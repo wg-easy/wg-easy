@@ -3,6 +3,7 @@
 const fs = require('fs').promises;
 const path = require('path');
 
+const uuid = require('uuid');
 const QRCode = require('qrcode');
 
 const Util = require('./Util');
@@ -28,9 +29,8 @@ module.exports = class WireGuard {
         } catch (err) {
           config = {
             server: {
-              // TODO: Generate new config
-              address: WG_DEFAULT_ADDRESS,
-              dns: WG_DEFAULT_DNS,
+              privateKey: await Util.exec('wg genkey'),
+              address: `${WG_DEFAULT_ADDRESS.replace('x', '1')}/24`,
             },
             clients: {},
           };
@@ -52,9 +52,8 @@ module.exports = class WireGuard {
 # Server
 [Interface]
 PrivateKey = ${config.server.privateKey}
-Address = ${config.server.address}
-ListenPort = ${config.server.port}
-DNS = ${config.server.dns}`;
+Address = ${config.server.address}/24
+ListenPort = 51820`;
 
     for (const [clientId, client] of Object.entries(config.clients)) {
       if (!client.enabled) continue;
@@ -65,7 +64,7 @@ DNS = ${config.server.dns}`;
 [Peer]
 PublicKey = ${client.publicKey}
 PresharedKey = ${client.preSharedKey}
-AllowedIPs = ${client.allowedIPs}`;
+AllowedIPs = ${client.address}/32`;
     }
 
     await fs.writeFile(path.join(WG_PATH, 'wg0.json'), JSON.stringify(config, false, 2));
@@ -78,6 +77,7 @@ AllowedIPs = ${client.allowedIPs}`;
       id: clientId,
       name: client.name,
       enabled: client.enabled,
+      address: client.address,
       publicKey: client.publicKey,
       createdAt: new Date(client.createdAt),
       updatedAt: new Date(client.updatedAt),
@@ -90,10 +90,8 @@ AllowedIPs = ${client.allowedIPs}`;
     }));
 
     // Loop WireGuard status
-    const clientsDump = await Util.exec('wg show wg0 dump');
-    // const clientsDump = `iOQJS7OUUGPYATsX6nqlL+sOODoiWiN5IOE8Msfw/0o=	BkdntwYazhYZzEEHhcYayq6TGw9/YUDQ251s+5bTgC0=	51820	off
-    // i8xWKqicnDkNL14I4B+I1zlB8od/booA1joIosWn7X4=	MzplKtOQ44/IaAKri2VKqCoIlg4XiVH7TCp5bcYRTQU=	172.17.0.1:60475	10.8.0.2/32	1621679257	7920	7440	off`;
-    clientsDump
+    const dump = await Util.exec('wg show wg0 dump');
+    dump
       .trim()
       .split('\n')
       .slice(1)
@@ -137,19 +135,18 @@ AllowedIPs = ${client.allowedIPs}`;
   }
 
   async getClientConfiguration({ clientId }) {
-    const config = await this.getConfig();
     const client = await this.getClient({ clientId });
 
     return `
 [Interface]
 PrivateKey = ${client.privateKey}
-Address = ${client.address}
-DNS = ${config.server.dns}
+Address = ${client.address}/24
+DNS = ${WG_DEFAULT_DNS}
 
 [Peer]
 PublicKey = ${client.publicKey}
 PresharedKey = ${client.preSharedKey}
-AllowedIPs = ${client.allowedIPs}
+AllowedIPs = 0.0.0.0/0, ::/0
 Endpoint = ${WG_HOST}:${WG_PORT}`;
   }
 
@@ -166,19 +163,45 @@ Endpoint = ${WG_HOST}:${WG_PORT}`;
       throw new Error('Missing: Name');
     }
 
-    // try {
-    //   await this.getClient({ name });
-    //   throw new Error(`Duplicate Client: ${name}`);
-    // } catch( err ) {
-    //   if( err.message.startsWith('Duplicate Client') ) {
-    //     throw err;
-    //   }
-    // }
+    const config = await this.getConfig();
 
-    // // TODO: This is unsafe
-    // await this.ssh.exec(`pivpn add -n ${name}`);
+    const privateKey = await Util.exec('wg genkey');
+    const publicKey = await Util.exec(`echo ${privateKey} | wg pubkey`);
+    const preSharedKey = await Util.exec('wg genpsk');
 
-    // return this.getClient({ name });
+    // Calculate next IP
+    let address;
+    for (let i = 2; i < 255; i++) {
+      const client = Object.values(config.clients).find(client => {
+        return client.address === WG_DEFAULT_ADDRESS.replace('x', i);
+      });
+
+      if (!client) {
+        address = WG_DEFAULT_ADDRESS.replace('x', i);
+        break;
+      }
+    }
+
+    if (!address) {
+      throw new Error('Maximum number of clients reached.');
+    }
+
+    // Create Client
+    const clientId = uuid.v4();
+    const client = {
+      name,
+      address,
+      privateKey,
+      publicKey,
+      preSharedKey,
+
+      createdAt: new Date(),
+      updatedAt: new Date(),
+
+      enabled: true,
+    };
+
+    config.clients[clientId] = client;
 
     await this.saveConfig();
   }
@@ -194,14 +217,18 @@ Endpoint = ${WG_HOST}:${WG_PORT}`;
 
   async enableClient({ clientId }) {
     const client = await this.getClient({ clientId });
+
     client.enabled = true;
+    client.updatedAt = new Date();
 
     await this.saveConfig();
   }
 
   async disableClient({ clientId }) {
     const client = await this.getClient({ clientId });
+
     client.enabled = false;
+    client.updatedAt = new Date();
 
     await this.saveConfig();
   }

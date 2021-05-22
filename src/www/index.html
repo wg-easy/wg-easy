@@ -3,7 +3,7 @@
 
 <head>
   <title>WireGuard</title>
-  <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
+  <link href="css/vendor/tailwind.min.css" rel="stylesheet">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/png" href="img/favicon.png">
   <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
@@ -61,7 +61,7 @@
             <div class="flex-grow">
               <div class="text-gray-700" :title="'Created at ' + dateTime(new Date(client.createdAt))">{{client.name}}
               </div>
-              <div v-if="client.allowedIPs" class="text-gray-300 text-xs">{{client.allowedIPs.split('/')[0]}}
+              <div class="text-gray-300 text-xs">{{client.address}}
                 <span v-if="client.transferTx" title="Download">
                   ·
                   <svg class="align-middle h-3 inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"

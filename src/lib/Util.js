@@ -1,8 +1,6 @@
 'use strict';
 
-const { rejects } = require('assert');
 const childProcess = require('child_process');
-const { resolve } = require('path');
 
 module.exports = class Util {
 

@@ -2,7 +2,7 @@
   "server": {
     "privateKey": "iOQJS7OUUGPYATsX6nqlL+sOODoiWiN5IOE8Msfw/0o=",
     "publicKey": "BkdntwYazhYZzEEHhcYayq6TGw9/YUDQ251s+5bTgC0=",
-    "address": "10.8.0.1/24",
+    "address": "10.8.0.1",
     "port": "51820",
     "dns": "1.1.1.1"
   },
@@ -14,8 +14,17 @@
       "privateKey": "sHUUDbaZBQshfOvvF8HeebhhXq3rDKWlW1Vm+6XMklU=",
       "publicKey": "i8xWKqicnDkNL14I4B+I1zlB8od/booA1joIosWn7X4=",
       "preSharedKey": "MzplKtOQ44/IaAKri2VKqCoIlg4XiVH7TCp5bcYRTQU=",
-      "address": "10.8.0.2/32",
-      "allowedIPs": "10.8.0.2/32",
+      "address": "10.8.0.2",
+      "enabled": true
+    },
+    "c3ff2018-b2a8-4276-a16e-788e9a7e1aa6": {
+      "name": "Test 2",
+      "address": "10.8.0.4",
+      "privateKey": "",
+      "publicKey": "",
+      "preSharedKey": "",
+      "createdAt": "2021-05-22T21:26:28.552Z",
+      "updatedAt": "2021-05-22T21:26:28.552Z",
       "enabled": true
     }
   }
