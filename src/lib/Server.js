@@ -15,7 +15,6 @@ const {
   PASSWORD,
 } = require('../config');
 
-WireGuard.getClients().then(console.log);
 module.exports = class Server {
 
   constructor() {

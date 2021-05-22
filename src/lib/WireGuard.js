@@ -90,9 +90,9 @@ AllowedIPs = ${client.allowedIPs}`;
     }));
 
     // Loop WireGuard status
-    // const clientsDump = await Util.exec('wg show wg0 dump');
-    const clientsDump = `iOQJS7OUUGPYATsX6nqlL+sOODoiWiN5IOE8Msfw/0o=	BkdntwYazhYZzEEHhcYayq6TGw9/YUDQ251s+5bTgC0=	51820	off
-i8xWKqicnDkNL14I4B+I1zlB8od/booA1joIosWn7X4=	MzplKtOQ44/IaAKri2VKqCoIlg4XiVH7TCp5bcYRTQU=	172.17.0.1:60475	10.8.0.2/32	1621679257	7920	7440	off`;
+    const clientsDump = await Util.exec('wg show wg0 dump');
+    // const clientsDump = `iOQJS7OUUGPYATsX6nqlL+sOODoiWiN5IOE8Msfw/0o=	BkdntwYazhYZzEEHhcYayq6TGw9/YUDQ251s+5bTgC0=	51820	off
+    // i8xWKqicnDkNL14I4B+I1zlB8od/booA1joIosWn7X4=	MzplKtOQ44/IaAKri2VKqCoIlg4XiVH7TCp5bcYRTQU=	172.17.0.1:60475	10.8.0.2/32	1621679257	7920	7440	off`;
     clientsDump
       .trim()
       .split('\n')
@@ -100,9 +100,9 @@ i8xWKqicnDkNL14I4B+I1zlB8od/booA1joIosWn7X4=	MzplKtOQ44/IaAKri2VKqCoIlg4XiVH7TCp
       .forEach(line => {
         const [
           publicKey,
-          preSharedKey,
+          preSharedKey, // eslint-disable-line no-unused-vars
           endpoint,
-          allowedIps,
+          allowedIps, // eslint-disable-line no-unused-vars
           latestHandshakeAt,
           transferRx,
           transferTx,
@@ -110,7 +110,6 @@ i8xWKqicnDkNL14I4B+I1zlB8od/booA1joIosWn7X4=	MzplKtOQ44/IaAKri2VKqCoIlg4XiVH7TCp
         ] = line.split('\t');
 
         const client = clients.find(client => client.publicKey === publicKey);
-        console.log({ publicKey, client });
         if (!client) return;
 
         client.endpoint = endpoint === '(none)'
@@ -123,8 +122,6 @@ i8xWKqicnDkNL14I4B+I1zlB8od/booA1joIosWn7X4=	MzplKtOQ44/IaAKri2VKqCoIlg4XiVH7TCp
         client.transferTx = Number(transferTx);
         client.persistentKeepalive = persistentKeepalive;
       });
-
-    console.log('clients', clients);
 
     return clients;
   }

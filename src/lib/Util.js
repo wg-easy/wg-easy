@@ -1,5 +1,9 @@
 'use strict';
 
+const { rejects } = require('assert');
+const childProcess = require('child_process');
+const { resolve } = require('path');
+
 module.exports = class Util {
 
   static requireSession(req, res, next) {
@@ -41,6 +45,19 @@ module.exports = class Util {
             });
         });
     };
+  }
+
+  static async exec(cmd) {
+    if (process.platform !== 'linux') {
+      return '';
+    }
+
+    return new Promise((resolve, reject) => {
+      childProcess.exec(cmd, (err, stdout) => {
+        if (err) return reject(err);
+        return resolve(stdout);
+      });
+    });
   }
 
 };
