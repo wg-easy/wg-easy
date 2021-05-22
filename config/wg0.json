@@ -1,0 +1,22 @@
+{
+  "server": {
+    "privateKey": "iOQJS7OUUGPYATsX6nqlL+sOODoiWiN5IOE8Msfw/0o=",
+    "publicKey": "BkdntwYazhYZzEEHhcYayq6TGw9/YUDQ251s+5bTgC0=",
+    "address": "10.8.0.1/24",
+    "port": "51820",
+    "dns": "1.1.1.1"
+  },
+  "clients": {
+    "af3111a4-7343-4380-a293-ed498d9aa3b8": {
+      "name": "Emile",
+      "createdAt": "2021-05-22T20:02:45.372Z",
+      "updatedAt": "2021-05-22T20:02:45.372Z",
+      "privateKey": "sHUUDbaZBQshfOvvF8HeebhhXq3rDKWlW1Vm+6XMklU=",
+      "publicKey": "i8xWKqicnDkNL14I4B+I1zlB8od/booA1joIosWn7X4=",
+      "preSharedKey": "MzplKtOQ44/IaAKri2VKqCoIlg4XiVH7TCp5bcYRTQU=",
+      "address": "10.8.0.2/32",
+      "allowedIPs": "10.8.0.2/32",
+      "enabled": true
+    }
+  }
+}

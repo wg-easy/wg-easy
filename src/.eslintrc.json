@@ -1,0 +1,7 @@
+{
+  "extends": "athom",
+  "rules": {
+    "consistent-return": "off",
+    "no-shadow": "off"
+  }
+}
