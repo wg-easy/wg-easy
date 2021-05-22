@@ -39,6 +39,8 @@ new Vue({
 
         return client;
       });
+
+      console.log(clients);
     },
     login(e) {
       e.preventDefault();

@@ -15,11 +15,13 @@ const {
   PASSWORD,
 } = require('../config');
 
+WireGuard.getClients().then(console.log);
 module.exports = class Server {
 
   constructor() {
     // Express
     this.app = express()
+      .disable('etag')
       .use('/', express.static(path.join(__dirname, '..', 'www')))
       .use(express.json())
       .use(expressSession({

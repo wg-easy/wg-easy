@@ -55,7 +55,14 @@ class API {
     return this.call({
       method: 'get',
       path: '/wireguard/client',
-    });
+    }).then(clients => clients.map(client => ({
+      ...client,
+      createdAt: new Date(client.createdAt),
+      updatedAt: new Date(client.updatedAt),
+      latestHandshakeAt: client.latestHandshakeAt !== null
+        ? new Date(client.latestHandshakeAt)
+        : null,
+    })));
   }
 
   async createClient({ name }) {

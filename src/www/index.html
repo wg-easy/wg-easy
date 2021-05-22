@@ -51,7 +51,8 @@
               </svg>
               <img v-if="client.avatar" :src="client.avatar" class="w-10 rounded-full absolute top-0 left-0" />
 
-              <div v-if="client.latestHandshake && ((new Date() - new Date(client.latestHandshake) < 1000 * 60 * 10))">
+              <div
+                v-if="client.latestHandshakeAt && ((new Date() - new Date(client.latestHandshakeAt) < 1000 * 60 * 10))">
                 <div class="animate-ping w-4 h-4 p-1 bg-green-100 rounded-full absolute -bottom-1 -right-1"></div>
                 <div class="w-2 h-2 bg-green-300 rounded-full absolute bottom-0 right-0"></div>
               </div>
@@ -60,8 +61,7 @@
             <div class="flex-grow">
               <div class="text-gray-700" :title="'Created at ' + dateTime(new Date(client.createdAt))">{{client.name}}
               </div>
-              <div v-if="client.allowedIps" class="text-gray-300 text-xs">{{client.iface}}
-                · {{client.allowedIps.split('/')[0]}}
+              <div v-if="client.allowedIPs" class="text-gray-300 text-xs">{{client.allowedIPs.split('/')[0]}}
                 <span v-if="client.transferTx" title="Download">
                   ·
                   <svg class="align-middle h-3 inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
@@ -82,9 +82,9 @@
                   </svg>
                   {{client.transferRx | bytes}}
                 </span>
-                <span v-if="client.latestHandshake"
-                  :title="'Last seen at ' + dateTime(new Date(client.latestHandshake))">
-                  · {{new Date(client.latestHandshake) | timeago}}
+                <span v-if="client.latestHandshakeAt"
+                  :title="'Last seen at ' + dateTime(new Date(client.latestHandshakeAt))">
+                  · {{new Date(client.latestHandshakeAt) | timeago}}
                 </span>
               </div>
             </div>
