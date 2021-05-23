@@ -44,7 +44,9 @@ module.exports = class Util {
     }
 
     return new Promise((resolve, reject) => {
-      childProcess.exec(cmd, (err, stdout) => {
+      childProcess.exec(cmd, {
+        shell: 'bash',
+      }, (err, stdout) => {
         if (err) return reject(err);
         return resolve(String(stdout).trim());
       });

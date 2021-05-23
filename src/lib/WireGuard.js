@@ -32,23 +32,25 @@ module.exports = class WireGuard {
         try {
           config = await fs.readFile(path.join(WG_PATH, 'wg0.json'), 'utf8');
           config = JSON.parse(config);
-          debug('Configuration loaded');
+          debug('Configuration loaded.');
         } catch (err) {
+          const privateKey = await Util.exec('wg genkey');
+          const publicKey = await Util.exec(`echo ${privateKey} | wg pubkey`);
+          const address = WG_DEFAULT_ADDRESS.replace('x', '1');
+
           config = {
             server: {
-              privateKey: await Util.exec('wg genkey'),
-              address: `${WG_DEFAULT_ADDRESS.replace('x', '1')}/24`,
+              privateKey,
+              publicKey,
+              address,
             },
             clients: {},
           };
-          debug('New configuration saved');
         }
 
         await this.__saveConfig(config);
-
-        debug('Starting...');
         await Util.exec('wg-quick up wg0');
-        debug('Started');
+        await this.__syncConfig();
 
         return config;
       });
@@ -60,6 +62,7 @@ module.exports = class WireGuard {
   async saveConfig() {
     const config = await this.getConfig();
     await this.__saveConfig(config);
+    await this.__syncConfig();
   }
 
   async __saveConfig(config) {
@@ -85,8 +88,16 @@ PresharedKey = ${client.preSharedKey}
 AllowedIPs = ${client.address}/32`;
     }
 
+    debug('Saving config...');
     await fs.writeFile(path.join(WG_PATH, 'wg0.json'), JSON.stringify(config, false, 2));
     await fs.writeFile(path.join(WG_PATH, 'wg0.conf'), result);
+    debug('Config saved.');
+  }
+
+  async __syncConfig() {
+    debug('Syncing config...');
+    await Util.exec('wg syncconf wg0 <(wg-quick strip wg0)');
+    debug('Config synced.');
   }
 
   async getClients() {
@@ -150,6 +161,7 @@ AllowedIPs = ${client.address}/32`;
   }
 
   async getClientConfiguration({ clientId }) {
+    const config = await this.getConfig();
     const client = await this.getClient({ clientId });
 
     return `
@@ -159,7 +171,7 @@ Address = ${client.address}/24
 DNS = ${WG_DEFAULT_DNS}
 
 [Peer]
-PublicKey = ${client.publicKey}
+PublicKey = ${config.server.publicKey}
 PresharedKey = ${client.preSharedKey}
 AllowedIPs = 0.0.0.0/0, ::/0
 Endpoint = ${WG_HOST}:${WG_PORT}`;
