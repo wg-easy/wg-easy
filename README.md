@@ -11,11 +11,11 @@ Make sure you have [Docker](https://docs.docker.com/get-docker/) installed.
 # Create a directory for the configuration files
 $ mkdir ~/.wg-easy
 $ cd ~/.wg-easy
-$ curl https://raw.githubusercontent.com/WeeJeWel/wg-easy/master/docker-compose.yml
-$ open docker-compose.yml
+$ wget https://raw.githubusercontent.com/WeeJeWel/wg-easy/master/docker-compose.yml
+$ vim docker-compose.yml
 ```
 
-Then change `WG_HOST=raspberrypi.local` to your server's public address, e.g. `WG_HOST=vpn.mydomain.com`.
+Change `WG_HOST=raspberrypi.local` to your server's public address, e.g. `WG_HOST=vpn.mydomain.com`.
 
 Optionally, set a Web UI password by uncommenting `PASSWORD=foobar123` and change the password.
 
