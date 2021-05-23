@@ -9,8 +9,8 @@ Make sure you have [Docker](https://docs.docker.com/get-docker/) installed.
 
 ```bash
 # Create a directory for the configuration files
-$ mkdir ~/wg-easy
-$ cd ~/wg-easy
+$ mkdir ~/.wg-easy
+$ cd ~/.wg-easy
 $ curl https://raw.githubusercontent.com/WeeJeWel/wg-easy/master/docker-compose.yml
 $ open docker-compose.yml
 ```
