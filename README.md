@@ -5,7 +5,7 @@
 ```bash
 $ docker run \
   --name wg-easy \
-  --mount type=bind,source=~/.wg-easy,target=/etc/wireguard \
+  --mount type=bind,source="$(pwd)",target=/etc/wireguard \
   --cap-add=NET_ADMIN \
   --cap-add=SYS_MODULE \
   --sysctl="net.ipv4.conf.all.src_valid_mark=1" \
