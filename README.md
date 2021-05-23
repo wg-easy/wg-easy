@@ -5,6 +5,7 @@
 ```bash
 $ docker run \
   --name wg-easy \
+  --env WG_HOST=192.168.1.2 \
   --mount type=bind,source="$(pwd)",target=/etc/wireguard \
   --cap-add=NET_ADMIN \
   --cap-add=SYS_MODULE \
