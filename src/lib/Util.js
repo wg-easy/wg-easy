@@ -5,6 +5,7 @@ const childProcess = require('child_process');
 module.exports = class Util {
 
   static promisify(fn) {
+    // eslint-disable-next-line func-names
     return function(req, res) {
       Promise.resolve().then(async () => fn(req, res))
         .then(result => {
@@ -39,6 +40,9 @@ module.exports = class Util {
   }
 
   static async exec(cmd) {
+    // eslint-disable-next-line no-console
+    console.log(`$ ${cmd}`);
+
     if (process.platform !== 'linux') {
       return '';
     }
