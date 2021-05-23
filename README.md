@@ -3,12 +3,21 @@
 ## Installation
 
 ### 1. Install Docker
-Make sure you have [Docker](https://docs.docker.com/get-docker/) installed.
 
-### 2. Configure
+If you haven't installed Docker yet, install it by running:
 
 ```bash
-# Create a directory for the configuration files
+$ curl -sSL https://get.docker.com | sh
+$ sudo sh get-docker.sh
+$ sudo usermod -aG docker $(whoami)
+$ bash
+```
+
+### 2. Configure WireGuard
+
+Run these commands to prepare and configure WireGuard.
+
+```bash
 $ mkdir ~/.wg-easy
 $ cd ~/.wg-easy
 $ wget https://raw.githubusercontent.com/WeeJeWel/wg-easy/master/docker-compose.yml
@@ -19,10 +28,12 @@ Change `WG_HOST=raspberrypi.local` to your server's public address, e.g. `WG_HOS
 
 Optionally, set a Web UI password by uncommenting `PASSWORD=foobar123` and change the password.
 
-### 3. Run
+### 3. Run WireGuard
+
+Finally, run WireGuard. It will automatically start after a reboot.
 
 ```bash
-$ docker compose up
+$ docker-compose up
 ```
 
 The Web UI will be available on `http://0.0.0.0:51821`. You can create new clients there.
