@@ -4,7 +4,7 @@
 
 You have found the easiest way to install & manage WireGuard on any Linux host!
 
-![](./assets/screenshot.png)
+![](./assets/screenshot.png =702x510)
 
 ## Features
 
