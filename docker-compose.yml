@@ -1,0 +1,26 @@
+version: "3.8"
+services:
+  wg-easy:
+    image: weejewel/wg-easy
+    container_name: wg-easy
+    volumes:
+      - .wg-easy:/etc/wireguard
+    ports:
+      - "51820:51820/udp"
+      - "51821:51821/tcp"
+    restart: unless-stopped
+    environment:
+      # ⚠️ Required:
+      # Change this to your host's public address
+      - WG_HOST=raspberrypi.local
+
+      # Optional:
+      # - PASSWORD=foobar123
+      # - WG_PORT=51820
+      # - WG_DEFAULT_ADDRESS=10.8.0.x
+      # - WG_DEFAULT_DNS=1.1.1.1
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
