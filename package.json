@@ -1,5 +1,14 @@
 {
+  "version": "0.1.0",
   "scripts": {
     "build": "docker build --tag wg-easy ."
+  },
+  "docker": {
+    "production": {
+      "tags": "latest"
+    },
+    "staging": {
+      "beta"
+    }
   }
 }
