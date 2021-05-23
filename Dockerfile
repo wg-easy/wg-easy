@@ -1,9 +1,9 @@
 FROM debian:bullseye
 
 # Install Linux packages
-RUN apt clean
-RUN apt update
-RUN apt install -y wireguard iproute2 openresolv curl
+RUN apt-get clean
+RUN apt-get update
+RUN apt-get install -y wireguard iproute2 openresolv curl
 
 # Install Node.js
 RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
