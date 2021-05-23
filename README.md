@@ -1,5 +1,22 @@
 # WireGuard Easy
 
+[![Build & Publish Docker Image to Docker Hub](https://github.com/WeeJeWel/wg-easy/actions/workflows/deploy.yml/badge.svg?branch=production)](https://github.com/WeeJeWel/wg-easy/actions/workflows/deploy.yml)
+
+You have found the easiest way to install & manage WireGuard on any Linux host!
+
+![](./assets/screenshot.png)
+
+## Features
+
+* All-in-one: WireGuard + Web UI
+* A beautiful management Web UI
+* Easy installation
+* List, create, delete, enable & disable clients
+* Show a client's QR code
+* Download a client's configuration file
+* Statistics for which clients are connected
+* Gravatar support 😏
+
 ## Installation
 
 ### 1. Install Docker

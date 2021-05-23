@@ -14,16 +14,20 @@
 <body class="bg-gray-50">
   <div id="app" class="container mx-auto">
     <div v-if="authenticated === true">
-      <h1 class="text-4xl font-medium mt-10 mb-2">WireGuard</h1>
-      <h2 class="text-sm text-gray-400 mb-10"><span v-if="requiresPassword" class="cursor-pointer hover:underline"
-          @click="logout">
-          Logout
-          <svg class="h-3 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-            stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-          </svg>
-        </span></h2>
+      <span v-if="requiresPassword"
+        class="text-sm text-gray-400 mb-10 mr-2 mt-3 cursor-pointer hover:underline float-right" @click="logout">
+        Logout
+        <svg class="h-3 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+        </svg>
+      </span>
+      <h1 class="text-4xl font-medium mt-10 mb-2">
+        <img src="./img/logo.png" width="32" class="inline align-middle" />
+        <span class="align-middle">WireGuard</span>
+      </h1>
+      <h2 class="text-sm text-gray-400 mb-10"></h2>
 
       <div class="shadow-md rounded-lg bg-white overflow-hidden">
         <div class="flex flex-row flex-auto items-center p-3 px-5 border border-b-2 border-gray-100">
@@ -32,7 +36,7 @@
           </div>
           <div class="flex-shrink-0">
             <button @click="clientCreate = true; clientCreateName = '';"
-              class="hover:bg-green-400 hover:border-green-400 hover:text-white text-gray-700 border-2 border-gray-100 py-2 px-4 rounded inline-flex items-center transition">
+              class="hover:bg-red-800 hover:border-red-800 hover:text-white text-gray-700 border-2 border-gray-100 py-2 px-4 rounded inline-flex items-center transition">
               <svg class="w-4 mr-2" inline xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                 stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -54,8 +58,8 @@
 
               <div
                 v-if="client.latestHandshakeAt && ((new Date() - new Date(client.latestHandshakeAt) < 1000 * 60 * 10))">
-                <div class="animate-ping w-4 h-4 p-1 bg-green-100 rounded-full absolute -bottom-1 -right-1"></div>
-                <div class="w-2 h-2 bg-green-300 rounded-full absolute bottom-0 right-0"></div>
+                <div class="animate-ping w-4 h-4 p-1 bg-red-100 rounded-full absolute -bottom-1 -right-1"></div>
+                <div class="w-2 h-2 bg-red-800 rounded-full absolute bottom-0 right-0"></div>
               </div>
             </div>
 
@@ -95,7 +99,7 @@
 
                 <!-- Enable/Disable -->
                 <div @click="disableClient(client)" v-if="client.enabled === true"
-                  class="inline-block align-middle rounded-full w-10 h-6 mr-1 bg-green-400 cursor-pointer hover:bg-green-500 transition-all">
+                  class="inline-block align-middle rounded-full w-10 h-6 mr-1 bg-red-800 cursor-pointer hover:bg-red-700 transition-all">
                   <div class="rounded-full w-4 h-4 m-1 ml-5 bg-white"></div>
                 </div>
                 <div @click="enableClient(client)" v-if="client.enabled === false"
@@ -104,7 +108,7 @@
                 </div>
 
                 <!-- Show QR-->
-                <button class="align-middle bg-gray-100 hover:bg-blue-400 hover:text-white p-2 rounded transition"
+                <button class="align-middle bg-gray-100 hover:bg-red-800 hover:text-white p-2 rounded transition"
                   title="Show QR Code" @click="qrcode = `/api/wireguard/client/${client.id}/qrcode.svg`">
                   <svg class="w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">
@@ -115,7 +119,7 @@
 
                 <!-- Download Config -->
                 <a :href="'/api/wireguard/client/' + client.id + '/configuration'" download
-                  class="align-middle inline-block bg-gray-100 hover:bg-blue-400 hover:text-white p-2 rounded transition"
+                  class="align-middle inline-block bg-gray-100 hover:bg-red-800 hover:text-white p-2 rounded transition"
                   title="Download Configuration">
                   <svg class="w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">
@@ -125,7 +129,7 @@
                 </a>
 
                 <!-- Delete -->
-                <button class="align-middle bg-gray-100 hover:bg-red-400 hover:text-white p-2 rounded transition"
+                <button class="align-middle bg-gray-100 hover:bg-red-800 hover:text-white p-2 rounded transition"
                   title="Delete Client" @click="clientDelete = client">
                   <svg class="w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd"
@@ -140,7 +144,7 @@
           <div v-if="clients && clients.length === 0">
             <p class="text-center m-10 text-gray-400 text-sm">There are no clients yet.<br /><br />
               <button @click="clientCreate = true; clientCreateName = '';"
-                class="bg-green-400 text-white hover:bg-green-500 border-2 border-none py-2 px-4 rounded inline-flex items-center transition">
+                class="bg-red-800 text-white hover:bg-red-700 border-2 border-none py-2 px-4 rounded inline-flex items-center transition">
                 <svg class="w-4 mr-2" inline xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                   stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -211,8 +215,8 @@
             <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
               <div class="sm:flex sm:items-start">
                 <div
-                  class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
-                  <svg class="h-6 w-6 text-green-600" inline xmlns="http://www.w3.org/2000/svg" fill="none"
+                  class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-800 sm:mx-0 sm:h-10 sm:w-10">
+                  <svg class="h-6 w-6 text-white" inline xmlns="http://www.w3.org/2000/svg" fill="none"
                     viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -224,7 +228,7 @@
                   </h3>
                   <div class="mt-2">
                     <p class="text-sm text-gray-500">
-                      <input class="rounded p-2 border-2 border-gray-100 focus:border-green-200 outline-none w-full"
+                      <input class="rounded p-2 border-2 border-gray-100 focus:border-gray-200 outline-none w-full"
                         type="text" v-model.trim="clientCreateName" placeholder="Name" />
                     </p>
                   </div>
@@ -233,7 +237,7 @@
             </div>
             <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
               <button v-if="clientCreateName.length" type="button" @click="createClient(); clientCreate = null"
-                class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-400 text-base font-medium text-white hover:bg-green-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm">
+                class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-800 text-base font-medium text-white hover:bg-red-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
                 Create
               </button>
               <button v-else type="button"
@@ -241,7 +245,7 @@
                 Create
               </button>
               <button type="button" @click="clientCreate = null"
-                class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
                 Cancel
               </button>
             </div>
@@ -325,18 +329,18 @@
 
       <form @submit="login" class="shadow rounded-md bg-white mx-auto w-64 p-5 overflow-hidden mt-10">
         <!-- Avatar -->
-        <div class="h-20 w-20 mb-10 mt-5 mx-auto rounded-full bg-gray-100 relative overflow-hidden">
-          <svg class="w-10 h-10 m-5 text-gray-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+        <div class="h-20 w-20 mb-10 mt-5 mx-auto rounded-full bg-red-800 relative overflow-hidden">
+          <svg class="w-10 h-10 m-5 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
             fill="currentColor">
             <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
           </svg>
         </div>
 
-        <input type="password" name="password" placeholder="password" v-model="password"
-          class="px-2 py-1 text-sm text-gray-500 mb-5 border-2 border-gray-100 rounded-lg w-full focus:border-green-400 outline-none" />
+        <input type="password" name="password" placeholder="Password" v-model="password"
+          class="px-3 py-2 text-sm text-gray-500 mb-5 border-2 border-gray-100 rounded-lg w-full focus:border-red-800 outline-none" />
 
         <button v-if="authenticating"
-          class="bg-green-400 w-full rounded shadow py-2 text-sm text-white cursor-not-allowed">
+          class="bg-red-800 w-full rounded shadow py-2 text-sm text-white cursor-not-allowed">
           <svg class="w-5 animate-spin mx-auto" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
             fill="currentColor">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -346,7 +350,7 @@
           </svg>
         </button>
         <input v-if="!authenticating && password" type="submit"
-          class="bg-green-400 w-full rounded shadow py-2 text-sm text-white hover:bg-green-500 transition cursor-pointer"
+          class="bg-red-800 w-full rounded shadow py-2 text-sm text-white hover:bg-red-700 transition cursor-pointer"
           value="Sign In">
         <input v-if="!authenticating && !password" type="submit"
           class="bg-gray-200 w-full rounded shadow py-2 text-sm text-white cursor-not-allowed" value="Sign In">
