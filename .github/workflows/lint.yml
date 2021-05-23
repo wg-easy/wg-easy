@@ -18,6 +18,6 @@ jobs:
           node-version: '14'
 
       - run: |
-        cd src
-        npm ci
-        npm run lint
+          cd src
+          npm ci
+          npm run lint
