@@ -22,6 +22,10 @@ module.exports = class WireGuard {
   async getConfig() {
     if (!this.__configPromise) {
       this.__configPromise = Promise.resolve().then(async () => {
+        if (!WG_HOST) {
+          throw new Error('WG_HOST Environment Variable Not Set!');
+        }
+
         let config;
         try {
           config = await fs.readFile(path.join(WG_PATH, 'wg0.json'), 'utf8');

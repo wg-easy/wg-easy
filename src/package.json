@@ -4,7 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "serve": "DEBUG=Server WG_PATH=../config/ nodemon server.js",
+    "serve": "DEBUG=Server WG_HOST=0.0.0.0 WG_PATH=../config/ nodemon server.js",
     "serve-with-password": "PASSWORD=wg npm run serve"
   },
   "author": "Emile Nijssen",

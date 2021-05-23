@@ -26,6 +26,16 @@
       "createdAt": "2021-05-22T21:41:49.876Z",
       "updatedAt": "2021-05-23T10:04:29.051Z",
       "enabled": true
+    },
+    "f1d0280c-07e7-4927-94dd-000a1723872f": {
+      "name": "Test 3",
+      "address": "10.8.0.4",
+      "privateKey": "",
+      "publicKey": "",
+      "preSharedKey": "",
+      "createdAt": "2021-05-23T10:21:24.607Z",
+      "updatedAt": "2021-05-23T10:21:24.607Z",
+      "enabled": true
     }
   }
 }
