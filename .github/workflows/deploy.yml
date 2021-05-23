@@ -45,4 +45,4 @@ jobs:
         push: true
         build-args: SSH_KEY=${{ secrets.SSH_KEY_BASE64 }}
         platforms: linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8
-        tags: weejewel/pivpn-web:v${{ env.VERSION }}, weejewel/pivpn-web:${{ env.DOCKER_TAGS }}
+        tags: weejewel/wg-easy:v${{ env.VERSION }}, weejewel/wg-easy:${{ env.DOCKER_TAGS }}
