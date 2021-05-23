@@ -1,4 +1,4 @@
-FROM node:16-alpine
+FROM node:14-alpine
 
 # Install Linux packages
 RUN apk add -U wireguard-tools
