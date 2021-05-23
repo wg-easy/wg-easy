@@ -1,6 +1,9 @@
 # WireGuard Easy
 
 [![Build & Publish Docker Image to Docker Hub](https://github.com/WeeJeWel/wg-easy/actions/workflows/deploy.yml/badge.svg?branch=production)](https://github.com/WeeJeWel/wg-easy/actions/workflows/deploy.yml)
+[![Docker](https://img.shields.io/docker/v/weejewel/wg-easy/latest)](https://hub.docker.com/r/weejewel/wg-easy)
+[![Docker](https://img.shields.io/docker/pulls/weejewel/wg-easy.svg)](https://hub.docker.com/r/weejewel/wg-easy)
+[![Sponsor](https://img.shields.io/github/sponsors/weejewel)](https://github.com/sponsors/WeeJeWel)
 
 You have found the easiest way to install & manage WireGuard on any Linux host!
 
@@ -51,7 +54,7 @@ Optionally, set a Web UI password by uncommenting `PASSWORD=foobar123` and chang
 Finally, run WireGuard. It will automatically start after a reboot.
 
 ```bash
-$ docker-compose up
+$ docker-compose up --detach
 ```
 
 The Web UI will be available on `http://0.0.0.0:51821`. You can create new clients there.
