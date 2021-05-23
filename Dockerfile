@@ -1,6 +1,7 @@
 FROM debian:bullseye
 
 # Install Linux packages
+RUN apt clean
 RUN apt update
 RUN apt install -y wireguard iproute2 openresolv curl
 
