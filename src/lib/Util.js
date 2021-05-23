@@ -25,6 +25,9 @@ module.exports = class Util {
             error = new Error(error);
           }
 
+          // eslint-disable-next-line no-console
+          console.error(error);
+
           return res
             .status(error.statusCode || 500)
             .json({

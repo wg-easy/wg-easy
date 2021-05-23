@@ -129,6 +129,7 @@ new Vue({
     this.api.getSession()
       .then(session => {
         this.authenticated = session.authenticated;
+        this.requiresPassword = session.requiresPassword;
         this.refresh().catch(err => {
           alert(err.message || err.toString());
         });
