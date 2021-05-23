@@ -11,6 +11,7 @@ new Vue({
     authenticated: null,
     authenticating: false,
     password: null,
+    requiresPassword: null,
 
     clients: null,
     clientDelete: null,
@@ -55,6 +56,7 @@ new Vue({
         .then(async () => {
           const session = await this.api.getSession();
           this.authenticated = session.authenticated;
+          this.requiresPassword = session.requiresPassword;
           return this.refresh();
         })
         .catch(err => {

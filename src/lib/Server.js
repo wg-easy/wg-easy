@@ -31,8 +31,14 @@ module.exports = class Server {
 
       // Authentication
       .get('/api/session', Util.promisify(async req => {
+        const requiresPassword = !!process.env.PASSWORD;
+        const authenticated = requiresPassword
+          ? !!(req.session && req.session.authenticated)
+          : true;
+
         return {
-          authenticated: !!(req.session && req.session.authenticated),
+          requiresPassword,
+          authenticated,
         };
       }))
       .post('/api/session', Util.promisify(async req => {
@@ -55,7 +61,19 @@ module.exports = class Server {
       }))
 
       // WireGuard
-      .use(Util.requireSession)
+      .use((req, res, next) => {
+        if (!PASSWORD) {
+          return next();
+        }
+
+        if (req.session && req.session.authenticated) {
+          return next();
+        }
+
+        return res.status(401).json({
+          error: 'Not Logged In',
+        });
+      })
       .delete('/api/session', Util.promisify(async req => {
         const sessionId = req.session.id;
 

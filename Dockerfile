@@ -8,6 +8,12 @@ RUN apt install -y wireguard iproute2 openresolv curl
 RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
 RUN apt-get install -y nodejs
 
-# RUN wg-quick up wg0
-EXPOSE 51820
-ENTRYPOINT ["tail", "-f", "/dev/null"]
+COPY src/ /app/
+WORKDIR /app
+RUN npm ci --production
+
+
+EXPOSE 51820/udp
+EXPOSE 80/tcp
+ENV DEBUG=Server,WireGuard
+CMD ["node", "server.js"]

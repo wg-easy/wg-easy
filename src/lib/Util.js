@@ -4,16 +4,6 @@ const childProcess = require('child_process');
 
 module.exports = class Util {
 
-  static requireSession(req, res, next) {
-    if (req.session && req.session.authenticated) {
-      return next();
-    }
-
-    return res.status(401).json({
-      error: 'Not Logged In',
-    });
-  }
-
   static promisify(fn) {
     return function(req, res) {
       Promise.resolve().then(async () => fn(req, res))
@@ -53,7 +43,7 @@ module.exports = class Util {
     return new Promise((resolve, reject) => {
       childProcess.exec(cmd, (err, stdout) => {
         if (err) return reject(err);
-        return resolve(stdout);
+        return resolve(String(stdout).trim());
       });
     });
   }

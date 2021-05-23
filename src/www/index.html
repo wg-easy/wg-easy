@@ -15,7 +15,8 @@
   <div id="app" class="container mx-auto">
     <div v-if="authenticated === true">
       <h1 class="text-4xl font-medium mt-10 mb-2">WireGuard</h1>
-      <h2 class="text-sm text-gray-400 mb-10"><span class="cursor-pointer hover:underline" @click="logout">
+      <h2 class="text-sm text-gray-400 mb-10"><span v-if="requiresPassword" class="cursor-pointer hover:underline"
+          @click="logout">
           Logout
           <svg class="h-3 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
             stroke="currentColor">

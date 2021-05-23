@@ -17,14 +17,14 @@
       "address": "10.8.0.2",
       "enabled": true
     },
-    "c3ff2018-b2a8-4276-a16e-788e9a7e1aa6": {
-      "name": "Test 2",
-      "address": "10.8.0.4",
-      "privateKey": "",
-      "publicKey": "",
-      "preSharedKey": "",
-      "createdAt": "2021-05-22T21:26:28.552Z",
-      "updatedAt": "2021-05-22T21:26:28.552Z",
+    "2ca33a1c-ed49-4bdd-b84c-adc77f1f3b2d": {
+      "name": "Test",
+      "address": "10.8.0.3",
+      "privateKey": "AJVOxJxEnbWyrj7SbhJxxiIIgBsRljs1fP2xrN76Kns=",
+      "publicKey": "563oiA0IuQqt8JPEXHGINT4mHYKzlLx9Ol2gcV1vKCk=",
+      "preSharedKey": "Q6xGB4og5Sj6M0MsHzkD16VsniT3FCqOnGmiLLilsU8=",
+      "createdAt": "2021-05-22T21:41:49.876Z",
+      "updatedAt": "2021-05-22T21:41:49.876Z",
       "enabled": true
     }
   }

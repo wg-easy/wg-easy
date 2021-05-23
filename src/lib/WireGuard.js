@@ -34,7 +34,10 @@ module.exports = class WireGuard {
             },
             clients: {},
           };
+          await this.saveConfig();
         }
+
+        await Util.exec('wg-quick up wg0');
 
         return config;
       });
@@ -99,7 +102,7 @@ AllowedIPs = ${client.address}/32`;
         const [
           publicKey,
           preSharedKey, // eslint-disable-line no-unused-vars
-          endpoint,
+          endpoint, // eslint-disable-line no-unused-vars
           allowedIps, // eslint-disable-line no-unused-vars
           latestHandshakeAt,
           transferRx,
@@ -110,9 +113,6 @@ AllowedIPs = ${client.address}/32`;
         const client = clients.find(client => client.publicKey === publicKey);
         if (!client) return;
 
-        client.endpoint = endpoint === '(none)'
-          ? null
-          : endpoint;
         client.latestHandshakeAt = latestHandshakeAt === '0'
           ? null
           : new Date(Number(`${latestHandshakeAt}000`));
