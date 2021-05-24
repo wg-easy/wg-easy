@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "serve": "DEBUG=Server,WireGuard WG_HOST=0.0.0.0 WG_PATH=../config/ nodemon server.js",
-    "serve-with-password": "PASSWORD=wg npm run serve"
+    "serve-with-password": "PASSWORD=wg npm run serve",
+    "lint": "eslint ."
   },
   "author": "Emile Nijssen",
   "license": "GPL",

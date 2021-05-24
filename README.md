@@ -1,23 +1,26 @@
 # WireGuard Easy
 
 [![Build & Publish Docker Image to Docker Hub](https://github.com/WeeJeWel/wg-easy/actions/workflows/deploy.yml/badge.svg?branch=production)](https://github.com/WeeJeWel/wg-easy/actions/workflows/deploy.yml)
+[![Lint](https://github.com/WeeJeWel/wg-easy/actions/workflows/lint.yml/badge.svg?branch=master)](https://github.com/WeeJeWel/wg-easy/actions/workflows/lint.yml)
+[![Docker](https://img.shields.io/docker/v/weejewel/wg-easy/latest)](https://hub.docker.com/r/weejewel/wg-easy)
+[![Docker](https://img.shields.io/docker/pulls/weejewel/wg-easy.svg)](https://hub.docker.com/r/weejewel/wg-easy)
+[![Sponsor](https://img.shields.io/github/sponsors/weejewel)](https://github.com/sponsors/WeeJeWel)
 
 You have found the easiest way to install & manage WireGuard on any Linux host!
 
 <p align="center">
-  <img src="./assets/screenshot.png" width="702" height="510" />
+  <img src="./assets/screenshot.png" width="702" />
 </p>
 
 ## Features
 
-* All-in-one: WireGuard + Web UI
-* A beautiful management Web UI
-* Easy installation
-* List, create, delete, enable & disable clients
-* Show a client's QR code
-* Download a client's configuration file
-* Statistics for which clients are connected
-* Gravatar support 😏
+* All-in-one: WireGuard + Web UI.
+* Easy installation, simple to use.
+* List, create, delete, enable & disable clients.
+* Show a client's QR code.
+* Download a client's configuration file.
+* Statistics for which clients are connected.
+* Gravatar support.
 
 ## Installation
 
@@ -52,7 +55,7 @@ Optionally, set a Web UI password by uncommenting `PASSWORD=foobar123` and chang
 Finally, run WireGuard. It will automatically start after a reboot.
 
 ```bash
-$ docker-compose up
+$ docker-compose up --detach
 ```
 
 The Web UI will be available on `http://0.0.0.0:51821`. You can create new clients there.
