@@ -50,6 +50,8 @@ Change `WG_HOST=raspberrypi.local` to your server's public address, e.g. `WG_HOS
 
 Optionally, set a Web UI password by uncommenting `PASSWORD=foobar123` and change the password.
 
+> By default, any WireGuard client will have access to the Web UI, unless you set a password.
+
 ### 3. Run WireGuard
 
 Finally, run WireGuard. It will automatically start after a reboot.
