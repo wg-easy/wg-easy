@@ -10,7 +10,7 @@ RUN npm ci --production
 
 # Expose Ports
 EXPOSE 51820/udp
-EXPOSE 80/tcp
+EXPOSE 51821/tcp
 
 # Set Environment
 ENV DEBUG=Server,WireGuard
