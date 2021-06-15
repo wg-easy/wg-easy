@@ -73,5 +73,6 @@ These options can be configured in `docker-compose.yml` under `environment`.
 | `WG_PORT` | `51820` | `51820` | The public UDP port of your VPN server |
 | `WG_DEFAULT_ADDRESS` | `10.8.0.x` | `10.6.0.x` | Clients IP address range |
 | `WG_DEFAULT_DNS` | `1.1.1.1` | `8.8.8.8, 8.8.4.4` | DNS server clients will use |
+| `WG_ALLOWED_IPS` | `0.0.0.0/0, ::/0` | `192.168.15.0/24, 10.0.1.0/24` | Allowed IPs clients will use |
 
 > If you change `WG_PORT`, make sure to also change the exposed port.
