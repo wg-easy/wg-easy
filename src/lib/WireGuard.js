@@ -16,6 +16,7 @@ const {
   WG_PORT,
   WG_DEFAULT_DNS,
   WG_DEFAULT_ADDRESS,
+  WG_ALLOWED_IPS,
 } = require('../config');
 
 module.exports = class WireGuard {
@@ -178,7 +179,7 @@ DNS = ${WG_DEFAULT_DNS}
 [Peer]
 PublicKey = ${config.server.publicKey}
 PresharedKey = ${client.preSharedKey}
-AllowedIPs = 0.0.0.0/0, ::/0
+AllowedIPs = ${WG_ALLOWED_IPS}
 Endpoint = ${WG_HOST}:${WG_PORT}`;
   }
 
