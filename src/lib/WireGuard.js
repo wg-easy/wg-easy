@@ -191,7 +191,7 @@ Endpoint = ${WG_HOST}:${WG_PORT}`;
     });
   }
 
-  async createClient({ name }) {
+  async createClient({ name, number }) {
     if (!name) {
       throw new Error('Missing: Name');
     }
@@ -206,20 +206,20 @@ Endpoint = ${WG_HOST}:${WG_PORT}`;
     let address;
     if (!number) {
       // Calculate next IP
-    for (let i = 2; i < 255; i++) {
-      const client = Object.values(config.clients).find(client => {
+      for (let i = 2; i < 255; i++) {
+        const client = Object.values(config.clients).find(client => {
           return client.address === WG_DEFAULT_ADDRESS.replace('x', i.toString());
-      });
+        });
 
-      if (!client) {
+        if (!client) {
           address = WG_DEFAULT_ADDRESS.replace('x', i.toString());
-        break;
+          break;
+        }
       }
-    }
 
-    if (!address) {
-      throw new Error('Maximum number of clients reached.');
-    }
+      if (!address) {
+        throw new Error('Maximum number of clients reached.');
+      }
     } else {
       // Search & use selected number for IP
       const client = Object.values(config.clients).find(client => {
