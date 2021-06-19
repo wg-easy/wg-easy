@@ -202,21 +202,34 @@ Endpoint = ${WG_HOST}:${WG_PORT}`;
     const publicKey = await Util.exec(`echo ${privateKey} | wg pubkey`);
     const preSharedKey = await Util.exec('wg genpsk');
 
-    // Calculate next IP
+    // IP address operations
     let address;
+    if (!number) {
+      // Calculate next IP
     for (let i = 2; i < 255; i++) {
       const client = Object.values(config.clients).find(client => {
-        return client.address === WG_DEFAULT_ADDRESS.replace('x', i);
+          return client.address === WG_DEFAULT_ADDRESS.replace('x', i.toString());
       });
 
       if (!client) {
-        address = WG_DEFAULT_ADDRESS.replace('x', i);
+          address = WG_DEFAULT_ADDRESS.replace('x', i.toString());
         break;
       }
     }
 
     if (!address) {
       throw new Error('Maximum number of clients reached.');
+    }
+    } else {
+      // Search & use selected number for IP
+      const client = Object.values(config.clients).find(client => {
+        return client.address === WG_DEFAULT_ADDRESS.replace('x', number);
+      });
+
+      if (client) {
+        throw new Error('Number in use, please select another or leave empty.');
+      }
+      address = WG_DEFAULT_ADDRESS.replace('x', number);
     }
 
     // Create Client

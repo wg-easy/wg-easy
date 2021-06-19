@@ -17,6 +17,7 @@ new Vue({
     clientDelete: null,
     clientCreate: null,
     clientCreateName: '',
+    clientCreateNumber: '',
     qrcode: null,
   },
   methods: {
@@ -80,9 +81,10 @@ new Vue({
     },
     createClient() {
       const name = this.clientCreateName;
+      const number = this.clientCreateNumber;
       if (!name) return;
 
-      this.api.createClient({ name })
+      this.api.createClient({ name, number })
         .catch(err => alert(err.message || err.toString()))
         .finally(() => this.refresh().catch(console.error));
     },
