@@ -34,6 +34,12 @@ new Vue({
       if (!this.authenticated) return;
 
       const clients = await this.api.getClients();
+
+      // Sort clients by last IP number
+      clients.sort((clientA, clientB) => {
+        return +clientA.address.split('.').pop() - +clientB.address.split('.').pop();
+      });
+
       this.clients = clients.map(client => {
         if (client.name.includes('@') && client.name.includes('.')) {
           client.avatar = `https://www.gravatar.com/avatar/${md5(client.name)}?d=blank`;
