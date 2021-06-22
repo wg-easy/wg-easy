@@ -15,6 +15,9 @@ new Vue({
 
     clients: null,
     clientDelete: null,
+    clientEdit: null,
+    clientEditName: '',
+    clientEditNumber: '',
     clientCreate: null,
     clientCreateName: '',
     clientCreateNumber: '',
@@ -91,6 +94,15 @@ new Vue({
       if (!name) return;
 
       this.api.createClient({ name, number })
+        .catch(err => alert(err.message || err.toString()))
+        .finally(() => this.refresh().catch(console.error));
+    },
+    updateClient(client) {
+      const name = this.clientEditName;
+      const number = this.clientEditNumber;
+      if (!name) return;
+
+      this.api.updateClient({ clientId: client.id, name, number })
         .catch(err => alert(err.message || err.toString()))
         .finally(() => this.refresh().catch(console.error));
     },

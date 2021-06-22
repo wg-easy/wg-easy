@@ -73,6 +73,14 @@ class API {
     });
   }
 
+  async updateClient({ clientId, name, number }) {
+    return this.call({
+      method: 'post',
+      path: `/wireguard/client/${clientId}/update`,
+      body: { name, number },
+    });
+  }
+
   async deleteClient({ clientId }) {
     return this.call({
       method: 'delete',

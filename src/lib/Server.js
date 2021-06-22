@@ -102,6 +102,11 @@ module.exports = class Server {
         const { name, number } = req.body;
         return WireGuard.createClient({ name, number });
       }))
+      .post('/api/wireguard/client/:clientId/update', Util.promisify(async req => {
+        const { clientId } = req.params;
+        const { name, number } = req.body;
+        return WireGuard.updateClient({ clientId, name, number });
+      }))
       .delete('/api/wireguard/client/:clientId', Util.promisify(async req => {
         const { clientId } = req.params;
         return WireGuard.deleteClient({ clientId });

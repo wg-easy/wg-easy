@@ -65,6 +65,39 @@ module.exports = class WireGuard {
     return this.__configPromise;
   }
 
+  __composeIP(clientId, number, config) {
+    let address;
+    if (!number) {
+      // Calculate next unused IP
+      for (let i = 2; i < 255; i++) {
+        const client = Object.values(config.clients).find((client, j) => {
+          return client.address === WG_DEFAULT_ADDRESS.replace('x', i.toString()) && Object.keys(config.clients)[j] !== clientId;
+        });
+
+        if (!client) {
+          address = WG_DEFAULT_ADDRESS.replace('x', i.toString());
+          break;
+        }
+      }
+
+      if (!address) {
+        throw new Error('Maximum number of clients reached.');
+      }
+    } else {
+      // Search selected number for IP
+      const client = Object.values(config.clients).find((client, j) => {
+        return client.address === WG_DEFAULT_ADDRESS.replace('x', number.toString()) && Object.keys(config.clients)[j] !== clientId;
+      });
+
+      if (client) {
+        throw new Error('Number in use, please select another or leave empty.');
+      }
+      return WG_DEFAULT_ADDRESS.replace('x', number);
+    }
+
+    return address;
+  }
+
   async saveConfig() {
     const config = await this.getConfig();
     await this.__saveConfig(config);
@@ -202,39 +235,11 @@ Endpoint = ${WG_HOST}:${WG_PORT}`;
     const publicKey = await Util.exec(`echo ${privateKey} | wg pubkey`);
     const preSharedKey = await Util.exec('wg genpsk');
 
-    // IP address operations
-    let address;
-    if (!number) {
-      // Calculate next IP
-      for (let i = 2; i < 255; i++) {
-        const client = Object.values(config.clients).find(client => {
-          return client.address === WG_DEFAULT_ADDRESS.replace('x', i.toString());
-        });
-
-        if (!client) {
-          address = WG_DEFAULT_ADDRESS.replace('x', i.toString());
-          break;
-        }
-      }
-
-      if (!address) {
-        throw new Error('Maximum number of clients reached.');
-      }
-    } else {
-      // Search & use selected number for IP
-      const client = Object.values(config.clients).find(client => {
-        return client.address === WG_DEFAULT_ADDRESS.replace('x', number);
-      });
-
-      if (client) {
-        throw new Error('Number in use, please select another or leave empty.');
-      }
-      address = WG_DEFAULT_ADDRESS.replace('x', number);
-    }
 
     // Create Client
     const clientId = uuid.v4();
-    const client = {
+    const address = this.__composeIP(clientId, number, config);
+    config.clients[clientId] = {
       name,
       address,
       privateKey,
@@ -247,7 +252,22 @@ Endpoint = ${WG_HOST}:${WG_PORT}`;
       enabled: true,
     };
 
-    config.clients[clientId] = client;
+    await this.saveConfig();
+  }
+
+  async updateClient({ clientId, name, number }) {
+    if (!name) {
+      throw new Error('Missing: Name');
+    }
+
+    const config = await this.getConfig();
+    const client = config.clients[clientId];
+    if (!client) {
+      throw new ServerError(`Client Not Found: ${clientId}`, 404);
+    }
+    client.name = name;
+    client.address = this.__composeIP(clientId, number, config);
+    client.updatedAt = new Date();
 
     await this.saveConfig();
   }
