@@ -235,7 +235,6 @@ Endpoint = ${WG_HOST}:${WG_PORT}`;
     const publicKey = await Util.exec(`echo ${privateKey} | wg pubkey`);
     const preSharedKey = await Util.exec('wg genpsk');
 
-
     // Create Client
     const clientId = uuid.v4();
     const address = this.__composeIP(clientId, number, config);
