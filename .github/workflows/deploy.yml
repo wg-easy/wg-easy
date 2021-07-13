@@ -19,6 +19,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+      with:
+        - ref: production
     
     - uses: benjlevesque/short-sha@v1.2
 
