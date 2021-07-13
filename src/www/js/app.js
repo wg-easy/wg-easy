@@ -17,7 +17,14 @@ new Vue({
     clientDelete: null,
     clientCreate: null,
     clientCreateName: '',
+    clientEditName: null,
+    clientEditNameId: null,
+    clientEditAddress: null,
+    clientEditAddressId: null,
     qrcode: null,
+
+    currentRelease: null,
+    latestRelease: null,
   },
   methods: {
     dateTime: value => {
@@ -101,6 +108,16 @@ new Vue({
         .catch(err => alert(err.message || err.toString()))
         .finally(() => this.refresh().catch(console.error));
     },
+    updateClientName(client, name) {
+      this.api.updateClientName({ clientId: client.id, name })
+        .catch(err => alert(err.message || err.toString()))
+        .finally(() => this.refresh().catch(console.error));
+    },
+    updateClientAddress(client, address) {
+      this.api.updateClientAddress({ clientId: client.id, address })
+        .catch(err => alert(err.message || err.toString()))
+        .finally(() => this.refresh().catch(console.error));
+    },
   },
   filters: {
     timeago: value => {
@@ -141,5 +158,30 @@ new Vue({
     setInterval(() => {
       this.refresh().catch(console.error);
     }, 1000);
+
+    Promise.resolve().then(async () => {
+      const currentRelease = await this.api.getRelease();
+      const latestRelease = await fetch('https://weejewel.github.io/wg-easy/changelog.json')
+        .then(res => res.json())
+        .then(releases => {
+          const releasesArray = Object.entries(releases).map(([version, changelog]) => ({
+            version: parseInt(version, 10),
+            changelog,
+          }));
+          releasesArray.sort((a, b) => {
+            return b.version - a.version;
+          });
+
+          return releasesArray[0];
+        });
+
+      console.log(`Current Release: ${currentRelease}`);
+      console.log(`Latest Release: ${latestRelease.version}`);
+
+      if (currentRelease >= latestRelease.version) return;
+
+      this.currentRelease = currentRelease;
+      this.latestRelease = latestRelease;
+    }).catch(console.error);
   },
 });

@@ -16,11 +16,15 @@ You have found the easiest way to install & manage WireGuard on any Linux host!
 
 * All-in-one: WireGuard + Web UI.
 * Easy installation, simple to use.
-* List, create, delete, enable & disable clients.
+* List, create, edit, delete, enable & disable clients.
 * Show a client's QR code.
 * Download a client's configuration file.
 * Statistics for which clients are connected.
 * Gravatar support.
+
+## Requirements
+
+* A host with a kernel that supports WireGuard (all modern kernels).
 
 ## Installation
 
@@ -76,3 +80,14 @@ These options can be configured in `docker-compose.yml` under `environment`.
 | `WG_ALLOWED_IPS` | `0.0.0.0/0, ::/0` | `192.168.15.0/24, 10.0.1.0/24` | Allowed IPs clients will use |
 
 > If you change `WG_PORT`, make sure to also change the exposed port.
+
+# Updating
+
+To update to the latest version, run:
+
+```bash
+docker-compose down
+docker-compose pull
+docker-compose up --detach --remove-orphans
+docker image prune
+```

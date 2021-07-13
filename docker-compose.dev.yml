@@ -1,0 +1,7 @@
+version: "3.8"
+services:
+  wg-easy:
+    image: wg-easy
+    command: npm run serve
+    volumes:
+      - ./src/:/app/
