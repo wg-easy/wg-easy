@@ -17,6 +17,10 @@ new Vue({
     clientDelete: null,
     clientCreate: null,
     clientCreateName: '',
+    clientEditName: null,
+    clientEditNameId: null,
+    clientEditAddress: null,
+    clientEditAddressId: null,
     qrcode: null,
   },
   methods: {
@@ -98,6 +102,16 @@ new Vue({
     },
     disableClient(client) {
       this.api.disableClient({ clientId: client.id })
+        .catch(err => alert(err.message || err.toString()))
+        .finally(() => this.refresh().catch(console.error));
+    },
+    updateClientName(client, name) {
+      this.api.updateClientName({ clientId: client.id, name })
+        .catch(err => alert(err.message || err.toString()))
+        .finally(() => this.refresh().catch(console.error));
+    },
+    updateClientAddress(client, address) {
+      this.api.updateClientAddress({ clientId: client.id, address })
         .catch(err => alert(err.message || err.toString()))
         .finally(() => this.refresh().catch(console.error));
     },

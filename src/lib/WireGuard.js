@@ -266,4 +266,26 @@ Endpoint = ${WG_HOST}:${WG_PORT}`;
     await this.saveConfig();
   }
 
+  async updateClientName({ clientId, name }) {
+    const client = await this.getClient({ clientId });
+
+    client.name = name;
+    client.updatedAt = new Date();
+
+    await this.saveConfig();
+  }
+
+  async updateClientAddress({ clientId, address }) {
+    const client = await this.getClient({ clientId });
+
+    if (!Util.isValidIPv4(address)) {
+      throw new ServerError(`Invalid Address: ${address}`, 400);
+    }
+
+    client.address = address;
+    client.updatedAt = new Date();
+
+    await this.saveConfig();
+  }
+
 };
