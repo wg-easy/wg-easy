@@ -20,7 +20,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
       with:
-        - ref: production
+        ref: production
     
     - uses: benjlevesque/short-sha@v1.2
 
