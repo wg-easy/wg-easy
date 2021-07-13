@@ -80,3 +80,14 @@ These options can be configured in `docker-compose.yml` under `environment`.
 | `WG_ALLOWED_IPS` | `0.0.0.0/0, ::/0` | `192.168.15.0/24, 10.0.1.0/24` | Allowed IPs clients will use |
 
 > If you change `WG_PORT`, make sure to also change the exposed port.
+
+# Updating
+
+To update to the latest version, run:
+
+```bash
+docker-compose down
+docker-compose pull
+docker-compose up --detach --remove-orphans
+docker image prune
+```

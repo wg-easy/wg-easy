@@ -12,6 +12,7 @@ const WireGuard = require('../services/WireGuard');
 
 const {
   PORT,
+  RELEASE,
   PASSWORD,
 } = require('../config');
 
@@ -28,6 +29,10 @@ module.exports = class Server {
         resave: true,
         saveUninitialized: true,
       }))
+
+      .get('/api/release', (Util.promisify(async () => {
+        return RELEASE;
+      })))
 
       // Authentication
       .get('/api/session', Util.promisify(async req => {

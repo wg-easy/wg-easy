@@ -29,6 +29,13 @@ class API {
     return json;
   }
 
+  async getRelease() {
+    return this.call({
+      method: 'get',
+      path: '/release',
+    });
+  }
+
   async getSession() {
     return this.call({
       method: 'get',
