@@ -16,11 +16,15 @@ You have found the easiest way to install & manage WireGuard on any Linux host!
 
 * All-in-one: WireGuard + Web UI.
 * Easy installation, simple to use.
-* List, create, delete, enable & disable clients.
+* List, create, edit, delete, enable & disable clients.
 * Show a client's QR code.
 * Download a client's configuration file.
 * Statistics for which clients are connected.
 * Gravatar support.
+
+## Requirements
+
+* A host with a kernel that supports WireGuard (all modern kernels).
 
 ## Installation
 

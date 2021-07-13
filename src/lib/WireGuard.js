@@ -51,6 +51,7 @@ module.exports = class WireGuard {
         }
 
         await this.__saveConfig(config);
+        await Util.exec('wg-quick down wg0').catch(() => {});
         await Util.exec('wg-quick up wg0');
         await Util.exec(`iptables -t nat -A POSTROUTING -s ${WG_DEFAULT_ADDRESS.replace('x', '0')}/24 -o eth0 -j MASQUERADE`);
         await Util.exec('iptables -A INPUT -p udp -m udp --dport 51820 -j ACCEPT');
@@ -174,7 +175,7 @@ AllowedIPs = ${client.address}/32`;
 [Interface]
 PrivateKey = ${client.privateKey}
 Address = ${client.address}/24
-DNS = ${WG_DEFAULT_DNS}
+${WG_DEFAULT_DNS ? `DNS = ${WG_DEFAULT_DNS}` : ''}
 
 [Peer]
 PublicKey = ${config.server.publicKey}
