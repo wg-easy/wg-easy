@@ -74,7 +74,7 @@ These options can be configured in `docker-compose.yml` under `environment`.
 | - | - | - | - |
 | `PASSWORD` | - | `foobar123` | When set, requires a password when logging in to the Web UI. |
 | `WG_HOST` | - | `vpn.myserver.com` | The public hostname of your VPN server |
-| `WEBHOST` | - | `0.0.0.0` | IP where the the web server listens
+| `WEBHOST` | - | `0.0.0.0` | IP where the web server listens
 | `WG_PORT` | `51820` | `51820` | The public UDP port of your VPN server |
 | `WG_DEFAULT_ADDRESS` | `10.8.0.x` | `10.6.0.x` | Clients IP address range |
 | `WG_DEFAULT_DNS` | `1.1.1.1` | `8.8.8.8, 8.8.4.4` | DNS server clients will use |
