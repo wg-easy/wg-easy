@@ -16,7 +16,7 @@ const {
   WG_PORT,
   WG_DEFAULT_DNS,
   WG_DEFAULT_ADDRESS,
-  WG_PERSISTENTKEEPALIVE;
+  WG_PERSISTENT_KEEPALIVE;
   WG_ALLOWED_IPS,
 } = require('../config');
 
@@ -182,7 +182,7 @@ ${WG_DEFAULT_DNS ? `DNS = ${WG_DEFAULT_DNS}` : ''}
 PublicKey = ${config.server.publicKey}
 PresharedKey = ${client.preSharedKey}
 AllowedIPs = ${WG_ALLOWED_IPS}
-PersistentKeepalive = ${WG_PERSISTENTKEEPALIVE}
+PersistentKeepalive = ${WG_PERSISTENT_KEEPALIVE}
 Endpoint = ${WG_HOST}:${WG_PORT}`;
   }
 
