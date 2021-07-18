@@ -25,6 +25,7 @@ You have found the easiest way to install & manage WireGuard on any Linux host!
 ## Requirements
 
 * A host with a kernel that supports WireGuard (all modern kernels).
+* A host with Docker installed.
 
 ## Installation
 
