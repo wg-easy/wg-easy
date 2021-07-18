@@ -21,8 +21,6 @@ jobs:
     - uses: actions/checkout@v2
       with:
         ref: production
-    
-    - uses: benjlevesque/short-sha@v1.2
 
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v1
