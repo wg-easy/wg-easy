@@ -40,6 +40,12 @@ $ sudo usermod -aG docker $(whoami)
 $ bash
 ```
 
+You might need to install docker-compose separately. For example, on a Raspberry Pi:
+
+```bash
+sudo apt-get install docker-compose
+```
+
 ### 2. Configure WireGuard
 
 Run these commands to prepare and configure WireGuard.
