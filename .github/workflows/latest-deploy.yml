@@ -1,4 +1,4 @@
-name: Build & Publish Docker Image to Docker Hub
+name: Build/Publish Latest Image to DockerHub
 
 on:
   workflow_dispatch:
