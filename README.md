@@ -36,8 +36,8 @@ If you haven't installed Docker yet, install it by running:
 ```bash
 $ curl -sSL https://get.docker.com | sh
 $ sudo usermod -aG docker $(whoami)
-$ bash
 ```
+Logout and login for the change to take effect.
 
 You might need to install docker-compose separately. For example, on a Raspberry Pi:
 
