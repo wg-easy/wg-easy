@@ -1,7 +1,7 @@
 FROM node:14-alpine
 
 # Install Linux packages
-RUN apk add -U wireguard-tools
+RUN apk add -U --no-cache wireguard-tools dumb-init
 
 # Copy Web UI
 COPY src/ /app/
@@ -16,4 +16,4 @@ EXPOSE 51821/tcp
 ENV DEBUG=Server,WireGuard
 
 # Run Web UI
-CMD ["node", "server.js"]
+CMD ["/usr/bin/dumb-init", "node", "server.js"]

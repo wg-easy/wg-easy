@@ -25,6 +25,7 @@ You have found the easiest way to install & manage WireGuard on any Linux host!
 ## Requirements
 
 * A host with a kernel that supports WireGuard (all modern kernels).
+* A host with Docker installed.
 
 ## Installation
 
@@ -37,6 +38,12 @@ $ curl -sSL https://get.docker.com | sh
 $ sudo sh get-docker.sh
 $ sudo usermod -aG docker $(whoami)
 $ bash
+```
+
+You might need to install docker-compose separately. For example, on a Raspberry Pi:
+
+```bash
+sudo apt-get install docker-compose
 ```
 
 ### 2. Configure WireGuard
