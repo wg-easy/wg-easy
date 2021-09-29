@@ -35,7 +35,6 @@ If you haven't installed Docker yet, install it by running:
 
 ```bash
 $ curl -sSL https://get.docker.com | sh
-$ sudo sh get-docker.sh
 $ sudo usermod -aG docker $(whoami)
 $ bash
 ```
