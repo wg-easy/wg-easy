@@ -36,8 +36,10 @@ If you haven't installed Docker yet, install it by running:
 ```bash
 $ curl -sSL https://get.docker.com | sh
 $ sudo usermod -aG docker $(whoami)
-$ bash
+$ exit
 ```
+
+And log in again.
 
 You might need to install docker-compose separately. For example, on a Raspberry Pi:
 
