@@ -87,6 +87,9 @@ These options can be configured in `docker-compose.yml` under `environment`.
 | `WG_DEFAULT_ADDRESS` | `10.8.0.x` | `10.6.0.x` | Clients IP address range |
 | `WG_DEFAULT_DNS` | `1.1.1.1` | `8.8.8.8, 8.8.4.4` | DNS server clients will use |
 | `WG_ALLOWED_IPS` | `0.0.0.0/0, ::/0` | `192.168.15.0/24, 10.0.1.0/24` | Allowed IPs clients will use |
+| `WG_NAT` | `true` | `false` | Enable or disable NAT iptables rules
+| `WG_SHOWDETAILS` | `true` | `false` | Enable or disable details
+| `THEME` | `black` | `white` | Skin
 
 > If you change `WG_PORT`, make sure to also change the exposed port.
 

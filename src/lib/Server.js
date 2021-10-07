@@ -14,6 +14,7 @@ const {
   PORT,
   RELEASE,
   PASSWORD,
+  THEME,
 } = require('../config');
 
 module.exports = class Server {
@@ -22,7 +23,7 @@ module.exports = class Server {
     // Express
     this.app = express()
       .disable('etag')
-      .use('/', express.static(path.join(__dirname, '..', 'www')))
+      .use('/', express.static(path.join(__dirname,'../www'),{index:'index.'+THEME+'.html'}))
       .use(express.json())
       .use(expressSession({
         secret: String(Math.random()),

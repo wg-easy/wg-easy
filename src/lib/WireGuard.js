@@ -18,6 +18,8 @@ const {
   WG_DEFAULT_ADDRESS,
   WG_PERSISTENT_KEEPALIVE,
   WG_ALLOWED_IPS,
+  WG_NAT,
+  WG_SHOWDETAILS,
 } = require('../config');
 
 module.exports = class WireGuard {
@@ -39,12 +41,14 @@ module.exports = class WireGuard {
           const privateKey = await Util.exec('wg genkey');
           const publicKey = await Util.exec(`echo ${privateKey} | wg pubkey`);
           const address = WG_DEFAULT_ADDRESS.replace('x', '1');
+          const port = WG_PORT;
 
           config = {
             server: {
               privateKey,
               publicKey,
               address,
+              port,
             },
             clients: {},
           };
@@ -54,10 +58,14 @@ module.exports = class WireGuard {
         await this.__saveConfig(config);
         await Util.exec('wg-quick down wg0').catch(() => {});
         await Util.exec('wg-quick up wg0');
-        await Util.exec(`iptables -t nat -A POSTROUTING -s ${WG_DEFAULT_ADDRESS.replace('x', '0')}/24 -o eth0 -j MASQUERADE`);
-        await Util.exec('iptables -A INPUT -p udp -m udp --dport 51820 -j ACCEPT');
-        await Util.exec('iptables -A FORWARD -i wg0 -j ACCEPT');
-        await Util.exec('iptables -A FORWARD -o wg0 -j ACCEPT');
+        if (WG_NAT) {
+          await Util.exec(`iptables -t nat -A POSTROUTING -s ${WG_DEFAULT_ADDRESS.replace('x', '0')}/24 -o eth0 -j MASQUERADE`);
+          await Util.exec(`iptables -A INPUT -p udp -m udp --dport ${WG_PORT} -j ACCEPT`);
+          //await Util.exec(`iptables -A FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT`)
+          //await Util.exec(`iptables -A FORWARD -s ${WG_DEFAULT_ADDRESS.replace('x', '0')}/24 -j ACCEPT`)
+          await Util.exec(`iptables -A FORWARD -i wg0 -j ACCEPT`);
+          await Util.exec(`iptables -A FORWARD -o wg0 -j ACCEPT`);
+        }
         await this.__syncConfig();
 
         return config;
@@ -82,7 +90,7 @@ module.exports = class WireGuard {
 [Interface]
 PrivateKey = ${config.server.privateKey}
 Address = ${config.server.address}/24
-ListenPort = 51820`;
+ListenPort = ${config.server.port}`;
 
     for (const [clientId, client] of Object.entries(config.clients)) {
       if (!client.enabled) continue;
@@ -119,6 +127,9 @@ AllowedIPs = ${client.address}/32`;
       createdAt: new Date(client.createdAt),
       updatedAt: new Date(client.updatedAt),
       allowedIPs: client.allowedIPs,
+      peerIPs: client.peerIPs,
+      showDetails: client.showDetails,
+      clientEndpoint: client.clientEndpoint,
 
       persistentKeepalive: null,
       latestHandshakeAt: null,
@@ -153,6 +164,11 @@ AllowedIPs = ${client.address}/32`;
         client.transferRx = Number(transferRx);
         client.transferTx = Number(transferTx);
         client.persistentKeepalive = persistentKeepalive;
+        client.allowedIPs = allowedIps;
+        client.peerIPs = WG_ALLOWED_IPS;
+        client.showDetails = WG_SHOWDETAILS;
+        client.clientEndpoint = endpoint;
+        endpoint
       });
 
     return clients;
@@ -204,6 +220,7 @@ Endpoint = ${WG_HOST}:${WG_PORT}`;
     const privateKey = await Util.exec('wg genkey');
     const publicKey = await Util.exec(`echo ${privateKey} | wg pubkey`);
     const preSharedKey = await Util.exec('wg genpsk');
+    const peerIps = WG_ALLOWED_IPS
 
     // Calculate next IP
     let address;
@@ -227,6 +244,7 @@ Endpoint = ${WG_HOST}:${WG_PORT}`;
     const client = {
       name,
       address,
+      peerIps,
       privateKey,
       publicKey,
       preSharedKey,
