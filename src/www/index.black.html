@@ -168,10 +168,12 @@
                     · {{new Date(client.latestHandshakeAt) | timeago}}
                   </span>
 
+                  <!-- Show Peer Allowed IPs -->
                   <span v-if="client.peerIPs && client.showDetails" title="Allowed IPs">
                     <br>{{client.peerIPs}}
                   </span>
 
+                  <!-- Client Endpoint -->
                   <span v-if="client.clientEndpoint && client.showDetails" title="Client IP">
                     · {{client.clientEndpoint}}
                   </span>

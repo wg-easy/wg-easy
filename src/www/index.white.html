@@ -28,7 +28,7 @@
           </svg>
         </span>
         <h1 class="text-4xl font-medium mt-10 mb-2">
-          <img src="./img/logo.black.png" width="50" class="inline align-middle" />
+          <img src="./img/logo.png" width="50" class="inline align-middle" />
           <span class="align-middle">WireGuard</span>
         </h1>
         <h2 class="text-sm text-gray-400 mb-10"></h2>
@@ -167,6 +167,17 @@
                     :title="'Last seen at ' + dateTime(new Date(client.latestHandshakeAt))">
                     · {{new Date(client.latestHandshakeAt) | timeago}}
                   </span>
+
+                  <!-- Show Peer Allowed IPs -->
+                  <span v-if="client.peerIPs && client.showDetails" title="Allowed IPs">
+                    <br>{{client.peerIPs}}
+                  </span>
+
+                  <!-- Client Endpoint -->
+                  <span v-if="client.clientEndpoint && client.showDetails" title="Client IP">
+                    · {{client.clientEndpoint}}
+                  </span>
+
                 </div>
               </div>
 
