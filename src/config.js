@@ -14,3 +14,6 @@ module.exports.WG_DEFAULT_DNS = typeof process.env.WG_DEFAULT_DNS === 'string'
   ? process.env.WG_DEFAULT_DNS
   : '1.1.1.1';
 module.exports.WG_ALLOWED_IPS = process.env.WG_ALLOWED_IPS || '0.0.0.0/0, ::/0';
+module.exports.METRICS_ENABLED = process.env.METRICS_ENABLED === 'true' || false;
+module.exports.METRICS_USER = process.env.METRICS_USER;
+module.exports.METRICS_PASSWORD = process.env.METRICS_PASSWORD;

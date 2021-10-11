@@ -1,9 +1,12 @@
-version: "3.8"
+version: '3.8'
 services:
   wg-easy:
     image: wg-easy
     command: npm run serve
     volumes:
       - ./src/:/app/
-    # environment: 
+    # environment:
     #   - PASSWORD=p
+    #   - METRICS_ENABLED=true
+    #   - METRICS_USER=u
+    #   - METRICS_PASSWORD=p

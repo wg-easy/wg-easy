@@ -114,6 +114,7 @@ AllowedIPs = ${client.address}/32`;
     const config = await this.getConfig();
     const clients = Object.entries(config.clients).map(([clientId, client]) => ({
       id: clientId,
+      interface: 'wg0',
       name: client.name,
       enabled: client.enabled,
       address: client.address,

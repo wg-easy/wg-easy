@@ -9,11 +9,15 @@ const debug = require('debug')('Server');
 const Util = require('./Util');
 const ServerError = require('./ServerError');
 const WireGuard = require('../services/WireGuard');
+const Metrics = require('../services/Metrics');
 
 const {
   PORT,
   RELEASE,
   PASSWORD,
+  METRICS_ENABLED,
+  METRICS_USER,
+  METRICS_PASSWORD,
 } = require('../config');
 
 module.exports = class Server {
@@ -23,6 +27,36 @@ module.exports = class Server {
     this.app = express()
       .disable('etag')
       .use('/', express.static(path.join(__dirname, '..', 'www')))
+
+      // Metrics
+      .get('/metrics', (Util.promisify(async (req, res) => {
+        if (!METRICS_ENABLED) {
+          throw new ServerError('Metrics Disabled', 400);
+        }
+
+        res.set('WWW-Authenticate', 'Basic realm="WireGuard Metrics"');
+
+        if (METRICS_USER || METRICS_PASSWORD) {
+          if (!req.headers['authorization']) {
+            throw new ServerError('Unauthorized', 401);
+          }
+
+          const [authScheme, authCredentials] = req.headers['authorization'].split(' ');
+          if (authScheme !== 'Basic' || !authCredentials) {
+            throw new ServerError('Unauthorized', 401);
+          }
+
+          const credentials = Buffer.from(`${METRICS_USER || ''}:${METRICS_PASSWORD || ''}`).toString('base64');
+          if (authCredentials !== credentials) {
+            throw new ServerError('Unauthorized', 401);
+          }
+        }
+
+        const metrics = await Metrics.getMetrics(await WireGuard.getClients());
+        res.header('Content-Type', 'text/plain');
+        res.send(metrics);
+      })))
+
       .use(express.json())
       .use(expressSession({
         secret: String(Math.random()),

@@ -22,6 +22,7 @@ You have found the easiest way to install & manage WireGuard on any Linux host!
 * Statistics for which clients are connected.
 * Tx/Rx charts for each connected client.
 * Gravatar support.
+* Metrics in Prometheus format.
 
 ## Requirements
 
@@ -87,6 +88,9 @@ These options can be configured by setting environment variables using `-e KEY="
 | `WG_DEFAULT_ADDRESS` | `10.8.0.x` | `10.6.0.x` | Clients IP address range. |
 | `WG_DEFAULT_DNS` | `1.1.1.1` | `8.8.8.8, 8.8.4.4` | DNS server clients will use. |
 | `WG_ALLOWED_IPS` | `0.0.0.0/0, ::/0` | `192.168.15.0/24, 10.0.1.0/24` | Allowed IPs clients will use. |
+| `METRICS_ENABLED` | `false` | `true` | When set, metrics in Prometheus format will be exposed. |
+| `METRICS_USER` | - | `prometheus` | When set, HTTP Basic authorization with this user will be required when accessing metrics. |
+| `METRICS_PASSWORD` | - | `password` | When set, HTTP Basic authorization will with this password be required when accessing metrics. |
 
 > If you change `WG_PORT`, make sure to also change the exposed port.
 
@@ -101,3 +105,35 @@ docker pull weejewel/wg-easy
 ```
 
 And then run the `docker run -d \ ...` command above again.
+
+# Exposed metrics
+
+When metrics are enabled `wg-easy` will expose metrics in Prometheus format under `/metrics` path. HTTP Basic autorization is supported for metrics endpoint.
+
+Node process metrics specific to `wg-easy` are exported with `wg_easy_` prefix. WireGuard metrics are exported with `wireguard_` prefix.
+
+WireGuard metrics are inspired and compatible with metrics collected by [prometheus_wireguard_exporter](https://github.com/MindFlavor/prometheus_wireguard_exporter). Grafana dashboards created for [prometheus_wireguard_exporter](https://github.com/MindFlavor/prometheus_wireguard_exporter) works with metrics exposed by `wg-easy`.
+
+## Example WireGuard metrics
+
+```
+# HELP wireguard_sent_bytes_total Bytes sent to the peer
+# TYPE wireguard_sent_bytes_total counter
+wireguard_sent_bytes_total{interface="wg0",public_key="QpPNe62/SuCUSEkBTu3r2U0ihe2UrDspxUUgk195zmc=",allowed_ips="10.112.112.2/32",friendly_name="Test User 1",enabled="true"} 0
+wireguard_sent_bytes_total{interface="wg0",public_key="2AyHc7bRYJUJdx9UG87QmZDolj8xh6CORgP0PA28JT4=",allowed_ips="10.112.112.3/32",friendly_name="Test User 2",enabled="true"} 95788240
+
+# HELP wireguard_received_bytes_total Bytes received from the peer
+# TYPE wireguard_received_bytes_total counter
+wireguard_received_bytes_total{interface="wg0",public_key="QpPNe62/SuCUSEkBTu3r2U0ihe2UrDspxUUgk195zmc=",allowed_ips="10.112.112.2/32",friendly_name="Test User 1",enabled="true"} 0
+wireguard_received_bytes_total{interface="wg0",public_key="2AyHc7bRYJUJdx9UG87QmZDolj8xh6CORgP0PA28JT4=",allowed_ips="10.112.112.3/32",friendly_name="Test User 2",enabled="true"} 54389700
+
+# HELP wireguard_latest_handshake_seconds Seconds from the last handshake
+# TYPE wireguard_latest_handshake_seconds gauge
+wireguard_latest_handshake_seconds{interface="wg0",public_key="QpPNe62/SuCUSEkBTu3r2U0ihe2UrDspxUUgk195zmc=",allowed_ips="10.112.112.2/32",friendly_name="Test User 1",enabled="true"} 0
+wireguard_latest_handshake_seconds{interface="wg0",public_key="2AyHc7bRYJUJdx9UG87QmZDolj8xh6CORgP0PA28JT4=",allowed_ips="10.112.112.3/32",friendly_name="Test User 2",enabled="true"} 1633967910
+
+# HELP wireguard_persistent_keepalive_seconds Seconds between each persistent keepalive packet
+# TYPE wireguard_persistent_keepalive_seconds gauge
+wireguard_persistent_keepalive_seconds{interface="wg0",public_key="QpPNe62/SuCUSEkBTu3r2U0ihe2UrDspxUUgk195zmc=",allowed_ips="10.112.112.2/32",friendly_name="Test User 1",enabled="true"} 0
+wireguard_persistent_keepalive_seconds{interface="wg0",public_key="2AyHc7bRYJUJdx9UG87QmZDolj8xh6CORgP0PA28JT4=",allowed_ips="10.112.112.3/32",friendly_name="Test User 2",enabled="true"} 0
+```
