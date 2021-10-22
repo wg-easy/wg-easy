@@ -82,7 +82,7 @@ module.exports = class WireGuard {
 [Interface]
 PrivateKey = ${config.server.privateKey}
 Address = ${config.server.address}/24
-ListenPort = 51820`;
+ListenPort = ${WG_PORT}`;
 
     for (const [clientId, client] of Object.entries(config.clients)) {
       if (!client.enabled) continue;
