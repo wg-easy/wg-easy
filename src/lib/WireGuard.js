@@ -18,6 +18,7 @@ const {
   WG_DEFAULT_ADDRESS,
   WG_PERSISTENT_KEEPALIVE,
   WG_ALLOWED_IPS,
+  FIREWALL_RULES
 } = require('../config');
 
 module.exports = class WireGuard {
@@ -54,10 +55,11 @@ module.exports = class WireGuard {
         await this.__saveConfig(config);
         await Util.exec('wg-quick down wg0').catch(() => {});
         await Util.exec('wg-quick up wg0');
-        await Util.exec(`iptables -t nat -A POSTROUTING -s ${WG_DEFAULT_ADDRESS.replace('x', '0')}/24 -o eth0 -j MASQUERADE`);
-        await Util.exec('iptables -A INPUT -p udp -m udp --dport 51820 -j ACCEPT');
-        await Util.exec('iptables -A FORWARD -i wg0 -j ACCEPT');
-        await Util.exec('iptables -A FORWARD -o wg0 -j ACCEPT');
+
+        if (FIREWALL_RULES) {
+          await Promise.all(FIREWALL_RULES.map(rule => Util.exec(rule.trim())));
+        }
+
         await this.__syncConfig();
 
         return config;

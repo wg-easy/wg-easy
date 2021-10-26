@@ -13,4 +13,13 @@ module.exports.WG_DEFAULT_ADDRESS = process.env.WG_DEFAULT_ADDRESS || '10.8.0.x'
 module.exports.WG_DEFAULT_DNS = typeof process.env.WG_DEFAULT_DNS === 'string'
   ? process.env.WG_DEFAULT_DNS
   : '1.1.1.1';
+module.exports.FIREWALL_RULES = process.env.FIREWALL_RULES === 'false'
+  ? false
+  : process.env.FIREWALL_RULES?.split(';') || [
+    `iptables -t nat -A POSTROUTING -s ${module.exports.WG_DEFAULT_ADDRESS.replace('x', '0')}/24 -o eth0 -j MASQUERADE`,
+    'iptables -A INPUT -p udp -m udp --dport 51820 -j ACCEPT',
+    'iptables -A FORWARD -i wg0 -j ACCEPT',
+    'iptables -A FORWARD -o wg0 -j ACCEPT',
+  ];
+
 module.exports.WG_ALLOWED_IPS = process.env.WG_ALLOWED_IPS || '0.0.0.0/0, ::/0';
