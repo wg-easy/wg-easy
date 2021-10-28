@@ -29,7 +29,7 @@ You have found the easiest way to install & manage WireGuard on any Linux host!
 
 ## Installation
 
-### 1. Install Docker
+### 1. Simple Docker Installation
 
 If you haven't installed Docker yet, install it by running:
 
@@ -41,7 +41,26 @@ $ exit
 
 And log in again.
 
-You might need to install docker-compose separately. For example, on a Raspberry Pi:
+```
+docker run -d \
+--name=wg-easy \
+--cap-add=NET_ADMIN \
+--cap-add=SYS_MODULE \
+-e WG_HOST=51.159.67.58 \
+-e PASSWORD=passwordforthewebuiHERE \
+-e WG_PORT=51820 \
+-e WG_DEFAULT_ADDRESS=10.8.0.x \
+-e WG_DEFAULT_DNS=1.1.1.1 \
+-e WG_ALLOWED_IPS=0.0.0.0/0,::/0 \
+-v /path/to/appdata/config:/etc/wireguard \
+-p 51820:51820/udp \
+-p 51821:51821/tcp \
+--sysctl="net.ipv4.conf.all.src_valid_mark=1" \
+--sysctl="net.ipv4.ip_forward=1" \
+--restart unless-stopped \
+weejewel/wg-easy
+```
+If you prefer a docker-compose install. For example, on a Raspberry Pi:
 
 ```bash
 sudo apt-get install docker-compose
