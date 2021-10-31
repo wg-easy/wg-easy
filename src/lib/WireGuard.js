@@ -40,9 +40,7 @@ module.exports = class WireGuard {
           debug('Configuration loaded.');
         } catch (err) {
           const privateKey = await Util.exec('wg genkey');
-          const publicKey = await Util.exec(`echo ${privateKey} | wg pubkey`, {
-            log: 'echo ***hidden*** | wg pubkey',
-          });
+          const publicKey = await Util.exec(`echo ${privateKey} | wg pubkey`, privateKey);
           const address = WG_DEFAULT_ADDRESS.replace('x', '1');
 
           config = {
@@ -57,14 +55,7 @@ module.exports = class WireGuard {
         }
 
         await this.__saveConfig(config);
-        await Util.exec('wg-quick down wg0').catch(() => { });
-        await Util.exec('wg-quick up wg0').catch(err => {
-          if (err && err.message && err.message.includes('Cannot find device "wg0"')) {
-            throw new Error('WireGuard exited with the error: Cannot find device "wg0"\nThis usually means that your host\'s kernel does not support WireGuard!');
-          }
-
-          throw err;
-        });
+        await this.restartGateway();
         await this.__syncConfig();
 
         return config;
@@ -72,6 +63,18 @@ module.exports = class WireGuard {
     }
 
     return this.__configPromise;
+  }
+
+  async restartGateway() {
+    this.gatewayUp = false;
+    await Util.exec('wg-quick down wg0').catch(() => { });
+    await Util.exec('wg-quick up wg0').catch(err => {
+      if (err && err.message && err.message.includes('Cannot find device "wg0"')) {
+        throw new Error('WireGuard exited with the error: Cannot find device "wg0"\nThis usually means that your host\'s kernel does not support WireGuard!');
+      }
+      throw err;
+    });
+    this.gatewayUp = true;
   }
 
   async saveConfig() {
@@ -144,6 +147,10 @@ AllowedIPs = ${client.address}/32`;
       transferTx: null,
     }));
 
+    if (!this.gatewayUp) {
+      return clients;
+    }
+
     // Loop WireGuard status
     const dump = await Util.exec('wg show wg0 dump', {
       log: false,
@@ -189,12 +196,21 @@ AllowedIPs = ${client.address}/32`;
   }
 
   async getClientConfiguration({ clientId }) {
+    // Keys of client are regenerated on each call!
+    // Gateway must be restarted to update to new keys
+
     const config = await this.getConfig();
     const client = await this.getClient({ clientId });
+    const privateKey = await Util.exec('wg genkey');
+    client.publicKey = await Util.exec(`echo ${privateKey} | wg pubkey`, privateKey);
+    client.preSharedKey = await Util.exec('wg genpsk');
+
+    await this.saveConfig();
+    await this.restartGateway();
 
     return `
 [Interface]
-PrivateKey = ${client.privateKey}
+PrivateKey = ${privateKey}
 Address = ${client.address}/24
 ${WG_DEFAULT_DNS ? `DNS = ${WG_DEFAULT_DNS}` : ''}
 ${WG_MTU ? `MTU = ${WG_MTU}` : ''}
@@ -225,8 +241,8 @@ Endpoint = ${WG_HOST}:${WG_PORT}`;
 
     const config = await this.getConfig();
 
-    const privateKey = await Util.exec('wg genkey');
-    const publicKey = await Util.exec(`echo ${privateKey} | wg pubkey`);
+    // Public key is placeholder, new one is generated on getClientConfig
+    const publicKey = await Util.exec('wg genpsk');
     const preSharedKey = await Util.exec('wg genpsk');
 
     // Calculate next IP
@@ -251,7 +267,6 @@ Endpoint = ${WG_HOST}:${WG_PORT}`;
     const client = {
       name,
       address,
-      privateKey,
       publicKey,
       preSharedKey,
       allowedIPs: allowedIPs,

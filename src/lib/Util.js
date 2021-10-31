@@ -52,15 +52,14 @@ module.exports = class Util {
     };
   }
 
-  static async exec(cmd, {
-    log = true,
-  } = {}) {
-    if (typeof log === 'string') {
-      // eslint-disable-next-line no-console
-      console.log(`$ ${log}`);
-    } else if (log === true) {
-      // eslint-disable-next-line no-console
+  static async exec(cmd, hide=null) {
+    // eslint-disable-next-line no-console
+
+    if (hide == null) {
       console.log(`$ ${cmd}`);
+    } else {
+      // Don't log sensitive information
+      console.log(`$ ${cmd.replace(hide, "*HIDDEN*")}`);
     }
 
     if (process.platform !== 'linux') {
