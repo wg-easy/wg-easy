@@ -5,7 +5,7 @@ services:
       # ⚠️ Required:
       # Change this to your host's public address
       - WG_HOST=raspberrypi.local
-
+      - WG_DEFAULT_DNS=9.9.9.9
       # Optional:
       # - PASSWORD=foobar123
       # - WG_PORT=51820

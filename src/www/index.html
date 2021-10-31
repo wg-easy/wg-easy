@@ -54,7 +54,7 @@
               <p class="text-2xl font-medium">Clients</p>
             </div>
             <div class="flex-shrink-0">
-              <button @click="clientCreate = true; clientCreateName = '';"
+              <button @click="clientCreate = true; clientCreateName = ''; clientCreateAllowedIPs = clientCreateAllowedIPsDefault;"
                 class="hover:bg-red-800 hover:border-red-800 hover:text-white text-gray-700 border-2 border-gray-100 py-2 px-4 rounded inline-flex items-center transition">
                 <svg class="w-4 mr-2" inline xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                   stroke="currentColor">
@@ -236,7 +236,7 @@
             </div>
             <div v-if="clients && clients.length === 0">
               <p class="text-center m-10 text-gray-400 text-sm">There are no clients yet.<br /><br />
-                <button @click="clientCreate = true; clientCreateName = '';"
+                <button @click="clientCreate = true; clientCreateName = ''; clientCreateAllowedIPs = clientCreateAllowedIPsDefault;"
                   class="bg-red-800 text-white hover:bg-red-700 border-2 border-none py-2 px-4 rounded inline-flex items-center transition">
                   <svg class="w-4 mr-2" inline xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">
@@ -324,6 +324,16 @@
                       <p class="text-sm text-gray-500">
                         <input class="rounded p-2 border-2 border-gray-100 focus:border-gray-200 outline-none w-full"
                           type="text" v-model.trim="clientCreateName" placeholder="Name" />
+                        <input class="rounded p-2 border-2 border-gray-100 focus:border-gray-200 outline-none w-full"
+                          type="text" v-model.trim="clientCreateAllowedIPs" placeholder="AllowedIPs" />
+                          <button type="button" @click="clientCreateAllowedIPs = clientCreateAllowedIPsDefault"
+                            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-800 text-base font-medium text-white hover:bg-red-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
+                            Allow all IPs
+                          </button>
+                          <button type="button" @click="clientCreateAllowedIPs; getDns().then(dns => {clientCreateAllowedIPs = dns == null ? clientCreateAllowedIPsExclude : `${clientCreateAllowedIPsExclude}, ${dns}/32`;});"
+                            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-800 text-base font-medium text-white hover:bg-red-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
+                            Exclude private IPs
+                          </button>
                       </p>
                     </div>
                   </div>
