@@ -19,3 +19,6 @@ module.exports.WG_ALLOWED_IPS = process.env.WG_ALLOWED_IPS || '0.0.0.0/0, ::/0';
 module.exports.WG_POST_UP = process.env.WG_POST_UP || '';
 module.exports.WG_POST_DOWN = process.env.WG_POST_DOWN || '';
 module.exports.WG_DEFAULT_DNS = process.env.WG_DEFAULT_DNS;
+module.exports.WG_HARDEN_CLIENTS = typeof process.env.WG_HARDEN_CLIENTS === 'string'
+  ? process.env.WG_HARDEN_CLIENTS === '1'
+  : false;

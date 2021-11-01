@@ -13,7 +13,8 @@ services:
       # - WG_DEFAULT_DNS=1.1.1.1
       # - WG_MTU=1420
       # - WG_ALLOWED_IPS=192.168.15.0/24, 10.0.1.0/24
-      
+      # - WG_HARDEN_CLIENTS=1
+
     image: weejewel/wg-easy
     container_name: wg-easy
     volumes:

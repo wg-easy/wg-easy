@@ -90,6 +90,7 @@ These options can be configured by setting environment variables using `-e KEY="
 | `WG_ALLOWED_IPS` | `0.0.0.0/0, ::/0` | `192.168.15.0/24, 10.0.1.0/24` | Allowed IPs clients will use. |
 | `WG_POST_UP` | `...` | `iptables ...` | See [config.js](https://github.com/WeeJeWel/wg-easy/blob/master/src/config.js#L19) for the default value. |
 | `WG_POST_DOWN` | `...` | `iptables ...` | See [config.js](https://github.com/WeeJeWel/wg-easy/blob/master/src/config.js#L26) for the default value. |
+| `WG_HARDEN_CLIENTS` | - | `1` | When clients are hardened their PrivateKeys will not be stored.  All requests to obtain their config, eg. download or QR code, will trigger a key regen. |
 
 > If you change `WG_PORT`, make sure to also change the exposed port.
 

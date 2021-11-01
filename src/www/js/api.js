@@ -58,6 +58,13 @@ class API {
     });
   }
 
+  async areClientsHardened() {
+    return this.call({
+      method: 'get',
+      path: '/wireguard/hardened',
+    });
+  }
+
   async getDns() {
     return this.call({
       method: 'get',
