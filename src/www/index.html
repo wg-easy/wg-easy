@@ -347,11 +347,11 @@
                         <input class="rounded p-2 border-2 border-gray-100 focus:border-gray-200 outline-none w-full"
                           type="text" v-model.trim="clientCreateAllowedIPs" placeholder="AllowedIPs" />
                           <button type="button" @click="clientCreateAllowedIPs = clientCreateAllowedIPsDefault"
-                            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-800 text-base font-medium text-white hover:bg-red-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
+                            class="hover:bg-red-800 hover:border-red-800 hover:text-white text-gray-700 border-2 border-gray-100 py-2 px-4 rounded inline-flex items-center transition">
                             Allow all IPs
                           </button>
                           <button type="button" @click="clientCreateAllowedIPs; getDns().then(dns => {clientCreateAllowedIPs = dns == null ? clientCreateAllowedIPsExclude : `${clientCreateAllowedIPsExclude}, ${dns}/32`;});"
-                            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-800 text-base font-medium text-white hover:bg-red-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
+                            class="hover:bg-red-800 hover:border-red-800 hover:text-white text-gray-700 border-2 border-gray-100 py-2 px-4 rounded inline-flex items-center transition">
                             Exclude private IPs
                           </button>
                       </p>
@@ -360,7 +360,7 @@
                 </div>
               </div>
               <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                <button v-if="clientCreateName.length" type="button" @click="createClient(); clientCreate = null"
+                <button v-if="clientCreateName.length && clientCreateAllowedIPs.length" type="button" @click="createClient(); clientCreate = null"
                   class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-800 text-base font-medium text-white hover:bg-red-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
                   Create
                 </button>
