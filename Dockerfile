@@ -7,6 +7,8 @@ RUN apk add -U --no-cache wireguard-tools dumb-init
 COPY src/ /app/
 WORKDIR /app
 RUN npm ci --production
+RUN npm i -g nodemon
+RUN mv /app/node_modules/ /node_modules/
 
 # Expose Ports
 EXPOSE 51820/udp
