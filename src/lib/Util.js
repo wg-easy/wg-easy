@@ -19,7 +19,7 @@ module.exports = class Util {
 
   static promisify(fn) {
     // eslint-disable-next-line func-names
-    return function(req, res) {
+    return function (req, res) {
       Promise.resolve().then(async () => fn(req, res))
         .then(result => {
           if (res.headersSent) return;
@@ -52,9 +52,16 @@ module.exports = class Util {
     };
   }
 
-  static async exec(cmd) {
-    // eslint-disable-next-line no-console
-    console.log(`$ ${cmd}`);
+  static async exec(cmd, {
+    log = true,
+  } = {}) {
+    if (typeof log === 'string') {
+      // eslint-disable-next-line no-console
+      console.log(`$ ${log}`);
+    } else if (log === true) {
+      // eslint-disable-next-line no-console
+      console.log(`$ ${cmd}`);
+    }
 
     if (process.platform !== 'linux') {
       return '';
