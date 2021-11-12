@@ -38,7 +38,7 @@ module.exports = class WireGuard {
         } catch (err) {
           const privateKey = await Util.exec('wg genkey');
           const publicKey = await Util.exec(`echo ${privateKey} | wg pubkey`, {
-            log: `echo ***hidden*** | wg pubkey`
+            log: 'echo ***hidden*** | wg pubkey',
           });
           const address = WG_DEFAULT_ADDRESS.replace('x', '1');
 
