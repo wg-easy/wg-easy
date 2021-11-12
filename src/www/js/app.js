@@ -47,8 +47,6 @@ new Vue({
 
         return client;
       });
-
-      console.log(clients);
     },
     login(e) {
       e.preventDefault();
@@ -71,6 +69,7 @@ new Vue({
         })
         .finally(() => {
           this.authenticating = false;
+          this.password = null;
         });
     },
     logout(e) {

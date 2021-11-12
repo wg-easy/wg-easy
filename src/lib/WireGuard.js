@@ -37,7 +37,9 @@ module.exports = class WireGuard {
           debug('Configuration loaded.');
         } catch (err) {
           const privateKey = await Util.exec('wg genkey');
-          const publicKey = await Util.exec(`echo ${privateKey} | wg pubkey`);
+          const publicKey = await Util.exec(`echo ${privateKey} | wg pubkey`, {
+            log: 'echo ***hidden*** | wg pubkey',
+          });
           const address = WG_DEFAULT_ADDRESS.replace('x', '1');
 
           config = {
@@ -52,7 +54,7 @@ module.exports = class WireGuard {
         }
 
         await this.__saveConfig(config);
-        await Util.exec('wg-quick down wg0').catch(() => {});
+        await Util.exec('wg-quick down wg0').catch(() => { });
         await Util.exec('wg-quick up wg0');
         await Util.exec(`iptables -t nat -A POSTROUTING -s ${WG_DEFAULT_ADDRESS.replace('x', '0')}/24 -o eth0 -j MASQUERADE`);
         await Util.exec('iptables -A INPUT -p udp -m udp --dport 51820 -j ACCEPT');
@@ -127,7 +129,9 @@ AllowedIPs = ${client.address}/32`;
     }));
 
     // Loop WireGuard status
-    const dump = await Util.exec('wg show wg0 dump');
+    const dump = await Util.exec('wg show wg0 dump', {
+      log: false,
+    });
     dump
       .trim()
       .split('\n')

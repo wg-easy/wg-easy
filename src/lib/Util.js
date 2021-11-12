@@ -52,9 +52,16 @@ module.exports = class Util {
     };
   }
 
-  static async exec(cmd) {
-    // eslint-disable-next-line no-console
-    console.log(`$ ${cmd}`);
+  static async exec(cmd, {
+    log = true,
+  } = {}) {
+    if (typeof log === 'string') {
+      // eslint-disable-next-line no-console
+      console.log(`$ ${log}`);
+    } else if (log === true) {
+      // eslint-disable-next-line no-console
+      console.log(`$ ${cmd}`);
+    }
 
     if (process.platform !== 'linux') {
       return '';
