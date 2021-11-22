@@ -95,4 +95,4 @@ docker stop wg-easy
 docker rm wg-easy
 ```
 
-And then run the 'Run WireGuard Easy' command above again.
+And then run the `docker run -d \ ...` command above again.
