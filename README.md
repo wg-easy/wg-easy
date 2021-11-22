@@ -9,7 +9,7 @@
 You have found the easiest way to install & manage WireGuard on any Linux host!
 
 <p align="center">
-  <img src="./assets/screenshot.png" width="702" />
+  <img src="./assets/screenshot.png" width="802" />
 </p>
 
 ## Features
@@ -20,6 +20,7 @@ You have found the easiest way to install & manage WireGuard on any Linux host!
 * Show a client's QR code.
 * Download a client's configuration file.
 * Statistics for which clients are connected.
+* Tx/Rx charts for each connected client.
 * Gravatar support.
 
 ## Requirements
@@ -41,42 +42,37 @@ $ exit
 
 And log in again.
 
-You might need to install docker-compose separately. For example, on a Raspberry Pi:
+### 2. Run WireGuard Easy
 
-```bash
-sudo apt-get install docker-compose
-```
+To automatically install & run wg-easy, simply run:
 
-### 2. Configure WireGuard
+<pre>
+$ docker run -d \
+  --name=wg-easy \
+  --cap-add=NET_ADMIN \
+  --cap-add=SYS_MODULE \
+  -e WG_HOST=<b>YOUR_SERVER_IP</b> \
+  -e PASSWORD=<b>YOUR_ADMIN_PASSWORD</b> \
+  -v ~/.wg-easy:/etc/wireguard \
+  -p 51820:51820/udp \
+  -p 51821:51821/tcp \
+  --sysctl="net.ipv4.conf.all.src_valid_mark=1" \
+  --sysctl="net.ipv4.ip_forward=1" \
+  --restart unless-stopped \
+  weejewel/wg-easy
+</pre>
 
-Run these commands to prepare and configure WireGuard.
+> 💡 Replace `YOUR_SERVER_IP` with your WAN IP, or a Dynamic DNS hostname.
+> 
+> 💡 Replace `YOUR_ADMIN_PASSWORD` with a password to log in on the Web UI.
 
-```bash
-$ mkdir ~/.wg-easy
-$ cd ~/.wg-easy
-$ wget https://raw.githubusercontent.com/WeeJeWel/wg-easy/master/docker-compose.yml
-$ vim docker-compose.yml
-```
+The Web UI will now be available on `http://0.0.0.0:51821`.
 
-Change `WG_HOST=raspberrypi.local` to your server's public address, e.g. `WG_HOST=vpn.mydomain.com`.
-
-Optionally, set a Web UI password by uncommenting `PASSWORD=foobar123` and change the password.
-
-> By default, any WireGuard client will have access to the Web UI, unless you set a password.
-
-### 3. Run WireGuard
-
-Finally, run WireGuard. It will automatically start after a reboot.
-
-```bash
-$ docker-compose up --detach
-```
-
-The Web UI will be available on `http://0.0.0.0:51821`. You can create new clients there.
+> 💡 Your configuration files will be saved in `~/.wg-easy`
 
 ## Options
 
-These options can be configured in `docker-compose.yml` under `environment`.
+These options can be configured by setting environment variables using `-e KEY="VALUE"` in the `docker run` command.
 
 | Env | Default | Example | Description |
 | - | - | - | - |
@@ -92,11 +88,11 @@ These options can be configured in `docker-compose.yml` under `environment`.
 
 # Updating
 
-To update to the latest version, run:
+To update to the latest version, simply run:
 
 ```bash
-docker-compose down
-docker-compose pull
-docker-compose up --detach --remove-orphans
-docker image prune
+docker stop wg-easy
+docker rm wg-easy
 ```
+
+And then run the `docker run -d \ ...` command above again.

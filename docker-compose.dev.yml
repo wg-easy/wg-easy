@@ -5,5 +5,5 @@ services:
     command: npm run serve
     volumes:
       - ./src/:/app/
-    environment: 
-      - PASSWORD=p
+    # environment: 
+    #   - PASSWORD=p

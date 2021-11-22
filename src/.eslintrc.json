@@ -5,6 +5,7 @@
   ],
   "rules": {
     "consistent-return": "off",
-    "no-shadow": "off"
+    "no-shadow": "off",
+    "max-len": "off"
   }
 }
