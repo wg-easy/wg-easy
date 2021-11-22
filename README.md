@@ -44,10 +44,10 @@ And log in again.
 
 ### 2. Run WireGuard Easy
 
-To automatically install & run wg-easy, in a terminal:
+To automatically install & run wg-easy, simply run:
 
 <pre>
-docker run -d \
+$ docker run -d \
   --name=wg-easy \
   --cap-add=NET_ADMIN \
   --cap-add=SYS_MODULE \
@@ -62,13 +62,13 @@ docker run -d \
   weejewel/wg-easy
 </pre>
 
-> 🌍 Replace `YOUR_SERVER_IP` with your WAN IP, or a Dynamic DNS hostname.
+> 💡 Replace `YOUR_SERVER_IP` with your WAN IP, or a Dynamic DNS hostname.
 > 
-> 🔑 Replace `YOUR_ADMIN_PASSWORD` with a password to log in on the Web UI.
+> 💡 Replace `YOUR_ADMIN_PASSWORD` with a password to log in on the Web UI.
 
 The Web UI will now be available on `http://0.0.0.0:51821`.
 
-> 💾 Your configuration files will be saved in `~/.wg-easy`
+> 💡 Your configuration files will be saved in `~/.wg-easy`
 
 ## Options
 
@@ -88,7 +88,7 @@ These options can be configured by setting environment variables using `-e KEY="
 
 # Updating
 
-To update to the latest version, run:
+To update to the latest version, simply run:
 
 ```bash
 docker stop wg-easy
