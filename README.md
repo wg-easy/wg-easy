@@ -93,6 +93,7 @@ To update to the latest version, simply run:
 ```bash
 docker stop wg-easy
 docker rm wg-easy
+docker pull weejewel/wg-easy
 ```
 
 And then run the `docker run -d \ ...` command above again.
