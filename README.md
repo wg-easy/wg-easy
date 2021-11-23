@@ -32,15 +32,69 @@ You have found the easiest way to install & manage WireGuard on any Linux host!
 
 ### 1. Install Docker
 
-If you haven't installed Docker yet, install it by running:
+You can follow this instruction, but don't forget to take a look to the [Docker documentation](https://docs.docker.com/engine/install/). 
 
-```bash
-$ curl -sSL https://get.docker.com | sh
-$ sudo usermod -aG docker $(whoami)
-$ exit
-```
+### 1. Install Docker
+
+#### a. Install using the convenience script (🏗 for test & development )
+
+Docker provides a convenience script at get.docker.com to install Docker into development environments quickly and non-interactively. The convenience script is not recommended for production environments:
+
+  ```bash
+  $ curl -sSL https://get.docker.com | sh
+  $ sudo usermod -aG docker $(whoami)
+  $ exit
+  ```
 
 And log in again.
+
+#### OR
+
+#### b. Install using the repository (✅ production ready)
+
+##### 1. Need to set up the repository ?
+
+If you have trouble installing Docker Engine, you need to set up the Docker repositor.
+
+1.  Update the `apt` package index and install packages to allow `apt` to use a
+    repository over HTTPS:
+
+    ```console
+    $ sudo apt-get update
+
+    $ sudo apt-get install \
+        ca-certificates \
+        curl \
+        gnupg \
+        lsb-release
+    ```
+
+2.  Add Docker's official GPG key:
+
+    ```console
+    $ curl -fsSL {{ download-url-base }}/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+    ```
+
+3.  Use the following command to set up the **stable** repository. To add the
+    **nightly** or **test** repository, add the word `nightly` or `test` (or both)
+    after the word `stable` in the commands below. [Learn about **nightly** and **test** channels](index.md).
+
+    ```console
+    $ echo \
+      "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] {{ download-url-base }} \
+      $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    ```
+
+Afterward, you can install and update Docker from the repository .
+
+##### 2. Install Docker Engine
+
+Update the `apt` package index, and install the latest version of Docker Engine and containerd, or go to the next step to install a specific version:
+
+```console
+$ sudo apt-get update
+$ sudo apt-get install docker-ce docker-ce-cli containerd.io
+```
 
 ### 2. Run WireGuard Easy
 
