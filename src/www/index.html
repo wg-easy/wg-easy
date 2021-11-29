@@ -154,7 +154,7 @@
                     </span>
 
                     <!-- Transfer TX -->
-                    <span v-if="client.transferTx" title="Download">
+                    <span v-if="client.transferTx":title="'Total Download: ' + bytes(client.transferTx)">
                       ·
                       <svg class="align-middle h-3 inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                         fill="currentColor">
@@ -166,7 +166,7 @@
                     </span>
 
                     <!-- Transfer RX -->
-                    <span v-if="client.transferRx" title="Upload">
+                    <span v-if="client.transferRx" :title="'Total Upload: ' + bytes(client.transferRx)">
                       ·
                       <svg class="align-middle h-3 inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                         fill="currentColor">
