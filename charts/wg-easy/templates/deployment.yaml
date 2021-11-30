@@ -1,0 +1,109 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "wg-easy.fullname" . }}
+  labels:
+    {{- include "wg-easy.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "wg-easy.selectorLabels" . | nindent 6 }}
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        {{- include "wg-easy.selectorLabels" . | nindent 8 }}
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      serviceAccountName: {{ include "wg-easy.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            capabilities:
+              add: ['NET_ADMIN']
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 51821
+              protocol: TCP
+            - name: wireguard
+              containerPort: 51820
+              protocol: UDP
+          env:
+            - name: WG_HOST
+              value: "{{ .Values.wireguard.host }}"
+            {{- if .Values.web.password }}
+            - name: PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Values.web.password.secretName }}"
+                  key: webpassword
+            {{- end }}
+            {{- if .Values.wireguard.service.port }}
+            - name: WG_PORT
+              value: "{{ .Values.wireguard.service.port }}"
+            {{- end }}
+            {{- if .Values.wireguard.clientAddrRange }}
+            - name: WG_DEFAULT_ADDRESS
+              value: "{{ .Values.wireguard.clientAddrRange }}"
+            {{- end }}
+            {{- if .Values.wireguard.dns }}
+            - name: WG_DEFAULT_DNS
+              value: "{{ .Values.wireguard.dns }}"
+            {{- end }}
+            {{- if .Values.wireguard.allowedIps }}
+            - name: WG_ALLOWED_IPS
+              value: "{{ .Values.wireguard.allowedIps }}"
+            {{- end }}
+            {{- if .Values.wireguard.persistentKeepalive }}
+            - name: WG_PERSISTENT_KEEPALIVE
+              value: "{{ .Values.wireguard.persistentKeepalive }}"
+            {{- end }}
+          volumeMounts:
+            - name: tun
+              mountPath: /dev/net/tun
+            - name: config
+              mountPath: /etc/wireguard
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: tun
+          hostPath:
+            type: 'CharDevice'
+            path: /dev/net/tun
+        - name: config
+        {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ if .Values.persistence.existingClaim }}{{ .Values.persistence.existingClaim }}{{- else }}{{ include "wg-easy.fullname" . }}{{- end }}
+        {{- end }}
+        {{- if not .Values.persistence.enabled }}
+        emptyDir: {}
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}

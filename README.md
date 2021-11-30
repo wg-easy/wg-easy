@@ -101,3 +101,12 @@ docker pull weejewel/wg-easy
 ```
 
 And then run the `docker run -d \ ...` command above again.
+
+# Helm Installation
+
+Available Helm values and their defaults can be found in the [chart readme](https://github.com/WeeJeWel/wg-easy/blob/main/charts/wg-easy/README.md)
+
+```bash
+helm repo add wg-easy https://weejewel.github.io/wg-easy
+helm search wg-easy
+```
