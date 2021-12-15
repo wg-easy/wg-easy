@@ -53,12 +53,27 @@ module.exports = class WireGuard {
           debug('Configuration generated.');
         }
 
+        if (WG_ALLOWED_IPS) {
+          var ALLOWED_IPS = WG_ALLOWED_IPS.split(',');
+        }else{
+          var ALLOWED_IPS = new Array();
+        }
+
         await this.__saveConfig(config);
         await Util.exec('wg-quick down wg0').catch(() => { });
         await Util.exec('wg-quick up wg0');
         await Util.exec(`iptables -t nat -A POSTROUTING -s ${WG_DEFAULT_ADDRESS.replace('x', '0')}/24 -o eth0 -j MASQUERADE`);
         await Util.exec('iptables -A INPUT -p udp -m udp --dport 51820 -j ACCEPT');
-        await Util.exec('iptables -A FORWARD -i wg0 -j ACCEPT');
+
+        if(ALLOWED_IPS.indexOf("0.0.0.0/0") === -1 && ALLOWED_IPS.indexOf("::/0") === -1){
+          for (const ALLOWED_IP of ALLOWED_IPS) {
+            await Util.exec(`iptables -A FORWARD -i wg0 --dst ${ALLOWED_IP} -j ACCEPT`);
+          }
+          await Util.exec('iptables -A FORWARD -i wg0 -j DROP');
+        }else{
+          await Util.exec('iptables -A FORWARD -i wg0 -j ACCEPT');
+        }
+        
         await Util.exec('iptables -A FORWARD -o wg0 -j ACCEPT');
         await this.__syncConfig();
 
