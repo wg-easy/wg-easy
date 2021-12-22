@@ -3,6 +3,7 @@
 /* eslint-disable no-undef */
 /* eslint-disable no-new */
 /* eslint-disable no-use-before-define */
+
 'use strict';
 
 new Vue({
