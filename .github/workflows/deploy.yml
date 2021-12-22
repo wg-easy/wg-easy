@@ -10,8 +10,6 @@ on:
       - staging/**
       - production
       - production/**
-  schedule:
-    - cron: "0 12 * * *"
 
 jobs:
   deploy:
