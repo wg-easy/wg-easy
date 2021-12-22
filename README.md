@@ -1,10 +1,10 @@
 # WireGuard Easy
 
-[![Build & Publish Docker Image to Docker Hub](https://github.com/WeeJeWel/wg-easy/actions/workflows/deploy.yml/badge.svg?branch=production)](https://github.com/WeeJeWel/wg-easy/actions/workflows/deploy.yml)
-[![Lint](https://github.com/WeeJeWel/wg-easy/actions/workflows/lint.yml/badge.svg?branch=master)](https://github.com/WeeJeWel/wg-easy/actions/workflows/lint.yml)
-[![Docker](https://img.shields.io/docker/v/weejewel/wg-easy/latest)](https://hub.docker.com/r/weejewel/wg-easy)
-[![Docker](https://img.shields.io/docker/pulls/weejewel/wg-easy.svg)](https://hub.docker.com/r/weejewel/wg-easy)
-[![Sponsor](https://img.shields.io/github/sponsors/weejewel)](https://github.com/sponsors/WeeJeWel)
+[![Build & Publish Docker Image to Docker Hub](https://github.com/jdeath/wg-easy/actions/workflows/deploy.yml/badge.svg?branch=production)](https://github.com/jdeath/wg-easy/actions/workflows/deploy.yml)
+[![Lint](https://github.com/jdeath/wg-easy/actions/workflows/lint.yml/badge.svg?branch=master)](https://github.com/jdeath/wg-easy/actions/workflows/lint.yml)
+[![Docker](https://img.shields.io/docker/v/jdeath/wg-easy/latest)](https://hub.docker.com/r/jdeath/wg-easy)
+[![Docker](https://img.shields.io/docker/pulls/jdeath/wg-easy.svg)](https://hub.docker.com/r/jdeath/wg-easy)
+[![Sponsor](https://img.shields.io/github/sponsors/jdeath)](https://github.com/sponsors/jdeath)
 
 You have found the easiest way to install & manage WireGuard on any Linux host!
 
@@ -68,11 +68,7 @@ $ docker run -d \
 
 The Web UI will now be available on `http://0.0.0.0:51821`.
 
-> 💡 Your configuration files will be saved in `~/.wg-easy`
-
-### 3. Sponsor
-
-Are you enjoying this project? [Buy me a beer!](https://github.com/sponsors/WeeJeWel) 🍻
+> 💡 Your configuration files will be saved in `~/.wg-easy` or in the `WG_PATH` location (info below)
 
 ## Options
 
@@ -87,6 +83,7 @@ These options can be configured by setting environment variables using `-e KEY="
 | `WG_DEFAULT_ADDRESS` | `10.8.0.x` | `10.6.0.x` | Clients IP address range. |
 | `WG_DEFAULT_DNS` | `1.1.1.1` | `8.8.8.8, 8.8.4.4` | DNS server clients will use. |
 | `WG_ALLOWED_IPS` | `0.0.0.0/0, ::/0` | `192.168.15.0/24, 10.0.1.0/24` | Allowed IPs clients will use. |
+| `WG_PATH` | `/etc/wireguard` | `/ssl/wegeasy` | overwrite storage location |
 
 > If you change `WG_PORT`, make sure to also change the exposed port.
 
@@ -97,7 +94,7 @@ To update to the latest version, simply run:
 ```bash
 docker stop wg-easy
 docker rm wg-easy
-docker pull weejewel/wg-easy
+docker pull jdeath/wg-easy
 ```
 
 And then run the `docker run -d \ ...` command above again.
