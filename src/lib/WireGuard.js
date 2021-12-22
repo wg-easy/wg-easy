@@ -106,7 +106,7 @@ AllowedIPs = ${client.address}/32`;
 
   async __syncConfig() {
     debug('Syncing config...');
-    await Util.exec(`wg syncconf ${WG_PATH}/wg0.conf <(wg-quick strip ${WG_PATH}/wg0.conf)`);
+    await Util.exec(`wg syncconf wg0 <(wg-quick strip ${WG_PATH}/wg0.conf)`);
     debug('Config synced.');
   }
 
