@@ -1,10 +1,11 @@
 {
+  "release": 4,
   "name": "wg-easy",
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
   "scripts": {
-    "serve": "DEBUG=Server,WireGuard WG_HOST=0.0.0.0 WG_PATH=../config/ nodemon server.js",
+    "serve": "DEBUG=Server,WireGuard nodemon server.js",
     "serve-with-password": "PASSWORD=wg npm run serve",
     "lint": "eslint ."
   },
@@ -19,8 +20,7 @@
   },
   "devDependencies": {
     "eslint": "^7.27.0",
-    "eslint-config-athom": "^2.1.0",
-    "nodemon": "^2.0.7"
+    "eslint-config-athom": "^2.1.0"
   },
   "nodemonConfig": {
     "ignore": [

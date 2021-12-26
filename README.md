@@ -9,18 +9,24 @@
 You have found the easiest way to install & manage WireGuard on any Linux host!
 
 <p align="center">
-  <img src="./assets/screenshot.png" width="702" />
+  <img src="./assets/screenshot.png" width="802" />
 </p>
 
 ## Features
 
 * All-in-one: WireGuard + Web UI.
 * Easy installation, simple to use.
-* List, create, delete, enable & disable clients.
+* List, create, edit, delete, enable & disable clients.
 * Show a client's QR code.
 * Download a client's configuration file.
 * Statistics for which clients are connected.
+* Tx/Rx charts for each connected client.
 * Gravatar support.
+
+## Requirements
+
+* A host with a kernel that supports WireGuard (all modern kernels).
+* A host with Docker installed.
 
 ## Installation
 
@@ -30,49 +36,69 @@ If you haven't installed Docker yet, install it by running:
 
 ```bash
 $ curl -sSL https://get.docker.com | sh
-$ sudo sh get-docker.sh
 $ sudo usermod -aG docker $(whoami)
-$ bash
+$ exit
 ```
 
-### 2. Configure WireGuard
+And log in again.
 
-Run these commands to prepare and configure WireGuard.
+### 2. Run WireGuard Easy
 
-```bash
-$ mkdir ~/.wg-easy
-$ cd ~/.wg-easy
-$ wget https://raw.githubusercontent.com/WeeJeWel/wg-easy/master/docker-compose.yml
-$ vim docker-compose.yml
-```
+To automatically install & run wg-easy, simply run:
 
-Change `WG_HOST=raspberrypi.local` to your server's public address, e.g. `WG_HOST=vpn.mydomain.com`.
+<pre>
+$ docker run -d \
+  --name=wg-easy \
+  -e WG_HOST=<b>🚨YOUR_SERVER_IP</b> \
+  -e PASSWORD=<b>🚨YOUR_ADMIN_PASSWORD</b> \
+  -v ~/.wg-easy:/etc/wireguard \
+  -p 51820:51820/udp \
+  -p 51821:51821/tcp \
+  --cap-add=NET_ADMIN \
+  --cap-add=SYS_MODULE \
+  --sysctl="net.ipv4.conf.all.src_valid_mark=1" \
+  --sysctl="net.ipv4.ip_forward=1" \
+  --restart unless-stopped \
+  weejewel/wg-easy
+</pre>
 
-Optionally, set a Web UI password by uncommenting `PASSWORD=foobar123` and change the password.
+> 💡 Replace `YOUR_SERVER_IP` with your WAN IP, or a Dynamic DNS hostname.
+> 
+> 💡 Replace `YOUR_ADMIN_PASSWORD` with a password to log in on the Web UI.
 
-> By default, any WireGuard client will have access to the Web UI, unless you set a password.
+The Web UI will now be available on `http://0.0.0.0:51821`.
 
-### 3. Run WireGuard
+> 💡 Your configuration files will be saved in `~/.wg-easy`
 
-Finally, run WireGuard. It will automatically start after a reboot.
+### 3. Sponsor
 
-```bash
-$ docker-compose up --detach
-```
-
-The Web UI will be available on `http://0.0.0.0:51821`. You can create new clients there.
+Are you enjoying this project? [Buy me a beer!](https://github.com/sponsors/WeeJeWel) 🍻
 
 ## Options
 
-These options can be configured in `docker-compose.yml` under `environment`.
+These options can be configured by setting environment variables using `-e KEY="VALUE"` in the `docker run` command.
 
 | Env | Default | Example | Description |
 | - | - | - | - |
 | `PASSWORD` | - | `foobar123` | When set, requires a password when logging in to the Web UI. |
-| `WG_HOST` | - | `vpn.myserver.com` | The public hostname of your VPN server |
-| `WG_PORT` | `51820` | `51820` | The public UDP port of your VPN server |
-| `WG_DEFAULT_ADDRESS` | `10.8.0.x` | `10.6.0.x` | Clients IP address range |
-| `WG_DEFAULT_DNS` | `1.1.1.1` | `8.8.8.8, 8.8.4.4` | DNS server clients will use |
-| `WG_MTU` | `null` | `1420` | The MTU the clients will use. (Server uses default WG MTU) |
+| `WG_HOST` | - | `vpn.myserver.com` | The public hostname of your VPN server. |
+| `WG_PORT` | `51820` | `12345` | The public UDP port of your VPN server. WireGuard will always listen on `51820` inside the Docker container. |
+| `WG_MTU` | `null` | `1420` | The MTU the clients will use. Server uses default WG MTU. |
+| `WG_PERSISTENT_KEEPALIVE` | `0` | `25` | Value in seconds to keep the "connection" open. |
+| `WG_DEFAULT_ADDRESS` | `10.8.0.x` | `10.6.0.x` | Clients IP address range. |
+| `WG_DEFAULT_DNS` | `1.1.1.1` | `8.8.8.8, 8.8.4.4` | DNS server clients will use. |
+| `WG_ALLOWED_IPS` | `0.0.0.0/0, ::/0` | `192.168.15.0/24, 10.0.1.0/24` | Allowed IPs clients will use. |
 
 > If you change `WG_PORT`, make sure to also change the exposed port.
+
+# Updating
+
+To update to the latest version, simply run:
+
+```bash
+docker stop wg-easy
+docker rm wg-easy
+docker pull weejewel/wg-easy
+```
+
+And then run the `docker run -d \ ...` command above again.

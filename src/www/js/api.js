@@ -29,6 +29,13 @@ class API {
     return json;
   }
 
+  async getRelease() {
+    return this.call({
+      method: 'get',
+      path: '/release',
+    });
+  }
+
   async getSession() {
     return this.call({
       method: 'get',
@@ -91,6 +98,22 @@ class API {
     return this.call({
       method: 'post',
       path: `/wireguard/client/${clientId}/disable`,
+    });
+  }
+
+  async updateClientName({ clientId, name }) {
+    return this.call({
+      method: 'put',
+      path: `/wireguard/client/${clientId}/name/`,
+      body: { name },
+    });
+  }
+
+  async updateClientAddress({ clientId, address }) {
+    return this.call({
+      method: 'put',
+      path: `/wireguard/client/${clientId}/address/`,
+      body: { address },
     });
   }
 

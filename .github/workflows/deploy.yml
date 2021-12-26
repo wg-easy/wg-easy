@@ -19,8 +19,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    
-    - uses: benjlevesque/short-sha@v1.2
+      with:
+        ref: production
 
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v1
@@ -35,10 +35,7 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
           
     # Set environment variables
-    - run: echo GH_BRANCH=${GITHUB_REF#refs/heads/} >> $GITHUB_ENV
-    - run: echo VERSION=$(cat package.json | jq -r .version) >> $GITHUB_ENV
-    - run: echo DOCKER_TAGS=$(cat package.json | jq -r .docker[\"$GH_BRANCH\"].tags) >> $GITHUB_ENV
-    - run: echo Branch ${{ env.GH_BRANCH }}, Tags ${{ env.DOCKER_TAGS }}
+    - run: echo RELEASE=$(cat ./src/package.json | jq -r .release) >> $GITHUB_ENV
     
     # Build & Publish
     - name: Build & Publish Docker Image
@@ -46,4 +43,4 @@ jobs:
       with:
         push: true
         platforms: linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8
-        tags: weejewel/wg-easy:v${{ env.VERSION }}, weejewel/wg-easy:${{ env.DOCKER_TAGS }}
+        tags: weejewel/wg-easy:latest, weejewel/wg-easy:${{ env.RELEASE }}

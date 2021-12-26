@@ -17,6 +17,8 @@ const {
   WG_MTU,
   WG_DEFAULT_DNS,
   WG_DEFAULT_ADDRESS,
+  WG_PERSISTENT_KEEPALIVE,
+  WG_ALLOWED_IPS,
 } = require('../config');
 
 module.exports = class WireGuard {
@@ -36,7 +38,9 @@ module.exports = class WireGuard {
           debug('Configuration loaded.');
         } catch (err) {
           const privateKey = await Util.exec('wg genkey');
-          const publicKey = await Util.exec(`echo ${privateKey} | wg pubkey`);
+          const publicKey = await Util.exec(`echo ${privateKey} | wg pubkey`, {
+            log: 'echo ***hidden*** | wg pubkey',
+          });
           const address = WG_DEFAULT_ADDRESS.replace('x', '1');
 
           config = {
@@ -51,6 +55,7 @@ module.exports = class WireGuard {
         }
 
         await this.__saveConfig(config);
+        await Util.exec('wg-quick down wg0').catch(() => { });
         await Util.exec('wg-quick up wg0');
         await Util.exec(`iptables -t nat -A POSTROUTING -s ${WG_DEFAULT_ADDRESS.replace('x', '0')}/24 -o eth0 -j MASQUERADE`);
         await Util.exec('iptables -A INPUT -p udp -m udp --dport 51820 -j ACCEPT');
@@ -125,7 +130,9 @@ AllowedIPs = ${client.address}/32`;
     }));
 
     // Loop WireGuard status
-    const dump = await Util.exec('wg show wg0 dump');
+    const dump = await Util.exec('wg show wg0 dump', {
+      log: false,
+    });
     dump
       .trim()
       .split('\n')
@@ -174,7 +181,7 @@ AllowedIPs = ${client.address}/32`;
 [Interface]
 PrivateKey = ${client.privateKey}
 Address = ${client.address}/24
-DNS = ${WG_DEFAULT_DNS}
+${WG_DEFAULT_DNS ? `DNS = ${WG_DEFAULT_DNS}` : ''}
 if (typeof ${WG_MTU} !== 'undefined' || ${WG_MTU} !== null) {
 MTU = ${WG_MTU}
 }
@@ -182,7 +189,8 @@ MTU = ${WG_MTU}
 [Peer]
 PublicKey = ${config.server.publicKey}
 PresharedKey = ${client.preSharedKey}
-AllowedIPs = 0.0.0.0/0, ::/0
+AllowedIPs = ${WG_ALLOWED_IPS}
+PersistentKeepalive = ${WG_PERSISTENT_KEEPALIVE}
 Endpoint = ${WG_HOST}:${WG_PORT}`;
   }
 
@@ -264,6 +272,28 @@ Endpoint = ${WG_HOST}:${WG_PORT}`;
     const client = await this.getClient({ clientId });
 
     client.enabled = false;
+    client.updatedAt = new Date();
+
+    await this.saveConfig();
+  }
+
+  async updateClientName({ clientId, name }) {
+    const client = await this.getClient({ clientId });
+
+    client.name = name;
+    client.updatedAt = new Date();
+
+    await this.saveConfig();
+  }
+
+  async updateClientAddress({ clientId, address }) {
+    const client = await this.getClient({ clientId });
+
+    if (!Util.isValidIPv4(address)) {
+      throw new ServerError(`Invalid Address: ${address}`, 400);
+    }
+
+    client.address = address;
     client.updatedAt = new Date();
 
     await this.saveConfig();
