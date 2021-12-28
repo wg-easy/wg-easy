@@ -8,6 +8,10 @@
 
 You have found the easiest way to install & manage WireGuard on any Linux host!
 
+Modificado el wireguard.js con las siguientes lineas para que el spk resultante funcione en un Synology.
+PostUp = iptables -A FORWARD -i %i -j ACCEPT; iptables -A FORWARD -o %i -j ACCEPT; iptables -t nat -A POSTROUTING -o ovs_eth0 -j MASQUERADE
+PostDown = iptables -D FORWARD -i %i -j ACCEPT; iptables -D FORWARD -o %i -j ACCEPT; iptables -t nat -D POSTROUTING -o ovs_eth0 -j MASQUERADE`;
+
 <p align="center">
   <img src="./assets/screenshot.png" width="802" />
 </p>
