@@ -93,7 +93,7 @@ spec:
             claimName: {{ if .Values.persistence.existingClaim }}{{ .Values.persistence.existingClaim }}{{- else }}{{ include "wg-easy.fullname" . }}{{- end }}
         {{- end }}
         {{- if not .Values.persistence.enabled }}
-        emptyDir: {}
+          emptyDir: {}
         {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
