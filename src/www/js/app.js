@@ -92,6 +92,14 @@ new Vue({
     },
   },
   methods: {
+    switchClientStatus(client) {
+      if (client.enabled === true) {
+        this.disableClient(client)
+      }
+      else {
+        this.enableClient(client);
+      }
+    },
     dateTime: value => {
       return new Intl.DateTimeFormat(undefined, {
         year: 'numeric',
