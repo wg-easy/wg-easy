@@ -3,10 +3,10 @@
 
 <head>
   <title>WireGuard</title>
-  <link href="/css/vendor/tailwind.min.css" rel="stylesheet">
-  <link rel="manifest" href="manifest.json">
-  <link rel="icon" type="image/png" href="img/favicon.png">
-  <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+  <link href="./css/vendor/tailwind.min.css" rel="stylesheet">
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" type="image/png" href="./img/favicon.png">
+  <link rel="apple-touch-icon" href="./img/apple-touch-icon.png">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
 </head>
@@ -200,7 +200,7 @@
 
                     <!-- Show QR-->
                     <button class="align-middle bg-gray-100 hover:bg-red-800 hover:text-white p-2 rounded transition"
-                      title="Show QR Code" @click="qrcode = `/api/wireguard/client/${client.id}/qrcode.svg`">
+                      title="Show QR Code" @click="qrcode = `./api/wireguard/client/${client.id}/qrcode.svg`">
                       <svg class="w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -209,7 +209,7 @@
                     </button>
 
                     <!-- Download Config -->
-                    <a :href="'/api/wireguard/client/' + client.id + '/configuration'" download
+                    <a :href="'./api/wireguard/client/' + client.id + '/configuration'" download
                       class="align-middle inline-block bg-gray-100 hover:bg-red-800 hover:text-white p-2 rounded transition"
                       title="Download Configuration">
                       <svg class="w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -473,13 +473,13 @@
 
   </div>
 
-  <script src="/js/vendor/vue.min.js"></script>
-  <script src="/js/vendor/apexcharts.min.js"></script>
-  <script src="/js/vendor/vue-apexcharts.min.js"></script>
-  <script src="/js/vendor/md5.min.js"></script>
-  <script src="/js/vendor/timeago.min.js"></script>
-  <script src="/js/api.js"></script>
-  <script src="/js/app.js"></script>
+  <script src="./js/vendor/vue.min.js"></script>
+  <script src="./js/vendor/apexcharts.min.js"></script>
+  <script src="./js/vendor/vue-apexcharts.min.js"></script>
+  <script src="./js/vendor/md5.min.js"></script>
+  <script src="./js/vendor/timeago.min.js"></script>
+  <script src="./js/api.js"></script>
+  <script src="./js/app.js"></script>
 </body>
 
 </html>
