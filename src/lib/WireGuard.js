@@ -55,7 +55,13 @@ module.exports = class WireGuard {
 
         await this.__saveConfig(config);
         await Util.exec('wg-quick down wg0').catch(() => { });
-        await Util.exec('wg-quick up wg0');
+        await Util.exec('wg-quick up wg0').catch(err => {
+          if (err && err.message && err.message.includes('Cannot find device "wg0"')) {
+            throw new Error('WireGuard exited with the error: Cannot find device "wg0"\nThis usually means that your host\'s kernel does not support WireGuard!');
+          }
+
+          throw err;
+        });
         await Util.exec(`iptables -t nat -A POSTROUTING -s ${WG_DEFAULT_ADDRESS.replace('x', '0')}/24 -o eth0 -j MASQUERADE`);
         await Util.exec('iptables -A INPUT -p udp -m udp --dport 51820 -j ACCEPT');
         await Util.exec('iptables -A FORWARD -i wg0 -j ACCEPT');
