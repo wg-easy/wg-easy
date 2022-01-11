@@ -192,9 +192,7 @@ AllowedIPs = ${client.address}/32`;
 PrivateKey = ${client.privateKey}
 Address = ${client.address}/24
 ${WG_DEFAULT_DNS ? `DNS = ${WG_DEFAULT_DNS}` : ''}
-if (typeof ${WG_MTU} !== 'undefined' || ${WG_MTU} !== null) {
-MTU = ${WG_MTU}
-}
+${WG_MTU ? `MTU = ${WG_MTU}` : ''}
 
 [Peer]
 PublicKey = ${config.server.publicKey}
