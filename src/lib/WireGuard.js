@@ -14,6 +14,7 @@ const {
   WG_PATH,
   WG_HOST,
   WG_PORT,
+  WG_MTU,
   WG_DEFAULT_DNS,
   WG_DEFAULT_ADDRESS,
   WG_PERSISTENT_KEEPALIVE,
@@ -191,6 +192,9 @@ AllowedIPs = ${client.address}/32`;
 PrivateKey = ${client.privateKey}
 Address = ${client.address}/24
 ${WG_DEFAULT_DNS ? `DNS = ${WG_DEFAULT_DNS}` : ''}
+if (typeof ${WG_MTU} !== 'undefined' || ${WG_MTU} !== null) {
+MTU = ${WG_MTU}
+}
 
 [Peer]
 PublicKey = ${config.server.publicKey}
