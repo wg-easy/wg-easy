@@ -4,10 +4,6 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - testing
-      - testing/**
-      - staging
-      - staging/**
       - production
       - production/**
 
