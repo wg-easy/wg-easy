@@ -99,8 +99,12 @@ AllowedIPs = ${client.address}/32`;
     }
 
     debug('Saving config...');
-    await fs.writeFile(path.join(WG_PATH, 'wg0.json'), JSON.stringify(config, false, 2));
-    await fs.writeFile(path.join(WG_PATH, 'wg0.conf'), result);
+    await fs.writeFile(path.join(WG_PATH, 'wg0.json'), JSON.stringify(config, false, 2), {
+      mode: 0o660,
+    });
+    await fs.writeFile(path.join(WG_PATH, 'wg0.conf'), result, {
+      mode: 0o600,
+    });
     debug('Config saved.');
   }
 
