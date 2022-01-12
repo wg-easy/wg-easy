@@ -1,12 +1,13 @@
 'use strict';
 
 const { release } = require('./package.json');
+const secrets = require('./secrets');
 
 module.exports.RELEASE = release;
 module.exports.PORT = process.env.PORT || 51821;
-module.exports.PASSWORD = process.env.PASSWORD;
+module.exports.PASSWORD = secrets.read(process.env.PASSWORD) || process.env.PASSWORD;
 module.exports.WG_PATH = process.env.WG_PATH || '/etc/wireguard/';
-module.exports.WG_HOST = process.env.WG_HOST;
+module.exports.WG_HOST = secrets.read(process.env.WG_HOST)|| process.env.WG_HOST;
 module.exports.WG_PORT = process.env.WG_PORT || 51820;
 module.exports.WG_MTU = process.env.WG_MTU || null;
 module.exports.WG_PERSISTENT_KEEPALIVE = process.env.WG_PERSISTENT_KEEPALIVE || 0;
