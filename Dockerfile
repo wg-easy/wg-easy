@@ -8,8 +8,8 @@ COPY src/ /app/
 WORKDIR /app
 RUN npm ci --production \
 &&  npm i -g nodemon \
-&&  npm cache clear --force
-RUN mv /app/node_modules/ /node_modules/
+&&  npm cache clear --force \
+&&  mv /app/node_modules/ /node_modules/
 
 # Expose Ports
 EXPOSE 51820/udp
