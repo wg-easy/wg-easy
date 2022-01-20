@@ -10,12 +10,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
 </head>
+  
+<style>
+  [v-cloak] {
+    display: none;
+  }
+</style>
 
 <body class="bg-gray-50 dark:bg-slate-800">
 
   <div id="app">
 
-    <div class="container mx-auto max-w-3xl">
+    <div v-cloak class="container mx-auto max-w-3xl">
 
       <div v-if="authenticated === true">
         <span v-if="requiresPassword"
