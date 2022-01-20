@@ -3,15 +3,16 @@
 
 <head>
   <title>WireGuard</title>
-  <link href="./css/vendor/tailwind.min.css" rel="stylesheet">
+  <!-- <link href="./css/vendor/tailwind.min.css" rel="stylesheet"> -->
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" type="image/png" href="./img/favicon.png">
   <link rel="apple-touch-icon" href="./img/apple-touch-icon.png">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="bg-gray-50">
+<body class="bg-gray-50 dark:bg-slate-800">
 
   <div id="app">
 
@@ -19,7 +20,7 @@
 
       <div v-if="authenticated === true">
         <span v-if="requiresPassword"
-          class="text-sm text-gray-400 mb-10 mr-2 mt-3 cursor-pointer hover:underline float-right" @click="logout">
+          class="text-sm text-gray-400 dark:text-slate-400 mb-10 mr-2 mt-3 cursor-pointer hover:underline float-right" @click="logout">
           Logout
           <svg class="h-3 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
             stroke="currentColor">
@@ -27,13 +28,13 @@
               d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
           </svg>
         </span>
-        <h1 class="text-4xl font-medium mt-10 mb-2">
-          <img src="./img/logo.png" width="32" class="inline align-middle" />
+        <h1 class="text-4xl dark:text-slate-200 font-medium mt-10 mb-2">
+          <img src="./img/logo.png" width="32" class="inline align-middle dark:bg-slate-200 py-1 rounded" />
           <span class="align-middle">WireGuard</span>
         </h1>
         <h2 class="text-sm text-gray-400 mb-10"></h2>
 
-        <div v-if="latestRelease" class="bg-red-800 p-4 text-white text-sm font-small mb-10 rounded-md shadow-lg"
+        <div v-if="latestRelease" class="bg-red-800 dark:bg-green-100 p-4 text-white dark:text-green-600 text-sm font-small mb-10 rounded-md shadow-lg"
           :title="`v${currentRelease} → v${latestRelease.version}`">
           <div class="container mx-auto flex flex-row flex-auto items-center">
             <div class="flex-grow">
@@ -42,20 +43,20 @@
             </div>
 
             <a href="https://github.com/WeeJeWel/wg-easy#updating" target="_blank"
-              class="p-3 rounded-md bg-white float-right font-sm font-semibold text-red-800 flex-shrink-0 border-2 border-red-800 hover:border-white hover:text-white hover:bg-red-800 transition-all">
+              class="p-3 rounded-md bg-white dark:bg-green-100 float-right font-sm font-semibold text-red-800 dark:text-green-600 flex-shrink-0 border-2 border-red-800 dark:border-green-600 hover:border-white dark:hover:border-green-600 hover:text-white dark:hover:text-green-100 hover:bg-red-800 dark:hover:bg-green-600 transition-all">
               Update →
             </a>
           </div>
         </div>
 
-        <div class="shadow-md rounded-lg bg-white overflow-hidden">
-          <div class="flex flex-row flex-auto items-center p-3 px-5 border border-b-2 border-gray-100">
+        <div class="shadow-md rounded-lg bg-white dark:bg-slate-700 overflow-hidden">
+          <div class="flex flex-row flex-auto items-center p-3 px-5 border-b-2 border-gray-100 dark:border-slate-600">
             <div class="flex-grow">
-              <p class="text-2xl font-medium">Clients</p>
+              <p class="text-2xl font-medium dark:text-slate-200">Clients</p>
             </div>
             <div class="flex-shrink-0">
               <button @click="clientCreate = true; clientCreateName = '';"
-                class="hover:bg-red-800 hover:border-red-800 hover:text-white text-gray-700 border-2 border-gray-100 py-2 px-4 rounded inline-flex items-center transition">
+                class="hover:bg-red-800 dark:hover:bg-blue-100 hover:border-red-800 dark:hover:border-blue-100 hover:text-white dark:hover:text-blue-600 text-gray-700 dark:text-slate-200 border-2 border-gray-100 dark:border-slate-600 py-2 px-4 rounded inline-flex items-center transition">
                 <svg class="w-4 mr-2" inline xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                   stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -69,7 +70,7 @@
           <div>
             <!-- Client -->
             <div v-if="clients && clients.length > 0" v-for="client in clients" :key="client.id"
-              class="relative overflow-hidden border-b border-gray-100 border-solid">
+              class="relative overflow-hidden border-b last:border-b-0 border-gray-100 dark:border-slate-600 border-solid">
 
               <!-- Chart -->
               <div class="absolute z-0 bottom-0 left-0 right-0" style="top: 60%;">
@@ -83,8 +84,8 @@
               </div>
 
               <div class="relative p-5 z-10 flex flex-row">
-                <div class="h-10 w-10 mr-5 rounded-full bg-gray-50 relative">
-                  <svg class="w-6 m-2 text-gray-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                <div class="h-10 w-10 mr-5 rounded-full bg-gray-50 dark:bg-blue-100 relative">
+                  <svg class="w-6 m-2 text-gray-300 dark:text-blue-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                     fill="currentColor">
                     <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
                       clip-rule="evenodd" />
@@ -93,22 +94,22 @@
 
                   <div
                     v-if="client.latestHandshakeAt && ((new Date() - new Date(client.latestHandshakeAt) < 1000 * 60 * 10))">
-                    <div class="animate-ping w-4 h-4 p-1 bg-red-100 rounded-full absolute -bottom-1 -right-1"></div>
-                    <div class="w-2 h-2 bg-red-800 rounded-full absolute bottom-0 right-0"></div>
+                    <div class="animate-ping w-4 h-4 p-1 bg-red-100 dark:bg-green-100 rounded-full absolute -bottom-1 -right-1"></div>
+                    <div class="w-2 h-2 bg-red-800 dark:bg-green-600 rounded-full absolute bottom-0 right-0"></div>
                   </div>
                 </div>
 
                 <div class="flex-grow">
 
                   <!-- Name -->
-                  <div class="text-gray-700 group" :title="'Created at ' + dateTime(new Date(client.createdAt))">
+                  <div class="text-gray-700 dark:text-slate-200 group" :title="'Created at ' + dateTime(new Date(client.createdAt))">
 
                     <!-- Show -->
                     <input v-show="clientEditNameId === client.id" v-model="clientEditName"
                       v-on:keyup.enter="updateClientName(client, clientEditName); clientEditName = null; clientEditNameId = null;"
                       v-on:keyup.escape="clientEditName = null; clientEditNameId = null;"
                       :ref="'client-' + client.id + '-name'"
-                      class="rounded px-1 border-2 border-gray-100 focus:border-gray-200 outline-none w-30" />
+                      class="rounded px-1 border-2 dark:bg-slate-700 border-gray-100 dark:border-slate-600 focus:border-gray-200 dark:focus:border-slate-500 outline-none w-30" />
                     <span v-show="clientEditNameId !== client.id"
                       class="inline-block border-t-2 border-b-2 border-transparent">{{client.name}}</span>
 
@@ -126,7 +127,7 @@
                   </div>
 
                   <!-- Info -->
-                  <div class="text-gray-400 text-xs">
+                  <div class="text-gray-400 dark:text-slate-400 text-xs">
 
                     <!-- Address -->
                     <span class="group">
@@ -136,7 +137,7 @@
                         v-on:keyup.enter="updateClientAddress(client, clientEditAddress); clientEditAddress = null; clientEditAddressId = null;"
                         v-on:keyup.escape="clientEditAddress = null; clientEditAddressId = null;"
                         :ref="'client-' + client.id + '-address'"
-                        class="rounded border-2 border-gray-100 focus:border-gray-200 outline-none w-20 text-black" />
+                        class="rounded border-2 dark:bg-slate-700 border-gray-100 dark:border-slate-600 focus:border-gray-200 dark:focus:border-slate-500 outline-none w-20 text-black dark:text-slate-300" />
                       <span v-show="clientEditAddressId !== client.id"
                         class="inline-block border-t-2 border-b-2 border-transparent">{{client.address}}</span>
 
@@ -190,16 +191,16 @@
 
                     <!-- Enable/Disable -->
                     <div @click="disableClient(client)" v-if="client.enabled === true" title="Disable Client"
-                      class="inline-block align-middle rounded-full w-10 h-6 mr-1 bg-red-800 cursor-pointer hover:bg-red-700 transition-all">
+                      class="inline-block align-middle rounded-full w-10 h-6 mr-1 bg-green-600 cursor-pointer hover:bg-green-700 transition-all">
                       <div class="rounded-full w-4 h-4 m-1 ml-5 bg-white"></div>
                     </div>
                     <div @click="enableClient(client)" v-if="client.enabled === false" title="Enable Client"
-                      class="inline-block align-middle rounded-full w-10 h-6 mr-1 bg-gray-200 cursor-pointer hover:bg-gray-300 transition-all">
+                      class="inline-block align-middle rounded-full w-10 h-6 mr-1 bg-gray-200 dark:bg-slate-400 cursor-pointer hover:bg-gray-300 dark:hover:bg-slate-500 transition-all">
                       <div class="rounded-full w-4 h-4 m-1 bg-white"></div>
                     </div>
 
                     <!-- Show QR-->
-                    <button class="align-middle bg-gray-100 hover:bg-red-800 hover:text-white p-2 rounded transition"
+                    <button class="align-middle bg-gray-100 dark:bg-slate-600 dark:text-slate-300 hover:bg-red-800 dark:hover:bg-blue-100 hover:text-white dark:hover:text-blue-600 p-2 rounded transition"
                       title="Show QR Code" @click="qrcode = `./api/wireguard/client/${client.id}/qrcode.svg`">
                       <svg class="w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
@@ -210,7 +211,7 @@
 
                     <!-- Download Config -->
                     <a :href="'./api/wireguard/client/' + client.id + '/configuration'" download
-                      class="align-middle inline-block bg-gray-100 hover:bg-red-800 hover:text-white p-2 rounded transition"
+                      class="align-middle inline-block bg-gray-100 dark:bg-slate-600 dark:text-slate-300 hover:bg-red-800 dark:hover:bg-blue-100 hover:text-white dark:hover:text-blue-600 p-2 rounded transition"
                       title="Download Configuration">
                       <svg class="w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
@@ -220,7 +221,7 @@
                     </a>
 
                     <!-- Delete -->
-                    <button class="align-middle bg-gray-100 hover:bg-red-800 hover:text-white p-2 rounded transition"
+                    <button class="align-middle bg-gray-100 dark:bg-slate-600 dark:text-slate-300 hover:bg-red-800 dark:hover:bg-red-100 hover:text-white dark:hover:text-red-600 p-2 rounded transition"
                       title="Delete Client" @click="clientDelete = client">
                       <svg class="w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd"
@@ -263,7 +264,7 @@
         <div v-if="qrcode">
           <div class="bg-black bg-opacity-50 fixed top-0 right-0 left-0 bottom-0 flex items-center justify-center z-20">
             <div class="bg-white rounded-md shadow-lg relative p-8">
-              <button @click="qrcode = null" class="absolute right-4 top-4 text-gray-600 hover:text-gray-800">
+              <button @click="qrcode = null" class="absolute right-4 top-4 text-gray-600 dark:text-slate-500 hover:text-gray-800 dark:hover:text-slate-700">
                 <svg class="w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                   stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -288,7 +289,7 @@
           To: "opacity-0"
       -->
             <div class="fixed inset-0 transition-opacity" aria-hidden="true">
-              <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+              <div class="absolute inset-0 bg-gray-500 dark:bg-black opacity-75 dark:opacity-50"></div>
             </div>
 
             <!-- This element is to trick the browser into centering the modal contents. -->
@@ -304,42 +305,42 @@
           To: "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
       -->
             <div
-              class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
+              class="inline-block align-bottom bg-white dark:bg-slate-700 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
               role="dialog" aria-modal="true" aria-labelledby="modal-headline">
-              <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+              <div class="bg-white dark:bg-slate-700 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                 <div class="sm:flex sm:items-start">
                   <div
-                    class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-800 sm:mx-0 sm:h-10 sm:w-10">
-                    <svg class="h-6 w-6 text-white" inline xmlns="http://www.w3.org/2000/svg" fill="none"
+                    class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-800 dark:bg-blue-100 sm:mx-0 sm:h-10 sm:w-10">
+                    <svg class="h-6 w-6 text-white dark:text-blue-600" inline xmlns="http://www.w3.org/2000/svg" fill="none"
                       viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                     </svg>
                   </div>
                   <div class="flex-grow mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                    <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-headline">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-slate-200" id="modal-headline">
                       New Client
                     </h3>
                     <div class="mt-2">
                       <p class="text-sm text-gray-500">
-                        <input class="rounded p-2 border-2 border-gray-100 focus:border-gray-200 outline-none w-full"
+                        <input class="rounded p-2 border-2 dark:bg-slate-700 dark:text-slate-200 border-gray-100 dark:border-slate-600 focus:border-gray-200 focus:dark:border-slate-500 outline-none w-full"
                           type="text" v-model.trim="clientCreateName" placeholder="Name" />
                       </p>
                     </div>
                   </div>
                 </div>
               </div>
-              <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+              <div class="bg-gray-50 dark:bg-slate-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                 <button v-if="clientCreateName.length" type="button" @click="createClient(); clientCreate = null"
-                  class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-800 text-base font-medium text-white hover:bg-red-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
+                  class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-800 dark:bg-blue-100 text-base font-medium text-white dark:text-blue-600 hover:bg-red-700 dark:hover:bg-blue-200 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
                   Create
                 </button>
                 <button v-else type="button"
-                  class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-gray-200 text-base font-medium text-white sm:ml-3 sm:w-auto sm:text-sm cursor-not-allowed">
+                  class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-gray-200 dark:bg-slate-400 text-base font-medium text-white dark:text-slate-300 sm:ml-3 sm:w-auto sm:text-sm cursor-not-allowed">
                   Create
                 </button>
                 <button type="button" @click="clientCreate = null"
-                  class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                  class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-slate-500 shadow-sm px-4 py-2 bg-white dark:bg-slate-500 text-base font-medium text-gray-700 dark:text-slate-50 hover:bg-gray-50 dark:hover:bg-slate-600 dark:hover:border-slate-600 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
                   Cancel
                 </button>
               </div>
@@ -361,7 +362,7 @@
           To: "opacity-0"
       -->
             <div class="fixed inset-0 transition-opacity" aria-hidden="true">
-              <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+              <div class="absolute inset-0 bg-gray-500 dark:bg-black opacity-75 dark:opacity-50"></div>
             </div>
 
             <!-- This element is to trick the browser into centering the modal contents. -->
@@ -377,9 +378,9 @@
           To: "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
       -->
             <div
-              class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
+              class="inline-block align-bottom bg-white dark:bg-slate-700 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
               role="dialog" aria-modal="true" aria-labelledby="modal-headline">
-              <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+              <div class="bg-white dark:bg-slate-700 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                 <div class="sm:flex sm:items-start">
                   <div
                     class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
@@ -391,11 +392,11 @@
                     </svg>
                   </div>
                   <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                    <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-headline">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-slate-200" id="modal-headline">
                       Delete Client
                     </h3>
                     <div class="mt-2">
-                      <p class="text-sm text-gray-500">
+                      <p class="text-sm text-gray-500 dark:text-slate-300">
                         Are you sure you want to delete <strong>{{clientDelete.name}}</strong>?
                         This action cannot be undone.
                       </p>
@@ -403,13 +404,13 @@
                   </div>
                 </div>
               </div>
-              <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+              <div class="bg-gray-50 dark:bg-slate-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                 <button type="button" @click="deleteClient(clientDelete); clientDelete = null"
-                  class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
+                  class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 dark:bg-red-100 text-base font-medium text-white dark:text-red-600 hover:bg-red-700 dark:hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
                   Delete
                 </button>
                 <button type="button" @click="clientDelete = null"
-                  class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                  class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-slate-500 shadow-sm px-4 py-2 bg-white dark:bg-slate-500 text-base font-medium text-gray-700 dark:text-slate-50 hover:bg-gray-50 dark:hover:bg-slate-600 dark:hover:border-slate-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
                   Cancel
                 </button>
               </div>
@@ -419,22 +420,22 @@
       </div>
 
       <div v-if="authenticated === false">
-        <h1 class="text-4xl font-medium my-16 text-gray-700 text-center">WireGuard</h1>
+        <h1 class="text-4xl font-medium my-16 text-gray-700 dark:text-slate-200 text-center">WireGuard</h1>
 
-        <form @submit="login" class="shadow rounded-md bg-white mx-auto w-64 p-5 overflow-hidden mt-10">
+        <form @submit="login" class="shadow rounded-md bg-white dark:bg-slate-700 mx-auto w-64 p-5 overflow-hidden mt-10">
           <!-- Avatar -->
-          <div class="h-20 w-20 mb-10 mt-5 mx-auto rounded-full bg-red-800 relative overflow-hidden">
-            <svg class="w-10 h-10 m-5 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+          <div class="h-20 w-20 mb-10 mt-5 mx-auto rounded-full bg-red-800 dark:bg-blue-100 relative overflow-hidden">
+            <svg class="w-10 h-10 m-5 text-white dark:text-blue-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
               fill="currentColor">
               <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
             </svg>
           </div>
 
           <input type="password" name="password" placeholder="Password" v-model="password"
-            class="px-3 py-2 text-sm text-gray-500 mb-5 border-2 border-gray-100 rounded-lg w-full focus:border-red-800 outline-none" />
+            class="px-3 py-2 text-sm dark:bg-slate-700 text-gray-500 dark:text-slate-200 mb-5 border-2 border-gray-100 dark:border-slate-600 rounded-lg w-full focus:border-red-800 dark:focus:border-slate-500 outline-none" />
 
           <button v-if="authenticating"
-            class="bg-red-800 w-full rounded shadow py-2 text-sm text-white cursor-not-allowed">
+            class="bg-red-800 dark:bg-blue-100 w-full rounded shadow py-2 text-sm text-white dark:text-blue-600 cursor-not-allowed">
             <svg class="w-5 animate-spin mx-auto" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
               fill="currentColor">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -444,10 +445,10 @@
             </svg>
           </button>
           <input v-if="!authenticating && password" type="submit"
-            class="bg-red-800 w-full rounded shadow py-2 text-sm text-white hover:bg-red-700 transition cursor-pointer"
+            class="bg-red-800 dark:bg-blue-100 w-full rounded shadow py-2 text-sm text-white dark:text-blue-600 hover:bg-red-700 dark:hover:bg-blue-200 transition cursor-pointer"
             value="Sign In">
           <input v-if="!authenticating && !password" type="submit"
-            class="bg-gray-200 w-full rounded shadow py-2 text-sm text-white cursor-not-allowed" value="Sign In">
+            class="bg-gray-200 dark:bg-slate-400 w-full rounded shadow py-2 text-sm text-white dark:text-slate-300 cursor-not-allowed" value="Sign In">
         </form>
       </div>
 
@@ -465,7 +466,7 @@
 
     </div>
 
-    <p class="text-center m-10 text-gray-300 text-xs">Made by <a target="_blank" class="hover:underline"
+    <p class="text-center m-10 text-gray-300 dark:text-slate-600 text-xs">Made by <a target="_blank" class="hover:underline"
         href="https://emilenijssen.nl/?ref=wg-easy">Emile Nijssen</a> · <a class="hover:underline"
         href="https://github.com/sponsors/WeeJeWel" target="_blank">Donate</a> · <a class="hover:underline"
         href="https://github.com/weejewel/wg-easy" target="_blank">GitHub</a></p>
