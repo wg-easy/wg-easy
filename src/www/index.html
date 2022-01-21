@@ -10,7 +10,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
 </head>
-  
+
 <style>
   [v-cloak] {
     display: none;
@@ -37,7 +37,7 @@
           <img src="./img/logo.png" width="32" class="inline align-middle dark:bg-slate-200 py-1 rounded" />
           <span class="align-middle">WireGuard</span>
         </h1>
-        <h2 class="text-sm text-gray-400 mb-10"></h2>
+        <h2 class="text-sm text-gray-400 dark:text-slate-400 mb-10"></h2>
 
         <div v-if="latestRelease" class="bg-red-800 dark:bg-green-100 p-4 text-white dark:text-green-600 text-sm font-small mb-10 rounded-md shadow-lg"
           :title="`v${currentRelease} → v${latestRelease.version}`">
@@ -192,7 +192,7 @@
                 </div>
 
                 <div class="text-right">
-                  <div class="text-gray-400">
+                  <div class="text-gray-400 dark:text-slate-400">
 
                     <!-- Enable/Disable -->
                     <div @click="disableClient(client)" v-if="client.enabled === true" title="Disable Client"
@@ -241,9 +241,9 @@
 
             </div>
             <div v-if="clients && clients.length === 0">
-              <p class="text-center m-10 text-gray-400 text-sm">There are no clients yet.<br /><br />
+              <p class="text-center m-10 text-gray-400 dark:text-slate-400 text-sm">There are no clients yet.<br /><br />
                 <button @click="clientCreate = true; clientCreateName = '';"
-                  class="bg-red-800 text-white hover:bg-red-700 border-2 border-none py-2 px-4 rounded inline-flex items-center transition">
+                  class="bg-red-800 dark:bg-blue-100 text-white dark:text-blue-600 hover:bg-red-700 dark:hover:bg-blue-200 border-2 border-none py-2 px-4 rounded inline-flex items-center transition">
                   <svg class="w-4 mr-2" inline xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -253,7 +253,7 @@
                 </button>
               </p>
             </div>
-            <div v-if="clients === null" class="text-gray-200 p-5">
+            <div v-if="clients === null" class="text-gray-200 dark:text-blue-300 p-5">
               <svg class="w-5 animate-spin mx-auto" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
                 fill="currentColor">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -457,7 +457,7 @@
         </form>
       </div>
 
-      <div v-if="authenticated === null" class="text-gray-300 pt-24 pb-12">
+      <div v-if="authenticated === null" class="text-gray-300 dark:text-blue-300 pt-24 pb-12">
 
         <svg class="w-5 animate-spin mx-auto" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
           fill="currentColor">
