@@ -1,0 +1,89 @@
+# Generation of Kubernetes YAML is still under development!
+#
+# Save the output of this file and use kubectl create -f to import
+# it into Kubernetes.
+#
+# Created with podman-3.0.1
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: "2022-01-21T12:07:16Z"
+  labels:
+    app: wg-easypod
+  name: wg-easy_pod
+spec:
+  containers:
+  - args:
+    - /usr/bin/dumb-init
+    - node
+    - server.js
+    command:
+    - docker-entrypoint.sh
+    env:
+    - name: container
+      value: podman
+    # Domain/hostname/IP address of host
+    - name: WG_HOST
+      value: 
+    # Admin password for login to web UI
+    #- name: PASSWORD
+    #  value: 
+    # The public UDP port of your Wireguard server (default is 51820)
+    #- name: WG_PORT
+    #  value:
+    # Clients IP address range (default is 10.8.0.x)
+    #- name: WG_DEFAULT_ADDRESS
+    #  value:
+    # Value in seconds to keep the "connection" open (default is 0)
+    #- name: WG_PERSISTENT_KEEPALIVE
+    #  value:
+    # DNS server clients will use (default is 1.1.1.1)
+    #- name: WG_DEFAULT_DNS
+    #  value:
+    # The MTU you wish to use (default is null)
+    #- name: WG_MTU
+    #  value:
+    # Allowed IPs clients will use (default is 0.0.0.0/0, ::/0)
+    #- name: WG_ALLOWED_IPS
+    #  value:
+    image: docker.io/weejewel/wg-easy:latest
+    name: wg-easy
+    ports:
+    - containerPort: 51820
+      hostPort: 51820
+      protocol: UDP
+    - containerPort: 51821
+      hostPort: 51821
+      protocol: TCP
+    resources: {}
+    securityContext:
+      allowPrivilegeEscalation: true
+      capabilities:
+        add:
+        - CAP_NET_ADMIN
+        - CAP_NET_RAW
+        - CAP_SYS_MODULE
+        drop:
+        - CAP_MKNOD
+        - CAP_AUDIT_WRITE
+      privileged: false
+      readOnlyRootFilesystem: false
+      seLinuxOptions: {}
+    volumeMounts:
+    - mountPath: /etc/wireguard
+      # wg-easy directory, replaceing / with -
+      # example: home-user-wg-easy
+      name: 
+    workingDir: /app
+  dnsConfig: {}
+  restartPolicy: Never
+  volumes:
+  - hostPath:
+      # wg-easy directory
+      # example: /home/user/wg-easy
+      path: 
+      type: Directory
+    # wg-easy directory, replacing / with -
+    # example: home-user-wg-easy
+    name: 
+status: {}
