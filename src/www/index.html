@@ -28,7 +28,7 @@
 
   <div id="app">
 
-    <div v-cloak class="container mx-auto max-w-3xl">
+    <div v-cloak class="container mx-auto max-w-3xl px-5 md:px-0">
 
       <div v-if="authenticated === true">
         <span v-if="requiresPassword"
@@ -95,7 +95,8 @@
                 </apexchart>
               </div>
 
-              <div class="relative p-5 z-10 flex flex-row">
+              <div class="relative p-5 z-10 flex flex-col md:flex-row justify-between">
+                <div class="flex items-center pb-2 md:pb-0">
                 <div class="h-10 w-10 mr-5 rounded-full bg-gray-50 dark:bg-blue-100 relative">
                   <svg class="w-6 m-2 text-gray-300 dark:text-blue-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                     fill="currentColor">
@@ -142,7 +143,7 @@
                   <div class="text-gray-400 dark:text-slate-400 text-xs">
 
                     <!-- Address -->
-                    <span class="group">
+                    <span class="group block md:inline-block pb-1 md:pb-0">
 
                       <!-- Show -->
                       <input v-show="clientEditAddressId === client.id" v-model="clientEditAddress"
@@ -197,9 +198,10 @@
                     </span>
                   </div>
                 </div>
+                </div>
 
-                <div class="text-right">
-                  <div class="text-gray-400 dark:text-slate-400">
+                <div class="flex items-center justify-end">
+                  <div class="text-gray-400 dark:text-slate-400 flex gap-1 items-center justify-between">
 
                     <!-- Enable/Disable -->
                     <div @click="disableClient(client)" v-if="client.enabled === true" title="Disable Client"
@@ -289,7 +291,7 @@
 
         <!-- Create Dialog -->
         <div v-if="clientCreate" class="fixed z-10 inset-0 overflow-y-auto">
-          <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+          <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <!--
         Background overlay, show/hide based on modal state.
 
@@ -317,7 +319,7 @@
           To: "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
       -->
             <div
-              class="inline-block align-bottom bg-white dark:bg-slate-700 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
+              class="inline-block align-bottom bg-white dark:bg-slate-700 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full"
               role="dialog" aria-modal="true" aria-labelledby="modal-headline">
               <div class="bg-white dark:bg-slate-700 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                 <div class="sm:flex sm:items-start">
@@ -362,7 +364,7 @@
 
         <!-- Delete Dialog -->
         <div v-if="clientDelete" class="fixed z-10 inset-0 overflow-y-auto">
-          <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+          <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <!--
         Background overlay, show/hide based on modal state.
 
@@ -390,7 +392,7 @@
           To: "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
       -->
             <div
-              class="inline-block align-bottom bg-white dark:bg-slate-700 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
+              class="inline-block align-bottom bg-white dark:bg-slate-700 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full"
               role="dialog" aria-modal="true" aria-labelledby="modal-headline">
               <div class="bg-white dark:bg-slate-700 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                 <div class="sm:flex sm:items-start">
@@ -418,11 +420,11 @@
               </div>
               <div class="bg-gray-50 dark:bg-slate-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                 <button type="button" @click="deleteClient(clientDelete); clientDelete = null"
-                  class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 dark:bg-red-100 text-base font-medium text-white dark:text-red-600 hover:bg-red-700 dark:hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
+                  class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 dark:bg-red-100 text-base font-medium text-white dark:text-red-600 hover:bg-red-700 dark:hover:bg-red-200 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
                   Delete
                 </button>
                 <button type="button" @click="clientDelete = null"
-                  class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-slate-500 shadow-sm px-4 py-2 bg-white dark:bg-slate-500 text-base font-medium text-gray-700 dark:text-slate-50 hover:bg-gray-50 dark:hover:bg-slate-600 dark:hover:border-slate-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                  class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-slate-500 shadow-sm px-4 py-2 bg-white dark:bg-slate-500 text-base font-medium text-gray-700 dark:text-slate-50 hover:bg-gray-50 dark:hover:bg-slate-600 dark:hover:border-slate-600 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
                   Cancel
                 </button>
               </div>
@@ -478,7 +480,7 @@
 
     </div>
 
-    <p class="text-center m-10 text-gray-300 dark:text-slate-600 text-xs">Made by <a target="_blank" class="hover:underline"
+    <p v-cloak class="text-center m-10 text-gray-300 dark:text-slate-600 text-xs">Made by <a target="_blank" class="hover:underline"
         href="https://emilenijssen.nl/?ref=wg-easy">Emile Nijssen</a> · <a class="hover:underline"
         href="https://github.com/sponsors/WeeJeWel" target="_blank">Donate</a> · <a class="hover:underline"
         href="https://github.com/weejewel/wg-easy" target="_blank">GitHub</a></p>
