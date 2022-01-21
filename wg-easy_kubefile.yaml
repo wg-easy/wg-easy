@@ -49,12 +49,14 @@ spec:
     image: docker.io/weejewel/wg-easy:latest
     name: wg-easy
     ports:
-    - containerPort: 51820
-      hostPort: 51820
-      protocol: UDP
-    - containerPort: 51821
-      hostPort: 51821
-      protocol: TCP
+    # Change hostPort to WG_HOST
+    #- containerPort: 51820
+    #  hostPort: 51820
+    #  protocol: UDP
+    # Change hostPort to whatever port you want for web UI
+    #- containerPort: 51821
+    #  hostPort: 51821
+    #  protocol: TCP
     resources: {}
     securityContext:
       allowPrivilegeEscalation: true
