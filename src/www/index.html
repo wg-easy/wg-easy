@@ -33,12 +33,10 @@
     <div class="flex justify-end">
       <button v-cloak id="theme-toggle" @click="toggleTheme"
         class="mt-5 mr-5 text-gray-500 dark:text-slate-200 bg-gray-200 dark:bg-slate-700 hover:bg-gray-300 dark:hover:bg-slate-600 focus:outline-none rounded-lg text-sm p-2.5 transition">
-        <svg id="theme-toggle-dark-icon" :class="{ hidden: isDark }" class="w-5 h-5" fill="currentColor"
-          viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+        <svg id="theme-toggle-dark-icon" :class="{ hidden: isDark }" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
           <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
         </svg>
-        <svg id="theme-toggle-light-icon" :class="{ hidden: !isDark }" class="w-5 h-5" fill="currentColor"
-          viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+        <svg id="theme-toggle-light-icon" :class="{ hidden: !isDark }" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
           <path fill-rule="evenodd" clip-rule="evenodd"
             d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z">
           </path>
@@ -50,8 +48,7 @@
 
       <div v-if="authenticated === true">
         <span v-if="requiresPassword"
-          class="text-sm text-gray-400 dark:text-slate-400 mb-10 mr-2 mt-3 cursor-pointer hover:underline float-right"
-          @click="logout">
+          class="text-sm text-gray-400 dark:text-slate-400 mb-10 mr-2 mt-3 cursor-pointer hover:underline float-right" @click="logout">
           Logout
           <svg class="h-3 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
             stroke="currentColor">
@@ -65,8 +62,7 @@
         </h1>
         <h2 class="text-sm text-gray-400 dark:text-slate-400 mb-10"></h2>
 
-        <div v-if="latestRelease"
-          class="bg-red-800 dark:bg-green-100 p-4 text-white dark:text-green-600 text-sm font-small mb-10 rounded-md shadow-lg"
+        <div v-if="latestRelease" class="bg-red-800 dark:bg-green-100 p-4 text-white dark:text-green-600 text-sm font-small mb-10 rounded-md shadow-lg"
           :title="`v${currentRelease} → v${latestRelease.version}`">
           <div class="container mx-auto flex flex-row flex-auto items-center">
             <div class="flex-grow">
@@ -117,41 +113,66 @@
 
               <div class="relative p-5 z-10 flex flex-col md:flex-row justify-between">
                 <div class="flex items-center pb-2 md:pb-0">
-                  <div class="h-10 w-10 mr-5 rounded-full bg-gray-50 dark:bg-blue-100 relative">
-                    <svg class="w-6 m-2 text-gray-300 dark:text-blue-600" xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 20 20" fill="currentColor">
-                      <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                        clip-rule="evenodd" />
-                    </svg>
-                    <img v-if="client.avatar" :src="client.avatar" class="w-10 rounded-full absolute top-0 left-0" />
+                <div class="h-10 w-10 mr-5 rounded-full bg-gray-50 dark:bg-blue-100 relative">
+                  <svg class="w-6 m-2 text-gray-300 dark:text-blue-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                    fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                      clip-rule="evenodd" />
+                  </svg>
+                  <img v-if="client.avatar" :src="client.avatar" class="w-10 rounded-full absolute top-0 left-0" />
 
-                    <div
-                      v-if="client.latestHandshakeAt && ((new Date() - new Date(client.latestHandshakeAt) < 1000 * 60 * 10))">
-                      <div
-                        class="animate-ping w-4 h-4 p-1 bg-red-100 dark:bg-green-100 rounded-full absolute -bottom-1 -right-1">
-                      </div>
-                      <div class="w-2 h-2 bg-red-800 dark:bg-green-600 rounded-full absolute bottom-0 right-0"></div>
-                    </div>
+                  <div
+                    v-if="client.latestHandshakeAt && ((new Date() - new Date(client.latestHandshakeAt) < 1000 * 60 * 10))">
+                    <div class="animate-ping w-4 h-4 p-1 bg-red-100 dark:bg-green-100 rounded-full absolute -bottom-1 -right-1"></div>
+                    <div class="w-2 h-2 bg-red-800 dark:bg-green-600 rounded-full absolute bottom-0 right-0"></div>
+                  </div>
+                </div>
+
+                <div class="flex-grow">
+
+                  <!-- Name -->
+                  <div class="text-gray-700 dark:text-slate-200 group" :title="'Created at ' + dateTime(new Date(client.createdAt))">
+
+                    <!-- Show -->
+                    <input v-show="clientEditNameId === client.id" v-model="clientEditName"
+                      v-on:keyup.enter="updateClientName(client, clientEditName); clientEditName = null; clientEditNameId = null;"
+                      v-on:keyup.escape="clientEditName = null; clientEditNameId = null;"
+                      :ref="'client-' + client.id + '-name'"
+                      class="rounded px-1 border-2 dark:bg-slate-700 border-gray-100 dark:border-slate-600 focus:border-gray-200 dark:focus:border-slate-500 outline-none w-30" />
+                    <span v-show="clientEditNameId !== client.id"
+                      class="inline-block border-t-2 border-b-2 border-transparent">{{client.name}}</span>
+
+                    <!-- Edit -->
+                    <span v-show="clientEditNameId !== client.id"
+                      @click="clientEditName = client.name; clientEditNameId = client.id; setTimeout(() => $refs['client-' + client.id + '-name'][0].select(), 1);"
+                      class="cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity">
+                      <svg xmlns="http://www.w3.org/2000/svg"
+                        class="h-4 w-4 inline align-middle opacity-25 hover:opacity-100" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
+                    </span>
                   </div>
 
-                  <div class="flex-grow">
+                  <!-- Info -->
+                  <div class="text-gray-400 dark:text-slate-400 text-xs">
 
-                    <!-- Name -->
-                    <div class="text-gray-700 dark:text-slate-200 group"
-                      :title="'Created on ' + dateTime(new Date(client.createdAt))">
+                    <!-- Address -->
+                    <span class="group block md:inline-block pb-1 md:pb-0">
 
                       <!-- Show -->
-                      <input v-show="clientEditNameId === client.id" v-model="clientEditName"
-                        v-on:keyup.enter="updateClientName(client, clientEditName); clientEditName = null; clientEditNameId = null;"
-                        v-on:keyup.escape="clientEditName = null; clientEditNameId = null;"
-                        :ref="'client-' + client.id + '-name'"
-                        class="rounded px-1 border-2 dark:bg-slate-700 border-gray-100 dark:border-slate-600 focus:border-gray-200 dark:focus:border-slate-500 dark:placeholder:text-slate-500 outline-none w-30" />
-                      <span v-show="clientEditNameId !== client.id"
-                        class="inline-block border-t-2 border-b-2 border-transparent">{{client.name}}</span>
+                      <input v-show="clientEditAddressId === client.id" v-model="clientEditAddress"
+                        v-on:keyup.enter="updateClientAddress(client, clientEditAddress); clientEditAddress = null; clientEditAddressId = null;"
+                        v-on:keyup.escape="clientEditAddress = null; clientEditAddressId = null;"
+                        :ref="'client-' + client.id + '-address'"
+                        class="rounded border-2 dark:bg-slate-700 border-gray-100 dark:border-slate-600 focus:border-gray-200 dark:focus:border-slate-500 outline-none w-20 text-black dark:text-slate-300" />
+                      <span v-show="clientEditAddressId !== client.id"
+                        class="inline-block border-t-2 border-b-2 border-transparent">{{client.address}}</span>
 
                       <!-- Edit -->
-                      <span v-show="clientEditNameId !== client.id"
-                        @click="clientEditName = client.name; clientEditNameId = client.id; setTimeout(() => $refs['client-' + client.id + '-name'][0].select(), 1);"
+                      <span v-show="clientEditAddressId !== client.id"
+                        @click="clientEditAddress = client.address; clientEditAddressId = client.id; setTimeout(() => $refs['client-' + client.id + '-address'][0].select(), 1);"
                         class="cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity">
                         <svg xmlns="http://www.w3.org/2000/svg"
                           class="h-4 w-4 inline align-middle opacity-25 hover:opacity-100" fill="none"
@@ -160,67 +181,39 @@
                             d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                         </svg>
                       </span>
-                    </div>
+                    </span>
 
-                    <!-- Info -->
-                    <div class="text-gray-400 dark:text-slate-400 text-xs">
+                    <!-- Transfer TX -->
+                    <span v-if="client.transferTx":title="'Total Download: ' + bytes(client.transferTx)">
+                      ·
+                      <svg class="align-middle h-3 inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                        fill="currentColor">
+                        <path fill-rule="evenodd"
+                          d="M16.707 10.293a1 1 0 010 1.414l-6 6a1 1 0 01-1.414 0l-6-6a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l4.293-4.293a1 1 0 011.414 0z"
+                          clip-rule="evenodd" />
+                      </svg>
+                      {{client.transferTxCurrent | bytes}}/s
+                    </span>
 
-                      <!-- Address -->
-                      <span class="group block md:inline-block pb-1 md:pb-0">
+                    <!-- Transfer RX -->
+                    <span v-if="client.transferRx" :title="'Total Upload: ' + bytes(client.transferRx)">
+                      ·
+                      <svg class="align-middle h-3 inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                        fill="currentColor">
+                        <path fill-rule="evenodd"
+                          d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z"
+                          clip-rule="evenodd" />
+                      </svg>
+                      {{client.transferRxCurrent | bytes}}/s
+                    </span>
 
-                        <!-- Show -->
-                        <input v-show="clientEditAddressId === client.id" v-model="clientEditAddress"
-                          v-on:keyup.enter="updateClientAddress(client, clientEditAddress); clientEditAddress = null; clientEditAddressId = null;"
-                          v-on:keyup.escape="clientEditAddress = null; clientEditAddressId = null;"
-                          :ref="'client-' + client.id + '-address'"
-                          class="rounded border-2 dark:bg-slate-700 border-gray-100 dark:border-slate-600 focus:border-gray-200 dark:focus:border-slate-500 outline-none w-20 text-black dark:text-slate-300 dark:placeholder:text-slate-500" />
-                        <span v-show="clientEditAddressId !== client.id"
-                          class="inline-block border-t-2 border-b-2 border-transparent">{{client.address}}</span>
-
-                        <!-- Edit -->
-                        <span v-show="clientEditAddressId !== client.id"
-                          @click="clientEditAddress = client.address; clientEditAddressId = client.id; setTimeout(() => $refs['client-' + client.id + '-address'][0].select(), 1);"
-                          class="cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity">
-                          <svg xmlns="http://www.w3.org/2000/svg"
-                            class="h-4 w-4 inline align-middle opacity-25 hover:opacity-100" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                          </svg>
-                        </span>
-                      </span>
-
-                      <!-- Transfer TX -->
-                      <span v-if="client.transferTx" :title="'Total Download: ' + bytes(client.transferTx)">
-                        ·
-                        <svg class="align-middle h-3 inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                          fill="currentColor">
-                          <path fill-rule="evenodd"
-                            d="M16.707 10.293a1 1 0 010 1.414l-6 6a1 1 0 01-1.414 0l-6-6a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l4.293-4.293a1 1 0 011.414 0z"
-                            clip-rule="evenodd" />
-                        </svg>
-                        {{client.transferTxCurrent | bytes}}/s
-                      </span>
-
-                      <!-- Transfer RX -->
-                      <span v-if="client.transferRx" :title="'Total Upload: ' + bytes(client.transferRx)">
-                        ·
-                        <svg class="align-middle h-3 inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                          fill="currentColor">
-                          <path fill-rule="evenodd"
-                            d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z"
-                            clip-rule="evenodd" />
-                        </svg>
-                        {{client.transferRxCurrent | bytes}}/s
-                      </span>
-
-                      <!-- Last seen -->
-                      <span v-if="client.latestHandshakeAt"
-                        :title="'Last seen on ' + dateTime(new Date(client.latestHandshakeAt))">
-                        · {{new Date(client.latestHandshakeAt) | timeago}}
-                      </span>
-                    </div>
+                    <!-- Last seen -->
+                    <span v-if="client.latestHandshakeAt"
+                      :title="'Last seen at ' + dateTime(new Date(client.latestHandshakeAt))">
+                      · {{new Date(client.latestHandshakeAt) | timeago}}
+                    </span>
                   </div>
+                </div>
                 </div>
 
                 <div class="flex items-center justify-end">
@@ -237,8 +230,7 @@
                     </div>
 
                     <!-- Show QR-->
-                    <button
-                      class="align-middle bg-gray-100 dark:bg-slate-600 dark:text-slate-300 hover:bg-red-800 dark:hover:bg-blue-100 hover:text-white dark:hover:text-blue-600 p-2 rounded transition"
+                    <button class="align-middle bg-gray-100 dark:bg-slate-600 dark:text-slate-300 hover:bg-red-800 dark:hover:bg-blue-100 hover:text-white dark:hover:text-blue-600 p-2 rounded transition"
                       title="Show QR Code" @click="qrcode = `./api/wireguard/client/${client.id}/qrcode.svg`">
                       <svg class="w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
@@ -259,8 +251,7 @@
                     </a>
 
                     <!-- Delete -->
-                    <button
-                      class="align-middle bg-gray-100 dark:bg-slate-600 dark:text-slate-300 hover:bg-red-800 dark:hover:bg-red-100 hover:text-white dark:hover:text-red-600 p-2 rounded transition"
+                    <button class="align-middle bg-gray-100 dark:bg-slate-600 dark:text-slate-300 hover:bg-red-800 dark:hover:bg-red-100 hover:text-white dark:hover:text-red-600 p-2 rounded transition"
                       title="Delete Client" @click="clientDelete = client">
                       <svg class="w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd"
@@ -275,8 +266,7 @@
 
             </div>
             <div v-if="clients && clients.length === 0">
-              <p class="text-center m-10 text-gray-400 dark:text-slate-400 text-sm">
-                There are no clients yet.<br /><br />
+              <p class="text-center m-10 text-gray-400 dark:text-slate-400 text-sm">There are no clients yet.<br /><br />
                 <button @click="clientCreate = true; clientCreateName = '';"
                   class="bg-red-800 dark:bg-blue-100 text-white dark:text-blue-600 hover:bg-red-700 dark:hover:bg-blue-200 border-2 border-none py-2 px-4 rounded inline-flex items-center transition">
                   <svg class="w-4 mr-2" inline xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -304,8 +294,7 @@
         <div v-if="qrcode">
           <div class="bg-black bg-opacity-50 fixed top-0 right-0 left-0 bottom-0 flex items-center justify-center z-20">
             <div class="bg-white rounded-md shadow-lg relative p-8">
-              <button @click="qrcode = null"
-                class="absolute right-4 top-4 text-gray-600 dark:text-slate-500 hover:text-gray-800 dark:hover:text-slate-700">
+              <button @click="qrcode = null" class="absolute right-4 top-4 text-gray-600 dark:text-slate-500 hover:text-gray-800 dark:hover:text-slate-700">
                 <svg class="w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                   stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -352,8 +341,8 @@
                 <div class="sm:flex sm:items-start">
                   <div
                     class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-800 dark:bg-blue-100 sm:mx-0 sm:h-10 sm:w-10">
-                    <svg class="h-6 w-6 text-white dark:text-blue-600" inline xmlns="http://www.w3.org/2000/svg"
-                      fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg class="h-6 w-6 text-white dark:text-blue-600" inline xmlns="http://www.w3.org/2000/svg" fill="none"
+                      viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                     </svg>
@@ -364,8 +353,7 @@
                     </h3>
                     <div class="mt-2">
                       <p class="text-sm text-gray-500">
-                        <input
-                          class="rounded p-2 border-2 dark:bg-slate-700 dark:text-slate-200 border-gray-100 dark:border-slate-600 focus:border-gray-200 focus:dark:border-slate-500 dark:placeholder:text-slate-400 outline-none w-full"
+                        <input class="rounded p-2 border-2 dark:bg-slate-700 dark:text-slate-200 border-gray-100 dark:border-slate-600 focus:border-gray-200 focus:dark:border-slate-500 outline-none w-full"
                           type="text" v-model.trim="clientCreateName" placeholder="Name" />
                       </p>
                     </div>
@@ -464,18 +452,17 @@
       <div v-if="authenticated === false">
         <h1 class="text-4xl font-medium my-16 text-gray-700 dark:text-slate-200 text-center">WireGuard</h1>
 
-        <form @submit="login"
-          class="shadow rounded-md bg-white dark:bg-slate-700 mx-auto w-64 p-5 overflow-hidden mt-10">
+        <form @submit="login" class="shadow rounded-md bg-white dark:bg-slate-700 mx-auto w-64 p-5 overflow-hidden mt-10">
           <!-- Avatar -->
           <div class="h-20 w-20 mb-10 mt-5 mx-auto rounded-full bg-red-800 dark:bg-blue-100 relative overflow-hidden">
-            <svg class="w-10 h-10 m-5 text-white dark:text-blue-600" xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20" fill="currentColor">
+            <svg class="w-10 h-10 m-5 text-white dark:text-blue-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+              fill="currentColor">
               <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
             </svg>
           </div>
 
           <input type="password" name="password" placeholder="Password" v-model="password"
-            class="px-3 py-2 text-sm dark:bg-slate-700 text-gray-500 dark:text-slate-200 mb-5 border-2 border-gray-100 dark:border-slate-600 rounded-lg w-full focus:border-red-800 dark:focus:border-slate-500 dark:placeholder:text-slate-400 outline-none" />
+            class="px-3 py-2 text-sm dark:bg-slate-700 text-gray-500 dark:text-slate-200 mb-5 border-2 border-gray-100 dark:border-slate-600 rounded-lg w-full focus:border-red-800 dark:focus:border-slate-500 outline-none" />
 
           <button v-if="authenticating"
             class="bg-red-800 dark:bg-blue-100 w-full rounded shadow py-2 text-sm text-white dark:text-blue-600 cursor-not-allowed">
@@ -491,8 +478,7 @@
             class="bg-red-800 dark:bg-blue-100 w-full rounded shadow py-2 text-sm text-white dark:text-blue-600 hover:bg-red-700 dark:hover:bg-blue-200 transition cursor-pointer"
             value="Sign In">
           <input v-if="!authenticating && !password" type="submit"
-            class="bg-gray-200 dark:bg-slate-400 w-full rounded shadow py-2 text-sm text-white dark:text-slate-300 cursor-not-allowed"
-            value="Sign In">
+            class="bg-gray-200 dark:bg-slate-400 w-full rounded shadow py-2 text-sm text-white dark:text-slate-300 cursor-not-allowed" value="Sign In">
         </form>
       </div>
 
@@ -510,10 +496,10 @@
 
     </div>
 
-    <p v-cloak class="text-center m-10 text-gray-300 dark:text-slate-600 text-xs">Made by <a target="_blank"
-        class="hover:underline" href="https://emilenijssen.nl/?ref=wg-easy">Emile Nijssen</a> · <a
-        class="hover:underline" href="https://github.com/sponsors/WeeJeWel" target="_blank">Donate</a> · <a
-        class="hover:underline" href="https://github.com/weejewel/wg-easy" target="_blank">GitHub</a></p>
+    <p v-cloak class="text-center m-10 text-gray-300 dark:text-slate-600 text-xs">Made by <a target="_blank" class="hover:underline"
+        href="https://emilenijssen.nl/?ref=wg-easy">Emile Nijssen</a> · <a class="hover:underline"
+        href="https://github.com/sponsors/WeeJeWel" target="_blank">Donate</a> · <a class="hover:underline"
+        href="https://github.com/weejewel/wg-easy" target="_blank">GitHub</a></p>
 
 
   </div>
