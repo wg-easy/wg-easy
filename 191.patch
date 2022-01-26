@@ -1,0 +1,974 @@
+From 00f3fff15ee2a5e5b4d27a32b6b02e897eb0a697 Mon Sep 17 00:00:00 2001
+From: crazyracer98 <8631139+crazyracer98@users.noreply.github.com>
+Date: Wed, 26 Jan 2022 22:31:11 +0100
+Subject: [PATCH 01/15] add IPv6 support
+
+---
+ Dockerfile           |  3 ++-
+ docker-compose.yml   | 22 +++++++++++++++++++-
+ src/config.js        |  9 ++++++++
+ src/lib/Server.js    |  5 +++++
+ src/lib/Util.js      |  7 +++++++
+ src/lib/WireGuard.js | 49 ++++++++++++++++++++++++++++++++++++++++----
+ src/www/index.html   | 25 ++++++++++++++++++++++
+ src/www/js/api.js    |  7 +++++++
+ src/www/js/app.js    |  7 +++++++
+ 9 files changed, 128 insertions(+), 6 deletions(-)
+
+diff --git a/Dockerfile b/Dockerfile
+index 2695361f..e3c1b71b 100644
+--- a/Dockerfile
++++ b/Dockerfile
+@@ -36,7 +36,8 @@ RUN npm i -g nodemon
+ # Install Linux packages
+ RUN apk add -U --no-cache \
+   wireguard-tools \
+-  dumb-init
++  dumb-init \
++  ip6tables
+ 
+ # Expose Ports
+ EXPOSE 51820/udp
+diff --git a/docker-compose.yml b/docker-compose.yml
+index 0a13accc..a492de47 100644
+--- a/docker-compose.yml
++++ b/docker-compose.yml
+@@ -1,4 +1,5 @@
+ version: "3.8"
++
+ services:
+   wg-easy:
+     environment:
+@@ -10,12 +11,18 @@ services:
+       # - PASSWORD=foobar123
+       # - WG_PORT=51820
+       # - WG_DEFAULT_ADDRESS=10.8.0.x
+-      # - WG_DEFAULT_DNS=1.1.1.1
++      # - WG_DEFAULT_ADDRESS6=fd42:beef::x
++      # - WG_DEFAULT_DNS=1.0.0.1
++      # - WG_DEFAULT_DNS6=2606:4700:4700::1001
+       # - WG_MTU=1420
+       # - WG_ALLOWED_IPS=192.168.15.0/24, 10.0.1.0/24
+       
+     image: weejewel/wg-easy
+     container_name: wg-easy
++    networks:
++      wg:
++        ipv4_address: 10.42.42.42
++        ipv6_address: fd00:42::42
+     volumes:
+       - .:/etc/wireguard
+     ports:
+@@ -28,3 +35,16 @@ services:
+     sysctls:
+       - net.ipv4.ip_forward=1
+       - net.ipv4.conf.all.src_valid_mark=1
++      - net.ipv6.conf.all.disable_ipv6=0
++      - net.ipv6.conf.all.forwarding=1
++      - net.ipv6.conf.default.forwarding=1
++
++networks:
++  wg:
++    driver: bridge
++    enable_ipv6: true
++    ipam:
++      driver: default
++      config:
++        - subnet: 10.42.42.0/24
++        - subnet: fd00:42::/120
+diff --git a/src/config.js b/src/config.js
+index a08aab3b..72cb282c 100644
+--- a/src/config.js
++++ b/src/config.js
+@@ -11,9 +11,13 @@ module.exports.WG_PORT = process.env.WG_PORT || 51820;
+ module.exports.WG_MTU = process.env.WG_MTU || null;
+ module.exports.WG_PERSISTENT_KEEPALIVE = process.env.WG_PERSISTENT_KEEPALIVE || 0;
+ module.exports.WG_DEFAULT_ADDRESS = process.env.WG_DEFAULT_ADDRESS || '10.8.0.x';
++module.exports.WG_DEFAULT_ADDRESS6 = process.env.WG_DEFAULT_ADDRESS6 || 'fd80:cafe::x';
+ module.exports.WG_DEFAULT_DNS = typeof process.env.WG_DEFAULT_DNS === 'string'
+   ? process.env.WG_DEFAULT_DNS
+   : '1.1.1.1';
++module.exports.WG_DEFAULT_DNS6 = typeof process.env.WG_DEFAULT_DNS6 === 'string'
++    ? process.env.WG_DEFAULT_DNS6
++    : '2606:4700:4700::1111';
+ module.exports.WG_ALLOWED_IPS = process.env.WG_ALLOWED_IPS || '0.0.0.0/0, ::/0';
+ 
+ module.exports.WG_POST_UP = process.env.WG_POST_UP || `
+@@ -21,6 +25,11 @@ iptables -t nat -A POSTROUTING -s ${module.exports.WG_DEFAULT_ADDRESS.replace('x
+ iptables -A INPUT -p udp -m udp --dport 51820 -j ACCEPT;
+ iptables -A FORWARD -i wg0 -j ACCEPT;
+ iptables -A FORWARD -o wg0 -j ACCEPT;
++ip6tables -t nat -A POSTROUTING -s ${module.exports.WG_DEFAULT_ADDRESS6.replace('x', '')}/120 -o eth0 -j MASQUERADE;
++ip6tables -A INPUT -p udp -m udp --dport 51820 -j ACCEPT;
++ip6tables -A FORWARD -i wg0 -j ACCEPT;
++ip6tables -A FORWARD -o wg0 -j ACCEPT;
+ `.split('\n').join(' ');
+ 
++
+ module.exports.WG_POST_DOWN = process.env.WG_POST_DOWN || '';
+diff --git a/src/lib/Server.js b/src/lib/Server.js
+index e204fa5f..ee75f3a9 100644
+--- a/src/lib/Server.js
++++ b/src/lib/Server.js
+@@ -130,6 +130,11 @@ module.exports = class Server {
+         const { address } = req.body;
+         return WireGuard.updateClientAddress({ clientId, address });
+       }))
++      .put('/api/wireguard/client/:clientId/address6', Util.promisify(async req => {
++        const { clientId } = req.params;
++        const { address6 } = req.body;
++        return WireGuard.updateClientAddress6({ clientId, address6 });
++      }))
+ 
+       .listen(PORT, () => {
+         debug(`Listening on http://0.0.0.0:${PORT}`);
+diff --git a/src/lib/Util.js b/src/lib/Util.js
+index 2a47a20e..758f0751 100644
+--- a/src/lib/Util.js
++++ b/src/lib/Util.js
+@@ -17,6 +17,13 @@ module.exports = class Util {
+     return true;
+   }
+ 
++  static isValidIPv6(str) {
++    // Regex source : https://stackoverflow.com/a/17871737
++    const regex = new RegExp('(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))');
++    const matches = str.match(regex);
++    return !!matches;
++  }
++
+   static promisify(fn) {
+     // eslint-disable-next-line func-names
+     return function(req, res) {
+diff --git a/src/lib/WireGuard.js b/src/lib/WireGuard.js
+index 032854f1..5285f261 100644
+--- a/src/lib/WireGuard.js
++++ b/src/lib/WireGuard.js
+@@ -16,7 +16,9 @@ const {
+   WG_PORT,
+   WG_MTU,
+   WG_DEFAULT_DNS,
++  WG_DEFAULT_DNS6,
+   WG_DEFAULT_ADDRESS,
++  WG_DEFAULT_ADDRESS6,
+   WG_PERSISTENT_KEEPALIVE,
+   WG_ALLOWED_IPS,
+   WG_POST_UP,
+@@ -44,12 +46,14 @@ module.exports = class WireGuard {
+             log: 'echo ***hidden*** | wg pubkey',
+           });
+           const address = WG_DEFAULT_ADDRESS.replace('x', '1');
++          const address6 = WG_DEFAULT_ADDRESS6.replace('x', '1');
+ 
+           config = {
+             server: {
+               privateKey,
+               publicKey,
+               address,
++              address6,
+             },
+             clients: {},
+           };
+@@ -69,6 +73,10 @@ module.exports = class WireGuard {
+         // await Util.exec('iptables -A INPUT -p udp -m udp --dport 51820 -j ACCEPT');
+         // await Util.exec('iptables -A FORWARD -i wg0 -j ACCEPT');
+         // await Util.exec('iptables -A FORWARD -o wg0 -j ACCEPT');
++        // await Util.exec(`ip6tables -t nat -A POSTROUTING -s ${WG_DEFAULT_ADDRESS6.replace('x', '')}/120 -o eth0 -j MASQUERADE`);
++        // await Util.exec('ip6tables -A INPUT -p udp -m udp --dport 51820 -j ACCEPT');
++        // await Util.exec('ip6tables -A FORWARD -i wg0 -j ACCEPT');
++        // await Util.exec('ip6tables -A FORWARD -o wg0 -j ACCEPT');
+         await this.__syncConfig();
+ 
+         return config;
+@@ -92,7 +100,7 @@ module.exports = class WireGuard {
+ # Server
+ [Interface]
+ PrivateKey = ${config.server.privateKey}
+-Address = ${config.server.address}/24
++Address = ${config.server.address}/24, ${config.server.address6}/120
+ ListenPort = 51820
+ PostUp = ${WG_POST_UP}
+ PostDown = ${WG_POST_DOWN}
+@@ -107,7 +115,7 @@ PostDown = ${WG_POST_DOWN}
+ [Peer]
+ PublicKey = ${client.publicKey}
+ PresharedKey = ${client.preSharedKey}
+-AllowedIPs = ${client.address}/32`;
++AllowedIPs = ${client.address}/32, ${client.address6}/32`;
+     }
+ 
+     debug('Config saving...');
+@@ -133,6 +141,7 @@ AllowedIPs = ${client.address}/32`;
+       name: client.name,
+       enabled: client.enabled,
+       address: client.address,
++      address6: client.address6,
+       publicKey: client.publicKey,
+       createdAt: new Date(client.createdAt),
+       updatedAt: new Date(client.updatedAt),
+@@ -191,12 +200,14 @@ AllowedIPs = ${client.address}/32`;
+   async getClientConfiguration({ clientId }) {
+     const config = await this.getConfig();
+     const client = await this.getClient({ clientId });
++    const isDnsSet = WG_DEFAULT_DNS || WG_DEFAULT_DNS6;
++    const dnsServers = [WG_DEFAULT_DNS, WG_DEFAULT_DNS6].filter(item => !!item).join(', ')
+ 
+     return `
+ [Interface]
+ PrivateKey = ${client.privateKey}
+-Address = ${client.address}/24
+-${WG_DEFAULT_DNS ? `DNS = ${WG_DEFAULT_DNS}` : ''}
++Address = ${client.address}/24, ${client.address6}/120
++${isDnsSet ? `DNS = ${dnsServers}` : ''}
+ ${WG_MTU ? `MTU = ${WG_MTU}` : ''}
+ 
+ [Peer]
+@@ -243,11 +254,28 @@ Endpoint = ${WG_HOST}:${WG_PORT}`;
+       throw new Error('Maximum number of clients reached.');
+     }
+ 
++    let address6;
++    for (let i = 2; i < 255; i++) {
++      const client = Object.values(config.clients).find(client => {
++        return client.address6 === WG_DEFAULT_ADDRESS6.replace('x', i.toString(16));
++      });
++
++      if (!client) {
++        address6 = WG_DEFAULT_ADDRESS6.replace('x', i.toString(16));
++        break;
++      }
++    }
++
++    if (!address6) {
++      throw new Error('Maximum number of clients reached.');
++    }
++
+     // Create Client
+     const clientId = uuid.v4();
+     const client = {
+       name,
+       address,
++      address6,
+       privateKey,
+       publicKey,
+       preSharedKey,
+@@ -311,5 +339,18 @@ Endpoint = ${WG_HOST}:${WG_PORT}`;
+ 
+     await this.saveConfig();
+   }
++  
++  async updateClientAddress6({ clientId, address6 }) {
++    const client = await this.getClient({ clientId });
++
++    if (!Util.isValidIPv6(address6)) {
++      throw new ServerError(`Invalid Address6: ${address6}`, 400);
++    }
++
++    client.address6 = address6;
++    client.updatedAt = new Date();
++
++    await this.saveConfig();
++  }
+ 
+ };
+diff --git a/src/www/index.html b/src/www/index.html
+index 4080c51a..79813cda 100644
+--- a/src/www/index.html
++++ b/src/www/index.html
+@@ -153,6 +153,31 @@ <h2 class="text-sm text-gray-400 mb-10"></h2>
+                       </span>
+                     </span>
+ 
++                    <!-- Address6 -->
++                    <span class="group">
++
++                      <!-- Show -->
++                      <input v-show="clientEditAddress6Id === client.id" v-model="clientEditAddress6"
++                        v-on:keyup.enter="updateClientAddress6(client, clientEditAddress6); clientEditAddress6 = null; clientEditAddress6Id = null;"
++                        v-on:keyup.escape="clientEditAddress6 = null; clientEditAddress6Id = null;"
++                        :ref="'client-' + client.id + '-address6'"
++                        class="rounded border-2 border-gray-100 focus:border-gray-200 outline-none w-20 text-black" />
++                      <span v-show="clientEditAddress6Id !== client.id"
++                        class="inline-block border-t-2 border-b-2 border-transparent">{{client.address6}}</span>
++
++                      <!-- Edit -->
++                      <span v-show="clientEditAddress6Id !== client.id"
++                        @click="clientEditAddress6 = client.address6; clientEditAddress6Id = client.id; setTimeout(() => $refs['client-' + client.id + '-address6'][0].select(), 1);"
++                        class="cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity">
++                        <svg xmlns="http://www.w3.org/2000/svg"
++                          class="h-4 w-4 inline align-middle opacity-25 hover:opacity-100" fill="none"
++                          viewBox="0 0 24 24" stroke="currentColor">
++                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
++                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
++                        </svg>
++                      </span>
++                    </span>
++
+                     <!-- Transfer TX -->
+                     <span v-if="client.transferTx":title="'Total Download: ' + bytes(client.transferTx)">
+                       ·
+diff --git a/src/www/js/api.js b/src/www/js/api.js
+index accbb579..4e41fd69 100644
+--- a/src/www/js/api.js
++++ b/src/www/js/api.js
+@@ -117,4 +117,11 @@ class API {
+     });
+   }
+ 
++  async updateClientAddress6({ clientId, address6 }) {
++    return this.call({
++      method: 'put',
++      path: `/wireguard/client/${clientId}/address6/`,
++      body: { address6 },
++    });
++  }
+ }
+diff --git a/src/www/js/app.js b/src/www/js/app.js
+index 137fb229..b4ff191c 100644
+--- a/src/www/js/app.js
++++ b/src/www/js/app.js
+@@ -43,6 +43,8 @@ new Vue({
+     clientEditNameId: null,
+     clientEditAddress: null,
+     clientEditAddressId: null,
++    clientEditAddress6: null,
++    clientEditAddress6Id: null,
+     qrcode: null,
+ 
+     currentRelease: null,
+@@ -243,6 +245,11 @@ new Vue({
+         .catch(err => alert(err.message || err.toString()))
+         .finally(() => this.refresh().catch(console.error));
+     },
++    updateClientAddress6(client, address6) {
++      this.api.updateClientAddress6({ clientId: client.id, address6 })
++        .catch(err => alert(err.message || err.toString()))
++        .finally(() => this.refresh().catch(console.error));
++    },
+   },
+   filters: {
+     bytes,
+
+From af609ddebfaea387cadcdfbdf9309fb960984f79 Mon Sep 17 00:00:00 2001
+From: crazyracer98 <8631139+crazyracer98@users.noreply.github.com>
+Date: Wed, 26 Jan 2022 23:28:09 +0100
+Subject: [PATCH 02/15] fix allowed IPv6
+
+---
+ src/lib/WireGuard.js | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/lib/WireGuard.js b/src/lib/WireGuard.js
+index 5285f261..d97a4d04 100644
+--- a/src/lib/WireGuard.js
++++ b/src/lib/WireGuard.js
+@@ -115,7 +115,7 @@ PostDown = ${WG_POST_DOWN}
+ [Peer]
+ PublicKey = ${client.publicKey}
+ PresharedKey = ${client.preSharedKey}
+-AllowedIPs = ${client.address}/32, ${client.address6}/32`;
++AllowedIPs = ${client.address}/32, ${client.address6}/128`;
+     }
+ 
+     debug('Config saving...');
+
+From 49ff5aa6b9bcf936b39616e8835ce2b1fec49a11 Mon Sep 17 00:00:00 2001
+From: crazyracer98 <8631139+crazyracer98@users.noreply.github.com>
+Date: Fri, 28 Jan 2022 13:46:10 +0100
+Subject: [PATCH 03/15] update documentation
+
+---
+ README.md | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/README.md b/README.md
+index 6ae66b35..fa9b7444 100644
+--- a/README.md
++++ b/README.md
+@@ -86,7 +86,9 @@ These options can be configured by setting environment variables using `-e KEY="
+ | `WG_MTU` | `null` | `1420` | The MTU the clients will use. Server uses default WG MTU. |
+ | `WG_PERSISTENT_KEEPALIVE` | `0` | `25` | Value in seconds to keep the "connection" open. |
+ | `WG_DEFAULT_ADDRESS` | `10.8.0.x` | `10.6.0.x` | Clients IP address range. |
++| `WG_DEFAULT_ADDRESS6` | `fd00::cafe:x` | `fd00::42:x` | Clients IPv6 address range. Has to be a valid IPv6 ULA address. |
+ | `WG_DEFAULT_DNS` | `1.1.1.1` | `8.8.8.8, 8.8.4.4` | DNS server clients will use. |
++| `WG_DEFAULT_DNS6` | `2606:4700:4700::1111` | `2606:4700:4700::1001, 2606:4700:4700::1111` | DNSv6 server clients will use. |
+ | `WG_ALLOWED_IPS` | `0.0.0.0/0, ::/0` | `192.168.15.0/24, 10.0.1.0/24` | Allowed IPs clients will use. |
+ | `WG_POST_UP` | `...` | `iptables ...` | See [config.js](https://github.com/WeeJeWel/wg-easy/blob/master/src/config.js#L19) for the default value. |
+ | `WG_POST_DOWN` | `...` | `iptables ...` | See [config.js](https://github.com/WeeJeWel/wg-easy/blob/master/src/config.js#L26) for the default value. |
+
+From c5708c6adadc5ec473cdfc78391350411623f784 Mon Sep 17 00:00:00 2001
+From: crazyracer98 <8631139+crazyracer98@users.noreply.github.com>
+Date: Fri, 28 Jan 2022 13:46:39 +0100
+Subject: [PATCH 04/15] fix IPv6 validation
+
+---
+ src/lib/Util.js | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/lib/Util.js b/src/lib/Util.js
+index 758f0751..a5b78445 100644
+--- a/src/lib/Util.js
++++ b/src/lib/Util.js
+@@ -19,7 +19,7 @@ module.exports = class Util {
+ 
+   static isValidIPv6(str) {
+     // Regex source : https://stackoverflow.com/a/17871737
+-    const regex = new RegExp('(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))');
++    const regex = new RegExp('^(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))$');
+     const matches = str.match(regex);
+     return !!matches;
+   }
+
+From 8b3ca71b1a2675d3456a72361f1632df82103332 Mon Sep 17 00:00:00 2001
+From: crazyracer98 <8631139+crazyracer98@users.noreply.github.com>
+Date: Fri, 28 Jan 2022 13:47:41 +0100
+Subject: [PATCH 05/15] fix IPv6 ranges
+
+---
+ docker-compose.yml | 6 +++---
+ src/config.js      | 4 ++--
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/docker-compose.yml b/docker-compose.yml
+index a492de47..3835c20a 100644
+--- a/docker-compose.yml
++++ b/docker-compose.yml
+@@ -11,7 +11,7 @@ services:
+       # - PASSWORD=foobar123
+       # - WG_PORT=51820
+       # - WG_DEFAULT_ADDRESS=10.8.0.x
+-      # - WG_DEFAULT_ADDRESS6=fd42:beef::x
++      # - WG_DEFAULT_ADDRESS6=fd00::cafe:x
+       # - WG_DEFAULT_DNS=1.0.0.1
+       # - WG_DEFAULT_DNS6=2606:4700:4700::1001
+       # - WG_MTU=1420
+@@ -22,7 +22,7 @@ services:
+     networks:
+       wg:
+         ipv4_address: 10.42.42.42
+-        ipv6_address: fd00:42::42
++        ipv6_address: fd00::2a
+     volumes:
+       - .:/etc/wireguard
+     ports:
+@@ -47,4 +47,4 @@ networks:
+       driver: default
+       config:
+         - subnet: 10.42.42.0/24
+-        - subnet: fd00:42::/120
++        - subnet: fd00::0/120
+diff --git a/src/config.js b/src/config.js
+index 72cb282c..750ec824 100644
+--- a/src/config.js
++++ b/src/config.js
+@@ -11,7 +11,7 @@ module.exports.WG_PORT = process.env.WG_PORT || 51820;
+ module.exports.WG_MTU = process.env.WG_MTU || null;
+ module.exports.WG_PERSISTENT_KEEPALIVE = process.env.WG_PERSISTENT_KEEPALIVE || 0;
+ module.exports.WG_DEFAULT_ADDRESS = process.env.WG_DEFAULT_ADDRESS || '10.8.0.x';
+-module.exports.WG_DEFAULT_ADDRESS6 = process.env.WG_DEFAULT_ADDRESS6 || 'fd80:cafe::x';
++module.exports.WG_DEFAULT_ADDRESS6 = process.env.WG_DEFAULT_ADDRESS6 || 'fd00::cafe:x';
+ module.exports.WG_DEFAULT_DNS = typeof process.env.WG_DEFAULT_DNS === 'string'
+   ? process.env.WG_DEFAULT_DNS
+   : '1.1.1.1';
+@@ -25,7 +25,7 @@ iptables -t nat -A POSTROUTING -s ${module.exports.WG_DEFAULT_ADDRESS.replace('x
+ iptables -A INPUT -p udp -m udp --dport 51820 -j ACCEPT;
+ iptables -A FORWARD -i wg0 -j ACCEPT;
+ iptables -A FORWARD -o wg0 -j ACCEPT;
+-ip6tables -t nat -A POSTROUTING -s ${module.exports.WG_DEFAULT_ADDRESS6.replace('x', '')}/120 -o eth0 -j MASQUERADE;
++ip6tables -t nat -A POSTROUTING -s ${module.exports.WG_DEFAULT_ADDRESS6.replace('x', '0')}/120 -o eth0 -j MASQUERADE;
+ ip6tables -A INPUT -p udp -m udp --dport 51820 -j ACCEPT;
+ ip6tables -A FORWARD -i wg0 -j ACCEPT;
+ ip6tables -A FORWARD -o wg0 -j ACCEPT;
+
+From 7f152ffc34f282616fd982eba614797bd6486f78 Mon Sep 17 00:00:00 2001
+From: crazyracer98 <8631139+crazyracer98@users.noreply.github.com>
+Date: Fri, 28 Jan 2022 13:56:50 +0100
+Subject: [PATCH 06/15] fix internal IPv6 subnet
+
+---
+ docker-compose.yml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/docker-compose.yml b/docker-compose.yml
+index 3835c20a..b342157a 100644
+--- a/docker-compose.yml
++++ b/docker-compose.yml
+@@ -47,4 +47,4 @@ networks:
+       driver: default
+       config:
+         - subnet: 10.42.42.0/24
+-        - subnet: fd00::0/120
++        - subnet: fd00::0/112
+
+From 780a2648c4c4bfdb71bd33bb7398e3e6d9245f2a Mon Sep 17 00:00:00 2001
+From: Joel Heaps <joel@joelheaps.com>
+Date: Fri, 28 Jan 2022 09:55:29 -0600
+Subject: [PATCH 07/15] Switch to randomly generated ULA and /64 prefix
+
+---
+ README.md            | 2 +-
+ docker-compose.yml   | 6 +++---
+ src/config.js        | 9 ++++-----
+ src/lib/WireGuard.js | 2 +-
+ 4 files changed, 9 insertions(+), 10 deletions(-)
+
+diff --git a/README.md b/README.md
+index fa9b7444..a681ff57 100644
+--- a/README.md
++++ b/README.md
+@@ -86,7 +86,7 @@ These options can be configured by setting environment variables using `-e KEY="
+ | `WG_MTU` | `null` | `1420` | The MTU the clients will use. Server uses default WG MTU. |
+ | `WG_PERSISTENT_KEEPALIVE` | `0` | `25` | Value in seconds to keep the "connection" open. |
+ | `WG_DEFAULT_ADDRESS` | `10.8.0.x` | `10.6.0.x` | Clients IP address range. |
+-| `WG_DEFAULT_ADDRESS6` | `fd00::cafe:x` | `fd00::42:x` | Clients IPv6 address range. Has to be a valid IPv6 ULA address. |
++| `WG_DEFAULT_ADDRESS6` | `fdcc:ad94:bacf:61a4::cafe:x` | `fdcc:ad94:bacf:61a4::42:x` | Clients IPv6 address range. Has to be a valid IPv6 ULA address. |
+ | `WG_DEFAULT_DNS` | `1.1.1.1` | `8.8.8.8, 8.8.4.4` | DNS server clients will use. |
+ | `WG_DEFAULT_DNS6` | `2606:4700:4700::1111` | `2606:4700:4700::1001, 2606:4700:4700::1111` | DNSv6 server clients will use. |
+ | `WG_ALLOWED_IPS` | `0.0.0.0/0, ::/0` | `192.168.15.0/24, 10.0.1.0/24` | Allowed IPs clients will use. |
+diff --git a/docker-compose.yml b/docker-compose.yml
+index b342157a..4b1f53fd 100644
+--- a/docker-compose.yml
++++ b/docker-compose.yml
+@@ -11,7 +11,7 @@ services:
+       # - PASSWORD=foobar123
+       # - WG_PORT=51820
+       # - WG_DEFAULT_ADDRESS=10.8.0.x
+-      # - WG_DEFAULT_ADDRESS6=fd00::cafe:x
++      # - WG_DEFAULT_ADDRESS6=fdcc:ad94:bacf:61a4::cafe:x
+       # - WG_DEFAULT_DNS=1.0.0.1
+       # - WG_DEFAULT_DNS6=2606:4700:4700::1001
+       # - WG_MTU=1420
+@@ -22,7 +22,7 @@ services:
+     networks:
+       wg:
+         ipv4_address: 10.42.42.42
+-        ipv6_address: fd00::2a
++        ipv6_address: fdcc:ad94:bacf:61a4::2a
+     volumes:
+       - .:/etc/wireguard
+     ports:
+@@ -47,4 +47,4 @@ networks:
+       driver: default
+       config:
+         - subnet: 10.42.42.0/24
+-        - subnet: fd00::0/112
++        - subnet: fdcc:ad94:bacf:61a4::/64
+diff --git a/src/config.js b/src/config.js
+index 750ec824..628815dc 100644
+--- a/src/config.js
++++ b/src/config.js
+@@ -11,13 +11,13 @@ module.exports.WG_PORT = process.env.WG_PORT || 51820;
+ module.exports.WG_MTU = process.env.WG_MTU || null;
+ module.exports.WG_PERSISTENT_KEEPALIVE = process.env.WG_PERSISTENT_KEEPALIVE || 0;
+ module.exports.WG_DEFAULT_ADDRESS = process.env.WG_DEFAULT_ADDRESS || '10.8.0.x';
+-module.exports.WG_DEFAULT_ADDRESS6 = process.env.WG_DEFAULT_ADDRESS6 || 'fd00::cafe:x';
++module.exports.WG_DEFAULT_ADDRESS6 = process.env.WG_DEFAULT_ADDRESS6 || 'fdcc:ad94:bacf:61a4::cafe:x';
+ module.exports.WG_DEFAULT_DNS = typeof process.env.WG_DEFAULT_DNS === 'string'
+   ? process.env.WG_DEFAULT_DNS
+   : '1.1.1.1';
+ module.exports.WG_DEFAULT_DNS6 = typeof process.env.WG_DEFAULT_DNS6 === 'string'
+-    ? process.env.WG_DEFAULT_DNS6
+-    : '2606:4700:4700::1111';
++  ? process.env.WG_DEFAULT_DNS6
++  : '2606:4700:4700::1111';
+ module.exports.WG_ALLOWED_IPS = process.env.WG_ALLOWED_IPS || '0.0.0.0/0, ::/0';
+ 
+ module.exports.WG_POST_UP = process.env.WG_POST_UP || `
+@@ -25,11 +25,10 @@ iptables -t nat -A POSTROUTING -s ${module.exports.WG_DEFAULT_ADDRESS.replace('x
+ iptables -A INPUT -p udp -m udp --dport 51820 -j ACCEPT;
+ iptables -A FORWARD -i wg0 -j ACCEPT;
+ iptables -A FORWARD -o wg0 -j ACCEPT;
+-ip6tables -t nat -A POSTROUTING -s ${module.exports.WG_DEFAULT_ADDRESS6.replace('x', '0')}/120 -o eth0 -j MASQUERADE;
++ip6tables -t nat -A POSTROUTING -s ${module.exports.WG_DEFAULT_ADDRESS6.replace('x', '0')}/64 -o eth0 -j MASQUERADE;
+ ip6tables -A INPUT -p udp -m udp --dport 51820 -j ACCEPT;
+ ip6tables -A FORWARD -i wg0 -j ACCEPT;
+ ip6tables -A FORWARD -o wg0 -j ACCEPT;
+ `.split('\n').join(' ');
+ 
+-
+ module.exports.WG_POST_DOWN = process.env.WG_POST_DOWN || '';
+diff --git a/src/lib/WireGuard.js b/src/lib/WireGuard.js
+index d97a4d04..26e91bdb 100644
+--- a/src/lib/WireGuard.js
++++ b/src/lib/WireGuard.js
+@@ -206,7 +206,7 @@ AllowedIPs = ${client.address}/32, ${client.address6}/128`;
+     return `
+ [Interface]
+ PrivateKey = ${client.privateKey}
+-Address = ${client.address}/24, ${client.address6}/120
++Address = ${client.address}/24, ${client.address6}/64
+ ${isDnsSet ? `DNS = ${dnsServers}` : ''}
+ ${WG_MTU ? `MTU = ${WG_MTU}` : ''}
+ 
+
+From 5d0d6c378fda978a36e9e80a04891b8eb62a169f Mon Sep 17 00:00:00 2001
+From: Joel Heaps <joel@joelheaps.com>
+Date: Fri, 28 Jan 2022 11:49:42 -0600
+Subject: [PATCH 08/15] Change compose version to 2.4 to allow enable_ipv6
+
+---
+ docker-compose.yml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/docker-compose.yml b/docker-compose.yml
+index 4b1f53fd..7a3f5dd3 100644
+--- a/docker-compose.yml
++++ b/docker-compose.yml
+@@ -1,4 +1,4 @@
+-version: "3.8"
++version: "2.4"
+ 
+ services:
+   wg-easy:
+
+From 40b330728fe9be9911a9df08eeaf824eece58d32 Mon Sep 17 00:00:00 2001
+From: Joel Heaps <joel@joelheaps.com>
+Date: Fri, 28 Jan 2022 11:58:36 -0600
+Subject: [PATCH 09/15] Check kernel modules before enabling IPv6 NAT
+
+---
+ src/config.js | 35 +++++++++++++++++++++++++----------
+ 1 file changed, 25 insertions(+), 10 deletions(-)
+
+diff --git a/src/config.js b/src/config.js
+index 628815dc..5f4ea7a2 100644
+--- a/src/config.js
++++ b/src/config.js
+@@ -1,6 +1,7 @@
+ 'use strict';
+ 
+ const { release } = require('./package.json');
++const childProcess = require('child_process');
+ 
+ module.exports.RELEASE = release;
+ module.exports.PORT = process.env.PORT || 51821;
+@@ -20,15 +21,29 @@ module.exports.WG_DEFAULT_DNS6 = typeof process.env.WG_DEFAULT_DNS6 === 'string'
+   : '2606:4700:4700::1111';
+ module.exports.WG_ALLOWED_IPS = process.env.WG_ALLOWED_IPS || '0.0.0.0/0, ::/0';
+ 
+-module.exports.WG_POST_UP = process.env.WG_POST_UP || `
+-iptables -t nat -A POSTROUTING -s ${module.exports.WG_DEFAULT_ADDRESS.replace('x', '0')}/24 -o eth0 -j MASQUERADE;
+-iptables -A INPUT -p udp -m udp --dport 51820 -j ACCEPT;
+-iptables -A FORWARD -i wg0 -j ACCEPT;
+-iptables -A FORWARD -o wg0 -j ACCEPT;
+-ip6tables -t nat -A POSTROUTING -s ${module.exports.WG_DEFAULT_ADDRESS6.replace('x', '0')}/64 -o eth0 -j MASQUERADE;
+-ip6tables -A INPUT -p udp -m udp --dport 51820 -j ACCEPT;
+-ip6tables -A FORWARD -i wg0 -j ACCEPT;
+-ip6tables -A FORWARD -o wg0 -j ACCEPT;
+-`.split('\n').join(' ');
++// Set WG_POST_UP to allow IPv6 NAT and forwarding only if the required kernel module is available
++const modules = childProcess.execSync('lsmod', {
++  shell: 'bash',
++})
++
++if (modules.includes("ip6table_nat")) {
++  module.exports.WG_POST_UP = process.env.WG_POST_UP || `
++  iptables -t nat -A POSTROUTING -s ${module.exports.WG_DEFAULT_ADDRESS.replace('x', '0')}/24 -o eth0 -j MASQUERADE;
++  iptables -A INPUT -p udp -m udp --dport 51820 -j ACCEPT;
++  iptables -A FORWARD -i wg0 -j ACCEPT;
++  iptables -A FORWARD -o wg0 -j ACCEPT;
++  ip6tables -t nat -A POSTROUTING -s ${module.exports.WG_DEFAULT_ADDRESS6.replace('x', '0')}/64 -o eth0 -j MASQUERADE;
++  ip6tables -A INPUT -p udp -m udp --dport 51820 -j ACCEPT;
++  ip6tables -A FORWARD -i wg0 -j ACCEPT;
++  ip6tables -A FORWARD -o wg0 -j ACCEPT;
++  `.split('\n').join(' ');
++} else {
++  module.exports.WG_POST_UP = process.env.WG_POST_UP || `
++  iptables -t nat -A POSTROUTING -s ${module.exports.WG_DEFAULT_ADDRESS.replace('x', '0')}/24 -o eth0 -j MASQUERADE;
++  iptables -A INPUT -p udp -m udp --dport 51820 -j ACCEPT;
++  iptables -A FORWARD -i wg0 -j ACCEPT;
++  iptables -A FORWARD -o wg0 -j ACCEPT;
++  `.split('\n').join(' ');
++}
+ 
+ module.exports.WG_POST_DOWN = process.env.WG_POST_DOWN || '';
+
+From 6b3633c5ad8486813ee3cec4cb3bf7ff6bed979b Mon Sep 17 00:00:00 2001
+From: Joel Heaps <joel@joelheaps.com>
+Date: Fri, 28 Jan 2022 12:10:50 -0600
+Subject: [PATCH 10/15] Revert "Switch to randomly generated ULA and /64
+ prefix"
+
+(Keeping PRs separate)
+---
+ README.md            | 2 +-
+ docker-compose.yml   | 6 +++---
+ src/config.js        | 7 ++++---
+ src/lib/WireGuard.js | 2 +-
+ 4 files changed, 9 insertions(+), 8 deletions(-)
+
+diff --git a/README.md b/README.md
+index a681ff57..fa9b7444 100644
+--- a/README.md
++++ b/README.md
+@@ -86,7 +86,7 @@ These options can be configured by setting environment variables using `-e KEY="
+ | `WG_MTU` | `null` | `1420` | The MTU the clients will use. Server uses default WG MTU. |
+ | `WG_PERSISTENT_KEEPALIVE` | `0` | `25` | Value in seconds to keep the "connection" open. |
+ | `WG_DEFAULT_ADDRESS` | `10.8.0.x` | `10.6.0.x` | Clients IP address range. |
+-| `WG_DEFAULT_ADDRESS6` | `fdcc:ad94:bacf:61a4::cafe:x` | `fdcc:ad94:bacf:61a4::42:x` | Clients IPv6 address range. Has to be a valid IPv6 ULA address. |
++| `WG_DEFAULT_ADDRESS6` | `fd00::cafe:x` | `fd00::42:x` | Clients IPv6 address range. Has to be a valid IPv6 ULA address. |
+ | `WG_DEFAULT_DNS` | `1.1.1.1` | `8.8.8.8, 8.8.4.4` | DNS server clients will use. |
+ | `WG_DEFAULT_DNS6` | `2606:4700:4700::1111` | `2606:4700:4700::1001, 2606:4700:4700::1111` | DNSv6 server clients will use. |
+ | `WG_ALLOWED_IPS` | `0.0.0.0/0, ::/0` | `192.168.15.0/24, 10.0.1.0/24` | Allowed IPs clients will use. |
+diff --git a/docker-compose.yml b/docker-compose.yml
+index 7a3f5dd3..7aed71e3 100644
+--- a/docker-compose.yml
++++ b/docker-compose.yml
+@@ -11,7 +11,7 @@ services:
+       # - PASSWORD=foobar123
+       # - WG_PORT=51820
+       # - WG_DEFAULT_ADDRESS=10.8.0.x
+-      # - WG_DEFAULT_ADDRESS6=fdcc:ad94:bacf:61a4::cafe:x
++      # - WG_DEFAULT_ADDRESS6=fd00::cafe:x
+       # - WG_DEFAULT_DNS=1.0.0.1
+       # - WG_DEFAULT_DNS6=2606:4700:4700::1001
+       # - WG_MTU=1420
+@@ -22,7 +22,7 @@ services:
+     networks:
+       wg:
+         ipv4_address: 10.42.42.42
+-        ipv6_address: fdcc:ad94:bacf:61a4::2a
++        ipv6_address: fd00::2a
+     volumes:
+       - .:/etc/wireguard
+     ports:
+@@ -47,4 +47,4 @@ networks:
+       driver: default
+       config:
+         - subnet: 10.42.42.0/24
+-        - subnet: fdcc:ad94:bacf:61a4::/64
++        - subnet: fd00::0/112
+diff --git a/src/config.js b/src/config.js
+index 5f4ea7a2..379333aa 100644
+--- a/src/config.js
++++ b/src/config.js
+@@ -12,13 +12,13 @@ module.exports.WG_PORT = process.env.WG_PORT || 51820;
+ module.exports.WG_MTU = process.env.WG_MTU || null;
+ module.exports.WG_PERSISTENT_KEEPALIVE = process.env.WG_PERSISTENT_KEEPALIVE || 0;
+ module.exports.WG_DEFAULT_ADDRESS = process.env.WG_DEFAULT_ADDRESS || '10.8.0.x';
+-module.exports.WG_DEFAULT_ADDRESS6 = process.env.WG_DEFAULT_ADDRESS6 || 'fdcc:ad94:bacf:61a4::cafe:x';
++module.exports.WG_DEFAULT_ADDRESS6 = process.env.WG_DEFAULT_ADDRESS6 || 'fd00::cafe:x';
+ module.exports.WG_DEFAULT_DNS = typeof process.env.WG_DEFAULT_DNS === 'string'
+   ? process.env.WG_DEFAULT_DNS
+   : '1.1.1.1';
+ module.exports.WG_DEFAULT_DNS6 = typeof process.env.WG_DEFAULT_DNS6 === 'string'
+-  ? process.env.WG_DEFAULT_DNS6
+-  : '2606:4700:4700::1111';
++    ? process.env.WG_DEFAULT_DNS6
++    : '2606:4700:4700::1111';
+ module.exports.WG_ALLOWED_IPS = process.env.WG_ALLOWED_IPS || '0.0.0.0/0, ::/0';
+ 
+ // Set WG_POST_UP to allow IPv6 NAT and forwarding only if the required kernel module is available
+@@ -46,4 +46,5 @@ if (modules.includes("ip6table_nat")) {
+   `.split('\n').join(' ');
+ }
+ 
++
+ module.exports.WG_POST_DOWN = process.env.WG_POST_DOWN || '';
+diff --git a/src/lib/WireGuard.js b/src/lib/WireGuard.js
+index 26e91bdb..d97a4d04 100644
+--- a/src/lib/WireGuard.js
++++ b/src/lib/WireGuard.js
+@@ -206,7 +206,7 @@ AllowedIPs = ${client.address}/32, ${client.address6}/128`;
+     return `
+ [Interface]
+ PrivateKey = ${client.privateKey}
+-Address = ${client.address}/24, ${client.address6}/64
++Address = ${client.address}/24, ${client.address6}/120
+ ${isDnsSet ? `DNS = ${dnsServers}` : ''}
+ ${WG_MTU ? `MTU = ${WG_MTU}` : ''}
+ 
+
+From 33aba0793dd99210574fa3a709c378d70ee3d0d8 Mon Sep 17 00:00:00 2001
+From: Joel Heaps <13434824+joelheaps@users.noreply.github.com>
+Date: Fri, 28 Jan 2022 16:01:01 -0600
+Subject: [PATCH 11/15] Eliminate redundant config in src/config.js
+
+Co-authored-by: crazyracer98 <8631139+crazyracer98@users.noreply.github.com>
+---
+ src/config.js | 24 +++++++++++-------------
+ 1 file changed, 11 insertions(+), 13 deletions(-)
+
+diff --git a/src/config.js b/src/config.js
+index 379333aa..404e9d26 100644
+--- a/src/config.js
++++ b/src/config.js
+@@ -26,24 +26,22 @@ const modules = childProcess.execSync('lsmod', {
+   shell: 'bash',
+ })
+ 
+-if (modules.includes("ip6table_nat")) {
+-  module.exports.WG_POST_UP = process.env.WG_POST_UP || `
++module.exports.WG_POST_UP = process.env.WG_POST_UP
++if (!!process.env.WG_POST_UP) {
++  module.exports.WG_POST_UP = `
+   iptables -t nat -A POSTROUTING -s ${module.exports.WG_DEFAULT_ADDRESS.replace('x', '0')}/24 -o eth0 -j MASQUERADE;
+   iptables -A INPUT -p udp -m udp --dport 51820 -j ACCEPT;
+   iptables -A FORWARD -i wg0 -j ACCEPT;
+-  iptables -A FORWARD -o wg0 -j ACCEPT;
+-  ip6tables -t nat -A POSTROUTING -s ${module.exports.WG_DEFAULT_ADDRESS6.replace('x', '0')}/64 -o eth0 -j MASQUERADE;
++  iptables -A FORWARD -o wg0 -j ACCEPT;`
++  
++  if (modules.includes("ip6table_nat")) {
++    module.exports.WG_POST_UP += `ip6tables -t nat -A POSTROUTING -s ${module.exports.WG_DEFAULT_ADDRESS6.replace('x', '0')}/64 -o eth0 -j MASQUERADE;
+   ip6tables -A INPUT -p udp -m udp --dport 51820 -j ACCEPT;
+   ip6tables -A FORWARD -i wg0 -j ACCEPT;
+-  ip6tables -A FORWARD -o wg0 -j ACCEPT;
+-  `.split('\n').join(' ');
+-} else {
+-  module.exports.WG_POST_UP = process.env.WG_POST_UP || `
+-  iptables -t nat -A POSTROUTING -s ${module.exports.WG_DEFAULT_ADDRESS.replace('x', '0')}/24 -o eth0 -j MASQUERADE;
+-  iptables -A INPUT -p udp -m udp --dport 51820 -j ACCEPT;
+-  iptables -A FORWARD -i wg0 -j ACCEPT;
+-  iptables -A FORWARD -o wg0 -j ACCEPT;
+-  `.split('\n').join(' ');
++  ip6tables -A FORWARD -o wg0 -j ACCEPT;`
++  }
++  
++  module.exports.WG_POST_UP = module.exports.WG_POST_UP.split('\n').join(' ');
+ }
+ 
+ 
+
+From a93bf4e9383b1b711f49d14b959807729dea94f2 Mon Sep 17 00:00:00 2001
+From: Joel Heaps <13434824+joelheaps@users.noreply.github.com>
+Date: Fri, 28 Jan 2022 16:04:42 -0600
+Subject: [PATCH 12/15] Use unique prefix for Docker network and wg client
+
+Co-authored-by: crazyracer98 <8631139+crazyracer98@users.noreply.github.com>
+---
+ docker-compose.yml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/docker-compose.yml b/docker-compose.yml
+index 4b1f53fd..335eed58 100644
+--- a/docker-compose.yml
++++ b/docker-compose.yml
+@@ -47,4 +47,4 @@ networks:
+       driver: default
+       config:
+         - subnet: 10.42.42.0/24
+-        - subnet: fdcc:ad94:bacf:61a4::/64
++        - subnet: fdcc:ad94:bacf:61a3::/64
+
+From 46b14daf8c665a7c179c9372ee439677acf0a664 Mon Sep 17 00:00:00 2001
+From: Joel Heaps <13434824+joelheaps@users.noreply.github.com>
+Date: Fri, 28 Jan 2022 16:04:57 -0600
+Subject: [PATCH 13/15] Use unique prefix for Docker network and wg client
+ (2/2)
+
+Co-authored-by: crazyracer98 <8631139+crazyracer98@users.noreply.github.com>
+---
+ docker-compose.yml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/docker-compose.yml b/docker-compose.yml
+index 335eed58..34833c98 100644
+--- a/docker-compose.yml
++++ b/docker-compose.yml
+@@ -22,7 +22,7 @@ services:
+     networks:
+       wg:
+         ipv4_address: 10.42.42.42
+-        ipv6_address: fdcc:ad94:bacf:61a4::2a
++        ipv6_address: fdcc:ad94:bacf:61a3::2a
+     volumes:
+       - .:/etc/wireguard
+     ports:
+
+From 05941cbda5c4134b3ecbe237688856630d660f67 Mon Sep 17 00:00:00 2001
+From: Joel Heaps <13434824+joelheaps@users.noreply.github.com>
+Date: Fri, 28 Jan 2022 20:50:21 -0600
+Subject: [PATCH 14/15] Update src/config.js
+
+Co-authored-by: crazyracer98 <8631139+crazyracer98@users.noreply.github.com>
+---
+ src/config.js | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/config.js b/src/config.js
+index 404e9d26..41131558 100644
+--- a/src/config.js
++++ b/src/config.js
+@@ -27,7 +27,7 @@ const modules = childProcess.execSync('lsmod', {
+ })
+ 
+ module.exports.WG_POST_UP = process.env.WG_POST_UP
+-if (!!process.env.WG_POST_UP) {
++if (!process.env.WG_POST_UP) {
+   module.exports.WG_POST_UP = `
+   iptables -t nat -A POSTROUTING -s ${module.exports.WG_DEFAULT_ADDRESS.replace('x', '0')}/24 -o eth0 -j MASQUERADE;
+   iptables -A INPUT -p udp -m udp --dport 51820 -j ACCEPT;
+
+From 1efce4efce701ebace3a6e4e3ed97098befa495e Mon Sep 17 00:00:00 2001
+From: crazyracer98 <8631139+crazyracer98@users.noreply.github.com>
+Date: Sat, 29 Jan 2022 13:34:14 +0100
+Subject: [PATCH 15/15] fix IPv6 addresses and ranges
+
+---
+ README.md            | 2 +-
+ docker-compose.yml   | 2 +-
+ src/config.js        | 6 +++---
+ src/lib/WireGuard.js | 2 +-
+ 4 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/README.md b/README.md
+index fa9b7444..a681ff57 100644
+--- a/README.md
++++ b/README.md
+@@ -86,7 +86,7 @@ These options can be configured by setting environment variables using `-e KEY="
+ | `WG_MTU` | `null` | `1420` | The MTU the clients will use. Server uses default WG MTU. |
+ | `WG_PERSISTENT_KEEPALIVE` | `0` | `25` | Value in seconds to keep the "connection" open. |
+ | `WG_DEFAULT_ADDRESS` | `10.8.0.x` | `10.6.0.x` | Clients IP address range. |
+-| `WG_DEFAULT_ADDRESS6` | `fd00::cafe:x` | `fd00::42:x` | Clients IPv6 address range. Has to be a valid IPv6 ULA address. |
++| `WG_DEFAULT_ADDRESS6` | `fdcc:ad94:bacf:61a4::cafe:x` | `fdcc:ad94:bacf:61a4::42:x` | Clients IPv6 address range. Has to be a valid IPv6 ULA address. |
+ | `WG_DEFAULT_DNS` | `1.1.1.1` | `8.8.8.8, 8.8.4.4` | DNS server clients will use. |
+ | `WG_DEFAULT_DNS6` | `2606:4700:4700::1111` | `2606:4700:4700::1001, 2606:4700:4700::1111` | DNSv6 server clients will use. |
+ | `WG_ALLOWED_IPS` | `0.0.0.0/0, ::/0` | `192.168.15.0/24, 10.0.1.0/24` | Allowed IPs clients will use. |
+diff --git a/docker-compose.yml b/docker-compose.yml
+index 86f07109..4ccd6590 100644
+--- a/docker-compose.yml
++++ b/docker-compose.yml
+@@ -11,7 +11,7 @@ services:
+       # - PASSWORD=foobar123
+       # - WG_PORT=51820
+       # - WG_DEFAULT_ADDRESS=10.8.0.x
+-      # - WG_DEFAULT_ADDRESS6=fd00::cafe:x
++      # - WG_DEFAULT_ADDRESS6=fdcc:ad94:bacf:61a4::cafe:x
+       # - WG_DEFAULT_DNS=1.0.0.1
+       # - WG_DEFAULT_DNS6=2606:4700:4700::1001
+       # - WG_MTU=1420
+diff --git a/src/config.js b/src/config.js
+index 41131558..ed628aa8 100644
+--- a/src/config.js
++++ b/src/config.js
+@@ -12,13 +12,13 @@ module.exports.WG_PORT = process.env.WG_PORT || 51820;
+ module.exports.WG_MTU = process.env.WG_MTU || null;
+ module.exports.WG_PERSISTENT_KEEPALIVE = process.env.WG_PERSISTENT_KEEPALIVE || 0;
+ module.exports.WG_DEFAULT_ADDRESS = process.env.WG_DEFAULT_ADDRESS || '10.8.0.x';
+-module.exports.WG_DEFAULT_ADDRESS6 = process.env.WG_DEFAULT_ADDRESS6 || 'fd00::cafe:x';
++module.exports.WG_DEFAULT_ADDRESS6 = process.env.WG_DEFAULT_ADDRESS6 || 'fdcc:ad94:bacf:61a4::cafe:x';
+ module.exports.WG_DEFAULT_DNS = typeof process.env.WG_DEFAULT_DNS === 'string'
+   ? process.env.WG_DEFAULT_DNS
+   : '1.1.1.1';
+ module.exports.WG_DEFAULT_DNS6 = typeof process.env.WG_DEFAULT_DNS6 === 'string'
+-    ? process.env.WG_DEFAULT_DNS6
+-    : '2606:4700:4700::1111';
++  ? process.env.WG_DEFAULT_DNS6
++  : '2606:4700:4700::1111';
+ module.exports.WG_ALLOWED_IPS = process.env.WG_ALLOWED_IPS || '0.0.0.0/0, ::/0';
+ 
+ // Set WG_POST_UP to allow IPv6 NAT and forwarding only if the required kernel module is available
+diff --git a/src/lib/WireGuard.js b/src/lib/WireGuard.js
+index d97a4d04..26e91bdb 100644
+--- a/src/lib/WireGuard.js
++++ b/src/lib/WireGuard.js
+@@ -206,7 +206,7 @@ AllowedIPs = ${client.address}/32, ${client.address6}/128`;
+     return `
+ [Interface]
+ PrivateKey = ${client.privateKey}
+-Address = ${client.address}/24, ${client.address6}/120
++Address = ${client.address}/24, ${client.address6}/64
+ ${isDnsSet ? `DNS = ${dnsServers}` : ''}
+ ${WG_MTU ? `MTU = ${WG_MTU}` : ''}
+ 
