@@ -36,7 +36,8 @@ RUN npm i -g nodemon
 # Install Linux packages
 RUN apk add -U --no-cache \
   wireguard-tools \
-  dumb-init
+  dumb-init \
+  ip6tables
 
 # Expose Ports
 EXPOSE 51820/udp

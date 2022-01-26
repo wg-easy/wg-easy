@@ -153,6 +153,31 @@
                       </span>
                     </span>
 
+                    <!-- Address6 -->
+                    <span class="group">
+
+                      <!-- Show -->
+                      <input v-show="clientEditAddress6Id === client.id" v-model="clientEditAddress6"
+                        v-on:keyup.enter="updateClientAddress6(client, clientEditAddress6); clientEditAddress6 = null; clientEditAddress6Id = null;"
+                        v-on:keyup.escape="clientEditAddress6 = null; clientEditAddress6Id = null;"
+                        :ref="'client-' + client.id + '-address6'"
+                        class="rounded border-2 border-gray-100 focus:border-gray-200 outline-none w-20 text-black" />
+                      <span v-show="clientEditAddress6Id !== client.id"
+                        class="inline-block border-t-2 border-b-2 border-transparent">{{client.address6}}</span>
+
+                      <!-- Edit -->
+                      <span v-show="clientEditAddress6Id !== client.id"
+                        @click="clientEditAddress6 = client.address6; clientEditAddress6Id = client.id; setTimeout(() => $refs['client-' + client.id + '-address6'][0].select(), 1);"
+                        class="cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                          class="h-4 w-4 inline align-middle opacity-25 hover:opacity-100" fill="none"
+                          viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                      </span>
+                    </span>
+
                     <!-- Transfer TX -->
                     <span v-if="client.transferTx":title="'Total Download: ' + bytes(client.transferTx)">
                       ·
