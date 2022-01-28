@@ -47,4 +47,4 @@ networks:
       driver: default
       config:
         - subnet: 10.42.42.0/24
-        - subnet: fdcc:ad94:bacf:61a4::/64
+        - subnet: fdcc:ad94:bacf:61a3::/64
