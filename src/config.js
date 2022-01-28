@@ -26,24 +26,22 @@ const modules = childProcess.execSync('lsmod', {
   shell: 'bash',
 })
 
-if (modules.includes("ip6table_nat")) {
-  module.exports.WG_POST_UP = process.env.WG_POST_UP || `
+module.exports.WG_POST_UP = process.env.WG_POST_UP
+if (!!process.env.WG_POST_UP) {
+  module.exports.WG_POST_UP = `
   iptables -t nat -A POSTROUTING -s ${module.exports.WG_DEFAULT_ADDRESS.replace('x', '0')}/24 -o eth0 -j MASQUERADE;
   iptables -A INPUT -p udp -m udp --dport 51820 -j ACCEPT;
   iptables -A FORWARD -i wg0 -j ACCEPT;
-  iptables -A FORWARD -o wg0 -j ACCEPT;
-  ip6tables -t nat -A POSTROUTING -s ${module.exports.WG_DEFAULT_ADDRESS6.replace('x', '0')}/64 -o eth0 -j MASQUERADE;
+  iptables -A FORWARD -o wg0 -j ACCEPT;`
+  
+  if (modules.includes("ip6table_nat")) {
+    module.exports.WG_POST_UP += `ip6tables -t nat -A POSTROUTING -s ${module.exports.WG_DEFAULT_ADDRESS6.replace('x', '0')}/64 -o eth0 -j MASQUERADE;
   ip6tables -A INPUT -p udp -m udp --dport 51820 -j ACCEPT;
   ip6tables -A FORWARD -i wg0 -j ACCEPT;
-  ip6tables -A FORWARD -o wg0 -j ACCEPT;
-  `.split('\n').join(' ');
-} else {
-  module.exports.WG_POST_UP = process.env.WG_POST_UP || `
-  iptables -t nat -A POSTROUTING -s ${module.exports.WG_DEFAULT_ADDRESS.replace('x', '0')}/24 -o eth0 -j MASQUERADE;
-  iptables -A INPUT -p udp -m udp --dport 51820 -j ACCEPT;
-  iptables -A FORWARD -i wg0 -j ACCEPT;
-  iptables -A FORWARD -o wg0 -j ACCEPT;
-  `.split('\n').join(' ');
+  ip6tables -A FORWARD -o wg0 -j ACCEPT;`
+  }
+  
+  module.exports.WG_POST_UP = module.exports.WG_POST_UP.split('\n').join(' ');
 }
 
 
