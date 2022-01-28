@@ -4,7 +4,7 @@ services:
     environment:
       # ⚠️ Required:
       # Change this to your host's public address
-      - WG_HOST=192.168.178.46
+      - WG_HOST=raspberrypi.local
 
       # Optional:
       # - PASSWORD=foobar123
