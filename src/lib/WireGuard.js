@@ -206,7 +206,7 @@ AllowedIPs = ${client.address}/32, ${client.address6}/128`;
     return `
 [Interface]
 PrivateKey = ${client.privateKey}
-Address = ${client.address}/24, ${client.address6}/64
+Address = ${client.address}/24, ${client.address6}/120
 ${isDnsSet ? `DNS = ${dnsServers}` : ''}
 ${WG_MTU ? `MTU = ${WG_MTU}` : ''}
 
