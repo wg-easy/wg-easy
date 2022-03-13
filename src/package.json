@@ -12,9 +12,9 @@
   "author": "Chono Nanton",
   "license": "GPL",
   "dependencies": {
-    "debug": "^4.3.1",
-    "express": "^4.17.1",
-    "express-session": "^1.17.1",
+    "debug": "^4.3.3",
+    "express": "^4.17.3",
+    "express-session": "^1.17.2",
     "qrcode": "^1.5.0",
     "uuid": "^8.3.2"
   },
