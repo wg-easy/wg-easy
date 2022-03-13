@@ -10,7 +10,7 @@
     "lint": "eslint ."
   },
   "author": "Chono Nanton",
-  "license": "GPL",
+  "license": "MIT",
   "dependencies": {
     "debug": "^4.3.3",
     "express": "^4.17.3",
