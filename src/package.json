@@ -19,8 +19,8 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "eslint": "^7.27.0",
-    "eslint-config-athom": "^2.1.0"
+    "eslint": "^8.11.0",
+    "eslint-config-athom": "^3.0.1"
   },
   "nodemonConfig": {
     "ignore": [
