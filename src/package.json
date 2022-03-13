@@ -1,6 +1,6 @@
 {
   "release": 5,
-  "name": "wg-easy",
+  "name": "wireui",
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
@@ -9,13 +9,13 @@
     "serve-with-password": "PASSWORD=wg npm run serve",
     "lint": "eslint ."
   },
-  "author": "Emile Nijssen",
+  "author": "Chono Nanton",
   "license": "GPL",
   "dependencies": {
     "debug": "^4.3.1",
     "express": "^4.17.1",
     "express-session": "^1.17.1",
-    "qrcode": "^1.4.4",
+    "qrcode": "^1.5.0",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
