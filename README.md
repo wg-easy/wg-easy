@@ -5,7 +5,7 @@
 [![Docker](https://img.shields.io/docker/v/weejewel/wg-easy/latest)](https://hub.docker.com/r/weejewel/wg-easy)
 [![Docker](https://img.shields.io/docker/pulls/gyarbij/wireui.svg)](https://hub.docker.com/r/gyarbij/wireui)
 
-This is a security and hardenig divergent fork of (wg-easy)[https://github.com/WeeJeWel/wg-easy]
+This is a security and hardenig divergent fork of [wg-easy](https://github.com/WeeJeWel/wg-easy)
 
 <p align="center">
   <img src="./assets/screenshot.png" width="802" />
