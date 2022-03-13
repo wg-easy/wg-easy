@@ -14,8 +14,8 @@ services:
       # - WG_MTU=1420
       # - WG_ALLOWED_IPS=192.168.15.0/24, 10.0.1.0/24
       
-    image: weejewel/wg-easy
-    container_name: wg-easy
+    image: gyarbij/wireui
+    container_name: wireui
     volumes:
       - .:/etc/wireguard
     ports:
