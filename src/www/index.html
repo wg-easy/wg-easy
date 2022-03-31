@@ -128,26 +128,6 @@
                   <!-- Info -->
                   <div class="text-gray-400 text-xs">
 
-                    <!-- Show QR-->
-                    <button class="align-middle bg-gray-100 hover:bg-red-800 hover:text-white p-2 rounded transition"
-                      title="Show QR Code" @click="clientQRShow = client; areClientsHardened().then(harden => {if (!harden) document.getElementById('client-qr-button').click();});">
-                      <svg class="w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
-                      </svg>
-                    </button>
-
-                    <!-- Download Config -->
-                    <button class="align-middle bg-gray-100 hover:bg-red-800 hover:text-white p-2 rounded transition"
-                      title="Download Configuration" @click="clientConfigDownload = client; areClientsHardened().then(harden => {if (!harden) document.getElementById('client-download-button').click();});">
-                      <svg class="w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                      </svg>
-                    </button>
-
                     <!-- Address -->
                     <span class="group">
 
@@ -220,7 +200,7 @@
 
                     <!-- Show QR-->
                     <button class="align-middle bg-gray-100 hover:bg-red-800 hover:text-white p-2 rounded transition"
-                      title="Show QR Code" @click="qrcode = `./api/wireguard/client/${client.id}/qrcode.svg`">
+                      title="Show QR Code" @click="clientQRShow = client; areClientsHardened().then(harden => {if (!harden) document.getElementById('client-qr-button').click();});">
                       <svg class="w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -229,15 +209,14 @@
                     </button>
 
                     <!-- Download Config -->
-                    <a :href="'./api/wireguard/client/' + client.id + '/configuration'" download
-                      class="align-middle inline-block bg-gray-100 hover:bg-red-800 hover:text-white p-2 rounded transition"
-                      title="Download Configuration">
+                    <button class="align-middle bg-gray-100 hover:bg-red-800 hover:text-white p-2 rounded transition"
+                      title="Download Configuration" @click="clientConfigDownload = client; areClientsHardened().then(harden => {if (!harden) document.getElementById('client-download-button').click();});">
                       <svg class="w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                       </svg>
-                    </a>
+                    </button>
 
                     <!-- Delete -->
                     <button class="align-middle bg-gray-100 hover:bg-red-800 hover:text-white p-2 rounded transition"
