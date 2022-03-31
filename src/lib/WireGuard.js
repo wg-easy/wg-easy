@@ -33,12 +33,12 @@ module.exports = class WireGuard {
           throw new Error('WG_HOST Environment Variable Not Set!');
         }
 
-        debug('Loading configuration...');
+        console.log('Loading configuration...');
         let config;
         try {
           config = await fs.readFile(path.join(WG_PATH, 'wg0.json'), 'utf8');
           config = JSON.parse(config);
-          debug('Configuration loaded.');
+          console.log('Configuration loaded.');
         } catch (err) {
           const privateKey = await Util.exec('wg genkey');
           const publicKey = await Util.exec(`echo ${privateKey} | wg pubkey`, privateKey);
@@ -52,7 +52,7 @@ module.exports = class WireGuard {
             },
             clients: {},
           };
-          debug('Configuration generated.');
+          console.log('Configuration generated.');
         }
 
         await this.__saveConfig(config);
@@ -110,20 +110,20 @@ PresharedKey = ${client.preSharedKey}
 AllowedIPs = ${client.address}/32`;
     }
 
-    debug('Config saving...');
+    console.log('Config saving...');
     await fs.writeFile(path.join(WG_PATH, 'wg0.json'), JSON.stringify(config, false, 2), {
       mode: 0o660,
     });
     await fs.writeFile(path.join(WG_PATH, 'wg0.conf'), result, {
       mode: 0o600,
     });
-    debug('Config saved.');
+    console.log('Config saved.');
   }
 
   async __syncConfig() {
-    debug('Config syncing...');
+    console.log('Config syncing...');
     await Util.exec('wg syncconf wg0 <(wg-quick strip wg0)');
-    debug('Config synced.');
+    console.log('Config synced.');
   }
 
   async getDns() {
