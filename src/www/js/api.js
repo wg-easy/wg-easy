@@ -72,6 +72,13 @@ class API {
     });
   }
 
+  async getDefaultAllowedIPs() {
+    return this.call({
+      method: 'get',
+      path: '/wireguard/default-allowed-ips',
+    });
+  }
+
   async getClients() {
     return this.call({
       method: 'get',

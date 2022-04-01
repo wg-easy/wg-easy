@@ -42,7 +42,6 @@ new Vue({
     clientConfigDownload: null,
     clientCreateName: '',
     clientCreateAllowedIPs: '',
-    clientCreateAllowedIPsDefault: '0.0.0.0/0, ::0/0',
     clientCreateAllowedIPsExclude: (
       '::/0, 1.0.0.0/8, 2.0.0.0/8, 3.0.0.0/8, '
       + '4.0.0.0/6, 8.0.0.0/7, 11.0.0.0/8, 12.0.0.0/6, '
@@ -230,6 +229,9 @@ new Vue({
     },
     getDns() {
       return this.api.getDns();
+    },
+    getDefaultAllowedIPs() {
+      return this.api.getDefaultAllowedIPs();
     },
     createClient() {
       const name = this.clientCreateName;

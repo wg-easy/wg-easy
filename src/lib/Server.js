@@ -62,7 +62,7 @@ module.exports = class Server {
         req.session.authenticated = true;
         req.session.save();
 
-        console.log(`New Session: ${req.session.id})`);
+        debug(`New Session: ${req.session.id})`);
       }))
 
       // WireGuard
@@ -84,13 +84,16 @@ module.exports = class Server {
 
         req.session.destroy();
 
-        console.log(`Deleted Session: ${sessionId}`);
+        debug(`Deleted Session: ${sessionId}`);
       }))
       .get('/api/wireguard/hardened', Util.promisify(async req => {
         return WireGuard.areClientsHardened();
       }))
       .get('/api/wireguard/dns', Util.promisify(async req => {
         return WireGuard.getDns();
+      }))
+      .get('/api/wireguard/default-allowed-ips', Util.promisify(async req => {
+        return WireGuard.getDefaultAllowedIPs();
       }))
       .get('/api/wireguard/client', Util.promisify(async req => {
         return WireGuard.getClients();
@@ -138,7 +141,7 @@ module.exports = class Server {
       }))
 
       .listen(PORT, () => {
-        console.log(`Listening on http://0.0.0.0:${PORT}`);
+        debug(`Listening on http://0.0.0.0:${PORT}`);
       });
   }
 
