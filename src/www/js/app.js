@@ -48,6 +48,7 @@ new Vue({
     currentRelease: null,
     latestRelease: null,
 
+    chartsVisible: (localStorage.getItem('chartsVisible') ?? 'true') === 'true',
     chartOptions: {
       chart: {
         background: 'transparent',
@@ -242,6 +243,10 @@ new Vue({
       this.api.updateClientAddress({ clientId: client.id, address })
         .catch(err => alert(err.message || err.toString()))
         .finally(() => this.refresh().catch(console.error));
+    },
+    toggleCharts() {
+      this.chartsVisible = !this.chartsVisible;
+      localStorage.setItem('chartsVisible', this.chartsVisible);
     },
   },
   filters: {
