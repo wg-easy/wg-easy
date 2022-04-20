@@ -1,0 +1,143 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wg-easy-pvc
+  namespace: wireguard
+spec:
+  storageClassName: openebs-data
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 0.25Gi
+      
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wg-easy
+  namespace: wireguard
+  labels:
+    app: wg-easy
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: wg-easy
+  template:
+    metadata:
+      labels:
+        app: wg-easy
+    spec:
+      restartPolicy: Always
+      initContainers:
+      - name: init
+        image: busybox:1.32.0
+        command:
+        - sh
+        - -c
+        - sysctl -w net.ipv4.ip_forward=1 && sysctl -w net.ipv4.conf.all.forwarding=1
+        securityContext:
+          privileged: true
+          capabilities:
+            add:
+            - NET_ADMIN
+      containers:
+      - name: wg-easy
+        image: weejewel/wg-easy
+        securityContext:
+          privileged: true
+          capabilities:
+            add:
+            - NET_ADMIN
+        ports:
+        - containerPort: 51820
+          protocol: UDP
+          name: wg
+        - containerPort: 51821
+          protocol: TCP
+          name: wg-dashboard
+        env:
+        - name: WG_HOST
+          value: "sub.domain.tld"
+        - name: PASSWORD
+          value: "eiCCXkBifqwJ8qGT74repVf3ab7mYsbzGUx66"
+        - name: WG_DEFAULT_DNS
+          value: "8.8.8.8"
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "150m"
+          limits:
+            memory: "128Mi"
+        volumeMounts:
+        - name: wg-easy-data
+          mountPath: /etc/wireguard
+      volumes:
+      - name: wg-easy-data
+        persistentVolumeClaim:
+          claimName: wg-easy-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wg-easy
+  namespace: wireguard
+  labels:
+    app: wg-easy
+spec:
+  type: NodePort
+  selector:
+    app: wg-easy
+  ports:
+  - port: 51820
+    targetPort: wg
+    # When import config to client, you must edit the peer port to 30001
+    nodePort: 30001
+    protocol: UDP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wg-easy-dashboard
+  namespace: wireguard
+  labels:
+    app: wg-easy
+spec:
+  selector:
+    app: wg-easy
+  ports:
+  - port: 51821
+    targetPort: wg-dashboard
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: wg-easy-dashboard
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    cert-manager.io/cluster-issuer: "production-issuer"
+
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: sub.domain.tld
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: wg-easy-dashboard
+            port:
+              number: 51821
+  tls:
+  - hosts:
+    - sub.domain.tld
+    secretName: sub.domain.tld-cert
