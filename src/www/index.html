@@ -10,12 +10,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
 </head>
+  
+<style>
+  [v-cloak] {
+    display: none;
+  }
+</style>
 
 <body class="bg-gray-50">
 
   <div id="app">
 
-    <div class="container mx-auto max-w-3xl">
+    <div v-cloak class="container mx-auto max-w-3xl">
 
       <div v-if="authenticated === true">
         <span v-if="requiresPassword"
@@ -465,7 +471,7 @@
 
     </div>
 
-    <p class="text-center m-10 text-gray-300 text-xs">Made by <a target="_blank" class="hover:underline"
+    <p v-cloak class="text-center m-10 text-gray-300 text-xs">Made by <a target="_blank" class="hover:underline"
         href="https://emilenijssen.nl/?ref=wg-easy">Emile Nijssen</a> · <a class="hover:underline"
         href="https://github.com/sponsors/WeeJeWel" target="_blank">Donate</a> · <a class="hover:underline"
         href="https://github.com/weejewel/wg-easy" target="_blank">GitHub</a></p>
