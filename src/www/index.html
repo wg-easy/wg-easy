@@ -107,7 +107,7 @@
                 <div class="flex-grow">
 
                   <!-- Name -->
-                  <div class="text-gray-700 group" :title="'Created at ' + dateTime(new Date(client.createdAt))">
+                  <div class="text-gray-700 group" :title="'Created on ' + dateTime(new Date(client.createdAt))">
 
                     <!-- Show -->
                     <input v-show="clientEditNameId === client.id" v-model="clientEditName"
@@ -185,7 +185,7 @@
 
                     <!-- Last seen -->
                     <span v-if="client.latestHandshakeAt"
-                      :title="'Last seen at ' + dateTime(new Date(client.latestHandshakeAt))">
+                      :title="'Last seen on ' + dateTime(new Date(client.latestHandshakeAt))">
                       · {{new Date(client.latestHandshakeAt) | timeago}}
                     </span>
                   </div>
