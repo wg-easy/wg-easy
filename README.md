@@ -26,7 +26,7 @@ You have found the easiest way to install & manage WireGuard on any Linux host!
 ## Requirements
 
 * A host with a kernel that supports WireGuard (all modern kernels).
-* A host with Docker installed.
+* A host with Docker installed (or you could use the non-docker installation instructions).
 
 ## Installation
 
@@ -99,6 +99,10 @@ Are you enjoying this project? [Buy me a beer!](https://github.com/sponsors/WeeJ
 
 These options can be configured by setting environment variables using `-e KEY="VALUE"` in the `docker run` command.
 
+If you are using the systemd service, then you can add new ones using `Environment=KEY=VALUE` under the [Service] Section in the service file.
+
+
+
 | Env | Default | Example | Description |
 | - | - | - | - |
 | `PASSWORD` | - | `foobar123` | When set, requires a password when logging in to the Web UI. |
@@ -125,3 +129,15 @@ docker pull weejewel/wg-easy
 ```
 
 And then run the `docker run -d \ ...` command above again.
+
+If you are using the non-docker installation, then do the following
+<pre>
+git clone https://github.com/WeeJeWel/wg-easy # do this if you dont have the repository cloned aldready
+cd wg-easy
+git pull
+rm -rf /app /node_modules
+mv src /app
+cd /app
+npm ci --production
+cp node_modules ..
+</pre>
