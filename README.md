@@ -62,8 +62,11 @@ $ docker run -d \
   weejewel/wg-easy
 </pre>
 
-If you don't want to use docker, then add the sysctl tweaks listed above, and install wireguard, nodejs and npm from your package manager. After that, run the following
+If you don't want to use docker, then install wireguard, nodejs and npm from your package manager and then, run the following
 <pre>
+echo net.ipv4.ip_forward=1 >> /etc/sysctl.conf
+echo net.ipv4.conf.all.src_valid_mark=1 >> /etc/sysctl.conf
+sysctl -p
 git clone https://github.com/WeeJeWel/wg-easy
 cd wg-easy
 mv src /app
