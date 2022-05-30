@@ -1,0 +1,17 @@
+[Unit]
+Description=The easiest way to run WireGuard VPN with Web-based Admin UI
+[Service]
+Environment=DEBUG=Server,Wireguard
+# Your server IP/domain
+Environment=WG_HOST=REPLACEME 
+# IP Range for Devices to use
+Environment=WG_DEFAULT_ADDRESS=10.7.0.x
+# Default DNS 
+Environment=WG_DEFAULT_DNS=9.9.9.9 
+# Admin Panel Password (Please use a strong and complicated one)
+Environment=PASSWORD=REPLACEME
+WorkingDirectory=/app
+ExecStart=node server.js
+
+[Install]
+WantedBy=default.target
