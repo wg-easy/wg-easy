@@ -62,6 +62,24 @@ $ docker run -d \
   weejewel/wg-easy
 </pre>
 
+If you don't want to use docker, then add the sysctl tweaks listed above, and install wireguard, nodejs and npm from your package manager. After that, run the following
+<pre>
+git clone https://github.com/WeeJeWel/wg-easy
+cd wg-easy
+mv src /app
+cd /app
+npm ci --production
+cp node_modules ..
+ufw allow 51821/tcp # (webui) Only for users of the UFW firewall
+ufw allow 51820/udp # (wireguard listening port) Only for users of the UFW firewall
+cd -
+cp wg-easy.service /etc/systemd/system
+nano /etc/systemd/system/wg-easy.service # Replace everything that is marked as 'REPLACEME' and tweak it to your liking
+systemctl daemon-reload
+systemctl enable --now wg-easy.service
+systemctl start wg-easy.service
+</pre>
+
 > 💡 Replace `YOUR_SERVER_IP` with your WAN IP, or a Dynamic DNS hostname.
 > 
 > 💡 Replace `YOUR_ADMIN_PASSWORD` with a password to log in on the Web UI.
