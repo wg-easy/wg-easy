@@ -23,8 +23,15 @@ function bytes(bytes, decimals, kib, maxunit) {
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
 }
 
+const i18n = new VueI18n({
+  locale: localStorage.getItem('lang') || 'en',
+  fallbackLocale: 'en',
+  messages,
+});
+
 new Vue({
   el: '#app',
+  i18n,
   components: {
     apexchart: VueApexCharts,
   },
@@ -47,6 +54,8 @@ new Vue({
 
     currentRelease: null,
     latestRelease: null,
+
+    langDropdownShow: false,
 
     chartOptions: {
       chart: {
@@ -243,11 +252,15 @@ new Vue({
         .catch(err => alert(err.message || err.toString()))
         .finally(() => this.refresh().catch(console.error));
     },
+    changeLang(lang) {
+      localStorage.setItem('lang', lang);
+      i18n.locale = lang;
+    },
   },
   filters: {
     bytes,
     timeago: value => {
-      return timeago().format(value);
+      return timeago.format(value, i18n.locale);
     },
   },
   mounted() {
