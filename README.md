@@ -93,7 +93,7 @@ These options can be configured by setting environment variables using `-e KEY="
 
 > If you change `WG_PORT`, make sure to also change the exposed port.
 
-# Updating
+## Updating
 
 To update to the latest version, simply run:
 
@@ -104,3 +104,7 @@ docker pull weejewel/wg-easy
 ```
 
 And then run the `docker run -d \ ...` command above again.
+
+## Common Use Cases
+
+* [Using WireGuard-Easy with Pi-Hole](https://github.com/WeeJeWel/wg-easy/wiki/Using-WireGuard-Easy-with-Pi-Hole)
