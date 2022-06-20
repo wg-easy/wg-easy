@@ -60,31 +60,36 @@ new Vue({
     chartOptions: {
       chart: {
         background: 'transparent',
-        type: 'area',
+        type: 'bar',
+        stacked: false,
         toolbar: {
           show: false,
         },
+        animations: {
+          enabled: false,
+        },
       },
-      fill: {
-        type: 'gradient',
-      },
-      colors: ['#CCCCCC'],
+      colors: [
+        '#DDDDDD', // rx
+        '#EEEEEE', // tx
+      ],
       dataLabels: {
         enabled: false,
       },
-      stroke: {
-        curve: 'smooth',
-        width: 0,
+      plotOptions: {
+        bar: {
+          horizontal: false,
+        },
       },
       xaxis: {
         labels: {
           show: false,
         },
         axisTicks: {
-          show: false,
+          show: true,
         },
         axisBorder: {
-          show: false,
+          show: true,
         },
       },
       yaxis: {
@@ -139,9 +144,9 @@ new Vue({
 
         if (!this.clientsPersist[client.id]) {
           this.clientsPersist[client.id] = {};
-          this.clientsPersist[client.id].transferRxHistory = Array(20).fill(0);
+          this.clientsPersist[client.id].transferRxHistory = Array(100).fill(0);
           this.clientsPersist[client.id].transferRxPrevious = client.transferRx;
-          this.clientsPersist[client.id].transferTxHistory = Array(20).fill(0);
+          this.clientsPersist[client.id].transferTxHistory = Array(100).fill(0);
           this.clientsPersist[client.id].transferTxPrevious = client.transferTx;
 
           this.clientsPersist[client.id].chartOptions = {
@@ -164,21 +169,19 @@ new Vue({
         this.clientsPersist[client.id].transferTxHistory.push(this.clientsPersist[client.id].transferTxCurrent);
         this.clientsPersist[client.id].transferTxHistory.shift();
 
+        this.clientsPersist[client.id].chartMax = Math.max(...this.clientsPersist[client.id].transferTxHistory, ...this.clientsPersist[client.id].transferRxHistory);
+
         client.transferTxCurrent = this.clientsPersist[client.id].transferTxCurrent;
-        client.transferTxSeries = [{
+        client.transferRxCurrent = this.clientsPersist[client.id].transferRxCurrent;
+
+        client.chartOptions = this.clientsPersist[client.id].chartOptions;
+        client.chartSeries = [{
           name: 'tx',
           data: this.clientsPersist[client.id].transferTxHistory,
-        }];
-
-        client.transferRxCurrent = this.clientsPersist[client.id].transferRxCurrent;
-        client.transferRxSeries = [{
+        }, {
           name: 'rx',
           data: this.clientsPersist[client.id].transferRxHistory,
         }];
-
-        this.clientsPersist[client.id].chartMax = Math.max(...this.clientsPersist[client.id].transferTxHistory, ...this.clientsPersist[client.id].transferRxHistory);
-
-        client.chartOptions = this.clientsPersist[client.id].chartOptions;
 
         return client;
       });
