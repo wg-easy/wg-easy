@@ -14,6 +14,7 @@ const {
   PORT,
   RELEASE,
   PASSWORD,
+  LANG,
 } = require('../config');
 
 module.exports = class Server {
@@ -134,6 +135,9 @@ module.exports = class Server {
         const { address } = req.body;
         return WireGuard.updateClientAddress({ clientId, address });
       }))
+      .get('/api/lang', (Util.promisify(async () => {
+        return LANG;
+      })))
 
       .listen(PORT, () => {
         debug(`Listening on http://0.0.0.0:${PORT}`);

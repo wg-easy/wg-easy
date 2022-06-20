@@ -33,26 +33,10 @@
               d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
           </svg>
         </span>
-        <div class="flex flex-row flex-auto items-center mt-10 mb-2">
-          <h1 class="text-4xl font-medium flex-grow">
-            <img src="./img/logo.png" width="32" class="inline align-middle" />
-            <span class="align-middle">WireGuard</span>
-          </h1>
-          <div class="relative inline-block text-left flex-shrink-0">
-            <button type="button" class="inline-flex justify-center w-40 rounded-md border border-gray-100 shadow-sm py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:bg-gray-100 focus:border-gray-200" id="menu-button" aria-expanded="true" aria-haspopup="true" @click="langDropdownShow = !langDropdownShow">
-              {{$t("changeLang")}}
-              <svg class="-mr-1 ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-              </svg>
-            </button>
-            <div v-show="langDropdownShow" class="absolute right-0 mt-2 w-40 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="menu-button">
-              <div class="py-1" role="none">
-                <a href="#" @click="changeLang('en')" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 hover:text-gray-900" role="menuitem" id="menu-item-0" data-lang="en">English</a>
-                <a href="#" @click="changeLang('ru')" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 hover:text-gray-900" role="menuitem" id="menu-item-1" data-lang="ru">Русский</a>
-              </div>
-            </div>
-          </div>
-       </div>
+        <h1 class="text-4xl font-medium mt-10 mb-2">
+          <img src="./img/logo.png" width="32" class="inline align-middle" />
+          <span class="align-middle">WireGuard</span>
+        </h1>
         <h2 class="text-sm text-gray-400 mb-10"></h2>
 
         <div v-if="latestRelease" class="bg-red-800 p-4 text-white text-sm font-small mb-10 rounded-md shadow-lg"
@@ -118,7 +102,7 @@
                 <div class="flex-grow">
 
                   <!-- Name -->
-                  <div class="text-gray-700 group" :title="$t('createdOn') + dateTime(new Date(client.createdOn))">
+                  <div class="text-gray-700 group" :title="$t('createdOn') + dateTime(new Date(client.createdAt))">
 
                     <!-- Show -->
                     <input v-show="clientEditNameId === client.id" v-model="clientEditName"

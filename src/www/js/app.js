@@ -55,8 +55,6 @@ new Vue({
     currentRelease: null,
     latestRelease: null,
 
-    langDropdownShow: false,
-
     chartOptions: {
       chart: {
         background: 'transparent',
@@ -255,10 +253,6 @@ new Vue({
         .catch(err => alert(err.message || err.toString()))
         .finally(() => this.refresh().catch(console.error));
     },
-    changeLang(lang) {
-      localStorage.setItem('lang', lang);
-      i18n.locale = lang;
-    },
   },
   filters: {
     bytes,
@@ -285,6 +279,12 @@ new Vue({
     }, 1000);
 
     Promise.resolve().then(async () => {
+      const lang = await this.api.getLang();
+      if (lang !== localStorage.getItem('lang') && i18n.availableLocales.includes(lang)) {
+        localStorage.setItem('lang', lang);
+        i18n.locale = lang;
+      }
+
       const currentRelease = await this.api.getRelease();
       const latestRelease = await fetch('https://weejewel.github.io/wg-easy/changelog.json')
         .then(res => res.json())

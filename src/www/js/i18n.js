@@ -15,7 +15,7 @@ const messages = { // eslint-disable-line no-unused-vars
     deleteDialog2: 'This action cannot be undone.',
     cancel: 'Cancel',
     create: 'Create',
-    createdAt: 'Created on ',
+    createdOn: 'Created on ',
     lastSeen: 'Last seen on ',
     totalDownload: 'Total Download: ',
     totalUpload: 'Total Upload: ',
@@ -27,7 +27,6 @@ const messages = { // eslint-disable-line no-unused-vars
     downloadConfig: 'Download Configuration',
     madeBy: 'Made by',
     donate: 'Donate',
-    changeLang: 'Change language',
   },
   ru: {
     name: 'Имя',
@@ -43,7 +42,7 @@ const messages = { // eslint-disable-line no-unused-vars
     deleteDialog2: 'Это действие невозможно отменить.',
     cancel: 'Закрыть',
     create: 'Создать',
-    createdAt: 'Создано в ',
+    createdOn: 'Создано в ',
     lastSeen: 'Последнее подключение в ',
     totalDownload: 'Всего скачано: ',
     totalUpload: 'Всего загружено: ',
@@ -55,6 +54,5 @@ const messages = { // eslint-disable-line no-unused-vars
     downloadConfig: 'Скачать конфигурацию',
     madeBy: 'Сделано',
     donate: 'Поблагодарить',
-    changeLang: 'Выбор языка',
   },
 };
