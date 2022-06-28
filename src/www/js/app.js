@@ -32,9 +32,6 @@ const i18n = new VueI18n({
 new Vue({
   el: '#app',
   i18n,
-  components: {
-    apexchart: VueApexCharts,
-  },
   data: {
     authenticated: null,
     authenticating: false,
@@ -131,7 +128,9 @@ new Vue({
         minute: 'numeric',
       }).format(value);
     },
-    async refresh() {
+    async refresh({
+      updateCharts = false,
+    } = {}) {
       if (!this.authenticated) return;
 
       const clients = await this.api.getClients();
@@ -142,44 +141,38 @@ new Vue({
 
         if (!this.clientsPersist[client.id]) {
           this.clientsPersist[client.id] = {};
-          this.clientsPersist[client.id].transferRxHistory = Array(100).fill(0);
+          this.clientsPersist[client.id].transferRxHistory = Array(50).fill(0);
           this.clientsPersist[client.id].transferRxPrevious = client.transferRx;
-          this.clientsPersist[client.id].transferTxHistory = Array(100).fill(0);
+          this.clientsPersist[client.id].transferTxHistory = Array(50).fill(0);
           this.clientsPersist[client.id].transferTxPrevious = client.transferTx;
-
-          this.clientsPersist[client.id].chartOptions = {
-            ...this.chartOptions,
-            yaxis: {
-              ...this.chartOptions.yaxis,
-              max: () => this.clientsPersist[client.id].chartMax,
-            },
-          };
         }
 
-        this.clientsPersist[client.id].transferRxCurrent = client.transferRx - this.clientsPersist[client.id].transferRxPrevious;
-        this.clientsPersist[client.id].transferRxPrevious = client.transferRx;
-        this.clientsPersist[client.id].transferTxCurrent = client.transferTx - this.clientsPersist[client.id].transferTxPrevious;
-        this.clientsPersist[client.id].transferTxPrevious = client.transferTx;
+        // Debug
+        // client.transferRx = this.clientsPersist[client.id].transferRxPrevious + Math.random() * 1000;
+        // client.transferTx = this.clientsPersist[client.id].transferTxPrevious + Math.random() * 1000;
 
-        this.clientsPersist[client.id].transferRxHistory.push(this.clientsPersist[client.id].transferRxCurrent);
-        this.clientsPersist[client.id].transferRxHistory.shift();
+        if (updateCharts) {
+          this.clientsPersist[client.id].transferRxCurrent = client.transferRx - this.clientsPersist[client.id].transferRxPrevious;
+          this.clientsPersist[client.id].transferRxPrevious = client.transferRx;
+          this.clientsPersist[client.id].transferTxCurrent = client.transferTx - this.clientsPersist[client.id].transferTxPrevious;
+          this.clientsPersist[client.id].transferTxPrevious = client.transferTx;
 
-        this.clientsPersist[client.id].transferTxHistory.push(this.clientsPersist[client.id].transferTxCurrent);
-        this.clientsPersist[client.id].transferTxHistory.shift();
+          this.clientsPersist[client.id].transferRxHistory.push(this.clientsPersist[client.id].transferRxCurrent);
+          this.clientsPersist[client.id].transferRxHistory.shift();
 
-        this.clientsPersist[client.id].chartMax = Math.max(...this.clientsPersist[client.id].transferTxHistory, ...this.clientsPersist[client.id].transferRxHistory);
+          this.clientsPersist[client.id].transferTxHistory.push(this.clientsPersist[client.id].transferTxCurrent);
+          this.clientsPersist[client.id].transferTxHistory.shift();
+        }
 
         client.transferTxCurrent = this.clientsPersist[client.id].transferTxCurrent;
         client.transferRxCurrent = this.clientsPersist[client.id].transferRxCurrent;
 
-        client.chartOptions = this.clientsPersist[client.id].chartOptions;
-        client.chartSeries = [{
-          name: 'tx',
-          data: this.clientsPersist[client.id].transferTxHistory,
-        }, {
-          name: 'rx',
-          data: this.clientsPersist[client.id].transferRxHistory,
-        }];
+        client.transferTxHistory = this.clientsPersist[client.id].transferTxHistory;
+        client.transferRxHistory = this.clientsPersist[client.id].transferRxHistory;
+        client.transferMax = Math.max(...client.transferTxHistory, ...client.transferRxHistory);
+
+        client.hoverTx = this.clientsPersist[client.id].hoverTx;
+        client.hoverRx = this.clientsPersist[client.id].hoverRx;
 
         return client;
       });
@@ -266,7 +259,9 @@ new Vue({
       .then(session => {
         this.authenticated = session.authenticated;
         this.requiresPassword = session.requiresPassword;
-        this.refresh().catch(err => {
+        this.refresh({
+          updateCharts: true,
+        }).catch(err => {
           alert(err.message || err.toString());
         });
       })
@@ -275,7 +270,9 @@ new Vue({
       });
 
     setInterval(() => {
-      this.refresh().catch(console.error);
+      this.refresh({
+        updateCharts: true,
+      }).catch(console.error);
     }, 1000);
 
     Promise.resolve().then(async () => {

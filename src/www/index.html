@@ -78,9 +78,47 @@
               class="relative overflow-hidden border-b border-gray-100 border-solid">
 
               <!-- Chart -->
-              <div class="absolute z-0 bottom-0 left-0 right-0" style="width: 100%; height: 30%;">
-                <apexchart width="100%" height="100%" :options="client.chartOptions" :series="client.chartSeries">
-                </apexchart>
+              <div class="absolute z-0 bottom-0 left-0 right-0" style="width: 100%; height: 20%;">
+                <!-- Bar -->
+                <div v-for="(_, index) in client.transferTxHistory" :style="{
+                    display: 'inline-flex',
+                    alignItems: 'flex-end',
+                    width: '2%', // 1/100th of client.transferTxHistory.length
+                    height: '100%',
+                    padding: '0 3px',
+                    boxSizing: 'border-box',
+                    fontSize: 0,
+                  }">
+
+                  <!-- TX -->
+                  <div :style="{
+                    minHeight: '0px',
+                    minWidth: '2px',
+                    maxWidth: '4px',
+                    width: '50%',
+                    marginRight: '1px',
+                    height: Math.round((client.transferTxHistory[index]/client.transferMax)*100) + '%',
+                    background: client.hoverTx
+                      ? '#992922'
+                      : '#F3F4F6',
+                    transition: 'all 0.2s',
+                    borderRadius: '2px 2px 0 0',
+                  }"></div>
+
+                  <!-- RX -->
+                  <div :style="{
+                    minHeight: '0px',
+                    minWidth: '2px',
+                    maxWidth: '4px',
+                    width: '50%',
+                    height: Math.round((client.transferRxHistory[index]/client.transferMax)*100) + '%',
+                    background: client.hoverRx
+                    ? '#992922'
+                    : '#F0F1F3',
+                    transition: 'all 0.2s',
+                    borderRadius: '2px 2px 0 0',
+                  }"></div>
+                </div>
               </div>
 
               <div class="relative p-5 z-10 flex flex-row">
@@ -155,7 +193,10 @@
                     </span>
 
                     <!-- Transfer TX -->
-                    <span v-if="client.transferTx" :title="$t('totalDownload') + bytes(client.transferTx)">
+                    <span v-if="client.transferTx" :title="$t('totalDownload') + bytes(client.transferTx)"
+                      @mouseover="client.hoverTx = clientsPersist[client.id].hoverTx = true;"
+                      @mouseleave="client.hoverTx = clientsPersist[client.id].hoverTx = false;"
+                      style="cursor: default;">
                       ·
                       <svg class="align-middle h-3 inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                         fill="currentColor">
@@ -167,7 +208,10 @@
                     </span>
 
                     <!-- Transfer RX -->
-                    <span v-if="client.transferRx" :title="$t('totalUpload') + bytes(client.transferRx)">
+                    <span v-if="client.transferRx" :title="$t('totalUpload') + bytes(client.transferRx)"
+                      @mouseover="client.hoverRx = clientsPersist[client.id].hoverRx = true;"
+                      @mouseleave="client.hoverRx = clientsPersist[client.id].hoverRx = false;"
+                      style="cursor: default;">
                       ·
                       <svg class="align-middle h-3 inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                         fill="currentColor">
@@ -474,8 +518,6 @@
   </div>
 
   <script src="./js/vendor/vue.min.js"></script>
-  <script src="./js/vendor/apexcharts.min.js"></script>
-  <script src="./js/vendor/vue-apexcharts.min.js"></script>
   <script src="./js/vendor/vue-i18n.min.js"></script>
   <script src="./js/vendor/md5.min.js"></script>
   <script src="./js/vendor/timeago.full.min.js"></script>
