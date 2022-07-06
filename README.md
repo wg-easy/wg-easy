@@ -5,6 +5,7 @@
 [![Docker](https://img.shields.io/docker/v/weejewel/wg-easy/latest)](https://hub.docker.com/r/weejewel/wg-easy)
 [![Docker](https://img.shields.io/docker/pulls/weejewel/wg-easy.svg)](https://hub.docker.com/r/weejewel/wg-easy)
 [![Sponsor](https://img.shields.io/github/sponsors/weejewel)](https://github.com/sponsors/WeeJeWel)
+![GitHub Stars](https://img.shields.io/github/stars/weejewel/wg-easy)
 
 You have found the easiest way to install & manage WireGuard on any Linux host!
 
