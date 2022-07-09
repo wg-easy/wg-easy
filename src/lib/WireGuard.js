@@ -112,7 +112,7 @@ PostDown = ${WG_POST_DOWN}
 [Peer]
 PublicKey = ${client.publicKey}
 PresharedKey = ${client.preSharedKey}
-AllowedIPs = ${client.address}/32`;
+AllowedIPs = ${client.address}`;
     }
 
     debug('Config saving...');
@@ -220,7 +220,7 @@ Endpoint = ${WG_HOST}:${WG_PORT}`;
     });
   }
 
-  async createClient({ name }) {
+  async createClient({ name, allowedIps }) {
     if (!name) {
       throw new Error('Missing: Name');
     }
@@ -231,16 +231,20 @@ Endpoint = ${WG_HOST}:${WG_PORT}`;
     const publicKey = await Util.exec(`echo ${privateKey} | wg pubkey`);
     const preSharedKey = await Util.exec('wg genpsk');
 
-    // Calculate next IP
     let address;
-    for (let i = 2; i < 255; i++) {
-      const client = Object.values(config.clients).find((client) => {
-        return client.address === WG_DEFAULT_ADDRESS.replace('x', i);
-      });
+    if (allowedIps) {
+      address = allowedIps
+    } else {
+      // Calculate next IP
+      for (let i = 2; i < 255; i++) {
+        const client = Object.values(config.clients).find(client => {
+          return client.address.includes(WG_DEFAULT_ADDRESS.replace('x', i));
+        });
 
-      if (!client) {
-        address = WG_DEFAULT_ADDRESS.replace('x', i);
-        break;
+        if (!client) {
+          address = `${WG_DEFAULT_ADDRESS.replace('x', i)}/32`;
+          break;
+        }
       }
     }
 
