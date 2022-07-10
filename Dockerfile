@@ -1,4 +1,5 @@
-FROM docker.io/library/node:17-alpine@sha256:0e83c810225bc29e614189acf3d6419e3c09881cefb9f7a170fdcfe3e15bbfd5 AS build_node_modules
+# There's an issue with node:16-alpine on pi
+FROM node:16.15.1-alpine AS build_node_modules
 
 # Copy Web UI
 COPY src/ /app/
@@ -7,7 +8,7 @@ RUN npm ci --production
 
 # Copy build result to a new image.
 # This saves a lot of disk space.
-FROM docker.io/library/node:17-alpine@sha256:0e83c810225bc29e614189acf3d6419e3c09881cefb9f7a170fdcfe3e15bbfd5
+FROM node:16.15.1-alpine
 COPY --from=build_node_modules /app /app
 
 # Move node_modules one directory up, so during development

@@ -1,10 +1,5 @@
 # WireUI
 
-[![Build & Publish Docker Image to Docker Hub](https://github.com/WeeJeWel/wg-easy/actions/workflows/deploy.yml/badge.svg?branch=production)](https://github.com/WeeJeWel/wg-easy/actions/workflows/deploy.yml)
-[![Lint](https://github.com/WeeJeWel/wg-easy/actions/workflows/lint.yml/badge.svg?branch=master)](https://github.com/WeeJeWel/wg-easy/actions/workflows/lint.yml)
-[![Docker](https://img.shields.io/docker/v/weejewel/wg-easy/latest)](https://hub.docker.com/r/weejewel/wg-easy)
-[![Docker](https://img.shields.io/docker/pulls/gyarbij/wireui.svg)](https://hub.docker.com/r/gyarbij/wireui)
-
 This is a security and hardenig divergent fork of [wg-easy](https://github.com/WeeJeWel/wg-easy)
 
 <p align="center">
@@ -41,16 +36,16 @@ $ exit
 
 And log in again.
 
-### 2. Run WireGuard Easy
+### 2. Run WireUI
 
 To automatically install & run wg-easy, simply run:
 
 <pre>
 $ docker run -d \
-  --name=wg-easy \
+  --name=wireui \
   -e WG_HOST=<b>🚨YOUR_SERVER_IP</b> \
   -e PASSWORD=<b>🚨YOUR_ADMIN_PASSWORD</b> \
-  -v ~/.wg-easy:/etc/wireguard \
+  -v ~/.wireui:/etc/wireguard \
   -p 51820:51820/udp \
   -p 51821:51821/tcp \
   --cap-add=NET_ADMIN \
@@ -94,9 +89,9 @@ These options can be configured by setting environment variables using `-e KEY="
 To update to the latest version, simply run:
 
 ```bash
-docker stop wg-easy
-docker rm wg-easy
-docker pull weejewel/wg-easy
+docker stop wireui
+docker rm wireui
+docker pull gyarbij/wireui
 ```
 
 And then run the `docker run -d \ ...` command above again.

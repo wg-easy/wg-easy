@@ -62,7 +62,7 @@ module.exports = class Server {
         req.session.authenticated = true;
         req.session.save();
 
-        debug(`New Session: ${req.session.id})`);
+        debug(`New Session: ${req.session.id}`);
       }))
 
       // WireGuard
@@ -99,8 +99,12 @@ module.exports = class Server {
         const { clientId } = req.params;
         const client = await WireGuard.getClient({ clientId });
         const config = await WireGuard.getClientConfiguration({ clientId });
-        const configName = client.name.replace(/[^a-zA-Z0-9_=+.-]/g, '-').replace(/(-{2,}|-$)/g, '-').replace(/-$/, '').substring(0, 32);
-        res.header('Content-Disposition', `attachment; filename="${configName}.conf"`);
+        const configName = client.name
+          .replace(/[^a-zA-Z0-9_=+.-]/g, '-')
+          .replace(/(-{2,}|-$)/g, '-')
+          .replace(/-$/, '')
+          .substring(0, 32);
+        res.header('Content-Disposition', `attachment; filename="${configName || clientId}.conf"`);
         res.header('Content-Type', 'text/plain');
         res.send(config);
       }))
