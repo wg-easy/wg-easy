@@ -1,6 +1,6 @@
 # WireUI
 
-This is a security and hardenig divergent fork of [wg-easy](https://github.com/WeeJeWel/wg-easy)
+This is a security and hardenig divergent fork of [wg-easy](https://github.com/Gyarbij/wireui)
 
 <p align="center">
   <img src="./assets/screenshot.png" width="802" />
@@ -38,7 +38,7 @@ And log in again.
 
 ### 2. Run WireUI
 
-To automatically install & run wg-easy, simply run:
+To automatically install & run wireui, simply run:
 
 <pre>
 $ docker run -d \
@@ -53,7 +53,7 @@ $ docker run -d \
   --sysctl="net.ipv4.conf.all.src_valid_mark=1" \
   --sysctl="net.ipv4.ip_forward=1" \
   --restart unless-stopped \
-  weejewel/wg-easy
+  Gyarbij/wireui
 </pre>
 
 > 💡 Replace `YOUR_SERVER_IP` with your WAN IP, or a Dynamic DNS hostname.
@@ -62,7 +62,7 @@ $ docker run -d \
 
 The Web UI will now be available on `http://0.0.0.0:51821`.
 
-> 💡 Your configuration files will be saved in `~/.wg-easy`
+> 💡 Your configuration files will be saved in `~/.wireui`
 
 
 ## Options
@@ -79,8 +79,8 @@ These options can be configured by setting environment variables using `-e KEY="
 | `WG_DEFAULT_ADDRESS` | `10.8.0.x` | `10.6.0.x` | Clients IP address range. |
 | `WG_DEFAULT_DNS` | `1.1.1.1` | `8.8.8.8, 8.8.4.4` | DNS server clients will use. |
 | `WG_ALLOWED_IPS` | `0.0.0.0/0, ::/0` | `192.168.15.0/24, 10.0.1.0/24` | Allowed IPs clients will use. |
-| `WG_POST_UP` | `...` | `iptables ...` | See [config.js](https://github.com/WeeJeWel/wg-easy/blob/master/src/config.js#L19) for the default value. |
-| `WG_POST_DOWN` | `...` | `iptables ...` | See [config.js](https://github.com/WeeJeWel/wg-easy/blob/master/src/config.js#L26) for the default value. |
+| `WG_POST_UP` | `...` | `iptables ...` | See [config.js](https://github.com/Gyarbij/wireui/blob/main/src/config.js#L19) for the default value. |
+| `WG_POST_DOWN` | `...` | `iptables ...` | See [config.js](https://github.com/Gyarbij/wireui/blob/main/src/config.js#L26) for the default value. |
 
 > If you change `WG_PORT`, make sure to also change the exposed port.
 
