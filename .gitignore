@@ -2,3 +2,8 @@
 /wg0.conf
 /wg0.json
 .DS_Store
+
+# General
+.DS_Store
+.AppleDouble
+.LSOverride
