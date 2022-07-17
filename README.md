@@ -1,6 +1,6 @@
 # WireUI
 
-This is a security and hardenig divergent fork of [wg-easy](https://github.com/Gyarbij/wireui)
+This is a security and hardening divergent fork of [wg-easy](https://github.com/Gyarbij/wireui) The easiest way to run [WireGuard](https://github.com/WireGuard). This takes care of the configurations steps for novices while still allowing customizability for more experienced users, and comes packed with a UI, so you're not fiddling with .conf files and scp.
 
 <p align="center">
   <img src="./assets/screenshot.png" width="802" />
@@ -20,13 +20,21 @@ This is a security and hardenig divergent fork of [wg-easy](https://github.com/G
 ## Requirements
 
 * A host with a kernel that supports WireGuard (all modern kernels).
-* A host with Docker installed.
+* A docker installation on the host.
+* The ability to open a port in your router/FW.
 
 ## Installation
 
 ### 1. Install Docker
 
-If you haven't installed Docker yet, install it by running:
+If there is no present installation of Docker, you should install it using:
+[Docker Desktop](https://docs.docker.com/get-docker/) for Desktop
+
+or
+
+[Docker Engine](https://docs.docker.com/engine/install/) for Servers/Headless
+
+Alternatively, you can install it by running the convenience script below. _The convenience script is not recommended for production environments, but can be used as an example to create a provisioning script that is tailored to your needs_:
 
 ```bash
 $ curl -sSL https://get.docker.com | sh
@@ -71,14 +79,14 @@ These options can be configured by setting environment variables using `-e KEY="
 
 | Env | Default | Example | Description |
 | - | - | - | - |
-| `PASSWORD` | - | `foobar123` | When set, requires a password when logging in to the Web UI. |
-| `WG_HOST` | - | `vpn.myserver.com` | The public hostname of your VPN server. |
+| `PASSWORD` | - | `ChangeMe@69` | When set, requires a password when logging in to the Web UI. |
+| `WG_HOST` | - | `vpn.example.com` | The public hostname of your VPN server. |
 | `WG_PORT` | `51820` | `12345` | The public UDP port of your VPN server. WireGuard will always listen on `51820` inside the Docker container. |
 | `WG_MTU` | `null` | `1420` | The MTU the clients will use. Server uses default WG MTU. |
 | `WG_PERSISTENT_KEEPALIVE` | `0` | `25` | Value in seconds to keep the "connection" open. |
-| `WG_DEFAULT_ADDRESS` | `10.8.0.x` | `10.6.0.x` | Clients IP address range. |
+| `WG_DEFAULT_ADDRESS` | `10.8.0.x` | `10.6.0.x` | Client's IP address range. |
 | `WG_DEFAULT_DNS` | `1.1.1.1` | `8.8.8.8, 8.8.4.4` | DNS server clients will use. |
-| `WG_ALLOWED_IPS` | `0.0.0.0/0, ::/0` | `192.168.15.0/24, 10.0.1.0/24` | Allowed IPs clients will use. |
+| `WG_ALLOWED_IPS` | `0.0.0.0/0, ::/0` | `192.420.69.0/24, 10.0.1.0/24` | Allowed IPs clients will use. |
 | `WG_POST_UP` | `...` | `iptables ...` | See [config.js](https://github.com/Gyarbij/wireui/blob/main/src/config.js#L19) for the default value. |
 | `WG_POST_DOWN` | `...` | `iptables ...` | See [config.js](https://github.com/Gyarbij/wireui/blob/main/src/config.js#L26) for the default value. |
 
