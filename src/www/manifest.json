@@ -1,5 +1,5 @@
 {
-  "name": "WireGuard",
+  "name": "WireUI powered by WireGuard",
   "display": "standalone",
   "background_color": "#fff",
   "icons": [
