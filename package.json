@@ -1,5 +1,5 @@
 {
-  "version": "0.0.1",
+  "version": "1.0.0",
   "scripts": {
     "build": "DOCKER_BUILDKIT=1 docker build --tag wireui .",
     "serve": "docker-compose -f docker-compose.yml -f docker-compose.dev.yml up",
