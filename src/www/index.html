@@ -33,7 +33,7 @@
               d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
           </svg>
         </span>
-        <h1 class="text-4xl font-medium mt-10 mb-2">
+        <h1 class="text-4xl font-medium mt-10 mb-2 ml-4 xl:ml-0">
           <img src="./img/logo.png" width="32" class="inline align-middle" />
           <span class="align-middle">WireGuard</span>
         </h1>
@@ -231,54 +231,56 @@
                 </div>
 
                 <div class="text-right">
-                  <div class="text-gray-400">
-
-                    <!-- Enable/Disable -->
-                    <div @click="disableClient(client)" v-if="client.enabled === true" title="Disable Client"
-                      class="inline-block align-middle rounded-full w-10 h-6 mr-1 bg-red-800 cursor-pointer hover:bg-red-700 transition-all">
-                      <div class="rounded-full w-4 h-4 m-1 ml-5 bg-white"></div>
+                  <div class="text-gray-400 flex flex-col xl:flex-row xl:items-center">
+                    <div class="xl:mr-2">
+                      <!-- Enable/Disable -->
+                      <div @click="disableClient(client)" v-if="client.enabled === true" title="Disable Client"
+                        class="inline-block align-middle rounded-full w-10 h-6 mr-1 bg-red-800 cursor-pointer hover:bg-red-700 transition-all">
+                        <div class="rounded-full w-4 h-4 m-1 ml-5 bg-white"></div>
+                      </div>
+                      <div @click="enableClient(client)" v-if="client.enabled === false" title="Enable Client"
+                        class="inline-block align-middle rounded-full w-10 h-6 mr-1 bg-gray-200 cursor-pointer hover:bg-gray-300 transition-all">
+                        <div class="rounded-full w-4 h-4 m-1 bg-white"></div>
+                      </div>
                     </div>
-                    <div @click="enableClient(client)" v-if="client.enabled === false" title="Enable Client"
-                      class="inline-block align-middle rounded-full w-10 h-6 mr-1 bg-gray-200 cursor-pointer hover:bg-gray-300 transition-all">
-                      <div class="rounded-full w-4 h-4 m-1 bg-white"></div>
+
+                    <div class="mt-2 xl:mt-0">
+                      <!-- Show QR-->
+                      <button class="align-middle bg-gray-100 hover:bg-red-800 hover:text-white p-2 rounded transition"
+                        title="Show QR Code" @click="qrcode = `./api/wireguard/client/${client.id}/qrcode.svg`">
+                        <svg class="w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                          stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                        </svg>
+                      </button>
+
+                      <!-- Download Config -->
+                      <a :href="'./api/wireguard/client/' + client.id + '/configuration'" download
+                        class="align-middle inline-block bg-gray-100 hover:bg-red-800 hover:text-white p-2 rounded transition"
+                        title="Download Configuration">
+                        <svg class="w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                          stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                      </a>
+
+                      <!-- Delete -->
+                      <button class="align-middle bg-gray-100 hover:bg-red-800 hover:text-white p-2 rounded transition"
+                        title="Delete Client" @click="clientDelete = client">
+                        <svg class="w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                          <path fill-rule="evenodd"
+                            d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                            clip-rule="evenodd" />
+                        </svg>
+                      </button>
                     </div>
-
-                    <!-- Show QR-->
-                    <button class="align-middle bg-gray-100 hover:bg-red-800 hover:text-white p-2 rounded transition"
-                      title="Show QR Code" @click="qrcode = `./api/wireguard/client/${client.id}/qrcode.svg`">
-                      <svg class="w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
-                      </svg>
-                    </button>
-
-                    <!-- Download Config -->
-                    <a :href="'./api/wireguard/client/' + client.id + '/configuration'" download
-                      class="align-middle inline-block bg-gray-100 hover:bg-red-800 hover:text-white p-2 rounded transition"
-                      title="Download Configuration">
-                      <svg class="w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                      </svg>
-                    </a>
-
-                    <!-- Delete -->
-                    <button class="align-middle bg-gray-100 hover:bg-red-800 hover:text-white p-2 rounded transition"
-                      title="Delete Client" @click="clientDelete = client">
-                      <svg class="w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd"
-                          d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                          clip-rule="evenodd" />
-                      </svg>
-                    </button>
                   </div>
                 </div>
-
               </div>
-
             </div>
+
             <div v-if="clients && clients.length === 0">
               <p class="text-center m-10 text-gray-400 text-sm">There are no clients yet.<br /><br />
                 <button @click="clientCreate = true; clientCreateName = '';"
