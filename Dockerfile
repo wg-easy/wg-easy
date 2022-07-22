@@ -36,7 +36,23 @@ RUN npm i -g nodemon
 # Install Linux packages
 RUN apk add -U --no-cache \
   wireguard-tools \
-  dumb-init
+  dumb-init \
+  curl
+
+# Install latest coredns
+RUN mkdir /coredns && \
+  COREDNS_VERSION=$(curl -sX GET "https://api.github.com/repos/coredns/coredns/releases/latest" \
+	| awk '/tag_name/{print $4;exit}' FS='[""]' | awk '{print substr($1,2); }') && \
+  curl -o \
+	  /tmp/coredns.tar.gz -L \
+	  "https://github.com/coredns/coredns/releases/download/v${COREDNS_VERSION}/coredns_${COREDNS_VERSION}_linux_amd64.tgz" && \
+  tar xf \
+	  /tmp/coredns.tar.gz -C \
+	  /coredns && \
+  rm -rf /tmp/coredns.tar.gz
+
+COPY coredns/Corefile /coredns
+COPY entrypoint.sh /
 
 # Expose Ports
 EXPOSE 51820/udp
@@ -46,5 +62,5 @@ EXPOSE 51821/tcp
 ENV DEBUG=Server,WireGuard
 
 # Run Web UI
-WORKDIR /app
-CMD ["/usr/bin/dumb-init", "node", "server.js"]
+WORKDIR /
+CMD ["./entrypoint.sh"]

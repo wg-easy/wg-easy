@@ -1,0 +1,4 @@
+. {
+    loop
+    forward . /etc/resolv.conf
+}
