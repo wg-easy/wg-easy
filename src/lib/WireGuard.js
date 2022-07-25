@@ -64,11 +64,11 @@ module.exports = class WireGuard {
           if (err && err.message && err.message.includes('Cannot find device "wg0"')) {
             debug('WireGuard exited with the error: Cannot find device "wg0"\nThis usually means that your host\'s kernel does not support WireGuard! Trying to use wireguard-go implementation.');
             Util.exec('mkdir -p /usr/local/sbin').catch(() => { });
-            Util.exec('ln -s /wireguard-go/wireguard-go /usr/local/sbin/wireguard-go').catch(() => { });
             Util.exec('ln -s /wireguard-go/wg /usr/local/sbin/wg').catch(() => { });
             Util.exec('ln -s /wireguard-go/wg-quick /usr/local/sbin/wg-quick').catch(() => { });
+            Util.exec('ln -s /wireguard-go/wireguard-go /usr/local/sbin/wireguard-go').catch(() => { });
 
-	    Util.exec('wg-quick up wg0').catch(err => {
+	    Util.exec('sleep 2 && wg-quick up wg0').catch(err => {
               if (err && err.message && err.message.includes('Cannot find device "wg0"')) {
                 throw new Error('WireGuard exited with the error: Cannot find device "wg0"\nThis means, that even wireguard-go does not work!\nThis usually means that you didn\'t mounted /dev/net/tun to container properly!');
               }
