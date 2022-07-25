@@ -70,13 +70,14 @@ module.exports = class WireGuard {
 
 	    Util.exec('wg-quick up wg0').catch(err => {
               if (err && err.message && err.message.includes('Cannot find device "wg0"')) {
-                throw new Error('WireGuard exited with the error: Cannot find device "wg0"\nThis means, that even wireguard-go doesnt work!');
+                throw new Error('WireGuard exited with the error: Cannot find device "wg0"\nThis means, that even wireguard-go does not work!\nThis usually means that you didn\'t mounted /dev/net/tun to container properly!');
               }
 
               throw err;
             });
-
           }
+
+          throw err;
         });
         // await Util.exec(`iptables -t nat -A POSTROUTING -s ${WG_DEFAULT_ADDRESS.replace('x', '0')}/24 -o eth0 -j MASQUERADE`);
         // await Util.exec('iptables -A INPUT -p udp -m udp --dport 51820 -j ACCEPT');
