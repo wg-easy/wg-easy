@@ -16,7 +16,6 @@ FROM docker.io/library/node:14-alpine@sha256:dc92f36e7cd917816fa2df041d4e9081453
 COPY src/ /app/
 WORKDIR /app
 RUN npm ci --production
-RUN mkdir -p /usr/local/sbin
 
 # Copy build result to a new image.
 # This saves a lot of disk space.
