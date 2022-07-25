@@ -70,6 +70,8 @@ $ docker run -d \
 The Web UI will now be available on `http://0.0.0.0:51821`.
 
 > 💡 Your configuration files will be saved in `~/.wg-easy`
+>
+> 💡 If you want to run this container on host, which doesn't support wireguard kernel module (i.e. cheap VPS with old kernel), you need to also mount `/dev/net/tun` by adding `-v /dev/net/tun:/dev/net/tun` to your `docker run ...` command.
 
 ### 3. Sponsor
 
