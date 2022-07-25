@@ -9,17 +9,20 @@
 # #
 # #
 
+FROM masipcat/wireguard-go:0.0.20220316 as wireguard-go
 FROM docker.io/library/node:14-alpine@sha256:dc92f36e7cd917816fa2df041d4e9081453366381a00f40398d99e9392e78664 AS build_node_modules
 
 # Copy Web UI
 COPY src/ /app/
 WORKDIR /app
 RUN npm ci --production
+RUN mkdir -p /usr/local/sbin
 
 # Copy build result to a new image.
 # This saves a lot of disk space.
 FROM docker.io/library/node:14-alpine@sha256:dc92f36e7cd917816fa2df041d4e9081453366381a00f40398d99e9392e78664
 COPY --from=build_node_modules /app /app
+COPY --from=wireguard-go /usr/bin/wireguard-go /usr/bin/wg* /wireguard-go/
 
 # Move node_modules one directory up, so during development
 # we don't have to mount it in a volume.
