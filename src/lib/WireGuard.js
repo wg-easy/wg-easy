@@ -1,6 +1,6 @@
 'use strict';
 
-const fs = require('fs').promises;
+const fs = require('fs');
 const path = require('path');
 
 const debug = require('debug')('WireGuard');
@@ -37,7 +37,7 @@ module.exports = class WireGuard {
         debug('Loading configuration...');
         let config;
         try {
-          config = await fs.readFile(path.join(WG_PATH, 'wg0.json'), 'utf8');
+          config = await fs.promises.readFile(path.join(WG_PATH, 'wg0.json'), 'utf8');
           config = JSON.parse(config);
           debug('Configuration loaded.');
         } catch (err) {
@@ -61,18 +61,18 @@ module.exports = class WireGuard {
         await this.__saveConfig(config);
         await Util.exec('wg-quick down wg0').catch(() => { });
         await Util.exec('wg-quick up wg0').catch(err => {
-          if (err && err.message && err.message.includes('Cannot find device "wg0"')) {
+          if (err && err.message && err.message.includes('wireguard-go wg0') && err.message.includes('Cannot find device "wg0"') && !fs.existsSync('/wireguard-go/already-copied')) {
+            throw new Error('WireGuard exited with the error: Cannot find device "wg0"\nThis means, that even wireguard-go does not work!\nThis usually means that you didn\'t mount /dev/net/tun to container properly!');
+	  }
+          else if (err && err.message && err.message.includes('Cannot find device "wg0"') && !fs.existsSync('/wireguard-go/already-copied')) {
             debug('WireGuard exited with the error: Cannot find device "wg0"\nThis usually means that your host\'s kernel does not support WireGuard! Trying to use wireguard-go implementation.');
             Util.exec('cp -f /wireguard-go/wg /wireguard-go/wg-quick /wireguard-go/wireguard-go /usr/bin/').catch(() => { });
-            Util.exec('wg-quick up wg0').catch(err => {
-              if (err && err.message && err.message.includes('Cannot find device "wg0"')) {
-                throw new Error('WireGuard exited with the error: Cannot find device "wg0"\nThis means, that even wireguard-go does not work!\nThis usually means that you didn\'t mount /dev/net/tun to container properly!');
-              }
-
-              throw err;
-            });
+            Util.exec('touch /wireguard-go/already-copied').catch(() => { });
+            delete this.__configPromise;
+            return this.getConfig();
           }
           else {
+            debug('Unhandled error! This usually means that your host\'s kernel does not support WireGuard and wireguard-go also does not work! Check previous error messages for more info.')
             throw err;
           }
         });
@@ -124,10 +124,10 @@ AllowedIPs = ${client.address}/32`;
     }
 
     debug('Config saving...');
-    await fs.writeFile(path.join(WG_PATH, 'wg0.json'), JSON.stringify(config, false, 2), {
+    await fs.promises.writeFile(path.join(WG_PATH, 'wg0.json'), JSON.stringify(config, false, 2), {
       mode: 0o660,
     });
-    await fs.writeFile(path.join(WG_PATH, 'wg0.conf'), result, {
+    await fs.promises.writeFile(path.join(WG_PATH, 'wg0.conf'), result, {
       mode: 0o600,
     });
     debug('Config saved.');
