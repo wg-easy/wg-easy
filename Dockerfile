@@ -61,8 +61,8 @@ EXPOSE 51821/tcp
 # Set Environment
 ENV DEBUG=Server,WireGuard
 
-# Run Web UI
-WORKDIR /
+# Set workdir to /app for eg 'docker exec' commands
+WORKDIR /app
 
 # Run Web UI and CoreDNS
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
