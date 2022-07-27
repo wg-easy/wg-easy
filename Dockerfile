@@ -63,4 +63,7 @@ ENV DEBUG=Server,WireGuard
 
 # Run Web UI
 WORKDIR /
-CMD ["./entrypoint.sh"]
+
+# Run Web UI and CoreDNS
+ENTRYPOINT ["/usr/bin/dumb-init", "--"]
+CMD ["/entrypoint.sh"]
