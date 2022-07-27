@@ -38,12 +38,16 @@ RUN apk add -U --no-cache \
   wireguard-tools \
   dumb-init
 
+COPY boringtun-cli /usr/local/sbin/boringtun
+
 # Expose Ports
 EXPOSE 51820/udp
 EXPOSE 51821/tcp
 
 # Set Environment
 ENV DEBUG=Server,WireGuard
+ENV WG_QUICK_USERSPACE_IMPLEMENTATION=boringtun
+ENV WG_SUDO=1
 
 # Run Web UI
 WORKDIR /app
