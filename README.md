@@ -53,7 +53,6 @@ $ docker run -d \
   -e WG_HOST=<b>🚨YOUR_SERVER_IP</b> \
   -e PASSWORD=<b>🚨YOUR_ADMIN_PASSWORD</b> \
   -v ~/.wg-easy:/etc/wireguard \
-  -device /dev/net/tun:/dev/net/tun \
   -p 51820:51820/udp \
   -p 51821:51821/tcp \
   --cap-add=NET_ADMIN \
@@ -71,6 +70,34 @@ $ docker run -d \
 The Web UI will now be available on `http://0.0.0.0:51821`.
 
 > 💡 Your configuration files will be saved in `~/.wg-easy`
+
+#### 2.1 Using boringtun
+
+This image has builtin [boringtun](https://github.com/cloudflare/boringtun) support for machines with older kernel or limited virtual environments such as OpenVZ.
+[boringtun](https://github.com/cloudflare/boringtun) is a userspace wireguard implementation using Rust. It is similar to [wireguard-go](https://git.zx2c4.com/wireguard-go) with a smaller memory footprint.
+The TUN device `/dev/net/tun` needs to exist on the host for `boringtun` to work.
+
+To activate `boringtun` in wg-easy, you need to set the `WG_QUICK_USERSPACE_IMPLEMENTATION` environment variable and mount the `/dev/net/tun` device when running the container.
+
+<pre>
+$ docker run -d \
+  --name=wg-easy \
+  -e WG_HOST=<b>🚨YOUR_SERVER_IP</b> \
+  -e PASSWORD=<b>🚨YOUR_ADMIN_PASSWORD</b> \
+  -v ~/.wg-easy:/etc/wireguard \
+  -device /dev/net/tun:/dev/net/tun \
+  -p 51820:51820/udp \
+  -p 51821:51821/tcp \
+  --cap-add=NET_ADMIN \
+  --cap-add=SYS_MODULE \
+  --sysctl="net.ipv4.conf.all.src_valid_mark=1" \
+  --sysctl="net.ipv4.ip_forward=1" \
+  --restart unless-stopped \
+  -e WG_QUICK_USERSPACE_IMPLEMENTATION=boringtun
+  weejewel/wg-easy
+</pre>
+
+Big thanks to leonnicolas for his [boringtun docker image](https://github.com/leonnicolas/boringtun).
 
 ### 3. Sponsor
 
