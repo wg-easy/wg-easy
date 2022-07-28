@@ -77,7 +77,8 @@ This image has builtin [boringtun](https://github.com/cloudflare/boringtun) supp
 [boringtun](https://github.com/cloudflare/boringtun) is a userspace wireguard implementation using Rust. It is similar to [wireguard-go](https://git.zx2c4.com/wireguard-go) with a smaller memory footprint.
 The TUN device `/dev/net/tun` needs to exist on the host for `boringtun` to work.
 
-To activate `boringtun` in wg-easy, you need to set the `WG_QUICK_USERSPACE_IMPLEMENTATION` environment variable and mount the `/dev/net/tun` device when running the container.
+To activate `boringtun` in wg-easy, you need to mount the `/dev/net/tun` device when running the container.
+The `wg-quick` will automatically fallback to userspace implementation if the kernel module doesn't exist.
 
 <pre>
 $ docker run -d \
@@ -93,11 +94,8 @@ $ docker run -d \
   --sysctl="net.ipv4.conf.all.src_valid_mark=1" \
   --sysctl="net.ipv4.ip_forward=1" \
   --restart unless-stopped \
-  -e WG_QUICK_USERSPACE_IMPLEMENTATION=boringtun
   weejewel/wg-easy
 </pre>
-
-Big thanks to leonnicolas for his [boringtun docker image](https://github.com/leonnicolas/boringtun).
 
 ### 3. Sponsor
 
