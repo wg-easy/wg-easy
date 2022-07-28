@@ -48,7 +48,7 @@ EXPOSE 51821/tcp
 ENV DEBUG=Server,WireGuard
 
 # Environment for using boringtun
-# ENV WG_QUICK_USERSPACE_IMPLEMENTATION
+# ENV WG_QUICK_USERSPACE_IMPLEMENTATION=boringtun
 ENV WG_SUDO=1
 
 # Run Web UI
