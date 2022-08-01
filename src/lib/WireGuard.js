@@ -110,8 +110,8 @@ PostDown = ${WG_POST_DOWN}
 # Client: ${client.name} (${clientId})
 [Peer]
 PublicKey = ${client.publicKey}
-PresharedKey = ${client.preSharedKey}
-AllowedIPs = ${client.address}/32`;
+${client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
+}AllowedIPs = ${client.address}/32`;
     }
 
     debug('Config saving...');
@@ -205,8 +205,8 @@ ${WG_MTU ? `MTU = ${WG_MTU}` : ''}
 
 [Peer]
 PublicKey = ${config.server.publicKey}
-PresharedKey = ${client.preSharedKey}
-AllowedIPs = ${WG_ALLOWED_IPS}
+${client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
+}AllowedIPs = ${WG_ALLOWED_IPS}
 PersistentKeepalive = ${WG_PERSISTENT_KEEPALIVE}
 Endpoint = ${WG_HOST}:${WG_PORT}`;
   }
