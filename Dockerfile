@@ -35,6 +35,7 @@ RUN npm i -g nodemon
 
 # Install Linux packages
 RUN apk add -U --no-cache \
+  tcpdump \
   wireguard-tools \
   dumb-init
 
