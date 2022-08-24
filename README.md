@@ -5,6 +5,7 @@
 [![Docker](https://img.shields.io/docker/v/weejewel/wg-easy/latest)](https://hub.docker.com/r/weejewel/wg-easy)
 [![Docker](https://img.shields.io/docker/pulls/weejewel/wg-easy.svg)](https://hub.docker.com/r/weejewel/wg-easy)
 [![Sponsor](https://img.shields.io/github/sponsors/weejewel)](https://github.com/sponsors/WeeJeWel)
+![GitHub Stars](https://img.shields.io/github/stars/weejewel/wg-easy)
 
 You have found the easiest way to install & manage WireGuard on any Linux host!
 
@@ -110,3 +111,4 @@ And then run the `docker run -d \ ...` command above again.
 ## Common Use Cases
 
 * [Using WireGuard-Easy with Pi-Hole](https://github.com/WeeJeWel/wg-easy/wiki/Using-WireGuard-Easy-with-Pi-Hole)
+* [Using WireGuard-Easy with nginx/SSL](https://github.com/WeeJeWel/wg-easy/wiki/Using-WireGuard-Easy-with-nginx-SSL)
