@@ -12,15 +12,15 @@
   "author": "Emile Nijssen",
   "license": "GPL",
   "dependencies": {
-    "debug": "^4.3.1",
-    "express": "^4.17.1",
-    "express-session": "^1.17.1",
-    "qrcode": "^1.4.4",
-    "uuid": "^8.3.2"
+    "debug": "^4.3.4",
+    "express": "^4.18.1",
+    "express-session": "^1.17.3",
+    "qrcode": "^1.5.1",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
-    "eslint": "^7.27.0",
-    "eslint-config-athom": "^2.1.0"
+    "eslint": "^8.24.0",
+    "eslint-config-athom": "^3.1.1"
   },
   "nodemonConfig": {
     "ignore": [
