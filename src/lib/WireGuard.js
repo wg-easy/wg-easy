@@ -11,6 +11,7 @@ const Util = require('./Util');
 const ServerError = require('./ServerError');
 
 const {
+  WG_SUDO_STRING,
   WG_PATH,
   WG_HOST,
   WG_PORT,
@@ -41,9 +42,9 @@ module.exports = class WireGuard {
           config = JSON.parse(config);
           debug('Configuration loaded.');
         } catch (err) {
-          const privateKey = await Util.exec('wg genkey');
-          const publicKey = await Util.exec(`echo ${privateKey} | wg pubkey`, {
-            log: 'echo ***hidden*** | wg pubkey',
+          const privateKey = await Util.exec(`${WG_SUDO_STRING}wg genkey`);
+          const publicKey = await Util.exec(`echo ${privateKey} | ${WG_SUDO_STRING}wg pubkey`, {
+            log: `echo ***hidden*** | ${WG_SUDO_STRING}wg pubkey`,
           });
           const address = WG_DEFAULT_ADDRESS.replace('x', '1');
 
@@ -59,8 +60,8 @@ module.exports = class WireGuard {
         }
 
         await this.__saveConfig(config);
-        await Util.exec('wg-quick down wg0').catch(() => { });
-        await Util.exec('wg-quick up wg0').catch(err => {
+        await Util.exec(`${WG_SUDO_STRING}wg-quick down wg0`).catch(() => { });
+        await Util.exec(`${WG_SUDO_STRING}wg-quick up wg0`).catch(err => {
           if (err && err.message && err.message.includes('Cannot find device "wg0"')) {
             throw new Error('WireGuard exited with the error: Cannot find device "wg0"\nThis usually means that your host\'s kernel does not support WireGuard!');
           }
@@ -126,7 +127,7 @@ AllowedIPs = ${client.address}/32`;
 
   async __syncConfig() {
     debug('Config syncing...');
-    await Util.exec('wg syncconf wg0 <(wg-quick strip wg0)');
+    await Util.exec(`${WG_SUDO_STRING}wg syncconf wg0 <(${WG_SUDO_STRING}wg-quick strip wg0)`);
     debug('Config synced.');
   }
 
@@ -149,7 +150,7 @@ AllowedIPs = ${client.address}/32`;
     }));
 
     // Loop WireGuard status
-    const dump = await Util.exec('wg show wg0 dump', {
+    const dump = await Util.exec(`${WG_SUDO_STRING}wg show wg0 dump`, {
       log: false,
     });
     dump
@@ -226,9 +227,11 @@ Endpoint = ${WG_HOST}:${WG_PORT}`;
 
     const config = await this.getConfig();
 
-    const privateKey = await Util.exec('wg genkey');
-    const publicKey = await Util.exec(`echo ${privateKey} | wg pubkey`);
-    const preSharedKey = await Util.exec('wg genpsk');
+    const privateKey = await Util.exec(`${WG_SUDO_STRING}wg genkey`);
+    const publicKey = await Util.exec(`echo ${privateKey} | ${WG_SUDO_STRING}wg pubkey`, {
+      log: `echo ***hidden*** | ${WG_SUDO_STRING}wg pubkey`,
+    });
+    const preSharedKey = await Util.exec(`${WG_SUDO_STRING}wg genpsk`);
 
     // Calculate next IP
     let address;
