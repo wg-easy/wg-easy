@@ -2,6 +2,8 @@
 
 const childProcess = require('child_process');
 
+const shellSymbol = (process.getuid() === 0) ? '#' : '$';
+
 module.exports = class Util {
 
   static isValidIPv4(str) {
@@ -57,10 +59,10 @@ module.exports = class Util {
   } = {}) {
     if (typeof log === 'string') {
       // eslint-disable-next-line no-console
-      console.log(`$ ${log}`);
+      console.log(`${shellSymbol} ${log}`);
     } else if (log === true) {
       // eslint-disable-next-line no-console
-      console.log(`$ ${cmd}`);
+      console.log(`${shellSymbol} ${cmd}`);
     }
 
     if (process.platform !== 'linux') {
