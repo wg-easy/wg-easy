@@ -6,6 +6,8 @@ const path = require('path');
 const debug = require('debug')('WireGuard');
 const uuid = require('uuid');
 const QRCode = require('qrcode');
+const { BigInteger } = require('jsbn');
+const { Address4 } = require('ip-address');
 
 const Util = require('./Util');
 const ServerError = require('./ServerError');
@@ -24,6 +26,11 @@ const {
   WG_PRE_DOWN,
   WG_POST_DOWN,
 } = require('../config');
+
+// Address constants
+const address = new Address4(WG_DEFAULT_ADDRESS);
+const startAddressI = address.startAddressExclusive().bigInteger();
+const endAddressI = address.endAddressExclusive().bigInteger();
 
 module.exports = class WireGuard {
 
@@ -45,7 +52,7 @@ module.exports = class WireGuard {
           const publicKey = await Util.exec(`echo ${privateKey} | wg pubkey`, {
             log: 'echo ***hidden*** | wg pubkey',
           });
-          const address = WG_DEFAULT_ADDRESS.replace('x', '1');
+          const address = await this.__getNthHostAddress(0);
 
           config = {
             server: {
@@ -67,10 +74,7 @@ module.exports = class WireGuard {
 
           throw err;
         });
-        // await Util.exec(`iptables -t nat -A POSTROUTING -s ${WG_DEFAULT_ADDRESS.replace('x', '0')}/24 -o eth0 -j MASQUERADE`);
-        // await Util.exec('iptables -A INPUT -p udp -m udp --dport 51820 -j ACCEPT');
-        // await Util.exec('iptables -A FORWARD -i wg0 -j ACCEPT');
-        // await Util.exec('iptables -A FORWARD -o wg0 -j ACCEPT');
+
         await this.__syncConfig();
 
         return config;
@@ -233,20 +237,23 @@ Endpoint = ${WG_HOST}:${WG_PORT}`;
     const preSharedKey = await Util.exec('wg genpsk');
 
     // Calculate next IP
-    let address;
-    for (let i = 2; i < 255; i++) {
-      const client = Object.values(config.clients).find(client => {
-        return client.address === WG_DEFAULT_ADDRESS.replace('x', i);
-      });
+    try {
+      let address;
+      for (let i = 1; ; i++) {
+        address = await this.__getNthHostAddress(i);
+        // warns about address being used unsafely, but since the function only exists in the loop
+        // scope this isn't an issue
+        // eslint-disable-next-line no-loop-func
+        const client = Object.values(config.clients).find(client => {
+          return address;
+        });
 
-      if (!client) {
-        address = WG_DEFAULT_ADDRESS.replace('x', i);
-        break;
+        if (!client) {
+          break;
+        }
       }
-    }
-
-    if (!address) {
-      throw new Error('Maximum number of clients reached.');
+    } catch (error) {
+      throw new Error('Maximum number of clients reached.', error);
     }
 
     // Create Client
@@ -318,6 +325,17 @@ Endpoint = ${WG_HOST}:${WG_PORT}`;
     client.updatedAt = new Date();
 
     await this.saveConfig();
+  }
+
+  async __getNthHostAddress(n) {
+    const bigN = new BigInteger(n.toString());
+    const newAddressI = startAddressI.add(bigN);
+
+    if (newAddressI.compareTo(endAddressI) > 0) {
+      throw new Error(`Subnet ${WG_DEFAULT_ADDRESS} doesn't contain ${n} host addresses!`);
+    }
+
+    return Address4.fromBigInteger(newAddressI).correctForm();
   }
 
 };
