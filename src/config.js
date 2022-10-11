@@ -3,7 +3,7 @@
 const { release } = require('./package.json');
 
 module.exports.USE_SUDO = process.env.USE_SUDO || (process.getuid() !== 0);
-module.exports.SUDO_STRING = module.exports.USE_SUDO ? 'sudo ' : '';
+module.exports.SUDO_STRING = module.exports.USE_SUDO ? 'sudo -n ' : '';
 module.exports.RELEASE = release;
 module.exports.PORT = process.env.PORT || 51821;
 module.exports.PASSWORD = process.env.PASSWORD;
