@@ -127,9 +127,7 @@ AllowedIPs = ${client.address}/32`;
 
   async __syncConfig() {
     debug('Config syncing...');
-    await Util.exec(`${SUDO_STRING} bash -c "wg syncconf wg0 <(wg-quick strip wg0)"`, {
-      log: `${SUDO_STRING}wg syncconf wg0 <(${SUDO_STRING}wg-quick strip wg0)`,
-    });
+    await Util.exec(`${SUDO_STRING}wg-quick strip wg0 | ${SUDO_STRING}wg syncconf wg0 /dev/fd/0`);
     debug('Config synced.');
   }
 
