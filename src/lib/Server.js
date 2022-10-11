@@ -11,6 +11,7 @@ const ServerError = require('./ServerError');
 const WireGuard = require('../services/WireGuard');
 
 const {
+  LISTEN_IP,
   PORT,
   RELEASE,
   PASSWORD,
@@ -135,8 +136,8 @@ module.exports = class Server {
         return WireGuard.updateClientAddress({ clientId, address });
       }))
 
-      .listen(PORT, () => {
-        debug(`Listening on http://0.0.0.0:${PORT}`);
+      .listen(PORT, LISTEN_IP, () => {
+        debug(`Listening on http://${LISTEN_IP}:${PORT}`);
       });
   }
 
