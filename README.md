@@ -1,13 +1,7 @@
-# WireGuard Easy
+# WireUI
 
-[![Build & Publish Docker Image to Docker Hub](https://github.com/WeeJeWel/wg-easy/actions/workflows/deploy.yml/badge.svg?branch=production)](https://github.com/WeeJeWel/wg-easy/actions/workflows/deploy.yml)
-[![Lint](https://github.com/WeeJeWel/wg-easy/actions/workflows/lint.yml/badge.svg?branch=master)](https://github.com/WeeJeWel/wg-easy/actions/workflows/lint.yml)
-[![Docker](https://img.shields.io/docker/v/weejewel/wg-easy/latest)](https://hub.docker.com/r/weejewel/wg-easy)
-[![Docker](https://img.shields.io/docker/pulls/weejewel/wg-easy.svg)](https://hub.docker.com/r/weejewel/wg-easy)
-[![Sponsor](https://img.shields.io/github/sponsors/weejewel)](https://github.com/sponsors/WeeJeWel)
-![GitHub Stars](https://img.shields.io/github/stars/weejewel/wg-easy)
 
-You have found the easiest way to install & manage WireGuard on any Linux host!
+This is a security and hardening divergent fork of [wg-easy](https://github.com/Gyarbij/wireui) The easiest way to run [WireGuard](https://github.com/WireGuard). This takes care of the configurations steps for novices while still allowing customizability for more experienced users, and comes packed with a UI, so you're not fiddling with .conf files and scp.
 
 <p align="center">
   <img src="./assets/screenshot.png" width="802" />
@@ -27,13 +21,21 @@ You have found the easiest way to install & manage WireGuard on any Linux host!
 ## Requirements
 
 * A host with a kernel that supports WireGuard (all modern kernels).
-* A host with Docker installed.
+* A docker installation on the host.
+* The ability to open a port in your router/FW.
 
 ## Installation
 
 ### 1. Install Docker
 
-If you haven't installed Docker yet, install it by running:
+If there is no present installation of Docker, you should install it using:
+[Docker Desktop](https://docs.docker.com/get-docker/) for Desktop
+
+or
+
+[Docker Engine](https://docs.docker.com/engine/install/) for Servers/Headless
+
+Alternatively, you can install it by running the convenience script below. _The convenience script is not recommended for production environments, but can be used as an example to create a provisioning script that is tailored to your needs_:
 
 ```bash
 $ curl -sSL https://get.docker.com | sh
@@ -43,16 +45,16 @@ $ exit
 
 And log in again.
 
-### 2. Run WireGuard Easy
+### 2. Run WireUI
 
-To automatically install & run wg-easy, simply run:
+To automatically install & run wireui, simply run:
 
 <pre>
 $ docker run -d \
-  --name=wg-easy \
+  --name=wireui \
   -e WG_HOST=<b>🚨YOUR_SERVER_IP</b> \
   -e PASSWORD=<b>🚨YOUR_ADMIN_PASSWORD</b> \
-  -v ~/.wg-easy:/etc/wireguard \
+  -v ~/.wireui:/etc/wireguard \
   -p 51820:51820/udp \
   -p 51821:51821/tcp \
   --cap-add=NET_ADMIN \
@@ -60,7 +62,7 @@ $ docker run -d \
   --sysctl="net.ipv4.conf.all.src_valid_mark=1" \
   --sysctl="net.ipv4.ip_forward=1" \
   --restart unless-stopped \
-  weejewel/wg-easy
+  gyarbij/wireui
 </pre>
 
 > 💡 Replace `YOUR_SERVER_IP` with your WAN IP, or a Dynamic DNS hostname.
@@ -69,11 +71,8 @@ $ docker run -d \
 
 The Web UI will now be available on `http://0.0.0.0:51821`.
 
-> 💡 Your configuration files will be saved in `~/.wg-easy`
+> 💡 Your configuration files will be saved in `~/.wireui`
 
-### 3. Sponsor
-
-Are you enjoying this project? [Buy me a beer!](https://github.com/sponsors/WeeJeWel) 🍻
 
 ## Options
 
@@ -81,18 +80,18 @@ These options can be configured by setting environment variables using `-e KEY="
 
 | Env | Default | Example | Description |
 | - | - | - | - |
-| `PASSWORD` | - | `foobar123` | When set, requires a password when logging in to the Web UI. |
-| `WG_HOST` | - | `vpn.myserver.com` | The public hostname of your VPN server. |
+| `PASSWORD` | - | `ChangeMe@69` | When set, requires a password when logging in to the Web UI. |
+| `WG_HOST` | - | `vpn.example.com` | The public hostname of your VPN server. |
 | `WG_PORT` | `51820` | `12345` | The public UDP port of your VPN server. WireGuard will always listen on `51820` inside the Docker container. |
 | `WG_MTU` | `null` | `1420` | The MTU the clients will use. Server uses default WG MTU. |
-| `WG_PERSISTENT_KEEPALIVE` | `0` | `25` | Value in seconds to keep the "connection" open. If this value is 0, then connections won't be kept alive. |
-| `WG_DEFAULT_ADDRESS` | `10.8.0.x` | `10.6.0.x` | Clients IP address range. |
+| `WG_PERSISTENT_KEEPALIVE` | `0` | `25` | Value in seconds to keep the "connection" open. |
+| `WG_DEFAULT_ADDRESS` | `10.8.0.x` | `10.6.0.x` | Client's IP address range. |
 | `WG_DEFAULT_DNS` | `1.1.1.1` | `8.8.8.8, 8.8.4.4` | DNS server clients will use. |
-| `WG_ALLOWED_IPS` | `0.0.0.0/0, ::/0` | `192.168.15.0/24, 10.0.1.0/24` | Allowed IPs clients will use. |
-| `WG_PRE_UP` | `...` | - | See [config.js](https://github.com/WeeJeWel/wg-easy/blob/master/src/config.js#L19) for the default value. |
-| `WG_POST_UP` | `...` | `iptables ...` | See [config.js](https://github.com/WeeJeWel/wg-easy/blob/master/src/config.js#L20) for the default value. |
-| `WG_PRE_DOWN` | `...` | - | See [config.js](https://github.com/WeeJeWel/wg-easy/blob/master/src/config.js#L27) for the default value. |
-| `WG_POST_DOWN` | `...` | `iptables ...` | See [config.js](https://github.com/WeeJeWel/wg-easy/blob/master/src/config.js#L28) for the default value. |
+| `WG_ALLOWED_IPS` | `0.0.0.0/0, ::/0` | `192.420.69.0/24, 10.0.1.0/24` | Allowed IPs clients will use. |
+| `WG_PRE_UP` | `...` | - | See [config.js](https://github.com/Gyarbij/wireui/blob/master/src/config.js#L19) for the default value. |
+| `WG_POST_UP` | `...` | `iptables ...` | See [config.js](https://github.com/Gyarbij/wireui/blob/master/src/config.js#L20) for the default value. |
+| `WG_PRE_DOWN` | `...` | - | See [config.js](https://github.com/Gyarbij/wireui/blob/master/src/config.js#L27) for the default value. |
+| `WG_POST_DOWN` | `...` | `iptables ...` | See [config.js](https://github.com/Gyarbij/wireui/blob/master/src/config.js#L28) for the default value. |
 
 > If you change `WG_PORT`, make sure to also change the exposed port.
 
@@ -101,9 +100,9 @@ These options can be configured by setting environment variables using `-e KEY="
 To update to the latest version, simply run:
 
 ```bash
-docker stop wg-easy
-docker rm wg-easy
-docker pull weejewel/wg-easy
+docker stop wireui
+docker rm wireui
+docker pull gyarbij/wireui
 ```
 
 And then run the `docker run -d \ ...` command above again.
