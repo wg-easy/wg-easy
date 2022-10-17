@@ -60,7 +60,7 @@
               <p class="text-2xl font-medium">Clients</p>
             </div>
             <div class="flex-shrink-0">
-              <button @click="clientCreate = true; clientCreateName = '';"
+              <button @click="clientCreate = true; clientCreateName = ''; clientCreateAllowedIps = '';"
                 class="hover:bg-red-800 hover:border-red-800 hover:text-white text-gray-700 border-2 border-gray-100 py-2 px-4 rounded inline-flex items-center transition">
                 <svg class="w-4 mr-2" inline xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                   stroke="currentColor">
@@ -182,6 +182,30 @@
                       <!-- Edit -->
                       <span v-show="clientEditAddressId !== client.id"
                         @click="clientEditAddress = client.address; clientEditAddressId = client.id; setTimeout(() => $refs['client-' + client.id + '-address'][0].select(), 1);"
+                        class="cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                          class="h-4 w-4 inline align-middle opacity-25 hover:opacity-100" fill="none"
+                          viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                      </span>
+                    </span>
+
+                    <span class="group">
+
+                      <!-- Show -->
+                      <input v-show="clientEditAllowIPSId === client.id" v-model="clientEditAllowIPS"
+                        v-on:keyup.enter="updateClientAllowIPS(client, clientEditAllowIPS); clientEditAllowIPS = null; clientEditAllowIPSId = null;"
+                        v-on:keyup.escape="clientEditAllowIPS = null; clientEditAllowIPSId = null;"
+                        :ref="'client-' + client.id + '-allowedGWIPs'"
+                        class="rounded border-2 border-gray-100 focus:border-gray-200 outline-none w-20 text-black" />
+                      <span v-show="clientEditAllowIPSId !== client.id"
+                        class="inline-block border-t-2 border-b-2 border-transparent">{{client.allowedGWIPs}}</span>
+
+                      <!-- Edit -->
+                      <span v-show="clientEditAllowIPSId !== client.id"
+                        @click="clientEditAllowIPS = client.allowedGWIPs; clientEditAllowIPSId = client.id; setTimeout(() => $refs['client-' + client.id + '-allowedGWIPs'][0].select(), 1);"
                         class="cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity">
                         <svg xmlns="http://www.w3.org/2000/svg"
                           class="h-4 w-4 inline align-middle opacity-25 hover:opacity-100" fill="none"
@@ -369,6 +393,12 @@
                       <p class="text-sm text-gray-500">
                         <input class="rounded p-2 border-2 border-gray-100 focus:border-gray-200 outline-none w-full"
                           type="text" v-model.trim="clientCreateName" placeholder="Name" />
+                      </p>
+                    </div>
+                    <div class="mt-2">
+                      <p class="text-sm text-gray-500">
+                        <input class="rounded p-2 border-2 border-gray-100 focus:border-gray-200 outline-none w-full"
+                          type="text" v-model.trim="clientCreateAllowedIps" placeholder="Allowed IPs (optional)" />
                       </p>
                     </div>
                   </div>
