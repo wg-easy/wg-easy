@@ -36,7 +36,7 @@ module.exports = class Server {
 
       // Authentication
       .get('/api/session', Util.promisify(async req => {
-        const requiresPassword = !!process.env.PASSWORD;
+        const requiresPassword = PASSWORD !== undefined;
         const authenticated = requiresPassword
           ? !!(req.session && req.session.authenticated)
           : true;

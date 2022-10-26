@@ -1,10 +1,22 @@
 'use strict';
 
-const { release } = require('./package.json');
+const {release} = require('./package.json');
+const fs = require('fs');
 
 module.exports.RELEASE = release;
 module.exports.PORT = process.env.PORT || 51821;
 module.exports.PASSWORD = process.env.PASSWORD;
+// Replace the existing password if a PASSWORD_FILE env variable is present
+// if not, then print the error and proceed
+if ('PASSWORD_FILE' in process.env && fs.existsSync(process.env.PASSWORD_FILE)) {
+  try {
+    module.exports.PASSWORD = fs.readFileSync(process.env.PASSWORD_FILE, 'utf8');
+  } catch (err) {
+    console.error('Could not load the PASSWORD_FILE, using the contents of the PASSWORD variable instead');
+  }
+} else if ('PASSWORD_FILE' in process.env && !fs.existsSync(process.env.PASSWORD_FILE)) {
+  console.error('The declared PASSWORD_FILE does not exist, using the contents of the PASSWORD variable instead')
+}
 module.exports.WG_PATH = process.env.WG_PATH || '/etc/wireguard/';
 module.exports.WG_HOST = process.env.WG_HOST;
 module.exports.WG_PORT = process.env.WG_PORT || 51820;
