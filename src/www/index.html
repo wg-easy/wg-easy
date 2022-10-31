@@ -148,8 +148,8 @@
                       v-on:keyup.escape="clientEditName = null; clientEditNameId = null;"
                       :ref="'client-' + client.id + '-name'"
                       class="rounded px-1 border-2 border-gray-100 focus:border-gray-200 outline-none w-30" />
-                    <span v-show="clientEditNameId !== client.id"
-                      class="inline-block border-t-2 border-b-2 border-transparent">{{client.name}}</span>
+                    <span v-show="clientEditNameId !== client.id" style="max-width: 28ch;"
+                      class="inline-block border-t-2 border-b-2 border-transparent align-top sm:w-auto overflow-hidden sm:overflow-visible overflow-ellipsis">{{client.name}}</span>
 
                     <!-- Edit -->
                     <span v-show="clientEditNameId !== client.id"
