@@ -110,6 +110,7 @@ new Vue({
         },
       },
     },
+    sortation: 'name',
   },
   methods: {
     dateTime: value => {
@@ -169,6 +170,7 @@ new Vue({
 
         return client;
       });
+      this.onSortationChange();
     },
     login(e) {
       e.preventDefault();
@@ -238,6 +240,21 @@ new Vue({
       this.api.updateClientAddress({ clientId: client.id, address })
         .catch(err => alert(err.message || err.toString()))
         .finally(() => this.refresh().catch(console.error));
+    },
+    onSortationChange() {
+      this.clients.sort((a, b) => {
+        const nameA = a[this.sortation].toUpperCase(); // ignore upper and lowercase
+        const nameB = b[this.sortation].toUpperCase(); // ignore upper and lowercase
+        if (nameA < nameB) {
+          return -1;
+        }
+        if (nameA > nameB) {
+          return 1;
+        }
+
+        // names must be equal
+        return 0;
+      });
     },
   },
   filters: {
