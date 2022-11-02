@@ -23,7 +23,7 @@
 
     <div v-cloak class="container mx-auto max-w-3xl">
 
-      <div v-if="authenticated !== true">
+      <div v-if="authenticated === true">
         <span v-if="requiresPassword"
           class="text-sm text-gray-400 mb-10 mr-2 mt-3 cursor-pointer hover:underline float-right" @click="logout">
           Logout
