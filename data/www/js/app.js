@@ -112,15 +112,7 @@ new Vue({
     },
   },
   methods: {
-    dateTime: value => {
-      return new Intl.DateTimeFormat(undefined, {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: 'numeric',
-        minute: 'numeric',
-      }).format(value);
-    },
+    dateTime: value => new Date(value),
     async refresh({
       updateCharts = false,
     } = {}) {

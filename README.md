@@ -17,7 +17,7 @@ You have found the easiest way to install & manage WireGuard on any Linux host!
 
 * All-in-one: WireGuard + Web UI.
 * Easy installation, simple to use.
-* List, create, edit, delete, enable & disable clients.
+* List, create, edit, delete, clients (enable & disable are currently broken).
 * Show a client's QR code.
 * Download a client's configuration file.
 * Statistics for which clients are connected.
@@ -28,6 +28,11 @@ You have found the easiest way to install & manage WireGuard on any Linux host!
 
 * A host with a kernel that supports WireGuard (all modern kernels).
 * A host with Docker installed.
+
+## Flaws
+
+* Application state r/w race contitions due to this is stored on the disk with no caching
+* Enabling/disabling clients is currently unavailable due to former flaw
 
 ## Installation
 
@@ -48,32 +53,20 @@ And log in again.
 To automatically install & run wg-easy, simply run:
 
 <pre>
-$ docker run -d \
-  --name=wg-easy \
-  -e WG_HOST=<b>🚨YOUR_SERVER_IP</b> \
-  -e PASSWORD=<b>🚨YOUR_ADMIN_PASSWORD</b> \
-  -v ~/.wg-easy:/etc/wireguard \
-  -p 51820:51820/udp \
-  -p 51821:51821/tcp \
-  --cap-add=NET_ADMIN \
-  --cap-add=SYS_MODULE \
-  --sysctl="net.ipv4.conf.all.src_valid_mark=1" \
-  --sysctl="net.ipv4.ip_forward=1" \
-  --restart unless-stopped \
-  weejewel/wg-easy
+$ docker compose -f docker-compose.deploy.yml up -d
 </pre>
 
-> 💡 Replace `YOUR_SERVER_IP` with your WAN IP, or a Dynamic DNS hostname.
+> 💡 Replace `HOST` with your WAN IP, or a Dynamic DNS hostname.
 > 
-> 💡 Replace `YOUR_ADMIN_PASSWORD` with a password to log in on the Web UI.
+> 💡 Replace `PASSWORD` with a password to log in on the Web UI.
 
-The Web UI will now be available on `http://0.0.0.0:51821`.
+The Web UI will now be available on `http://0.0.0.0:8080`.
 
-> 💡 Your configuration files will be saved in `~/.wg-easy`
+> 💡 Your configuration files will be saved in `./data`
 
 ### 3. Sponsor
 
-Are you enjoying this project? [Buy me a beer!](https://github.com/sponsors/WeeJeWel) 🍻
+Are you enjoying this project? [Buy Weejewel a beer!](https://github.com/sponsors/WeeJeWel) 🍻
 
 ## Options
 
@@ -82,17 +75,17 @@ These options can be configured by setting environment variables using `-e KEY="
 | Env | Default | Example | Description |
 | - | - | - | - |
 | `PASSWORD` | - | `foobar123` | When set, requires a password when logging in to the Web UI. |
-| `WG_HOST` | - | `vpn.myserver.com` | The public hostname of your VPN server. |
+| `HOST` | - | `vpn.myserver.com` | The public hostname of your VPN server. |
 | `WG_PORT` | `51820` | `12345` | The public UDP port of your VPN server. WireGuard will always listen on `51820` inside the Docker container. |
-| `WG_MTU` | `null` | `1420` | The MTU the clients will use. Server uses default WG MTU. |
-| `WG_PERSISTENT_KEEPALIVE` | `0` | `25` | Value in seconds to keep the "connection" open. If this value is 0, then connections won't be kept alive. |
-| `WG_DEFAULT_ADDRESS` | `10.8.0.x` | `10.6.0.x` | Clients IP address range. |
-| `WG_DEFAULT_DNS` | `1.1.1.1` | `8.8.8.8, 8.8.4.4` | DNS server clients will use. |
-| `WG_ALLOWED_IPS` | `0.0.0.0/0, ::/0` | `192.168.15.0/24, 10.0.1.0/24` | Allowed IPs clients will use. |
-| `WG_PRE_UP` | `...` | - | See [config.js](https://github.com/WeeJeWel/wg-easy/blob/master/src/config.js#L19) for the default value. |
-| `WG_POST_UP` | `...` | `iptables ...` | See [config.js](https://github.com/WeeJeWel/wg-easy/blob/master/src/config.js#L20) for the default value. |
-| `WG_PRE_DOWN` | `...` | - | See [config.js](https://github.com/WeeJeWel/wg-easy/blob/master/src/config.js#L27) for the default value. |
-| `WG_POST_DOWN` | `...` | `iptables ...` | See [config.js](https://github.com/WeeJeWel/wg-easy/blob/master/src/config.js#L28) for the default value. |
+| `MTU` | `null` | `1420` | The MTU the clients will use. Server uses default WG MTU. |
+| `PERSISTENT_KEEPALIVE` | `0` | `25` | Value in seconds to keep the "connection" open. If this value is 0, then connections won't be kept alive. |
+| `DEFAULT_ADDRESS` | `10.8.0.1` | `10.6.0.1` | Clients IP address range. |
+| `DEFAULT_DNS` | `1.1.1.1` | `8.8.8.8, 8.8.4.4` | DNS server clients will use. |
+| `ALLOWED_IPS` | `0.0.0.0/0, ::/0` | `192.168.15.0/24, 10.0.1.0/24` | Allowed IPs clients will use. |
+| `PRE_UP` | `...` | - | See [config.js](https://github.com/WeeJeWel/wg-easy/blob/master/src/config.js#L19) for the default value. |
+| `OST_UP` | `...` | `iptables ...` | See [config.js](https://github.com/WeeJeWel/wg-easy/blob/master/src/config.js#L20) for the default value. |
+| `PRE_DOWN` | `...` | - | See [config.js](https://github.com/WeeJeWel/wg-easy/blob/master/src/config.js#L27) for the default value. |
+| `POST_DOWN` | `...` | `iptables ...` | See [config.js](https://github.com/WeeJeWel/wg-easy/blob/master/src/config.js#L28) for the default value. |
 
 > If you change `WG_PORT`, make sure to also change the exposed port.
 
@@ -101,12 +94,12 @@ These options can be configured by setting environment variables using `-e KEY="
 To update to the latest version, simply run:
 
 ```bash
-docker stop wg-easy
-docker rm wg-easy
-docker pull weejewel/wg-easy
+docker stop rs-wg
+docker rm rs-wg
+docker pull yamzeg/rs-wg
 ```
 
-And then run the `docker run -d \ ...` command above again.
+And then run the `docker compose -f \ ...` command above again.
 
 ## Common Use Cases
 

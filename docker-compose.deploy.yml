@@ -1,21 +1,21 @@
 version: "3.8"
 services:
   rs-wg:      
-    image: rs-wg-local
+    image: yamzeg/rs-wg
     container_name: rs-wg
     environment:
       - WIREGUARD_SETTINGS=/etc/wireguard/settings.json
       - WIREGUARD_PATH=/etc/wireguard/
-      - STATIC_DIR=/etc/wireguard/www
+      - STATIC_DIR=/etc/www/
       - RUST_LOG=actix_web=warn,debug
 
       # optional parameters are commented out
       # - INTERFACE_NAME=wg0
       # - RELEASE=rs0
       # - API_PORT=8080
-      # - PASSWORD=123321
-      - HOST=localhost
-      # - WG_PORT=51825
+      - PASSWORD=123321
+      - HOST=
+      # - WG_PORT=51820
       # - MTU=0
       # - PERSISTENT_KEEPALIVE=25
       # - DEFAULT_ADDRESS=10.8.0.1
@@ -26,12 +26,10 @@ services:
       # - POST_UP=
       # - PRE_DOWN=
       # - POST_DOWN=
-
     volumes:
       - ./data:/etc/wireguard
-      - ./application/bin:/usr/local/cargo/bin
     ports:
-      - "8081:51820/udp"
+      - "51820:51820/udp" # should be same as WG_PORT
       - "8080:8080/tcp"
     cap_add:
       - NET_ADMIN

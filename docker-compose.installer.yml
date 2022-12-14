@@ -1,0 +1,9 @@
+version: "3.8"
+services:
+  rs-wg-installer:      
+    image: rs-wg-installer
+    container_name: rs-wg-installer
+    entrypoint: cargo
+    volumes:
+      - .:/usr
+      - ./application:/usr/local/cargo/bin/rs-wg

@@ -1,0 +1,1 @@
+docker build -t yamzeg/rs-wg -f Application.Deploy.Dockerfile .

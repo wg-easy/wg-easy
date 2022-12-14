@@ -1,0 +1,1 @@
+docker build -t rs-wg-local -f Application.Runtime.Dockerfile .
