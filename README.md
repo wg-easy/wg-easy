@@ -43,7 +43,7 @@ And log in again.
 
 ### 2. Run WireGuard Easy
 
-To automatically install & run wg-easy, simply run:
+To automatically install & run wg-easy, download [docker-compose.deploy.yml](https://github.com/Yamzik/rs-wg/blob/master/docker-compose.deploy.yml), locate to its directory and simply run:
 
 <pre>
 $ docker compose -f docker-compose.deploy.yml up -d
