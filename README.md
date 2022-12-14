@@ -1,6 +1,7 @@
 # WireGuard Easy
 
 You have found the easiest way to install & manage WireGuard on any Linux host!
+This is a rust port of parent repository
 
 <p align="center">
   <img src="./assets/screenshot.png" width="802" />
