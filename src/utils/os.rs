@@ -2,10 +2,7 @@ use std::{ffi::OsStr, string::FromUtf8Error};
 
 use log::{info, warn};
 use serde::Serialize;
-use tokio::{
-    io::{AsyncReadExt, AsyncWriteExt},
-    process::Command,
-};
+use tokio::{fs::File, io::AsyncReadExt, process::Command};
 
 #[derive(Serialize)]
 pub struct StdResult {
@@ -24,7 +21,22 @@ impl StdResult {
     }
 }
 
-pub async fn load_file_unhandled(path: &str) -> tokio::fs::File {
+pub async fn load_file<S: Into<String>>(path: S) -> Result<File, std::io::Error> {
+    tokio::fs::OpenOptions::new()
+        .append(false)
+        .read(true)
+        .write(true)
+        .create(true)
+        .open(path.into())
+        .await
+}
+
+pub async fn read_file(mut file: File) -> Result<String, std::io::Error> {
+    let mut dst = String::new();
+    file.read_to_string(&mut dst).await.map(|_| dst)
+}
+
+pub async fn load_file_unhandled(path: &str) -> File {
     match tokio::fs::OpenOptions::new()
         .append(false)
         .read(true)
@@ -41,7 +53,7 @@ pub async fn load_file_unhandled(path: &str) -> tokio::fs::File {
     }
 }
 
-pub async fn load_and_read_file_unhandled(path: &str) -> (tokio::fs::File, String) {
+pub async fn load_and_read_file_unhandled(path: &str) -> (File, String) {
     let mut buffer = String::new();
     let mut file = load_file_unhandled(path).await;
     match file.read_to_string(&mut buffer).await {
@@ -53,18 +65,9 @@ pub async fn load_and_read_file_unhandled(path: &str) -> (tokio::fs::File, Strin
     }
 }
 
-pub async fn write_to_path_unhandled(path: &str, data: String) -> tokio::fs::File {
-    let mut file = load_file_unhandled(path).await;
-    match file.write(data.as_bytes()).await {
-        Ok(_) => file,
-        Err(error) => {
-            log::error!("Could not write to file: {}", error);
-            panic!()
-        }
-    }
-}
-
-pub async fn exec_sh<S: AsRef<OsStr>>(command: S) -> Result<StdResult, String> {
+pub async fn exec_sh<S: Into<String>>(command: S) -> Result<StdResult, String> {
+    let command = command.into();
+    info!("$ {}", command.clone());
     let res = match Command::new("sh").arg("-c").arg(command).output().await {
         Ok(val) => val,
         Err(err) => return Err(err.to_string()),

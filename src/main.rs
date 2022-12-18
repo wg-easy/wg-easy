@@ -1,5 +1,5 @@
 mod utils;
-mod wireguard;
+mod wg_rs;
 use actix_session::{storage::CookieSessionStore, Session, SessionMiddleware};
 
 use actix_web::{
@@ -10,9 +10,12 @@ use actix_web::{
 };
 
 use serde::{Deserialize, Serialize};
+use tokio::sync::RwLock;
 use utils::{misc, os};
 use uuid::Uuid;
-use wireguard::config::{WireGuard, WireguardSettings};
+use wg_rs::config::Settings;
+
+use wg_rs::wireguard::WireGuard;
 
 #[derive(Deserialize)]
 struct Name {
@@ -131,23 +134,26 @@ async fn session_logout(session: Session) -> impl Responder {
 }
 
 #[get("/api/wireguard/client")]
-async fn all_clients(wireguard: web::Data<WireGuard>) -> impl Responder {
-    let memento = wireguard.get_memento().await;
-    let clients = wireguard.get_clients(&memento).await;
+async fn all_clients(wireguard: web::Data<RwLock<WireGuard>>) -> impl Responder {
+    let wireguard = wireguard.read().await;
+    let clients = wireguard.get_clients().await;
     HttpResponse::Ok().body(serde_json::to_string_pretty(&clients).unwrap())
 }
 
 #[get("/api/wireguard/client/{id}/qrcode.svg")]
-async fn client_qr(id: web::Path<Uuid>, wireguard: web::Data<WireGuard>) -> impl Responder {
-    let memento = wireguard.get_memento().await;
-    let qr = wireguard.get_client_qrcode_svg(&memento, *id).await;
+async fn client_qr(id: web::Path<Uuid>, wireguard: web::Data<RwLock<WireGuard>>) -> impl Responder {
+    let wireguard = wireguard.read().await;
+    let qr = wireguard.get_client_qrcode_svg(*id).await;
     HttpResponse::Ok().body(qr)
 }
 
 #[get("/api/wireguard/client/{id}/configuration")]
-async fn client_config(id: web::Path<Uuid>, wireguard: web::Data<WireGuard>) -> impl Responder {
-    let memento = wireguard.get_memento().await;
-    let (name, config) = wireguard.get_client_configuration(&memento, *id);
+async fn client_config(
+    id: web::Path<Uuid>,
+    wireguard: web::Data<RwLock<WireGuard>>,
+) -> impl Responder {
+    let wireguard = wireguard.read().await;
+    let (name, config) = wireguard.get_client_configuration(*id);
     HttpResponse::Ok()
         .content_type("text/plain")
         .append_header(ContentDisposition {
@@ -161,33 +167,42 @@ async fn client_config(id: web::Path<Uuid>, wireguard: web::Data<WireGuard>) -> 
 }
 
 #[post("/api/wireguard/client")]
-async fn create_client(data: web::Json<Name>, wireguard: web::Data<WireGuard>) -> impl Responder {
-    let mut memento = wireguard.get_memento().await;
-    let client = wireguard
-        .create_client(&mut memento, data.name.to_string())
-        .await;
-    HttpResponse::Ok().body(serde_json::to_string_pretty(client).unwrap())
+async fn create_client(
+    data: web::Json<Name>,
+    wireguard: web::Data<RwLock<WireGuard>>,
+) -> impl Responder {
+    let mut wireguard = wireguard.write().await;
+    let client = wireguard.create_client(data.name.to_string()).await;
+    HttpResponse::Ok().body(serde_json::to_string_pretty(&client).unwrap())
 }
 
 #[delete("/api/wireguard/client/{id}")]
-async fn delete_client(id: web::Path<Uuid>, wireguard: web::Data<WireGuard>) -> impl Responder {
-    let mut memento = wireguard.get_memento().await;
-    wireguard.delete_client(&mut memento, *id).await;
+async fn delete_client(
+    id: web::Path<Uuid>,
+    wireguard: web::Data<RwLock<WireGuard>>,
+) -> impl Responder {
+    let mut wireguard = wireguard.write().await;
+    wireguard.delete_client(*id).await;
     HttpResponse::NoContent()
 }
 
 #[post("/api/wireguard/client/{id}/enable")]
-async fn enable_client(id: web::Path<Uuid>, wireguard: web::Data<WireGuard>) -> impl Responder {
-    // todo here is a bug that kills whole app
-    // let mut memento = wireguard.get_memento().await;
-    // wireguard.enable_client(&mut memento, *id).await;
+async fn enable_client(
+    id: web::Path<Uuid>,
+    wireguard: web::Data<RwLock<WireGuard>>,
+) -> impl Responder {
+    let mut wireguard = wireguard.write().await;
+    wireguard.enable_client(*id).await;
     HttpResponse::NoContent()
 }
 
 #[post("/api/wireguard/client/{id}/disable")]
-async fn disable_client(id: web::Path<Uuid>, wireguard: web::Data<WireGuard>) -> impl Responder {
-    // let mut memento = wireguard.get_memento().await;
-    // wireguard.disable_client(&mut memento, *id).await;
+async fn disable_client(
+    id: web::Path<Uuid>,
+    wireguard: web::Data<RwLock<WireGuard>>,
+) -> impl Responder {
+    let mut wireguard = wireguard.write().await;
+    wireguard.disable_client(*id).await;
     HttpResponse::NoContent()
 }
 
@@ -206,8 +221,7 @@ async fn main() -> std::io::Result<()> {
     let password = get_env("PASSWORD", "123321");
 
     let settings = get_wireguard_settings();
-    let wireguard = WireGuard::new("wg0", wireguard_path, settings);
-
+    let mut wireguard = WireGuard::new("wg0", wireguard_path, settings).await;
     wireguard.start().await;
 
     let index_path = format!("{}/index.html", static_dir);
@@ -216,7 +230,7 @@ async fn main() -> std::io::Result<()> {
     let (_, manifest_file) = os::load_and_read_file_unhandled(mainfest_path.as_str()).await;
 
     let security = web::Data::new(Security { password });
-    let web_wireguard = web::Data::new(wireguard);
+    let web_wireguard = web::Data::new(RwLock::new(wireguard));
     let static_files = web::Data::new(Static {
         dir: static_dir,
         index_page,
@@ -261,7 +275,7 @@ async fn main() -> std::io::Result<()> {
     .await
 }
 
-fn get_wireguard_settings() -> WireguardSettings {
+fn get_wireguard_settings() -> Settings {
     let interface_name = get_env("INTERFACE_NAME", "wg0");
     let release_ = get_env("RELEASE", "rs0");
     let api_port = get_env("API_PORT", "8080");
@@ -293,7 +307,7 @@ fn get_wireguard_settings() -> WireguardSettings {
     let pre_down = get_env("PRE_DOWN", "");
     let post_down = get_env("POST_DOWN", "");
 
-    WireguardSettings {
+    Settings {
         interface_name,
         release: release_,
         api_port: api_port.parse::<i32>().expect("Invalid api port was set"),
