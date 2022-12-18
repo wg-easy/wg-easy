@@ -5,7 +5,7 @@ services:
     container_name: rs-wg
     environment:
       - WIREGUARD_SETTINGS=/etc/wireguard/settings.json
-      - WIREGUARD_PATH=/etc/wireguard/
+      - WIREGUARD_PATH=/etc/wireguard
       - STATIC_DIR=/etc/www/
       - RUST_LOG=actix_web=warn,debug
 

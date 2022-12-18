@@ -2,6 +2,7 @@ use std::sync::Arc;
 
 use chrono::{SecondsFormat, SubsecRound, Utc};
 
+use log::error;
 use uuid::Uuid;
 
 use crate::utils::{misc, os};
@@ -17,7 +18,7 @@ pub struct WireGuard {
 
 impl WireGuard {
     pub async fn new(name: &str, wg_path: String, settings: Settings) -> Self {
-        let path = format!("{}{}", wg_path, name);
+        let path = format!("{}/{}", wg_path, name);
         let config_path = format!("{}.conf", path);
         let memento_path = format!("{}.json", path);
         let name = format!("{}", name);
@@ -27,32 +28,46 @@ impl WireGuard {
         Self {
             name,
             settings: counter.clone(),
-            memento_accessor: Accessor::new(memento_path, config_path, counter).await,
+            memento_accessor: Accessor::build(memento_path, config_path, counter)
+                .await
+                .unwrap_or_else(|err| {
+                    error!("Error initializing Wireguard: {}", err);
+                    panic!()
+                }),
         }
     }
 
     pub async fn quick_up(&self) {
-        let result = os::exec_sh(format!("wg-quick up {}", &self.name))
+        os::exec_sh(&format!("wg-quick up {}", &self.name))
             .await
-            .expect("Error");
-        result.log();
+            .unwrap_or_else(|err| {
+                error!("Error quick_up: {}", err);
+                panic!()
+            })
+            .log();
     }
 
     pub async fn quick_down(&self) {
-        let result = os::exec_sh(format!("wg-quick down {}", &self.name))
+        os::exec_sh(&format!("wg-quick down {}", &self.name))
             .await
-            .expect("Error");
-        result.log();
+            .unwrap_or_else(|err| {
+                error!("Error quick_down: {}", err);
+                panic!()
+            })
+            .log();
     }
 
     pub async fn sync_config(&self) {
-        let result = os::exec_sh(format!(
+        os::exec_sh(&format!(
             "wg syncconf {} <(wg-quick strip {})",
             self.name, self.name
         ))
         .await
-        .expect("Error syncing");
-        result.log();
+        .unwrap_or_else(|err| {
+            error!("Error syncing: {}", err);
+            panic!()
+        })
+        .log();
     }
 
     pub async fn start(&mut self) {
@@ -64,12 +79,18 @@ impl WireGuard {
     }
 
     pub async fn create_client(&mut self, name: String) -> Client {
-        let private_key = os::exec_sh("wg genkey").await.expect("error genkey").stdout;
+        let private_key = os::exec_sh(&"wg genkey")
+            .await
+            .expect("error genkey")
+            .stdout;
 
         let pub_cmd = format!("echo {} | wg pubkey", private_key);
-        let public_key = os::exec_sh(pub_cmd).await.expect("error pubkey").stdout;
+        let public_key = os::exec_sh(&pub_cmd).await.expect("error pubkey").stdout;
 
-        let pre_shared_key = os::exec_sh("wg genpsk").await.expect("error genpsk").stdout;
+        let pre_shared_key = os::exec_sh(&"wg genpsk")
+            .await
+            .expect("error genpsk")
+            .stdout;
 
         let mut memento = self.memento_accessor.get();
 
@@ -122,7 +143,7 @@ impl WireGuard {
     }
 
     pub async fn get_clients(&self) -> Vec<WebClient> {
-        let res = os::exec_sh("wg show wg0 dump").await.unwrap();
+        let res = os::exec_sh(&"wg show wg0 dump").await.unwrap();
 
         let lines: Vec<Vec<String>> = res
             .stdout

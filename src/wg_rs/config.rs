@@ -1,11 +1,12 @@
-use std::{collections::HashMap, sync::Arc};
+use std::{collections::HashMap, error::Error, sync::Arc};
 
 use chrono::{SecondsFormat, SubsecRound, Utc};
 
 use futures_util::TryFutureExt;
+use log::error;
 use serde::{Deserialize, Serialize};
 
-use tokio::{io::AsyncWriteExt, join};
+use tokio::join;
 use uuid::Uuid;
 
 use crate::utils::{misc, os};
@@ -127,38 +128,45 @@ pub struct Accessor {
 }
 
 impl Accessor {
-    pub async fn new(memento_path: String, config_path: String, settings: Arc<Settings>) -> Self {
-        let memento_str = os::load_file(memento_path.clone())
-            .and_then(|file| os::read_file(file))
+    pub async fn build(
+        memento_path: String,
+        config_path: String,
+        settings: Arc<Settings>,
+    ) -> Result<Self, Box<dyn Error>> {
+        let memento_str = os::read_file(memento_path.clone())
             .await
             .expect("Could not read memento");
 
-        let memento = if memento_str.is_empty() {
+        if memento_str.is_empty() {
             log::info!("Creating new WireGuard configuration...");
-            let private_key = os::exec_sh("wg genkey").await.expect("error genkey").stdout;
-            let public_key = os::exec_sh(format!("echo {} | wg pubkey", private_key))
+            os::exec_sh(&"wg genkey")
+                .and_then(|res_public| async move {
+                    os::exec_sh(&format!("echo {} | wg pubkey", &res_public.stdout))
+                        .await
+                        .map(|res_private| (res_public.stdout, res_private.stdout))
+                })
                 .await
-                .expect("error pubkey")
-                .stdout;
-
-            let address = settings.default_address.clone();
-            let memento = Memento::new(Server {
-                private_key,
-                public_key,
-                address,
-            });
-            log::info!("WireGuard configuration generated...");
-            memento
+                .and_then(|(public_key, private_key)| {
+                    let address = settings.default_address.clone();
+                    let memento = Memento::new(Server {
+                        private_key,
+                        public_key,
+                        address,
+                    });
+                    log::info!("WireGuard configuration generated...");
+                    Ok(memento)
+                })
         } else {
-            serde_json::from_str(&memento_str).expect("Could not serialize memento")
-        };
-
-        Self {
-            config_path,
-            memento_path,
-            memento,
-            settings,
+            Ok(serde_json::from_str(&memento_str).expect("Could not serialize memento"))
         }
+        .and_then(|memento| {
+            Ok(Self {
+                config_path,
+                memento_path,
+                memento,
+                settings,
+            })
+        })
     }
 
     pub async fn set(&mut self, memento: Memento) {
@@ -169,24 +177,19 @@ impl Accessor {
         ser_memento.push('\n');
         ser_config.push('\n');
 
-        _ = join!(
-            async {
-                let mut file = os::load_file(self.memento_path.clone())
-                    .await
-                    .expect("Could not load memento");
-                file.write(ser_memento.as_bytes())
-                    .await
-                    .expect("Could not write memento");
-            },
-            async {
-                let mut file = os::load_file(self.config_path.clone())
-                    .await
-                    .expect("Could not load config");
-                file.write(ser_config.as_bytes())
-                    .await
-                    .expect("Could not write config");
-            }
+        let (memento_wr, config_wr) = join!(
+            os::write_file(self.memento_path.clone(), ser_memento),
+            os::write_file(self.config_path.clone(), ser_config)
         );
+
+        memento_wr.unwrap_or_else(|err| {
+            error!("Could not write memento: {}", err);
+            panic!()
+        });
+        config_wr.unwrap_or_else(|err| {
+            error!("Could not write config: {}", err);
+            panic!()
+        });
 
         self.memento = memento;
     }
