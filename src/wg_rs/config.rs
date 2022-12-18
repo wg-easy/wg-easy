@@ -3,6 +3,7 @@ use std::{collections::HashMap, sync::Arc};
 use chrono::{SecondsFormat, SubsecRound, Utc};
 
 use futures_util::TryFutureExt;
+use log::error;
 use serde::{Deserialize, Serialize};
 
 use tokio::{io::AsyncWriteExt, join};
@@ -128,8 +129,7 @@ pub struct Accessor {
 
 impl Accessor {
     pub async fn new(memento_path: String, config_path: String, settings: Arc<Settings>) -> Self {
-        let memento_str = os::load_file(memento_path.clone())
-            .and_then(|file| os::read_file(file))
+        let memento_str = os::read_file(memento_path.clone())
             .await
             .expect("Could not read memento");
 
@@ -169,24 +169,19 @@ impl Accessor {
         ser_memento.push('\n');
         ser_config.push('\n');
 
-        _ = join!(
-            async {
-                let mut file = os::load_file(self.memento_path.clone())
-                    .await
-                    .expect("Could not load memento");
-                file.write(ser_memento.as_bytes())
-                    .await
-                    .expect("Could not write memento");
-            },
-            async {
-                let mut file = os::load_file(self.config_path.clone())
-                    .await
-                    .expect("Could not load config");
-                file.write(ser_config.as_bytes())
-                    .await
-                    .expect("Could not write config");
-            }
+        let (memento_wr, config_wr) = join!(
+            os::write_file(self.memento_path.clone(), ser_memento),
+            os::write_file(self.config_path.clone(), ser_config)
         );
+
+        memento_wr.unwrap_or_else(|err| {
+            error!("Could not write memento: {}", err);
+            panic!()
+        });
+        config_wr.unwrap_or_else(|err| {
+            error!("Could not write config: {}", err);
+            panic!()
+        });
 
         self.memento = memento;
     }

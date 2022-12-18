@@ -1,8 +1,13 @@
-use std::{ffi::OsStr, string::FromUtf8Error};
+use std::string::FromUtf8Error;
 
+use futures_util::TryFutureExt;
 use log::{info, warn};
 use serde::Serialize;
-use tokio::{fs::File, io::AsyncReadExt, process::Command};
+use tokio::{
+    fs::File,
+    io::{AsyncReadExt, AsyncWriteExt},
+    process::Command,
+};
 
 #[derive(Serialize)]
 pub struct StdResult {
@@ -21,26 +26,40 @@ impl StdResult {
     }
 }
 
-pub async fn load_file<S: Into<String>>(path: S) -> Result<File, std::io::Error> {
+pub async fn write_file<P: Into<String>, D: Into<String>>(
+    path: P,
+    data: D,
+) -> Result<(), std::io::Error> {
     tokio::fs::OpenOptions::new()
-        .append(false)
+        .write(true)
+        .truncate(true)
+        .create(true)
+        .open(path.into())
+        .and_then(|mut file| async move {
+            let result = file.write(data.into().as_bytes()).await;
+            file.flush().await
+        })
+        .await
+}
+
+pub async fn read_file<S: Into<String>>(path: S) -> Result<String, std::io::Error> {
+    tokio::fs::OpenOptions::new()
         .read(true)
         .write(true)
         .create(true)
         .open(path.into())
+        .and_then(|mut file| async move {
+            let mut dst = String::new();
+            file.read_to_string(&mut dst).await.map(|_| dst)
+        })
         .await
-}
-
-pub async fn read_file(mut file: File) -> Result<String, std::io::Error> {
-    let mut dst = String::new();
-    file.read_to_string(&mut dst).await.map(|_| dst)
 }
 
 pub async fn load_file_unhandled(path: &str) -> File {
     match tokio::fs::OpenOptions::new()
-        .append(false)
         .read(true)
         .write(true)
+        .truncate(true)
         .create(true)
         .open(path)
         .await

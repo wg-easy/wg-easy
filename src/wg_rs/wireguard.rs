@@ -17,7 +17,7 @@ pub struct WireGuard {
 
 impl WireGuard {
     pub async fn new(name: &str, wg_path: String, settings: Settings) -> Self {
-        let path = format!("{}{}", wg_path, name);
+        let path = format!("{}/{}", wg_path, name);
         let config_path = format!("{}.conf", path);
         let memento_path = format!("{}.json", path);
         let name = format!("{}", name);
@@ -122,29 +122,29 @@ impl WireGuard {
     }
 
     pub async fn get_clients(&self) -> Vec<WebClient> {
-        let res = os::exec_sh("wg show wg0 dump").await.unwrap();
+        // let res = os::exec_sh("wg show wg0 dump").await.unwrap();
 
-        let lines: Vec<Vec<String>> = res
-            .stdout
-            .trim()
-            .split('\n')
-            .skip(1)
-            .map(|line| line.split('\t').map(|x| x.to_string()).collect())
-            .collect();
+        // let lines: Vec<Vec<String>> = res
+        //     .stdout
+        //     .trim()
+        //     .split('\n')
+        //     .skip(1)
+        //     .map(|line| line.split('\t').map(|x| x.to_string()).collect())
+        //     .collect();
 
-        let lines: Vec<DumpClient> = lines
-            .iter()
-            .map(|x| DumpClient {
-                public_key: x[0].to_string(),
-                pre_shared_key: x[1].to_string(),
-                endpoint: x[2].to_string(),
-                allowed_ips: x[3].to_string(),
-                latest_handshake_at: x[4].to_string(),
-                transfer_rx: x[5].parse::<i64>().unwrap(),
-                transfer_tx: x[6].parse::<i64>().unwrap(),
-                persistent_keepalive: x[7].to_string(),
-            })
-            .collect();
+        // let lines: Vec<DumpClient> = lines
+        //     .iter()
+        //     .map(|x| DumpClient {
+        //         public_key: x[0].to_string(),
+        //         pre_shared_key: x[1].to_string(),
+        //         endpoint: x[2].to_string(),
+        //         allowed_ips: x[3].to_string(),
+        //         latest_handshake_at: x[4].to_string(),
+        //         transfer_rx: x[5].parse::<i64>().unwrap(),
+        //         transfer_tx: x[6].parse::<i64>().unwrap(),
+        //         persistent_keepalive: x[7].to_string(),
+        //     })
+        //     .collect();
 
         let memento = self.memento_accessor.get();
         let clients: Vec<WebClient> = memento
@@ -153,12 +153,12 @@ impl WireGuard {
             .map(|(uuid, value)| {
                 let uuid = uuid.to_owned();
                 let value = value.to_owned();
-                let client_conf;
+                // let client_conf;
 
-                match lines.iter().find(|x| x.public_key.eq(&value.public_key)) {
-                    Some(conf) => client_conf = conf,
-                    None => return None,
-                };
+                // match lines.iter().find(|x| x.public_key.eq(&value.public_key)) {
+                //     Some(conf) => client_conf = conf,
+                //     None => return None,
+                // };
                 Some(WebClient {
                     id: uuid,
                     name: value.name,
@@ -167,11 +167,11 @@ impl WireGuard {
                     public_key: value.public_key,
                     created_at: value.created_at,
                     updated_at: value.updated_at,
-                    allowed_ips: client_conf.allowed_ips.to_string(),
-                    persistent_keepalive: client_conf.persistent_keepalive.to_string(),
-                    latest_handshake_at: client_conf.latest_handshake_at.to_string(),
-                    transfer_rx: client_conf.transfer_rx,
-                    transfer_tx: client_conf.transfer_tx,
+                    allowed_ips:          "123".to_string(),  //client_conf.allowed_ips.to_string(),
+                    persistent_keepalive: "123".to_string(),  //client_conf.persistent_keepalive.to_string(),
+                    latest_handshake_at:  "123".to_string(),  //client_conf.latest_handshake_at.to_string(),
+                    transfer_rx:           1234, //client_conf.transfer_rx,
+                    transfer_tx:           1234, //client_conf.transfer_tx,
                 })
             })
             .filter(|x| x.is_some())
