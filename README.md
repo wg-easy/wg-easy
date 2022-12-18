@@ -11,7 +11,7 @@ This is a rust port of parent repository
 
 * All-in-one: WireGuard + Web UI.
 * Easy installation, simple to use.
-* List, create, edit, delete, clients (enable & disable are currently broken).
+* List, create, edit, delete, clients.
 * Show a client's QR code.
 * Download a client's configuration file.
 * Statistics for which clients are connected.
@@ -22,11 +22,6 @@ This is a rust port of parent repository
 
 * A host with a kernel that supports WireGuard (all modern kernels).
 * A host with Docker installed.
-
-## Flaws
-
-* Application state r/w race contitions due to this is stored on the disk with no caching
-* Enabling/disabling clients is currently unavailable due to former flaw
 
 ## Installation
 
