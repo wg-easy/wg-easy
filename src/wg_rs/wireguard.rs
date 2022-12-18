@@ -2,6 +2,7 @@ use std::sync::Arc;
 
 use chrono::{SecondsFormat, SubsecRound, Utc};
 
+use log::error;
 use uuid::Uuid;
 
 use crate::utils::{misc, os};
@@ -27,32 +28,46 @@ impl WireGuard {
         Self {
             name,
             settings: counter.clone(),
-            memento_accessor: Accessor::new(memento_path, config_path, counter).await,
+            memento_accessor: Accessor::build(memento_path, config_path, counter)
+                .await
+                .unwrap_or_else(|err| {
+                    error!("Error initializing Wireguard: {}", err);
+                    panic!()
+                }),
         }
     }
 
     pub async fn quick_up(&self) {
-        let result = os::exec_sh(format!("wg-quick up {}", &self.name))
+        os::exec_sh(&format!("wg-quick up {}", &self.name))
             .await
-            .expect("Error");
-        result.log();
+            .unwrap_or_else(|err| {
+                error!("Error quick_up: {}", err);
+                panic!()
+            })
+            .log();
     }
 
     pub async fn quick_down(&self) {
-        let result = os::exec_sh(format!("wg-quick down {}", &self.name))
+        os::exec_sh(&format!("wg-quick down {}", &self.name))
             .await
-            .expect("Error");
-        result.log();
+            .unwrap_or_else(|err| {
+                error!("Error quick_down: {}", err);
+                panic!()
+            })
+            .log();
     }
 
     pub async fn sync_config(&self) {
-        let result = os::exec_sh(format!(
+        os::exec_sh(&format!(
             "wg syncconf {} <(wg-quick strip {})",
             self.name, self.name
         ))
         .await
-        .expect("Error syncing");
-        result.log();
+        .unwrap_or_else(|err| {
+            error!("Error syncing: {}", err);
+            panic!()
+        })
+        .log();
     }
 
     pub async fn start(&mut self) {
@@ -64,12 +79,18 @@ impl WireGuard {
     }
 
     pub async fn create_client(&mut self, name: String) -> Client {
-        let private_key = os::exec_sh("wg genkey").await.expect("error genkey").stdout;
+        let private_key = os::exec_sh(&"wg genkey")
+            .await
+            .expect("error genkey")
+            .stdout;
 
         let pub_cmd = format!("echo {} | wg pubkey", private_key);
-        let public_key = os::exec_sh(pub_cmd).await.expect("error pubkey").stdout;
+        let public_key = os::exec_sh(&pub_cmd).await.expect("error pubkey").stdout;
 
-        let pre_shared_key = os::exec_sh("wg genpsk").await.expect("error genpsk").stdout;
+        let pre_shared_key = os::exec_sh(&"wg genpsk")
+            .await
+            .expect("error genpsk")
+            .stdout;
 
         let mut memento = self.memento_accessor.get();
 
@@ -122,29 +143,29 @@ impl WireGuard {
     }
 
     pub async fn get_clients(&self) -> Vec<WebClient> {
-        // let res = os::exec_sh("wg show wg0 dump").await.unwrap();
+        let res = os::exec_sh(&"wg show wg0 dump").await.unwrap();
 
-        // let lines: Vec<Vec<String>> = res
-        //     .stdout
-        //     .trim()
-        //     .split('\n')
-        //     .skip(1)
-        //     .map(|line| line.split('\t').map(|x| x.to_string()).collect())
-        //     .collect();
+        let lines: Vec<Vec<String>> = res
+            .stdout
+            .trim()
+            .split('\n')
+            .skip(1)
+            .map(|line| line.split('\t').map(|x| x.to_string()).collect())
+            .collect();
 
-        // let lines: Vec<DumpClient> = lines
-        //     .iter()
-        //     .map(|x| DumpClient {
-        //         public_key: x[0].to_string(),
-        //         pre_shared_key: x[1].to_string(),
-        //         endpoint: x[2].to_string(),
-        //         allowed_ips: x[3].to_string(),
-        //         latest_handshake_at: x[4].to_string(),
-        //         transfer_rx: x[5].parse::<i64>().unwrap(),
-        //         transfer_tx: x[6].parse::<i64>().unwrap(),
-        //         persistent_keepalive: x[7].to_string(),
-        //     })
-        //     .collect();
+        let lines: Vec<DumpClient> = lines
+            .iter()
+            .map(|x| DumpClient {
+                public_key: x[0].to_string(),
+                pre_shared_key: x[1].to_string(),
+                endpoint: x[2].to_string(),
+                allowed_ips: x[3].to_string(),
+                latest_handshake_at: x[4].to_string(),
+                transfer_rx: x[5].parse::<i64>().unwrap(),
+                transfer_tx: x[6].parse::<i64>().unwrap(),
+                persistent_keepalive: x[7].to_string(),
+            })
+            .collect();
 
         let memento = self.memento_accessor.get();
         let clients: Vec<WebClient> = memento
@@ -153,12 +174,12 @@ impl WireGuard {
             .map(|(uuid, value)| {
                 let uuid = uuid.to_owned();
                 let value = value.to_owned();
-                // let client_conf;
+                let client_conf;
 
-                // match lines.iter().find(|x| x.public_key.eq(&value.public_key)) {
-                //     Some(conf) => client_conf = conf,
-                //     None => return None,
-                // };
+                match lines.iter().find(|x| x.public_key.eq(&value.public_key)) {
+                    Some(conf) => client_conf = conf,
+                    None => return None,
+                };
                 Some(WebClient {
                     id: uuid,
                     name: value.name,
@@ -167,11 +188,11 @@ impl WireGuard {
                     public_key: value.public_key,
                     created_at: value.created_at,
                     updated_at: value.updated_at,
-                    allowed_ips:          "123".to_string(),  //client_conf.allowed_ips.to_string(),
-                    persistent_keepalive: "123".to_string(),  //client_conf.persistent_keepalive.to_string(),
-                    latest_handshake_at:  "123".to_string(),  //client_conf.latest_handshake_at.to_string(),
-                    transfer_rx:           1234, //client_conf.transfer_rx,
-                    transfer_tx:           1234, //client_conf.transfer_tx,
+                    allowed_ips: client_conf.allowed_ips.to_string(),
+                    persistent_keepalive: client_conf.persistent_keepalive.to_string(),
+                    latest_handshake_at: client_conf.latest_handshake_at.to_string(),
+                    transfer_rx: client_conf.transfer_rx,
+                    transfer_tx: client_conf.transfer_tx,
                 })
             })
             .filter(|x| x.is_some())

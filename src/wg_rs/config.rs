@@ -1,4 +1,4 @@
-use std::{collections::HashMap, sync::Arc};
+use std::{collections::HashMap, error::Error, sync::Arc};
 
 use chrono::{SecondsFormat, SubsecRound, Utc};
 
@@ -6,7 +6,7 @@ use futures_util::TryFutureExt;
 use log::error;
 use serde::{Deserialize, Serialize};
 
-use tokio::{io::AsyncWriteExt, join};
+use tokio::join;
 use uuid::Uuid;
 
 use crate::utils::{misc, os};
@@ -128,37 +128,45 @@ pub struct Accessor {
 }
 
 impl Accessor {
-    pub async fn new(memento_path: String, config_path: String, settings: Arc<Settings>) -> Self {
+    pub async fn build(
+        memento_path: String,
+        config_path: String,
+        settings: Arc<Settings>,
+    ) -> Result<Self, Box<dyn Error>> {
         let memento_str = os::read_file(memento_path.clone())
             .await
             .expect("Could not read memento");
 
-        let memento = if memento_str.is_empty() {
+        if memento_str.is_empty() {
             log::info!("Creating new WireGuard configuration...");
-            let private_key = os::exec_sh("wg genkey").await.expect("error genkey").stdout;
-            let public_key = os::exec_sh(format!("echo {} | wg pubkey", private_key))
+            os::exec_sh(&"wg genkey")
+                .and_then(|res_public| async move {
+                    os::exec_sh(&format!("echo {} | wg pubkey", &res_public.stdout))
+                        .await
+                        .map(|res_private| (res_public.stdout, res_private.stdout))
+                })
                 .await
-                .expect("error pubkey")
-                .stdout;
-
-            let address = settings.default_address.clone();
-            let memento = Memento::new(Server {
-                private_key,
-                public_key,
-                address,
-            });
-            log::info!("WireGuard configuration generated...");
-            memento
+                .and_then(|(public_key, private_key)| {
+                    let address = settings.default_address.clone();
+                    let memento = Memento::new(Server {
+                        private_key,
+                        public_key,
+                        address,
+                    });
+                    log::info!("WireGuard configuration generated...");
+                    Ok(memento)
+                })
         } else {
-            serde_json::from_str(&memento_str).expect("Could not serialize memento")
-        };
-
-        Self {
-            config_path,
-            memento_path,
-            memento,
-            settings,
+            Ok(serde_json::from_str(&memento_str).expect("Could not serialize memento"))
         }
+        .and_then(|memento| {
+            Ok(Self {
+                config_path,
+                memento_path,
+                memento,
+                settings,
+            })
+        })
     }
 
     pub async fn set(&mut self, memento: Memento) {
