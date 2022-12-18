@@ -13,8 +13,8 @@ services:
       # - INTERFACE_NAME=wg0
       # - RELEASE=rs0
       # - API_PORT=8080
-      - PASSWORD=123321
-      - HOST=
+      # - PASSWORD=123321
+      - HOST=localhost
       # - WG_PORT=51820
       # - MTU=0
       # - PERSISTENT_KEEPALIVE=25
