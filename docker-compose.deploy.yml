@@ -1,6 +1,6 @@
 version: "3.8"
 services:
-  rs-wg:      
+  rs-wg:
     image: yamzeg/rs-wg
     container_name: rs-wg
     environment:
@@ -15,7 +15,7 @@ services:
       # - API_PORT=8080
       # - PASSWORD=123321
       - HOST=localhost
-      # - WG_PORT=51820
+      - WG_PORT=51820
       # - MTU=0
       # - PERSISTENT_KEEPALIVE=25
       # - DEFAULT_ADDRESS=10.8.0.1

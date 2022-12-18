@@ -221,13 +221,18 @@ async fn main() -> std::io::Result<()> {
     let password = get_env("PASSWORD", "123321");
 
     let settings = get_wireguard_settings();
-    let mut wireguard = WireGuard::new("wg0", wireguard_path, settings).await;
+    let mut wireguard = WireGuard::new(wireguard_path, settings).await;
     wireguard.start().await;
 
     let index_path = format!("{}/index.html", static_dir);
     let mainfest_path = format!("{}/manifest.json", static_dir);
-    let (_, index_page) = os::load_and_read_file_unhandled(index_path.as_str()).await;
-    let (_, manifest_file) = os::load_and_read_file_unhandled(mainfest_path.as_str()).await;
+
+    let index_page = os::read_file(index_path)
+        .await
+        .expect("Could not read index");
+    let manifest_file = os::read_file(mainfest_path)
+        .await
+        .expect("Could not read manifest");
 
     let security = web::Data::new(Security { password });
     let web_wireguard = web::Data::new(RwLock::new(wireguard));
@@ -281,7 +286,7 @@ fn get_wireguard_settings() -> Settings {
     let api_port = get_env("API_PORT", "8080");
     let password = get_env("PASSWORD", "123321");
     let host = std::env::var("HOST").expect("Must set HOST env var");
-    let wg_port = get_env("WG_PORT", "51820");
+    let wg_port = std::env::var("WG_PORT").expect("Must set WG_PORT env var");
     let mtu = get_env("MTU", "0");
     let persistent_keepalive = get_env("PERSISTENT_KEEPALIVE", "25");
     let default_address = get_env("DEFAULT_ADDRESS", "10.8.0.1");

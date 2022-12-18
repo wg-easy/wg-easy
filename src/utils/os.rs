@@ -67,35 +67,6 @@ pub async fn read_file<S: Into<String>>(path: S) -> Result<String, std::io::Erro
         .await
 }
 
-pub async fn load_file_unhandled(path: &str) -> File {
-    match tokio::fs::OpenOptions::new()
-        .read(true)
-        .write(true)
-        .truncate(true)
-        .create(true)
-        .open(path)
-        .await
-    {
-        Ok(file) => file,
-        Err(error) => {
-            log::error!("Could not load file {}: {}", path, error);
-            panic!()
-        }
-    }
-}
-
-pub async fn load_and_read_file_unhandled(path: &str) -> (File, String) {
-    let mut buffer = String::new();
-    let mut file = load_file_unhandled(path).await;
-    match file.read_to_string(&mut buffer).await {
-        Ok(_) => (file, buffer),
-        Err(error) => {
-            log::error!("Could not read file data: {}", error);
-            panic!()
-        }
-    }
-}
-
 pub async fn exec_sh<S: ToString>(command: &S) -> Result<StdResult, Box<dyn Error>> {
     let command = command.to_string();
     info!("$ {}", command.clone());

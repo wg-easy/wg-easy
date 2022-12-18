@@ -17,11 +17,11 @@ pub struct WireGuard {
 }
 
 impl WireGuard {
-    pub async fn new(name: &str, wg_path: String, settings: Settings) -> Self {
-        let path = format!("{}/{}", wg_path, name);
+    pub async fn new(wg_path: String, settings: Settings) -> Self {
+        let path = format!("{}/{}", wg_path, settings.interface_name);
         let config_path = format!("{}.conf", path);
         let memento_path = format!("{}.json", path);
-        let name = format!("{}", name);
+        let name = format!("{}", settings.interface_name);
 
         let counter = Arc::new(settings);
 

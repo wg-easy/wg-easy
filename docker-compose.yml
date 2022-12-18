@@ -15,7 +15,7 @@ services:
       # - API_PORT=8080
       # - PASSWORD=123321
       - HOST=localhost
-      # - WG_PORT=51825
+      - WG_PORT=51820
       # - MTU=0
       # - PERSISTENT_KEEPALIVE=25
       # - DEFAULT_ADDRESS=10.8.0.1
@@ -31,7 +31,7 @@ services:
       - ./data:/etc/wireguard
       - ./application/bin:/usr/local/cargo/bin
     ports:
-      - "8081:51820/udp"
+      - "51820:51820/udp"
       - "8080:8080/tcp"
     cap_add:
       - NET_ADMIN

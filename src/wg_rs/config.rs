@@ -140,13 +140,13 @@ impl Accessor {
         if memento_str.is_empty() {
             log::info!("Creating new WireGuard configuration...");
             os::exec_sh(&"wg genkey")
-                .and_then(|res_public| async move {
-                    os::exec_sh(&format!("echo {} | wg pubkey", &res_public.stdout))
+                .and_then(|res_private| async move {
+                    os::exec_sh(&format!("echo {} | wg pubkey", &res_private.stdout))
                         .await
-                        .map(|res_private| (res_public.stdout, res_private.stdout))
+                        .map(|res_public| (res_private.stdout, res_public.stdout))
                 })
                 .await
-                .and_then(|(public_key, private_key)| {
+                .and_then(|(private_key, public_key)| {
                     let address = settings.default_address.clone();
                     let memento = Memento::new(Server {
                         private_key,
@@ -207,7 +207,7 @@ impl Accessor {
             format!("[Interface]\n"),
             format!("PrivateKey = {}\n", config.server.private_key),
             format!("Address = {}/24\n", config.server.address),
-            format!("ListenPort = 51820\n"),
+            format!("ListenPort = {}\n", self.settings.wg_port),
             format!("PreUp = {}\n", self.settings.pre_up),
             format!("PostUp = {}\n", self.settings.post_up),
             format!("PreDown = {}\n", self.settings.pre_down),
