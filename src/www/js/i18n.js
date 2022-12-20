@@ -49,10 +49,10 @@ const messages = { // eslint-disable-line no-unused-vars
     newClient: 'Создать клиента',
     disableClient: 'Выключить клиента',
     enableClient: 'Включить клиента',
-    noClients: 'Пока нету клиентов.',
-    showQR: 'Показать QR код',
+    noClients: 'Пока нет клиентов.',
+    showQR: 'Показать QR-код',
     downloadConfig: 'Скачать конфигурацию',
-    madeBy: 'Сделано',
+    madeBy: 'Автор',
     donate: 'Поблагодарить',
   },
   tr: { // Müslüm Barış Korkmazer @babico
