@@ -1,0 +1,140 @@
+name: Release
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push to main / master branch in the repository
+  push:
+    branches:
+      - main
+      - master
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  vulnerability-assessment:
+    # The type of runner that the job will run on
+    runs-on: self-hosted
+    # Docker image
+    container: node:16.19.0
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - run: yarn audit --groups dependencies
+        continue-on-error: true
+
+  code-style-check:
+    runs-on: self-hosted
+    container: node:16.19.0
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - run: npx prettier --check .
+
+  code-syntax-check:
+    runs-on: self-hosted
+    container: node:16.19.0
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: NPM Login
+        env:
+          DATOMS_JS_REGISTRY_USER: ${{ secrets.DATOMS_JS_REGISTRY_USER }}
+          DATOMS_JS_REGISTRY_PASSWORD: ${{ secrets.DATOMS_JS_REGISTRY_PASSWORD }}
+          DATOMS_JS_REGISTRY_EMAIL: ${{ secrets.DATOMS_JS_REGISTRY_EMAIL }}
+          DATOMS_JS_REGISTRY_URL: ${{ secrets.DATOMS_JS_REGISTRY_URL }}
+        run: npm i -g npm-cli-login && npm-cli-login -u $DATOMS_JS_REGISTRY_USER -p $DATOMS_JS_REGISTRY_PASSWORD -e $DATOMS_JS_REGISTRY_EMAIL -r $DATOMS_JS_REGISTRY_URL -s @datoms
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+      - name: Setup Yarn Cache
+        uses: actions/cache@v3
+        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - name: NPM Install
+        run: yarn
+      - run: yarn test:syntax
+
+  build:
+    runs-on: self-hosted
+    needs: [vulnerability-assessment, code-style-check, code-syntax-check]
+    steps:
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Docker meta
+        id: docker_meta
+        uses: docker/metadata-action@v4
+        with:
+          # list of Docker images to use as base name for tags
+          images: |
+            ${{ secrets.DATOMS_DOCKER_IMAGE_NAME }}
+          # generate Docker tags based on the following attributes
+          tags: |
+            type=sha,prefix=,format=short
+      # https://docs.docker.com/language/java/configure-ci-cd/#optimize-the-workflow
+      # - name: Cache Docker layers
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: /tmp/.buildx-cache
+      #     key: ${{ runner.os }}-buildx-${{ github.sha }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-buildx-
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          build-args: |
+            DATOMS_JS_REGISTRY_USER=${{ secrets.DATOMS_JS_REGISTRY_USER }}
+            DATOMS_JS_REGISTRY_PASSWORD=${{ secrets.DATOMS_JS_REGISTRY_PASSWORD }}
+            DATOMS_JS_REGISTRY_EMAIL=${{ secrets.DATOMS_JS_REGISTRY_EMAIL }}
+            DATOMS_JS_REGISTRY_URL=${{ secrets.DATOMS_JS_REGISTRY_URL }}
+            CI=${{ secrets.CI }}
+          # cache-from: type=local,src=/tmp/.buildx-cache
+          # cache-to: type=local,dest=/tmp/.buildx-cache
+          push: true
+          tags: ${{ steps.docker_meta.outputs.tags }}
+          labels: ${{ steps.docker_meta.outputs.tags }}
+
+  release:
+    runs-on: self-hosted
+    needs: [build]
+    container: node:16.19.0
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: NPM Login
+        env:
+          DATOMS_JS_REGISTRY_USER: ${{ secrets.DATOMS_JS_REGISTRY_USER }}
+          DATOMS_JS_REGISTRY_PASSWORD: ${{ secrets.DATOMS_JS_REGISTRY_PASSWORD }}
+          DATOMS_JS_REGISTRY_EMAIL: ${{ secrets.DATOMS_JS_REGISTRY_EMAIL }}
+          DATOMS_JS_REGISTRY_URL: ${{ secrets.DATOMS_JS_REGISTRY_URL }}
+        run: npm i -g npm-cli-login && npm-cli-login -u $DATOMS_JS_REGISTRY_USER -p $DATOMS_JS_REGISTRY_PASSWORD -e $DATOMS_JS_REGISTRY_EMAIL -r $DATOMS_JS_REGISTRY_URL -s @datoms
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+      - name: Setup Yarn Cache
+        uses: actions/cache@v3
+        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - name: NPM Install
+        run: yarn
+      - name: Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.DATOMS_GITHUB_TOKEN }}
+        run: yarn semantic-release
