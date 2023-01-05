@@ -229,15 +229,34 @@ Endpoint = ${WG_HOST}:${WG_PORT}`;
     // const preSharedKey = await Util.exec('wg genpsk');
 
     // Calculate next IP
+    // let address;
+    // for (let i = 2; i < 255; i++) {
+    //   const client = Object.values(config.clients).find(client => {
+    //     return client.address === WG_DEFAULT_ADDRESS.replace('x', i);
+    //   });
+
+    //   if (!client) {
+    //     address = WG_DEFAULT_ADDRESS.replace('x', i);
+    //     break;
+    //   }
+    // }
+
+    // if exceed max clients limit increase the range by changing 10.8.0.x to 10.8.y.x i.e increase y only if x is 255 for one value of y
     let address;
-    for (let i = 2; i < 255; i++) {
+    let secondIp = 5;
+    for (let i = 0; i < 255; i++) {
       const client = Object.values(config.clients).find(client => {
-        return client.address === WG_DEFAULT_ADDRESS.replace('x', i);
+        return client.address === `10.8.${secondIp}.${i}`;
       });
 
       if (!client) {
-        address = WG_DEFAULT_ADDRESS.replace('x', i);
+        address = `10.8.${secondIp}.${i}`;
         break;
+      }
+      // increase ip by y (10.8.y.x) if x reaches max value
+      if (i === 254 && secondIp < 10) {
+        secondIp++;
+        i = 0;
       }
     }
 
