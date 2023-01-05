@@ -110,7 +110,6 @@ PostDown = ${WG_POST_DOWN}
 # Client: ${client.name} (${clientId})
 [Peer]
 PublicKey = ${client.publicKey}
-PresharedKey = ${client.preSharedKey}
 AllowedIPs = ${client.address}/32`;
     }
 
@@ -205,7 +204,6 @@ ${WG_MTU ? `MTU = ${WG_MTU}` : ''}
 
 [Peer]
 PublicKey = ${config.server.publicKey}
-PresharedKey = ${client.preSharedKey}
 AllowedIPs = ${WG_ALLOWED_IPS}
 PersistentKeepalive = ${WG_PERSISTENT_KEEPALIVE}
 Endpoint = ${WG_HOST}:${WG_PORT}`;
@@ -228,7 +226,7 @@ Endpoint = ${WG_HOST}:${WG_PORT}`;
 
     const privateKey = await Util.exec('wg genkey');
     const publicKey = await Util.exec(`echo ${privateKey} | wg pubkey`);
-    const preSharedKey = await Util.exec('wg genpsk');
+    // const preSharedKey = await Util.exec('wg genpsk');
 
     // Calculate next IP
     let address;
@@ -254,7 +252,7 @@ Endpoint = ${WG_HOST}:${WG_PORT}`;
       address,
       privateKey,
       publicKey,
-      preSharedKey,
+      // preSharedKey, //unclear generation of preSharedKey
 
       createdAt: new Date(),
       updatedAt: new Date(),
