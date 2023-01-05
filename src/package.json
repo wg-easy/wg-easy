@@ -1,6 +1,6 @@
 {
   "release": 7,
-  "name": "wg-easy",
+  "name": "wireguard-ui",
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
@@ -9,11 +9,11 @@
     "serve-with-password": "PASSWORD=wg npm run serve",
     "lint": "eslint ."
   },
-  "author": "Emile Nijssen",
+  "author": "Sanjay TM",
   "license": "GPL",
   "dependencies": {
     "debug": "^4.3.1",
-    "express": "^4.17.1",
+    "express": "^4.18.2",
     "express-session": "^1.17.1",
     "qrcode": "^1.4.4",
     "uuid": "^8.3.2"
