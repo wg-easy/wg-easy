@@ -292,25 +292,35 @@ Endpoint = ${WG_HOST}:${WG_PORT}`;
     if (config.clients[clientId]) {
       delete config.clients[clientId];
       await this.saveConfig();
+      return {status: 'Client Deleted'};
     }
+    return {status: 'Client Not Found'};
   }
 
   async enableClient({ clientId }) {
     const client = await this.getClient({ clientId });
 
-    client.enabled = true;
-    client.updatedAt = new Date();
+    if (client) {
+      client.enabled = true;
+      client.updatedAt = new Date();
 
-    await this.saveConfig();
+      await this.saveConfig();
+      return {status: 'Client Enabled'};
+    }
+    return {status: 'Client Not Found'};
   }
 
   async disableClient({ clientId }) {
     const client = await this.getClient({ clientId });
 
-    client.enabled = false;
-    client.updatedAt = new Date();
+    if (client) {
+      client.enabled = false;
+      client.updatedAt = new Date();
 
-    await this.saveConfig();
+      await this.saveConfig();
+      return {status: 'Client Disabled'};
+    }
+    return {status: 'Client Not Found'};
   }
 
   async updateClientName({ clientId, name }) {
@@ -320,6 +330,8 @@ Endpoint = ${WG_HOST}:${WG_PORT}`;
     client.updatedAt = new Date();
 
     await this.saveConfig();
+
+    return {status: 'Client Name Updated'};
   }
 
   async updateClientAddress({ clientId, address }) {
@@ -333,6 +345,8 @@ Endpoint = ${WG_HOST}:${WG_PORT}`;
     client.updatedAt = new Date();
 
     await this.saveConfig();
+
+    return {status: 'Client Address Updated'};
   }
 
 };
