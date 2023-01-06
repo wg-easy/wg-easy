@@ -191,9 +191,16 @@ AllowedIPs = ${client.address}/32`;
     return client;
   }
 
+  //get local ip
+  static async getLocalIP() {
+    var ip = await Util.exec('hostname -I');
+    return ip.split(' ')[0];
+  }
+
   async getClientConfiguration({ clientId }) {
     const config = await this.getConfig();
     const client = await this.getClient({ clientId });
+    const localIP = await WireGuard.getLocalIP();
 
     return `
 [Interface]
@@ -206,7 +213,7 @@ ${WG_MTU ? `MTU = ${WG_MTU}` : ''}
 PublicKey = ${config.server.publicKey}
 AllowedIPs = ${WG_ALLOWED_IPS}
 PersistentKeepalive = ${WG_PERSISTENT_KEEPALIVE}
-Endpoint = ${WG_HOST}:${WG_PORT}`;
+Endpoint = ${localIP}:${WG_PORT}`;
   }
 
   async getClientQRCodeSVG({ clientId }) {
