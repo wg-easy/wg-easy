@@ -53,12 +53,17 @@
             </a>
           </div>
         </div>
-
+        
         <div class="shadow-md rounded-lg bg-white overflow-hidden">
           <div class="flex flex-row flex-auto items-center p-3 px-5 border border-b-2 border-gray-100">
             <div class="flex-grow">
               <p class="text-2xl font-medium">Clients</p>
             </div>
+            <!-- search bar -->
+            <div class="flex-grow">
+              <input type="text" v-model="search" placeholder="Search" class="border-2 border-gray-100 py-2 px-4 rounded">
+            </div>
+
             <div class="flex-shrink-0">
               <button @click="clientCreate = true; clientCreateName = ''; clientCreateStoreId = '';"
                 class="hover:bg-red-800 hover:border-red-800 hover:text-white text-gray-700 border-2 border-gray-100 py-2 px-4 rounded inline-flex items-center transition">
@@ -74,7 +79,7 @@
 
           <div>
             <!-- Client -->
-            <div v-if="clients && clients.length > 0" v-for="client in clients" :key="client.id"
+            <div v-if="clients && clients.length > 0" v-for="client in filteredClients" :key="client.id"
               class="relative overflow-hidden border-b border-gray-100 border-solid">
 
               <!-- Chart -->

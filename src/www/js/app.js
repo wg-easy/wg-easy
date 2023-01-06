@@ -31,6 +31,7 @@ new Vue({
     password: null,
     requiresPassword: null,
 
+    search: null,
     clients: null,
     clientsPersist: {},
     clientDelete: null,
@@ -111,6 +112,20 @@ new Vue({
         },
       },
     },
+  },
+  computed: {
+    filteredClients() {
+      if (!this.clients) return null;
+
+      return this.clients.filter(client => {
+        if (!this.search) return true;
+
+        const search = this.search.toLowerCase();
+        return client.name.toLowerCase().includes(search)
+          || client.address.toLowerCase().includes(search)
+          || client.id.toLowerCase().includes(search);
+      });
+    }
   },
   methods: {
     dateTime: value => {
