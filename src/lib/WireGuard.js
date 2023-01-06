@@ -224,7 +224,7 @@ Endpoint = ${localIP}:${WG_PORT}`;
     });
   }
 
-  async createClient({ name }) {
+  async createClient({ name , storeId }) {
     if (!name) {
       throw new Error('Missing: Name');
     }
@@ -275,11 +275,11 @@ Endpoint = ${localIP}:${WG_PORT}`;
     const clientId = uuid.v4();
     const client = {
       name,
+      storeId,
       address,
       privateKey,
       publicKey,
       // preSharedKey, //unclear generation of preSharedKey
-
       createdAt: new Date(),
       updatedAt: new Date(),
 

@@ -109,8 +109,14 @@ module.exports = class Server {
         res.send(config);
       }))
       .post('/api/wireguard/client', Util.promisify(async req => {
-        const { name } = req.body;
-        return WireGuard.createClient({ name });
+        const { name , storeId } = req.body;
+        if (name === undefined) {
+          throw new ServerError('Missing: Name', 400);
+        }
+        if (storeId === undefined) {
+          throw new ServerError('Missing: StoreId', 400);
+        }
+        return WireGuard.createClient({ name , storeId});
       }))
       .delete('/api/wireguard/client/:clientId', Util.promisify(async req => {
         const { clientId } = req.params;

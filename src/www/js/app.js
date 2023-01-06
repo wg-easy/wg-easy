@@ -36,6 +36,7 @@ new Vue({
     clientDelete: null,
     clientCreate: null,
     clientCreateName: '',
+    clientCreateStoreId: '',
     clientEditName: null,
     clientEditNameId: null,
     clientEditAddress: null,
@@ -208,9 +209,11 @@ new Vue({
     },
     createClient() {
       const name = this.clientCreateName;
+      const storeId = this.clientCreateStoreId;
       if (!name) return;
+      if (!storeId) return;
 
-      this.api.createClient({ name })
+      this.api.createClient({ name , storeId })
         .catch(err => alert(err.message || err.toString()))
         .finally(() => this.refresh().catch(console.error));
     },
