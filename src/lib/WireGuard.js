@@ -134,6 +134,7 @@ AllowedIPs = ${client.address}/32`;
     const clients = Object.entries(config.clients).map(([clientId, client]) => ({
       id: clientId,
       name: client.name,
+      storeId: client.storeId,
       enabled: client.enabled,
       address: client.address,
       publicKey: client.publicKey,

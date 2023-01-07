@@ -39,7 +39,7 @@
         </h1>
         <h2 class="text-sm text-gray-400 mb-10"></h2>
 
-        <div v-if="latestRelease" class="bg-red-800 p-4 text-white text-sm font-small mb-10 rounded-md shadow-lg"
+        <!-- <div v-if="latestRelease" class="bg-red-800 p-4 text-white text-sm font-small mb-10 rounded-md shadow-lg"
           :title="`v${currentRelease} → v${latestRelease.version}`">
           <div class="container mx-auto flex flex-row flex-auto items-center">
             <div class="flex-grow">
@@ -52,7 +52,7 @@
               Update →
             </a>
           </div>
-        </div>
+        </div> -->
         
         <div class="shadow-md rounded-lg bg-white overflow-hidden">
           <div class="flex flex-row flex-auto items-center p-3 px-5 border border-b-2 border-gray-100">
@@ -61,7 +61,7 @@
             </div>
             <!-- search bar -->
             <div class="flex-grow">
-              <input type="text" v-model="search" placeholder="Search" class="border-2 border-gray-100 py-2 px-4 rounded">
+              <input type="text" v-model="search" placeholder="Search Store" class="border-2 border-gray-100 py-2 px-4 rounded">
             </div>
 
             <div class="flex-shrink-0">
@@ -234,8 +234,16 @@
                     </span>
                   </div>
                 </div>
+                <div class="flex-grow text-center">
+                  <div class="text-gray-300">
+                    <!-- Store Id -->
+                    <span v-if="client.storeId" :title="'Store Id'">
+                      {{client.storeId}}
+                    </span>
+                  </div>
+                </div>
 
-                <div class="text-right">
+                <div class="flex-grow text-right">
                   <div class="text-gray-400">
 
                     <!-- Enable/Disable -->
@@ -283,6 +291,10 @@
 
               </div>
 
+            </div>
+            <div v-if="clients && clients.length > 0 && filteredClients.length === 0">
+              <p class="text-center m-10 text-gray-400 text-sm">No clients match your search.<br /><br />
+              </p>
             </div>
             <div v-if="clients && clients.length === 0">
               <p class="text-center m-10 text-gray-400 text-sm">There are no clients yet.<br /><br />
