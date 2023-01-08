@@ -79,7 +79,7 @@
 
           <div>
             <!-- Client -->
-            <div v-if="clients && clients.length > 0" v-for="client in filteredClients" :key="client.id"
+            <div v-if="clients && clients.length > 0" v-for="client in currentPage" :key="client.id"
               class="relative overflow-hidden border-b border-gray-100 border-solid">
 
               <!-- Chart -->
@@ -527,7 +527,30 @@
         </svg>
 
       </div>
+      <!-- Previous and Next Button-->
+      <div class="flex justify-between items-center mt-10">
+        <div class="flex-shrink-0">
+          <button v-if="pageNumber > 0" type="button" @click="previousPage"
+            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-800 text-base font-medium text-white hover:bg-red-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
+            ← Previous
+          </button>
+          <button v-else type="button"
+            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-gray-200 text-base font-medium text-white sm:ml-3 sm:w-auto sm:text-sm cursor-not-allowed">
+            ← Previous
+          </button>
+        </div>
 
+        <div class="flex-shrink-0">
+          <button v-if="canGoToNextPage" type="button" @click="nextPage"
+            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-800 text-base font-medium text-white hover:bg-red-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
+            Next →
+          </button>
+          <button v-else type="button"
+            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-gray-200 text-base font-medium text-white sm:ml-3 sm:w-auto sm:text-sm cursor-not-allowed">
+            Next →
+          </button>
+        </div>
+      </div>
     </div>
 
     <p v-cloak class="text-center m-10 text-gray-300 text-xs">Made by <a target="_blank" class="hover:underline"

@@ -31,7 +31,13 @@ new Vue({
     password: null,
     requiresPassword: null,
 
+    prepage: 10,
+    pageNumber: 0,
+    canGoToNextPage: false,
+
     search: null,
+    searchPrevious: null,
+    
     clients: null,
     clientsPersist: {},
     clientDelete: null,
@@ -120,14 +126,37 @@ new Vue({
       return this.clients.filter(client => {
         if (!this.search) return true;
 
+        // Reset page number if search changed
+        if (this.search !== this.searchPrevious) {
+          this.pageNumber = 0;
+          this.searchPrevious = this.search;
+        }
         const search = this.search.toLowerCase();
-        return client.name.toLowerCase().includes(search)
-          || client.address.toLowerCase().includes(search)
-          || client.id.toLowerCase().includes(search);
+        return client.name.toLowerCase().includes(search);
       });
+    },
+
+    currentPage() {
+      if (!this.filteredClients) return null;
+
+      this.canGoToNextPage = this.pageNumber+1 < this.filteredClients.length / this.prepage;
+      return this.filteredClients.slice(this.pageNumber * this.prepage, this.pageNumber * this.prepage + this.prepage);
     }
+
   },
   methods: {
+    nextPage() {
+      if (this.pageNumber < this.clients.length / this.prepage) {
+        this.pageNumber++;
+      }
+    },
+
+    previousPage() {
+      if (this.pageNumber > 0) {
+        this.pageNumber--;
+      }
+    },
+
     dateTime: value => {
       return new Intl.DateTimeFormat(undefined, {
         year: 'numeric',
