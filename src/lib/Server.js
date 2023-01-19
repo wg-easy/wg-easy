@@ -108,6 +108,35 @@ module.exports = class Server {
         res.header('Content-Type', 'text/plain');
         res.send(config);
       }))
+      //get client by storeId
+      .get('/api/wireguard/client/storeId/:storeId', Util.promisify(async (req, res) => {
+        const { storeId } = req.params;
+        debug(storeId);
+        const clientId = await WireGuard.getClientIdByStoreId({ storeId });
+        const config = await WireGuard.getClientConfiguration({ clientId: clientId });
+        const configName = storeId
+          .replace(/[^a-zA-Z0-9_=+.-]/g, '-')
+          .replace(/(-{2,}|-$)/g, '-')
+          .replace(/-$/, '')
+          .substring(0, 32);
+        res.header('Content-Disposition', `attachment; filename="${configName || clientId}.conf"`);
+        res.header('Content-Type', 'text/plain');
+        res.send(config);
+      }))
+      //get client by name //!!! only for old windows API
+      .get('/api/wireguard/client/:name', Util.promisify(async (req, res) => {
+        const { name } = req.params;
+        const clientId = await WireGuard.getClientIdByName({ name });
+        const config = await WireGuard.getClientConfiguration({ clientId: clientId });
+        const configName = name
+          .replace(/[^a-zA-Z0-9_=+.-]/g, '-')
+          .replace(/(-{2,}|-$)/g, '-')
+          .replace(/-$/, '')
+          .substring(0, 32);
+        res.header('Content-Disposition', `attachment; filename="${configName || clientId}.conf"`);
+        res.header('Content-Type', 'text/plain');
+        res.send(config);
+      }))
       .post('/api/wireguard/client', Util.promisify(async req => {
         const { name , storeId } = req.body;
         if (name === undefined) {

@@ -186,10 +186,34 @@ AllowedIPs = ${client.address}/32`;
     const config = await this.getConfig();
     const client = config.clients[clientId];
     if (!client) {
-      throw new ServerError(`Client Not Found: ${clientId}`, 404);
+      throw new ServerError(`Client Not Found2: ${clientId}`, 404);
     }
 
     return client;
+  }
+
+  //get client by storeId
+  async getClientIdByStoreId({ storeId }) {
+    //get all clients
+    const clients = await this.getClients();
+    //find client by storeId
+    const client = clients.find(client => client.storeId === storeId);
+    if (!client) {
+      throw new ServerError(`Client Not Found3: ${storeId}`, 404);
+    }
+    return client.id;
+  }
+
+  //get client by name
+  async getClientIdByName({ name }) {
+    //get all clients
+    const clients = await this.getClients();
+    //find client by name
+    const client = clients.find(client => client.name === name);
+    if (!client) {
+      throw new ServerError(`Client Not Found: ${name}`, 404);
+    }
+    return client.id;
   }
 
   //get local ip
