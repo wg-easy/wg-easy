@@ -1,13 +1,14 @@
 {
   "release": "11",
   "name": "wg-easy",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "",
   "main": "server.js",
   "scripts": {
     "serve": "DEBUG=Server,WireGuard nodemon server.js",
     "serve-with-password": "PASSWORD=wg npm run serve",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "buildcss": "npx tailwindcss -i ./www/src/css/app.css -o ./www/css/app.css --watch"
   },
   "author": "Emile Nijssen",
   "license": "GPL",
@@ -20,7 +21,8 @@
   },
   "devDependencies": {
     "eslint": "^8.53.0",
-    "eslint-config-athom": "^3.1.1"
+    "eslint-config-athom": "^3.1.1",
+    "tailwindcss": "^3.3.5"
   },
   "nodemonConfig": {
     "ignore": [
