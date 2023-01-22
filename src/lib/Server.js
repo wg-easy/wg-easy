@@ -104,7 +104,7 @@ module.exports = class Server {
           .replace(/(-{2,}|-$)/g, '-')
           .replace(/-$/, '')
           .substring(0, 32);
-        res.header('Content-Disposition', `attachment; filename="${configName}.conf"`);
+        res.header('Content-Disposition', `attachment; filename="${configName || clientId}.conf"`);
         res.header('Content-Type', 'text/plain');
         res.send(config);
       }))
