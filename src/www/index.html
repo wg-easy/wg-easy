@@ -121,7 +121,7 @@
                 </div>
               </div>
 
-              <div class="relative p-5 z-10 flex flex-row">
+              <div class="relative p-5 z-10 flex flex-row flex-wrap justify-start">
                 <div class="h-10 w-10 mr-5 rounded-full bg-gray-50 relative">
                   <svg class="w-6 m-2 text-gray-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                     fill="currentColor">
@@ -137,7 +137,7 @@
                   </div>
                 </div>
 
-                <div class="flex-grow">
+                <div class="sm:flex-grow">
 
                   <!-- Name -->
                   <div class="text-gray-700 group" :title="'Created on ' + dateTime(new Date(client.createdAt))">
@@ -148,8 +148,8 @@
                       v-on:keyup.escape="clientEditName = null; clientEditNameId = null;"
                       :ref="'client-' + client.id + '-name'"
                       class="rounded px-1 border-2 border-gray-100 focus:border-gray-200 outline-none w-30" />
-                    <span v-show="clientEditNameId !== client.id"
-                      class="inline-block border-t-2 border-b-2 border-transparent">{{client.name}}</span>
+                    <span v-show="clientEditNameId !== client.id" style="max-width: 28ch;"
+                      class="inline-block border-t-2 border-b-2 border-transparent align-top sm:w-auto overflow-hidden sm:overflow-visible overflow-ellipsis">{{client.name}}</span>
 
                     <!-- Edit -->
                     <span v-show="clientEditNameId !== client.id"
@@ -230,7 +230,7 @@
                   </div>
                 </div>
 
-                <div class="text-right">
+                <div class="text-right w-full sm:w-auto mt-3 sm:mt-0">
                   <div class="text-gray-400">
 
                     <!-- Enable/Disable -->
