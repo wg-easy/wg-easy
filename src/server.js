@@ -5,7 +5,7 @@ require('./services/Server');
 const WireGuard = require('./services/WireGuard');
 
 WireGuard.getConfig()
-  .catch(err => {
+  .catch((err) => {
   // eslint-disable-next-line no-console
     console.error(err);
 
