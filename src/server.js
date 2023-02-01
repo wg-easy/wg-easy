@@ -1,8 +1,8 @@
-"use strict";
+'use strict';
 
-require("./services/Server");
+require('./services/Server');
 
-const WireGuard = require("./services/WireGuard");
+const WireGuard = require('./services/WireGuard');
 
 WireGuard.getConfig()
   .catch(err => {
