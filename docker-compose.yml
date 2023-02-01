@@ -1,4 +1,7 @@
 version: "3.8"
+volumes:
+  etc_wireguard:
+
 services:
   wg-easy:
     environment:
@@ -18,10 +21,10 @@ services:
       # - WG_PRE_DOWN=echo "Pre Down" > /etc/wireguard/pre-down.txt
       # - WG_POST_DOWN=echo "Post Down" > /etc/wireguard/post-down.txt
       
-    image: weejewel/wg-easy
+    image: peterlewis/wg-easy
     container_name: wg-easy
     volumes:
-      - .:/etc/wireguard
+      - etc_wireguard:/etc/wireguard
     ports:
       - "51820:51820/udp"
       - "51821:51821/tcp"
