@@ -1,6 +1,6 @@
 # WireGuard Easy
 
-[![Build & Publish Docker Image to Docker Hub](https://github.com/peterlewis/wg-easy/actions/workflows/deploy.yml/badge.svg?branch=production)](https://github.com/WeeJeWel/wg-easy/actions/workflows/deploy.yml)
+[![Build & Publish Docker Image to Docker Hub](https://github.com/peterlewis/wg-easy/actions/workflows/deploy.yml/badge.svg?branch=production)](https://github.com/peterlewis/wg-easy/actions/workflows/deploy.yml)
 [![Lint](https://github.com/peterlewis/wg-easy/actions/workflows/lint.yml/badge.svg?branch=master)](https://github.com/peterlewis/wg-easy/actions/workflows/lint.yml)
 [![Docker](https://img.shields.io/docker/v/peterlewis/wg-easy/latest)](https://hub.docker.com/r/peterlewis/wg-easy)
 [![Docker](https://img.shields.io/docker/pulls/peterlewis/wg-easy.svg)](https://hub.docker.com/r/peterlewis/wg-easy)
