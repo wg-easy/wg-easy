@@ -112,7 +112,7 @@ new Vue({
     },
   },
   methods: {
-    dateTime: value => {
+    dateTime: (value) => {
       return new Intl.DateTimeFormat(undefined, {
         year: 'numeric',
         month: 'short',
@@ -127,7 +127,7 @@ new Vue({
       if (!this.authenticated) return;
 
       const clients = await this.api.getClients();
-      this.clients = clients.map(client => {
+      this.clients = clients.map((client) => {
         if (client.name.includes('@') && client.name.includes('.')) {
           client.avatar = `https://www.gravatar.com/avatar/${md5(client.name)}?d=blank`;
         }
@@ -186,7 +186,7 @@ new Vue({
           this.requiresPassword = session.requiresPassword;
           return this.refresh();
         })
-        .catch(err => {
+        .catch((err) => {
           alert(err.message || err.toString());
         })
         .finally(() => {
@@ -202,7 +202,7 @@ new Vue({
           this.authenticated = false;
           this.clients = null;
         })
-        .catch(err => {
+        .catch((err) => {
           alert(err.message || err.toString());
         });
     },
@@ -211,54 +211,54 @@ new Vue({
       if (!name) return;
 
       this.api.createClient({ name })
-        .catch(err => alert(err.message || err.toString()))
+        .catch((err) => alert(err.message || err.toString()))
         .finally(() => this.refresh().catch(console.error));
     },
     deleteClient(client) {
       this.api.deleteClient({ clientId: client.id })
-        .catch(err => alert(err.message || err.toString()))
+        .catch((err) => alert(err.message || err.toString()))
         .finally(() => this.refresh().catch(console.error));
     },
     enableClient(client) {
       this.api.enableClient({ clientId: client.id })
-        .catch(err => alert(err.message || err.toString()))
+        .catch((err) => alert(err.message || err.toString()))
         .finally(() => this.refresh().catch(console.error));
     },
     disableClient(client) {
       this.api.disableClient({ clientId: client.id })
-        .catch(err => alert(err.message || err.toString()))
+        .catch((err) => alert(err.message || err.toString()))
         .finally(() => this.refresh().catch(console.error));
     },
     updateClientName(client, name) {
       this.api.updateClientName({ clientId: client.id, name })
-        .catch(err => alert(err.message || err.toString()))
+        .catch((err) => alert(err.message || err.toString()))
         .finally(() => this.refresh().catch(console.error));
     },
     updateClientAddress(client, address) {
       this.api.updateClientAddress({ clientId: client.id, address })
-        .catch(err => alert(err.message || err.toString()))
+        .catch((err) => alert(err.message || err.toString()))
         .finally(() => this.refresh().catch(console.error));
     },
   },
   filters: {
     bytes,
-    timeago: value => {
+    timeago: (value) => {
       return timeago().format(value);
     },
   },
   mounted() {
     this.api = new API();
     this.api.getSession()
-      .then(session => {
+      .then((session) => {
         this.authenticated = session.authenticated;
         this.requiresPassword = session.requiresPassword;
         this.refresh({
           updateCharts: true,
-        }).catch(err => {
+        }).catch((err) => {
           alert(err.message || err.toString());
         });
       })
-      .catch(err => {
+      .catch((err) => {
         alert(err.message || err.toString());
       });
 
@@ -271,8 +271,8 @@ new Vue({
     Promise.resolve().then(async () => {
       const currentRelease = await this.api.getRelease();
       const latestRelease = await fetch('https://weejewel.github.io/wg-easy/changelog.json')
-        .then(res => res.json())
-        .then(releases => {
+        .then((res) => res.json())
+        .then((releases) => {
           const releasesArray = Object.entries(releases).map(([version, changelog]) => ({
             version: parseInt(version, 10),
             changelog,
