@@ -82,6 +82,7 @@ These options can be configured by setting environment variables using `-e KEY="
 | Env | Default | Example | Description |
 | - | - | - | - |
 | `PASSWORD` | - | `foobar123` | When set, requires a password when logging in to the Web UI. |
+| `PASSWORD_FILE` | - | `/run/secrets/password` | Path to a mounted password file. When set, contents of the file will override value from `PASSWORD`. |
 | `WG_HOST` | - | `vpn.myserver.com` | The public hostname of your VPN server. |
 | `WG_PORT` | `51820` | `12345` | The public UDP port of your VPN server. WireGuard will always listen on `51820` inside the Docker container. |
 | `WG_MTU` | `null` | `1420` | The MTU the clients will use. Server uses default WG MTU. |
