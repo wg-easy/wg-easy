@@ -10,7 +10,7 @@ module.exports.PASSWORD = process.env.PASSWORD;
 // if not, then print the error and proceed
 if ('PASSWORD_FILE' in process.env && fs.existsSync(process.env.PASSWORD_FILE)) {
   try {
-    module.exports.PASSWORD = fs.readFileSync(process.env.PASSWORD_FILE, 'utf8');
+    module.exports.PASSWORD = fs.readFileSync(process.env.PASSWORD_FILE, 'utf8').replace(/[\n\r]/g, '');
   } catch (err) {
     console.error('Could not load the PASSWORD_FILE, using the contents of the PASSWORD variable instead');
   }
