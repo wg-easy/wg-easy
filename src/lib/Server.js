@@ -138,6 +138,16 @@ module.exports = class Server {
       .listen(PORT, () => {
         debug(`Listening on http://0.0.0.0:${PORT}`);
       });
+
+      process.on('SIGTERM', async () => {
+        debug('SIGTERM signal received: exiting')
+        Util.exec('wg-quick down wg0').then(() => {
+          debug('cleaned up wireguard');
+        });
+        this.app.close(() => {
+          debug('HTTP server closed')
+        })
+      })
   }
 
 };
