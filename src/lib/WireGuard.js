@@ -13,6 +13,7 @@ const ServerError = require('./ServerError');
 const {
   WG_PATH,
   WG_HOST,
+  IPIFY_URL,
   WG_PORT,
   WG_MTU,
   WG_DEFAULT_DNS,
@@ -30,8 +31,8 @@ module.exports = class WireGuard {
   async getConfig() {
     if (!this.__configPromise) {
       this.__configPromise = Promise.resolve().then(async () => {
-        if (!WG_HOST) {
-          throw new Error('WG_HOST Environment Variable Not Set!');
+        if (!WG_HOST && !IPIFY_URL) {
+          throw new Error('WG_HOST or IPIFY_URL Environment Variable Not Set!');
         }
 
         debug('Loading configuration...');
@@ -192,9 +193,19 @@ AllowedIPs = ${client.address}/32`;
     return client;
   }
 
+  async getPublicIp() {
+    if (IPIFY_URL == "") {
+      return WG_HOST
+    }
+    const response = await fetch(IPIFY_URL);
+    const data = await response.json();
+    return data.ip;
+  }
+
   async getClientConfiguration({ clientId }) {
     const config = await this.getConfig();
     const client = await this.getClient({ clientId });
+    const host = await this.getPublicIp();
 
     return `
 [Interface]
@@ -208,7 +219,7 @@ PublicKey = ${config.server.publicKey}
 PresharedKey = ${client.preSharedKey}
 AllowedIPs = ${WG_ALLOWED_IPS}
 PersistentKeepalive = ${WG_PERSISTENT_KEEPALIVE}
-Endpoint = ${WG_HOST}:${WG_PORT}`;
+Endpoint = ${host}:${WG_PORT}`;
   }
 
   async getClientQRCodeSVG({ clientId }) {
