@@ -19,6 +19,7 @@ const {
   WG_DEFAULT_ADDRESS,
   WG_PERSISTENT_KEEPALIVE,
   WG_ALLOWED_IPS,
+  ENFORCE_WG_ALLOWED_IPS,
   WG_PRE_UP,
   WG_POST_UP,
   WG_PRE_DOWN,
@@ -96,7 +97,13 @@ module.exports = class WireGuard {
 PrivateKey = ${config.server.privateKey}
 Address = ${config.server.address}/24
 ListenPort = 51820
-PreUp = ${WG_PRE_UP}
+`;
+
+    if (ENFORCE_WG_ALLOWED_IPS) {
+      result += `AllowedIPs = ${WG_ALLOWED_IPS}\n`;
+    }
+
+    result += `PreUp = ${WG_PRE_UP}
 PostUp = ${WG_POST_UP}
 PreDown = ${WG_PRE_DOWN}
 PostDown = ${WG_POST_DOWN}
