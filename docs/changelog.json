@@ -7,5 +7,5 @@
   "6": "Many small performance improvements & bug fixes. Enjoy!",
   "7": "Improved the look & performance of the upload/download chart."
   "8": "Updated NodeJS to v18, updated Node modules, improved layout on mobile devices & linting fixes."
-  "8.0.1": "Updated NodeJS to v18.14.1 and bump node dependencies, both by @pheiduck in #17 and #18."
+  "9": "Updated NodeJS to v18.14.1 and bump node dependencies, both by @pheiduck in #17 and #18."
 }
