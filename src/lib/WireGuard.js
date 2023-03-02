@@ -15,6 +15,7 @@ const {
   WG_HOST,
   WG_PORT,
   WG_MTU,
+  WG_TABLE,
   WG_DEFAULT_DNS,
   WG_DEFAULT_ADDRESS,
   WG_PERSISTENT_KEEPALIVE,
@@ -102,6 +103,11 @@ PreDown = ${WG_PRE_DOWN}
 PostDown = ${WG_POST_DOWN}
 `;
 
+    if (WG_TABLE) {
+      result += `
+Table = ${WG_TABLE}
+`;
+    }
     for (const [clientId, client] of Object.entries(config.clients)) {
       if (!client.enabled) continue;
 
