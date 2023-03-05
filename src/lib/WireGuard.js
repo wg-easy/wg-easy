@@ -112,6 +112,11 @@ PostDown = ${WG_POST_DOWN}
 PublicKey = ${client.publicKey}
 PresharedKey = ${client.preSharedKey}
 AllowedIPs = ${client.address}/32`;
+      debug(client.name);
+      debug(client.name === 'Homeserver');
+      if (client.name === 'Homeserver') {
+        result += ',10.0.0.0/24,10.0.3.0/24';
+      }
     }
 
     debug('Config saving...');
