@@ -1,7 +1,7 @@
-# WireGuard Easy
+# WireGuard Easy-Breezy
 
-[![Build & Publish Docker Image to Docker Hub](https://github.com/WeeJeWel/wg-easy/actions/workflows/deploy.yml/badge.svg?branch=production)](https://github.com/WeeJeWel/wg-easy/actions/workflows/deploy.yml)
-[![Lint](https://github.com/WeeJeWel/wg-easy/actions/workflows/lint.yml/badge.svg?branch=master)](https://github.com/WeeJeWel/wg-easy/actions/workflows/lint.yml)
+[![Build & Publish Docker Image to Docker Hub](https://github.com/Dev-A-Line/wg-breezy/actions/workflows/deploy.yml/badge.svg?branch=production)](https://github.com/Dev-A-Line/wg-breezy/actions/workflows/deploy.yml)
+[![Lint](https://github.com/Dev-A-Line/wg-breezy/actions/workflows/lint.yml/badge.svg?branch=master)](https://github.com/Dev-A-Line/wg-breezy/actions/workflows/lint.yml)
 [![Docker](https://img.shields.io/docker/v/weejewel/wg-easy/latest)](https://hub.docker.com/r/weejewel/wg-easy)
 [![Docker](https://img.shields.io/docker/pulls/weejewel/wg-easy.svg)](https://hub.docker.com/r/weejewel/wg-easy)
 [![Sponsor](https://img.shields.io/github/sponsors/weejewel)](https://github.com/sponsors/WeeJeWel)
@@ -45,14 +45,14 @@ And log in again.
 
 ### 2. Run WireGuard Easy
 
-To automatically install & run wg-easy, simply run:
+To automatically install & run wg-breezy, simply run:
 
 <pre>
 $ docker run -d \
-  --name=wg-easy \
+  --name=wg-breezy \
   -e WG_HOST=<b>🚨YOUR_SERVER_IP</b> \
   -e PASSWORD=<b>🚨YOUR_ADMIN_PASSWORD</b> \
-  -v ~/.wg-easy:/etc/wireguard \
+  -v ~/.wg-breezy:/etc/wireguard \
   -p 51820:51820/udp \
   -p 51821:51821/tcp \
   --cap-add=NET_ADMIN \
@@ -60,7 +60,7 @@ $ docker run -d \
   --sysctl="net.ipv4.conf.all.src_valid_mark=1" \
   --sysctl="net.ipv4.ip_forward=1" \
   --restart unless-stopped \
-  weejewel/wg-easy
+  devaline/wg-breezy
 </pre>
 
 > 💡 Replace `YOUR_SERVER_IP` with your WAN IP, or a Dynamic DNS hostname.
@@ -69,11 +69,11 @@ $ docker run -d \
 
 The Web UI will now be available on `http://0.0.0.0:51821`.
 
-> 💡 Your configuration files will be saved in `~/.wg-easy`
+> 💡 Your configuration files will be saved in `~/.wg-breezy`
 
 ### 3. Sponsor
 
-Are you enjoying this project? [Buy me a beer!](https://github.com/sponsors/WeeJeWel) 🍻
+Are you enjoying this project? [Buy me a beer!](https://github.com/sponsors/Dev-A-Line) 🍻
 
 ## Options
 
@@ -89,10 +89,10 @@ These options can be configured by setting environment variables using `-e KEY="
 | `WG_DEFAULT_ADDRESS` | `10.8.0.x` | `10.6.0.x` | Clients IP address range. |
 | `WG_DEFAULT_DNS` | `1.1.1.1` | `8.8.8.8, 8.8.4.4` | DNS server clients will use. |
 | `WG_ALLOWED_IPS` | `0.0.0.0/0, ::/0` | `192.168.15.0/24, 10.0.1.0/24` | Allowed IPs clients will use. |
-| `WG_PRE_UP` | `...` | - | See [config.js](https://github.com/WeeJeWel/wg-easy/blob/master/src/config.js#L19) for the default value. |
-| `WG_POST_UP` | `...` | `iptables ...` | See [config.js](https://github.com/WeeJeWel/wg-easy/blob/master/src/config.js#L20) for the default value. |
-| `WG_PRE_DOWN` | `...` | - | See [config.js](https://github.com/WeeJeWel/wg-easy/blob/master/src/config.js#L27) for the default value. |
-| `WG_POST_DOWN` | `...` | `iptables ...` | See [config.js](https://github.com/WeeJeWel/wg-easy/blob/master/src/config.js#L28) for the default value. |
+| `WG_PRE_UP` | `...` | - | See [config.js](https://github.com/Dev-A-Line/wg-breezy/blob/master/src/config.js#L19) for the default value. |
+| `WG_POST_UP` | `...` | `iptables ...` | See [config.js](https://github.com/Dev-A-Line/wg-breezy/blob/master/src/config.js#L20) for the default value. |
+| `WG_PRE_DOWN` | `...` | - | See [config.js](https://github.com/Dev-A-Line/wg-breezy/blob/master/src/config.js#L27) for the default value. |
+| `WG_POST_DOWN` | `...` | `iptables ...` | See [config.js](https://github.com/Dev-A-Line/wg-breezy/blob/master/src/config.js#L28) for the default value. |
 
 > If you change `WG_PORT`, make sure to also change the exposed port.
 
@@ -101,14 +101,14 @@ These options can be configured by setting environment variables using `-e KEY="
 To update to the latest version, simply run:
 
 ```bash
-docker stop wg-easy
-docker rm wg-easy
-docker pull weejewel/wg-easy
+docker stop wg-breezy
+docker rm wg-breezy
+docker pull devaline/wg-breezy
 ```
 
 And then run the `docker run -d \ ...` command above again.
 
 ## Common Use Cases
 
-* [Using WireGuard-Easy with Pi-Hole](https://github.com/WeeJeWel/wg-easy/wiki/Using-WireGuard-Easy-with-Pi-Hole)
-* [Using WireGuard-Easy with nginx/SSL](https://github.com/WeeJeWel/wg-easy/wiki/Using-WireGuard-Easy-with-nginx-SSL)
+* [Using WireGuard-Easy with Pi-Hole](https://github.com/Dev-A-Line/wg-breezy/wiki/Using-WireGuard-Easy-with-Pi-Hole)
+* [Using WireGuard-Easy with nginx/SSL](https://github.com/Dev-A-Line/wg-breezy/wiki/Using-WireGuard-Easy-with-nginx-SSL)
