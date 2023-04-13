@@ -1,6 +1,6 @@
 {
   "release": 7,
-  "name": "wg-easy",
+  "name": "wg-breezy",
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
@@ -28,6 +28,6 @@
     ]
   },
   "engines": {
-    "node": "14"
+    "node": "16"
   }
 }
