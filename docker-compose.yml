@@ -1,6 +1,6 @@
 version: "3.8"
 services:
-  wg-easy:
+  wg-breezy:
     environment:
       # ⚠️ Required:
       # Change this to your host's public address
@@ -18,8 +18,8 @@ services:
       # - WG_PRE_DOWN=echo "Pre Down" > /etc/wireguard/pre-down.txt
       # - WG_POST_DOWN=echo "Post Down" > /etc/wireguard/post-down.txt
       
-    image: weejewel/wg-easy
-    container_name: wg-easy
+    image: devaline/wg-breezy
+    container_name: wg-breezy
     volumes:
       - .:/etc/wireguard
     ports:
