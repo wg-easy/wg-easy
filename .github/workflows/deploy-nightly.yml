@@ -3,7 +3,7 @@ name: Build & Publish Docker Image to Docker Hub
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 12 * * *"
+    - cron: "0 0 * * *"
 
 jobs:
   deploy:
