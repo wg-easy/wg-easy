@@ -30,8 +30,13 @@ module.exports = class WireGuard {
   async getConfig() {
     if (!this.__configPromise) {
       this.__configPromise = Promise.resolve().then(async () => {
+        let wgHost;
         if (!WG_HOST) {
           throw new Error('WG_HOST Environment Variable Not Set!');
+        } else if (WG_HOST === 'auto') {
+          wgHost = await Util.exec('curl -s icanhazip.com');
+        } else {
+          wgHost = WG_HOST;
         }
 
         debug('Loading configuration...');
@@ -52,6 +57,7 @@ module.exports = class WireGuard {
               privateKey,
               publicKey,
               address,
+              wgHost,
             },
             clients: {},
           };
@@ -208,7 +214,7 @@ PublicKey = ${config.server.publicKey}
 PresharedKey = ${client.preSharedKey}
 AllowedIPs = ${WG_ALLOWED_IPS}
 PersistentKeepalive = ${WG_PERSISTENT_KEEPALIVE}
-Endpoint = ${WG_HOST}:${WG_PORT}`;
+Endpoint = ${config.server.wgHost || WG_HOST}:${WG_PORT}`;
   }
 
   async getClientQRCodeSVG({ clientId }) {
