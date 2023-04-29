@@ -51,4 +51,4 @@ ENV DEBUG=Server,WireGuard
 
 # Run Web UI
 WORKDIR /app
-CMD ["/usr/bin/dumb-init", "./prometheus_wireguard_exporter", "node", "server.js"]
+CMD ["/usr/bin/dumb-init", "./prometheus_wireguard_exporter", "-p 51822", "2>&1", "&", "node", "server.js"]
