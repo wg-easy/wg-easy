@@ -7,7 +7,8 @@
   "scripts": {
     "serve": "DEBUG=Server,WireGuard nodemon server.js",
     "serve-with-password": "PASSWORD=wg npm run serve",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "buildcss": "npx tailwindcss -i ./www/src/css/app.css -o ./www/css/app.css --watch"
   },
   "author": "Emile Nijssen",
   "license": "GPL",
@@ -20,7 +21,8 @@
   },
   "devDependencies": {
     "eslint": "^7.27.0",
-    "eslint-config-athom": "^2.1.0"
+    "eslint-config-athom": "^2.1.0",
+    "tailwindcss": "^3.3.2"
   },
   "nodemonConfig": {
     "ignore": [

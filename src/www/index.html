@@ -3,19 +3,14 @@
 
 <head>
   <title>WireGuard</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="./css/app.css" rel="stylesheet">
   <script>
-    tailwind.config = {
-      darkMode: 'class',
-    }
-
     if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
       document.documentElement.classList.add('dark')
     } else {
       document.documentElement.classList.remove('dark')
     }
   </script>
-  <!-- <link href="./css/vendor/tailwind.min.css" rel="stylesheet"> -->
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" type="image/png" href="./img/favicon.png">
   <link rel="apple-touch-icon" href="./img/apple-touch-icon.png">
