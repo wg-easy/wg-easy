@@ -110,8 +110,12 @@ PostDown = ${WG_POST_DOWN}
 # Client: ${client.name} (${clientId})
 [Peer]
 PublicKey = ${client.publicKey}
-PresharedKey = ${client.preSharedKey}
 AllowedIPs = ${client.address}/32`;
+
+      if (client.preSharedKey) {
+        result += `
+PresharedKey = ${client.preSharedKey}`;
+      }
     }
 
     debug('Config saving...');
@@ -196,7 +200,7 @@ AllowedIPs = ${client.address}/32`;
     const config = await this.getConfig();
     const client = await this.getClient({ clientId });
 
-    return `
+    let result = `
 [Interface]
 PrivateKey = ${client.privateKey}
 Address = ${client.address}/24
@@ -205,10 +209,16 @@ ${WG_MTU ? `MTU = ${WG_MTU}` : ''}
 
 [Peer]
 PublicKey = ${config.server.publicKey}
-PresharedKey = ${client.preSharedKey}
 AllowedIPs = ${WG_ALLOWED_IPS}
 PersistentKeepalive = ${WG_PERSISTENT_KEEPALIVE}
 Endpoint = ${WG_HOST}:${WG_PORT}`;
+
+    if (client.preSharedKey) {
+      result += `
+PresharedKey = ${client.preSharedKey}`;
+    }
+
+    return result;
   }
 
   async getClientQRCodeSVG({ clientId }) {
