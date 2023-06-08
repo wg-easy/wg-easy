@@ -19,6 +19,7 @@ const {
   WG_DEFAULT_ADDRESS,
   WG_PERSISTENT_KEEPALIVE,
   WG_ALLOWED_IPS,
+  WG_HOMESERVER_ALLOWED_IPS,
   WG_PRE_UP,
   WG_POST_UP,
   WG_PRE_DOWN,
@@ -114,8 +115,8 @@ PresharedKey = ${client.preSharedKey}
 AllowedIPs = ${client.address}/32`;
       debug(client.name);
       debug(client.name === 'Homeserver');
-      if (client.name === 'Homeserver') {
-        result += ',10.0.0.0/24,10.0.3.0/24';
+      if (client.name === 'Homeserver' && WG_HOMESERVER_ALLOWED_IPS) {
+        result += ',' + WG_HOMESERVER_ALLOWED_IPS;
       }
     }
 
