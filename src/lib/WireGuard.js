@@ -116,7 +116,7 @@ AllowedIPs = ${client.address}/32`;
       debug(client.name);
       debug(client.name === 'Homeserver');
       if (client.name === 'Homeserver' && WG_HOMESERVER_ALLOWED_IPS) {
-        result += ',' + WG_HOMESERVER_ALLOWED_IPS;
+        result += `,${WG_HOMESERVER_ALLOWED_IPS}`;
       }
     }
 
