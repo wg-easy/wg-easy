@@ -1,6 +1,7 @@
 'use strict';
 
 const path = require('path');
+const crypto = require('crypto');
 
 const express = require('express');
 const expressSession = require('express-session');
@@ -73,6 +74,22 @@ module.exports = class Server {
 
         if (req.session && req.session.authenticated) {
           return next();
+        }
+
+        if (req.path.startsWith('/api/') && req.headers['authorization']) {
+          const authorizationHash = crypto.createHash('sha256')
+            .update(req.headers['authorization'])
+            .digest('hex');
+          const passwordHash = crypto.createHash('sha256')
+            .update(PASSWORD)
+            .digest('hex');
+          if (crypto.timingSafeEqual(Buffer.from(authorizationHash), Buffer.from(passwordHash))) {
+            return next();
+          }
+
+          return res.status(401).json({
+            error: 'Incorrect Password',
+          });
         }
 
         return res.status(401).json({
