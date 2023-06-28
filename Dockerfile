@@ -9,7 +9,7 @@
 # #
 # #
 
-FROM docker.io/library/node:20-alpine AS build_node_modules
+FROM docker.io/library/node:20-alpine@sha256:77516e190b36147a51d2d1b85b52f57592fe956b1dbeea57a3d618a0affd5104 AS build_node_modules
 
 # Copy Web UI
 COPY src/ /app/
@@ -18,7 +18,7 @@ RUN npm ci --production
 
 # Copy build result to a new image.
 # This saves a lot of disk space.
-FROM docker.io/library/node:20-alpine
+FROM docker.io/library/node:20-alpine@sha256:77516e190b36147a51d2d1b85b52f57592fe956b1dbeea57a3d618a0affd5104
 COPY --from=build_node_modules /app /app
 
 # Move node_modules one directory up, so during development
