@@ -47,11 +47,11 @@ And log in again.
 
 To automatically install & run wg-easy, simply run:
 
-<pre>
+```shell
 $ docker run -d \
   --name=wg-easy \
-  -e WG_HOST=<b>🚨YOUR_SERVER_IP</b> \
-  -e PASSWORD=<b>🚨YOUR_ADMIN_PASSWORD</b> \
+  -e WG_HOST=🚨YOUR_SERVER_IP \
+  -e PASSWORD=🚨YOUR_ADMIN_PASSWORD \
   -v ~/.wg-easy:/etc/wireguard \
   -p 51820:51820/udp \
   -p 51821:51821/tcp \
@@ -61,7 +61,34 @@ $ docker run -d \
   --sysctl="net.ipv4.ip_forward=1" \
   --restart unless-stopped \
   weejewel/wg-easy
-</pre>
+```
+
+Or to use Docker Compose ([installation](https://docs.docker.com/compose/install/)), create the file `docker-compose.yml` with the following contents:
+
+```yaml
+version: '3.3'
+services:
+    wg-easy:
+        container_name: wg-easy
+        environment:
+            - WG_HOST=🚨YOUR_SERVER_IP
+            - PASSWORD=🚨YOUR_ADMIN_PASSWORD
+        volumes:
+            - '~/.wg-easy:/etc/wireguard'
+        cap_add:
+            - NET_ADMIN
+            - SYS_MODULE
+        sysctls:
+            - net.ipv4.conf.all.src_valid_mark=1
+            - net.ipv4.ip_forward=1
+        ports:
+            - '51820:51820/udp'
+            - '51821:51821/tcp'
+        restart: unless-stopped
+        image: weejewel/wg-easy
+```
+
+and then run `$ docker compose up -d` in the same directory as the file you just created.
 
 > 💡 Replace `YOUR_SERVER_IP` with your WAN IP, or a Dynamic DNS hostname.
 > 
@@ -77,7 +104,7 @@ Are you enjoying this project? [Buy me a beer!](https://github.com/sponsors/WeeJ
 
 ## Options
 
-These options can be configured by setting environment variables using `-e KEY="VALUE"` in the `docker run` command.
+These options can be configured by setting environment variables using `-e KEY="VALUE"` in the `docker run` command or by adding additional lines in the format `- KEY=VALUE` in the `environment` section if using Compose.
 
 | Env | Default | Example | Description |
 | - | - | - | - |
@@ -107,7 +134,7 @@ docker rm wg-easy
 docker pull weejewel/wg-easy
 ```
 
-And then run the `docker run -d \ ...` command above again.
+And then run the `docker run -d \ ...` command above again. Alternatively, if using Docker Compose navigate to the folder containing your `docker-compose.yml` file and run `$ docker compose up`.
 
 ## Common Use Cases
 
