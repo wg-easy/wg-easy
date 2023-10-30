@@ -2,10 +2,6 @@
 
 [![Build & Publish Docker Image to Docker Hub](https://github.com/Dev-A-Line/wg-breezy/actions/workflows/deploy.yml/badge.svg?branch=production)](https://github.com/Dev-A-Line/wg-breezy/actions/workflows/deploy.yml)
 [![Lint](https://github.com/Dev-A-Line/wg-breezy/actions/workflows/lint.yml/badge.svg?branch=master)](https://github.com/Dev-A-Line/wg-breezy/actions/workflows/lint.yml)
-[![Docker](https://img.shields.io/docker/v/weejewel/wg-easy/latest)](https://hub.docker.com/r/weejewel/wg-easy)
-[![Docker](https://img.shields.io/docker/pulls/weejewel/wg-easy.svg)](https://hub.docker.com/r/weejewel/wg-easy)
-[![Sponsor](https://img.shields.io/github/sponsors/weejewel)](https://github.com/sponsors/WeeJeWel)
-![GitHub Stars](https://img.shields.io/github/stars/weejewel/wg-easy)
 
 You have found the easiest way to install & manage WireGuard on any Linux host!
 
