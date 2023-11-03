@@ -1,11 +1,11 @@
 # WireGuard Easy
 
-[![Build & Publish Docker Image to Docker Hub](https://github.com/peterlewis/wg-easy/actions/workflows/deploy.yml/badge.svg?branch=production)](https://github.com/peterlewis/wg-easy/actions/workflows/deploy.yml)
-[![Lint](https://github.com/peterlewis/wg-easy/actions/workflows/lint.yml/badge.svg?branch=master)](https://github.com/peterlewis/wg-easy/actions/workflows/lint.yml)
-[![Docker](https://img.shields.io/docker/v/peterlewis/wg-easy/latest)](https://hub.docker.com/r/peterlewis/wg-easy)
-[![Docker](https://img.shields.io/docker/pulls/peterlewis/wg-easy.svg)](https://hub.docker.com/r/peterlewis/wg-easy)
+[![Build & Publish Docker Image to Docker Hub](https://github.com/pheiduck/wg-easy/actions/workflows/deploy.yml/badge.svg?branch=production)](https://github.com/pheiduck/wg-easy/actions/workflows/deploy.yml)
+[![Lint](https://github.com/pheiduck/wg-easy/actions/workflows/lint.yml/badge.svg?branch=master)](https://github.com/pheiduck/wg-easy/actions/workflows/lint.yml)
+[![Docker](https://img.shields.io/docker/v/pheiduck/wg-easy/latest)](https://hub.docker.com/r/pheiduck/wg-easy)
+[![Docker](https://img.shields.io/docker/pulls/pheiduck/wg-easy.svg)](https://hub.docker.com/r/pheiduck/wg-easy)
 [![Sponsor](https://img.shields.io/github/sponsors/WeeJeWel)](https://github.com/sponsors/WeeJeWel)
-![GitHub Stars](https://img.shields.io/github/stars/peterlewis/wg-easy)
+![GitHub Stars](https://img.shields.io/github/stars/pheiduck/wg-easy)
 
 You have found the easiest way to install & manage WireGuard on any Linux host!
 
@@ -60,7 +60,7 @@ $ docker run -d \
   --sysctl="net.ipv4.conf.all.src_valid_mark=1" \
   --sysctl="net.ipv4.ip_forward=1" \
   --restart unless-stopped \
-  peterlewis/wg-easy
+  pheiduck/wg-easy
 </pre>
 
 > 💡 Replace `YOUR_SERVER_IP` with your WAN IP, or a Dynamic DNS hostname.
@@ -92,10 +92,10 @@ These options can be configured by setting environment variables using `-e KEY="
 | `WG_DEFAULT_ADDRESS` | `10.8.0.x` | `10.6.0.x` | Clients IP address range. |
 | `WG_DEFAULT_DNS` | `1.1.1.1` | `8.8.8.8, 8.8.4.4` | DNS server clients will use. |
 | `WG_ALLOWED_IPS` | `0.0.0.0/0, ::/0` | `192.168.15.0/24, 10.0.1.0/24` | Allowed IPs clients will use. |
-| `WG_PRE_UP` | `...` | - | See [config.js](https://github.com/peterlewis/wg-easy/blob/master/src/config.js#L19) for the default value. |
-| `WG_POST_UP` | `...` | `iptables ...` | See [config.js](https://github.com/peterlewis/wg-easy/blob/master/src/config.js#L20) for the default value. |
-| `WG_PRE_DOWN` | `...` | - | See [config.js](https://github.com/peterlewis/wg-easy/blob/master/src/config.js#L27) for the default value. |
-| `WG_POST_DOWN` | `...` | `iptables ...` | See [config.js](https://github.com/peterlewis/wg-easy/blob/master/src/config.js#L28) for the default value. |
+| `WG_PRE_UP` | `...` | - | See [config.js](https://github.com/pheiduck/wg-easy/blob/master/src/config.js#L19) for the default value. |
+| `WG_POST_UP` | `...` | `iptables ...` | See [config.js](https://github.com/pheiduck/wg-easy/blob/master/src/config.js#L20) for the default value. |
+| `WG_PRE_DOWN` | `...` | - | See [config.js](https://github.com/pheiduck/wg-easy/blob/master/src/config.js#L27) for the default value. |
+| `WG_POST_DOWN` | `...` | `iptables ...` | See [config.js](https://github.com/pheiduck/wg-easy/blob/master/src/config.js#L28) for the default value. |
 
 > If you change `WG_PORT`, make sure to also change the exposed port.
 
@@ -106,12 +106,12 @@ To update to the latest version, simply run:
 ```bash
 docker stop wg-easy
 docker rm wg-easy
-docker pull peterlewis/wg-easy
+docker pull pheiduck/wg-easy
 ```
 
 And then run the `docker run -d \ ...` command above again.
 
 ## Common Use Cases
 
-* [Using WireGuard-Easy with Pi-Hole](https://github.com/peterlewis/wg-easy/wiki/Using-WireGuard-Easy-with-Pi-Hole)
-* [Using WireGuard-Easy with nginx/SSL](https://github.com/peterlewis/wg-easy/wiki/Using-WireGuard-Easy-with-nginx-SSL)
+* [Using WireGuard-Easy with Pi-Hole](https://github.com/pheiduck/wg-easy/wiki/Using-WireGuard-Easy-with-Pi-Hole)
+* [Using WireGuard-Easy with nginx/SSL](https://github.com/pheiduck/wg-easy/wiki/Using-WireGuard-Easy-with-nginx-SSL)
