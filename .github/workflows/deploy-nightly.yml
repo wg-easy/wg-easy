@@ -10,18 +10,18 @@ jobs:
     name: Build & Deploy
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@main
       with:
         ref: production
 
     - name: Set up QEMU
-      uses: docker/setup-qemu-action@v2
+      uses: docker/setup-qemu-action@master
 
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
+      uses: docker/setup-buildx-action@master
 
     - name: Login to DockerHub
-      uses: docker/login-action@v2
+      uses: docker/login-action@master
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
@@ -31,7 +31,7 @@ jobs:
     
     # Build & Publish
     - name: Build & Publish Docker Image
-      uses: docker/build-push-action@v3
+      uses: docker/build-push-action@master
       with:
         push: true
         platforms: linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8
