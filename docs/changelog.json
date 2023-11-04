@@ -9,4 +9,5 @@
   "8": "Updated NodeJS to v18, updated Node modules, improved layout on mobile devices & linting fixes."
   "9": "Updated NodeJS to v18.14.1 and bump node dependencies, both by @pheiduck in #17 and #18."
   "10": "Updated NodeJS to v18.15.0 (@pheiduck) and bump node dependencies."
+  "11": "Updated NodeJS to v18.18.2, bump node dependencies & add ability to adjust WebUI host/port (@rahilarious)."
 }
