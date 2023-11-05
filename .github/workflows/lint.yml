@@ -3,7 +3,7 @@ name: Lint
 on:
   push:
     branches:
-      - development
+      - main
       - production
   pull_request:
 
