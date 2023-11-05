@@ -1,13 +1,5 @@
-# There's an issue with node:16-alpine.
-# On Raspberry Pi, the following crash happens:
-
-# #FailureMessage Object: 0x7e87753c
-# #
-# # Fatal error in , line 0
-# # unreachable code
-# #
-# #
-# #
+# There's an issue with node:20-alpine.
+# Docker deployment is canceled after 25< minutes.
 
 FROM docker.io/library/node:18-alpine@sha256:435dcad253bb5b7f347ebc69c8cc52de7c912eb7241098b920f2fc2d7843183d AS build_node_modules
 
