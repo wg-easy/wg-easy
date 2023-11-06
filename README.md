@@ -1,7 +1,7 @@
 # WireGuard Easy
 
-[![Build & Publish Docker Image to Docker Hub](https://github.com/pheiduck/wg-easy/actions/workflows/deploy.yml/badge.svg?branch=production)](https://github.com/pheiduck/wg-easy/actions/workflows/deploy.yml)
-[![Lint](https://github.com/pheiduck/wg-easy/actions/workflows/lint.yml/badge.svg?branch=master)](https://github.com/pheiduck/wg-easy/actions/workflows/lint.yml)
+[![Build & Publish Docker Image to Docker Hub](https://github.com/pheiduck/wg-easy/actions/workflows/deploy-stable.yml/badge.svg?branch=production)](https://github.com/pheiduck/wg-easy/actions/workflows/deploy-stable.yml)
+[![Lint](https://github.com/pheiduck/wg-easy/actions/workflows/lint.yml/badge.svg?branch=main)](https://github.com/pheiduck/wg-easy/actions/workflows/lint.yml)
 [![Docker](https://img.shields.io/docker/v/pheiduck/wg-easy/latest)](https://hub.docker.com/r/pheiduck/wg-easy)
 [![Docker](https://img.shields.io/docker/pulls/pheiduck/wg-easy.svg)](https://hub.docker.com/r/pheiduck/wg-easy)
 [![Sponsor](https://img.shields.io/github/sponsors/WeeJeWel)](https://github.com/sponsors/WeeJeWel)
