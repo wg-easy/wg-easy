@@ -1,4 +1,4 @@
-name: Build & Publish Docker Image to Docker Hub
+name: Build & Publish Docker Image to Docker Hub (Development)
 
 on:
   workflow_dispatch:
@@ -35,4 +35,4 @@ jobs:
       with:
         push: true
         platforms: linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8
-        tags: pheiduck/wg-easy:nightly
+        tags: pheiduck/wg-easy:development
