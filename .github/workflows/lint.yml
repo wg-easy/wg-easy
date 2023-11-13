@@ -17,7 +17,8 @@ jobs:
         with:
           node-version: 'lts/*'
 
-      - run: |
+      - name: npm run lint
+        run: |
           npm config set fund false
           cd src
           npm ci
