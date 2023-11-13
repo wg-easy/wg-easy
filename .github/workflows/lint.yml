@@ -16,6 +16,7 @@ jobs:
       - uses: actions/setup-node@main
         with:
           node-version: 'lts/*'
+          check-latest: true
 
       - name: npm run lint
         run: |
