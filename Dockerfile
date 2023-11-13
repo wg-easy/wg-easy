@@ -6,7 +6,7 @@ FROM docker.io/library/node:18-alpine@sha256:435dcad253bb5b7f347ebc69c8cc52de7c9
 # Copy Web UI
 COPY src/ /app/
 WORKDIR /app
-RUN npm ci --production
+RUN npm config set fund false && npm ci --production
 
 # Copy build result to a new image.
 # This saves a lot of disk space.
@@ -23,7 +23,7 @@ COPY --from=build_node_modules /app /app
 RUN mv /app/node_modules /node_modules
 
 # Enable this to run `npm run serve`
-RUN npm i -g nodemon
+RUN npm config set fund false && npm i -g nodemon
 
 # Install Linux packages
 RUN apk add -U --no-cache \
