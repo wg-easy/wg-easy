@@ -18,6 +18,7 @@ jobs:
           node-version: 'lts/*'
 
       - run: |
+          npm config set fund false
           cd src
           npm ci
           npm run lint
