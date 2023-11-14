@@ -27,3 +27,6 @@ iptables -A FORWARD -o wg0 -j ACCEPT;
 
 module.exports.WG_PRE_DOWN = process.env.WG_PRE_DOWN || '';
 module.exports.WG_POST_DOWN = process.env.WG_POST_DOWN || '';
+
+// Adding enviroment variable for the users.json file
+module.exports.USERS_PATH = process.env.USERS_PATH || '/app/';

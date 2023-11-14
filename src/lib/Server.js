@@ -10,10 +10,15 @@ const Util = require('./Util');
 const ServerError = require('./ServerError');
 const WireGuard = require('../services/WireGuard');
 
+// Needed to open users.json file
+const fs = require('fs').promises;
+
+// Getting enviroment variables
 const {
   PORT,
   RELEASE,
   PASSWORD,
+  USERS_PATH
 } = require('../config');
 
 module.exports = class Server {
@@ -47,16 +52,23 @@ module.exports = class Server {
         };
       }))
       .post('/api/session', Util.promisify(async req => {
+        // Post authentication
         const {
+          username,
           password,
         } = req.body;
+        
+        // Check if the credentials are correct
+        const tmp = await fs.readFile(path.join(USERS_PATH, 'users.json'));
+        const { users } = JSON.parse(tmp);
+        const user = users.find(findUser => findUser.username === username);
 
-        if (typeof password !== 'string') {
-          throw new ServerError('Missing: Password', 401);
+        if (typeof user !== 'object') {
+          throw new ServerError('Wrong Username', 401);
         }
 
-        if (password !== PASSWORD) {
-          throw new ServerError('Incorrect Password', 401);
+        if (user.password !== password) {
+          throw new ServerError('Wrong Password', 401);
         }
 
         req.session.authenticated = true;
