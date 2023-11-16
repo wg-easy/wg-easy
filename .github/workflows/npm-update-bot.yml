@@ -7,7 +7,7 @@ on:
     - cron: "0 0 * * *"
 
 jobs:
-  nub:
+  npmupbot:
     name: NPM Update Bot 🤖
     runs-on: ubuntu-latest
     steps:
