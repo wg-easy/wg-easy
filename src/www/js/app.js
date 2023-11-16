@@ -28,8 +28,8 @@ new Vue({
   data: {
     authenticated: null,
     authenticating: false,
+    username: null,
     password: null,
-    requiresPassword: null,
 
     clients: null,
     clientsPersist: {},
@@ -173,17 +173,18 @@ new Vue({
     login(e) {
       e.preventDefault();
 
+      if (!this.username) return;
       if (!this.password) return;
       if (this.authenticating) return;
 
       this.authenticating = true;
       this.api.createSession({
+        username: this.username,
         password: this.password,
       })
         .then(async () => {
           const session = await this.api.getSession();
           this.authenticated = session.authenticated;
-          this.requiresPassword = session.requiresPassword;
           return this.refresh();
         })
         .catch(err => {
@@ -191,6 +192,7 @@ new Vue({
         })
         .finally(() => {
           this.authenticating = false;
+          this.username = null;
           this.password = null;
         });
     },
@@ -251,7 +253,6 @@ new Vue({
     this.api.getSession()
       .then(session => {
         this.authenticated = session.authenticated;
-        this.requiresPassword = session.requiresPassword;
         this.refresh({
           updateCharts: true,
         }).catch(err => {

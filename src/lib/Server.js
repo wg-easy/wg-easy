@@ -39,15 +39,11 @@ module.exports = class Server {
         return RELEASE;
       })))
 
-      // Authentication
+      // Get session data
       .get('/api/session', Util.promisify(async req => {
-        const requiresPassword = !!process.env.PASSWORD;
-        const authenticated = requiresPassword
-          ? !!(req.session && req.session.authenticated)
-          : true;
+        const authenticated = !!(req.session && req.session.authenticated);
 
         return {
-          requiresPassword,
           authenticated,
         };
       }))
@@ -79,10 +75,7 @@ module.exports = class Server {
 
       // WireGuard
       .use((req, res, next) => {
-        if (!PASSWORD) {
-          return next();
-        }
-
+     
         if (req.session && req.session.authenticated) {
           return next();
         }

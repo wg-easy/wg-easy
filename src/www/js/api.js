@@ -43,11 +43,11 @@ class API {
     });
   }
 
-  async createSession({ password }) {
+  async createSession({ username, password }) {
     return this.call({
       method: 'post',
       path: '/session',
-      body: { password },
+      body: { username, password },
     });
   }
 
