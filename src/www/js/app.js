@@ -28,8 +28,11 @@ new Vue({
   data: {
     authenticated: null,
     authenticating: false,
-    username: null,
     password: null,
+    username: null,
+    newPassword: null,
+    checkPassword: null,
+    changingPassword: null,
 
     clients: null,
     clientsPersist: {},
@@ -207,6 +210,26 @@ new Vue({
         .catch(err => {
           alert(err.message || err.toString());
         });
+    },
+    updatePassword(e) {
+      e.preventDefault();
+
+      this.changingPassword = true;
+      this.api.changePassword({
+        newPassword: this.newPassword,
+        checkPassword: this.checkPassword,
+      })
+      .then(() => {
+        alert("Password Changed!");
+      })
+      .catch(err => {
+        alert(err.message || err.toString());
+      })
+      .finally(() => {
+        this.newPassword = null;
+        this.checkPassword = null;
+        this.changingPassword = null;
+      });
     },
     createClient() {
       const name = this.clientCreateName;

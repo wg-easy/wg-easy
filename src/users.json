@@ -1,17 +1,14 @@
-{
-    "users": [
-      {
-        "username": "alice",
-        "password": "password123"
-      },
-      {
-        "username": "bob",
-        "password": "notpassword777"
-      },
-      {
-        "username": "roberto",
-        "password": "yespassword999"
-      }
-    ]
+[
+  {
+    "username": "alice",
+    "password": "password123"
+  },
+  {
+    "username": "bob",
+    "password": "notpassword777"
+  },
+  {
+    "username": "roberto",
+    "password": "yespassword999"
   }
-  
+]

@@ -54,6 +54,32 @@
           </div>
         </div>
 
+        <!-- Password Update form -->
+        <form @submit="updatePassword" class="shadow rounded-md bg-white mx-auto w-64 p-5 overflow-hidden mt-10">
+         
+          <input type="password" name="newPassword" placeholder="New Password" v-model="newPassword"
+          class="px-3 py-2 text-sm text-gray-500 mb-5 border-2 border-gray-100 rounded-lg w-full focus:border-red-800 outline-none" />
+
+          <input type="password" name="checkPassword" placeholder="Confirm New Password" v-model="checkPassword"
+            class="px-3 py-2 text-sm text-gray-500 mb-5 border-2 border-gray-100 rounded-lg w-full focus:border-red-800 outline-none" />
+
+          <button v-if="changingPassword"
+            class="bg-red-800 w-full rounded shadow py-2 text-sm text-white cursor-not-allowed">
+            <svg class="w-5 animate-spin mx-auto" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+              fill="currentColor">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+              </path>
+            </svg>
+          </button>
+          <input v-if="!changingPassword && newPassword && checkPassword" type="submit"
+            class="bg-red-800 w-full rounded shadow py-2 text-sm text-white hover:bg-red-700 transition cursor-pointer"
+            value="Change Password">
+          <input v-if="!changingPassword && (!newPassword || !checkPassword)" type="submit"
+            class="bg-gray-200 w-full rounded shadow py-2 text-sm text-white cursor-not-allowed" value="Change Password">
+        </form>
+
         <div class="shadow-md rounded-lg bg-white overflow-hidden">
           <div class="flex flex-row flex-auto items-center p-3 px-5 border border-b-2 border-gray-100">
             <div class="flex-grow">

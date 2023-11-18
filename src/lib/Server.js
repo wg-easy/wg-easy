@@ -48,15 +48,15 @@ module.exports = class Server {
         };
       }))
       .post('/api/session', Util.promisify(async req => {
-        // Post authentication
+        // Authentication
         const {
           username,
           password,
         } = req.body;
         
         // Check if the credentials are correct
-        const tmp = await fs.readFile(path.join(USERS_PATH, 'users.json'));
-        const { users } = JSON.parse(tmp);
+        const usersJson = await fs.readFile(path.join(USERS_PATH, 'users.json'), 'utf8');
+        const users = JSON.parse(usersJson);
         const user = users.find(findUser => findUser.username === username);
 
         if (typeof user !== 'object') {
@@ -68,12 +68,12 @@ module.exports = class Server {
         }
 
         req.session.authenticated = true;
+        req.session.username = user.username;
         req.session.save();
 
         debug(`New Session: ${req.session.id}`);
       }))
 
-      // WireGuard
       .use((req, res, next) => {
      
         if (req.session && req.session.authenticated) {
@@ -91,6 +91,32 @@ module.exports = class Server {
 
         debug(`Deleted Session: ${sessionId}`);
       }))
+      .post('/api/updatePassword', Util.promisify(async req => {
+        const {
+          newPassword,
+          checkPassword,
+        } = req.body;
+        const username = req.session.username;
+
+        const usersJson = await fs.readFile(path.join(USERS_PATH, 'users.json'), 'utf8');
+        const users = JSON.parse(usersJson);
+        const user = users.find(findUser => findUser.username === username);
+
+        if (typeof user !== 'object') {
+          throw new ServerError('This session.username does not exists', 401);
+        }
+
+        if (newPassword !== checkPassword) {
+          throw new ServerError("Passwords don't match", 401);
+        }
+
+        user.password = newPassword;
+        await fs.writeFile(path.join(USERS_PATH, 'users.json'), JSON.stringify(users, false, 2), {
+          mode: 0o660,
+        });
+        
+      }))
+      // WireGuard
       .get('/api/wireguard/client', Util.promisify(async req => {
         return WireGuard.getClients();
       }))

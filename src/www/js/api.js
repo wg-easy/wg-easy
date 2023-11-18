@@ -58,6 +58,14 @@ class API {
     });
   }
 
+  async changePassword({ newPassword, checkPassword }) {
+    return this.call({
+      method: 'post',
+      path: '/updatePassword',
+      body: { newPassword, checkPassword },
+    });
+  }
+
   async getClients() {
     return this.call({
       method: 'get',
