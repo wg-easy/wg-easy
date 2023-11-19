@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@main
       - uses: actions/setup-node@main
         with:
-          node-version: 'lts/*'
+          node-version: 'current'
           check-latest: true
 
       - name: npm run lint
