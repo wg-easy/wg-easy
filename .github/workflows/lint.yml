@@ -22,5 +22,5 @@ jobs:
         run: |
           npm config set fund false
           cd src
-          npm ci
+          npm ci --legacy-peer-deps
           npm run lint
