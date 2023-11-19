@@ -16,6 +16,7 @@ jobs:
         with:
           node-version: 'current'
           check-latest: true
+          cache: 'npm'
 
       - name: Bot 🤖 "Updating NPM Packages..."
         run: |

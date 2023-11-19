@@ -17,6 +17,7 @@ jobs:
         with:
           node-version: 'current'
           check-latest: true
+          cache: 'npm'
 
       - name: npm run lint
         run: |
