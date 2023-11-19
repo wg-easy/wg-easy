@@ -20,9 +20,9 @@ jobs:
       - name: Bot 🤖 "Updating NPM Packages..."
         run: |
           npm config set fund false
-          npm update
+          npm update --legacy-peer-deps
           cd src
-          npm update
+          npm update --legacy-peer-deps
           git config --global user.name 'NPM Update Bot'
           git config --global user.email 'npmupbot@users.noreply.github.com'
           git add .
