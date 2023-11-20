@@ -17,7 +17,6 @@ const fs = require('fs').promises;
 const {
   PORT,
   RELEASE,
-  PASSWORD,
   USERS_PATH
 } = require('../config');
 
