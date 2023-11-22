@@ -1,7 +1,7 @@
 # There's an issue with node:20-alpine.
 # Docker deployment is canceled after 25< minutes.
 
-FROM docker.io/library/node:18-alpine@sha256:435dcad253bb5b7f347ebc69c8cc52de7c912eb7241098b920f2fc2d7843183d AS build_node_modules
+FROM docker.io/library/node:18-alpine@sha256:3428c2de886bf4378657da6fe86e105573a609c94df1f7d6a70e57d2b51de21f AS build_node_modules
 
 # Copy Web UI
 COPY src/ /app/
@@ -9,7 +9,7 @@ WORKDIR /app
 RUN npm config set fund false && npm ci --legacy-peer-deps
 # Copy build result to a new image.
 # This saves a lot of disk space.
-FROM docker.io/library/node:18-alpine@sha256:435dcad253bb5b7f347ebc69c8cc52de7c912eb7241098b920f2fc2d7843183d
+FROM docker.io/library/node:18-alpine@sha256:3428c2de886bf4378657da6fe86e105573a609c94df1f7d6a70e57d2b51de21f
 COPY --from=build_node_modules /app /app
 
 # Move node_modules one directory up, so during development
