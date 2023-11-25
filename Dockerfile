@@ -3,10 +3,13 @@
 
 FROM docker.io/library/node:18-alpine@sha256:3428c2de886bf4378657da6fe86e105573a609c94df1f7d6a70e57d2b51de21f AS build_node_modules
 
+RUN npm config set fund false &&\
+    npm config set update-notifier false
+
 # Copy Web UI
 COPY src/ /app/
 WORKDIR /app
-RUN npm config set fund false && npm ci --legacy-peer-deps
+RUN npm ci --legacy-peer-deps
 # Copy build result to a new image.
 # This saves a lot of disk space.
 FROM docker.io/library/node:18-alpine@sha256:3428c2de886bf4378657da6fe86e105573a609c94df1f7d6a70e57d2b51de21f
@@ -22,7 +25,7 @@ COPY --from=build_node_modules /app /app
 RUN mv /app/node_modules /node_modules
 
 # Enable this to run `npm run serve`
-RUN npm config set fund false && npm i -g nodemon
+RUN npm i -g nodemon
 
 # Install Linux packages
 RUN apk add -U --no-cache \
