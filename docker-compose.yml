@@ -18,7 +18,7 @@ services:
       # - WG_PRE_DOWN=echo "Pre Down" > /etc/wireguard/pre-down.txt
       # - WG_POST_DOWN=echo "Post Down" > /etc/wireguard/post-down.txt
       
-    image: weejewel/wg-easy
+    build: .
     container_name: wg-easy
     volumes:
       - .:/etc/wireguard
@@ -32,3 +32,9 @@ services:
     sysctls:
       - net.ipv4.ip_forward=1
       - net.ipv4.conf.all.src_valid_mark=1
+    depends_on:
+      - redis
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"

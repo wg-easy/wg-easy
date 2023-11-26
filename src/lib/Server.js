@@ -13,6 +13,13 @@ const WireGuard = require('../services/WireGuard');
 // Needed to open users.json file
 const fs = require('fs').promises;
 
+// Redis
+const redis = require('redis');
+const redisClient = redis.createClient({
+  url: 'redis://redis:6379'
+  });
+redisClient.connect();
+
 // Getting enviroment variables
 const {
   PORT,
@@ -53,21 +60,29 @@ module.exports = class Server {
           password,
         } = req.body;
         
-        // Check if the credentials are correct
-        const usersJson = await fs.readFile(path.join(USERS_PATH, 'users.json'), 'utf8');
-        const users = JSON.parse(usersJson);
-        const user = users.find(findUser => findUser.username === username);
-
-        if (typeof user !== 'object') {
-          throw new ServerError('Wrong Username', 401);
-        }
-
-        if (user.password !== password) {
-          throw new ServerError('Wrong Password', 401);
+        let dbPassword = await redisClient.get(username);
+      
+        if (dbPassword !== password || dbPassword == null) {
+          const usersJson =  await fs.readFile(path.join(USERS_PATH, 'users.json'), 'utf8');
+          const users = JSON.parse(usersJson);
+        
+          for (let i = 0; i < users.length; i++) {
+            await redisClient.set(users[i].username, users[i].password);
+          }
+        
+          dbPassword =  await redisClient.get(username);
+        
+          if (dbPassword == null) {
+            throw new ServerError('Wrong Username', 401);
+          }
+        
+          if (dbPassword !== password) {
+            throw new ServerError('Wrong Password', 401);
+          }
         }
 
         req.session.authenticated = true;
-        req.session.username = user.username;
+        req.session.username = username;      
         req.session.save();
 
         debug(`New Session: ${req.session.id}`);
