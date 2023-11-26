@@ -3,8 +3,9 @@
 
 FROM docker.io/library/node:18-alpine@sha256:3428c2de886bf4378657da6fe86e105573a609c94df1f7d6a70e57d2b51de21f AS build_node_modules
 
-RUN npm config set fund false &&\
-    npm config set update-notifier false
+# Hide fund and update-notifier message
+RUN npm config set -g fund false &&\
+    npm config set -g update-notifier false
 
 # Copy Web UI
 COPY src/ /app/
@@ -13,6 +14,11 @@ RUN npm ci --legacy-peer-deps
 # Copy build result to a new image.
 # This saves a lot of disk space.
 FROM docker.io/library/node:18-alpine@sha256:3428c2de886bf4378657da6fe86e105573a609c94df1f7d6a70e57d2b51de21f
+
+# Hide fund and update-notifier message
+RUN npm config set -g fund false &&\
+    npm config set -g update-notifier false
+
 COPY --from=build_node_modules /app /app
 
 # Move node_modules one directory up, so during development
@@ -29,8 +35,8 @@ RUN npm i -g nodemon
 
 # Install Linux packages
 RUN apk add -U --no-cache \
-  wireguard-tools \
-  dumb-init
+    wireguard-tools \
+    dumb-init
 
 # Expose Ports
 EXPOSE 51820/udp
