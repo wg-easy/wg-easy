@@ -60,10 +60,10 @@ module.exports = class Server {
           password,
         } = req.body;
         
-        const dbPassword = await redisClient.get(username);
+        let dbPassword = await redisClient.get(username);
         
         if (dbPassword !== password || dbPassword == null) {
-          const usersJson =  await fs.readFile(path.join(USERS_PATH, 'users.json'), 'utf8');
+          const usersJson =  await fs.readFile(USERS_PATH, 'utf8');
           const users = JSON.parse(usersJson);
         
           for (let i = 0; i < users.length; i++) {
@@ -112,9 +112,9 @@ module.exports = class Server {
         } = req.body;
         const username = req.session.username;
 
-        const usersJson = await fs.readFile(path.join(USERS_PATH, 'users.json'), 'utf8');
+        const usersJson = await fs.readFile(USERS_PATH, 'utf8');
         const users = JSON.parse(usersJson);
-        const user = users.find(findUser => findUser.username === username);
+        let user = users.find(findUser => findUser.username === username);
 
         if (typeof user !== 'object') {
           throw new ServerError('This session.username does not exists', 401);
@@ -125,9 +125,10 @@ module.exports = class Server {
         }
 
         user.password = newPassword;
-        await fs.writeFile(path.join(USERS_PATH, 'users.json'), JSON.stringify(users, false, 2), {
+        await fs.writeFile(USERS_PATH, JSON.stringify(users, false, 2), {
           mode: 0o660,
         });
+        redisClient.set(user.username, user.password);
       }))
       // WireGuard
       .get('/api/wireguard/client', Util.promisify(async req => {
