@@ -37,7 +37,7 @@ $ cd wg-easy
 >
 > 💡 Replace `YOUR_SERVER_IP` with your WAN IP, or a Dynamic DNS hostname.
 > 
-> 💡 If you enable `USERS_PATH` be sure to place your file inside `./src/`.
+> 💡 If you enable `USERS_PATH` be sure to place your file inside `./src/`. See [users.json](https://github.com/Elemento-Modular-Cloud/wg-easy/blob/develop/src/users.json) for example.
 >
 > 💡 Your configuration files will be saved in `~/.wg-easy`
 <pre>
@@ -57,7 +57,7 @@ These options can be configured by setting environment variables inside `docker-
 | Env | Default | Example | Description |
 | - | - | - | - |
 | `WG_HOST` | - | `vpn.myserver.com` | The public hostname of your VPN server. |
-| `USERS_PATH` | - | `/app/users.json` | The path to a JSON file located under ./src/(users.json) made of users and passwords. |
+| `USERS_PATH` | - | `/app/users.json` | The path to a JSON file located under ./src/[users.json](https://github.com/Elemento-Modular-Cloud/wg-easy/blob/develop/src/users.json) made of users and passwords. |
 | `WG_DEVICE` | `eth0` | `ens6f0` | Ethernet device the wireguard traffic should be forwarded through. |
 | `WG_PORT` | `51820` | `12345` | The public UDP port of your VPN server. WireGuard will always listen on `51820` inside the Docker container. |
 | `WG_MTU` | `null` | `1420` | The MTU the clients will use. Server uses default WG MTU. |
