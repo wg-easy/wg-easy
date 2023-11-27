@@ -62,7 +62,7 @@ module.exports = class Server {
         
         let dbPassword = await redisClient.get(username);
         
-        if (dbPassword !== password || dbPassword == null) {
+        if ((dbPassword !== password || dbPassword == null) && USERS_PATH) {
           const usersJson =  await fs.readFile(USERS_PATH, 'utf8');
           const users = JSON.parse(usersJson);
         
@@ -71,14 +71,14 @@ module.exports = class Server {
           }
         
           dbPassword =  await redisClient.get(username);
-        
-          if (dbPassword == null) {
-            throw new ServerError('Wrong Username', 401);
-          }
-        
-          if (dbPassword !== password) {
-            throw new ServerError('Wrong Password', 401);
-          }
+        }
+
+        if (dbPassword == null) {
+          throw new ServerError('Wrong Username', 401);
+        }
+      
+        if (dbPassword !== password) {
+          throw new ServerError('Wrong Password', 401);
         }
 
         req.session.authenticated = true;
@@ -110,25 +110,29 @@ module.exports = class Server {
           newPassword,
           checkPassword,
         } = req.body;
-        const username = req.session.username;
-
-        const usersJson = await fs.readFile(USERS_PATH, 'utf8');
-        const users = JSON.parse(usersJson);
-        let user = users.find(findUser => findUser.username === username);
-
-        if (typeof user !== 'object') {
-          throw new ServerError('This session.username does not exists', 401);
-        }
 
         if (newPassword !== checkPassword) {
           throw new ServerError("Passwords don't match", 401);
         }
 
-        user.password = newPassword;
-        await fs.writeFile(USERS_PATH, JSON.stringify(users, false, 2), {
-          mode: 0o660,
-        });
-        redisClient.set(user.username, user.password);
+        const username = req.session.username;
+
+        if (USERS_PATH) {
+          const usersJson = await fs.readFile(USERS_PATH, 'utf8');
+          const users = JSON.parse(usersJson);
+          let user = users.find(findUser => findUser.username === username);
+
+          if (typeof user !== 'object') {
+            throw new ServerError('This session.username does not exists', 401);
+          }
+
+          user.password = newPassword;
+          await fs.writeFile(USERS_PATH, JSON.stringify(users, false, 2), {
+            mode: 0o660,
+          });
+        }
+
+        redisClient.set(username, newPassword);
       }))
       // WireGuard
       .get('/api/wireguard/client', Util.promisify(async req => {
