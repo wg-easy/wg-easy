@@ -7,7 +7,7 @@ services:
       - WG_HOST=raspberrypi.local
 
       # Optional:
-      # - USERS_PATH=/app/users.json
+      - USERS_PATH=/app/users.json
       # - WG_PORT=51820
       # - WG_DEFAULT_ADDRESS=10.8.0.x
       # - WG_DEFAULT_DNS=1.1.1.1
@@ -22,6 +22,7 @@ services:
     container_name: wg-easy
     volumes:
       - .:/etc/wireguard
+      - ./users.json:/app/users.json
     ports:
       - "51820:51820/udp"
       - "51821:51821/tcp"
@@ -34,7 +35,10 @@ services:
       - net.ipv4.conf.all.src_valid_mark=1
     depends_on:
       - redis
+
   redis:
     image: redis
-    ports:
-      - "6379:6379"
+    expose:
+      - 6379
+    # ports:
+    #   - "6379:6379"
