@@ -12,15 +12,18 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@main
-      - uses: actions/setup-node@main
+      - name: Checkout repository
+        uses: actions/checkout@main
+      - name: Setup Node
+        uses: actions/setup-node@main
         with:
           node-version: 'current'
           check-latest: true
+          cache: 'npm'
 
       - name: npm run lint
         run: |
-          npm config set fund false
+          npm config set -g fund false
           cd src
           npm ci --legacy-peer-deps
           npm run lint
