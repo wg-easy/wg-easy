@@ -1,7 +1,7 @@
 # There's an issue with node:20-alpine.
 # Docker deployment is canceled after 25< minutes.
 
-FROM docker.io/library/node:18-alpine@sha256:3428c2de886bf4378657da6fe86e105573a609c94df1f7d6a70e57d2b51de21f AS build_node_modules
+FROM docker.io/library/node:18-alpine@sha256:16b46e5ea9fb5c2d13dda36f0feb670fa89de6a412725007555f2eee9a126b60 AS build_node_modules
 
 # Hide fund and update-notifier message
 RUN npm config set -g fund false &&\
@@ -13,7 +13,7 @@ WORKDIR /app
 RUN npm ci --legacy-peer-deps
 # Copy build result to a new image.
 # This saves a lot of disk space.
-FROM docker.io/library/node:18-alpine@sha256:3428c2de886bf4378657da6fe86e105573a609c94df1f7d6a70e57d2b51de21f
+FROM docker.io/library/node:18-alpine@sha256:16b46e5ea9fb5c2d13dda36f0feb670fa89de6a412725007555f2eee9a126b60
 
 # Hide fund and update-notifier message
 RUN npm config set -g fund false &&\
