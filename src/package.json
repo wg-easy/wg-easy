@@ -1,7 +1,7 @@
 {
   "release": "11",
   "name": "wg-easy",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "",
   "main": "server.js",
   "scripts": {
@@ -12,6 +12,7 @@
   "author": "Emile Nijssen",
   "license": "GPL",
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "debug": "^4.3.4",
     "express": "^4.18.2",
     "express-session": "^1.17.3",
