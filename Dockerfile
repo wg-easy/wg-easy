@@ -10,7 +10,7 @@ RUN npm config set -g fund false &&\
 # Copy Web UI
 COPY src/ /app/
 WORKDIR /app
-RUN npm ci
+RUN npm ci --legacy-peer-deps
 # Copy build result to a new image.
 # This saves a lot of disk space.
 FROM docker.io/library/node:18-alpine@sha256:16b46e5ea9fb5c2d13dda36f0feb670fa89de6a412725007555f2eee9a126b60
