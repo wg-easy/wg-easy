@@ -2,6 +2,7 @@
 
 const path = require('path');
 const bcrypt = require('bcryptjs');
+const crypto = require('node:crypto');
 
 const express = require('express');
 const expressSession = require('express-session');
@@ -27,9 +28,10 @@ module.exports = class Server {
       .use('/', express.static(path.join(__dirname, '..', 'www')))
       .use(express.json())
       .use(expressSession({
-        secret: String(Math.random()),
+        secret: crypto.randomBytes(256).toString('hex'),
         resave: true,
         saveUninitialized: true,
+        secure: true,
       }))
 
       .get('/api/release', (Util.promisify(async () => {
