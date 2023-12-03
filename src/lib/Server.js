@@ -118,6 +118,9 @@ module.exports = class Server {
         const svg = await WireGuard.getClientQRCodeSVG({ clientId });
         res.header('Content-Type', 'image/svg+xml');
         res.send(svg);
+        if (clientId === '__proto__' || clientId === 'constructor' || clientId === 'prototype') {
+          res.end(403);
+        }
       }))
       .get('/api/wireguard/client/:clientId/configuration', Util.promisify(async (req, res) => {
         const { clientId } = req.params;
@@ -131,6 +134,9 @@ module.exports = class Server {
         res.header('Content-Disposition', `attachment; filename="${configName || clientId}.conf"`);
         res.header('Content-Type', 'text/plain');
         res.send(config);
+        if (clientId === '__proto__' || clientId === 'constructor' || clientId === 'prototype') {
+          res.end(403);
+        }
       }))
       .post('/api/wireguard/client', Util.promisify(async (req) => {
         const { name } = req.body;
