@@ -31,6 +31,9 @@ module.exports = class Server {
         secret: crypto.randomBytes(256).toString('hex'),
         resave: true,
         saveUninitialized: true,
+        cookie: {
+          httpOnly: true,
+        },
       }))
 
       .get('/api/release', (Util.promisify(async () => {
