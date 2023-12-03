@@ -118,9 +118,6 @@ module.exports = class Server {
         const svg = await WireGuard.getClientQRCodeSVG({ clientId });
         res.header('Content-Type', 'image/svg+xml');
         res.send(svg);
-        if (clientId === '__proto__' || clientId === 'constructor' || clientId === 'prototype') {
-          res.end(403);
-        }
       }))
       .get('/api/wireguard/client/:clientId/configuration', Util.promisify(async (req, res) => {
         const { clientId } = req.params;
@@ -134,9 +131,6 @@ module.exports = class Server {
         res.header('Content-Disposition', `attachment; filename="${configName || clientId}.conf"`);
         res.header('Content-Type', 'text/plain');
         res.send(config);
-        if (clientId === '__proto__' || clientId === 'constructor' || clientId === 'prototype') {
-          res.end(403);
-        }
       }))
       .post('/api/wireguard/client', Util.promisify(async (req) => {
         const { name } = req.body;
@@ -146,21 +140,33 @@ module.exports = class Server {
         const { clientId } = req.params;
         return WireGuard.deleteClient({ clientId });
       }))
-      .post('/api/wireguard/client/:clientId/enable', Util.promisify(async (req) => {
+      .post('/api/wireguard/client/:clientId/enable', Util.promisify(async (req, res) => {
         const { clientId } = req.params;
+        if (clientId === '__proto__' || clientId === 'constructor' || clientId === 'prototype') {
+          res.end(403);
+        }
         return WireGuard.enableClient({ clientId });
       }))
-      .post('/api/wireguard/client/:clientId/disable', Util.promisify(async (req) => {
+      .post('/api/wireguard/client/:clientId/disable', Util.promisify(async (req, res) => {
         const { clientId } = req.params;
+        if (clientId === '__proto__' || clientId === 'constructor' || clientId === 'prototype') {
+          res.end(403);
+        }
         return WireGuard.disableClient({ clientId });
       }))
-      .put('/api/wireguard/client/:clientId/name', Util.promisify(async (req) => {
+      .put('/api/wireguard/client/:clientId/name', Util.promisify(async (req, res) => {
         const { clientId } = req.params;
+        if (clientId === '__proto__' || clientId === 'constructor' || clientId === 'prototype') {
+          res.end(403);
+        }
         const { name } = req.body;
         return WireGuard.updateClientName({ clientId, name });
       }))
-      .put('/api/wireguard/client/:clientId/address', Util.promisify(async (req) => {
+      .put('/api/wireguard/client/:clientId/address', Util.promisify(async (req, res) => {
         const { clientId } = req.params;
+        if (clientId === '__proto__' || clientId === 'constructor' || clientId === 'prototype') {
+          res.end(403);
+        }
         const { address } = req.body;
         return WireGuard.updateClientAddress({ clientId, address });
       }))
