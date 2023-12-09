@@ -20,6 +20,9 @@ jobs:
           node-version: 'current'
           check-latest: true
           cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
+            src/package-lock.json
 
       - name: npm run lint
         run: |
