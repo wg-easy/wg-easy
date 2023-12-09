@@ -26,7 +26,7 @@ jobs:
       - name: Bot 🤖 "Updating NPM Packages..."
         run: |
           npm config set -g fund false
-          npm install -g npm-check-updates
+          npm install -g --silent npm-check-updates
           ncu -u
           npm update
           cd src
