@@ -2,8 +2,10 @@ name: Build & Publish Docker Image to Docker Hub
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "0 0 * * *"
+  push:
+    branches:
+      - main
+      - main/**
 
 jobs:
   deploy:
