@@ -23,7 +23,6 @@ module.exports = class Server {
 
   constructor() {
     // Express
-    const expiryDate = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
     this.app = express()
       .disable('etag')
       .use('/', express.static(path.join(__dirname, '..', 'www')))
@@ -34,7 +33,6 @@ module.exports = class Server {
         saveUninitialized: true,
         cookie: {
           httpOnly: true,
-          expires: expiryDate,
         },
       }))
 
