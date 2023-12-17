@@ -1,11 +1,10 @@
-name: Build & Publish Docker Image to Docker Hub
+name: Build & Publish Docker Image to GitHub Container Registry
 
 on:
   workflow_dispatch:
   push:
     branches:
       - production
-      - production/**
 
 jobs:
   deploy:
@@ -29,13 +28,12 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
           
-    # Set environment variables
-    - run: echo RELEASE=$(cat ./src/package.json | jq -r .release) >> $GITHUB_ENV
+    - name: Set environment variables
+      run: echo RELEASE=$(cat ./src/package.json | jq -r .release) >> $GITHUB_ENV
     
-    # Build & Publish
     - name: Build & Publish Docker Image
       uses: docker/build-push-action@v2
       with:
         push: true
         platforms: linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8
-        tags: weejewel/wg-easy:latest, weejewel/wg-easy:${{ env.RELEASE }}
+        tags: wg-easy/wg-easy:latest, wg-easy/wg-easy:${{ env.RELEASE }}
