@@ -11,6 +11,7 @@ You have found the easiest way to install & manage WireGuard on any Linux host!
 <p align="center">
   <img src="./assets/screenshot.png" width="802" />
 </p>
+⚠️  Due to the fact that wireguard uses keys to <b>authenticate a device</b> and not a user/human <b>each device needs an individual config/key</b>! So, in the screenshot above Emile, Jason, Linus and Adam have only one single device with a WireGuard config/key. ⚠️
 
 ## Features
 
