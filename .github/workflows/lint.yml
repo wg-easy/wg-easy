@@ -3,7 +3,7 @@ name: Lint
 on:
   push:
     branches:
-      - development
+      - main
       - production
   pull_request:
 
@@ -12,12 +12,21 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - name: Checkout repository
+        uses: actions/checkout@main
+      - name: Setup Node
+        uses: actions/setup-node@main
         with:
-          node-version: '18'
+          node-version: 'current'
+          check-latest: true
+          cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
+            src/package-lock.json
 
-      - run: |
+      - name: npm run lint
+        run: |
+          npm config set -g fund false
           cd src
           npm ci
           npm run lint
