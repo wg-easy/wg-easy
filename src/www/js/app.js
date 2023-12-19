@@ -45,6 +45,8 @@ new Vue({
     currentRelease: null,
     latestRelease: null,
 
+    isDark: null,
+
     chartOptions: {
       chart: {
         background: 'transparent',
@@ -129,7 +131,7 @@ new Vue({
       const clients = await this.api.getClients();
       this.clients = clients.map((client) => {
         if (client.name.includes('@') && client.name.includes('.')) {
-          client.avatar = `https://www.gravatar.com/avatar/${md5(client.name)}?d=blank`;
+          client.avatar = `https://www.gravatar.com/avatar/${sha512(client.name)}?d=blank`;
         }
 
         if (!this.clientsPersist[client.id]) {
@@ -239,6 +241,16 @@ new Vue({
         .catch((err) => alert(err.message || err.toString()))
         .finally(() => this.refresh().catch(console.error));
     },
+    toggleTheme() {
+      if (this.isDark) {
+        localStorage.theme = 'light';
+        document.documentElement.classList.remove('dark');
+      } else {
+        localStorage.theme = 'dark';
+        document.documentElement.classList.add('dark');
+      }
+      this.isDark = !this.isDark;
+    },
   },
   filters: {
     bytes,
@@ -247,6 +259,11 @@ new Vue({
     },
   },
   mounted() {
+    this.isDark = false;
+    if (localStorage.theme === 'dark') {
+      this.isDark = true;
+    }
+
     this.api = new API();
     this.api.getSession()
       .then((session) => {
@@ -270,7 +287,7 @@ new Vue({
 
     Promise.resolve().then(async () => {
       const currentRelease = await this.api.getRelease();
-      const latestRelease = await fetch('https://peterlewis.github.io/wg-easy/changelog.json')
+      const latestRelease = await fetch('https://pheiduck.github.io/wg-easy/changelog.json')
         .then((res) => res.json())
         .then((releases) => {
           const releasesArray = Object.entries(releases).map(([version, changelog]) => ({
