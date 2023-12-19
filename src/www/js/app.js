@@ -283,7 +283,7 @@ new Vue({
       }
 
       const currentRelease = await this.api.getRelease();
-      const latestRelease = await fetch('https://weejewel.github.io/wg-easy/changelog.json')
+      const latestRelease = await fetch('https://wg-easy.github.io/wg-easy/changelog.json')
         .then(res => res.json())
         .then(releases => {
           const releasesArray = Object.entries(releases).map(([version, changelog]) => ({
