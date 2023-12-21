@@ -35,9 +35,11 @@ RUN npm i -g nodemon
 
 # Install Linux packages
 RUN apk add -U --no-cache \
-    iptables \
+    iptables-legacy \
     wireguard-tools \
-    dumb-init
+    dumb-init &&\
+    rm /sbin/iptables &&\
+    ln -s /sbin/iptables-legacy /sbin/iptables
 
 # Expose Ports
 EXPOSE 51820/udp
