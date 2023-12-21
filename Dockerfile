@@ -40,8 +40,7 @@ RUN apk add -U --no-cache \
     dumb-init
 
 # Symlink iptables
-RUN rm /sbin/iptables \
-    ln -s /sbin/iptables-legacy /sbin/iptables
+RUN ln -s /sbin/iptables-legacy /sbin/iptables
 
 # Expose Ports
 EXPOSE 51820/udp
