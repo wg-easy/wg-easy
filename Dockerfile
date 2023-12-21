@@ -30,6 +30,9 @@ COPY --from=build_node_modules /app /app
 # than what runs inside of docker.
 RUN mv /app/node_modules /node_modules
 
+# Enable this to run `npm run serve`
+RUN npm i -g nodemon
+
 # Install Linux packages
 RUN apk add -U --no-cache \
     iptables \
