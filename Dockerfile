@@ -21,9 +21,14 @@ RUN mv /app/node_modules /node_modules
 
 # Install Linux packages
 RUN apk add -U --no-cache \
-  iptables \
-  wireguard-tools \
-  dumb-init
+    dpkg \
+    dumb-init \
+    iptables \
+    iptables-legacy \
+    wireguard-tools
+
+# Symlink iptables
+RUN update-alternatives --install /sbin/iptables iptables /sbin/iptables-legacy 10 --slave /sbin/iptables-restore iptables-restore /sbin/iptables-legacy-restore --slave /sbin/iptables-save iptables-save /sbin/iptables-legacy-save
 
 # Expose Ports
 EXPOSE 51820/udp
