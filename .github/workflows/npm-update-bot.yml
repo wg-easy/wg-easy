@@ -12,11 +12,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@main
+        uses: actions/checkout@v4
       - name: Setup Node
-        uses: actions/setup-node@main
+        uses: actions/setup-node@v4
         with:
-          node-version: 'current'
+          node-version: '18'
           check-latest: true
           cache: 'npm'
           cache-dependency-path: |
