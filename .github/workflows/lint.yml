@@ -26,7 +26,6 @@ jobs:
 
       - name: npm run lint
         run: |
-          npm config set -g fund false
           cd src
           npm ci
           npm run lint
