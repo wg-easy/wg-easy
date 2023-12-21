@@ -37,8 +37,10 @@ RUN npm i -g nodemon
 RUN apk add -U --no-cache \
     iptables-legacy \
     wireguard-tools \
-    dumb-init &&\
-    rm /sbin/iptables &&\
+    dumb-init
+
+# Symlink iptables
+RUN rm /sbin/iptables \
     ln -s /sbin/iptables-legacy /sbin/iptables
 
 # Expose Ports
