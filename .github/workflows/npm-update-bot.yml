@@ -1,0 +1,39 @@
+name: NPM Update Bot 🤖
+
+on:
+  push:
+    branches: [ "main" ]
+  schedule:
+    - cron: "0 0 * * *"
+
+jobs:
+  npmupbot:
+    name: NPM Update Bot 🤖
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@main
+      - name: Setup Node
+        uses: actions/setup-node@main
+        with:
+          node-version: 'current'
+          check-latest: true
+          cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
+            src/package-lock.json
+
+      - name: Bot 🤖 "Updating NPM Packages..."
+        run: |
+          npm config set -g fund false
+          npm install -g --silent npm-check-updates
+          ncu -u
+          npm update
+          cd src
+          ncu -u
+          npm update
+          git config --global user.name 'NPM Update Bot'
+          git config --global user.email 'npmupbot@users.noreply.github.com'
+          git add .
+          git commit -am "npm: package updates" || true
+          git push || true

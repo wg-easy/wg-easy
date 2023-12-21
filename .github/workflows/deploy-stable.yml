@@ -1,9 +1,10 @@
-name: Build & Publish Nightly Docker Image to GitHub Container Registry
+name: Build & Publish Docker Image to GitHub Container Registry
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "0 12 * * *"
+  push:
+    branches:
+      - production
 
 jobs:
   deploy:
@@ -13,15 +14,15 @@ jobs:
       packages: write
       contents: read
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@main
       with:
         ref: production
 
     - name: Set up QEMU
-      uses: docker/setup-qemu-action@v1
+      uses: docker/setup-qemu-action@master
 
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v1
+      uses: docker/setup-buildx-action@master
 
     - name: Login to GitHub Container Registry
       uses: docker/login-action@v3
@@ -34,8 +35,8 @@ jobs:
       run: echo RELEASE=$(cat ./src/package.json | jq -r .release) >> $GITHUB_ENV
     
     - name: Build & Publish Docker Image
-      uses: docker/build-push-action@v5
+      uses: docker/build-push-action@master
       with:
         push: true
         platforms: linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8
-        tags: ghcr.io/wg-easy/wg-easy:nightly, ghcr.io/wg-easy/wg-easy:${{ env.RELEASE }}-nightly
+        tags: ghcr.io/wg-easy/wg-easy:latest, ghcr.io/wg-easy/wg-easy:${{ env.RELEASE }}

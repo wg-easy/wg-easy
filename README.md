@@ -22,6 +22,8 @@ You have found the easiest way to install & manage WireGuard on any Linux host!
 * Statistics for which clients are connected.
 * Tx/Rx charts for each connected client.
 * Gravatar support.
+* Toggleable Light / Dark Mode
+* Sessionless HTTP API authentication
 
 ## Requirements
 
@@ -72,7 +74,7 @@ The Web UI will now be available on `http://0.0.0.0:51821`.
 
 ### 3. Sponsor
 
-Are you enjoying this project? [Buy me a beer!](https://github.com/sponsors/WeeJeWel) 🍻
+Are you enjoying this project? [Buy WeeJeWel a beer!](https://github.com/sponsors/WeeJeWel) 🍻
 
 ## Options
 
@@ -80,6 +82,8 @@ These options can be configured by setting environment variables using `-e KEY="
 
 | Env | Default | Example | Description |
 | - | - | - | - |
+| `PORT` | `51821` | `6789` | TCP port for Web UI. |
+| `WEBUI_HOST` | `0.0.0.0` | `localhost` | IP address web UI binds to. |
 | `PASSWORD` | - | `foobar123` | When set, requires a password when logging in to the Web UI. |
 | `WG_HOST` | - | `vpn.myserver.com` | The public hostname of your VPN server. |
 | `WG_DEVICE` | `eth0` | `ens6f0` | Ethernet device the wireguard traffic should be forwarded through. |
