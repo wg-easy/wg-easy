@@ -1,4 +1,4 @@
-name: Build & Publish Nightly Docker Image to GitHub Container Registry
+name: Build & Publish Nightly
 
 on:
   workflow_dispatch:
