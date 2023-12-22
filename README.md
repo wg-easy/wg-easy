@@ -22,8 +22,8 @@ You have found the easiest way to install & manage WireGuard on any Linux host!
 * Statistics for which clients are connected.
 * Tx/Rx charts for each connected client.
 * Gravatar support.
-* Automatic Light / Dark Mode
-* Sessionless HTTP API authentication
+* Automatic Light / Dark Mode (WIP: available in `nightly` build)
+* Sessionless HTTP API authentication (WIP: available in `nightly` build)
 
 ## Requirements
 
