@@ -21,7 +21,7 @@ module.exports = class Util {
     // eslint-disable-next-line func-names
     return function(req, res) {
       Promise.resolve().then(async () => fn(req, res))
-        .then(result => {
+        .then((result) => {
           if (res.headersSent) return;
 
           if (typeof result === 'undefined') {
@@ -34,7 +34,7 @@ module.exports = class Util {
             .status(200)
             .json(result);
         })
-        .catch(error => {
+        .catch((error) => {
           if (typeof error === 'string') {
             error = new Error(error);
           }
