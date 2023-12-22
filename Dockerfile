@@ -3,22 +3,14 @@
 
 FROM docker.io/library/node:18-alpine AS build_node_modules
 
-# Hide fund and update-notifier message
-RUN npm config set -g fund false &&\
-    npm config set -g update-notifier false
-
 # Copy Web UI
 COPY src/ /app/
 WORKDIR /app
-RUN npm ci
+RUN npm ci --production
+
 # Copy build result to a new image.
 # This saves a lot of disk space.
 FROM docker.io/library/node:18-alpine
-
-# Hide fund and update-notifier message
-RUN npm config set -g fund false &&\
-    npm config set -g update-notifier false
-
 COPY --from=build_node_modules /app /app
 
 # Move node_modules one directory up, so during development
