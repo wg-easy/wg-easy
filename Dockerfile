@@ -27,7 +27,7 @@ RUN apk add -U --no-cache \
     iptables-legacy \
     wireguard-tools
 
-# Symlink iptables
+# Use iptables-legacy
 RUN update-alternatives --install /sbin/iptables iptables /sbin/iptables-legacy 10 --slave /sbin/iptables-restore iptables-restore /sbin/iptables-legacy-restore --slave /sbin/iptables-save iptables-save /sbin/iptables-legacy-save
 
 # Expose Ports
