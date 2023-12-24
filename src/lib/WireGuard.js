@@ -157,7 +157,7 @@ AllowedIPs = ${client.address}/32`;
       .trim()
       .split('\n')
       .slice(1)
-      .forEach(line => {
+      .forEach((line) => {
         const [
           publicKey,
           preSharedKey, // eslint-disable-line no-unused-vars
@@ -169,7 +169,7 @@ AllowedIPs = ${client.address}/32`;
           persistentKeepalive,
         ] = line.split('\t');
 
-        const client = clients.find(client => client.publicKey === publicKey);
+        const client = clients.find((client) => client.publicKey === publicKey);
         if (!client) return;
 
         client.latestHandshakeAt = latestHandshakeAt === '0'
@@ -234,7 +234,7 @@ Endpoint = ${WG_HOST}:${WG_PORT}`;
     // Calculate next IP
     let address;
     for (let i = 2; i < 255; i++) {
-      const client = Object.values(config.clients).find(client => {
+      const client = Object.values(config.clients).find((client) => {
         return client.address === WG_DEFAULT_ADDRESS.replace('x', i);
       });
 
@@ -249,8 +249,9 @@ Endpoint = ${WG_HOST}:${WG_PORT}`;
     }
 
     // Create Client
-    const clientId = uuid.v4();
+    const id = uuid.v4();
     const client = {
+      id,
       name,
       address,
       privateKey,
@@ -263,7 +264,7 @@ Endpoint = ${WG_HOST}:${WG_PORT}`;
       enabled: true,
     };
 
-    config.clients[clientId] = client;
+    config.clients[id] = client;
 
     await this.saveConfig();
 
