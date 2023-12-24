@@ -65,7 +65,7 @@ $ docker run -d \
 </pre>
 
 > 💡 Replace `YOUR_SERVER_IP` with your WAN IP, or a Dynamic DNS hostname.
-> 
+>
 > 💡 Replace `YOUR_ADMIN_PASSWORD` with a password to log in on the Web UI.
 
 The Web UI will now be available on `http://0.0.0.0:51821`.
