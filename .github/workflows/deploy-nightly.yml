@@ -29,10 +29,10 @@ jobs:
         registry: ghcr.io
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
-          
+
     - name: Set environment variables
       run: echo RELEASE=$(cat ./src/package.json | jq -r .release) >> $GITHUB_ENV
-    
+
     - name: Build & Publish Docker Image
       uses: docker/build-push-action@v5
       with:
