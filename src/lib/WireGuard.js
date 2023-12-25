@@ -60,9 +60,9 @@ module.exports = class WireGuard {
 
         await this.__saveConfig(config);
         await Util.exec('wg-quick down wg0').catch(() => { });
-        await Util.exec('wg-quick up wg0').catch(async (err) => {
-          if (err && err.message && err.message.includes('Cannot find device "wg0"\nInvoke "wireguard-go" for creating "wg0"')) {
-            await Util.exec('wireguard-go wg0').catch(() => { });
+        await Util.exec('wg-quick up wg0 || wireguard-go wg0').catch((err) => {
+          if (err && err.message && err.message.includes('Cannot find device "wg0"')) {
+            throw new Error('WireGuard exited with the error: Cannot find device "wg0"\nThis usually means that your host\'s kernel does not support WireGuard!');
           }
 
           throw err;
