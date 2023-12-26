@@ -17,6 +17,11 @@ module.exports = class Util {
     return true;
   }
 
+  static isValidIPv6(str) {
+    const ipv6Regex = /^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$/;
+    return ipv6Regex.test(str);
+  }
+
   static promisify(fn) {
     // eslint-disable-next-line func-names
     return function(req, res) {

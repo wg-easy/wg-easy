@@ -145,7 +145,7 @@
                     <!-- Info -->
                     <div class="text-gray-400 dark:text-neutral-400 text-xs">
 
-                      <!-- Address -->
+                      <!-- Address IPv4 -->
                       <span class="group block md:inline-block pb-1 md:pb-0">
 
                         <!-- Show -->
@@ -160,6 +160,31 @@
                         <!-- Edit -->
                         <span v-show="clientEditAddressId !== client.id"
                           @click="clientEditAddress = client.address; clientEditAddressId = client.id; setTimeout(() => $refs['client-' + client.id + '-address'][0].select(), 1);"
+                          class="cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity">
+                          <svg xmlns="http://www.w3.org/2000/svg"
+                            class="h-4 w-4 inline align-middle opacity-25 hover:opacity-100" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          </svg>
+                        </span>
+                      </span>
+
+                      <!-- Address IPv6 -->
+                      <span class="group block md:inline-block pb-1 md:pb-0">
+
+                        <!-- Show -->
+                        <input v-show="clientEditAddressId6 === client.id" v-model="clientEditAddress6"
+                          v-on:keyup.enter="updateClientaddress6(client, clientEditAddress6); clientEditAddress6 = null; clientEditAddressId6 = null;"
+                          v-on:keyup.escape="clientEditAddress6 = null; clientEditAddressId6 = null;"
+                          :ref="'client-' + client.id + '-address'"
+                          class="rounded border-2 dark:bg-neutral-700 border-gray-100 dark:border-neutral-600 focus:border-gray-200 dark:focus:border-neutral-500 outline-none w-20 text-black dark:text-neutral-300 dark:placeholder:text-neutral-500" />
+                        <span v-show="clientEditAddressId6 !== client.id"
+                          class="inline-block border-t-2 border-b-2 border-transparent">{{client.address6}}</span>
+
+                        <!-- Edit -->
+                        <span v-show="clientEditAddressId6 !== client.id"
+                          @click="clientEditAddress6 = client.address6; clientEditAddressId6 = client.id; setTimeout(() => $refs['client-' + client.id + '-address'][0].select(), 1);"
                           class="cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity">
                           <svg xmlns="http://www.w3.org/2000/svg"
                             class="h-4 w-4 inline align-middle opacity-25 hover:opacity-100" fill="none"

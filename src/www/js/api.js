@@ -117,4 +117,12 @@ class API {
     });
   }
 
+  async updateClientaddress6({ clientId, address6 }) {
+    return this.call({
+      method: 'put',
+      path: `/wireguard/client/${clientId}/address6/`,
+      body: { address6 },
+    });
+  }
+
 }
