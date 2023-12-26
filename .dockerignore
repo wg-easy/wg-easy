@@ -1,0 +1,25 @@
+# Compiled output
+.sass-cache/
+.log/
+.vscode/
+.editorconfig
+# Node
+src/node_modules
+npm-debug.logn
+# Git
+.git/
+.gitignore
+.github/
+# Docker
+.dockerignore
+docker-compose.dev.yml
+docker-compose.yml
+# Assets
+assets/
+# System files
+.DS_Store
+Thumbs.db
+# Docs
+docs/
+*.md
+.secret-*
