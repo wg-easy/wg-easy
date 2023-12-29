@@ -82,16 +82,9 @@ module.exports = class Server {
         }
 
         if (req.path.startsWith('/api/') && req.headers['authorization']) {
-          const authorizationHash = bcrypt.createHash('bcrypt')
-            .update(req.headers['authorization'])
-            .digest('hex');
-          const passwordHash = bcrypt.createHash('bcrypt')
-            .update(PASSWORD)
-            .digest('hex');
-          if (bcrypt.timingSafeEqual(Buffer.from(authorizationHash), Buffer.from(passwordHash))) {
+          if (bcrypt.compareSync(req.headers['authorization'], bcrypt.hashSync(PASSWORD, 10))) {
             return next();
           }
-
           return res.status(401).json({
             error: 'Incorrect Password',
           });
