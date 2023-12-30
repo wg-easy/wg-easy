@@ -3,6 +3,6 @@
 'use strict';
 
 module.exports = {
-  darkMode: 'class',
+  darkMode: 'media',
   content: ['./www/**/*.{html,js}'],
 };
