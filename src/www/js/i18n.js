@@ -167,8 +167,8 @@ const messages = { // eslint-disable-line no-unused-vars
   de: { // github.com/florian-asche
     name: 'Name',
     password: 'Passwort',
-    signIn: 'Login',
-    logout: 'Logout',
+    signIn: 'Anmelden',
+    logout: 'Abmelden',
     updateAvailable: 'Ein Update steht zur Verfügung!',
     update: 'Update',
     clients: 'Clients',
