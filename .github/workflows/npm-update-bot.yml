@@ -1,7 +1,8 @@
 name: NPM Update Bot 🤖
 
 on:
-  workflow_dispatch:
+  push:
+    branches: [ "wg-easy:master" ]
   schedule:
     - cron: "0 0 * * *"
 
