@@ -26,6 +26,7 @@ jobs:
           npm install -g --silent npm-check-updates
           git clone --depth 1 --quiet https://github.com/wg-easy/wg-easy.git
           cd wg-easy
+          git checkout master
           ncu -u
           npm update
           cd src
