@@ -15,6 +15,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: wg-easy/wg-easy
+          ref: master
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
