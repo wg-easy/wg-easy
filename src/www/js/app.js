@@ -215,7 +215,7 @@ new Vue({
       if (!name) return;
 
       this.api.createClient({ name, allowedIps })
-        .catch(err => alert(err.message || err.toString()))
+        .catch((err) => alert(err.message || err.toString()))
         .finally(() => this.refresh().catch(console.error));
     },
     deleteClient(client) {
