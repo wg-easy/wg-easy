@@ -240,11 +240,11 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
 
     let address;
     if (allowedIps) {
-      address = allowedIps
+      address = allowedIps;
     } else {
       // Calculate next IP
       for (let i = 2; i < 255; i++) {
-        const client = Object.values(config.clients).find(client => {
+        const client = Object.values(config.clients).find((client) => {
           return client.address.includes(WG_DEFAULT_ADDRESS.replace('x', i));
         });
 
