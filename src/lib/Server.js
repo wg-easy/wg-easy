@@ -128,7 +128,7 @@ module.exports = class Server {
         res.header('Content-Type', 'text/plain');
         res.send(config);
       }))
-      .post('/api/wireguard/client', Util.promisify(async req => {
+      .post('/api/wireguard/client', Util.promisify(async (req) => {
         const { name, allowedIps } = req.body;
         return WireGuard.createClient({ name, allowedIps });
       }))
