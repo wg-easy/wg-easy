@@ -99,6 +99,3 @@ At the very least, please try to:
 
 - Use backticks to wrap code. This ensures that it retains its formatting and isn't modified when it's rendered by GitHub, and makes the code more readable to others
 - When applicable, use syntax highlighting by adding the correct language name after the first "code fence"
-
-
-[so]: http://stackoverflow.com/questions/tagged/wg-easy
