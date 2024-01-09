@@ -5,6 +5,6 @@ services:
     command: npm run serve
     volumes:
       - ./src/:/app/
-    environment: 
+    environment:
       # - PASSWORD=p
       - WG_HOST=192.168.1.233
