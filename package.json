@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.0.1",
   "scripts": {
     "build": "DOCKER_BUILDKIT=1 docker build --tag wg-easy .",
     "serve": "docker-compose -f docker-compose.yml -f docker-compose.dev.yml up",

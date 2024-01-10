@@ -60,14 +60,14 @@ module.exports = class WireGuard {
 
         await this.__saveConfig(config);
         await Util.exec('wg-quick down wg0').catch(() => { });
-        await Util.exec('wg-quick up wg0').catch(err => {
+        await Util.exec('wg-quick up wg0').catch((err) => {
           if (err && err.message && err.message.includes('Cannot find device "wg0"')) {
             throw new Error('WireGuard exited with the error: Cannot find device "wg0"\nThis usually means that your host\'s kernel does not support WireGuard!');
           }
 
           throw err;
         });
-        // await Util.exec(`iptables -t nat -A POSTROUTING -s ${WG_DEFAULT_ADDRESS.replace('x', '0')}/24 -o eth0 -j MASQUERADE`);
+        // await Util.exec(`iptables -t nat -A POSTROUTING -s ${WG_DEFAULT_ADDRESS.replace('x', '0')}/24 -o ' + WG_DEVICE + ' -j MASQUERADE`);
         // await Util.exec('iptables -A INPUT -p udp -m udp --dport 51820 -j ACCEPT');
         // await Util.exec('iptables -A FORWARD -i wg0 -j ACCEPT');
         // await Util.exec('iptables -A FORWARD -o wg0 -j ACCEPT');
@@ -156,7 +156,7 @@ AllowedIPs = ${client.address}/32`;
       .trim()
       .split('\n')
       .slice(1)
-      .forEach(line => {
+      .forEach((line) => {
         const [
           publicKey,
           preSharedKey, // eslint-disable-line no-unused-vars
@@ -168,7 +168,7 @@ AllowedIPs = ${client.address}/32`;
           persistentKeepalive,
         ] = line.split('\t');
 
-        const client = clients.find(client => client.publicKey === publicKey);
+        const client = clients.find((client) => client.publicKey === publicKey);
         if (!client) return;
 
         client.latestHandshakeAt = latestHandshakeAt === '0'
@@ -233,7 +233,7 @@ Endpoint = ${WG_HOST}:${WG_PORT}`;
     // Calculate next IP
     let address;
     for (let i = 2; i < 255; i++) {
-      const client = Object.values(config.clients).find(client => {
+      const client = Object.values(config.clients).find((client) => {
         return client.address === WG_DEFAULT_ADDRESS.replace('x', i);
       });
 
@@ -248,8 +248,9 @@ Endpoint = ${WG_HOST}:${WG_PORT}`;
     }
 
     // Create Client
-    const clientId = uuid.v4();
+    const id = uuid.v4();
     const client = {
+      id,
       name,
       address,
       privateKey,
@@ -262,7 +263,7 @@ Endpoint = ${WG_HOST}:${WG_PORT}`;
       enabled: true,
     };
 
-    config.clients[clientId] = client;
+    config.clients[id] = client;
 
     await this.saveConfig();
 
