@@ -1,4 +1,6 @@
-version: "2.4"
+version: "3.8"
+volumes:
+  etc_wireguard:
 
 services:
   wg-easy:
@@ -16,15 +18,20 @@ services:
       # - WG_DEFAULT_DNS6=2606:4700:4700::1001
       # - WG_MTU=1420
       # - WG_ALLOWED_IPS=192.168.15.0/24, 10.0.1.0/24
-      
-    image: weejewel/wg-easy
+      # - WG_PERSISTENT_KEEPALIVE=25
+      # - WG_PRE_UP=echo "Pre Up" > /etc/wireguard/pre-up.txt
+      # - WG_POST_UP=echo "Post Up" > /etc/wireguard/post-up.txt
+      # - WG_PRE_DOWN=echo "Pre Down" > /etc/wireguard/pre-down.txt
+      # - WG_POST_DOWN=echo "Post Down" > /etc/wireguard/post-down.txt
+
+    image: ghcr.io/wg-easy/wg-easy
     container_name: wg-easy
     networks:
       wg:
         ipv4_address: 10.42.42.42
         ipv6_address: fdcc:ad94:bacf:61a3::2a
     volumes:
-      - .:/etc/wireguard
+      - etc_wireguard:/etc/wireguard
     ports:
       - "51820:51820/udp"
       - "51821:51821/tcp"

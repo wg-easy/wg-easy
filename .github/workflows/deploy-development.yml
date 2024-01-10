@@ -1,10 +1,7 @@
-name: Build & Publish Latest
+name: Build & Publish Development
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - production
 
 jobs:
   deploy:
@@ -31,12 +28,9 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Set environment variables
-      run: echo RELEASE=$(cat ./src/package.json | jq -r .release) >> $GITHUB_ENV
-
     - name: Build & Publish Docker Image
       uses: docker/build-push-action@v5
       with:
         push: true
         platforms: linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8
-        tags: ghcr.io/wg-easy/wg-easy:latest, ghcr.io/wg-easy/wg-easy:${{ env.RELEASE }}
+        tags: ghcr.io/wg-easy/wg-easy:development

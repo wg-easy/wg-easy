@@ -12,12 +12,20 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
-          node-version: '14'
+          node-version: '18'
+          check-latest: true
+          cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
+            src/package-lock.json
 
-      - run: |
+      - name: npm run lint
+        run: |
           cd src
           npm ci
           npm run lint

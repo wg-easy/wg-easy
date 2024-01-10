@@ -25,9 +25,6 @@ function bytes(bytes, decimals, kib, maxunit) {
 
 new Vue({
   el: '#app',
-  components: {
-    apexchart: VueApexCharts,
-  },
   data: {
     authenticated: null,
     authenticating: false,
@@ -50,34 +47,41 @@ new Vue({
     currentRelease: null,
     latestRelease: null,
 
+    isDark: null,
+
     chartOptions: {
       chart: {
         background: 'transparent',
-        type: 'area',
+        type: 'bar',
+        stacked: false,
         toolbar: {
           show: false,
         },
+        animations: {
+          enabled: false,
+        },
       },
-      fill: {
-        type: 'gradient',
-      },
-      colors: ['#CCCCCC'],
+      colors: [
+        '#DDDDDD', // rx
+        '#EEEEEE', // tx
+      ],
       dataLabels: {
         enabled: false,
       },
-      stroke: {
-        curve: 'smooth',
-        width: 0,
+      plotOptions: {
+        bar: {
+          horizontal: false,
+        },
       },
       xaxis: {
         labels: {
           show: false,
         },
         axisTicks: {
-          show: false,
+          show: true,
         },
         axisBorder: {
-          show: false,
+          show: true,
         },
       },
       yaxis: {
@@ -112,7 +116,7 @@ new Vue({
     },
   },
   methods: {
-    dateTime: value => {
+    dateTime: (value) => {
       return new Intl.DateTimeFormat(undefined, {
         year: 'numeric',
         month: 'short',
@@ -121,57 +125,51 @@ new Vue({
         minute: 'numeric',
       }).format(value);
     },
-    async refresh() {
+    async refresh({
+      updateCharts = false,
+    } = {}) {
       if (!this.authenticated) return;
 
       const clients = await this.api.getClients();
-      this.clients = clients.map(client => {
+      this.clients = clients.map((client) => {
         if (client.name.includes('@') && client.name.includes('.')) {
-          client.avatar = `https://www.gravatar.com/avatar/${md5(client.name)}?d=blank`;
+          client.avatar = `https://www.gravatar.com/avatar/${sha512(client.name)}?d=blank`;
         }
 
         if (!this.clientsPersist[client.id]) {
           this.clientsPersist[client.id] = {};
-          this.clientsPersist[client.id].transferRxHistory = Array(20).fill(0);
+          this.clientsPersist[client.id].transferRxHistory = Array(50).fill(0);
           this.clientsPersist[client.id].transferRxPrevious = client.transferRx;
-          this.clientsPersist[client.id].transferTxHistory = Array(20).fill(0);
+          this.clientsPersist[client.id].transferTxHistory = Array(50).fill(0);
           this.clientsPersist[client.id].transferTxPrevious = client.transferTx;
-
-          this.clientsPersist[client.id].chartOptions = {
-            ...this.chartOptions,
-            yaxis: {
-              ...this.chartOptions.yaxis,
-              max: () => this.clientsPersist[client.id].chartMax,
-            },
-          };
         }
 
-        this.clientsPersist[client.id].transferRxCurrent = client.transferRx - this.clientsPersist[client.id].transferRxPrevious;
-        this.clientsPersist[client.id].transferRxPrevious = client.transferRx;
-        this.clientsPersist[client.id].transferTxCurrent = client.transferTx - this.clientsPersist[client.id].transferTxPrevious;
-        this.clientsPersist[client.id].transferTxPrevious = client.transferTx;
+        // Debug
+        // client.transferRx = this.clientsPersist[client.id].transferRxPrevious + Math.random() * 1000;
+        // client.transferTx = this.clientsPersist[client.id].transferTxPrevious + Math.random() * 1000;
 
-        this.clientsPersist[client.id].transferRxHistory.push(this.clientsPersist[client.id].transferRxCurrent);
-        this.clientsPersist[client.id].transferRxHistory.shift();
+        if (updateCharts) {
+          this.clientsPersist[client.id].transferRxCurrent = client.transferRx - this.clientsPersist[client.id].transferRxPrevious;
+          this.clientsPersist[client.id].transferRxPrevious = client.transferRx;
+          this.clientsPersist[client.id].transferTxCurrent = client.transferTx - this.clientsPersist[client.id].transferTxPrevious;
+          this.clientsPersist[client.id].transferTxPrevious = client.transferTx;
 
-        this.clientsPersist[client.id].transferTxHistory.push(this.clientsPersist[client.id].transferTxCurrent);
-        this.clientsPersist[client.id].transferTxHistory.shift();
+          this.clientsPersist[client.id].transferRxHistory.push(this.clientsPersist[client.id].transferRxCurrent);
+          this.clientsPersist[client.id].transferRxHistory.shift();
+
+          this.clientsPersist[client.id].transferTxHistory.push(this.clientsPersist[client.id].transferTxCurrent);
+          this.clientsPersist[client.id].transferTxHistory.shift();
+        }
 
         client.transferTxCurrent = this.clientsPersist[client.id].transferTxCurrent;
-        client.transferTxSeries = [{
-          name: 'tx',
-          data: this.clientsPersist[client.id].transferTxHistory,
-        }];
-
         client.transferRxCurrent = this.clientsPersist[client.id].transferRxCurrent;
-        client.transferRxSeries = [{
-          name: 'rx',
-          data: this.clientsPersist[client.id].transferRxHistory,
-        }];
 
-        this.clientsPersist[client.id].chartMax = Math.max(...this.clientsPersist[client.id].transferTxHistory, ...this.clientsPersist[client.id].transferRxHistory);
+        client.transferTxHistory = this.clientsPersist[client.id].transferTxHistory;
+        client.transferRxHistory = this.clientsPersist[client.id].transferRxHistory;
+        client.transferMax = Math.max(...client.transferTxHistory, ...client.transferRxHistory);
 
-        client.chartOptions = this.clientsPersist[client.id].chartOptions;
+        client.hoverTx = this.clientsPersist[client.id].hoverTx;
+        client.hoverRx = this.clientsPersist[client.id].hoverRx;
 
         return client;
       });
@@ -192,7 +190,7 @@ new Vue({
           this.requiresPassword = session.requiresPassword;
           return this.refresh();
         })
-        .catch(err => {
+        .catch((err) => {
           alert(err.message || err.toString());
         })
         .finally(() => {
@@ -208,7 +206,7 @@ new Vue({
           this.authenticated = false;
           this.clients = null;
         })
-        .catch(err => {
+        .catch((err) => {
           alert(err.message || err.toString());
         });
     },
@@ -217,69 +215,83 @@ new Vue({
       if (!name) return;
 
       this.api.createClient({ name })
-        .catch(err => alert(err.message || err.toString()))
+        .catch((err) => alert(err.message || err.toString()))
         .finally(() => this.refresh().catch(console.error));
     },
     deleteClient(client) {
       this.api.deleteClient({ clientId: client.id })
-        .catch(err => alert(err.message || err.toString()))
+        .catch((err) => alert(err.message || err.toString()))
         .finally(() => this.refresh().catch(console.error));
     },
     enableClient(client) {
       this.api.enableClient({ clientId: client.id })
-        .catch(err => alert(err.message || err.toString()))
+        .catch((err) => alert(err.message || err.toString()))
         .finally(() => this.refresh().catch(console.error));
     },
     disableClient(client) {
       this.api.disableClient({ clientId: client.id })
-        .catch(err => alert(err.message || err.toString()))
+        .catch((err) => alert(err.message || err.toString()))
         .finally(() => this.refresh().catch(console.error));
     },
     updateClientName(client, name) {
       this.api.updateClientName({ clientId: client.id, name })
-        .catch(err => alert(err.message || err.toString()))
+        .catch((err) => alert(err.message || err.toString()))
         .finally(() => this.refresh().catch(console.error));
     },
     updateClientAddress(client, address) {
       this.api.updateClientAddress({ clientId: client.id, address })
-        .catch(err => alert(err.message || err.toString()))
+        .catch((err) => alert(err.message || err.toString()))
         .finally(() => this.refresh().catch(console.error));
     },
-    updateClientAddress6(client, address6) {
-      this.api.updateClientAddress6({ clientId: client.id, address6 })
-        .catch(err => alert(err.message || err.toString()))
-        .finally(() => this.refresh().catch(console.error));
+    toggleTheme() {
+      if (this.isDark) {
+        localStorage.theme = 'light';
+        document.documentElement.classList.remove('dark');
+      } else {
+        localStorage.theme = 'dark';
+        document.documentElement.classList.add('dark');
+      }
+      this.isDark = !this.isDark;
     },
   },
   filters: {
     bytes,
-    timeago: value => {
+    timeago: (value) => {
       return timeago().format(value);
     },
   },
   mounted() {
+    this.isDark = false;
+    if (localStorage.theme === 'dark') {
+      this.isDark = true;
+    }
+
     this.api = new API();
     this.api.getSession()
-      .then(session => {
+      .then((session) => {
         this.authenticated = session.authenticated;
         this.requiresPassword = session.requiresPassword;
-        this.refresh().catch(err => {
+        this.refresh({
+          updateCharts: true,
+        }).catch((err) => {
           alert(err.message || err.toString());
         });
       })
-      .catch(err => {
+      .catch((err) => {
         alert(err.message || err.toString());
       });
 
     setInterval(() => {
-      this.refresh().catch(console.error);
+      this.refresh({
+        updateCharts: true,
+      }).catch(console.error);
     }, 1000);
 
     Promise.resolve().then(async () => {
       const currentRelease = await this.api.getRelease();
-      const latestRelease = await fetch('https://weejewel.github.io/wg-easy/changelog.json')
-        .then(res => res.json())
-        .then(releases => {
+      const latestRelease = await fetch('https://wg-easy.github.io/wg-easy/changelog.json')
+        .then((res) => res.json())
+        .then((releases) => {
           const releasesArray = Object.entries(releases).map(([version, changelog]) => ({
             version: parseInt(version, 10),
             changelog,
