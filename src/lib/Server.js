@@ -53,14 +53,16 @@ module.exports = class Server {
         const { password } = ctx.request.body;
 
         if (typeof password !== 'string') {
-          throw new ServerError('Missing: Password', 401);
+          ctx.throw(401, JSON.stringify({ error: 'Missing: Password' }));
         }
 
         if (password !== PASSWORD) {
-          throw new ServerError('Incorrect Password', 401);
+          ctx.throw(401, JSON.stringify({ error: 'Incorrect Password' }));
         }
 
         ctx.session.authenticated = true;
+
+        ctx.status = 204;
 
         debug(`New Session: ${ctx.session.id}`);
       })
@@ -95,6 +97,8 @@ module.exports = class Server {
         const sessionId = ctx.session.id;
 
         ctx.session = null;
+
+        ctx.status = 204;
 
         debug(`Deleted Session: ${sessionId}`);
       })
