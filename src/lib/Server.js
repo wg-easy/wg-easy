@@ -12,6 +12,7 @@ const serve = require('koa-static');
 
 const debug = require('debug')('Server');
 
+const ServerError = require('./ServerError');
 const WireGuard = require('../services/WireGuard');
 
 const {
@@ -27,6 +28,15 @@ module.exports = class Server {
     this.app.keys = [crypto.randomBytes(256).toString('hex')];
 
     this.app
+      .use(async (ctx, next) => {
+        try {
+          await next();
+        } catch (err) {
+          ctx.status = err.statusCode || err.status || 500;
+          ctx.body = { error: err.message };
+          ctx.app.emit('error', err, ctx);
+        }
+      })
       .use(serve(path.join(__dirname, '..', 'www')))
       .use(bodyParser())
       .use(session(this.app))
@@ -52,11 +62,11 @@ module.exports = class Server {
         const { password } = ctx.request.body;
 
         if (typeof password !== 'string') {
-          ctx.throw(401, JSON.stringify({ error: 'Missing: Password' }));
+          throw new ServerError('Missing: Password', 401);
         }
 
         if (password !== PASSWORD) {
-          ctx.throw(401, JSON.stringify({ error: 'Incorrect Password' }));
+          throw new ServerError('Incorrect Password', 401);
         }
 
         ctx.session.authenticated = true;
