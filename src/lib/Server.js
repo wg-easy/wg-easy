@@ -12,7 +12,6 @@ const serve = require('koa-static');
 
 const debug = require('debug')('Server');
 
-const ServerError = require('./ServerError');
 const WireGuard = require('../services/WireGuard');
 
 const {
