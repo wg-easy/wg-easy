@@ -10,6 +10,8 @@ const session = require('koa-session');
 const bodyParser = require('koa-bodyparser');
 const serve = require('koa-static');
 
+const debug = require('debug')('Server');
+
 const ServerError = require('./ServerError');
 const WireGuard = require('../services/WireGuard');
 
@@ -60,7 +62,7 @@ module.exports = class Server {
 
         ctx.session.authenticated = true;
 
-        console.log(`New Session: ${ctx.session.id}`);
+        debug(`New Session: ${ctx.session.id}`);
       })
 
     // WireGuard
@@ -94,7 +96,7 @@ module.exports = class Server {
 
         ctx.session = null;
 
-        console.log(`Deleted Session: ${sessionId}`);
+        debug(`Deleted Session: ${sessionId}`);
       })
       .get('/api/wireguard/client', async (ctx) => {
         ctx.body = await WireGuard.getClients();
@@ -162,7 +164,7 @@ module.exports = class Server {
       });
 
     this.app.listen(PORT, WEBUI_HOST, () => {
-      console.log(`Listening on http://${WEBUI_HOST}:${PORT}`);
+      debug(`Listening on http://${WEBUI_HOST}:${PORT}`);
     });
   }
 
