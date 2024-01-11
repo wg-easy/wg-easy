@@ -29,6 +29,8 @@ RUN npm i -g nodemon
 RUN apk add --no-cache \
     dpkg \
     dumb-init \
+    ip6tables \
+    ip6tables-legacy \
     iptables \
     iptables-legacy \
     wireguard-tools
