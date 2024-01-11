@@ -1,4 +1,4 @@
-Attribution-ShareAlike 4.0 International
+Attribution-NonCommercial-ShareAlike 4.0 International
 
 =======================================================================
 
@@ -33,7 +33,7 @@ exhaustive, and do not form part of our licenses.
      material not subject to the license. This includes other CC-
      licensed material, or material used under an exception or
      limitation to copyright. More considerations for licensors:
-	wiki.creativecommons.org/Considerations_for_licensors
+    wiki.creativecommons.org/Considerations_for_licensors
 
      Considerations for the public: By using one of our public
      licenses, a licensor grants the public permission to use the
@@ -48,24 +48,24 @@ exhaustive, and do not form part of our licenses.
      rights in the material. A licensor may make special requests,
      such as asking that all changes be marked or described.
      Although not required by our licenses, you are encouraged to
-     respect those requests where reasonable. More_considerations
+     respect those requests where reasonable. More considerations
      for the public:
-	wiki.creativecommons.org/Considerations_for_licensees
+    wiki.creativecommons.org/Considerations_for_licensees
 
 =======================================================================
 
-Creative Commons Attribution-ShareAlike 4.0 International Public
-License
+Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
+Public License
 
 By exercising the Licensed Rights (defined below), You accept and agree
 to be bound by the terms and conditions of this Creative Commons
-Attribution-ShareAlike 4.0 International Public License ("Public
-License"). To the extent this Public License may be interpreted as a
-contract, You are granted the Licensed Rights in consideration of Your
-acceptance of these terms and conditions, and the Licensor grants You
-such rights in consideration of benefits the Licensor receives from
-making the Licensed Material available under these terms and
-conditions.
+Attribution-NonCommercial-ShareAlike 4.0 International Public License
+("Public License"). To the extent this Public License may be
+interpreted as a contract, You are granted the Licensed Rights in
+consideration of Your acceptance of these terms and conditions, and the
+Licensor grants You such rights in consideration of benefits the
+Licensor receives from making the Licensed Material available under
+these terms and conditions.
 
 
 Section 1 -- Definitions.
@@ -84,7 +84,7 @@ Section 1 -- Definitions.
      and Similar Rights in Your contributions to Adapted Material in
      accordance with the terms and conditions of this Public License.
 
-  c. BY-SA Compatible License means a license listed at
+  c. BY-NC-SA Compatible License means a license listed at
      creativecommons.org/compatiblelicenses, approved by Creative
      Commons as essentially the equivalent of this Public License.
 
@@ -108,7 +108,7 @@ Section 1 -- Definitions.
 
   g. License Elements means the license attributes listed in the name
      of a Creative Commons Public License. The License Elements of this
-     Public License are Attribution and ShareAlike.
+     Public License are Attribution, NonCommercial, and ShareAlike.
 
   h. Licensed Material means the artistic or literary work, database,
      or other material to which the Licensor applied this Public
@@ -122,7 +122,15 @@ Section 1 -- Definitions.
   j. Licensor means the individual(s) or entity(ies) granting rights
      under this Public License.
 
-  k. Share means to provide material to the public by any means or
+  k. NonCommercial means not primarily intended for or directed towards
+     commercial advantage or monetary compensation. For purposes of
+     this Public License, the exchange of the Licensed Material for
+     other material subject to Copyright and Similar Rights by digital
+     file-sharing or similar means is NonCommercial provided there is
+     no payment of monetary compensation in connection with the
+     exchange.
+
+  l. Share means to provide material to the public by any means or
      process that requires permission under the Licensed Rights, such
      as reproduction, public display, public performance, distribution,
      dissemination, communication, or importation, and to make material
@@ -130,13 +138,13 @@ Section 1 -- Definitions.
      public may access the material from a place and at a time
      individually chosen by them.
 
-  l. Sui Generis Database Rights means rights other than copyright
+  m. Sui Generis Database Rights means rights other than copyright
      resulting from Directive 96/9/EC of the European Parliament and of
      the Council of 11 March 1996 on the legal protection of databases,
      as amended and/or succeeded, as well as other essentially
      equivalent rights anywhere in the world.
 
-  m. You means the individual or entity exercising the Licensed Rights
+  n. You means the individual or entity exercising the Licensed Rights
      under this Public License. Your has a corresponding meaning.
 
 
@@ -150,9 +158,10 @@ Section 2 -- Scope.
           exercise the Licensed Rights in the Licensed Material to:
 
             a. reproduce and Share the Licensed Material, in whole or
-               in part; and
+               in part, for NonCommercial purposes only; and
 
-            b. produce, reproduce, and Share Adapted Material.
+            b. produce, reproduce, and Share Adapted Material for
+               NonCommercial purposes only.
 
        2. Exceptions and Limitations. For the avoidance of doubt, where
           Exceptions and Limitations apply to Your use, this Public
@@ -220,7 +229,9 @@ Section 2 -- Scope.
           Rights, whether directly or through a collecting society
           under any voluntary or waivable statutory or compulsory
           licensing scheme. In all other cases the Licensor expressly
-          reserves any right to collect such royalties.
+          reserves any right to collect such royalties, including when
+          the Licensed Material is used other than for NonCommercial
+          purposes.
 
 
 Section 3 -- License Conditions.
@@ -265,7 +276,6 @@ following conditions.
           reasonable to satisfy the conditions by providing a URI or
           hyperlink to a resource that includes the required
           information.
-
        3. If requested by the Licensor, You must remove any of the
           information required by Section 3(a)(1)(A) to the extent
           reasonably practicable.
@@ -277,7 +287,7 @@ following conditions.
 
        1. The Adapter's License You apply must be a Creative Commons
           license with the same License Elements, this version or
-          later, or a BY-SA Compatible License.
+          later, or a BY-NC-SA Compatible License.
 
        2. You must include the text of, or the URI or hyperlink to, the
           Adapter's License You apply. You may satisfy this condition
@@ -297,14 +307,15 @@ apply to Your use of the Licensed Material:
 
   a. for the avoidance of doubt, Section 2(a)(1) grants You the right
      to extract, reuse, reproduce, and Share all or a substantial
-     portion of the contents of the database;
+     portion of the contents of the database for NonCommercial purposes
+     only;
 
   b. if You include all or a substantial portion of the database
      contents in a database in which You have Sui Generis Database
      Rights, then the database in which You have Sui Generis Database
      Rights (but not its individual contents) is Adapted Material,
-
      including for purposes of Section 3(b); and
+
   c. You must comply with the conditions in Section 3(a) if You Share
      all or a substantial portion of the contents of the database.
 
@@ -403,7 +414,6 @@ Section 8 -- Interpretation.
      as a limitation upon, or waiver of, any privileges and immunities
      that apply to the Licensor or You, including from the legal
      processes of any jurisdiction or authority.
-
 
 =======================================================================
 
