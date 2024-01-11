@@ -25,7 +25,7 @@ module.exports = class Server {
     // Express
     this.app = express()
       .disable('etag')
-      .use('/', express.static(path.join(__dirname, '..', 'www')))
+      .use('/', express.static(path.join(__dirname, '..', 'webui', 'dist')))
       .use(express.json())
       .use(expressSession({
         secret: crypto.randomBytes(256).toString('hex'),
