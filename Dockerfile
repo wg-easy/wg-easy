@@ -19,7 +19,7 @@ RUN npm ci --omit=dev
 FROM docker.io/library/node:18-alpine
 
 # Copy the server files and the built static files
-COPY --from=build_node_modules /server /app
+COPY --from=build_node_modules /server /app/server
 COPY --from=build_node_modules /webui/dist /app/www
 
 # Move node_modules one directory up, so during development
@@ -29,7 +29,7 @@ COPY --from=build_node_modules /webui/dist /app/www
 # Also, some node_modules might be native, and
 # the architecture & OS of your development machine might differ
 # than what runs inside of docker.
-RUN mv /app/node_modules /node_modules
+RUN mv /app/server/node_modules /app/node_modules
 
 # Enable this to run `npm run serve`
 RUN npm i -g nodemon
@@ -53,5 +53,5 @@ EXPOSE 51821/tcp
 ENV DEBUG=Server,WireGuard
 
 # Run Web UI
-WORKDIR /app
+WORKDIR /app/server
 CMD ["/usr/bin/dumb-init", "node", "server.js"]

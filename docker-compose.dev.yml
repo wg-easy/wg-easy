@@ -4,7 +4,8 @@ services:
     image: wg-easy
     command: npm run serve
     volumes:
-      - ./src/:/app/
+      - ./src/:/app/server
+      - ./webui/dist:/app/www
     environment:
       # - PASSWORD=p
       - WG_HOST=192.168.1.233
