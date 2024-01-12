@@ -13,10 +13,13 @@
   "author": "Emile Nijssen",
   "license": "GPL",
   "dependencies": {
+    "@koa/router": "^12.0.1",
     "bcryptjs": "^2.4.3",
     "debug": "^4.3.4",
-    "express": "^4.18.2",
-    "express-session": "^1.17.3",
+    "koa": "^2.15.0",
+    "koa-bodyparser": "^4.4.1",
+    "koa-session": "^6.4.0",
+    "koa-static": "^5.0.0",
     "qrcode": "^1.5.3",
     "uuid": "^9.0.1"
   },
