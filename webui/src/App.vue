@@ -473,14 +473,6 @@ export default {
 </script>
 
 <template>
-  <!-- <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-    </div>
-  </header> -->
-
   <main>
     <div v-cloak class="container mx-auto max-w-3xl px-5 md:px-0">
       <div v-if="authenticated === true">
