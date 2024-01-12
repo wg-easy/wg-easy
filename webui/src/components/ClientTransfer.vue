@@ -1,13 +1,18 @@
+<script>
+import { useBytes } from '../composables/useBytes';
+export default {
+  setup() {
+    const { bytes } = useBytes();
+    return { bytes };
+  },
+  props: ['transferData', 'transferDataCurrent', 'title'],
+};
+</script>
+
 <template>
   <span v-if="transferData" :title="title">
     ·
     <slot></slot>
-    {{ transferDataCurrent }}/s
+    {{ bytes(transferDataCurrent) }}/s
   </span>
 </template>
-
-<script>
-export default {
-  props: ['transferData', 'transferDataCurrent', 'title'],
-};
-</script>

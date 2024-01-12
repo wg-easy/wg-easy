@@ -231,6 +231,7 @@ export default {
 
     const { dateTime } = useDateTime();
     const { timeago } = useTimeAgo();
+    const { bytes } = useBytes();
 
     return {
       authenticated,
@@ -258,6 +259,7 @@ export default {
 
       dateTime,
       timeago,
+      bytes,
 
       api,
     };
@@ -596,21 +598,19 @@ export default {
                       />
 
                       <!-- Transfer TX -->
-                      <!-- FIXME: add "bytes" -->
                       <ClientTransfer
                         :transferData="client.transferTx"
                         :transferDataCurrent="client.transferTxCurrent"
-                        title="'Total Download: ' + client.transferTx"
+                        :title="'Total Download: ' + bytes(client.transferTx)"
                       >
                         <IconDownArrow />
                       </ClientTransfer>
 
                       <!-- Transfer RX -->
-                      <!-- FIXME: add "bytes" -->
                       <ClientTransfer
                         :transferData="client.transferRx"
                         :transferDataCurrent="client.transferRxCurrent"
-                        title="'Total Upload: ' + client.transferRx"
+                        :title="'Total Upload: ' + bytes(client.transferRx)"
                       >
                         <IconUpArrow />
                       </ClientTransfer>
