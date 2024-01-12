@@ -4,6 +4,7 @@ import sha256 from 'crypto-js/sha256';
 
 import { useDateTime } from './composables/useDateTime';
 import { useTimeAgo } from './composables/useTimeAgo';
+import { useBytes } from './composables/useBytes';
 
 import UpdateNotification from './components/UpdateNotification.vue';
 import ClientNewButton from './components/ClientNewButton.vue';
@@ -22,6 +23,7 @@ import IconClose from './components/icons/IconClose.vue';
 import IconWarning from './components/icons/IconWarning.vue';
 import IconAvatarDefault from './components/icons/IconAvatarDefault.vue';
 import ClientTransfer from './components/ClientTransfer.vue';
+import VueApexCharts from 'vue3-apexcharts';
 
 class API {
   async call({ method, path, body }) {
@@ -341,6 +343,7 @@ export default {
     IconWarning,
     IconAvatarDefault,
     ClientTransfer,
+    apexchart: VueApexCharts,
   },
   methods: {
     handleNewClient() {
@@ -553,26 +556,43 @@ export default {
               class="relative overflow-hidden border-b last:border-b-0 border-gray-100 dark:border-neutral-600 border-solid"
             >
               <!-- Chart -->
-              <!-- FIXME: Not working yet -->
-              <!-- <div class="absolute z-0 bottom-0 left-0 right-0" style="top: 60%">
+              <!-- TODO: Individual bars are too wide -->
+              <div
+                class="absolute z-0 bottom-0 left-0 right-0"
+                style="top: 60%"
+              >
                 <apexchart
                   width="100%"
                   height="100%"
-                  :options="client.chartOptions"
-                  :series="client.transferTxSeries"
-                >
-                </apexchart>
+                  type="bar"
+                  :options="chartOptions"
+                  :series="[
+                    {
+                      name: 'Upload (TX)',
+                      data: client.transferTxHistory,
+                    },
+                  ]"
+                />
               </div>
-              <div class="absolute z-0 top-0 left-0 right-0" style="bottom: 60%">
+              <div
+                class="absolute z-0 top-0 left-0 right-0"
+                style="bottom: 60%"
+              >
                 <apexchart
                   width="100%"
                   height="100%"
-                  :options="client.chartOptions"
-                  :series="client.transferRxSeries"
+                  type="bar"
+                  :options="chartOptions"
+                  :series="[
+                    {
+                      name: 'Download (RX)',
+                      data: client.transferRxHistory,
+                    },
+                  ]"
                   style="transform: scaleY(-1)"
                 >
                 </apexchart>
-              </div> -->
+              </div>
 
               <div
                 class="relative p-5 z-10 flex flex-col md:flex-row justify-between"
