@@ -1,5 +1,6 @@
 <script>
 import { ref, reactive } from 'vue';
+import sha256 from 'crypto-js/sha256';
 
 class API {
   async call({ method, path, body }) {
@@ -223,10 +224,7 @@ export default {
       const clientsData = await api.getClients();
       clients.value = clientsData.map((client) => {
         if (client.name.includes('@') && client.name.includes('.')) {
-          // FIXME: add "sha512"
-          client.avatar = `https://www.gravatar.com/avatar/${sha512(
-            client.name
-          )}?d=blank`;
+          client.avatar = `https://www.gravatar.com/avatar/${sha256(client.name)}?d=blank`;
         }
 
         if (!clientsPersist[client.id]) {
