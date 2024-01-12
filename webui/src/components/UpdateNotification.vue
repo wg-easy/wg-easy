@@ -1,7 +1,7 @@
 <script>
 export default {
-  props: ['latestRelease', 'currentRelease']
-}
+  props: ['latestRelease', 'currentRelease'],
+};
 </script>
 
 <template>
