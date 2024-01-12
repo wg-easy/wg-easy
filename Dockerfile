@@ -15,7 +15,10 @@ RUN npm ci --omit=dev &&\
 # This saves a lot of disk space.
 FROM docker.io/library/node:20-alpine
 HEALTHCHECK CMD /usr/bin/timeout 5s /bin/sh -c "/usr/bin/wg show | /bin/grep -q interface || exit 1" --interval=1m --timeout=5s --retries=3
+
+# Copy the server files and the built static files
 COPY --from=build_node_modules /app /app
+COPY --from=build_node_modules /webui/dist /app/www
 
 # Move node_modules one directory up, so during development
 # we don't have to mount it in a volume.
