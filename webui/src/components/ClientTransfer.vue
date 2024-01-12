@@ -1,13 +1,13 @@
 <template>
-    <span v-if="transferData" :title="title">
-        ·
-        <slot></slot>
-        {{ transferDataCurrent }}/s
-    </span>
+  <span v-if="transferData" :title="title">
+    ·
+    <slot></slot>
+    {{ transferDataCurrent }}/s
+  </span>
 </template>
 
 <script>
 export default {
-    props: ["transferData", "transferDataCurrent", "title"],
+  props: ['transferData', 'transferDataCurrent', 'title'],
 };
 </script>

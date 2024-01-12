@@ -21,7 +21,7 @@ import LoadingSpinner from './components/LoadingSpinner.vue';
 import IconClose from './components/icons/IconClose.vue';
 import IconWarning from './components/icons/IconWarning.vue';
 import IconAvatarDefault from './components/icons/IconAvatarDefault.vue';
-import ClientTransfer from './components/ClientTransfer.vue'
+import ClientTransfer from './components/ClientTransfer.vue';
 
 class API {
   async call({ method, path, body }) {
@@ -346,13 +346,15 @@ export default {
       this.clientCreateName = '';
     },
 
-    async refresh ({ updateCharts = false } = {}) {
+    async refresh({ updateCharts = false } = {}) {
       if (!this.authenticated) return;
 
       const clientsData = await this.api.getClients();
       this.clients = clientsData.map((client) => {
         if (client.name.includes('@') && client.name.includes('.')) {
-          client.avatar = `https://www.gravatar.com/avatar/${sha256(client.name)}?d=blank`;
+          client.avatar = `https://www.gravatar.com/avatar/${sha256(
+            client.name
+          )}?d=blank`;
         }
 
         if (!this.clientsPersist[client.id]) {
@@ -369,10 +371,12 @@ export default {
 
         if (updateCharts) {
           this.clientsPersist[client.id].transferRxCurrent =
-            client.transferRx - this.clientsPersist[client.id].transferRxPrevious;
+            client.transferRx -
+            this.clientsPersist[client.id].transferRxPrevious;
           this.clientsPersist[client.id].transferRxPrevious = client.transferRx;
           this.clientsPersist[client.id].transferTxCurrent =
-            client.transferTx - this.clientsPersist[client.id].transferTxPrevious;
+            client.transferTx -
+            this.clientsPersist[client.id].transferTxPrevious;
           this.clientsPersist[client.id].transferTxPrevious = client.transferTx;
 
           this.clientsPersist[client.id].transferRxHistory.push(
@@ -386,11 +390,15 @@ export default {
           this.clientsPersist[client.id].transferTxHistory.shift();
         }
 
-        client.transferTxCurrent = this.clientsPersist[client.id].transferTxCurrent;
-        client.transferRxCurrent = this.clientsPersist[client.id].transferRxCurrent;
+        client.transferTxCurrent =
+          this.clientsPersist[client.id].transferTxCurrent;
+        client.transferRxCurrent =
+          this.clientsPersist[client.id].transferRxCurrent;
 
-        client.transferTxHistory = this.clientsPersist[client.id].transferTxHistory;
-        client.transferRxHistory = this.clientsPersist[client.id].transferRxHistory;
+        client.transferTxHistory =
+          this.clientsPersist[client.id].transferTxHistory;
+        client.transferRxHistory =
+          this.clientsPersist[client.id].transferRxHistory;
         client.transferMax = Math.max(
           ...client.transferTxHistory,
           ...client.transferRxHistory
@@ -403,7 +411,7 @@ export default {
       });
     },
 
-    login (e) {
+    login(e) {
       e.preventDefault();
 
       if (!this.password) return;
@@ -429,7 +437,7 @@ export default {
         });
     },
 
-    logout (e) {
+    logout(e) {
       e.preventDefault();
 
       this.api
@@ -443,7 +451,7 @@ export default {
         });
     },
 
-    createClient () {
+    createClient() {
       const name = this.clientCreateName;
       if (!name) return;
 
@@ -453,42 +461,42 @@ export default {
         .finally(() => this.refresh().catch(console.error));
     },
 
-    deleteClient (client) {
+    deleteClient(client) {
       this.api
         .deleteClient({ clientId: client.id })
         .catch((err) => alert(err.message || err.toString()))
         .finally(() => this.refresh().catch(console.error));
     },
 
-    enableClient (client) {
+    enableClient(client) {
       this.api
         .enableClient({ clientId: client.id })
         .catch((err) => alert(err.message || err.toString()))
         .finally(() => this.refresh().catch(console.error));
     },
 
-    disableClient (client) {
+    disableClient(client) {
       this.api
         .disableClient({ clientId: client.id })
         .catch((err) => alert(err.message || err.toString()))
         .finally(() => this.refresh().catch(console.error));
     },
 
-    updateClientName (client, name) {
+    updateClientName(client, name) {
       this.api
         .updateClientName({ clientId: client.id, name })
         .catch((err) => alert(err.message || err.toString()))
         .finally(() => this.refresh().catch(console.error));
     },
 
-    updateClientAddress (client, address) {
+    updateClientAddress(client, address) {
       this.api
         .updateClientAddress({ clientId: client.id, address })
         .catch((err) => alert(err.message || err.toString()))
         .finally(() => this.refresh().catch(console.error));
     },
 
-    toggleTheme () {
+    toggleTheme() {
       if (this.isDark) {
         localStorage.theme = 'light';
         document.documentElement.classList.remove('dark');
@@ -524,7 +532,10 @@ export default {
         </h1>
         <h2 class="text-sm text-gray-400 dark:text-neutral-400 mb-10"></h2>
 
-        <UpdateNotification :latestRelease="latestRelease" :currentRelease="currentRelease" />
+        <UpdateNotification
+          :latestRelease="latestRelease"
+          :currentRelease="currentRelease"
+        />
 
         <div
           class="shadow-md rounded-lg bg-white dark:bg-neutral-700 overflow-hidden"
@@ -939,7 +950,9 @@ export default {
           <div
             class="h-20 w-20 mb-10 mt-5 mx-auto rounded-full bg-red-800 dark:bg-red-800 relative overflow-hidden"
           >
-            <IconAvatarDefault class="w-10 h-10 m-5 text-white dark:text-white" />
+            <IconAvatarDefault
+              class="w-10 h-10 m-5 text-white dark:text-white"
+            />
           </div>
 
           <input
