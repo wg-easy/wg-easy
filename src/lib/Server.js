@@ -161,14 +161,14 @@ module.exports = class Server {
         const { address } = req.body;
         return WireGuard.updateClientAddress({ clientId, address });
       }))
-        .put('/api/wireguard/client/:clientId/allowedips', Util.promisify(async (req, res) => {
-          const { clientId } = req.params;
-          if (clientId === '__proto__' || clientId === 'constructor' || clientId === 'prototype') {
-            res.end(403);
-          }
-          const { allowedIPs } = req.body;
-          return WireGuard.updateClientAllowedIPs({ clientId, allowedIPs });
-        }))
+      .put('/api/wireguard/client/:clientId/allowedips', Util.promisify(async (req, res) => {
+        const { clientId } = req.params;
+        if (clientId === '__proto__' || clientId === 'constructor' || clientId === 'prototype') {
+          res.end(403);
+        }
+        const { allowedIPs } = req.body;
+        return WireGuard.updateClientAllowedIPs({ clientId, allowedIPs });
+      }))
 
       .listen(PORT, WEBUI_HOST, () => {
         debug(`Listening on http://${WEBUI_HOST}:${PORT}`);

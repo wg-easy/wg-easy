@@ -42,7 +42,7 @@ new Vue({
     clientEditAddress: null,
     clientEditAddressId: null,
     clientEditAllowedIPs: null,
-    userInputIP:[0,0,0,0,0],
+    userInputIP: [0, 0, 0, 0, 0],
     qrcode: null,
 
     currentRelease: null,
@@ -247,20 +247,20 @@ new Vue({
     },
     updateClientAllowedIPs(client) {
       this.api.updateClientAllowedIPs({ clientId: client.id, allowedIPs: client.allowedIPs })
-          .catch((err) => alert(err.message || err.toString()))
-          .finally(() => this.refresh().catch(console.error));
+        .catch((err) => alert(err.message || err.toString()))
+        .finally(() => this.refresh().catch(console.error));
     },
-    addNewIP(){
-      let address = this.userInputIP.slice(0,4).join('.');
-      let allowedIPs = this.clientEditAllowedIPs.allowedIPs;
-      let obj = {type:'ipv4', address, cidr: this.userInputIP[4]};
+    addNewIP() {
+      const address = this.userInputIP.slice(0, 4).join('.');
+      const allowedIPs = [...this.clientEditAllowedIPs.allowedIPs];
+      const obj = { type: 'ipv4', address, cidr: this.userInputIP[4] };
       allowedIPs.push(obj);
       this.clientEditAllowedIPs.allowedIPs = allowedIPs;
-      this.userInputIP = [0,0,0,0,0];
+      this.userInputIP = [0, 0, 0, 0, 0];
     },
-    removeIP(index){
-      let allowedIPs = this.clientEditAllowedIPs.allowedIPs;
-      allowedIPs.splice(index,1);
+    removeIP(index) {
+      const allowedIPs = [...this.clientEditAllowedIPs.allowedIPs];
+      allowedIPs.splice(index, 1);
       this.clientEditAllowedIPs.allowedIPs = allowedIPs;
     },
     toggleTheme() {
