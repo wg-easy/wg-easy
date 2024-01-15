@@ -19,7 +19,7 @@ jobs:
       pull-requests: write
 
     steps:
-    - uses: actions/stale@v5
+    - uses: actions/stale@v9
       with:
           days-before-issue-stale: 14
           days-before-issue-close: 7
@@ -31,4 +31,4 @@ jobs:
           stale-pr-message: "This PR is stale because it has been open for 30 days with no activity."
           close-pr-message: "This PR was closed because it has been inactive for 14 days since being marked as stale."
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          operations-per-run: 100
+          operations-per-run: 5
