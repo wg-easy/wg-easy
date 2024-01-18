@@ -10,8 +10,14 @@ RUN npm ci --omit=dev
 
 # Copy build result to a new image.
 # This saves a lot of disk space.
-FROM docker.io/library/node:18-alpine
+# FROM docker.io/library/node:18-alpine
+FROM amneziavpn/amnezia-wg:latest
 COPY --from=build_node_modules /app /app
+
+# Install Node.js
+RUN apk add --no-cache \
+    nodejs \
+    npm
 
 # Move node_modules one directory up, so during development
 # we don't have to mount it in a volume.
@@ -29,9 +35,7 @@ RUN npm i -g nodemon
 RUN apk add --no-cache \
     dpkg \
     dumb-init \
-    iptables \
-    iptables-legacy \
-    wireguard-tools
+    iptables
 
 # Use iptables-legacy
 RUN update-alternatives --install /sbin/iptables iptables /sbin/iptables-legacy 10 --slave /sbin/iptables-restore iptables-restore /sbin/iptables-legacy-restore --slave /sbin/iptables-save iptables-save /sbin/iptables-legacy-save
