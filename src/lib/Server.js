@@ -17,6 +17,7 @@ const {
   WEBUI_HOST,
   RELEASE,
   PASSWORD,
+  LANG,
 } = require('../config');
 
 module.exports = class Server {
@@ -161,6 +162,9 @@ module.exports = class Server {
         const { address } = req.body;
         return WireGuard.updateClientAddress({ clientId, address });
       }))
+      .get('/api/lang', (Util.promisify(async () => {
+        return LANG;
+      })))
 
       .listen(PORT, WEBUI_HOST, () => {
         debug(`Listening on http://${WEBUI_HOST}:${PORT}`);
