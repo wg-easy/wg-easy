@@ -5,7 +5,7 @@
   <title>WireGuard</title>
   <link href="./css/app.css" rel="stylesheet">
   <link rel="manifest" href="./manifest.json">
-  <link rel="icon" type="image/png" href="./img/favicon.png">
+  <link rel="icon" href="img/favicon.ico" sizes="any">
   <link rel="apple-touch-icon" href="./img/apple-touch-icon.png">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -35,8 +35,8 @@
           </svg>
         </span>
         <h1 class="text-4xl dark:text-neutral-200 font-medium mt-2 mb-2">
-          <img src="./img/logo.png" width="32" class="inline align-middle dark:bg" />
-          <span class="align-middle">WireGuard</span>
+          <img src="./img/logo.svg" width="60" class="inline align-middle dark:bg" />
+          <span class="align-middle">AmneziaWG</span>
         </h1>
         <h2 class="text-sm text-gray-400 dark:text-neutral-400 mb-10"></h2>
 
@@ -211,18 +211,6 @@
 
                       <div class="rounded-full w-4 h-4 m-1 bg-white"></div>
                     </div>
-
-                    <!-- Show QR-->
-
-                    <button
-                      class="align-middle bg-gray-100 dark:bg-neutral-600 dark:text-neutral-300 hover:bg-red-800 dark:hover:bg-red-800 hover:text-white dark:hover:text-white p-2 rounded transition"
-                      :title="$t('showQR')" @click="qrcode = `./api/wireguard/client/${client.id}/qrcode.svg`">
-                      <svg class="w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
-                      </svg>
-                    </button>
 
                     <!-- Download Config -->
                     <a :href="'./api/wireguard/client/' + client.id + '/configuration'" download
@@ -439,7 +427,7 @@
       </div>
 
       <div v-if="authenticated === false">
-        <h1 class="text-4xl font-medium my-16 text-gray-700 dark:text-neutral-200 text-center">WireGuard</h1>
+        <h1 class="text-4xl font-medium my-16 text-gray-700 dark:text-neutral-200 text-center">AmneziaWG</h1>
 
         <form @submit="login"
           class="shadow rounded-md bg-white dark:bg-neutral-700 mx-auto w-64 p-5 overflow-hidden mt-10">
@@ -486,12 +474,6 @@
       </div>
 
     </div>
-
-    <p v-cloak class="text-center m-10 text-gray-300 dark:text-neutral-600 text-xs"> <a class="hover:underline" target="_blank" 
-        href="https://github.com/wg-easy/wg-easy">WireGuard Easy</a> © 2021-2024 by <a class="hover:underline" target="_blank"
-        href="https://emilenijssen.nl/?ref=wg-easy">Emile Nijssen</a> is licensed under <a class="hover:underline" target="_blank"
-        href="http://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> · <a class="hover:underline"
-        href="https://github.com/sponsors/WeeJeWel" target="_blank">{{$t("donate")}}</a></p>
 
   </div>
 
