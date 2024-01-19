@@ -41,6 +41,10 @@ module.exports = class Server {
         return RELEASE;
       })))
 
+      .get('/api/lang', (Util.promisify(async () => {
+        return LANG;
+      })))
+
     // Authentication
       .get('/api/session', Util.promisify(async (req) => {
         const requiresPassword = !!process.env.PASSWORD;
@@ -162,9 +166,6 @@ module.exports = class Server {
         const { address } = req.body;
         return WireGuard.updateClientAddress({ clientId, address });
       }))
-      .get('/api/lang', (Util.promisify(async () => {
-        return LANG;
-      })))
 
       .listen(PORT, WEBUI_HOST, () => {
         debug(`Listening on http://${WEBUI_HOST}:${PORT}`);
