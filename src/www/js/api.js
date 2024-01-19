@@ -36,6 +36,13 @@ class API {
     });
   }
 
+  async getLang() {
+    return this.call({
+      method: 'get',
+      path: '/lang',
+    });
+  }
+
   async getSession() {
     return this.call({
       method: 'get',
@@ -114,13 +121,6 @@ class API {
       method: 'put',
       path: `/wireguard/client/${clientId}/address/`,
       body: { address },
-    });
-  }
-
-  async getLang() {
-    return this.call({
-      method: 'get',
-      path: '/lang',
     });
   }
 
