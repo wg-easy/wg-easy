@@ -42,7 +42,7 @@ class API {
       path: '/lang',
     });
   }
-  
+
   async getSession() {
     return this.call({
       method: 'get',
