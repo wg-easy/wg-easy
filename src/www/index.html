@@ -26,7 +26,8 @@
         <span v-if="requiresPassword"
           class="text-sm text-gray-400 dark:text-neutral-400 mb-10 mr-2 mt-3 cursor-pointer hover:underline float-right"
           @click="logout">
-          Logout
+          {{$t("logout")}}
+
           <svg class="h-3 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
             stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -44,13 +45,13 @@
           :title="`v${currentRelease} → v${latestRelease.version}`">
           <div class="container mx-auto flex flex-row flex-auto items-center">
             <div class="flex-grow">
-              <p class="font-bold">There is an update available!</p>
+              <p class="font-bold">{{$t("updateAvailable")}}</p>
               <p>{{latestRelease.changelog}}</p>
             </div>
 
             <a href="https://github.com/wg-easy/wg-easy#updating" target="_blank"
               class="p-3 rounded-md bg-white dark:bg-red-100 float-right font-sm font-semibold text-red-800 dark:text-red-600 flex-shrink-0 border-2 border-red-800 dark:border-red-600 hover:border-white dark:hover:border-red-600 hover:text-white dark:hover:text-red-100 hover:bg-red-800 dark:hover:bg-red-600 transition-all">
-              Update →
+              {{$t("update")}} →
             </a>
           </div>
         </div>
@@ -58,7 +59,7 @@
         <div class="shadow-md rounded-lg bg-white dark:bg-neutral-700 overflow-hidden">
           <div class="flex flex-row flex-auto items-center p-3 px-5 border-b-2 border-gray-100 dark:border-neutral-600">
             <div class="flex-grow">
-              <p class="text-2xl font-medium dark:text-neutral-200">Clients</p>
+              <p class="text-2xl font-medium dark:text-neutral-200">{{$t("clients")}}</p>
             </div>
             <div class="flex-shrink-0">
               <button @click="clientCreate = true; clientCreateName = '';"
@@ -68,7 +69,7 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
-                <span class="text-sm">New</span>
+                <span class="text-sm">{{$t("new")}}</span>
               </button>
             </div>
           </div>
@@ -88,7 +89,6 @@
                   style="transform: scaleY(-1);">
                 </apexchart>
               </div>
-
               <div class="relative p-5 z-10 flex flex-col md:flex-row justify-between">
                 <div class="flex items-center pb-2 md:pb-0">
                   <div class="h-10 w-10 mr-5 rounded-full bg-gray-50 relative">
@@ -112,7 +112,7 @@
 
                     <!-- Name -->
                     <div class="text-gray-700 dark:text-neutral-200 group"
-                      :title="'Created on ' + dateTime(new Date(client.createdAt))">
+                      :title="$t('createdOn') + dateTime(new Date(client.createdAt))">
 
                       <!-- Show -->
                       <input v-show="clientEditNameId === client.id" v-model="clientEditName"
@@ -165,7 +165,7 @@
                       </span>
 
                       <!-- Transfer TX -->
-                      <span v-if="client.transferTx" :title="'Total Download: ' + bytes(client.transferTx)">
+                      <span v-if="client.transferTx" :title="$t('totalDownload') + bytes(client.transferTx)">
                         ·
                         <svg class="align-middle h-3 inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                           fill="currentColor">
@@ -177,7 +177,7 @@
                       </span>
 
                       <!-- Transfer RX -->
-                      <span v-if="client.transferRx" :title="'Total Upload: ' + bytes(client.transferRx)">
+                      <span v-if="client.transferRx" :title="$t('totalUpload') + bytes(client.transferRx)">
                         ·
                         <svg class="align-middle h-3 inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                           fill="currentColor">
@@ -190,7 +190,7 @@
 
                       <!-- Last seen -->
                       <span v-if="client.latestHandshakeAt"
-                        :title="'Last seen on ' + dateTime(new Date(client.latestHandshakeAt))">
+                        :title="$t('lastSeen') + dateTime(new Date(client.latestHandshakeAt))">
                         · {{new Date(client.latestHandshakeAt) | timeago}}
                       </span>
                     </div>
@@ -201,19 +201,22 @@
                   <div class="text-gray-400 dark:text-neutral-400 flex gap-1 items-center justify-between">
 
                     <!-- Enable/Disable -->
-                    <div @click="disableClient(client)" v-if="client.enabled === true" title="Disable Client"
+                    <div @click="disableClient(client)" v-if="client.enabled === true" :title="$t('disableClient')"
                       class="inline-block align-middle rounded-full w-10 h-6 mr-1 bg-red-800 cursor-pointer hover:bg-red-700 transition-all">
                       <div class="rounded-full w-4 h-4 m-1 ml-5 bg-white"></div>
                     </div>
-                    <div @click="enableClient(client)" v-if="client.enabled === false" title="Enable Client"
+
+                    <div @click="enableClient(client)" v-if="client.enabled === false" :title="$t('enableClient')"
                       class="inline-block align-middle rounded-full w-10 h-6 mr-1 bg-gray-200 dark:bg-neutral-400 cursor-pointer hover:bg-gray-300 dark:hover:bg-neutral-500 transition-all">
+
                       <div class="rounded-full w-4 h-4 m-1 bg-white"></div>
                     </div>
 
                     <!-- Show QR-->
+
                     <button
                       class="align-middle bg-gray-100 dark:bg-neutral-600 dark:text-neutral-300 hover:bg-red-800 dark:hover:bg-red-800 hover:text-white dark:hover:text-white p-2 rounded transition"
-                      title="Show QR Code" @click="qrcode = `./api/wireguard/client/${client.id}/qrcode.svg`">
+                      :title="$t('showQR')" @click="qrcode = `./api/wireguard/client/${client.id}/qrcode.svg`">
                       <svg class="w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -224,7 +227,7 @@
                     <!-- Download Config -->
                     <a :href="'./api/wireguard/client/' + client.id + '/configuration'" download
                       class="align-middle inline-block bg-gray-100 dark:bg-neutral-600 dark:text-neutral-300 hover:bg-red-800 dark:hover:bg-red-800 hover:text-white dark:hover:text-white p-2 rounded transition"
-                      title="Download Configuration">
+                      :title="$t('downloadConfig')">
                       <svg class="w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -233,9 +236,10 @@
                     </a>
 
                     <!-- Delete -->
+
                     <button
                       class="align-middle bg-gray-100 dark:bg-neutral-600 dark:text-neutral-300 hover:bg-red-800 dark:hover:bg-red-800 hover:text-white dark:hover:text-white p-2 rounded transition"
-                      title="Delete Client" @click="clientDelete = client">
+                      :title="$t('deleteClient')" @click="clientDelete = client">
                       <svg class="w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd"
                           d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
@@ -250,7 +254,7 @@
             </div>
             <div v-if="clients && clients.length === 0">
               <p class="text-center m-10 text-gray-400 dark:text-neutral-400 text-sm">
-                There are no clients yet.<br /><br />
+                {{$t("noClients")}}<br /><br />
                 <button @click="clientCreate = true; clientCreateName = '';"
                   class="bg-red-800 hover:bg-red-700 text-white border-2 border-none py-2 px-4 rounded inline-flex items-center transition">
                   <svg class="w-4 mr-2" inline xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -258,7 +262,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                   </svg>
-                  <span class="text-sm">New Client</span>
+                  <span class="text-sm">{{$t("newClient")}}</span>
                 </button>
               </p>
             </div>
@@ -334,13 +338,13 @@
                   </div>
                   <div class="flex-grow mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                     <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-neutral-200" id="modal-headline">
-                      New Client
+                      {{$t("newClient")}}
                     </h3>
                     <div class="mt-2">
                       <p class="text-sm text-gray-500">
                         <input
                           class="rounded p-2 border-2 dark:bg-neutral-700 dark:text-neutral-200 border-gray-100 dark:border-neutral-600 focus:border-gray-200 focus:dark:border-neutral-500 dark:placeholder:text-neutral-400 outline-none w-full"
-                          type="text" v-model.trim="clientCreateName" placeholder="Name" />
+                          type="text" v-model.trim="clientCreateName" :placeholder="$t('name')" />
                       </p>
                     </div>
                   </div>
@@ -349,15 +353,15 @@
               <div class="bg-gray-50 dark:bg-neutral-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                 <button v-if="clientCreateName.length" type="button" @click="createClient(); clientCreate = null"
                   class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-800 text-base font-medium text-white hover:bg-red-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
-                  Create
+                  {{$t("create")}}
                 </button>
                 <button v-else type="button"
                   class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-gray-200 dark:bg-neutral-400 text-base font-medium text-white dark:text-neutral-300 sm:ml-3 sm:w-auto sm:text-sm cursor-not-allowed">
-                  Create
+                  {{$t("create")}}
                 </button>
                 <button type="button" @click="clientCreate = null"
                   class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-neutral-500 shadow-sm px-4 py-2 bg-white dark:bg-neutral-500 text-base font-medium text-gray-700 dark:text-neutral-50 hover:bg-gray-50 dark:hover:bg-neutral-600 dark:hover:border-neutral-600 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                  Cancel
+                  {{$t("cancel")}}
                 </button>
               </div>
             </div>
@@ -409,12 +413,11 @@
                   </div>
                   <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                     <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-neutral-200" id="modal-headline">
-                      Delete Client
+                      {{$t("deleteClient")}}
                     </h3>
                     <div class="mt-2">
                       <p class="text-sm text-gray-500 dark:text-neutral-300">
-                        Are you sure you want to delete <strong>{{clientDelete.name}}</strong>?
-                        This action cannot be undone.
+                        {{$t("deleteDialog1")}} <strong>{{clientDelete.name}}</strong>? {{$t("deleteDialog2")}}
                       </p>
                     </div>
                   </div>
@@ -423,11 +426,11 @@
               <div class="bg-gray-50 dark:bg-neutral-600 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                 <button type="button" @click="deleteClient(clientDelete); clientDelete = null"
                   class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 dark:bg-red-600 text-base font-medium text-white dark:text-white hover:bg-red-700 dark:hover:bg-red-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
-                  Delete
+                  {{$t("deleteClient")}}
                 </button>
                 <button type="button" @click="clientDelete = null"
                   class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-neutral-500 shadow-sm px-4 py-2 bg-white dark:bg-neutral-500 text-base font-medium text-gray-700 dark:text-neutral-50 hover:bg-gray-50 dark:hover:bg-neutral-600 dark:hover:border-neutral-600 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                  Cancel
+                  {{$t("cancel")}}
                 </button>
               </div>
             </div>
@@ -448,7 +451,7 @@
             </svg>
           </div>
 
-          <input type="password" name="password" placeholder="Password" v-model="password"
+          <input type="password" name="password" :placeholder="$t('password')" v-model="password"
             class="px-3 py-2 text-sm dark:bg-neutral-700 text-gray-500 dark:text-gray-500 mb-5 border-2 border-gray-100 dark:border-neutral-800 rounded-lg w-full focus:border-red-800 dark:focus:border-red-800 dark:placeholder:text-neutral-400 outline-none" />
 
           <button v-if="authenticating"
@@ -463,10 +466,10 @@
           </button>
           <input v-if="!authenticating && password" type="submit"
             class="bg-red-800 dark:bg-red-800 w-full rounded shadow py-2 text-sm text-white dark:text-white hover:bg-red-700 dark:hover:bg-red-700 transition cursor-pointer"
-            value="Sign In">
+            :value="$t('signIn')">
           <input v-if="!authenticating && !password" type="submit"
             class="bg-gray-200 dark:bg-neutral-800 w-full rounded shadow py-2 text-sm text-white dark:text-white cursor-not-allowed"
-            value="Sign In">
+            :value="$t('signIn')">
         </form>
       </div>
 
@@ -488,17 +491,18 @@
         href="https://github.com/wg-easy/wg-easy">WireGuard Easy</a> © 2021-2024 by <a class="hover:underline" target="_blank"
         href="https://emilenijssen.nl/?ref=wg-easy">Emile Nijssen</a> is licensed under <a class="hover:underline" target="_blank"
         href="http://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> · <a class="hover:underline"
-        href="https://github.com/sponsors/WeeJeWel" target="_blank">Donate</a></p>
-
+        href="https://github.com/sponsors/WeeJeWel" target="_blank">{{$t("donate")}}</a></p>
 
   </div>
 
   <script src="./js/vendor/vue.min.js"></script>
+  <script src="./js/vendor/vue-i18n.min.js"></script>
   <script src="./js/vendor/apexcharts.min.js"></script>
   <script src="./js/vendor/vue-apexcharts.min.js"></script>
   <script src="./js/vendor/sha512.min.js"></script>
-  <script src="./js/vendor/timeago.min.js"></script>
+  <script src="./js/vendor/timeago.full.min.js"></script>
   <script src="./js/api.js"></script>
+  <script src="./js/i18n.js"></script>
   <script src="./js/app.js"></script>
 </body>
 
