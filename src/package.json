@@ -8,7 +8,7 @@
     "serve": "DEBUG=Server,WireGuard nodemon server.js",
     "serve-with-password": "PASSWORD=wg npm run serve",
     "lint": "eslint .",
-    "buildcss": "npx tailwindcss -i ./www/src/css/app.css -o ./www/css/app.css --watch"
+    "buildcss": "npx tailwindcss -i ./www/src/css/app.css -o ./www/css/app.css"
   },
   "author": "Emile Nijssen",
   "license": "GPL",
