@@ -158,6 +158,11 @@ module.exports = class Server {
         const { name } = req.body;
         return WireGuard.updateClientName({ clientId, name });
       }))
+      .put('/api/wireguard/client/:clientId/address6', Util.promisify(async req => {
+        const { clientId } = req.params;
+        const { address6 } = req.body;
+        return WireGuard.updateClientAddress6({ clientId, address6 });
+      }))
       .put('/api/wireguard/client/:clientId/address', Util.promisify(async (req, res) => {
         const { clientId } = req.params;
         if (clientId === '__proto__' || clientId === 'constructor' || clientId === 'prototype') {

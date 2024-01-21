@@ -16,7 +16,9 @@ const {
   WG_PORT,
   WG_MTU,
   WG_DEFAULT_DNS,
+  WG_DEFAULT_DNS6,
   WG_DEFAULT_ADDRESS,
+  WG_DEFAULT_ADDRESS6,
   WG_PERSISTENT_KEEPALIVE,
   WG_ALLOWED_IPS,
   WG_PRE_UP,
@@ -46,12 +48,14 @@ module.exports = class WireGuard {
             log: 'echo ***hidden*** | wg pubkey',
           });
           const address = WG_DEFAULT_ADDRESS.replace('x', '1');
+	  const address6 = WG_DEFAULT_ADDRESS6.replace('x', '1');
 
           config = {
             server: {
               privateKey,
               publicKey,
               address,
+	      address6,
             },
             clients: {},
           };
@@ -71,7 +75,11 @@ module.exports = class WireGuard {
         // await Util.exec('iptables -A INPUT -p udp -m udp --dport 51820 -j ACCEPT');
         // await Util.exec('iptables -A FORWARD -i wg0 -j ACCEPT');
         // await Util.exec('iptables -A FORWARD -o wg0 -j ACCEPT');
-        await this.__syncConfig();
+        // await Util.exec(`ip6tables -t nat -A POSTROUTING -s ${WG_DEFAULT_ADDRESS6.replace('x', '')}/120 -o eth0 -j MASQUERADE`);
+        // await Util.exec('ip6tables -A INPUT -p udp -m udp --dport 51820 -j ACCEPT');
+        // await Util.exec('ip6tables -A FORWARD -i wg0 -j ACCEPT');
+        // await Util.exec('ip6tables -A FORWARD -o wg0 -j ACCEPT');
+	await this.__syncConfig();
 
         return config;
       });
@@ -94,7 +102,7 @@ module.exports = class WireGuard {
 # Server
 [Interface]
 PrivateKey = ${config.server.privateKey}
-Address = ${config.server.address}/24
+Address = ${config.server.address}/24, ${config.server.address6}/120
 ListenPort = 51820
 PreUp = ${WG_PRE_UP}
 PostUp = ${WG_POST_UP}
@@ -111,7 +119,7 @@ PostDown = ${WG_POST_DOWN}
 [Peer]
 PublicKey = ${client.publicKey}
 PresharedKey = ${client.preSharedKey}
-AllowedIPs = ${client.address}/32`;
+AllowedIPs = ${client.address}/32, ${client.address6}/128`;    
     }
 
     debug('Config saving...');
@@ -137,6 +145,7 @@ AllowedIPs = ${client.address}/32`;
       name: client.name,
       enabled: client.enabled,
       address: client.address,
+      address6: client.address6,
       publicKey: client.publicKey,
       createdAt: new Date(client.createdAt),
       updatedAt: new Date(client.updatedAt),
@@ -195,12 +204,14 @@ AllowedIPs = ${client.address}/32`;
   async getClientConfiguration({ clientId }) {
     const config = await this.getConfig();
     const client = await this.getClient({ clientId });
+    const isDnsSet = WG_DEFAULT_DNS || WG_DEFAULT_DNS6;
+    const dnsServers = [WG_DEFAULT_DNS, WG_DEFAULT_DNS6].filter(item => !!item).join(', ')
 
     return `
 [Interface]
 PrivateKey = ${client.privateKey}
-Address = ${client.address}/24
-${WG_DEFAULT_DNS ? `DNS = ${WG_DEFAULT_DNS}` : ''}
+Address = ${client.address}/24, ${client.address6}/64
+${isDnsSet ? `DNS = ${dnsServers}` : ''}
 ${WG_MTU ? `MTU = ${WG_MTU}` : ''}
 
 [Peer]
@@ -247,12 +258,29 @@ Endpoint = ${WG_HOST}:${WG_PORT}`;
       throw new Error('Maximum number of clients reached.');
     }
 
+    let address6;
+    for (let i = 2; i < 255; i++) {
+      const client = Object.values(config.clients).find(client => {
+        return client.address6 === WG_DEFAULT_ADDRESS6.replace('x', i.toString(16));
+      });
+
+      if (!client) {
+        address6 = WG_DEFAULT_ADDRESS6.replace('x', i.toString(16));
+        break;
+      }
+    }
+
+    if (!address6) {
+      throw new Error('Maximum number of clients reached.');
+    }
+
     // Create Client
     const id = uuid.v4();
     const client = {
       id,
       name,
       address,
+      address6,
       privateKey,
       publicKey,
       preSharedKey,
@@ -314,6 +342,19 @@ Endpoint = ${WG_HOST}:${WG_PORT}`;
     }
 
     client.address = address;
+    client.updatedAt = new Date();
+
+    await this.saveConfig();
+  }
+
+  async updateClientAddress6({ clientId, address6 }) {
+    const client = await this.getClient({ clientId });
+
+    if (!Util.isValidIPv6(address6)) {
+      throw new ServerError(`Invalid Address6: ${address6}`, 400);
+    }
+
+    client.address6 = address6;
     client.updatedAt = new Date();
 
     await this.saveConfig();
