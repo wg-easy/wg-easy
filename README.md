@@ -22,7 +22,7 @@ You have found the easiest way to install & manage WireGuard on any Linux host!
 * Statistics for which clients are connected.
 * Tx/Rx charts for each connected client.
 * Gravatar support.
-* Automatic Light / Dark Mode (WIP: available in `nightly` build)
+* Automatic Light / Dark Mode
 
 ## Requirements
 
@@ -50,6 +50,7 @@ To automatically install & run wg-easy, simply run:
 <pre>
 $ docker run -d \
   --name=wg-easy \
+  -e LANG=de
   -e WG_HOST=<b>🚨YOUR_SERVER_IP</b> \
   -e PASSWORD=<b>🚨YOUR_ADMIN_PASSWORD</b> \
   -v ~/.wg-easy:/etc/wireguard \

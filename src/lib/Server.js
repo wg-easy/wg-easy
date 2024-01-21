@@ -17,6 +17,7 @@ const {
   WEBUI_HOST,
   RELEASE,
   PASSWORD,
+  LANG,
 } = require('../config');
 
 module.exports = class Server {
@@ -38,6 +39,10 @@ module.exports = class Server {
 
       .get('/api/release', (Util.promisify(async () => {
         return RELEASE;
+      })))
+
+      .get('/api/lang', (Util.promisify(async () => {
+        return LANG;
       })))
 
     // Authentication

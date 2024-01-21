@@ -5,6 +5,9 @@ volumes:
 services:
   wg-easy:
     environment:
+      # Change Language:
+      # (Supports: en, ru, tr, no, pl, fr, de)
+      - LANG=de
       # ⚠️ Required:
       # Change this to your host's public address
       - WG_HOST=raspberrypi.local

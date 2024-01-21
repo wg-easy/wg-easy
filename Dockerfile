@@ -26,7 +26,7 @@ RUN mv /app/node_modules /node_modules
 RUN npm i -g nodemon
 
 # Install Linux packages
-RUN apk add -U --no-cache \
+RUN apk add --no-cache \
     dpkg \
     dumb-init \
     iptables \
