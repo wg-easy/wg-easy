@@ -252,7 +252,7 @@ new Vue({
     },
     updateClientAddress6(client, address6) {
       this.api.updateClientAddress6({ clientId: client.id, address6 })
-        .catch(err => alert(err.message || err.toString()))
+        .catch((err) => alert(err.message || err.toString()))
         .finally(() => this.refresh().catch(console.error));
     },
     toggleTheme() {

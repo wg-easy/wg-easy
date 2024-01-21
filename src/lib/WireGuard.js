@@ -48,14 +48,14 @@ module.exports = class WireGuard {
             log: 'echo ***hidden*** | wg pubkey',
           });
           const address = WG_DEFAULT_ADDRESS.replace('x', '1');
-	  const address6 = WG_DEFAULT_ADDRESS6.replace('x', '1');
+          const address6 = WG_DEFAULT_ADDRESS6.replace('x', '1');
 
           config = {
             server: {
               privateKey,
               publicKey,
               address,
-	      address6,
+              address6,
             },
             clients: {},
           };
@@ -79,7 +79,7 @@ module.exports = class WireGuard {
         // await Util.exec('ip6tables -A INPUT -p udp -m udp --dport 51820 -j ACCEPT');
         // await Util.exec('ip6tables -A FORWARD -i wg0 -j ACCEPT');
         // await Util.exec('ip6tables -A FORWARD -o wg0 -j ACCEPT');
-	await this.__syncConfig();
+        await this.__syncConfig();
 
         return config;
       });
@@ -119,7 +119,7 @@ PostDown = ${WG_POST_DOWN}
 [Peer]
 PublicKey = ${client.publicKey}
 PresharedKey = ${client.preSharedKey}
-AllowedIPs = ${client.address}/32, ${client.address6}/128`;    
+AllowedIPs = ${client.address}/32, ${client.address6}/128`;
     }
 
     debug('Config saving...');
@@ -205,7 +205,7 @@ AllowedIPs = ${client.address}/32, ${client.address6}/128`;
     const config = await this.getConfig();
     const client = await this.getClient({ clientId });
     const isDnsSet = WG_DEFAULT_DNS || WG_DEFAULT_DNS6;
-    const dnsServers = [WG_DEFAULT_DNS, WG_DEFAULT_DNS6].filter(item => !!item).join(', ')
+    const dnsServers = [WG_DEFAULT_DNS, WG_DEFAULT_DNS6].filter((item) => !!item).join(', ');
 
     return `
 [Interface]
@@ -260,7 +260,7 @@ Endpoint = ${WG_HOST}:${WG_PORT}`;
 
     let address6;
     for (let i = 2; i < 255; i++) {
-      const client = Object.values(config.clients).find(client => {
+      const client = Object.values(config.clients).find((client) => {
         return client.address6 === WG_DEFAULT_ADDRESS6.replace('x', i.toString(16));
       });
 
