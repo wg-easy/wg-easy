@@ -36,6 +36,13 @@ class API {
     });
   }
 
+  async getLang() {
+    return this.call({
+      method: 'get',
+      path: '/lang',
+    });
+  }
+
   async getSession() {
     return this.call({
       method: 'get',
@@ -62,7 +69,7 @@ class API {
     return this.call({
       method: 'get',
       path: '/wireguard/client',
-    }).then(clients => clients.map(client => ({
+    }).then((clients) => clients.map((client) => ({
       ...client,
       createdAt: new Date(client.createdAt),
       updatedAt: new Date(client.updatedAt),

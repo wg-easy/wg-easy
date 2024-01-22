@@ -4,6 +4,7 @@ const { release } = require('./package.json');
 
 module.exports.RELEASE = release;
 module.exports.PORT = process.env.PORT || 51821;
+module.exports.WEBUI_HOST = process.env.WEBUI_HOST || '0.0.0.0';
 module.exports.PASSWORD = process.env.PASSWORD;
 module.exports.WG_PATH = process.env.WG_PATH || '/etc/wireguard/';
 module.exports.WG_DEVICE = process.env.WG_DEVICE || 'eth0';
@@ -28,3 +29,4 @@ iptables -A FORWARD -o wg0 -j ACCEPT;
 
 module.exports.WG_PRE_DOWN = process.env.WG_PRE_DOWN || '';
 module.exports.WG_POST_DOWN = process.env.WG_POST_DOWN || '';
+module.exports.LANG = process.env.LANG || 'en';

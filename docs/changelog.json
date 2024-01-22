@@ -5,5 +5,8 @@
   "4": "Now with pretty charts for client's network speed. Enjoy!",
   "5": "Many small improvements & feature requests. Enjoy!",
   "6": "Many small performance improvements & bug fixes. Enjoy!",
-  "7": "Improved the look & performance of the upload/download chart."
+  "7": "Improved the look & performance of the upload/download chart.",
+  "8": "Updated to Node.js v18.",
+  "9": "Fixed issue running on devices with older kernels.",
+  "10": "Added sessionless HTTP API auth & automatic dark mode."
 }

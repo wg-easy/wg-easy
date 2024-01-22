@@ -23,8 +23,15 @@ function bytes(bytes, decimals, kib, maxunit) {
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
 }
 
+const i18n = new VueI18n({
+  locale: localStorage.getItem('lang') || 'en',
+  fallbackLocale: 'en',
+  messages,
+});
+
 new Vue({
   el: '#app',
+  i18n,
   data: {
     authenticated: null,
     authenticating: false,
@@ -44,6 +51,8 @@ new Vue({
 
     currentRelease: null,
     latestRelease: null,
+
+    isDark: null,
 
     chartOptions: {
       chart: {
@@ -112,7 +121,7 @@ new Vue({
     },
   },
   methods: {
-    dateTime: value => {
+    dateTime: (value) => {
       return new Intl.DateTimeFormat(undefined, {
         year: 'numeric',
         month: 'short',
@@ -127,9 +136,9 @@ new Vue({
       if (!this.authenticated) return;
 
       const clients = await this.api.getClients();
-      this.clients = clients.map(client => {
+      this.clients = clients.map((client) => {
         if (client.name.includes('@') && client.name.includes('.')) {
-          client.avatar = `https://www.gravatar.com/avatar/${md5(client.name)}?d=blank`;
+          client.avatar = `https://www.gravatar.com/avatar/${sha512(client.name)}?d=blank`;
         }
 
         if (!this.clientsPersist[client.id]) {
@@ -186,7 +195,7 @@ new Vue({
           this.requiresPassword = session.requiresPassword;
           return this.refresh();
         })
-        .catch(err => {
+        .catch((err) => {
           alert(err.message || err.toString());
         })
         .finally(() => {
@@ -202,7 +211,7 @@ new Vue({
           this.authenticated = false;
           this.clients = null;
         })
-        .catch(err => {
+        .catch((err) => {
           alert(err.message || err.toString());
         });
     },
@@ -211,54 +220,69 @@ new Vue({
       if (!name) return;
 
       this.api.createClient({ name })
-        .catch(err => alert(err.message || err.toString()))
+        .catch((err) => alert(err.message || err.toString()))
         .finally(() => this.refresh().catch(console.error));
     },
     deleteClient(client) {
       this.api.deleteClient({ clientId: client.id })
-        .catch(err => alert(err.message || err.toString()))
+        .catch((err) => alert(err.message || err.toString()))
         .finally(() => this.refresh().catch(console.error));
     },
     enableClient(client) {
       this.api.enableClient({ clientId: client.id })
-        .catch(err => alert(err.message || err.toString()))
+        .catch((err) => alert(err.message || err.toString()))
         .finally(() => this.refresh().catch(console.error));
     },
     disableClient(client) {
       this.api.disableClient({ clientId: client.id })
-        .catch(err => alert(err.message || err.toString()))
+        .catch((err) => alert(err.message || err.toString()))
         .finally(() => this.refresh().catch(console.error));
     },
     updateClientName(client, name) {
       this.api.updateClientName({ clientId: client.id, name })
-        .catch(err => alert(err.message || err.toString()))
+        .catch((err) => alert(err.message || err.toString()))
         .finally(() => this.refresh().catch(console.error));
     },
     updateClientAddress(client, address) {
       this.api.updateClientAddress({ clientId: client.id, address })
-        .catch(err => alert(err.message || err.toString()))
+        .catch((err) => alert(err.message || err.toString()))
         .finally(() => this.refresh().catch(console.error));
+    },
+    toggleTheme() {
+      if (this.isDark) {
+        localStorage.theme = 'light';
+        document.documentElement.classList.remove('dark');
+      } else {
+        localStorage.theme = 'dark';
+        document.documentElement.classList.add('dark');
+      }
+      this.isDark = !this.isDark;
     },
   },
   filters: {
     bytes,
-    timeago: value => {
-      return timeago().format(value);
+    timeago: (value) => {
+      return timeago.format(value, i18n.locale);
     },
   },
   mounted() {
+    this.isDark = false;
+    if (localStorage.theme === 'dark') {
+      this.isDark = true;
+    }
+
     this.api = new API();
     this.api.getSession()
-      .then(session => {
+      .then((session) => {
         this.authenticated = session.authenticated;
         this.requiresPassword = session.requiresPassword;
         this.refresh({
           updateCharts: true,
-        }).catch(err => {
+        }).catch((err) => {
           alert(err.message || err.toString());
         });
       })
-      .catch(err => {
+      .catch((err) => {
         alert(err.message || err.toString());
       });
 
@@ -269,10 +293,16 @@ new Vue({
     }, 1000);
 
     Promise.resolve().then(async () => {
+      const lang = await this.api.getLang();
+      if (lang !== localStorage.getItem('lang') && i18n.availableLocales.includes(lang)) {
+        localStorage.setItem('lang', lang);
+        i18n.locale = lang;
+      }
+
       const currentRelease = await this.api.getRelease();
-      const latestRelease = await fetch('https://weejewel.github.io/wg-easy/changelog.json')
-        .then(res => res.json())
-        .then(releases => {
+      const latestRelease = await fetch('https://wg-easy.github.io/wg-easy/changelog.json')
+        .then((res) => res.json())
+        .then((releases) => {
           const releasesArray = Object.entries(releases).map(([version, changelog]) => ({
             version: parseInt(version, 10),
             changelog,

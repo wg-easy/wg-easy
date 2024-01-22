@@ -3,71 +3,73 @@
 
 <head>
   <title>WireGuard</title>
-  <link href="./css/vendor/tailwind.min.css" rel="stylesheet">
+  <link href="./css/app.css" rel="stylesheet">
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" type="image/png" href="./img/favicon.png">
   <link rel="apple-touch-icon" href="./img/apple-touch-icon.png">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
 </head>
-
 <style>
   [v-cloak] {
     display: none;
   }
 </style>
 
-<body class="bg-gray-50">
+<body class="bg-gray-50 dark:bg-neutral-800">
 
   <div id="app">
 
-    <div v-cloak class="container mx-auto max-w-3xl">
+    <div v-cloak class="container mx-auto max-w-3xl px-5 md:px-0">
 
       <div v-if="authenticated === true">
         <span v-if="requiresPassword"
-          class="text-sm text-gray-400 mb-10 mr-2 mt-3 cursor-pointer hover:underline float-right" @click="logout">
-          Logout
+          class="text-sm text-gray-400 dark:text-neutral-400 mb-10 mr-2 mt-3 cursor-pointer hover:underline float-right"
+          @click="logout">
+          {{$t("logout")}}
+
           <svg class="h-3 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
             stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
           </svg>
         </span>
-        <h1 class="text-4xl font-medium mt-10 mb-2">
-          <img src="./img/logo.png" width="32" class="inline align-middle" />
+        <h1 class="text-4xl dark:text-neutral-200 font-medium mt-2 mb-2">
+          <img src="./img/logo.png" width="32" class="inline align-middle dark:bg" />
           <span class="align-middle">WireGuard</span>
         </h1>
-        <h2 class="text-sm text-gray-400 mb-10"></h2>
+        <h2 class="text-sm text-gray-400 dark:text-neutral-400 mb-10"></h2>
 
-        <div v-if="latestRelease" class="bg-red-800 p-4 text-white text-sm font-small mb-10 rounded-md shadow-lg"
+        <div v-if="latestRelease"
+          class="bg-red-800 dark:bg-red-100 p-4 text-white dark:text-red-600 text-sm font-small mb-10 rounded-md shadow-lg"
           :title="`v${currentRelease} → v${latestRelease.version}`">
           <div class="container mx-auto flex flex-row flex-auto items-center">
             <div class="flex-grow">
-              <p class="font-bold">There is an update available!</p>
+              <p class="font-bold">{{$t("updateAvailable")}}</p>
               <p>{{latestRelease.changelog}}</p>
             </div>
 
-            <a href="https://github.com/WeeJeWel/wg-easy#updating" target="_blank"
-              class="p-3 rounded-md bg-white float-right font-sm font-semibold text-red-800 flex-shrink-0 border-2 border-red-800 hover:border-white hover:text-white hover:bg-red-800 transition-all">
-              Update →
+            <a href="https://github.com/wg-easy/wg-easy#updating" target="_blank"
+              class="p-3 rounded-md bg-white dark:bg-red-100 float-right font-sm font-semibold text-red-800 dark:text-red-600 flex-shrink-0 border-2 border-red-800 dark:border-red-600 hover:border-white dark:hover:border-red-600 hover:text-white dark:hover:text-red-100 hover:bg-red-800 dark:hover:bg-red-600 transition-all">
+              {{$t("update")}} →
             </a>
           </div>
         </div>
 
-        <div class="shadow-md rounded-lg bg-white overflow-hidden">
-          <div class="flex flex-row flex-auto items-center p-3 px-5 border border-b-2 border-gray-100">
+        <div class="shadow-md rounded-lg bg-white dark:bg-neutral-700 overflow-hidden">
+          <div class="flex flex-row flex-auto items-center p-3 px-5 border-b-2 border-gray-100 dark:border-neutral-600">
             <div class="flex-grow">
-              <p class="text-2xl font-medium">Clients</p>
+              <p class="text-2xl font-medium dark:text-neutral-200">{{$t("clients")}}</p>
             </div>
             <div class="flex-shrink-0">
               <button @click="clientCreate = true; clientCreateName = '';"
-                class="hover:bg-red-800 hover:border-red-800 hover:text-white text-gray-700 border-2 border-gray-100 py-2 px-4 rounded inline-flex items-center transition">
+                class="hover:bg-red-800 hover:border-red-800 hover:text-white text-gray-700 dark:text-neutral-200 border-2 border-gray-100 dark:border-neutral-600 py-2 px-4 rounded inline-flex items-center transition">
                 <svg class="w-4 mr-2" inline xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                   stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
-                <span class="text-sm">New</span>
+                <span class="text-sm">{{$t("new")}}</span>
               </button>
             </div>
           </div>
@@ -75,113 +77,55 @@
           <div>
             <!-- Client -->
             <div v-if="clients && clients.length > 0" v-for="client in clients" :key="client.id"
-              class="relative overflow-hidden border-b border-gray-100 border-solid">
+              class="relative overflow-hidden border-b last:border-b-0 border-gray-100 dark:border-neutral-600 border-solid">
 
               <!-- Chart -->
-              <div class="absolute z-0 bottom-0 left-0 right-0" style="width: 100%; height: 20%;">
-                <!-- Bar -->
-                <div v-for="(_, index) in client.transferTxHistory" :style="{
-                    display: 'inline-flex',
-                    alignItems: 'flex-end',
-                    width: '2%', // 1/100th of client.transferTxHistory.length
-                    height: '100%',
-                    padding: '0 3px',
-                    boxSizing: 'border-box',
-                    fontSize: 0,
-                  }">
-
-                  <!-- TX -->
-                  <div :style="{
-                    minHeight: '0px',
-                    minWidth: '2px',
-                    maxWidth: '4px',
-                    width: '50%',
-                    marginRight: '1px',
-                    height: Math.round((client.transferTxHistory[index]/client.transferMax)*100) + '%',
-                    background: client.hoverTx
-                      ? '#992922'
-                      : '#F3F4F6',
-                    transition: 'all 0.2s',
-                    borderRadius: '2px 2px 0 0',
-                  }"></div>
-
-                  <!-- RX -->
-                  <div :style="{
-                    minHeight: '0px',
-                    minWidth: '2px',
-                    maxWidth: '4px',
-                    width: '50%',
-                    height: Math.round((client.transferRxHistory[index]/client.transferMax)*100) + '%',
-                    background: client.hoverRx
-                    ? '#992922'
-                    : '#F0F1F3',
-                    transition: 'all 0.2s',
-                    borderRadius: '2px 2px 0 0',
-                  }"></div>
-                </div>
+              <div class="absolute z-0 bottom-0 left-0 right-0" style="top: 60%;">
+                <apexchart width="100%" height="100%" :options="client.chartOptions" :series="client.transferTxSeries">
+                </apexchart>
               </div>
+              <div class="absolute z-0 top-0 left-0 right-0" style="bottom: 60%;">
+                <apexchart width="100%" height="100%" :options="client.chartOptions" :series="client.transferRxSeries"
+                  style="transform: scaleY(-1);">
+                </apexchart>
+              </div>
+              <div class="relative p-5 z-10 flex flex-col md:flex-row justify-between">
+                <div class="flex items-center pb-2 md:pb-0">
+                  <div class="h-10 w-10 mr-5 rounded-full bg-gray-50 relative">
+                    <svg class="w-6 m-2 text-gray-300" xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                        clip-rule="evenodd" />
+                    </svg>
+                    <img v-if="client.avatar" :src="client.avatar" class="w-10 rounded-full absolute top-0 left-0" />
 
-              <div class="relative p-5 z-10 flex flex-row">
-                <div class="h-10 w-10 mr-5 rounded-full bg-gray-50 relative">
-                  <svg class="w-6 m-2 text-gray-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                    fill="currentColor">
-                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                      clip-rule="evenodd" />
-                  </svg>
-                  <img v-if="client.avatar" :src="client.avatar" class="w-10 rounded-full absolute top-0 left-0" />
-
-                  <div
-                    v-if="client.latestHandshakeAt && ((new Date() - new Date(client.latestHandshakeAt) < 1000 * 60 * 10))">
-                    <div class="animate-ping w-4 h-4 p-1 bg-red-100 rounded-full absolute -bottom-1 -right-1"></div>
-                    <div class="w-2 h-2 bg-red-800 rounded-full absolute bottom-0 right-0"></div>
-                  </div>
-                </div>
-
-                <div class="flex-grow">
-
-                  <!-- Name -->
-                  <div class="text-gray-700 group" :title="'Created on ' + dateTime(new Date(client.createdAt))">
-
-                    <!-- Show -->
-                    <input v-show="clientEditNameId === client.id" v-model="clientEditName"
-                      v-on:keyup.enter="updateClientName(client, clientEditName); clientEditName = null; clientEditNameId = null;"
-                      v-on:keyup.escape="clientEditName = null; clientEditNameId = null;"
-                      :ref="'client-' + client.id + '-name'"
-                      class="rounded px-1 border-2 border-gray-100 focus:border-gray-200 outline-none w-30" />
-                    <span v-show="clientEditNameId !== client.id"
-                      class="inline-block border-t-2 border-b-2 border-transparent">{{client.name}}</span>
-
-                    <!-- Edit -->
-                    <span v-show="clientEditNameId !== client.id"
-                      @click="clientEditName = client.name; clientEditNameId = client.id; setTimeout(() => $refs['client-' + client.id + '-name'][0].select(), 1);"
-                      class="cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity">
-                      <svg xmlns="http://www.w3.org/2000/svg"
-                        class="h-4 w-4 inline align-middle opacity-25 hover:opacity-100" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                      </svg>
-                    </span>
+                    <div
+                      v-if="client.latestHandshakeAt && ((new Date() - new Date(client.latestHandshakeAt) < 1000 * 60 * 10))">
+                      <div
+                        class="animate-ping w-4 h-4 p-1 bg-red-100 dark:bg-red-100 rounded-full absolute -bottom-1 -right-1">
+                      </div>
+                      <div class="w-2 h-2 bg-red-800 dark:bg-red-600 rounded-full absolute bottom-0 right-0"></div>
+                    </div>
                   </div>
 
-                  <!-- Info -->
-                  <div class="text-gray-400 text-xs">
+                  <div class="flex-grow">
 
-                    <!-- Address -->
-                    <span class="group">
+                    <!-- Name -->
+                    <div class="text-gray-700 dark:text-neutral-200 group"
+                      :title="$t('createdOn') + dateTime(new Date(client.createdAt))">
 
                       <!-- Show -->
-                      <input v-show="clientEditAddressId === client.id" v-model="clientEditAddress"
-                        v-on:keyup.enter="updateClientAddress(client, clientEditAddress); clientEditAddress = null; clientEditAddressId = null;"
-                        v-on:keyup.escape="clientEditAddress = null; clientEditAddressId = null;"
-                        :ref="'client-' + client.id + '-address'"
-                        class="rounded border-2 border-gray-100 focus:border-gray-200 outline-none w-20 text-black" />
-                      <span v-show="clientEditAddressId !== client.id"
-                        class="inline-block border-t-2 border-b-2 border-transparent">{{client.address}}</span>
+                      <input v-show="clientEditNameId === client.id" v-model="clientEditName"
+                        v-on:keyup.enter="updateClientName(client, clientEditName); clientEditName = null; clientEditNameId = null;"
+                        v-on:keyup.escape="clientEditName = null; clientEditNameId = null;"
+                        :ref="'client-' + client.id + '-name'"
+                        class="rounded px-1 border-2 dark:bg-neutral-700 border-gray-100 dark:border-neutral-600 focus:border-gray-200 dark:focus:border-neutral-500 dark:placeholder:text-neutral-500 outline-none w-30" />
+                      <span v-show="clientEditNameId !== client.id"
+                        class="inline-block border-t-2 border-b-2 border-transparent">{{client.name}}</span>
 
                       <!-- Edit -->
-                      <span v-show="clientEditAddressId !== client.id"
-                        @click="clientEditAddress = client.address; clientEditAddressId = client.id; setTimeout(() => $refs['client-' + client.id + '-address'][0].select(), 1);"
+                      <span v-show="clientEditNameId !== client.id"
+                        @click="clientEditName = client.name; clientEditNameId = client.id; setTimeout(() => $refs['client-' + client.id + '-name'][0].select(), 1);"
                         class="cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity">
                         <svg xmlns="http://www.w3.org/2000/svg"
                           class="h-4 w-4 inline align-middle opacity-25 hover:opacity-100" fill="none"
@@ -190,62 +134,89 @@
                             d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                         </svg>
                       </span>
-                    </span>
+                    </div>
 
-                    <!-- Transfer TX -->
-                    <span v-if="client.transferTx" :title="'Total Download: ' + bytes(client.transferTx)"
-                      @mouseover="client.hoverTx = clientsPersist[client.id].hoverTx = true;"
-                      @mouseleave="client.hoverTx = clientsPersist[client.id].hoverTx = false;"
-                      style="cursor: default;">
-                      ·
-                      <svg class="align-middle h-3 inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                        fill="currentColor">
-                        <path fill-rule="evenodd"
-                          d="M16.707 10.293a1 1 0 010 1.414l-6 6a1 1 0 01-1.414 0l-6-6a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l4.293-4.293a1 1 0 011.414 0z"
-                          clip-rule="evenodd" />
-                      </svg>
-                      {{client.transferTxCurrent | bytes}}/s
-                    </span>
+                    <!-- Info -->
+                    <div class="text-gray-400 dark:text-neutral-400 text-xs">
 
-                    <!-- Transfer RX -->
-                    <span v-if="client.transferRx" :title="'Total Upload: ' + bytes(client.transferRx)"
-                      @mouseover="client.hoverRx = clientsPersist[client.id].hoverRx = true;"
-                      @mouseleave="client.hoverRx = clientsPersist[client.id].hoverRx = false;"
-                      style="cursor: default;">
-                      ·
-                      <svg class="align-middle h-3 inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                        fill="currentColor">
-                        <path fill-rule="evenodd"
-                          d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z"
-                          clip-rule="evenodd" />
-                      </svg>
-                      {{client.transferRxCurrent | bytes}}/s
-                    </span>
+                      <!-- Address -->
+                      <span class="group block md:inline-block pb-1 md:pb-0">
 
-                    <!-- Last seen -->
-                    <span v-if="client.latestHandshakeAt"
-                      :title="'Last seen on ' + dateTime(new Date(client.latestHandshakeAt))">
-                      · {{new Date(client.latestHandshakeAt) | timeago}}
-                    </span>
+                        <!-- Show -->
+                        <input v-show="clientEditAddressId === client.id" v-model="clientEditAddress"
+                          v-on:keyup.enter="updateClientAddress(client, clientEditAddress); clientEditAddress = null; clientEditAddressId = null;"
+                          v-on:keyup.escape="clientEditAddress = null; clientEditAddressId = null;"
+                          :ref="'client-' + client.id + '-address'"
+                          class="rounded border-2 dark:bg-neutral-700 border-gray-100 dark:border-neutral-600 focus:border-gray-200 dark:focus:border-neutral-500 outline-none w-20 text-black dark:text-neutral-300 dark:placeholder:text-neutral-500" />
+                        <span v-show="clientEditAddressId !== client.id"
+                          class="inline-block border-t-2 border-b-2 border-transparent">{{client.address}}</span>
+
+                        <!-- Edit -->
+                        <span v-show="clientEditAddressId !== client.id"
+                          @click="clientEditAddress = client.address; clientEditAddressId = client.id; setTimeout(() => $refs['client-' + client.id + '-address'][0].select(), 1);"
+                          class="cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity">
+                          <svg xmlns="http://www.w3.org/2000/svg"
+                            class="h-4 w-4 inline align-middle opacity-25 hover:opacity-100" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          </svg>
+                        </span>
+                      </span>
+
+                      <!-- Transfer TX -->
+                      <span v-if="client.transferTx" :title="$t('totalDownload') + bytes(client.transferTx)">
+                        ·
+                        <svg class="align-middle h-3 inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                          fill="currentColor">
+                          <path fill-rule="evenodd"
+                            d="M16.707 10.293a1 1 0 010 1.414l-6 6a1 1 0 01-1.414 0l-6-6a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l4.293-4.293a1 1 0 011.414 0z"
+                            clip-rule="evenodd" />
+                        </svg>
+                        {{client.transferTxCurrent | bytes}}/s
+                      </span>
+
+                      <!-- Transfer RX -->
+                      <span v-if="client.transferRx" :title="$t('totalUpload') + bytes(client.transferRx)">
+                        ·
+                        <svg class="align-middle h-3 inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                          fill="currentColor">
+                          <path fill-rule="evenodd"
+                            d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z"
+                            clip-rule="evenodd" />
+                        </svg>
+                        {{client.transferRxCurrent | bytes}}/s
+                      </span>
+
+                      <!-- Last seen -->
+                      <span v-if="client.latestHandshakeAt"
+                        :title="$t('lastSeen') + dateTime(new Date(client.latestHandshakeAt))">
+                        · {{new Date(client.latestHandshakeAt) | timeago}}
+                      </span>
+                    </div>
                   </div>
                 </div>
 
-                <div class="text-right">
-                  <div class="text-gray-400">
+                <div class="flex items-center justify-end">
+                  <div class="text-gray-400 dark:text-neutral-400 flex gap-1 items-center justify-between">
 
                     <!-- Enable/Disable -->
-                    <div @click="disableClient(client)" v-if="client.enabled === true" title="Disable Client"
+                    <div @click="disableClient(client)" v-if="client.enabled === true" :title="$t('disableClient')"
                       class="inline-block align-middle rounded-full w-10 h-6 mr-1 bg-red-800 cursor-pointer hover:bg-red-700 transition-all">
                       <div class="rounded-full w-4 h-4 m-1 ml-5 bg-white"></div>
                     </div>
-                    <div @click="enableClient(client)" v-if="client.enabled === false" title="Enable Client"
-                      class="inline-block align-middle rounded-full w-10 h-6 mr-1 bg-gray-200 cursor-pointer hover:bg-gray-300 transition-all">
+
+                    <div @click="enableClient(client)" v-if="client.enabled === false" :title="$t('enableClient')"
+                      class="inline-block align-middle rounded-full w-10 h-6 mr-1 bg-gray-200 dark:bg-neutral-400 cursor-pointer hover:bg-gray-300 dark:hover:bg-neutral-500 transition-all">
+
                       <div class="rounded-full w-4 h-4 m-1 bg-white"></div>
                     </div>
 
                     <!-- Show QR-->
-                    <button class="align-middle bg-gray-100 hover:bg-red-800 hover:text-white p-2 rounded transition"
-                      title="Show QR Code" @click="qrcode = `./api/wireguard/client/${client.id}/qrcode.svg`">
+
+                    <button
+                      class="align-middle bg-gray-100 dark:bg-neutral-600 dark:text-neutral-300 hover:bg-red-800 dark:hover:bg-red-800 hover:text-white dark:hover:text-white p-2 rounded transition"
+                      :title="$t('showQR')" @click="qrcode = `./api/wireguard/client/${client.id}/qrcode.svg`">
                       <svg class="w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -255,8 +226,8 @@
 
                     <!-- Download Config -->
                     <a :href="'./api/wireguard/client/' + client.id + '/configuration'" download
-                      class="align-middle inline-block bg-gray-100 hover:bg-red-800 hover:text-white p-2 rounded transition"
-                      title="Download Configuration">
+                      class="align-middle inline-block bg-gray-100 dark:bg-neutral-600 dark:text-neutral-300 hover:bg-red-800 dark:hover:bg-red-800 hover:text-white dark:hover:text-white p-2 rounded transition"
+                      :title="$t('downloadConfig')">
                       <svg class="w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -265,8 +236,10 @@
                     </a>
 
                     <!-- Delete -->
-                    <button class="align-middle bg-gray-100 hover:bg-red-800 hover:text-white p-2 rounded transition"
-                      title="Delete Client" @click="clientDelete = client">
+
+                    <button
+                      class="align-middle bg-gray-100 dark:bg-neutral-600 dark:text-neutral-300 hover:bg-red-800 dark:hover:bg-red-800 hover:text-white dark:hover:text-white p-2 rounded transition"
+                      :title="$t('deleteClient')" @click="clientDelete = client">
                       <svg class="w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd"
                           d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
@@ -280,19 +253,20 @@
 
             </div>
             <div v-if="clients && clients.length === 0">
-              <p class="text-center m-10 text-gray-400 text-sm">There are no clients yet.<br /><br />
+              <p class="text-center m-10 text-gray-400 dark:text-neutral-400 text-sm">
+                {{$t("noClients")}}<br /><br />
                 <button @click="clientCreate = true; clientCreateName = '';"
-                  class="bg-red-800 text-white hover:bg-red-700 border-2 border-none py-2 px-4 rounded inline-flex items-center transition">
+                  class="bg-red-800 hover:bg-red-700 text-white border-2 border-none py-2 px-4 rounded inline-flex items-center transition">
                   <svg class="w-4 mr-2" inline xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                   </svg>
-                  <span class="text-sm">New Client</span>
+                  <span class="text-sm">{{$t("newClient")}}</span>
                 </button>
               </p>
             </div>
-            <div v-if="clients === null" class="text-gray-200 p-5">
+            <div v-if="clients === null" class="text-gray-200 dark:text-red-300 p-5">
               <svg class="w-5 animate-spin mx-auto" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
                 fill="currentColor">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -308,7 +282,8 @@
         <div v-if="qrcode">
           <div class="bg-black bg-opacity-50 fixed top-0 right-0 left-0 bottom-0 flex items-center justify-center z-20">
             <div class="bg-white rounded-md shadow-lg relative p-8">
-              <button @click="qrcode = null" class="absolute right-4 top-4 text-gray-600 hover:text-gray-800">
+              <button @click="qrcode = null"
+                class="absolute right-4 top-4 text-gray-600 dark:text-neutral-500 hover:text-gray-800 dark:hover:text-neutral-700">
                 <svg class="w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                   stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -321,7 +296,7 @@
 
         <!-- Create Dialog -->
         <div v-if="clientCreate" class="fixed z-10 inset-0 overflow-y-auto">
-          <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+          <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <!--
         Background overlay, show/hide based on modal state.
 
@@ -333,7 +308,7 @@
           To: "opacity-0"
       -->
             <div class="fixed inset-0 transition-opacity" aria-hidden="true">
-              <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+              <div class="absolute inset-0 bg-gray-500 dark:bg-black opacity-75 dark:opacity-50"></div>
             </div>
 
             <!-- This element is to trick the browser into centering the modal contents. -->
@@ -342,50 +317,51 @@
         Modal panel, show/hide based on modal state.
 
         Entering: "ease-out duration-300"
-          From: "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-          To: "opacity-100 translate-y-0 sm:scale-100"
+          From: "opacity-0 tranneutral-y-4 sm:tranneutral-y-0 sm:scale-95"
+          To: "opacity-100 tranneutral-y-0 sm:scale-100"
         Leaving: "ease-in duration-200"
-          From: "opacity-100 translate-y-0 sm:scale-100"
-          To: "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+          From: "opacity-100 tranneutral-y-0 sm:scale-100"
+          To: "opacity-0 tranneutral-y-4 sm:tranneutral-y-0 sm:scale-95"
       -->
             <div
-              class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
+              class="inline-block align-bottom bg-white dark:bg-neutral-700 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full"
               role="dialog" aria-modal="true" aria-labelledby="modal-headline">
-              <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+              <div class="bg-white dark:bg-neutral-700 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                 <div class="sm:flex sm:items-start">
                   <div
                     class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-800 sm:mx-0 sm:h-10 sm:w-10">
-                    <svg class="h-6 w-6 text-white" inline xmlns="http://www.w3.org/2000/svg" fill="none"
-                      viewBox="0 0 24 24" stroke="currentColor">
+                    <svg class="h-6 w-6 text-white" inline xmlns="http://www.w3.org/2000/svg"
+                      fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                     </svg>
                   </div>
                   <div class="flex-grow mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                    <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-headline">
-                      New Client
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-neutral-200" id="modal-headline">
+                      {{$t("newClient")}}
                     </h3>
                     <div class="mt-2">
                       <p class="text-sm text-gray-500">
-                        <input class="rounded p-2 border-2 border-gray-100 focus:border-gray-200 outline-none w-full"
-                          type="text" v-model.trim="clientCreateName" placeholder="Name" />
+                        <input
+                          class="rounded p-2 border-2 dark:bg-neutral-700 dark:text-neutral-200 border-gray-100 dark:border-neutral-600 focus:border-gray-200 focus:dark:border-neutral-500 dark:placeholder:text-neutral-400 outline-none w-full"
+                          type="text" v-model.trim="clientCreateName" :placeholder="$t('name')" />
                       </p>
                     </div>
                   </div>
                 </div>
               </div>
-              <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+              <div class="bg-gray-50 dark:bg-neutral-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                 <button v-if="clientCreateName.length" type="button" @click="createClient(); clientCreate = null"
                   class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-800 text-base font-medium text-white hover:bg-red-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
-                  Create
+                  {{$t("create")}}
                 </button>
                 <button v-else type="button"
-                  class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-gray-200 text-base font-medium text-white sm:ml-3 sm:w-auto sm:text-sm cursor-not-allowed">
-                  Create
+                  class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-gray-200 dark:bg-neutral-400 text-base font-medium text-white dark:text-neutral-300 sm:ml-3 sm:w-auto sm:text-sm cursor-not-allowed">
+                  {{$t("create")}}
                 </button>
                 <button type="button" @click="clientCreate = null"
-                  class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                  Cancel
+                  class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-neutral-500 shadow-sm px-4 py-2 bg-white dark:bg-neutral-500 text-base font-medium text-gray-700 dark:text-neutral-50 hover:bg-gray-50 dark:hover:bg-neutral-600 dark:hover:border-neutral-600 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                  {{$t("cancel")}}
                 </button>
               </div>
             </div>
@@ -394,7 +370,7 @@
 
         <!-- Delete Dialog -->
         <div v-if="clientDelete" class="fixed z-10 inset-0 overflow-y-auto">
-          <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+          <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <!--
         Background overlay, show/hide based on modal state.
 
@@ -406,7 +382,7 @@
           To: "opacity-0"
       -->
             <div class="fixed inset-0 transition-opacity" aria-hidden="true">
-              <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+              <div class="absolute inset-0 bg-gray-500 dark:bg-black opacity-75 dark:opacity-50"></div>
             </div>
 
             <!-- This element is to trick the browser into centering the modal contents. -->
@@ -415,16 +391,16 @@
         Modal panel, show/hide based on modal state.
 
         Entering: "ease-out duration-300"
-          From: "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-          To: "opacity-100 translate-y-0 sm:scale-100"
+          From: "opacity-0 tranneutral-y-4 sm:tranneutral-y-0 sm:scale-95"
+          To: "opacity-100 tranneutral-y-0 sm:scale-100"
         Leaving: "ease-in duration-200"
-          From: "opacity-100 translate-y-0 sm:scale-100"
-          To: "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+          From: "opacity-100 tranneutral-y-0 sm:scale-100"
+          To: "opacity-0 tranneutral-y-4 sm:tranneutral-y-0 sm:scale-95"
       -->
             <div
-              class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
+              class="inline-block align-bottom bg-white dark:bg-neutral-700 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full"
               role="dialog" aria-modal="true" aria-labelledby="modal-headline">
-              <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+              <div class="bg-white dark:bg-neutral-700 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                 <div class="sm:flex sm:items-start">
                   <div
                     class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
@@ -436,26 +412,25 @@
                     </svg>
                   </div>
                   <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                    <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-headline">
-                      Delete Client
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-neutral-200" id="modal-headline">
+                      {{$t("deleteClient")}}
                     </h3>
                     <div class="mt-2">
-                      <p class="text-sm text-gray-500">
-                        Are you sure you want to delete <strong>{{clientDelete.name}}</strong>?
-                        This action cannot be undone.
+                      <p class="text-sm text-gray-500 dark:text-neutral-300">
+                        {{$t("deleteDialog1")}} <strong>{{clientDelete.name}}</strong>? {{$t("deleteDialog2")}}
                       </p>
                     </div>
                   </div>
                 </div>
               </div>
-              <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+              <div class="bg-gray-50 dark:bg-neutral-600 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                 <button type="button" @click="deleteClient(clientDelete); clientDelete = null"
-                  class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
-                  Delete
+                  class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 dark:bg-red-600 text-base font-medium text-white dark:text-white hover:bg-red-700 dark:hover:bg-red-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
+                  {{$t("deleteClient")}}
                 </button>
                 <button type="button" @click="clientDelete = null"
-                  class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                  Cancel
+                  class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-neutral-500 shadow-sm px-4 py-2 bg-white dark:bg-neutral-500 text-base font-medium text-gray-700 dark:text-neutral-50 hover:bg-gray-50 dark:hover:bg-neutral-600 dark:hover:border-neutral-600 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                  {{$t("cancel")}}
                 </button>
               </div>
             </div>
@@ -464,22 +439,23 @@
       </div>
 
       <div v-if="authenticated === false">
-        <h1 class="text-4xl font-medium my-16 text-gray-700 text-center">WireGuard</h1>
+        <h1 class="text-4xl font-medium my-16 text-gray-700 dark:text-neutral-200 text-center">WireGuard</h1>
 
-        <form @submit="login" class="shadow rounded-md bg-white mx-auto w-64 p-5 overflow-hidden mt-10">
+        <form @submit="login"
+          class="shadow rounded-md bg-white dark:bg-neutral-700 mx-auto w-64 p-5 overflow-hidden mt-10">
           <!-- Avatar -->
-          <div class="h-20 w-20 mb-10 mt-5 mx-auto rounded-full bg-red-800 relative overflow-hidden">
-            <svg class="w-10 h-10 m-5 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-              fill="currentColor">
+          <div class="h-20 w-20 mb-10 mt-5 mx-auto rounded-full bg-red-800 dark:bg-red-800 relative overflow-hidden">
+            <svg class="w-10 h-10 m-5 text-white dark:text-white" xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
             </svg>
           </div>
 
-          <input type="password" name="password" placeholder="Password" v-model="password"
-            class="px-3 py-2 text-sm text-gray-500 mb-5 border-2 border-gray-100 rounded-lg w-full focus:border-red-800 outline-none" />
+          <input type="password" name="password" :placeholder="$t('password')" v-model="password"
+            class="px-3 py-2 text-sm dark:bg-neutral-700 text-gray-500 dark:text-gray-500 mb-5 border-2 border-gray-100 dark:border-neutral-800 rounded-lg w-full focus:border-red-800 dark:focus:border-red-800 dark:placeholder:text-neutral-400 outline-none" />
 
           <button v-if="authenticating"
-            class="bg-red-800 w-full rounded shadow py-2 text-sm text-white cursor-not-allowed">
+            class="bg-red-800 dark:bg-red-800 w-full rounded shadow py-2 text-sm text-white dark:text-white cursor-not-allowed">
             <svg class="w-5 animate-spin mx-auto" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
               fill="currentColor">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -489,14 +465,15 @@
             </svg>
           </button>
           <input v-if="!authenticating && password" type="submit"
-            class="bg-red-800 w-full rounded shadow py-2 text-sm text-white hover:bg-red-700 transition cursor-pointer"
-            value="Sign In">
+            class="bg-red-800 dark:bg-red-800 w-full rounded shadow py-2 text-sm text-white dark:text-white hover:bg-red-700 dark:hover:bg-red-700 transition cursor-pointer"
+            :value="$t('signIn')">
           <input v-if="!authenticating && !password" type="submit"
-            class="bg-gray-200 w-full rounded shadow py-2 text-sm text-white cursor-not-allowed" value="Sign In">
+            class="bg-gray-200 dark:bg-neutral-800 w-full rounded shadow py-2 text-sm text-white dark:text-white cursor-not-allowed"
+            :value="$t('signIn')">
         </form>
       </div>
 
-      <div v-if="authenticated === null" class="text-gray-300 pt-24 pb-12">
+      <div v-if="authenticated === null" class="text-gray-300 dark:text-red-300 pt-24 pb-12">
 
         <svg class="w-5 animate-spin mx-auto" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
           fill="currentColor">
@@ -510,18 +487,22 @@
 
     </div>
 
-    <p v-cloak class="text-center m-10 text-gray-300 text-xs">Made by <a target="_blank" class="hover:underline"
-        href="https://emilenijssen.nl/?ref=wg-easy">Emile Nijssen</a> · <a class="hover:underline"
-        href="https://github.com/sponsors/WeeJeWel" target="_blank">Donate</a> · <a class="hover:underline"
-        href="https://github.com/weejewel/wg-easy" target="_blank">GitHub</a></p>
-
+    <p v-cloak class="text-center m-10 text-gray-300 dark:text-neutral-600 text-xs"> <a class="hover:underline" target="_blank" 
+        href="https://github.com/wg-easy/wg-easy">WireGuard Easy</a> © 2021-2024 by <a class="hover:underline" target="_blank"
+        href="https://emilenijssen.nl/?ref=wg-easy">Emile Nijssen</a> is licensed under <a class="hover:underline" target="_blank"
+        href="http://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> · <a class="hover:underline"
+        href="https://github.com/sponsors/WeeJeWel" target="_blank">{{$t("donate")}}</a></p>
 
   </div>
 
   <script src="./js/vendor/vue.min.js"></script>
-  <script src="./js/vendor/md5.min.js"></script>
-  <script src="./js/vendor/timeago.min.js"></script>
+  <script src="./js/vendor/vue-i18n.min.js"></script>
+  <script src="./js/vendor/apexcharts.min.js"></script>
+  <script src="./js/vendor/vue-apexcharts.min.js"></script>
+  <script src="./js/vendor/sha512.min.js"></script>
+  <script src="./js/vendor/timeago.full.min.js"></script>
   <script src="./js/api.js"></script>
+  <script src="./js/i18n.js"></script>
   <script src="./js/app.js"></script>
 </body>
 

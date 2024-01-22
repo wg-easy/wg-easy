@@ -1,26 +1,28 @@
 {
-  "release": 7,
+  "release": "10",
   "name": "wg-easy",
-  "version": "1.0.0",
-  "description": "",
+  "version": "1.0.1",
+  "description": "The easiest way to run WireGuard VPN + Web-based Admin UI.",
   "main": "server.js",
   "scripts": {
     "serve": "DEBUG=Server,WireGuard nodemon server.js",
     "serve-with-password": "PASSWORD=wg npm run serve",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "buildcss": "npx tailwindcss -i ./www/src/css/app.css -o ./www/css/app.css"
   },
   "author": "Emile Nijssen",
   "license": "GPL",
   "dependencies": {
-    "debug": "^4.3.1",
-    "express": "^4.17.1",
-    "express-session": "^1.17.1",
-    "qrcode": "^1.4.4",
-    "uuid": "^8.3.2"
+    "bcryptjs": "^2.4.3",
+    "debug": "^4.3.4",
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "qrcode": "^1.5.3",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
-    "eslint": "^7.27.0",
-    "eslint-config-athom": "^2.1.0"
+    "eslint-config-athom": "^3.1.3",
+    "tailwindcss": "^3.4.1"
   },
   "nodemonConfig": {
     "ignore": [
@@ -28,6 +30,6 @@
     ]
   },
   "engines": {
-    "node": "14"
+    "node": "18"
   }
 }
