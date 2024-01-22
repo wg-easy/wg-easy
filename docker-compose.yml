@@ -5,6 +5,8 @@ volumes:
 services:
   wg-easy:
     environment:
+      # Change Localtime
+      - TZ=Europe/Berlin
       # Change Language:
       # (Supports: en, ru, tr, no, pl, fr, de, ca, es)
       - LANG=de

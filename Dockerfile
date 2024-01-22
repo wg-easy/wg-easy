@@ -27,6 +27,7 @@ RUN npm i -g nodemon
 
 # Install Linux packages
 RUN apk add --no-cache \
+    tzdata \
     dpkg \
     dumb-init \
     iptables \
