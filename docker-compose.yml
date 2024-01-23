@@ -5,8 +5,6 @@ volumes:
 services:
   wg-easy:
     environment:
-      # Change Localtime
-      - TZ=Europe/Berlin
       # Change Language:
       # (Supports: en, ru, tr, no, pl, fr, de, ca, es)
       - LANG=de
@@ -31,6 +29,7 @@ services:
     container_name: wg-easy
     volumes:
       - etc_wireguard:/etc/wireguard
+      - /etc/localtime:/etc/localtime:ro
     ports:
       - "51820:51820/udp"
       - "51821:51821/tcp"

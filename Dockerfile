@@ -37,6 +37,11 @@ RUN apk add --no-cache \
 # Use iptables-legacy
 RUN update-alternatives --install /sbin/iptables iptables /sbin/iptables-legacy 10 --slave /sbin/iptables-restore iptables-restore /sbin/iptables-legacy-restore --slave /sbin/iptables-save iptables-save /sbin/iptables-legacy-save
 
+# Use Timezone from Docker Host
+COPY --from=alpine \
+    /usr/share/zoneinfo \
+    /usr/share/zoneinfo
+
 # Expose Ports
 EXPOSE 51820/udp
 EXPOSE 51821/tcp
