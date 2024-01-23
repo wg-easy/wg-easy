@@ -3,6 +3,9 @@
 
 FROM docker.io/library/node:18-alpine AS build_node_modules
 
+# Use Timezone from Docker Host
+RUN apk add --no-cache tzdata
+
 # Copy Web UI
 COPY src/ /app/
 WORKDIR /app
@@ -12,6 +15,9 @@ RUN npm ci --omit=dev
 # This saves a lot of disk space.
 FROM docker.io/library/node:18-alpine
 COPY --from=build_node_modules /app /app
+
+# Use Timezone from Docker Host
+COPY --from=build_node_modules /usr/share/zoneinfo /usr/share/zoneinfo
 
 # Move node_modules one directory up, so during development
 # we don't have to mount it in a volume.
@@ -27,7 +33,6 @@ RUN npm i -g nodemon
 
 # Install Linux packages
 RUN apk add --no-cache \
-    tzdata \
     dpkg \
     dumb-init \
     iptables \
@@ -36,11 +41,6 @@ RUN apk add --no-cache \
 
 # Use iptables-legacy
 RUN update-alternatives --install /sbin/iptables iptables /sbin/iptables-legacy 10 --slave /sbin/iptables-restore iptables-restore /sbin/iptables-legacy-restore --slave /sbin/iptables-save iptables-save /sbin/iptables-legacy-save
-
-# Use Timezone from Docker Host
-COPY --from=build_node_modules \
-    /usr/share/zoneinfo \
-    /usr/share/zoneinfo
 
 # Expose Ports
 EXPOSE 51820/udp
