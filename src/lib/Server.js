@@ -16,7 +16,11 @@ const ServerError = require('./ServerError');
 const WireGuard = require('../services/WireGuard');
 
 const {
-  PORT, WEBUI_HOST, RELEASE, PASSWORD,
+  PORT,
+  WEBUI_HOST,
+  RELEASE,
+  PASSWORD,
+  LANG,
 } = require('../config');
 
 module.exports = class Server {
@@ -47,6 +51,10 @@ module.exports = class Server {
       .get('/api/release', async (ctx) => {
         ctx.body = RELEASE;
       })
+
+      .get('/api/lang', (Util.promisify(async () => {
+        return LANG;
+      })))
 
     // Authentication
       .get('/api/session', async (ctx) => {

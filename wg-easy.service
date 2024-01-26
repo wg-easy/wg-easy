@@ -1,0 +1,22 @@
+[Unit]
+Description=Wireguard VPN + + Web-based Admin UI
+After=network-online.target nss-lookup.target
+
+[Service]
+Environment="WG_HOST=raspberrypi.local" # Change this to your host's public address or static public ip.
+Environment="PASSWORD=REPLACEME" # When set, requires a password when logging in to the Web UI, to disable add a hashtag
+#Environment="WG_DEFAULT_ADDRESS=10.0.8.x" #Clients IP address range.
+#Environment="WG_DEFAULT_DNS=10.0.8.1, 1.1.1.1" #DNS server clients will use. If set to blank value, clients will not use any DNS.
+#Environment="WG_ALLOWED_IPS=0.0.0.0/0,::/0" #Allowed IPs clients will use.
+#Environment="WG_DEVICE=ens1" #Ethernet device the wireguard traffic should be forwarded through.
+#Environment="PORT=80" #TCP port for Web UI. Default : 51821
+#Environment="WG_MTU=1420" #The MTU the clients will use. Server uses default WG MTU
+#Environment="WG_PERSISTENT_KEEPALIVE=25" #Value in seconds to keep the "connection" open. If this value is 0, then connections won't be kept alive.
+Type=simple
+RemainAfterExit=no
+ExecStart=/usr/bin/env node /app/server.js
+Restart=on-failure
+RestartSec=1
+
+[Install]
+WantedBy=multi-user.target
