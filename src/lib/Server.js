@@ -2,7 +2,7 @@
 
 const path = require('path');
 const bcrypt = require('bcryptjs');
-const crypto = require('crypto');
+const crypto = require('node:crypto');
 
 const Koa = require('koa');
 const Router = require('@koa/router');
@@ -12,6 +12,7 @@ const serve = require('koa-static');
 
 const debug = require('debug')('Server');
 
+const Util = require('./Util');
 const ServerError = require('./ServerError');
 const WireGuard = require('../services/WireGuard');
 
