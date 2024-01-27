@@ -79,6 +79,7 @@ module.exports = class Server {
         }
 
         ctx.session.authenticated = true;
+        ctx.status = 204;
         ctx.session.save();
 
         debug(`New Session: ${ctx.session.id}`);
