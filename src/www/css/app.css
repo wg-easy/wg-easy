@@ -1334,6 +1334,11 @@ video {
   transition-duration: 150ms;
 }
 
+.disabled-link {
+  opacity: 0.25;
+  cursor: default;
+}
+
 .duration-200 {
   transition-duration: 200ms;
 }
