@@ -1334,11 +1334,6 @@ video {
   transition-duration: 150ms;
 }
 
-.disabled-link {
-  opacity: 0.25;
-  cursor: default;
-}
-
 .duration-200 {
   transition-duration: 200ms;
 }
@@ -1353,6 +1348,11 @@ video {
 
 .ease-out {
   transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
+}
+
+.is-disabled {
+  opacity: 0.25;
+  cursor: default;
 }
 
 .last\:border-b-0:last-child {
