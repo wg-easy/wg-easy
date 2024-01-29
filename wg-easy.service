@@ -6,6 +6,7 @@ After=network-online.target nss-lookup.target
 Environment="WG_HOST=raspberrypi.local" # Change this to your host's public address or static public ip.
 Environment="PASSWORD=REPLACEME" # When set, requires a password when logging in to the Web UI, to disable add a hashtag
 #Environment="WG_DEFAULT_ADDRESS=10.0.8.x" #Clients IP address range.
+#Environment="WG_DEFAULT_ADDRESS_RANGE=24" #Clients IP address range block.
 #Environment="WG_DEFAULT_DNS=10.0.8.1, 1.1.1.1" #DNS server clients will use. If set to blank value, clients will not use any DNS.
 #Environment="WG_ALLOWED_IPS=0.0.0.0/0,::/0" #Allowed IPs clients will use.
 #Environment="WG_DEVICE=ens1" #Ethernet device the wireguard traffic should be forwarded through.
