@@ -439,7 +439,10 @@
       </div>
 
       <div v-if="authenticated === false">
-        <h1 class="text-4xl font-medium my-16 text-gray-700 dark:text-neutral-200 text-center">WireGuard</h1>
+        <h1 class="text-4xl font-medium my-16 text-gray-700 dark:text-neutral-200 text-center">
+          <img src="./img/logo.png" width="32" class="inline align-middle dark:bg" />
+          <span class="align-middle">WireGuard</span>
+        </h1>
 
         <form @submit="login"
           class="shadow rounded-md bg-white dark:bg-neutral-700 mx-auto w-64 p-5 overflow-hidden mt-10">
