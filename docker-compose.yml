@@ -7,7 +7,7 @@ services:
     environment:
       # Change Language:
       # (Supports: en, ru, tr, no, pl, fr, de)
-      - LANG=de
+      - LANG=en
       # ⚠️ Required:
       # Change this to your host's public address
       - WG_HOST=raspberrypi.local

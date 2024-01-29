@@ -216,7 +216,7 @@
                     <button
                             class="align-middle bg-gray-100 dark:bg-neutral-600 dark:text-neutral-300 hover:bg-red-800 dark:hover:bg-red-800 hover:text-white dark:hover:text-white p-2 rounded transition"
                             title="Edit Allowed IPs" @click="clientEditAllowedIPs = client">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 icon icon-tabler icon-tabler-list" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 icon icon-tabler icon-tabler-list" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                         <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                         <path d="M9 6l11 0" />
                         <path d="M9 12l11 0" />
@@ -476,22 +476,30 @@
                   role="dialog" aria-modal="true" aria-labelledby="modal-headline">
             <div class="bg-white dark:bg-neutral-700 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
               <div class="sm:flex sm:items-start">
-                <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-circle-check" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full text-white bg-red-800 sm:mx-0 sm:h-10 sm:w-10">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-topology-star" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                     <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                    <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
-                    <path d="M9 12l2 2l4 -4" /></svg>
+                    <path d="M8 18a2 2 0 1 0 -4 0a2 2 0 0 0 4 0z" />
+                    <path d="M20 6a2 2 0 1 0 -4 0a2 2 0 0 0 4 0z" />
+                    <path d="M8 6a2 2 0 1 0 -4 0a2 2 0 0 0 4 0z" />
+                    <path d="M20 18a2 2 0 1 0 -4 0a2 2 0 0 0 4 0z" />
+                    <path d="M14 12a2 2 0 1 0 -4 0a2 2 0 0 0 4 0z" />
+                    <path d="M7.5 7.5l3 3" />
+                    <path d="M7.5 16.5l3 -3" />
+                    <path d="M13.5 13.5l3 3" />
+                    <path d="M16.5 7.5l-3 3" />
+                  </svg>
                 </div>
-                <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                   <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-neutral-200" id="modal-headline">
                     Edit AllowedIPs
                   </h3>
                   <div class="mt-2 flex items-center flex-col">
-                    <div class="w-full min-h-5 mb-2 flex flex-wrap">
-                      <div class="bg-white tracking-wide h-[40px] border-2 border-gray-100 items-center rounded p-1 mb-2 mr-2 px-2 cursor-pointer flex w-fit" v-for="(item,index) in clientEditAllowedIPs.allowedIPs">
+                    <div class="w-full min-h-5 flex flex-wrap">
+                      <div :class="[item.address!==clientEditAllowedIPs.address?'pr-8':'']" class="bg-white text-gray-700 relative h-8 tracking-widest border-2 border-gray-100 text-sm items-center rounded p-1 mb-2 mr-2 px-2 cursor-pointer flex w-fit" v-for="(item,index) in clientEditAllowedIPs.allowedIPs">
                         {{item.address+'/'+item.cidr}}
-                        <div v-if="item.address!==clientEditAllowedIPs.address" class="inline-block border-l-2 pl-1 ml-2">
-                          <svg @click="removeIP(index)" xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-x" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <div v-if="item.address!==clientEditAllowedIPs.address" style="width:calc(2rem - 4px);height:calc(2rem - 4px)" class="hover:bg-red-800 hover:text-white rounded top-0 right-0 w-8 h-8 flex justify-center items-center absolute">
+                          <svg @click="removeIP(index)" xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-x" width="15" height="15" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                             <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                             <line x1="18" y1="6" x2="6" y2="18" />
                             <line x1="6" y1="6" x2="18" y2="18" /></svg>
@@ -499,14 +507,14 @@
                       </div>
                     </div>
                     <div class="w-full flex items-center">
-                      <div class="h-[40px] w-fit text-sm bg-white border-2 border-gray-100 rounded flex items-center px-2">
-                        <input maxlength="3" v-model.number="userInputIP[0]" class="w-[30px] text-center outline-none border-none bg-transparent"/><span class="text-gray-700">⋅</span>
-                        <input maxlength="3" v-model.number="userInputIP[1]" class="w-[30px] text-center outline-none border-none bg-transparent"/><span class="text-gray-700">⋅</span>
-                        <input maxlength="3" v-model.number="userInputIP[2]" class="w-[30px] text-center outline-none border-none bg-transparent"/><span class="text-gray-700">⋅</span>
-                        <input maxlength="3" v-model.number="userInputIP[3]" class="w-[30px] text-center outline-none border-none bg-transparent"/><span class="text-gray-700">/</span>
-                        <input maxlength="2" v-model.number="userInputIP[4]" class="w-[30px] text-center outline-none border-none bg-transparent"/>
+                      <div class="h-8 text-gray-700 w-fit text-sm bg-white border-2 border-gray-100 rounded flex items-center px-2">
+                        <input maxlength="3" v-model.number="userInputIP[0]" class="w-8 text-center outline-none border-none bg-transparent"/><span>⋅</span>
+                        <input maxlength="3" v-model.number="userInputIP[1]" class="w-8 text-center outline-none border-none bg-transparent"/><span>⋅</span>
+                        <input maxlength="3" v-model.number="userInputIP[2]" class="w-8 text-center outline-none border-none bg-transparent"/><span>⋅</span>
+                        <input maxlength="3" v-model.number="userInputIP[3]" class="w-8 text-center outline-none border-none bg-transparent"/><span>/</span>
+                        <input maxlength="2" v-model.number="userInputIP[4]" class="w-8 text-center outline-none border-none bg-transparent"/>
                       </div>
-                      <div @click="addNewIP" class="w-[40px] h-[40px] rounded bg-white border-2 border-gray-100 cursor-pointer ml-2 flex justify-center items-center">
+                      <div @click="addNewIP" class="w-8 h-8 rounded bg-white hover:border-red-800 hover:bg-red-800 hover:text-white text-gray-700 border-2 border-gray-100 cursor-pointer ml-2 flex justify-center items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-plus" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                           <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                           <path d="M12 5l0 14" />
