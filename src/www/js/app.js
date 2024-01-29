@@ -48,6 +48,8 @@ new Vue({
     clientEditNameId: null,
     clientEditAddress: null,
     clientEditAddressId: null,
+    clientEditAllowedIPs: null,
+    userInputIP: [0, 0, 0, 0, 0],
     qrcode: null,
 
     currentRelease: null,
@@ -249,6 +251,24 @@ new Vue({
       this.api.updateClientAddress({ clientId: client.id, address })
         .catch((err) => alert(err.message || err.toString()))
         .finally(() => this.refresh().catch(console.error));
+    },
+    updateClientAllowedIPs(client) {
+      this.api.updateClientAllowedIPs({ clientId: client.id, allowedIPs: client.allowedIPs })
+        .catch((err) => alert(err.message || err.toString()))
+        .finally(() => this.refresh().catch(console.error));
+    },
+    addNewIP() {
+      const address = this.userInputIP.slice(0, 4).join('.');
+      const allowedIPs = [...this.clientEditAllowedIPs.allowedIPs];
+      const obj = { type: 'ipv4', address, cidr: this.userInputIP[4] };
+      allowedIPs.push(obj);
+      this.clientEditAllowedIPs.allowedIPs = allowedIPs;
+      this.userInputIP = [0, 0, 0, 0, 0];
+    },
+    removeIP(index) {
+      const allowedIPs = [...this.clientEditAllowedIPs.allowedIPs];
+      allowedIPs.splice(index, 1);
+      this.clientEditAllowedIPs.allowedIPs = allowedIPs;
     },
     toggleTheme() {
       if (this.isDark) {

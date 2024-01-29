@@ -72,6 +72,7 @@ The Web UI will now be available on `http://0.0.0.0:51821`.
 
 > 💡 Your configuration files will be saved in `~/.wg-easy`
 
+> 💡 If you discover that newly added allowed IPs on the client cannot communicate, you can try setting `net.ipv4.conf.all.src_valid_mark=0` when executing the `docker run` command.
 ### 3. Sponsor
 
 Are you enjoying this project? [Buy Emile a beer!](https://github.com/sponsors/WeeJeWel) 🍻

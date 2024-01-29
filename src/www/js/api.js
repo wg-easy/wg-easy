@@ -124,4 +124,12 @@ class API {
     });
   }
 
+  async updateClientAllowedIPs({ clientId, allowedIPs }) {
+    return this.call({
+      method: 'put',
+      path: `/wireguard/client/${clientId}/allowedIPs/`,
+      body: { allowedIPs },
+    });
+  }
+
 }
