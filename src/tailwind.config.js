@@ -8,7 +8,7 @@ module.exports = {
   plugins: [
     function addDisabledClass({ addUtilities }) {
       const newUtilities = {
-        '.is-disabled': {
+        '.inactive': {
           opacity: '0.25',
           cursor: 'default',
         },
