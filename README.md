@@ -57,7 +57,6 @@ $ sudo usermod -aG docker $USER
 $ systemctl enable --now docker
 $ exit
 ```
-
 **Arch Linux/other Arch based Distros:**
 ```bash
 $ sudo pacman -S docker docker-compose
