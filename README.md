@@ -31,9 +31,19 @@ You have found the easiest way to install & manage WireGuard on any Linux host!
 
 ## Installation
 
-### 1. Install Docker
+### 1. Prepare (if needed)
+
+**CentOS 7:**
+```bash
+$ sudo yum install epel-release elrepo-release yum-plugin-elrepo kmod-wireguard
+```
+
+### 2. Install Docker
 
 If you haven't installed Docker yet, install it by running:
+
+⚠️ Warning: The Script below will not work on all Linux Distros <br>
+you need to check how to install docker with your Package Manager.
 
 ```bash
 $ curl -sSL https://get.docker.com | sh
@@ -43,7 +53,7 @@ $ exit
 
 And log in again.
 
-### 2. Run WireGuard Easy
+### 3. Run WireGuard Easy
 
 To automatically install & run wg-easy, simply run:
 
@@ -72,7 +82,7 @@ The Web UI will now be available on `http://0.0.0.0:51821`.
 
 > 💡 Your configuration files will be saved in `~/.wg-easy`
 
-### 3. Sponsor
+### 4. Sponsor
 
 Are you enjoying this project? [Buy Emile a beer!](https://github.com/sponsors/WeeJeWel) 🍻
 
