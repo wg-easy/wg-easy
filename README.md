@@ -34,7 +34,6 @@ You have found the easiest way to install & manage WireGuard on any Linux host!
 ### 1. Prepare (if needed)
 
 **CentOS 7/8/9:**
-
 ```bash
 $ sudo yum install epel-release elrepo-release yum-plugin-elrepo kmod-wireguard
 ```
@@ -45,7 +44,6 @@ If you haven't installed Docker yet, install it by running:
 
 ⚠️ Warning: The Script below will not work on all Linux Distros <br>
 you need to check how to install docker with your Package Manager.
-
 ```bash
 $ curl -sSL https://get.docker.com | sh
 $ sudo usermod -aG docker $USER
@@ -61,7 +59,6 @@ $ exit
 ```
 
 **Arch Linux/other Arch based Distros:**
-
 ```bash
 $ sudo pacman -S docker docker-compose
 $ sudo usermod -aG docker $USER
