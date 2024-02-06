@@ -1,5 +1,5 @@
 /*
-! tailwindcss v3.4.1 | MIT License | https://tailwindcss.com
+! tailwindcss v3.4.0 | MIT License | https://tailwindcss.com
 */
 
 /*
@@ -548,6 +548,12 @@ video {
   width: 100%;
 }
 
+@media (min-width: 576px) {
+  .container {
+    max-width: 576px;
+  }
+}
+
 @media (min-width: 640px) {
   .container {
     max-width: 640px;
@@ -676,6 +682,10 @@ video {
   margin-bottom: 4rem;
 }
 
+.-ml-4 {
+  margin-left: -1rem;
+}
+
 .mb-10 {
   margin-bottom: 2.5rem;
 }
@@ -700,8 +710,16 @@ video {
   margin-right: 0.5rem;
 }
 
-.mr-5 {
-  margin-right: 1.25rem;
+.mr-4 {
+  margin-right: 1rem;
+}
+
+.mt-0 {
+  margin-top: 0px;
+}
+
+.mt-0\.5 {
+  margin-top: 0.125rem;
 }
 
 .mt-10 {
@@ -718,6 +736,10 @@ video {
 
 .mt-5 {
   margin-top: 1.25rem;
+}
+
+.mt-px {
+  margin-top: 1px;
 }
 
 .block {
@@ -840,6 +862,10 @@ video {
   width: 100%;
 }
 
+.min-w-24 {
+  min-width: 6rem;
+}
+
 .max-w-3xl {
   max-width: 48rem;
 }
@@ -923,6 +949,18 @@ video {
 
 .gap-1 {
   gap: 0.25rem;
+}
+
+.gap-2 {
+  gap: 0.5rem;
+}
+
+.gap-3 {
+  gap: 0.75rem;
+}
+
+.self-start {
+  align-self: flex-start;
 }
 
 .overflow-hidden {
@@ -1421,6 +1459,12 @@ video {
   opacity: 1;
 }
 
+@media (min-width: 576px) {
+  .xs\:flex-row {
+    flex-direction: row;
+  }
+}
+
 @media (min-width: 640px) {
   .sm\:mx-0 {
     margin-left: 0px;
@@ -1488,8 +1532,16 @@ video {
     transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
   }
 
+  .sm\:flex-row {
+    flex-direction: row;
+  }
+
   .sm\:flex-row-reverse {
     flex-direction: row-reverse;
+  }
+
+  .sm\:flex-nowrap {
+    flex-wrap: nowrap;
   }
 
   .sm\:items-start {
@@ -1528,6 +1580,10 @@ video {
 }
 
 @media (min-width: 768px) {
+  .md\:ml-0 {
+    margin-left: 0px;
+  }
+
   .md\:inline-block {
     display: inline-block;
   }
