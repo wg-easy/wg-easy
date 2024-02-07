@@ -23,6 +23,15 @@ const {
   WG_POST_UP,
   WG_PRE_DOWN,
   WG_POST_DOWN,
+  JC,
+  JMIN,
+  JMAX,
+  S1,
+  S2,
+  H1,
+  H2,
+  H3,
+  H4,
 } = require('../config');
 
 module.exports = class WireGuard {
@@ -46,38 +55,26 @@ module.exports = class WireGuard {
             log: 'echo ***hidden*** | wg pubkey',
           });
 
-          const getRandomInt = (min, max) => min + Math.floor(Math.random() * (max - min));
-          const getRandomJunkSize = () => getRandomInt(15, 150)
-          const getRandomHeader = () => getRandomInt(1, 2_147_483_647)
-
           const address = WG_DEFAULT_ADDRESS.replace('x', '1');
-          const jc = getRandomInt(3, 10);
-          const jmin = 50;
-          const jmax = 1000;
-          const s1 = getRandomJunkSize();
-          const s2 = getRandomJunkSize();
-          const h1 = getRandomHeader();
-          const h2 = getRandomHeader();
-          const h3 = getRandomHeader();
-          const h4 = getRandomHeader();
 
           config = {
             server: {
               privateKey,
               publicKey,
               address,
-              jc,
-              jmin,
-              jmax,
-              s1,
-              s2,
-              h1,
-              h2,
-              h3,
-              h4,
+              jc: JC,
+              jmin: JMIN,
+              jmax: JMAX,
+              s1: S1,
+              s2: S2,
+              h1: H1,
+              h2: H2,
+              h3: H3,
+              h4: H4,
             },
             clients: {},
           };
+
 
           debug('Configuration generated.');
         }
@@ -124,6 +121,15 @@ PreUp = ${WG_PRE_UP}
 PostUp = ${WG_POST_UP}
 PreDown = ${WG_PRE_DOWN}
 PostDown = ${WG_POST_DOWN}
+Jc = ${config.server.jc}
+Jmin = ${config.server.jmin}
+Jmax = ${config.server.jmax}
+S1 = ${config.server.s1}
+S2 = ${config.server.s2}
+H1 = ${config.server.h1}
+H2 = ${config.server.h2}
+H3 = ${config.server.h3}
+H4 = ${config.server.h4}
 Jc = ${config.server.jc}
 Jmin = ${config.server.jmin}
 Jmax = ${config.server.jmax}
@@ -229,12 +235,11 @@ AllowedIPs = ${client.address}/32`;
     const config = await this.getConfig();
     const client = await this.getClient({ clientId });
 
-    return `
-[Interface]
+    return `[Interface]
 PrivateKey = ${client.privateKey}
 Address = ${client.address}
-${WG_DEFAULT_DNS ? `DNS = ${WG_DEFAULT_DNS}` : ''}
-${WG_MTU ? `MTU = ${WG_MTU}` : ''}
+${WG_DEFAULT_DNS ? `DNS = ${WG_DEFAULT_DNS}\n` : ''}\
+${WG_MTU ? `MTU = ${WG_MTU}\n` : ''}\
 Jc = ${config.server.jc}
 Jmin = ${config.server.jmin}
 Jmax = ${config.server.jmax}

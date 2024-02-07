@@ -7,6 +7,7 @@ jobs:
   deploy:
     name: Build & Deploy
     runs-on: ubuntu-latest
+    if: github.repository_owner == 'wg-easy'
     permissions:
       packages: write
       contents: read
