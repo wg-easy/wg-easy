@@ -56,15 +56,6 @@ module.exports = class WireGuard {
           });
 
           const address = WG_DEFAULT_ADDRESS.replace('x', '1');
-          const jc = getRandomInt(3, 10);
-          const jmin = 50;
-          const jmax = 1000;
-          const s1 = getRandomJunkSize();
-          const s2 = getRandomJunkSize();
-          const h1 = getRandomHeader();
-          const h2 = getRandomHeader();
-          const h3 = getRandomHeader();
-          const h4 = getRandomHeader();
 
           config = {
             server: {
