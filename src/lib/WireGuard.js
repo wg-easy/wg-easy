@@ -23,6 +23,15 @@ const {
   WG_POST_UP,
   WG_PRE_DOWN,
   WG_POST_DOWN,
+  JC,
+  JMIN,
+  JMAX,
+  S1,
+  S2,
+  H1,
+  H2,
+  H3,
+  H4,
 } = require('../config');
 
 module.exports = class WireGuard {
@@ -46,35 +55,22 @@ module.exports = class WireGuard {
             log: 'echo ***hidden*** | wg pubkey',
           });
 
-          const getRandomInt = (min, max) => min + Math.floor(Math.random() * (max - min));
-          const getRandomJunkSize = () => getRandomInt(15, 150)
-          const getRandomHeader = () => getRandomInt(1, 2_147_483_647)
-
           const address = WG_DEFAULT_ADDRESS.replace('x', '1');
-          const jc = getRandomInt(3, 10);
-          const jmin = 50;
-          const jmax = 1000;
-          const s1 = getRandomJunkSize();
-          const s2 = getRandomJunkSize();
-          const h1 = getRandomHeader();
-          const h2 = getRandomHeader();
-          const h3 = getRandomHeader();
-          const h4 = getRandomHeader();
 
           config = {
             server: {
               privateKey,
               publicKey,
               address,
-              jc,
-              jmin,
-              jmax,
-              s1,
-              s2,
-              h1,
-              h2,
-              h3,
-              h4,
+              jc: JC,
+              jmin: JMIN,
+              jmax: JMAX,
+              s1: S1,
+              s2: S2,
+              h1: H1,
+              h2: H2,
+              h3: H3,
+              h4: H4,
             },
             clients: {},
           };
