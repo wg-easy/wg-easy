@@ -57,6 +57,7 @@ These options can be configured by setting environment variables using `-e KEY="
 
 | Env | Default | Example | Description |
 | - | - | - | - |
+| `LANGUAGE` | `en` | `de` | Web UI language. List of available languages in [i18n.js]() |
 | `PORT` | `51821` | `6789` | TCP port for Web UI. |
 | `WEBUI_HOST` | `0.0.0.0` | `localhost` | IP address web UI binds to. |
 | `PASSWORD` | - | `foobar123` | When set, requires a password when logging in to the Web UI. |
@@ -68,10 +69,20 @@ These options can be configured by setting environment variables using `-e KEY="
 | `WG_DEFAULT_ADDRESS` | `10.8.0.x` | `10.6.0.x` | Clients IP address range. |
 | `WG_DEFAULT_DNS` | `1.1.1.1` | `8.8.8.8, 8.8.4.4` | DNS server clients will use. If set to blank value, clients will not use any DNS. |
 | `WG_ALLOWED_IPS` | `0.0.0.0/0, ::/0` | `192.168.15.0/24, 10.0.1.0/24` | Allowed IPs clients will use. |
-| `WG_PRE_UP` | `...` | - | See [config.js](https://github.com/wg-easy/wg-easy/blob/master/src/config.js#L19) for the default value. |
-| `WG_POST_UP` | `...` | `iptables ...` | See [config.js](https://github.com/wg-easy/wg-easy/blob/master/src/config.js#L20) for the default value. |
-| `WG_PRE_DOWN` | `...` | - | See [config.js](https://github.com/wg-easy/wg-easy/blob/master/src/config.js#L27) for the default value. |
-| `WG_POST_DOWN` | `...` | `iptables ...` | See [config.js](https://github.com/wg-easy/wg-easy/blob/master/src/config.js#L28) for the default value. |
+| `WG_PRE_UP` | `...` | - | See [config.js](/src/config.js#L21) for the default value. |
+| `WG_POST_UP` | `...` | `iptables ...` | See [config.js](/src/config.js#L22) for the default value. |
+| `WG_PRE_DOWN` | `...` | - | See [config.js](/src/config.js#L29) for the default value. |
+| `WG_POST_DOWN` | `...` | `iptables ...` | See [config.js](/src/config.js#L30) for the default value. |
+| `JC` | `random` | `5` | Junk packet count — number of packets with random data that are sent before the start of the session. |
+| `JMIN` | `50` | `25` | Junk packet minimum size — minimum packet size for Junk packet. That is, all randomly generated packets will have a size no smaller than Jmin. |
+| `JMAX` | `1000` | `250` | Junk packet maximum size — maximum size for Junk packets. |
+| `S1` | `random` | `75` | Init packet junk size — the size of random data that will be added to the init packet, the size of which is initially fixed. |
+| `S2` | `random` | `75` | Response packet junk size — the size of random data that will be added to the response packet, the size of which is initially fixed. |
+| `H1` | `random` | `59869232` | Init packet magic header — the header of the first byte of the handshake. Must be < uint_max. |
+| `H2` | `random` | `869587260` | Response packet magic header — header of the first byte of the handshake response. Must be < uint_max. |
+| `H3` | `random` | `1632311713` | Underload packet magic header — UnderLoad packet header. Must be < uint_max. |
+| `H4` | `random` | `820711365` | Transport packet magic header — header of the packet of the data packet. Must be < uint_max. |
 
-> If you change `WG_PORT`, make sure to also change the exposed port.
+## Thanks
 
+Based on [wg-easy](https://github.com/wg-easy/wg-easy) by Emile Nijssen.
