@@ -53,6 +53,7 @@ new Vue({
     latestRelease: null,
 
     isDark: null,
+    uiDetailedStats: false,
 
     chartOptions: {
       chart: {
@@ -298,6 +299,8 @@ new Vue({
         localStorage.setItem('lang', lang);
         i18n.locale = lang;
       }
+
+      this.uiDetailedStats = await this.api.getUiDetailedStats();
 
       const currentRelease = await this.api.getRelease();
       const latestRelease = await fetch('https://wg-easy.github.io/wg-easy/changelog.json')

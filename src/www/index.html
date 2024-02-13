@@ -17,11 +17,8 @@
 </style>
 
 <body class="bg-gray-50 dark:bg-neutral-800">
-
   <div id="app">
-
     <div v-cloak class="container mx-auto max-w-3xl px-5 md:px-0">
-
       <div v-if="authenticated === true">
         <span v-if="requiresPassword"
           class="text-sm text-gray-400 dark:text-neutral-400 mb-10 mr-2 mt-3 cursor-pointer hover:underline float-right"
@@ -92,8 +89,6 @@
 
               <div class="relative p-5 z-10 flex flex-col xs:flex-row justify-between gap-3">
                 <div class="flex gap-2 w-full items-center ">
-                  <!-- flex-wrap sm:flex-nowrap flex-col sm:flex-row pb-2 md:pb-0-->
-                  <!-- <div class="flex flex-grow items-center"> -->
 
                   <!-- Avatar -->
                   <div class="h-10 w-10 mr-4 mt-2 self-start rounded-full bg-gray-50 relative">
@@ -166,16 +161,37 @@
                             </svg>
                           </span>
                         </span>
+                        <!-- Inline Transfer TX -->
+                        <span v-if="!uiDetailedStats && client.transferTx" :title="$t('totalDownload') + bytes(client.transferTx)">
+                          ·
+                          <svg class="align-middle h-3 inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd"
+                              d="M16.707 10.293a1 1 0 010 1.414l-6 6a1 1 0 01-1.414 0l-6-6a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l4.293-4.293a1 1 0 011.414 0z"
+                              clip-rule="evenodd" />
+                          </svg>
+                          {{client.transferTxCurrent | bytes}}/s
+                        </span>
+                        
+                        <!-- Inline Transfer RX -->
+                        <span v-if="!uiDetailedStats && client.transferRx" :title="$t('totalUpload') + bytes(client.transferRx)">
+                          ·
+                          <svg class="align-middle h-3 inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd"
+                              d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z"
+                              clip-rule="evenodd" />
+                          </svg>
+                          {{client.transferRxCurrent | bytes}}/s
+                        </span>
                         <!-- Last seen -->
-                        <span class="text-gray-400 dark:text-neutral-500" v-if=" client.latestHandshakeAt"
+                        <span class="text-gray-400 dark:text-neutral-500" v-if="true"
                           :title="$t('lastSeen') + dateTime(new Date(client.latestHandshakeAt))">
-                          {{new Date(client.latestHandshakeAt) | timeago}}
+                          {{!uiDetailedStats ? " · " : ""}}{{new Date(client.latestHandshakeAt) | timeago}}
                         </span>
                       </div>
                     </div>
 
                     <!-- Info -->
-                    <div
+                    <div v-if="uiDetailedStats"
                       class="flex gap-2 items-center text-gray-400 dark:text-neutral-400 text-xs mt-px -ml-4 md:ml-0">
 
                       <!-- Transfer TX -->
