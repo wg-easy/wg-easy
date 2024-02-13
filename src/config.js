@@ -6,11 +6,11 @@ const { release } = require('./package.json');
 
 function parseDefaultAddress(defaultAddress) {
   // Set the default full address with subnet if it's not provided
-  const defaultFullAddress = defaultAddress || '10.8.0.1/24';
+  const defaultFullAddress = defaultAddress || '10.8.0.0/24';
 
-  // Check if the address ends with '.x', if so, replace with '.1/24'
+  // Check if the address ends with '.x', if so, replace with '.0/24'
   const addressWithSubnet = defaultFullAddress.endsWith('.x')
-    ? defaultFullAddress.replace('.x', '.1/24')
+    ? defaultFullAddress.replace('.x', '.0/24')
     : defaultFullAddress;
 
   const [ipAddress, subnetRange] = addressWithSubnet.split('/');
@@ -21,7 +21,7 @@ function parseDefaultAddress(defaultAddress) {
   };
 }
 
-// Use the function to parse the environment variable or default to '10.8.0.1/24'
+// Use the function to parse the environment variable or default to '10.8.0.0/24'
 const { ipAddress, subnetRange } = parseDefaultAddress(process.env.WG_DEFAULT_ADDRESS);
 
 module.exports.RELEASE = release;
