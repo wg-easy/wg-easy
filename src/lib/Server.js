@@ -46,7 +46,7 @@ module.exports = class Server {
         return LANG;
       })))
       .get('/api/ui-detailed-stats', (Util.promisify(async () => {
-        return UI_DETAILED_STATS === 'true' ? true : false;
+        return UI_DETAILED_STATS === 'true';
       })))
 
     // Authentication
