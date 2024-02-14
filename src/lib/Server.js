@@ -39,9 +39,7 @@ module.exports = class Server {
       }))
 
       .get('/api/check-update', (Util.promisify(async () => {
-        return {
-          checkUpdate: CHECK_UPDATE,
-        };
+        return CHECK_UPDATE;
       })))
 
       .get('/api/release', (Util.promisify(async () => {

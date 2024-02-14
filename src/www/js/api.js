@@ -29,7 +29,7 @@ class API {
     return json;
   }
 
-  async checkUpdate() {
+  async getCheckUpdate() {
     return this.call({
       method: 'get',
       path: '/check-update',

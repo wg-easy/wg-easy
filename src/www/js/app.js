@@ -301,7 +301,7 @@ new Vue({
         i18n.locale = lang;
       }
 
-      const checkUpdate = await this.api.checkUpdate();
+      const checkUpdate = await this.api.getCheckUpdate();
       if (!checkUpdate) return;
 
       const currentRelease = await this.api.getRelease();
