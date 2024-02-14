@@ -29,6 +29,7 @@ services:
     container_name: wg-easy
     volumes:
       - etc_wireguard:/etc/wireguard
+      - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     ports:
       - "51820:51820/udp"
