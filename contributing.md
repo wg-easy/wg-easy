@@ -1,6 +1,6 @@
-# Contributing to wg-easy
+# Contributing to amnezia-wg-easy
 
-First and foremost, thank you! We appreciate that you want to contribute to wg-easy, your time is valuable, and your contributions mean a lot to us.
+First and foremost, thank you! We appreciate that you want to contribute to amnezia-wg-easy, your time is valuable, and your contributions mean a lot to us.
 
 
 ## Important!
@@ -25,14 +25,13 @@ Creating an issue is the simplest form of contributing to a project. But there a
 - Bug reports
 
 
-## Showing support for wg-easy
+## Showing support for amnezia-wg-easy
 
 Please keep in mind that open source software is built by people like you, who spend their free time creating things the rest the community can use.
 
-Don't have time to contribute? No worries, here are some other ways to show your support for wg-easy:
+Don't have time to contribute? No worries, here are some other ways to show your support for amnezia-wg-easy:
 
-- star the [project](https://github.com/wg-easy/wg-easy)
-- tweet your support for wg-easy
+- star the [project](https://github.com/spcfox/amnezia-wg-easy)
 
 
 ## Issues
@@ -67,14 +66,14 @@ Please be as descriptive as possible when creating an issue. Give us the informa
 
 - **description**: (required) What is the bug you're experiencing? How are you using this library/app?
 - **OS**: (required) what operating system are you on?
-- **version**: (required) please note the version of wg-easy are you using
+- **version**: (required) please note the version of amnezia-wg-easy are you using
 - **error messages**: (required) please paste any error messages into the issue, or a [gist](https://gist.github.com/)
 - **extensions, plugins, helpers, etc** (if applicable): please list any extensions you're using
 
 
 ### Closing issues
 
-The original poster or the maintainers of wg-easy may close an issue at any time. Typically, but not exclusively, issues are closed when:
+The original poster or the maintainers of amnezia-wg-easy may close an issue at any time. Typically, but not exclusively, issues are closed when:
 
 - The issue is resolved
 - The project's maintainers have determined the issue is out of scope

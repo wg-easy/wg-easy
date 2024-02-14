@@ -13,6 +13,7 @@ const ServerError = require('./ServerError');
 const WireGuard = require('../services/WireGuard');
 
 const {
+  CHECK_UPDATE,
   PORT,
   WEBUI_HOST,
   RELEASE,
@@ -36,6 +37,10 @@ module.exports = class Server {
           httpOnly: true,
         },
       }))
+
+      .get('/api/check-update', (Util.promisify(async () => {
+        return CHECK_UPDATE;
+      })))
 
       .get('/api/release', (Util.promisify(async () => {
         return RELEASE;

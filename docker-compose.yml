@@ -6,7 +6,7 @@ services:
   amnezia-wg-easy:
     env_file:
       - .env
-    build: .
+    image: ghcr.io/spcfox/amnezia-wg-easy
     container_name: amnezia-wg-easy
     volumes:
       - ~/.amnezia-wg-easy:/etc/wireguard

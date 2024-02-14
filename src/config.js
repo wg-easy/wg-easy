@@ -2,6 +2,7 @@
 
 const { release } = require('./package.json');
 
+module.exports.CHECK_UPDATE = process.env.CHECK_UPDATE ? process.env.CHECK_UPDATE.toLowerCase() === 'true' : true;
 module.exports.RELEASE = release;
 module.exports.PORT = process.env.PORT || 51821;
 module.exports.WEBUI_HOST = process.env.WEBUI_HOST || '0.0.0.0';
@@ -31,8 +32,8 @@ module.exports.WG_POST_DOWN = process.env.WG_POST_DOWN || '';
 module.exports.LANG = process.env.LANGUAGE || 'en';
 
 const getRandomInt = (min, max) => min + Math.floor(Math.random() * (max - min));
-const getRandomJunkSize = () => getRandomInt(15, 150)
-const getRandomHeader = () => getRandomInt(1, 2_147_483_647)
+const getRandomJunkSize = () => getRandomInt(15, 150);
+const getRandomHeader = () => getRandomInt(1, 2_147_483_647);
 
 module.exports.JC = process.env.JC || getRandomInt(3, 10);
 module.exports.JMIN = process.env.JMIN || 50;

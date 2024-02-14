@@ -5,6 +5,8 @@
 
 'use strict';
 
+const CHANGELOG_URL = 'https://raw.githubusercontent.com/spcfox/amnezia-wg-easy/production/docs/changelog.json';
+
 function bytes(bytes, decimals, kib, maxunit) {
   kib = kib || false;
   if (bytes === 0) return '0 B';
@@ -299,8 +301,11 @@ new Vue({
         i18n.locale = lang;
       }
 
+      const checkUpdate = await this.api.getCheckUpdate();
+      if (!checkUpdate) return;
+
       const currentRelease = await this.api.getRelease();
-      const latestRelease = await fetch('https://wg-easy.github.io/wg-easy/changelog.json')
+      const latestRelease = await fetch(CHANGELOG_URL)
         .then((res) => res.json())
         .then((releases) => {
           const releasesArray = Object.entries(releases).map(([version, changelog]) => ({

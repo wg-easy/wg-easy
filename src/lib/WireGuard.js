@@ -75,7 +75,6 @@ module.exports = class WireGuard {
             clients: {},
           };
 
-
           debug('Configuration generated.');
         }
 
