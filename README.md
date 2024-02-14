@@ -37,7 +37,7 @@ And log in again.
 
 ### 2. Run AmneziaWG Easy
 
-```bash
+<pre>
 $ docker run -d \
   --name=amnezia-wg-easy \
   -e LANG=en \
@@ -53,7 +53,7 @@ $ docker run -d \
   --device=/dev/net/tun:/dev/net/tun \
   --restart unless-stopped \
   ghcr.io/spcfox/amnezia-wg-easy
-```
+</pre>
 
 The Web UI will now be available on `http://0.0.0.0:51821`.
 
