@@ -65,7 +65,7 @@ These options can be configured by setting environment variables using `-e KEY="
 
 | Env | Default | Example | Description |
 | - | - | - | - |
-| `LANGUAGE` | `en` | `de` | Web UI language. List of available languages in [i18n.js]() |
+| `LANGUAGE` | `en` | `de` | Web UI language (Supports: en, ru, tr, no, pl, fr, de, ca, es). |
 | `CHECK_UPDATE` | `true` | `false` | Check for a new version and display a notification about its availability |
 | `PORT` | `51821` | `6789` | TCP port for Web UI. |
 | `WEBUI_HOST` | `0.0.0.0` | `localhost` | IP address web UI binds to. |
