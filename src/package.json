@@ -1,8 +1,8 @@
 {
-  "release": "11",
-  "name": "wg-easy",
-  "version": "1.0.1",
-  "description": "The easiest way to run WireGuard VPN + Web-based Admin UI.",
+  "release": "1",
+  "name": "amnezia-wg-easy",
+  "version": "1.0.0",
+  "description": "The easiest way to run AmneziaWG VPN + Web-based Admin UI.",
   "main": "server.js",
   "scripts": {
     "serve": "DEBUG=Server,WireGuard nodemon server.js",
@@ -10,7 +10,7 @@
     "lint": "eslint .",
     "buildcss": "npx tailwindcss -i ./www/src/css/app.css -o ./www/css/app.css"
   },
-  "author": "Emile Nijssen",
+  "author": "Viktor Yudov",
   "license": "GPL",
   "dependencies": {
     "bcryptjs": "^2.4.3",

@@ -35,16 +35,24 @@ $ exit
 
 And log in again.
 
-### 2. Set environment variables
-
-In [.env](.env) set the following environment variables:
-- Replace `YOUR_SERVER_IP` with your WAN IP, or a Dynamic DNS hostname.
-- Replace `YOUR_ADMIN_PASSWORD` with a password to log in on the Web UI.
-
-### 3. Build & run the Docker image
+### 2. Run AmneziaWG Easy
 
 ```bash
-$ docker-compose up -d
+$ docker run -d \
+  --name=amnezia-wg-easy \
+  -e LANG=en \
+  -e WG_HOST=<b>🚨YOUR_SERVER_IP</b> \
+  -e PASSWORD=<b>🚨YOUR_ADMIN_PASSWORD</b> \
+  -v ~/.amnezia-wg-easy:/etc/wireguard \
+  -p 51820:51820/udp \
+  -p 51821:51821/tcp \
+  --cap-add=NET_ADMIN \
+  --cap-add=SYS_MODULE \
+  --sysctl="net.ipv4.conf.all.src_valid_mark=1" \
+  --sysctl="net.ipv4.ip_forward=1" \
+  --device=/dev/net/tun:/dev/net/tun \
+  --restart unless-stopped \
+  ghcr.io/spcfox/amnezia-wg-easy
 ```
 
 The Web UI will now be available on `http://0.0.0.0:51821`.
@@ -58,6 +66,7 @@ These options can be configured by setting environment variables using `-e KEY="
 | Env | Default | Example | Description |
 | - | - | - | - |
 | `LANGUAGE` | `en` | `de` | Web UI language. List of available languages in [i18n.js]() |
+| `CHECK_UPDATE` | `true` | `false` | Check for a new version and display a notification about its availability |
 | `PORT` | `51821` | `6789` | TCP port for Web UI. |
 | `WEBUI_HOST` | `0.0.0.0` | `localhost` | IP address web UI binds to. |
 | `PASSWORD` | - | `foobar123` | When set, requires a password when logging in to the Web UI. |
@@ -78,10 +87,20 @@ These options can be configured by setting environment variables using `-e KEY="
 | `JMAX` | `1000` | `250` | Junk packet maximum size — maximum size for Junk packets. |
 | `S1` | `random` | `75` | Init packet junk size — the size of random data that will be added to the init packet, the size of which is initially fixed. |
 | `S2` | `random` | `75` | Response packet junk size — the size of random data that will be added to the response packet, the size of which is initially fixed. |
-| `H1` | `random` | `59869232` | Init packet magic header — the header of the first byte of the handshake. Must be < uint_max. |
-| `H2` | `random` | `869587260` | Response packet magic header — header of the first byte of the handshake response. Must be < uint_max. |
-| `H3` | `random` | `1632311713` | Underload packet magic header — UnderLoad packet header. Must be < uint_max. |
-| `H4` | `random` | `820711365` | Transport packet magic header — header of the packet of the data packet. Must be < uint_max. |
+| `H1` | `random` | `1234567891` | Init packet magic header — the header of the first byte of the handshake. Must be < uint_max. |
+| `H2` | `random` | `1234567892` | Response packet magic header — header of the first byte of the handshake response. Must be < uint_max. |
+| `H3` | `random` | `1234567893` | Underload packet magic header — UnderLoad packet header. Must be < uint_max. |
+| `H4` | `random` | `1234567894` | Transport packet magic header — header of the packet of the data packet. Must be < uint_max. |
+
+## Updating
+
+To update to the latest version, simply run:
+
+```bash
+docker stop amnezia-wg-easy
+docker rm amnezia-wg-easy
+docker pull ghcr.io/spcfox/amnezia-wg-easy
+```
 
 ## Thanks
 

@@ -7,14 +7,14 @@ jobs:
   deploy:
     name: Build & Deploy
     runs-on: ubuntu-latest
-    if: github.repository_owner == 'wg-easy'
+    if: github.repository_owner == 'spcfox'
     permissions:
       packages: write
       contents: read
     steps:
     - uses: actions/checkout@v4
       with:
-        ref: production
+        ref: master
 
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v3
@@ -34,4 +34,4 @@ jobs:
       with:
         push: true
         platforms: linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8
-        tags: ghcr.io/wg-easy/wg-easy:development
+        tags: ghcr.io/spcfox/amnezia-wg-easy:development

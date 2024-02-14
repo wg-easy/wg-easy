@@ -29,6 +29,13 @@ class API {
     return json;
   }
 
+  async checkUpdate() {
+    return this.call({
+      method: 'get',
+      path: '/check-update',
+    });
+  }
+
   async getRelease() {
     return this.call({
       method: 'get',
