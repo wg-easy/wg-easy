@@ -1,6 +1,6 @@
 version: "3.8"
 volumes:
-  etc_wireguard:
+  etc_amneziawg:
 
 services:
   amnezia-wg-easy:
