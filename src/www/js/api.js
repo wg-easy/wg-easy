@@ -36,6 +36,13 @@ class API {
     });
   }
 
+  async getLang() {
+    return this.call({
+      method: 'get',
+      path: '/lang',
+    });
+  }
+
   async getSession() {
     return this.call({
       method: 'get',

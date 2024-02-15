@@ -23,8 +23,15 @@ function bytes(bytes, decimals, kib, maxunit) {
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
 }
 
+const i18n = new VueI18n({
+  locale: localStorage.getItem('lang') || 'en',
+  fallbackLocale: 'en',
+  messages,
+});
+
 new Vue({
   el: '#app',
+  i18n,
   data: {
     authenticated: null,
     authenticating: false,
@@ -255,7 +262,7 @@ new Vue({
   filters: {
     bytes,
     timeago: (value) => {
-      return timeago().format(value);
+      return timeago.format(value, i18n.locale);
     },
   },
   mounted() {
@@ -286,6 +293,12 @@ new Vue({
     }, 1000);
 
     Promise.resolve().then(async () => {
+      const lang = await this.api.getLang();
+      if (lang !== localStorage.getItem('lang') && i18n.availableLocales.includes(lang)) {
+        localStorage.setItem('lang', lang);
+        i18n.locale = lang;
+      }
+
       const currentRelease = await this.api.getRelease();
       const latestRelease = await fetch('https://wg-easy.github.io/wg-easy/changelog.json')
         .then((res) => res.json())
