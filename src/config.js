@@ -27,5 +27,5 @@ iptables -A FORWARD -o wg0 -j ACCEPT -m comment --comment "wg-easy rule";
 `.split('\n').join(' ');
 
 module.exports.WG_PRE_DOWN = process.env.WG_PRE_DOWN || 'iptables-save | grep -vF "wg-easy rule" | iptables-restore';
-module.exports.WG_POST_DOWN = process.env.WG_POST_DOWN || '';
+module.exports.WG_POST_DOWN = process.env.WG_POST_DOWN || 'iptables-save | grep -vF "wg-easy rule" | iptables-restore';
 module.exports.LANG = process.env.LANG || 'en';
