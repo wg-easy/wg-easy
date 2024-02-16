@@ -50,7 +50,7 @@ To automatically install & run wg-easy, simply run:
 <pre>
 $ docker run -d \
   --name=wg-easy \
-  -e LANG=de
+  -e LANG=de \
   -e WG_HOST=<b>🚨YOUR_SERVER_IP</b> \
   -e PASSWORD=<b>🚨YOUR_ADMIN_PASSWORD</b> \
   -v ~/.wg-easy:/etc/wireguard \
@@ -97,6 +97,7 @@ These options can be configured by setting environment variables using `-e KEY="
 | `WG_POST_UP` | `...` | `iptables ...` | See [config.js](https://github.com/wg-easy/wg-easy/blob/master/src/config.js#L20) for the default value. |
 | `WG_PRE_DOWN` | `...` | - | See [config.js](https://github.com/wg-easy/wg-easy/blob/master/src/config.js#L27) for the default value. |
 | `WG_POST_DOWN` | `...` | `iptables ...` | See [config.js](https://github.com/wg-easy/wg-easy/blob/master/src/config.js#L28) for the default value. |
+| `LANG` | `en` | `de` | Web UI language (Supports: en, ru, tr, no, pl, fr, de, ca, es). |
 
 > If you change `WG_PORT`, make sure to also change the exposed port.
 
