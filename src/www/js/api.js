@@ -43,6 +43,13 @@ class API {
     });
   }
 
+  async getUiDetailedStats() {
+    return this.call({
+      method: 'get',
+      path: '/ui-detailed-stats',
+    });
+  }
+
   async getSession() {
     return this.call({
       method: 'get',
