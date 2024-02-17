@@ -87,11 +87,11 @@
                 </apexchart>
               </div>
 
-              <div class="relative p-5 z-10 flex flex-col xs:flex-row justify-between gap-3">
-                <div class="flex gap-2 w-full items-center ">
+              <div class="relative p-5 z-10 flex flex-col md:flex-row justify-between gap-3">
+                <div class="flex gap-3 md:gap-4 w-full items-center ">
 
                   <!-- Avatar -->
-                  <div class="h-10 w-10 mr-4 mt-2 self-start rounded-full bg-gray-50 relative">
+                  <div class="h-10 w-10 mt-2 self-start rounded-full bg-gray-50 relative">
                     <svg class="w-6 m-2 text-gray-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                       fill="currentColor">
                       <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
@@ -109,11 +109,11 @@
                   </div>
 
                   <!-- Name & Info -->
-                  <div class="flex flex-col md:flex-row w-full gap-2">
+                  <div class="flex flex-col xxs:flex-row w-full gap-2">
 
                     <!-- Name -->
                     <div class="flex flex-col flex-grow gap-1">
-                      <div class="text-gray-700 dark:text-neutral-200 group"
+                      <div class="text-gray-700 dark:text-neutral-200 group text-sm md:text-base"
                         :title="$t('createdOn') + dateTime(new Date(client.createdAt))">
 
                         <!-- Show -->
@@ -183,7 +183,7 @@
                           {{client.transferRxCurrent | bytes}}/s
                         </span>
                         <!-- Last seen -->
-                        <span class="text-gray-400 dark:text-neutral-500" v-if="true"
+                        <span class="text-gray-400 dark:text-neutral-500" v-if="client.latestHandshakeAt"
                           :title="$t('lastSeen') + dateTime(new Date(client.latestHandshakeAt))">
                           {{!uiDetailedStats ? " · " : ""}}{{new Date(client.latestHandshakeAt) | timeago}}
                         </span>
@@ -192,10 +192,10 @@
 
                     <!-- Info -->
                     <div v-if="uiDetailedStats"
-                      class="flex gap-2 items-center text-gray-400 dark:text-neutral-400 text-xs mt-px -ml-4 md:ml-0">
+                      class="flex gap-2 items-center shrink-0 text-gray-400 dark:text-neutral-400 text-xs mt-px -ml-4 xxs:ml-0">
 
                       <!-- Transfer TX -->
-                      <div class="min-w-24" v-if="client.transferTx">
+                      <div class="min-w-20 md:min-w-24" v-if="client.transferTx">
                         <span class="flex gap-1" :title="$t('totalDownload') + bytes(client.transferTx)">
                           <svg class="align-middle h-3 inline mt-0.5" xmlns="http://www.w3.org/2000/svg"
                             viewBox="0 0 20 20" fill="currentColor">
@@ -214,7 +214,7 @@
                       </div>
 
                       <!-- Transfer RX -->
-                      <div class="min-w-24" v-if="client.transferRx">
+                      <div class="min-w-20 md:min-w-24" v-if="client.transferRx">
                         <span class="flex gap-1" :title="$t('totalUpload') + bytes(client.transferRx)">
 
                           <svg class="align-middle h-3 inline mt-0.5" xmlns="http://www.w3.org/2000/svg"
