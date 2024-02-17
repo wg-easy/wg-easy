@@ -9,4 +9,5 @@
   "8": "Updated to Node.js v18.",
   "9": "Fixed issue running on devices with older kernels.",
   "10": "Added sessionless HTTP API auth & automatic dark mode."
+  "11": "Multilanguage Support & various bugfixes"
 }

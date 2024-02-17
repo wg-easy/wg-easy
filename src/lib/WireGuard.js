@@ -207,12 +207,11 @@ AllowedIPs = ${client.address}/32, ${client.address6}/128`;
     const isDnsSet = WG_DEFAULT_DNS || WG_DEFAULT_DNS6;
     const dnsServers = [WG_DEFAULT_DNS, WG_DEFAULT_DNS6].filter((item) => !!item).join(', ');
 
-    return `
-[Interface]
+    return `[Interface]
 PrivateKey = ${client.privateKey}
 Address = ${client.address}/24, ${client.address6}/64
-${isDnsSet ? `DNS = ${dnsServers}` : ''}
-${WG_MTU ? `MTU = ${WG_MTU}` : ''}
+${WG_DEFAULT_DNS ? `DNS = ${WG_DEFAULT_DNS}\n` : ''}\
+${WG_MTU ? `MTU = ${WG_MTU}\n` : ''}\
 
 [Peer]
 PublicKey = ${config.server.publicKey}
