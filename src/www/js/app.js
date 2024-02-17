@@ -293,14 +293,21 @@ new Vue({
       }).catch(console.error);
     }, 1000);
 
+    this.api.getUiDetailedStats()
+      .then((res) => {
+        this.uiDetailedStats = res;
+      })
+      .catch(() => {
+        console.log('Failed to get ui-detailed-stats');
+        this.uiDetailedStats = false;
+      });
+
     Promise.resolve().then(async () => {
       const lang = await this.api.getLang();
       if (lang !== localStorage.getItem('lang') && i18n.availableLocales.includes(lang)) {
         localStorage.setItem('lang', lang);
         i18n.locale = lang;
       }
-
-      this.uiDetailedStats = await this.api.getUiDetailedStats();
 
       const currentRelease = await this.api.getRelease();
       const latestRelease = await fetch('https://wg-easy.github.io/wg-easy/changelog.json')
@@ -324,6 +331,6 @@ new Vue({
 
       this.currentRelease = currentRelease;
       this.latestRelease = latestRelease;
-    }).catch(console.error);
+    }).catch((err) => console.error(err));
   },
 });
