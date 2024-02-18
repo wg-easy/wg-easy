@@ -25,6 +25,9 @@ RUN mv /app/node_modules /node_modules
 # Enable this to run `npm run serve`
 RUN npm i -g nodemon
 
+# Workaround CVE-2023-42282
+RUN npm uninstall -g ip
+
 # Install Linux packages
 RUN apk add --no-cache \
     dpkg \
