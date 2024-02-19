@@ -248,7 +248,7 @@ const messages = { // eslint-disable-line no-unused-vars
   ko: {
     name: '이름',
     password: '암호',
-    signIn: '로그안',
+    signIn: '로그인',
     logout: '로그아웃',
     updateAvailable: '업데이트가 있습니다!',
     update: '업데이트',
