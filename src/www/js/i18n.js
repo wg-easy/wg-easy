@@ -298,5 +298,5 @@ const messages = { // eslint-disable-line no-unused-vars
     downloadConfig: 'Tải xuống cấu hình',
     madeBy: 'Được tạo bởi',
     donate: 'Ủng hộ',
-  }
+  },
 };
