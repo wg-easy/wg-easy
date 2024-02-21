@@ -412,7 +412,7 @@ const messages = { // eslint-disable-line no-unused-vars
     password: '密碼',
     signIn: '登入',
     logout: '登出',
-    updateAvailable: '有新版本可用！',  
+    updateAvailable: '有新版本可用！',
     update: '更新',
     clients: '客戶',
     new: '新建',
