@@ -322,4 +322,5 @@ Endpoint = ${WG_HOST}:${WG_PORT}`;
   async Shutdown() {
     await Util.exec('wg-quick down wg0').catch(() => { });
   }
+
 };
