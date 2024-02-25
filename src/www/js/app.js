@@ -53,7 +53,7 @@ new Vue({
     latestRelease: null,
 
     isDark: null,
-    uiUsageStats: false,
+    uiTrafficStats: false,
 
     chartOptions: {
       chart: {
@@ -293,13 +293,13 @@ new Vue({
       }).catch(console.error);
     }, 1000);
 
-    this.api.getuiUsageStats()
+    this.api.getuiTrafficStats()
       .then((res) => {
-        this.uiUsageStats = res;
+        this.uiTrafficStats = res;
       })
       .catch(() => {
-        console.log('Failed to get ui-usage-stats');
-        this.uiUsageStats = false;
+        console.log('Failed to get ui-traffic-stats');
+        this.uiTrafficStats = false;
       });
 
     Promise.resolve().then(async () => {
