@@ -43,10 +43,10 @@ class API {
     });
   }
 
-  async getUiDetailedStats() {
+  async getuiUsageStats() {
     return this.call({
       method: 'get',
-      path: '/ui-detailed-stats',
+      path: '/ui-usage-stats',
     });
   }
 

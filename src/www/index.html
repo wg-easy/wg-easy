@@ -162,7 +162,7 @@
                           </span>
                         </span>
                         <!-- Inline Transfer TX -->
-                        <span v-if="!uiDetailedStats && client.transferTx" :title="$t('totalDownload') + bytes(client.transferTx)">
+                        <span v-if="!uiUsageStats && client.transferTx" :title="$t('totalDownload') + bytes(client.transferTx)">
                           ·
                           <svg class="align-middle h-3 inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd"
@@ -173,7 +173,7 @@
                         </span>
                         
                         <!-- Inline Transfer RX -->
-                        <span v-if="!uiDetailedStats && client.transferRx" :title="$t('totalUpload') + bytes(client.transferRx)">
+                        <span v-if="!uiUsageStats && client.transferRx" :title="$t('totalUpload') + bytes(client.transferRx)">
                           ·
                           <svg class="align-middle h-3 inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd"
@@ -185,13 +185,13 @@
                         <!-- Last seen -->
                         <span class="text-gray-400 dark:text-neutral-500" v-if="client.latestHandshakeAt"
                           :title="$t('lastSeen') + dateTime(new Date(client.latestHandshakeAt))">
-                          {{!uiDetailedStats ? " · " : ""}}{{new Date(client.latestHandshakeAt) | timeago}}
+                          {{!uiUsageStats ? " · " : ""}}{{new Date(client.latestHandshakeAt) | timeago}}
                         </span>
                       </div>
                     </div>
 
                     <!-- Info -->
-                    <div v-if="uiDetailedStats"
+                    <div v-if="uiUsageStats"
                       class="flex gap-2 items-center shrink-0 text-gray-400 dark:text-neutral-400 text-xs mt-px justify-end">
 
                       <!-- Transfer TX -->

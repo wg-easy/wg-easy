@@ -29,4 +29,4 @@ iptables -A FORWARD -o wg0 -j ACCEPT;
 module.exports.WG_PRE_DOWN = process.env.WG_PRE_DOWN || '';
 module.exports.WG_POST_DOWN = process.env.WG_POST_DOWN || '';
 module.exports.LANG = process.env.LANG || 'en';
-module.exports.UI_DETAILED_STATS = process.env.UI_DETAILED_STATS || 'false';
+module.exports.UI_USAGE_STATS = process.env.UI_USAGE_STATS || 'false';

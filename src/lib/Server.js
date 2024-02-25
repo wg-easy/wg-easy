@@ -18,7 +18,7 @@ const {
   RELEASE,
   PASSWORD,
   LANG,
-  UI_DETAILED_STATS,
+  UI_USAGE_STATS,
 } = require('../config');
 
 module.exports = class Server {
@@ -45,8 +45,8 @@ module.exports = class Server {
       .get('/api/lang', (Util.promisify(async () => {
         return LANG;
       })))
-      .get('/api/ui-detailed-stats', (Util.promisify(async () => {
-        return UI_DETAILED_STATS === 'true';
+      .get('/api/ui-usage-stats', (Util.promisify(async () => {
+        return UI_USAGE_STATS === 'true';
       })))
 
     // Authentication
