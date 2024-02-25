@@ -14,7 +14,7 @@ After=network-online.target nss-lookup.target docker.service
 #Environment="WG_PERSISTENT_KEEPALIVE=25" #Value in seconds to keep the "connection" open. If this value is 0, then connections won't be kept alive.
 Type=simple
 RemainAfterExit=no
-ExecStart=/usr/bin/env node /home/ubuntu/wg-easy/server.js
+ExecStart=/usr/bin/env node /home/ubuntu/wg-easy/src/server.js
 Restart=on-failure
 RestartSec=1
 
