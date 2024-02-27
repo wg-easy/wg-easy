@@ -1,5 +1,5 @@
 /*
-! tailwindcss v3.4.1 | MIT License | https://tailwindcss.com
+! tailwindcss v3.4.0 | MIT License | https://tailwindcss.com
 */
 
 /*
@@ -688,10 +688,6 @@ video {
   margin-bottom: 4rem;
 }
 
-.-ml-4 {
-  margin-left: -1rem;
-}
-
 .mb-10 {
   margin-bottom: 2.5rem;
 }
@@ -975,6 +971,10 @@ video {
   white-space: nowrap;
 }
 
+.whitespace-nowrap {
+  white-space: nowrap;
+}
+
 .rounded {
   border-radius: 0.25rem;
 }
@@ -1139,6 +1139,11 @@ video {
 .py-3 {
   padding-top: 0.75rem;
   padding-bottom: 0.75rem;
+}
+
+.py-5 {
+  padding-top: 1.25rem;
+  padding-bottom: 1.25rem;
 }
 
 .pb-1 {
@@ -1454,10 +1459,6 @@ video {
 }
 
 @media (min-width: 450px) {
-  .xxs\:ml-0 {
-    margin-left: 0px;
-  }
-
   .xxs\:flex-row {
     flex-direction: row;
   }
