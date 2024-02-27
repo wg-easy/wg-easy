@@ -1,5 +1,5 @@
 [Unit]
-Description=Wireguard VPN + + Web-based Admin UI
+Description=Wireguard VPN + Web-based Admin UI
 After=network-online.target nss-lookup.target
 
 [Service]

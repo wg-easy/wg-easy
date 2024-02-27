@@ -202,12 +202,11 @@ AllowedIPs = ${client.address}/32`;
     const config = await this.getConfig();
     const client = await this.getClient({ clientId });
 
-    return `
-[Interface]
+    return `[Interface]
 PrivateKey = ${client.privateKey}
 Address = ${client.address}/24
-${WG_DEFAULT_DNS ? `DNS = ${WG_DEFAULT_DNS}` : ''}
-${WG_MTU ? `MTU = ${WG_MTU}` : ''}
+${WG_DEFAULT_DNS ? `DNS = ${WG_DEFAULT_DNS}\n` : ''}\
+${WG_MTU ? `MTU = ${WG_MTU}\n` : ''}\
 
 [Peer]
 PublicKey = ${config.server.publicKey}

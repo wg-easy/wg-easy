@@ -6,7 +6,7 @@ services:
   wg-easy:
     environment:
       # Change Language:
-      # (Supports: en, ru, tr, no, pl, fr, de)
+      # (Supports: en, ua, ru, tr, no, pl, fr, de, ca, es, pt, chs, cht)
       - LANG=de
       # ⚠️ Required:
       # Change this to your host's public address
