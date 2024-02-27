@@ -17,9 +17,6 @@ $IPT -I INPUT 1 -p tcp --dport 51821 -j ACCEPT      # for webui
 $IPT -t nat -I POSTROUTING 1 -s $SUB_NET -o $IN_FACE -j MASQUERADE
 $IPT -I FORWARD 1 -i $WG_FACE -j ACCEPT   #for internet
 $IPT -I FORWARD 1 -o $WG_FACE -j ACCEPT   #for internet
-
-systemctl start mount-mypi.service
-
 # wg set wg0 fwmark 51820
 
 ## IPv6 (Uncomment) ##

@@ -11,5 +11,6 @@ WG_PORT="51820"                  # WG udp port
 $IPT -t nat -I POSTROUTING 1 -s $SUB_NET -o $WG_FACE -j MASQUERADE
 $IPT -I FORWARD 1 -i $WG_FACE -o wg0 -j ACCEPT   #for internet
 $IPT -I FORWARD 1 -i wg0 -o $WG_FACE -j ACCEPT   #for internet
+ip rule add from 10.254.1.209/32 table main     # for ssh access
 wg set wg0 fwmark 51820
 set -e
