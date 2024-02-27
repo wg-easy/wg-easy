@@ -18,6 +18,7 @@ $IPT -t nat -I POSTROUTING 1 -s $SUB_NET -o $IN_FACE -j MASQUERADE
 $IPT -I FORWARD 1 -i $WG_FACE -j ACCEPT   #for internet
 $IPT -I FORWARD 1 -o $WG_FACE -j ACCEPT   #for internet
 
+wg-quick up wg1
 systemctl start mount-mypi.service
 
 # wg set wg0 fwmark 51820
