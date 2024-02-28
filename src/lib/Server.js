@@ -1,15 +1,27 @@
 'use strict';
 
-const path = require('path');
 const bcrypt = require('bcryptjs');
 const crypto = require('node:crypto');
+const { createServer } = require('node:http');
+const { stat, readFile } = require('node:fs/promises');
+const { join } = require('node:path');
 
-const express = require('express');
 const expressSession = require('express-session');
 const debug = require('debug')('Server');
 
-const Util = require('./Util');
-const ServerError = require('./ServerError');
+const {
+  createApp,
+  createError,
+  createRouter,
+  defineEventHandler,
+  fromNodeMiddleware,
+  getRouterParam,
+  toNodeListener,
+  readBody,
+  setHeader,
+  serveStatic,
+} = require('h3');
+
 const WireGuard = require('../services/WireGuard');
 
 const {
@@ -23,33 +35,39 @@ const {
 module.exports = class Server {
 
   constructor() {
-    // Express
-    this.app = express()
-      .disable('etag')
-      .use('/', express.static(path.join(__dirname, '..', 'www')))
-      .use(express.json())
-      .use(expressSession({
-        secret: crypto.randomBytes(256).toString('hex'),
-        resave: true,
-        saveUninitialized: true,
-        cookie: {
-          httpOnly: true,
-        },
+    const app = createApp();
+    this.app = app;
+
+    app.use(fromNodeMiddleware(expressSession({
+      secret: crypto.randomBytes(256).toString('hex'),
+      resave: true,
+      saveUninitialized: true,
+      cookie: {
+        httpOnly: true,
+      },
+    })));
+
+    const router = createRouter();
+    app.use(router);
+
+    router
+      .get('/api/release', defineEventHandler((event) => {
+        setHeader(event, 'Content-Type', 'application/json');
+
+        return RELEASE;
       }))
 
-      .get('/api/release', (Util.promisify(async () => {
-        return RELEASE;
-      })))
+      .get('/api/lang', defineEventHandler((event) => {
+        setHeader(event, 'Content-Type', 'application/json');
 
-      .get('/api/lang', (Util.promisify(async () => {
-        return LANG;
-      })))
+        return `"${LANG}"`;
+      }))
 
     // Authentication
-      .get('/api/session', Util.promisify(async (req) => {
+      .get('/api/session', defineEventHandler((event) => {
         const requiresPassword = !!process.env.PASSWORD;
         const authenticated = requiresPassword
-          ? !!(req.session && req.session.authenticated)
+          ? !!(event.node.req.session && event.node.req.session.authenticated)
           : true;
 
         return {
@@ -57,28 +75,35 @@ module.exports = class Server {
           authenticated,
         };
       }))
-      .post('/api/session', Util.promisify(async (req) => {
-        const {
-          password,
-        } = req.body;
+      .post('/api/session', defineEventHandler(async (event) => {
+        const { password } = await readBody(event);
 
         if (typeof password !== 'string') {
-          throw new ServerError('Missing: Password', 401);
+          throw createError({
+            status: 401,
+            message: 'Missing: Password',
+          });
         }
 
         if (password !== PASSWORD) {
-          throw new ServerError('Incorrect Password', 401);
+          throw createError({
+            status: 401,
+            message: 'Incorrect Password',
+          });
         }
 
-        req.session.authenticated = true;
-        req.session.save();
+        event.node.req.session.authenticated = true;
+        event.node.req.session.save();
 
-        debug(`New Session: ${req.session.id}`);
-      }))
+        debug(`New Session: ${event.node.req.session.id}`);
+
+        return { succcess: true };
+      }));
 
     // WireGuard
-      .use((req, res, next) => {
-        if (!PASSWORD) {
+    app.use(
+      fromNodeMiddleware((req, res, next) => {
+        if (!PASSWORD || !req.url.startsWith('/api/')) {
           return next();
         }
 
@@ -86,7 +111,7 @@ module.exports = class Server {
           return next();
         }
 
-        if (req.path.startsWith('/api/') && req.headers['authorization']) {
+        if (req.url.startsWith('/api/') && req.headers['authorization']) {
           if (bcrypt.compareSync(req.headers['authorization'], bcrypt.hashSync(PASSWORD, 10))) {
             return next();
           }
@@ -98,25 +123,32 @@ module.exports = class Server {
         return res.status(401).json({
           error: 'Not Logged In',
         });
-      })
-      .delete('/api/session', Util.promisify(async (req) => {
-        const sessionId = req.session.id;
+      }),
+    );
 
-        req.session.destroy();
+    const router2 = createRouter();
+    app.use(router2);
+
+    router2
+      .delete('/api/session', defineEventHandler((event) => {
+        const sessionId = event.node.req.session.id;
+
+        event.node.req.session.destroy();
 
         debug(`Deleted Session: ${sessionId}`);
+        return { success: true };
       }))
-      .get('/api/wireguard/client', Util.promisify(async (req) => {
+      .get('/api/wireguard/client', defineEventHandler(() => {
         return WireGuard.getClients();
       }))
-      .get('/api/wireguard/client/:clientId/qrcode.svg', Util.promisify(async (req, res) => {
-        const { clientId } = req.params;
+      .get('/api/wireguard/client/:clientId/qrcode.svg', defineEventHandler(async (event) => {
+        const clientId = getRouterParam(event, 'clientId');
         const svg = await WireGuard.getClientQRCodeSVG({ clientId });
-        res.header('Content-Type', 'image/svg+xml');
-        res.send(svg);
+        setHeader(event, 'Content-Type', 'image/svg+xml');
+        return svg;
       }))
-      .get('/api/wireguard/client/:clientId/configuration', Util.promisify(async (req, res) => {
-        const { clientId } = req.params;
+      .get('/api/wireguard/client/:clientId/configuration', defineEventHandler(async (event) => {
+        const clientId = getRouterParam(event, 'clientId');
         const client = await WireGuard.getClient({ clientId });
         const config = await WireGuard.getClientConfiguration({ clientId });
         const configName = client.name
@@ -124,52 +156,79 @@ module.exports = class Server {
           .replace(/(-{2,}|-$)/g, '-')
           .replace(/-$/, '')
           .substring(0, 32);
-        res.header('Content-Disposition', `attachment; filename="${configName || clientId}.conf"`);
-        res.header('Content-Type', 'text/plain');
-        res.send(config);
+        setHeader(event, 'Content-Disposition', `attachment; filename="${configName || clientId}.conf"`);
+        setHeader(event, 'Content-Type', 'text/plain');
+        return config;
       }))
-      .post('/api/wireguard/client', Util.promisify(async (req) => {
-        const { name } = req.body;
-        return WireGuard.createClient({ name });
+      .post('/api/wireguard/client', defineEventHandler(async (event) => {
+        const { name } = await readBody(event);
+        await WireGuard.createClient({ name });
+        return { success: true };
       }))
-      .delete('/api/wireguard/client/:clientId', Util.promisify(async (req) => {
-        const { clientId } = req.params;
-        return WireGuard.deleteClient({ clientId });
+      .delete('/api/wireguard/client/:clientId', defineEventHandler(async (event) => {
+        const clientId = getRouterParam(event, 'clientId');
+        await WireGuard.deleteClient({ clientId });
+        return { success: true };
       }))
-      .post('/api/wireguard/client/:clientId/enable', Util.promisify(async (req, res) => {
-        const { clientId } = req.params;
+      .post('/api/wireguard/client/:clientId/enable', defineEventHandler(async (event) => {
+        const clientId = getRouterParam(event, 'clientId');
         if (clientId === '__proto__' || clientId === 'constructor' || clientId === 'prototype') {
-          res.end(403);
+          throw createError({ status: 403 });
         }
-        return WireGuard.enableClient({ clientId });
+        await WireGuard.enableClient({ clientId });
+        return { success: true };
       }))
-      .post('/api/wireguard/client/:clientId/disable', Util.promisify(async (req, res) => {
-        const { clientId } = req.params;
+      .post('/api/wireguard/client/:clientId/disable', defineEventHandler(async (event) => {
+        const clientId = getRouterParam(event, 'clientId');
         if (clientId === '__proto__' || clientId === 'constructor' || clientId === 'prototype') {
-          res.end(403);
+          throw createError({ status: 403 });
         }
-        return WireGuard.disableClient({ clientId });
+        await WireGuard.disableClient({ clientId });
+        return { success: true };
       }))
-      .put('/api/wireguard/client/:clientId/name', Util.promisify(async (req, res) => {
-        const { clientId } = req.params;
+      .put('/api/wireguard/client/:clientId/name', defineEventHandler(async (event) => {
+        const clientId = getRouterParam(event, 'clientId');
         if (clientId === '__proto__' || clientId === 'constructor' || clientId === 'prototype') {
-          res.end(403);
+          throw createError({ status: 403 });
         }
-        const { name } = req.body;
-        return WireGuard.updateClientName({ clientId, name });
+        const { name } = await readBody(event);
+        await WireGuard.updateClientName({ clientId, name });
+        return { success: true };
       }))
-      .put('/api/wireguard/client/:clientId/address', Util.promisify(async (req, res) => {
-        const { clientId } = req.params;
+      .put('/api/wireguard/client/:clientId/address', defineEventHandler(async (event) => {
+        const clientId = getRouterParam(event, 'clientId');
         if (clientId === '__proto__' || clientId === 'constructor' || clientId === 'prototype') {
-          res.end(403);
+          throw createError({ status: 403 });
         }
-        const { address } = req.body;
-        return WireGuard.updateClientAddress({ clientId, address });
-      }))
+        const { address } = await readBody(event);
+        await WireGuard.updateClientAddress({ clientId, address });
+        return { success: true };
+      }));
 
-      .listen(PORT, WEBUI_HOST, () => {
-        debug(`Listening on http://${WEBUI_HOST}:${PORT}`);
-      });
+    // Static assets
+    const publicDir = 'www';
+    app.use(
+      defineEventHandler((event) => {
+        return serveStatic(event, {
+          getContents: (id) => readFile(join(publicDir, id)),
+          getMeta: async (id) => {
+            const stats = await stat(join(publicDir, id)).catch(() => {});
+
+            if (!stats || !stats.isFile()) {
+              return;
+            }
+
+            return {
+              size: stats.size,
+              mtime: stats.mtimeMs,
+            };
+          },
+        });
+      }),
+    );
+
+    createServer(toNodeListener(app)).listen(PORT, WEBUI_HOST);
+    debug(`Listening on http://${WEBUI_HOST}:${PORT}`);
   }
 
 };
