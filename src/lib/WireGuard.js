@@ -318,4 +318,9 @@ Endpoint = ${WG_HOST}:${WG_PORT}`;
     await this.saveConfig();
   }
 
+  // Shutdown wireguard
+  async Shutdown() {
+    await Util.exec('wg-quick down wg0').catch(() => { });
+  }
+
 };
