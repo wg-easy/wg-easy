@@ -27,5 +27,11 @@ iptables -A FORWARD -o wg0 -j ACCEPT;
 `.split('\n').join(' ');
 
 module.exports.WG_PRE_DOWN = process.env.WG_PRE_DOWN || '';
-module.exports.WG_POST_DOWN = process.env.WG_POST_DOWN || '';
+module.exports.WG_POST_DOWN = process.env.WG_POST_DOWN || `
+iptables -t nat -D POSTROUTING -s ${module.exports.WG_DEFAULT_ADDRESS.replace('x', '0')}/24 -o ${module.exports.WG_DEVICE} -j MASQUERADE;
+iptables -D INPUT -p udp -m udp --dport 51820 -j ACCEPT;
+iptables -D FORWARD -i wg0 -j ACCEPT;
+iptables -D FORWARD -o wg0 -j ACCEPT;
+`.split('\n').join(' ');
 module.exports.LANG = process.env.LANG || 'en';
+module.exports.UI_TRAFFIC_STATS = process.env.UI_TRAFFIC_STATS || 'false';
