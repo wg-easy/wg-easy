@@ -23,7 +23,7 @@ module.exports = {
           opacity: '0.25',
           cursor: 'default',
         },
-      },
+      };
       addUtilities(newUtilities);
     },
   ],
