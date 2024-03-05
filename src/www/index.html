@@ -17,8 +17,11 @@
 </style>
 
 <body class="bg-gray-50 dark:bg-neutral-800">
+
   <div id="app">
-    <div v-cloak class="container mx-auto max-w-3xl px-3 md:px-0">
+
+    <div v-cloak class="container mx-auto max-w-3xl px-5 md:px-0">
+
       <div v-if="authenticated === true">
         <span v-if="requiresPassword"
           class="text-sm text-gray-400 dark:text-neutral-400 mb-10 mr-2 mt-3 cursor-pointer hover:underline float-right"
@@ -86,14 +89,11 @@
                   style="transform: scaleY(-1);">
                 </apexchart>
               </div>
-
-              <div class="relative py-5 px-3 z-10 flex flex-col sm:flex-row justify-between gap-3">
-                <div class="flex gap-3 md:gap-4 w-full items-center ">
-
-                  <!-- Avatar -->
-                  <div class="h-10 w-10 mt-2 self-start rounded-full bg-gray-50 relative">
-                    <svg class="w-6 m-2 text-gray-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                      fill="currentColor">
+              <div class="relative p-5 z-10 flex flex-col md:flex-row justify-between">
+                <div class="flex items-center pb-2 md:pb-0">
+                  <div class="h-10 w-10 mr-5 rounded-full bg-gray-50 relative">
+                    <svg class="w-6 m-2 text-gray-300" xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20" fill="currentColor">
                       <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
                         clip-rule="evenodd" />
                     </svg>
@@ -108,26 +108,52 @@
                     </div>
                   </div>
 
-                  <!-- Name & Info -->
-                  <div class="flex flex-col xxs:flex-row w-full gap-2">
+                  <div class="flex-grow">
 
                     <!-- Name -->
-                    <div class="flex flex-col flex-grow gap-1">
-                      <div class="text-gray-700 dark:text-neutral-200 group text-sm md:text-base"
-                        :title="$t('createdOn') + dateTime(new Date(client.createdAt))">
+                    <div class="text-gray-700 dark:text-neutral-200 group"
+                      :title="$t('createdOn') + dateTime(new Date(client.createdAt))">
+
+                      <!-- Show -->
+                      <input v-show="clientEditNameId === client.id" v-model="clientEditName"
+                        v-on:keyup.enter="updateClientName(client, clientEditName); clientEditName = null; clientEditNameId = null;"
+                        v-on:keyup.escape="clientEditName = null; clientEditNameId = null;"
+                        :ref="'client-' + client.id + '-name'"
+                        class="rounded px-1 border-2 dark:bg-neutral-700 border-gray-100 dark:border-neutral-600 focus:border-gray-200 dark:focus:border-neutral-500 dark:placeholder:text-neutral-500 outline-none w-30" />
+                      <span v-show="clientEditNameId !== client.id"
+                        class="inline-block border-t-2 border-b-2 border-transparent">{{client.name}}</span>
+
+                      <!-- Edit -->
+                      <span v-show="clientEditNameId !== client.id"
+                        @click="clientEditName = client.name; clientEditNameId = client.id; setTimeout(() => $refs['client-' + client.id + '-name'][0].select(), 1);"
+                        class="cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                          class="h-4 w-4 inline align-middle opacity-25 hover:opacity-100" fill="none"
+                          viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                      </span>
+                    </div>
+
+                    <!-- Info -->
+                    <div class="text-gray-400 dark:text-neutral-400 text-xs">
+
+                      <!-- Address -->
+                      <span class="group block md:inline-block pb-1 md:pb-0">
 
                         <!-- Show -->
-                        <input v-show="clientEditNameId === client.id" v-model="clientEditName"
-                          v-on:keyup.enter="updateClientName(client, clientEditName); clientEditName = null; clientEditNameId = null;"
-                          v-on:keyup.escape="clientEditName = null; clientEditNameId = null;"
-                          :ref="'client-' + client.id + '-name'"
-                          class="rounded px-1 border-2 dark:bg-neutral-700 border-gray-100 dark:border-neutral-600 focus:border-gray-200 dark:focus:border-neutral-500 dark:placeholder:text-neutral-500 outline-none w-30" />
-                        <span v-show="clientEditNameId !== client.id"
-                          class="border-t-2 border-b-2 border-transparent">{{client.name}}</span>
+                        <input v-show="clientEditAddressId === client.id" v-model="clientEditAddress"
+                          v-on:keyup.enter="updateClientAddress(client, clientEditAddress); clientEditAddress = null; clientEditAddressId = null;"
+                          v-on:keyup.escape="clientEditAddress = null; clientEditAddressId = null;"
+                          :ref="'client-' + client.id + '-address'"
+                          class="rounded border-2 dark:bg-neutral-700 border-gray-100 dark:border-neutral-600 focus:border-gray-200 dark:focus:border-neutral-500 outline-none w-20 text-black dark:text-neutral-300 dark:placeholder:text-neutral-500" />
+                        <span v-show="clientEditAddressId !== client.id"
+                          class="inline-block border-t-2 border-b-2 border-transparent">{{client.address}}</span>
 
                         <!-- Edit -->
-                        <span v-show="clientEditNameId !== client.id"
-                          @click="clientEditName = client.name; clientEditNameId = client.id; setTimeout(() => $refs['client-' + client.id + '-name'][0].select(), 1);"
+                        <span v-show="clientEditAddressId !== client.id"
+                          @click="clientEditAddress = client.address; clientEditAddressId = client.id; setTimeout(() => $refs['client-' + client.id + '-address'][0].select(), 1);"
                           class="cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity">
                           <svg xmlns="http://www.w3.org/2000/svg"
                             class="h-4 w-4 inline align-middle opacity-25 hover:opacity-100" fill="none"
@@ -136,105 +162,39 @@
                               d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                           </svg>
                         </span>
-                      </div>
-                      <!-- Address -->
-                      <div class=" block md:inline-block pb-1 md:pb-0 text-gray-500 dark:text-neutral-400 text-xs">
-                        <span class="group">
-                          <!-- Show -->
-                          <input v-show="clientEditAddressId === client.id" v-model="clientEditAddress"
-                            v-on:keyup.enter="updateClientAddress(client, clientEditAddress); clientEditAddress = null; clientEditAddressId = null;"
-                            v-on:keyup.escape="clientEditAddress = null; clientEditAddressId = null;"
-                            :ref="'client-' + client.id + '-address'"
-                            class="rounded border-2 dark:bg-neutral-700 border-gray-100 dark:border-neutral-600 focus:border-gray-200 dark:focus:border-neutral-500 outline-none w-20 text-black dark:text-neutral-300 dark:placeholder:text-neutral-500" />
-                          <span v-show="clientEditAddressId !== client.id"
-                            class="inline-block ">{{client.address}}</span>
-
-                          <!-- Edit -->
-                          <span v-show="clientEditAddressId !== client.id"
-                            @click="clientEditAddress = client.address; clientEditAddressId = client.id; setTimeout(() => $refs['client-' + client.id + '-address'][0].select(), 1);"
-                            class="cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity">
-                            <svg xmlns="http://www.w3.org/2000/svg"
-                              class="h-4 w-4 inline align-middle opacity-25 hover:opacity-100" fill="none"
-                              viewBox="0 0 24 24" stroke="currentColor">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg>
-                          </span>
-                        </span>
-                        <!-- Inline Transfer TX -->
-                        <span v-if="!uiTrafficStats && client.transferTx" class="whitespace-nowrap" :title="$t('totalDownload') + bytes(client.transferTx)">
-                          ·
-                          <svg class="align-middle h-3 inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd"
-                              d="M16.707 10.293a1 1 0 010 1.414l-6 6a1 1 0 01-1.414 0l-6-6a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l4.293-4.293a1 1 0 011.414 0z"
-                              clip-rule="evenodd" />
-                          </svg>
-                          {{client.transferTxCurrent | bytes}}/s
-                        </span>
-                        
-                        <!-- Inline Transfer RX -->
-                        <span v-if="!uiTrafficStats && client.transferRx" class="whitespace-nowrap" :title="$t('totalUpload') + bytes(client.transferRx)">
-                          ·
-                          <svg class="align-middle h-3 inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd"
-                              d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z"
-                              clip-rule="evenodd" />
-                          </svg>
-                          {{client.transferRxCurrent | bytes}}/s
-                        </span>
-                        <!-- Last seen -->
-                        <span class="text-gray-400 dark:text-neutral-500 whitespace-nowrap" v-if="client.latestHandshakeAt"
-                          :title="$t('lastSeen') + dateTime(new Date(client.latestHandshakeAt))">
-                          {{!uiTrafficStats ? " · " : ""}}{{new Date(client.latestHandshakeAt) | timeago}}
-                        </span>
-                      </div>
-                    </div>
-
-                    <!-- Info -->
-                    <div v-if="uiTrafficStats"
-                      class="flex gap-2 items-center shrink-0 text-gray-400 dark:text-neutral-400 text-xs mt-px justify-end">
+                      </span>
 
                       <!-- Transfer TX -->
-                      <div class="min-w-20 md:min-w-24" v-if="client.transferTx">
-                        <span class="flex gap-1" :title="$t('totalDownload') + bytes(client.transferTx)">
-                          <svg class="align-middle h-3 inline mt-0.5" xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd"
-                              d="M16.707 10.293a1 1 0 010 1.414l-6 6a1 1 0 01-1.414 0l-6-6a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l4.293-4.293a1 1 0 011.414 0z"
-                              clip-rule="evenodd" />
-                          </svg>
-                          <div>
-                            <span class="text-gray-700 dark:text-neutral-200">{{client.transferTxCurrent |
-                              bytes}}/s</span>
-                            <!-- Total TX -->
-                            <br><span class="font-regular" style="font-size:0.85em">{{bytes(client.transferTx)}}</span>
-                          </div>
-                        </span>
-
-                      </div>
+                      <span v-if="client.transferTx" :title="$t('totalDownload') + bytes(client.transferTx)">
+                        ·
+                        <svg class="align-middle h-3 inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                          fill="currentColor">
+                          <path fill-rule="evenodd"
+                            d="M16.707 10.293a1 1 0 010 1.414l-6 6a1 1 0 01-1.414 0l-6-6a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l4.293-4.293a1 1 0 011.414 0z"
+                            clip-rule="evenodd" />
+                        </svg>
+                        {{client.transferTxCurrent | bytes}}/s
+                      </span>
 
                       <!-- Transfer RX -->
-                      <div class="min-w-20 md:min-w-24" v-if="client.transferRx">
-                        <span class="flex gap-1" :title="$t('totalUpload') + bytes(client.transferRx)">
+                      <span v-if="client.transferRx" :title="$t('totalUpload') + bytes(client.transferRx)">
+                        ·
+                        <svg class="align-middle h-3 inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                          fill="currentColor">
+                          <path fill-rule="evenodd"
+                            d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z"
+                            clip-rule="evenodd" />
+                        </svg>
+                        {{client.transferRxCurrent | bytes}}/s
+                      </span>
 
-                          <svg class="align-middle h-3 inline mt-0.5" xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd"
-                              d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z"
-                              clip-rule="evenodd" />
-                          </svg>
-                          <div>
-                            <span class="text-gray-700 dark:text-neutral-200">{{client.transferRxCurrent |
-                              bytes}}/s</span>
-                            <!-- Total RX -->
-                            <br><span class="font-regular" style="font-size:0.85em">{{bytes(client.transferRx)}}</span>
-                          </div>
-                        </span>
-                      </div>
-
+                      <!-- Last seen -->
+                      <span v-if="client.latestHandshakeAt"
+                        :title="$t('lastSeen') + dateTime(new Date(client.latestHandshakeAt))">
+                        · {{new Date(client.latestHandshakeAt) | timeago}}
+                      </span>
                     </div>
                   </div>
-                  <!-- </div> --> <!-- <div class="flex flex-grow items-center"> -->
                 </div>
 
                 <div class="flex items-center justify-end">

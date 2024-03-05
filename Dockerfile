@@ -6,8 +6,7 @@ FROM docker.io/library/node:18-alpine AS build_node_modules
 # Copy Web UI
 COPY src/ /app/
 WORKDIR /app
-RUN npm ci --omit=dev &&\
-    mv node_modules /node_modules
+RUN npm ci --omit=dev
 
 # Copy build result to a new image.
 # This saves a lot of disk space.
@@ -21,15 +20,10 @@ COPY --from=build_node_modules /app /app
 # Also, some node_modules might be native, and
 # the architecture & OS of your development machine might differ
 # than what runs inside of docker.
-COPY --from=build_node_modules /node_modules /node_modules
+RUN mv /app/node_modules /node_modules
 
-RUN \
-    # Enable this to run `npm run serve`
-    npm i -g nodemon &&\
-    # Workaround CVE-2023-42282
-    npm uninstall -g ip &&\
-    # Delete unnecessary files 
-    npm cache clean --force && rm -rf ~/.npm
+# Enable this to run `npm run serve`
+RUN npm i -g nodemon
 
 # Install Linux packages
 RUN apk add --no-cache \
