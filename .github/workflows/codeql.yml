@@ -12,7 +12,7 @@ jobs:
   analyze:
     name: Analyze
     runs-on: ubuntu-latest
-    if: github.repository_owner == 'wg-easy'
+    if: github.repository_owner == 'MicaelSMC'
     permissions:
       actions: read
       contents: read
