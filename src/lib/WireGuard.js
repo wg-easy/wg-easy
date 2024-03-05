@@ -256,6 +256,7 @@ Endpoint = ${WG_HOST}:${WG_PORT}`;
 
     // Create Client
     const id = uuid.v4();
+    const cidrBlock = WG_DEFAULT_ADDRESS_RANGE;
     const client = {
       id,
       name,
