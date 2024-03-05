@@ -4,38 +4,18 @@ const ip = require('ip');
 
 const { release } = require('./package.json');
 
-function parseDefaultAddress(defaultAddress) {
-  // Set the default full address with subnet if it's not provided
-  const defaultFullAddress = defaultAddress || '10.8.0.0/24';
-
-  // Check if the address ends with '.x', if so, replace with '.0/24'
-  const addressWithSubnet = defaultFullAddress.endsWith('.x')
-    ? defaultFullAddress.replace('.x', '.0/24')
-    : defaultFullAddress;
-
-  const [ipAddress, subnetRange] = addressWithSubnet.split('/');
-
-  return {
-    ipAddress,
-    subnetRange: subnetRange || '24', // Default subnet range to 24 if not provided
-  };
-}
-
-// Use the function to parse the environment variable or default to '10.8.0.0/24'
-const { ipAddress, subnetRange } = parseDefaultAddress(process.env.WG_DEFAULT_ADDRESS);
-
 module.exports.RELEASE = release;
-module.exports.PORT = process.env.PORT || 51821;
+module.exports.PORT = process.env.PORT || '51821';
 module.exports.WEBUI_HOST = process.env.WEBUI_HOST || '0.0.0.0';
 module.exports.PASSWORD = process.env.PASSWORD;
 module.exports.WG_PATH = process.env.WG_PATH || '/etc/wireguard/';
 module.exports.WG_DEVICE = process.env.WG_DEVICE || 'eth0';
 module.exports.WG_HOST = process.env.WG_HOST;
-module.exports.WG_PORT = process.env.WG_PORT || 51820;
+module.exports.WG_PORT = process.env.WG_PORT || '51820';
 module.exports.WG_MTU = process.env.WG_MTU || null;
-module.exports.WG_PERSISTENT_KEEPALIVE = process.env.WG_PERSISTENT_KEEPALIVE || 0;
-module.exports.WG_DEFAULT_ADDRESS = ipAddress;
-module.exports.WG_DEFAULT_ADDRESS_RANGE = subnetRange;
+module.exports.WG_PERSISTENT_KEEPALIVE = process.env.WG_PERSISTENT_KEEPALIVE || '0';
+module.exports.WG_DEFAULT_ADDRESS = process.env.WG_DEFAULT_ADDRESS || '10.8.0.0';
+module.exports.WG_DEFAULT_ADDRESS_RANGE = process.env.WG_DEFAULT_ADDRESS_RANGE || '24';
 module.exports.WG_DEFAULT_DNS = typeof process.env.WG_DEFAULT_DNS === 'string'
   ? process.env.WG_DEFAULT_DNS
   : '1.1.1.1';
