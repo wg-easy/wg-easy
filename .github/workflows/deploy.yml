@@ -10,7 +10,7 @@ jobs:
   deploy:
     name: Build & Deploy
     runs-on: ubuntu-latest
-    if: github.repository_owner == 'wg-easy'
+    if: github.repository_owner == 'MicaelSMC'
     permissions:
       packages: write
       contents: read
