@@ -1387,6 +1387,11 @@ video {
   transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
 }
 
+.is-disabled {
+  opacity: 0.25;
+  cursor: default;
+}
+
 .last\:border-b-0:last-child {
   border-bottom-width: 0px;
 }

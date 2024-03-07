@@ -16,4 +16,15 @@ module.exports = {
       '2xl': '1536px',
     },
   },
+  plugins: [
+    function addDisabledClass({ addUtilities }) {
+      const newUtilities = {
+        '.is-disabled': {
+          opacity: '0.25',
+          cursor: 'default',
+        },
+      };
+      addUtilities(newUtilities);
+    },
+  ],
 };
