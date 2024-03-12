@@ -17,7 +17,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
-        ref: 80310bfd95cd023db30ed11152bbef5fc7c4436a
+        ref: production
 
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v3
