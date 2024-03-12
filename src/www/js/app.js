@@ -53,6 +53,7 @@ new Vue({
     latestRelease: null,
 
     isDark: null,
+    uiTrafficStats: false,
 
     chartOptions: {
       chart: {
@@ -138,7 +139,7 @@ new Vue({
       const clients = await this.api.getClients();
       this.clients = clients.map((client) => {
         if (client.name.includes('@') && client.name.includes('.')) {
-          client.avatar = `https://www.gravatar.com/avatar/${sha512(client.name)}?d=blank`;
+          client.avatar = `https://gravatar.com/avatar/${sha256(client.name.toLowerCase().trim())}.jpg`;
         }
 
         if (!this.clientsPersist[client.id]) {
@@ -292,6 +293,15 @@ new Vue({
       }).catch(console.error);
     }, 1000);
 
+    this.api.getuiTrafficStats()
+      .then((res) => {
+        this.uiTrafficStats = res;
+      })
+      .catch(() => {
+        console.log('Failed to get ui-traffic-stats');
+        this.uiTrafficStats = false;
+      });
+
     Promise.resolve().then(async () => {
       const lang = await this.api.getLang();
       if (lang !== localStorage.getItem('lang') && i18n.availableLocales.includes(lang)) {
@@ -321,6 +331,6 @@ new Vue({
 
       this.currentRelease = currentRelease;
       this.latestRelease = latestRelease;
-    }).catch(console.error);
+    }).catch((err) => console.error(err));
   },
 });
