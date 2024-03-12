@@ -5,6 +5,8 @@
 
 'use strict';
 
+const semver = require('semver');
+
 function bytes(bytes, decimals, kib, maxunit) {
   kib = kib || false;
   if (bytes === 0) return '0 B';
@@ -318,7 +320,7 @@ new Vue({
             changelog,
           }));
           releasesArray.sort((a, b) => {
-            return b.version - a.version;
+            return semver.compare(b.version, a.version);
           });
 
           return releasesArray[0];
@@ -327,7 +329,7 @@ new Vue({
       console.log(`Current Release: ${currentRelease}`);
       console.log(`Latest Release: ${latestRelease.version}`);
 
-      if (currentRelease >= latestRelease.version) return;
+      if (semver.gte(currentRelease, latestRelease.version)) return;
 
       this.currentRelease = currentRelease;
       this.latestRelease = latestRelease;
