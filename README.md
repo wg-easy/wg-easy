@@ -36,9 +36,9 @@ You have found the easiest way to install & manage WireGuard on any Linux host!
 If you haven't installed Docker yet, install it by running:
 
 ```bash
-$ curl -sSL https://get.docker.com | sh
-$ sudo usermod -aG docker $(whoami)
-$ exit
+curl -sSL https://get.docker.com | sh
+sudo usermod -aG docker $(whoami)
+exit
 ```
 
 And log in again.
@@ -71,6 +71,10 @@ $ docker run -d \
 The Web UI will now be available on `http://0.0.0.0:51821`.
 
 > 💡 Your configuration files will be saved in `~/.wg-easy`
+
+WireGuard Easy can be launched with Docker Compose as well - just download
+[`docker-compose.yml`](docker-compose.yml), make necessary adjustments and
+execute `docker compose up --detach`.
 
 ### 3. Sponsor
 
@@ -113,6 +117,16 @@ docker pull ghcr.io/wg-easy/wg-easy
 ```
 
 And then run the `docker run -d \ ...` command above again.
+
+To update using Docker Compose:
+
+```shell
+docker compose pull
+docker compose up --detach
+```
+
+The WireGuared Easy container will be automatically recreated if a newer image
+was pulled.
 
 ## Common Use Cases
 
