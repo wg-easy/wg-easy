@@ -50,6 +50,13 @@ class API {
     });
   }
 
+  async getChartType() {
+    return this.call({
+      method: 'get',
+      path: '/ui-chart-type',
+    });
+  }
+
   async getSession() {
     return this.call({
       method: 'get',

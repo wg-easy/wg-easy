@@ -23,14 +23,33 @@ function bytes(bytes, decimals, kib, maxunit) {
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
 }
 
+const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+const theme = darkModeMediaQuery.matches ? 'dark' : 'light';
+
 const i18n = new VueI18n({
   locale: localStorage.getItem('lang') || 'en',
   fallbackLocale: 'en',
   messages,
 });
 
+const UI_CHART_TYPES = [
+  { type: false, strokeWidth: 0 },
+  { type: 'line', strokeWidth: 3 },
+  { type: 'area', strokeWidth: 0 },
+  { type: 'bar', strokeWidth: 0 },
+]
+
+const CHART_COLORS = {
+  rx: { light: 'rgba(0,0,0,0.2)', dark: 'rgba(255,255,255,0.3)' },
+  tx: { light: 'rgba(0,0,0,0.3)', dark: 'rgba(255,255,255,0.5)' },
+  gradient: {light: ['rgba(0,0,0,0.1)', 'rgba(0,0,0,0)'], dark: ['rgba(255,255,255,0.1)', 'rgba(255,255,255,0)']},
+}
+
 new Vue({
   el: '#app',
+  components: {
+    apexchart: VueApexCharts,
+  },
   i18n,
   data: {
     authenticated: null,
@@ -55,10 +74,11 @@ new Vue({
     isDark: null,
     uiTrafficStats: false,
 
+    uiChartType: 0,
+
     chartOptions: {
       chart: {
         background: 'transparent',
-        type: 'bar',
         stacked: false,
         toolbar: {
           show: false,
@@ -67,10 +87,23 @@ new Vue({
           enabled: false,
         },
       },
-      colors: [
-        '#DDDDDD', // rx
-        '#EEEEEE', // tx
-      ],
+      colors: [],
+      stroke: {
+        curve: 'smooth',
+      },
+      fill: {
+        type: 'gradient',
+        gradient: {
+          shade: 'dark',
+          type: 'vertical',
+          shadeIntensity: 1,
+          gradientToColors: CHART_COLORS.gradient[theme],
+          inverseColors: true,
+          opacityFrom: 1,
+          opacityTo: 1,
+          stops: [0, 100],
+        },
+    },
       dataLabels: {
         enabled: false,
       },
@@ -135,7 +168,7 @@ new Vue({
       updateCharts = false,
     } = {}) {
       if (!this.authenticated) return;
-
+      
       const clients = await this.api.getClients();
       this.clients = clients.map((client) => {
         if (client.name.includes('@') && client.name.includes('.')) {
@@ -154,25 +187,39 @@ new Vue({
         // client.transferRx = this.clientsPersist[client.id].transferRxPrevious + Math.random() * 1000;
         // client.transferTx = this.clientsPersist[client.id].transferTxPrevious + Math.random() * 1000;
 
+        this.clientsPersist[client.id].transferRxCurrent = client.transferRx - this.clientsPersist[client.id].transferRxPrevious;
+        this.clientsPersist[client.id].transferRxPrevious = client.transferRx;
+        this.clientsPersist[client.id].transferTxCurrent = client.transferTx - this.clientsPersist[client.id].transferTxPrevious;
+        this.clientsPersist[client.id].transferTxPrevious = client.transferTx;
+
         if (updateCharts) {
-          this.clientsPersist[client.id].transferRxCurrent = client.transferRx - this.clientsPersist[client.id].transferRxPrevious;
-          this.clientsPersist[client.id].transferRxPrevious = client.transferRx;
-          this.clientsPersist[client.id].transferTxCurrent = client.transferTx - this.clientsPersist[client.id].transferTxPrevious;
-          this.clientsPersist[client.id].transferTxPrevious = client.transferTx;
 
           this.clientsPersist[client.id].transferRxHistory.push(this.clientsPersist[client.id].transferRxCurrent);
           this.clientsPersist[client.id].transferRxHistory.shift();
 
           this.clientsPersist[client.id].transferTxHistory.push(this.clientsPersist[client.id].transferTxCurrent);
           this.clientsPersist[client.id].transferTxHistory.shift();
+
+          this.clientsPersist[client.id].transferTxSeries = [{
+            name: 'Tx',
+            data: this.clientsPersist[client.id].transferTxHistory,
+          }];
+
+          this.clientsPersist[client.id].transferRxSeries = [{
+            name: 'Rx',
+            data: this.clientsPersist[client.id].transferRxHistory,
+          }];
+
+          client.transferTxHistory = this.clientsPersist[client.id].transferTxHistory;
+          client.transferRxHistory = this.clientsPersist[client.id].transferRxHistory;
+          client.transferMax = Math.max(...client.transferTxHistory, ...client.transferRxHistory);
+
+          client.transferTxSeries = this.clientsPersist[client.id].transferTxSeries;
+          client.transferRxSeries = this.clientsPersist[client.id].transferRxSeries;
         }
 
         client.transferTxCurrent = this.clientsPersist[client.id].transferTxCurrent;
         client.transferRxCurrent = this.clientsPersist[client.id].transferRxCurrent;
-
-        client.transferTxHistory = this.clientsPersist[client.id].transferTxHistory;
-        client.transferRxHistory = this.clientsPersist[client.id].transferRxHistory;
-        client.transferMax = Math.max(...client.transferTxHistory, ...client.transferRxHistory);
 
         client.hoverTx = this.clientsPersist[client.id].hoverTx;
         client.hoverRx = this.clientsPersist[client.id].hoverRx;
@@ -278,7 +325,7 @@ new Vue({
         this.authenticated = session.authenticated;
         this.requiresPassword = session.requiresPassword;
         this.refresh({
-          updateCharts: true,
+          updateCharts: this.updateCharts,
         }).catch((err) => {
           alert(err.message || err.toString());
         });
@@ -289,7 +336,7 @@ new Vue({
 
     setInterval(() => {
       this.refresh({
-        updateCharts: true,
+        updateCharts: this.updateCharts,
       }).catch(console.error);
     }, 1000);
 
@@ -298,8 +345,15 @@ new Vue({
         this.uiTrafficStats = res;
       })
       .catch(() => {
-        console.log('Failed to get ui-traffic-stats');
         this.uiTrafficStats = false;
+      });
+    
+    this.api.getChartType()
+      .then((res) => {
+        this.uiChartType = parseInt(res);
+      })
+      .catch(() => {
+        this.uiChartType = 0;
       });
 
     Promise.resolve().then(async () => {
@@ -332,5 +386,28 @@ new Vue({
       this.currentRelease = currentRelease;
       this.latestRelease = latestRelease;
     }).catch((err) => console.error(err));
+  },
+  computed: {
+    chartOptionsTX() {
+      const opts = {
+        ...this.chartOptions,
+        colors: [CHART_COLORS.tx[theme]],
+      };
+      opts.chart.type = UI_CHART_TYPES[this.uiChartType].type || false;
+      opts.stroke.width = UI_CHART_TYPES[this.uiChartType].strokeWidth;
+      return opts;
+    },
+    chartOptionsRX() {
+      const opts = {
+        ...this.chartOptions,
+        colors: [CHART_COLORS.rx[theme]],
+      };
+      opts.chart.type = UI_CHART_TYPES[this.uiChartType].type || false;
+      opts.stroke.width = UI_CHART_TYPES[this.uiChartType].strokeWidth;
+      return opts;
+    },
+    updateCharts() {
+      return this.uiChartType > 0;
+    }
   },
 });
