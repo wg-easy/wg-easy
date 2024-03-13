@@ -188,9 +188,9 @@ new Vue({
         }
 
         // Debug
-        client.transferRx = this.clientsPersist[client.id].transferRxPrevious + Math.random() * 1000;
-        client.transferTx = this.clientsPersist[client.id].transferTxPrevious + Math.random() * 1000;
-        client.latestHandshakeAt = new Date();
+        // client.transferRx = this.clientsPersist[client.id].transferRxPrevious + Math.random() * 1000;
+        // client.transferTx = this.clientsPersist[client.id].transferTxPrevious + Math.random() * 1000;
+        // client.latestHandshakeAt = new Date();
 
         this.clientsPersist[client.id].transferRxCurrent = client.transferRx - this.clientsPersist[client.id].transferRxPrevious;
         this.clientsPersist[client.id].transferRxPrevious = client.transferRx;
