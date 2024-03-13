@@ -77,17 +77,17 @@
               class="relative overflow-hidden border-b last:border-b-0 border-gray-100 dark:border-neutral-600 border-solid">
 
               <!-- Chart -->
-              <div v-if="uiChartType" class="absolute z-0 bottom-0 left-0 right-0" style="top: 60%;">
+              <div v-if="uiChartType" class="absolute z-0 bottom-0 left-0 right-0 h-6" >
                 <apexchart width="100%" height="100%" :options="chartOptionsTX" :series="client.transferTxSeries">
                 </apexchart>
               </div>
-              <div v-if="uiChartType" class="absolute z-0 top-0 left-0 right-0" style="bottom: 60%;">
+              <div v-if="uiChartType" class="absolute z-0 top-0 left-0 right-0 h-6" >
                 <apexchart width="100%" height="100%" :options="chartOptionsRX" :series="client.transferRxSeries"
                   style="transform: scaleY(-1);">
                 </apexchart>
               </div>
 
-              <div class="relative py-5 px-3 z-10 flex flex-col sm:flex-row justify-between gap-3">
+              <div class="relative py-3 md:py-5 px-3 z-10 flex flex-col sm:flex-row justify-between gap-3">
                 <div class="flex gap-3 md:gap-4 w-full items-center ">
 
                   <!-- Avatar -->
