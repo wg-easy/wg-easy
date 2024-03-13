@@ -2,6 +2,7 @@ name: Build & Publish Development
 
 on:
   workflow_dispatch:
+  pull_request:
 
 jobs:
   deploy:
@@ -29,9 +30,9 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Build & Publish Docker Image
+    - name: Build Docker Image
       uses: docker/build-push-action@v5
       with:
-        push: true
+        push: false
         platforms: linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8
-        tags: ghcr.io/wg-easy/wg-easy:development
+        tags: ghcr.io/wg-easy/wg-easy:pr
