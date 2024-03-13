@@ -37,13 +37,13 @@ const UI_CHART_TYPES = [
   { type: 'line', strokeWidth: 3 },
   { type: 'area', strokeWidth: 0 },
   { type: 'bar', strokeWidth: 0 },
-]
+];
 
 const CHART_COLORS = {
   rx: { light: 'rgba(0,0,0,0.2)', dark: 'rgba(255,255,255,0.3)' },
   tx: { light: 'rgba(0,0,0,0.3)', dark: 'rgba(255,255,255,0.5)' },
-  gradient: {light: ['rgba(0,0,0,0.1)', 'rgba(0,0,0,0)'], dark: ['rgba(255,255,255,0.1)', 'rgba(255,255,255,0)']},
-}
+  gradient: { light: ['rgba(0,0,0,0.1)', 'rgba(0,0,0,0)'], dark: ['rgba(255,255,255,0.1)', 'rgba(255,255,255,0)'] },
+};
 
 new Vue({
   el: '#app',
@@ -89,7 +89,7 @@ new Vue({
         parentHeightOffset: 0,
         sparkline: {
           enabled: true,
-        }
+        },
       },
       colors: [],
       stroke: {
@@ -107,7 +107,7 @@ new Vue({
           opacityTo: 1,
           stops: [0, 100],
         },
-    },
+      },
       dataLabels: {
         enabled: false,
       },
@@ -172,7 +172,7 @@ new Vue({
       updateCharts = false,
     } = {}) {
       if (!this.authenticated) return;
-      
+
       const clients = await this.api.getClients();
       this.clients = clients.map((client) => {
         if (client.name.includes('@') && client.name.includes('.')) {
@@ -198,7 +198,6 @@ new Vue({
         this.clientsPersist[client.id].transferTxPrevious = client.transferTx;
 
         if (updateCharts) {
-
           this.clientsPersist[client.id].transferRxHistory.push(this.clientsPersist[client.id].transferRxCurrent);
           this.clientsPersist[client.id].transferRxHistory.shift();
 
@@ -352,10 +351,10 @@ new Vue({
       .catch(() => {
         this.uiTrafficStats = false;
       });
-    
+
     this.api.getChartType()
       .then((res) => {
-        this.uiChartType = parseInt(res);
+        this.uiChartType = parseInt(res, 10);
       })
       .catch(() => {
         this.uiChartType = 0;
@@ -413,6 +412,6 @@ new Vue({
     },
     updateCharts() {
       return this.uiChartType > 0;
-    }
+    },
   },
 });
