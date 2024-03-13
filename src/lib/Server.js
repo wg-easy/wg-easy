@@ -19,6 +19,7 @@ const {
   PASSWORD,
   LANG,
   UI_TRAFFIC_STATS,
+  UI_CHART_TYPE,
 } = require('../config');
 
 module.exports = class Server {
@@ -44,6 +45,9 @@ module.exports = class Server {
       })))
       .get('/api/ui-traffic-stats', (Util.promisify(async () => {
         return UI_TRAFFIC_STATS === 'true';
+      })))
+      .get('/api/ui-chart-type', (Util.promisify(async () => {
+        return UI_CHART_TYPE || 0;
       })))
 
     // Authentication
