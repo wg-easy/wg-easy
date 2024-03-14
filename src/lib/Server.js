@@ -66,44 +66,44 @@ module.exports = class Server {
       .get('/api/ui-traffic-stats', defineEventHandler((event) => {
         setHeader(event, 'Content-Type', 'application/json');
         return `"${UI_TRAFFIC_STATS}"`;
-      })
+      }))
 
       // Authentication
-        .get('/api/session', defineEventHandler((event) => {
-          const requiresPassword = !!process.env.PASSWORD;
-          const authenticated = requiresPassword
-            ? !!(event.node.req.session && event.node.req.session.authenticated)
-            : true;
+      .get('/api/session', defineEventHandler((event) => {
+        const requiresPassword = !!process.env.PASSWORD;
+        const authenticated = requiresPassword
+          ? !!(event.node.req.session && event.node.req.session.authenticated)
+          : true;
 
-          return {
-            requiresPassword,
-            authenticated,
-          };
-        }))
-        .post('/api/session', defineEventHandler(async (event) => {
-          const { password } = await readBody(event);
+        return {
+          requiresPassword,
+          authenticated,
+        };
+      }))
+      .post('/api/session', defineEventHandler(async (event) => {
+        const { password } = await readBody(event);
 
-          if (typeof password !== 'string') {
-            throw createError({
-              status: 401,
-              message: 'Missing: Password',
-            });
-          }
+        if (typeof password !== 'string') {
+          throw createError({
+            status: 401,
+            message: 'Missing: Password',
+          });
+        }
 
-          if (password !== PASSWORD) {
-            throw createError({
-              status: 401,
-              message: 'Incorrect Password',
-            });
-          }
+        if (password !== PASSWORD) {
+          throw createError({
+            status: 401,
+            message: 'Incorrect Password',
+          });
+        }
 
-          event.node.req.session.authenticated = true;
-          event.node.req.session.save();
+        event.node.req.session.authenticated = true;
+        event.node.req.session.save();
 
-          debug(`New Session: ${event.node.req.session.id}`);
+        debug(`New Session: ${event.node.req.session.id}`);
 
-          return { succcess: true };
-        })));
+        return { succcess: true };
+      }));
 
     // WireGuard
     app.use(
