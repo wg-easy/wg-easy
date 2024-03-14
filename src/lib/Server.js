@@ -66,7 +66,7 @@ module.exports = class Server {
       .get('/api/ui-traffic-stats', (Util.promisify(async () => {
         return UI_TRAFFIC_STATS === 'true';
       }))
-           
+
     // Authentication
       .get('/api/session', defineEventHandler((event) => {
         const requiresPassword = !!process.env.PASSWORD;
