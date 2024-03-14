@@ -63,7 +63,10 @@ module.exports = class Server {
 
         return `"${LANG}"`;
       }))
-
+      .get('/api/ui-traffic-stats', (Util.promisify(async () => {
+        return UI_TRAFFIC_STATS === 'true';
+      }))
+           
     // Authentication
       .get('/api/session', defineEventHandler((event) => {
         const requiresPassword = !!process.env.PASSWORD;
