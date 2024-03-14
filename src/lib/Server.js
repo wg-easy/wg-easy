@@ -64,9 +64,10 @@ module.exports = class Server {
 
         return `"${LANG}"`;
       }))
-      .get('/api/ui-traffic-stats', (Util.promisify(async () => {
-        return UI_TRAFFIC_STATS === 'true';
-      }))
+      .get('/api/ui-traffic-stats', defineEventHandler((event) => {
+        setHeader(event, 'Content-Type', 'application/json');
+        return `"${UI_TRAFFIC_STATS}"`;
+      })
 
       // Authentication
         .get('/api/session', defineEventHandler((event) => {
