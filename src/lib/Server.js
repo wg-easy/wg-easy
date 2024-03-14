@@ -21,6 +21,7 @@ const {
   setHeader,
   serveStatic,
 } = require('h3');
+const Util = require('./Util');
 
 const WireGuard = require('../services/WireGuard');
 
@@ -67,42 +68,42 @@ module.exports = class Server {
         return UI_TRAFFIC_STATS === 'true';
       }))
 
-    // Authentication
-      .get('/api/session', defineEventHandler((event) => {
-        const requiresPassword = !!process.env.PASSWORD;
-        const authenticated = requiresPassword
-          ? !!(event.node.req.session && event.node.req.session.authenticated)
-          : true;
+      // Authentication
+        .get('/api/session', defineEventHandler((event) => {
+          const requiresPassword = !!process.env.PASSWORD;
+          const authenticated = requiresPassword
+            ? !!(event.node.req.session && event.node.req.session.authenticated)
+            : true;
 
-        return {
-          requiresPassword,
-          authenticated,
-        };
-      }))
-      .post('/api/session', defineEventHandler(async (event) => {
-        const { password } = await readBody(event);
+          return {
+            requiresPassword,
+            authenticated,
+          };
+        }))
+        .post('/api/session', defineEventHandler(async (event) => {
+          const { password } = await readBody(event);
 
-        if (typeof password !== 'string') {
-          throw createError({
-            status: 401,
-            message: 'Missing: Password',
-          });
-        }
+          if (typeof password !== 'string') {
+            throw createError({
+              status: 401,
+              message: 'Missing: Password',
+            });
+          }
 
-        if (password !== PASSWORD) {
-          throw createError({
-            status: 401,
-            message: 'Incorrect Password',
-          });
-        }
+          if (password !== PASSWORD) {
+            throw createError({
+              status: 401,
+              message: 'Incorrect Password',
+            });
+          }
 
-        event.node.req.session.authenticated = true;
-        event.node.req.session.save();
+          event.node.req.session.authenticated = true;
+          event.node.req.session.save();
 
-        debug(`New Session: ${event.node.req.session.id}`);
+          debug(`New Session: ${event.node.req.session.id}`);
 
-        return { succcess: true };
-      })));
+          return { succcess: true };
+        })));
 
     // WireGuard
     app.use(
