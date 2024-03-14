@@ -21,7 +21,6 @@ const {
   setHeader,
   serveStatic,
 } = require('h3');
-const Util = require('./Util');
 
 const WireGuard = require('../services/WireGuard');
 
