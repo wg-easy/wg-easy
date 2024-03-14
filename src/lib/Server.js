@@ -30,6 +30,7 @@ const {
   RELEASE,
   PASSWORD,
   LANG,
+  UI_TRAFFIC_STATS,
 } = require('../config');
 
 module.exports = class Server {
