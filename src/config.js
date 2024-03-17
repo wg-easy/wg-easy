@@ -27,4 +27,4 @@ module.exports.WG_POST_UP = path.resolve(__dirname, './wgsh/wg0-post-up.sh');
 module.exports.WG_PRE_DOWN = path.resolve(__dirname, './wgsh/wg0-pre-down.sh');
 module.exports.WG_POST_DOWN = process.env.WG_PRE_DOWN || '';
 module.exports.LANG = process.env.LANG || 'en';
-module.exports.UI_TRAFFIC_STATS = process.env.UI_TRAFFIC_STATS || 'false';
+module.exports.UI_TRAFFIC_STATS = process.env.UI_TRAFFIC_STATS || 'true';
