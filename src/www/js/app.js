@@ -71,7 +71,7 @@ new Vue({
     uiTrafficStats: false,
 
     uiChartType: 0,
-    uiShowCharts: localStorage.getItem('uiShowCharts') === "1" ? true : false,
+    uiShowCharts: localStorage.getItem('uiShowCharts') === '1',
     uiTheme: localStorage.theme || 'auto',
     prefersDarkScheme: window.matchMedia('(prefers-color-scheme: dark)'),
 
@@ -189,6 +189,7 @@ new Vue({
         // client.transferRx = this.clientsPersist[client.id].transferRxPrevious + Math.random() * 1000;
         // client.transferTx = this.clientsPersist[client.id].transferTxPrevious + Math.random() * 1000;
         // client.latestHandshakeAt = new Date();
+        // this.requiresPassword = true;
 
         this.clientsPersist[client.id].transferRxCurrent = client.transferRx - this.clientsPersist[client.id].transferRxPrevious;
         this.clientsPersist[client.id].transferRxPrevious = client.transferRx;
@@ -211,7 +212,6 @@ new Vue({
             name: 'Rx',
             data: this.clientsPersist[client.id].transferRxHistory,
           }];
-
           client.transferTxHistory = this.clientsPersist[client.id].transferTxHistory;
           client.transferRxHistory = this.clientsPersist[client.id].transferRxHistory;
           client.transferMax = Math.max(...client.transferTxHistory, ...client.transferRxHistory);
@@ -318,7 +318,7 @@ new Vue({
     },
     toggleCharts() {
       localStorage.setItem('uiShowCharts', this.uiShowCharts ? 1 : 0);
-    }
+    },
   },
   filters: {
     bytes,
