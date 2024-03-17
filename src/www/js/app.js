@@ -23,9 +23,6 @@ function bytes(bytes, decimals, kib, maxunit) {
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
 }
 
-const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-const theme = darkModeMediaQuery.matches ? 'dark' : 'light';
-
 const i18n = new VueI18n({
   locale: localStorage.getItem('lang') || 'en',
   fallbackLocale: 'en',
@@ -40,9 +37,9 @@ const UI_CHART_TYPES = [
 ];
 
 const CHART_COLORS = {
-  rx: { light: 'rgba(0,0,0,0.2)', dark: 'rgba(255,255,255,0.3)' },
-  tx: { light: 'rgba(0,0,0,0.3)', dark: 'rgba(255,255,255,0.5)' },
-  gradient: { light: ['rgba(0,0,0,0.1)', 'rgba(0,0,0,0)'], dark: ['rgba(255,255,255,0.1)', 'rgba(255,255,255,0)'] },
+  rx: { light: 'rgba(128,128,128,0.3)', dark: 'rgba(255,255,255,0.3)' },
+  tx: { light: 'rgba(128,128,128,0.4)', dark: 'rgba(255,255,255,0.3)' },
+  gradient: { light: ['rgba(0,0,0,1.0)', 'rgba(0,0,0,1.0)'], dark: ['rgba(128,128,128,0)', 'rgba(128,128,128,0)'] },
 };
 
 new Vue({
@@ -71,10 +68,12 @@ new Vue({
     currentRelease: null,
     latestRelease: null,
 
-    isDark: null,
     uiTrafficStats: false,
 
     uiChartType: 0,
+    uiShowCharts: localStorage.getItem('uiShowCharts') === "1" ? true : false,
+    uiTheme: localStorage.theme || 'auto',
+    prefersDarkScheme: window.matchMedia('(prefers-color-scheme: dark)'),
 
     chartOptions: {
       chart: {
@@ -100,11 +99,10 @@ new Vue({
         gradient: {
           shade: 'dark',
           type: 'vertical',
-          shadeIntensity: 1,
-          gradientToColors: CHART_COLORS.gradient[theme],
-          inverseColors: true,
-          opacityFrom: 1,
-          opacityTo: 1,
+          shadeIntensity: 0,
+          gradientToColors: CHART_COLORS.gradient[this.theme],
+          inverseColors: false,
+          opacityTo: 0,
           stops: [0, 100],
         },
       },
@@ -301,15 +299,26 @@ new Vue({
         .finally(() => this.refresh().catch(console.error));
     },
     toggleTheme() {
-      if (this.isDark) {
-        localStorage.theme = 'light';
-        document.documentElement.classList.remove('dark');
-      } else {
-        localStorage.theme = 'dark';
-        document.documentElement.classList.add('dark');
-      }
-      this.isDark = !this.isDark;
+      const themes = ['light', 'dark', 'auto'];
+      const currentIndex = themes.indexOf(this.uiTheme);
+      const newIndex = (currentIndex + 1) % themes.length;
+      this.uiTheme = themes[newIndex];
+      localStorage.theme = this.uiTheme;
+      this.setTheme(this.uiTheme);
     },
+    setTheme(theme) {
+      const { classList } = document.documentElement;
+      const shouldAddDarkClass = theme === 'dark' || (theme === 'auto' && this.prefersDarkScheme.matches);
+      classList.toggle('dark', shouldAddDarkClass);
+    },
+    handlePrefersChange(e) {
+      if (localStorage.theme === 'auto') {
+        this.setTheme(e.matches ? 'dark' : 'light');
+      }
+    },
+    toggleCharts() {
+      localStorage.setItem('uiShowCharts', this.uiShowCharts ? 1 : 0);
+    }
   },
   filters: {
     bytes,
@@ -318,10 +327,8 @@ new Vue({
     },
   },
   mounted() {
-    this.isDark = false;
-    if (localStorage.theme === 'dark') {
-      this.isDark = true;
-    }
+    this.prefersDarkScheme.addListener(this.handlePrefersChange);
+    this.setTheme(this.uiTheme);
 
     this.api = new API();
     this.api.getSession()
@@ -395,7 +402,7 @@ new Vue({
     chartOptionsTX() {
       const opts = {
         ...this.chartOptions,
-        colors: [CHART_COLORS.tx[theme]],
+        colors: [CHART_COLORS.tx[this.theme]],
       };
       opts.chart.type = UI_CHART_TYPES[this.uiChartType].type || false;
       opts.stroke.width = UI_CHART_TYPES[this.uiChartType].strokeWidth;
@@ -404,14 +411,20 @@ new Vue({
     chartOptionsRX() {
       const opts = {
         ...this.chartOptions,
-        colors: [CHART_COLORS.rx[theme]],
+        colors: [CHART_COLORS.rx[this.theme]],
       };
       opts.chart.type = UI_CHART_TYPES[this.uiChartType].type || false;
       opts.stroke.width = UI_CHART_TYPES[this.uiChartType].strokeWidth;
       return opts;
     },
     updateCharts() {
-      return this.uiChartType > 0;
+      return this.uiChartType > 0 && this.uiShowCharts;
+    },
+    theme() {
+      if (this.uiTheme === 'auto') {
+        return this.prefersDarkScheme.matches ? 'dark' : 'light';
+      }
+      return this.uiTheme;
     },
   },
 });

@@ -28,6 +28,8 @@ const messages = { // eslint-disable-line no-unused-vars
     downloadConfig: 'Download Configuration',
     madeBy: 'Made by',
     donate: 'Donate',
+    toggleCharts: 'Show/hide Charts',
+    theme: { dark: 'Dark theme', light: 'Light theme', auto: 'Auto theme' }
   },
   ua: {
     name: 'Ім`я',
