@@ -18,6 +18,7 @@ const {
   RELEASE,
   PASSWORD,
   LANG,
+  UI_TRAFFIC_STATS,
 } = require('../config');
 
 module.exports = class Server {
@@ -32,9 +33,6 @@ module.exports = class Server {
         secret: crypto.randomBytes(256).toString('hex'),
         resave: true,
         saveUninitialized: true,
-        cookie: {
-          httpOnly: true,
-        },
       }))
 
       .get('/api/release', (Util.promisify(async () => {
@@ -43,6 +41,9 @@ module.exports = class Server {
 
       .get('/api/lang', (Util.promisify(async () => {
         return LANG;
+      })))
+      .get('/api/ui-traffic-stats', (Util.promisify(async () => {
+        return UI_TRAFFIC_STATS === 'true';
       })))
 
     // Authentication
