@@ -52,7 +52,6 @@ module.exports = class Server {
     router
       .get('/api/release', defineEventHandler((event) => {
         setHeader(event, 'Content-Type', 'application/json');
-
         return RELEASE;
       }))
 
