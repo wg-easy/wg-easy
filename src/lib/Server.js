@@ -67,6 +67,7 @@ module.exports = class Server {
       .get('/api/ui-chart-type', defineEventHandler((event) => {
         setHeader(event, 'Content-Type', 'application/json');
         return `"${UI_CHART_TYPE}"`;
+      }))
 
       // Authentication
       .get('/api/session', defineEventHandler((event) => {
