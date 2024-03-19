@@ -212,6 +212,7 @@ new Vue({
             name: 'Rx',
             data: this.clientsPersist[client.id].transferRxHistory,
           }];
+
           client.transferTxHistory = this.clientsPersist[client.id].transferTxHistory;
           client.transferRxHistory = this.clientsPersist[client.id].transferRxHistory;
           client.transferMax = Math.max(...client.transferTxHistory, ...client.transferRxHistory);
