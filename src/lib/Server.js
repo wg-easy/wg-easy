@@ -31,6 +31,7 @@ const {
   PASSWORD,
   LANG,
   UI_TRAFFIC_STATS,
+  UI_CHART_TYPE,
 } = require('../config');
 
 module.exports = class Server {
@@ -57,13 +58,15 @@ module.exports = class Server {
 
       .get('/api/lang', defineEventHandler((event) => {
         setHeader(event, 'Content-Type', 'application/json');
-
         return `"${LANG}"`;
       }))
       .get('/api/ui-traffic-stats', defineEventHandler((event) => {
         setHeader(event, 'Content-Type', 'application/json');
         return `"${UI_TRAFFIC_STATS}"`;
       }))
+      .get('/api/ui-chart-type', defineEventHandler((event) => {
+        setHeader(event, 'Content-Type', 'application/json');
+        return `"${UI_CHART_TYPE}"`;
 
       // Authentication
       .get('/api/session', defineEventHandler((event) => {
