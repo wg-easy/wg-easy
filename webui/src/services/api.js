@@ -1,6 +1,8 @@
+const SERVER = 'http://127.0.0.1:51821'
+
 export default class API {
   async call({ method, path, body }) {
-    const res = await fetch(`./api${path}`, {
+    const res = await fetch(`${SERVER}/api${path}`, {
       method,
       headers: {
         'Content-Type': 'application/json',
@@ -11,7 +13,8 @@ export default class API {
     if (res.status === 204) {
       return undefined;
     }
-
+    console.log(`${SERVER}/api${path}`);
+    
     const json = await res.json();
 
     if (!res.ok) {
