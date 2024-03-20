@@ -1,6 +1,7 @@
 'use strict';
 
 const { release } = require('./package.json');
+require('dotenv').config(); // development
 
 module.exports.RELEASE = release;
 module.exports.PORT = process.env.PORT || '51821';
