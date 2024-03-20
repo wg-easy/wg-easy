@@ -6,6 +6,7 @@
   "rules": {
     "consistent-return": "off",
     "no-shadow": "off",
-    "max-len": "off"
+    "max-len": "off",
+    "linebreak-style": "off"
   }
 }
