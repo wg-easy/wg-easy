@@ -1,4 +1,4 @@
-const SERVER = 'http://127.0.0.1:51821'
+const SERVER = 'http://127.0.0.1:51821';
 
 export default class API {
   async call({ method, path, body }) {
@@ -13,8 +13,7 @@ export default class API {
     if (res.status === 204) {
       return undefined;
     }
-    console.log(`${SERVER}/api${path}`);
-    
+
     const json = await res.json();
 
     if (!res.ok) {
@@ -62,10 +61,7 @@ export default class API {
         ...client,
         createdAt: new Date(client.createdAt),
         updatedAt: new Date(client.updatedAt),
-        latestHandshakeAt:
-          client.latestHandshakeAt !== null
-            ? new Date(client.latestHandshakeAt)
-            : null,
+        latestHandshakeAt: client.latestHandshakeAt !== null ? new Date(client.latestHandshakeAt) : null,
       }))
     );
   }
