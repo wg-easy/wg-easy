@@ -213,7 +213,7 @@ module.exports = class Server {
       }));
 
     // Static assets
-    const publicDir = 'www';
+    const publicDir = join(__dirname, '../../frontend');
     app.use(
       defineEventHandler((event) => {
         return serveStatic(event, {

@@ -23,10 +23,11 @@ jobs:
           cache: 'npm'
           cache-dependency-path: |
             package-lock.json
-            src/package-lock.json
+            backend/package-lock.json
+            frontend/package-lock.json
 
       - name: npm run lint
         run: |
-          cd src
+          cd backend
           npm ci
           npm run lint

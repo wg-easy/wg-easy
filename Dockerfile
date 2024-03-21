@@ -4,8 +4,9 @@
 FROM docker.io/library/node:18-alpine AS build_node_modules
 
 # Copy Web UI
-COPY src/ /app/
-WORKDIR /app
+COPY backend/ /app/backend/
+COPY frontend/ /app/frontend/
+WORKDIR /app/backend
 RUN npm ci --omit=dev &&\
     mv node_modules /node_modules
 
@@ -28,7 +29,7 @@ RUN \
     npm i -g nodemon &&\
     # Workaround CVE-2023-42282
     npm uninstall -g ip &&\
-    # Delete unnecessary files 
+    # Delete unnecessary files
     npm cache clean --force && rm -rf ~/.npm
 
 # Install Linux packages
@@ -50,5 +51,5 @@ EXPOSE 51821/tcp
 ENV DEBUG=Server,WireGuard
 
 # Run Web UI
-WORKDIR /app
+WORKDIR /app/backend
 CMD ["/usr/bin/dumb-init", "node", "server.js"]

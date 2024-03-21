@@ -25,14 +25,18 @@ jobs:
           cache: 'npm'
           cache-dependency-path: |
             package-lock.json
-            src/package-lock.json
+            backend/package-lock.json
+            frontend/package-lock.json
 
       - name: Bot 🤖 "Updating NPM Packages..."
         run: |
           npm install -g --silent npm-check-updates
           ncu -u
           npm update
-          cd src
+          cd backend
+          ncu -u
+          npm update
+          cd ../frontend
           ncu -u
           npm update
           npm run buildcss
