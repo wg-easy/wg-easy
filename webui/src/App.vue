@@ -263,9 +263,15 @@ import Footer from '@/components/Footer.vue';
 import API from '@/services/api';
 import Client from '@/components/Client.vue';
 
-const authenticated = ref(null);
-const authenticating = ref(false);
-const password = ref(null);
+import { useStore } from './store/store';
+import { storeToRefs } from 'pinia';
+
+const store = useStore();
+const { authenticated } = storeToRefs(store);
+
+// const authenticated = ref(null);
+// const authenticating = ref(false);
+// const password = ref(null);
 const requiresPassword = ref(null);
 
 const clients = ref(null);
@@ -395,31 +401,31 @@ async function refresh({ updateCharts = false } = {}) {
   });
 }
 
-function login(e) {
-  e.preventDefault();
+// function login(e) {
+//   e.preventDefault();
 
-  if (!password.value) return;
-  if (authenticating.value) return;
+//   if (!password.value) return;
+//   if (authenticating.value) return;
 
-  authenticating.value = true;
-  api
-    .createSession({
-      password: password,
-    })
-    .then(async () => {
-      const session = await api.getSession();
-      authenticated.value = session.authenticated;
-      requiresPassword.value = session.requiresPassword;
-      return this.refresh();
-    })
-    .catch((err) => {
-      alert(err.message || err.toString());
-    })
-    .finally(() => {
-      this.authenticating = false;
-      this.password = null;
-    });
-}
+//   authenticating.value = true;
+//   api
+//     .createSession({
+//       password: password,
+//     })
+//     .then(async () => {
+//       const session = await api.getSession();
+//       authenticated.value = session.authenticated;
+//       requiresPassword.value = session.requiresPassword;
+//       return this.refresh();
+//     })
+//     .catch((err) => {
+//       alert(err.message || err.toString());
+//     })
+//     .finally(() => {
+//       this.authenticating = false;
+//       this.password = null;
+//     });
+// }
 
 function logout(e) {
   e.preventDefault();
