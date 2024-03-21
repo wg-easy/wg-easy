@@ -4,7 +4,7 @@
 
 module.exports = {
   darkMode: 'selector',
-  content: ['./www/**/*.{html,js}'],
+  content: ['./index.html'],
   theme: {
     screens: {
       xxs: '450px',
