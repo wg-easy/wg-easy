@@ -40,7 +40,11 @@
 
 <script setup>
 import IconAvatarDefault from '@/components/icons/IconAvatarDefault.vue';
-import LoadingSpinner from './LoadingSpinner.vue';
+import LoadingSpinner from '@/components/LoadingSpinner.vue';
 
+import { useStore } from '@/store/store';
+import { storeToRefs } from 'pinia';
 
+const store = useStore();
+const { password, authenticating, login } = storeToRefs(store);
 </script>

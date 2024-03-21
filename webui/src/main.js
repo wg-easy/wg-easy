@@ -5,6 +5,4 @@ import { createApp } from 'vue';
 import { createPinia } from 'pinia';
 
 const pinia = createPinia();
-const app = createApp(App).mount('#app');
-
-app.use(pinia);
+createApp(App).use(pinia).mount('#app');
