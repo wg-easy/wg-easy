@@ -28,6 +28,6 @@ jobs:
 
       - name: npm run lint
         run: |
-          cd src
+          cd backend
           npm ci
           npm run lint

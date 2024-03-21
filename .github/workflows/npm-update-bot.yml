@@ -33,7 +33,10 @@ jobs:
           npm install -g --silent npm-check-updates
           ncu -u
           npm update
-          cd src
+          cd backend
+          ncu -u
+          npm update
+          cd ../frontend
           ncu -u
           npm update
           npm run buildcss
