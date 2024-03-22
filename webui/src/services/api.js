@@ -1,12 +1,14 @@
-const SERVER = 'http://127.0.0.1:51821';
-
 export default class API {
+  constructor() {
+    this.SERVER = 'http://localhost:51821'; //! DEV
+  }
   async call({ method, path, body }) {
-    const res = await fetch(`${SERVER}/api${path}`, {
+    const res = await fetch(`${this.SERVER}/api${path}`, {
       method,
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: 'include', //! DEV
       body: body ? JSON.stringify(body) : undefined,
     });
 
@@ -108,6 +110,13 @@ export default class API {
       method: 'put',
       path: `/wireguard/client/${clientId}/address/`,
       body: { address },
+    });
+  }
+
+  async getQrCode({ clientId }) {
+    return this.call({
+      method: 'get',
+      path: `/wireguard/client/${clientId}/qrcode.svg`,
     });
   }
 }
