@@ -2,18 +2,18 @@
   <div class="text-gray-400 dark:text-neutral-400 flex gap-1 items-center justify-between">
     <!-- Enable/Disable -->
     <div
-      @click="disableClient(client)"
       v-if="client.enabled === true"
       title="Disable Client"
       class="inline-block align-middle rounded-full w-10 h-6 mr-1 bg-red-800 cursor-pointer hover:bg-red-700 transition-all"
+      @click="disableClient(client)"
     >
       <div class="rounded-full w-4 h-4 m-1 ml-5 bg-white"></div>
     </div>
     <div
-      @click="enableClient(client)"
       v-if="client.enabled === false"
       title="Enable Client"
       class="inline-block align-middle rounded-full w-10 h-6 mr-1 bg-gray-200 dark:bg-neutral-400 cursor-pointer hover:bg-gray-300 dark:hover:bg-neutral-500 transition-all"
+      @click="enableClient(client)"
     >
       <div class="rounded-full w-4 h-4 m-1 bg-white"></div>
     </div>
@@ -22,7 +22,7 @@
     <button
       class="align-middle bg-gray-100 dark:bg-neutral-600 dark:text-neutral-300 hover:bg-red-800 dark:hover:bg-red-800 hover:text-white dark:hover:text-white p-2 rounded transition"
       title="Show QR Code"
-      @click="qrcode = `./api/wireguard/client/${client.id}/qrcode.svg`"
+      @click="getQrCode(client)"
     >
       <IconQRCode />
     </button>
@@ -41,7 +41,7 @@
     <button
       class="align-middle bg-gray-100 dark:bg-neutral-600 dark:text-neutral-300 hover:bg-red-800 dark:hover:bg-red-800 hover:text-white dark:hover:text-white p-2 rounded transition"
       title="Delete Client"
-      @click="clientDelete = client"
+      @click="handleDeleteClick()"
     >
       <IconDelete />
     </button>
@@ -49,15 +49,20 @@
 </template>
 
 <script setup>
+import { storeToRefs } from 'pinia';
+
 import IconQRCode from '@/components/icons/IconQRCode.vue';
 import IconDownload from '@/components/icons/IconDownload.vue';
 import IconDelete from '@/components/icons/IconDelete.vue';
 
 import API from '@/services/api';
-
 const api = new API();
 
-defineProps({
+import { useStore } from '@/store/store';
+const store = useStore();
+const { qrcode, clientToDelete } = storeToRefs(store);
+
+const props = defineProps({
   client: {},
 });
 
@@ -69,5 +74,12 @@ function enableClient(client) {
 function disableClient(client) {
   api.disableClient({ clientId: client.id }).catch((err) => alert(err.message || err.toString()));
   // .finally(() => refresh().catch(console.error));
+}
+
+async function getQrCode(client) {
+  qrcode.value = `${api.SERVER}/api/wireguard/client/${client.id}/qrcode.svg`;
+}
+function handleDeleteClick() {
+  clientToDelete.value = props.client;
 }
 </script>

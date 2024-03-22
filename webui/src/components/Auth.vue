@@ -2,7 +2,10 @@
   <div>
     <h1 class="text-4xl font-medium my-16 text-gray-700 dark:text-neutral-200 text-center">WireGuard</h1>
 
-    <form class="shadow rounded-md bg-white dark:bg-neutral-700 mx-auto w-64 p-5 overflow-hidden mt-10" @submit="login">
+    <form
+      class="shadow rounded-md bg-white dark:bg-neutral-700 mx-auto w-64 p-5 overflow-hidden mt-10"
+      @submit="store.login"
+    >
       <!-- Avatar -->
       <div class="h-20 w-20 mb-10 mt-5 mx-auto rounded-full bg-red-800 dark:bg-red-800 relative overflow-hidden">
         <IconAvatarDefault class="w-10 h-10 m-5 text-white dark:text-white" />
@@ -46,5 +49,5 @@ import { useStore } from '@/store/store';
 import { storeToRefs } from 'pinia';
 
 const store = useStore();
-const { password, authenticating, login } = storeToRefs(store);
+const { password, authenticating } = storeToRefs(store);
 </script>
