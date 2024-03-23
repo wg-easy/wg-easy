@@ -19,6 +19,12 @@ export const useStore = defineStore('store', () => {
   const clientCreateName = ref('');
   const qrcode = ref(null);
 
+  const uiTheme = ref(localStorage.theme || 'auto');
+  const prefersDarkScheme = ref(window.matchMedia('(prefers-color-scheme: dark)'));
+
+  const uiChartType = ref(0);
+  const uiShowCharts = ref(localStorage.getItem('uiShowCharts') === '1');
+
   function login(e) {
     e.preventDefault();
 
@@ -34,7 +40,7 @@ export const useStore = defineStore('store', () => {
         const session = await api.getSession();
         authenticated.value = session.authenticated;
         requiresPassword.value = session.requiresPassword;
-        return this.refresh();
+        return refresh();
       })
       .catch((err) => {
         console.log(err.message || err.toString());
@@ -135,6 +141,30 @@ export const useStore = defineStore('store', () => {
     }
   }
 
+  function toggleTheme() {
+    const themes = ['light', 'dark', 'auto'];
+    const currentIndex = themes.indexOf(uiTheme.value);
+    const newIndex = (currentIndex + 1) % themes.length;
+    uiTheme.value = themes[newIndex];
+    localStorage.theme = uiTheme.value;
+    setTheme(uiTheme.value);
+  }
+  function setTheme(theme) {
+    const { classList } = document.documentElement;
+    const shouldAddDarkClass = theme === 'dark' || (theme === 'auto' && prefersDarkScheme.value.matches);
+    classList.toggle('dark', shouldAddDarkClass);
+  }
+
+  function handlePrefersChange(e) {
+    if (localStorage.theme === 'auto') {
+      setTheme(e.matches ? 'dark' : 'light');
+    }
+  }
+
+  function toggleCharts() {
+    localStorage.setItem('uiShowCharts', uiShowCharts.value ? 1 : 0);
+  }
+
   return {
     authenticated,
     authenticating,
@@ -146,10 +176,18 @@ export const useStore = defineStore('store', () => {
     clientCreateShowModal,
     clientCreateName,
     qrcode,
+    uiTheme,
+    prefersDarkScheme,
+    uiChartType,
+    uiShowCharts,
     login,
     logout,
     createClient,
     deleteClient,
     refresh,
+    toggleTheme,
+    setTheme,
+    handlePrefersChange,
+    toggleCharts,
   };
 });

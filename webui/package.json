@@ -10,11 +10,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "apexcharts": "^3.45.1",
+    "apexcharts": "^3.48.0",
     "crypto-js": "^4.2.0",
     "pinia": "^2.1.7",
     "vue": "^3.3.11",
-    "vue3-apexcharts": "^1.4.4"
+    "vue-i18n": "^9.10.2",
+    "vue3-apexcharts": "^1.5.2"
   },
   "devDependencies": {
     "@typescript-eslint/parser": "^7.3.1",
