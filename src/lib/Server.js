@@ -225,6 +225,12 @@ module.exports = class Server {
               return;
             }
 
+            if (id.endsWith('.html')) setHeader(event, 'Content-Type', 'text/html');
+            if (id.endsWith('.js')) setHeader(event, 'Content-Type', 'application/javascript');
+            if (id.endsWith('.json')) setHeader(event, 'Content-Type', 'application/json');
+            if (id.endsWith('.css')) setHeader(event, 'Content-Type', 'text/css');
+            if (id.endsWith('.png')) setHeader(event, 'Content-Type', 'image/png');
+
             return {
               size: stats.size,
               mtime: stats.mtimeMs,
