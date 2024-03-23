@@ -114,9 +114,6 @@ export default class API {
   }
 
   async getQrCode({ clientId }) {
-    return this.call({
-      method: 'get',
-      path: `/wireguard/client/${clientId}/qrcode.svg`,
-    });
+    return `${this.SERVER}/api/wireguard/client/${clientId}/qrcode.svg`;
   }
 }
