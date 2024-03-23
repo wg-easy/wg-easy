@@ -3,7 +3,6 @@
 /wg0.json
 /src/node_modules
 .DS_Store
-*.swp
 
 # Logs
 logs
@@ -26,7 +25,7 @@ coverage
 
 # Editor directories and files
 .vscode/*
-*.vscode-workspace
+*.code-workspace
 !.vscode/extensions.json
 .idea
 *.suo
@@ -36,3 +35,4 @@ coverage
 *.sw?
 
 *.tsbuildinfo
+*.env*
