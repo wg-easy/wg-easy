@@ -26,8 +26,6 @@ COPY --from=build_node_modules /node_modules /node_modules
 RUN \
     # Enable this to run `npm run serve`
     npm i -g nodemon &&\
-    # Workaround CVE-2023-42282
-    npm uninstall -g ip &&\
     # Delete unnecessary files 
     npm cache clean --force && rm -rf ~/.npm
 

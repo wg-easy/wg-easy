@@ -29,8 +29,24 @@ const i18n = new VueI18n({
   messages,
 });
 
+const UI_CHART_TYPES = [
+  { type: false, strokeWidth: 0 },
+  { type: 'line', strokeWidth: 3 },
+  { type: 'area', strokeWidth: 0 },
+  { type: 'bar', strokeWidth: 0 },
+];
+
+const CHART_COLORS = {
+  rx: { light: 'rgba(128,128,128,0.3)', dark: 'rgba(255,255,255,0.3)' },
+  tx: { light: 'rgba(128,128,128,0.4)', dark: 'rgba(255,255,255,0.3)' },
+  gradient: { light: ['rgba(0,0,0,1.0)', 'rgba(0,0,0,1.0)'], dark: ['rgba(128,128,128,0)', 'rgba(128,128,128,0)'] },
+};
+
 new Vue({
   el: '#app',
+  components: {
+    apexchart: VueApexCharts,
+  },
   i18n,
   data: {
     authenticated: null,
@@ -52,13 +68,16 @@ new Vue({
     currentRelease: null,
     latestRelease: null,
 
-    isDark: null,
     uiTrafficStats: false,
+
+    uiChartType: 0,
+    uiShowCharts: localStorage.getItem('uiShowCharts') === '1',
+    uiTheme: localStorage.theme || 'auto',
+    prefersDarkScheme: window.matchMedia('(prefers-color-scheme: dark)'),
 
     chartOptions: {
       chart: {
         background: 'transparent',
-        type: 'bar',
         stacked: false,
         toolbar: {
           show: false,
@@ -66,11 +85,27 @@ new Vue({
         animations: {
           enabled: false,
         },
+        parentHeightOffset: 0,
+        sparkline: {
+          enabled: true,
+        },
       },
-      colors: [
-        '#DDDDDD', // rx
-        '#EEEEEE', // tx
-      ],
+      colors: [],
+      stroke: {
+        curve: 'smooth',
+      },
+      fill: {
+        type: 'gradient',
+        gradient: {
+          shade: 'dark',
+          type: 'vertical',
+          shadeIntensity: 0,
+          gradientToColors: CHART_COLORS.gradient[this.theme],
+          inverseColors: false,
+          opacityTo: 0,
+          stops: [0, 100],
+        },
+      },
       dataLabels: {
         enabled: false,
       },
@@ -84,10 +119,10 @@ new Vue({
           show: false,
         },
         axisTicks: {
-          show: true,
+          show: false,
         },
         axisBorder: {
-          show: true,
+          show: false,
         },
       },
       yaxis: {
@@ -153,26 +188,41 @@ new Vue({
         // Debug
         // client.transferRx = this.clientsPersist[client.id].transferRxPrevious + Math.random() * 1000;
         // client.transferTx = this.clientsPersist[client.id].transferTxPrevious + Math.random() * 1000;
+        // client.latestHandshakeAt = new Date();
+        // this.requiresPassword = true;
+
+        this.clientsPersist[client.id].transferRxCurrent = client.transferRx - this.clientsPersist[client.id].transferRxPrevious;
+        this.clientsPersist[client.id].transferRxPrevious = client.transferRx;
+        this.clientsPersist[client.id].transferTxCurrent = client.transferTx - this.clientsPersist[client.id].transferTxPrevious;
+        this.clientsPersist[client.id].transferTxPrevious = client.transferTx;
 
         if (updateCharts) {
-          this.clientsPersist[client.id].transferRxCurrent = client.transferRx - this.clientsPersist[client.id].transferRxPrevious;
-          this.clientsPersist[client.id].transferRxPrevious = client.transferRx;
-          this.clientsPersist[client.id].transferTxCurrent = client.transferTx - this.clientsPersist[client.id].transferTxPrevious;
-          this.clientsPersist[client.id].transferTxPrevious = client.transferTx;
-
           this.clientsPersist[client.id].transferRxHistory.push(this.clientsPersist[client.id].transferRxCurrent);
           this.clientsPersist[client.id].transferRxHistory.shift();
 
           this.clientsPersist[client.id].transferTxHistory.push(this.clientsPersist[client.id].transferTxCurrent);
           this.clientsPersist[client.id].transferTxHistory.shift();
+
+          this.clientsPersist[client.id].transferTxSeries = [{
+            name: 'Tx',
+            data: this.clientsPersist[client.id].transferTxHistory,
+          }];
+
+          this.clientsPersist[client.id].transferRxSeries = [{
+            name: 'Rx',
+            data: this.clientsPersist[client.id].transferRxHistory,
+          }];
+
+          client.transferTxHistory = this.clientsPersist[client.id].transferTxHistory;
+          client.transferRxHistory = this.clientsPersist[client.id].transferRxHistory;
+          client.transferMax = Math.max(...client.transferTxHistory, ...client.transferRxHistory);
+
+          client.transferTxSeries = this.clientsPersist[client.id].transferTxSeries;
+          client.transferRxSeries = this.clientsPersist[client.id].transferRxSeries;
         }
 
         client.transferTxCurrent = this.clientsPersist[client.id].transferTxCurrent;
         client.transferRxCurrent = this.clientsPersist[client.id].transferRxCurrent;
-
-        client.transferTxHistory = this.clientsPersist[client.id].transferTxHistory;
-        client.transferRxHistory = this.clientsPersist[client.id].transferRxHistory;
-        client.transferMax = Math.max(...client.transferTxHistory, ...client.transferRxHistory);
 
         client.hoverTx = this.clientsPersist[client.id].hoverTx;
         client.hoverRx = this.clientsPersist[client.id].hoverRx;
@@ -250,14 +300,25 @@ new Vue({
         .finally(() => this.refresh().catch(console.error));
     },
     toggleTheme() {
-      if (this.isDark) {
-        localStorage.theme = 'light';
-        document.documentElement.classList.remove('dark');
-      } else {
-        localStorage.theme = 'dark';
-        document.documentElement.classList.add('dark');
+      const themes = ['light', 'dark', 'auto'];
+      const currentIndex = themes.indexOf(this.uiTheme);
+      const newIndex = (currentIndex + 1) % themes.length;
+      this.uiTheme = themes[newIndex];
+      localStorage.theme = this.uiTheme;
+      this.setTheme(this.uiTheme);
+    },
+    setTheme(theme) {
+      const { classList } = document.documentElement;
+      const shouldAddDarkClass = theme === 'dark' || (theme === 'auto' && this.prefersDarkScheme.matches);
+      classList.toggle('dark', shouldAddDarkClass);
+    },
+    handlePrefersChange(e) {
+      if (localStorage.theme === 'auto') {
+        this.setTheme(e.matches ? 'dark' : 'light');
       }
-      this.isDark = !this.isDark;
+    },
+    toggleCharts() {
+      localStorage.setItem('uiShowCharts', this.uiShowCharts ? 1 : 0);
     },
   },
   filters: {
@@ -267,10 +328,8 @@ new Vue({
     },
   },
   mounted() {
-    this.isDark = false;
-    if (localStorage.theme === 'dark') {
-      this.isDark = true;
-    }
+    this.prefersDarkScheme.addListener(this.handlePrefersChange);
+    this.setTheme(this.uiTheme);
 
     this.api = new API();
     this.api.getSession()
@@ -278,7 +337,7 @@ new Vue({
         this.authenticated = session.authenticated;
         this.requiresPassword = session.requiresPassword;
         this.refresh({
-          updateCharts: true,
+          updateCharts: this.updateCharts,
         }).catch((err) => {
           alert(err.message || err.toString());
         });
@@ -289,7 +348,7 @@ new Vue({
 
     setInterval(() => {
       this.refresh({
-        updateCharts: true,
+        updateCharts: this.updateCharts,
       }).catch(console.error);
     }, 1000);
 
@@ -298,8 +357,15 @@ new Vue({
         this.uiTrafficStats = res;
       })
       .catch(() => {
-        console.log('Failed to get ui-traffic-stats');
         this.uiTrafficStats = false;
+      });
+
+    this.api.getChartType()
+      .then((res) => {
+        this.uiChartType = parseInt(res, 10);
+      })
+      .catch(() => {
+        this.uiChartType = 0;
       });
 
     Promise.resolve().then(async () => {
@@ -332,5 +398,34 @@ new Vue({
       this.currentRelease = currentRelease;
       this.latestRelease = latestRelease;
     }).catch((err) => console.error(err));
+  },
+  computed: {
+    chartOptionsTX() {
+      const opts = {
+        ...this.chartOptions,
+        colors: [CHART_COLORS.tx[this.theme]],
+      };
+      opts.chart.type = UI_CHART_TYPES[this.uiChartType].type || false;
+      opts.stroke.width = UI_CHART_TYPES[this.uiChartType].strokeWidth;
+      return opts;
+    },
+    chartOptionsRX() {
+      const opts = {
+        ...this.chartOptions,
+        colors: [CHART_COLORS.rx[this.theme]],
+      };
+      opts.chart.type = UI_CHART_TYPES[this.uiChartType].type || false;
+      opts.stroke.width = UI_CHART_TYPES[this.uiChartType].strokeWidth;
+      return opts;
+    },
+    updateCharts() {
+      return this.uiChartType > 0 && this.uiShowCharts;
+    },
+    theme() {
+      if (this.uiTheme === 'auto') {
+        return this.prefersDarkScheme.matches ? 'dark' : 'light';
+      }
+      return this.uiTheme;
+    },
   },
 });
