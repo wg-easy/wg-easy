@@ -5,7 +5,7 @@
       v-if="client.enabled === true"
       title="Disable Client"
       class="inline-block align-middle rounded-full w-10 h-6 mr-1 bg-red-800 cursor-pointer hover:bg-red-700 transition-all"
-      @click="disableClient(client)"
+      @click="disableClient"
     >
       <div class="rounded-full w-4 h-4 m-1 ml-5 bg-white"></div>
     </div>
@@ -13,7 +13,7 @@
       v-if="client.enabled === false"
       title="Enable Client"
       class="inline-block align-middle rounded-full w-10 h-6 mr-1 bg-gray-200 dark:bg-neutral-400 cursor-pointer hover:bg-gray-300 dark:hover:bg-neutral-500 transition-all"
-      @click="enableClient(client)"
+      @click="enableClient"
     >
       <div class="rounded-full w-4 h-4 m-1 bg-white"></div>
     </div>
@@ -22,7 +22,7 @@
     <button
       class="align-middle bg-gray-100 dark:bg-neutral-600 dark:text-neutral-300 hover:bg-red-800 dark:hover:bg-red-800 hover:text-white dark:hover:text-white p-2 rounded transition"
       title="Show QR Code"
-      @click="getQrCode(client)"
+      @click="getQrCode"
     >
       <IconQRCode />
     </button>
@@ -41,7 +41,7 @@
     <button
       class="align-middle bg-gray-100 dark:bg-neutral-600 dark:text-neutral-300 hover:bg-red-800 dark:hover:bg-red-800 hover:text-white dark:hover:text-white p-2 rounded transition"
       title="Delete Client"
-      @click="handleDeleteClick()"
+      @click="handleDeleteClick"
     >
       <IconDelete />
     </button>
@@ -65,19 +65,24 @@ const { qrcode, clientToDelete } = storeToRefs(store);
 const props = defineProps({
   client: {},
 });
+const refresh = store.refresh;
 
-function enableClient(client) {
-  api.enableClient({ clientId: client.id }).catch((err) => alert(err.message || err.toString()));
-  // .finally(() => refresh().catch(console.error));
+function enableClient() {
+  api
+    .enableClient({ clientId: props.client.id })
+    .catch((err) => alert(err.message || err.toString()))
+    .finally(() => refresh().catch(console.error));
 }
 
-function disableClient(client) {
-  api.disableClient({ clientId: client.id }).catch((err) => alert(err.message || err.toString()));
-  // .finally(() => refresh().catch(console.error));
+function disableClient() {
+  api
+    .disableClient({ clientId: props.client.id })
+    .catch((err) => alert(err.message || err.toString()))
+    .finally(() => refresh().catch(console.error));
 }
 
-async function getQrCode(client) {
-  qrcode.value = `${api.SERVER}/api/wireguard/client/${client.id}/qrcode.svg`;
+async function getQrCode() {
+  qrcode.value = await api.getQrCode({ clientId: props.client.id });
 }
 function handleDeleteClick() {
   clientToDelete.value = props.client;
