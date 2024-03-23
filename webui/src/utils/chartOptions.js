@@ -1,9 +1,6 @@
-import { reactive } from 'vue';
-
-const chartOptions = reactive({
+export const chartOptions = {
   chart: {
     background: 'transparent',
-    type: 'bar',
     stacked: false,
     toolbar: {
       show: false,
@@ -11,11 +8,26 @@ const chartOptions = reactive({
     animations: {
       enabled: false,
     },
+    parentHeightOffset: 0,
+    sparkline: {
+      enabled: true,
+    },
   },
-  colors: [
-    '#DDDDDD', // rx
-    '#EEEEEE', // tx
-  ],
+  colors: [],
+  stroke: {
+    curve: 'smooth',
+  },
+  fill: {
+    type: 'gradient',
+    gradient: {
+      shade: 'dark',
+      type: 'vertical',
+      shadeIntensity: 0,
+      inverseColors: false,
+      opacityTo: 0,
+      stops: [0, 100],
+    },
+  },
   dataLabels: {
     enabled: false,
   },
@@ -29,10 +41,10 @@ const chartOptions = reactive({
       show: false,
     },
     axisTicks: {
-      show: true,
+      show: false,
     },
     axisBorder: {
-      show: true,
+      show: false,
     },
   },
   yaxis: {
@@ -64,6 +76,4 @@ const chartOptions = reactive({
       },
     },
   },
-});
-
-export default chartOptions;
+};

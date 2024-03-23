@@ -32,6 +32,28 @@ export default class API {
     });
   }
 
+  async getLang() {
+    const res = await this.call({
+      method: 'get',
+      path: '/lang',
+    });
+    return res.slice(0, 2);
+  }
+
+  async getuiTrafficStats() {
+    return this.call({
+      method: 'get',
+      path: '/ui-traffic-stats',
+    });
+  }
+
+  async getChartType() {
+    return this.call({
+      method: 'get',
+      path: '/ui-chart-type',
+    });
+  }
+
   async getSession() {
     return this.call({
       method: 'get',

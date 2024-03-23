@@ -1,6 +1,6 @@
 <template>
   <main>
-    <div v-cloak class="container mx-auto max-w-3xl px-5 md:px-0">
+    <div v-cloak class="container mx-auto max-w-3xl px-3 md:px-0 mt-4 xs:mt-6">
       <div v-if="authenticated === true">
         <Header />
         <UpdateNotification :latest-release="latestRelease" :current-release="currentRelease" />
@@ -62,7 +62,8 @@
 </template>
 
 <script setup>
-import { ref, onBeforeUnmount, onBeforeMount } from 'vue';
+import { ref, onBeforeUnmount, onBeforeMount, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import Auth from '@/components/Auth.vue';
 import UpdateNotification from '@/components/UpdateNotification.vue';
@@ -80,10 +81,13 @@ import Client from '@/components/Client.vue';
 import { useStore } from '@/store/store';
 import { storeToRefs } from 'pinia';
 
+const i18n = useI18n();
+
 const store = useStore();
 const { authenticated, requiresPassword } = storeToRefs(store);
 
-const { clients, clientCreateShowModal, clientToDelete, clientCreateName, qrcode } = storeToRefs(store);
+const { clients, clientCreateShowModal, clientToDelete, qrcode, prefersDarkScheme, uiTheme, uiChartType } =
+  storeToRefs(store);
 
 const currentRelease = ref(null);
 const latestRelease = ref(null);
@@ -93,8 +97,15 @@ const refreshInterval = ref(null);
 const api = new API();
 
 const refresh = store.refresh;
+const setTheme = store.setTheme;
+
+watch(prefersDarkScheme.value, () => {
+  setTheme(uiTheme.value);
+});
 
 onBeforeMount(() => {
+  setTheme(uiTheme.value);
+
   api
     .getSession()
     .then((session) => {
@@ -107,12 +118,24 @@ onBeforeMount(() => {
     .catch((err) => {
       console.log(err.message || err.toString());
     });
+
+  getChartType();
   getRelease();
+  getLang();
 });
 
 onBeforeUnmount(() => {
   clearInterval(refreshInterval.value);
 });
+
+async function getLang() {
+  const lang = await api.getLang();
+
+  if (lang !== localStorage.getItem('lang') && i18n.availableLocales.includes(lang)) {
+    localStorage.setItem('lang', lang);
+    i18n.global.locale = lang;
+  }
+}
 
 async function getRelease() {
   try {
@@ -141,5 +164,18 @@ async function getRelease() {
   } catch (error) {
     console.log('Something went wrong', error);
   }
+}
+
+async function getChartType() {
+  api
+    .getChartType()
+    .then((res) => {
+      uiChartType.value = parseInt(res, 10);
+      console.log(res);
+      console.log(uiChartType.value);
+    })
+    .catch(() => {
+      uiChartType.value = 0;
+    });
 }
 </script>
