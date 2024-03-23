@@ -138,4 +138,12 @@ class API {
     });
   }
 
+  async updateClientIpSegSelected({ clientId, ipSegSelected }) {
+    return this.call({
+      method: 'put',
+      path: `/wireguard/client/${clientId}/ipSegSelected/`,
+      body: { ipSegSelected },
+    });
+  }
+
 }

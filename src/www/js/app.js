@@ -46,6 +46,7 @@ new Vue({
   el: '#app',
   components: {
     apexchart: VueApexCharts,
+    Multiselect: window.VueMultiselect.default,
   },
   i18n,
   data: {
@@ -230,6 +231,21 @@ new Vue({
         return client;
       });
     },
+    addNewTag(client, newTag) {
+      const tag = newTag;
+      client.ipSegSelected.push(tag);
+      client.ipSegSelecting.push(tag);
+      const list = client.ipSegSelected;
+      this.updateClientIpSegSelected(client, list);
+    },
+    handleSelect(client, event) {
+      const list = client.ipSegSelected;
+      this.updateClientIpSegSelected(client, list);
+    },
+    handleRemove(client, event) {
+      const list = client.ipSegSelected;
+      this.updateClientIpSegSelected(client, list);
+    },
     login(e) {
       e.preventDefault();
 
@@ -296,6 +312,11 @@ new Vue({
     },
     updateClientAddress(client, address) {
       this.api.updateClientAddress({ clientId: client.id, address })
+        .catch((err) => alert(err.message || err.toString()))
+        .finally(() => this.refresh().catch(console.error));
+    },
+    updateClientIpSegSelected(client, ipSegSelected) {
+      this.api.updateClientIpSegSelected({ clientId: client.id, ipSegSelected })
         .catch((err) => alert(err.message || err.toString()))
         .finally(() => this.refresh().catch(console.error));
     },

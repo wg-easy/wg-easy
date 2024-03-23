@@ -210,6 +210,15 @@ module.exports = class Server {
         const { address } = await readBody(event);
         await WireGuard.updateClientAddress({ clientId, address });
         return { success: true };
+      }))
+      .put('/api/wireguard/client/:clientId/ipSegSelected', defineEventHandler(async (event) => {
+        const clientId = getRouterParam(event, 'clientId');
+        if (clientId === '__proto__' || clientId === 'constructor' || clientId === 'prototype') {
+          throw createError({ status: 403 });
+        }
+        const { ipSegSelected } = await readBody(event);
+        await WireGuard.updateClientIpSegSelected({ clientId, ipSegSelected });
+        return { success: true };
       }));
 
     // Static assets
