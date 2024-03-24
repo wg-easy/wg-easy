@@ -4,6 +4,7 @@
 <head>
   <title>WireGuard</title>
   <meta charset="utf-8"/>
+  <link href="./css/vue-multiselect.min.css" rel="stylesheet">
   <link href="./css/app.css" rel="stylesheet">
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" type="image/png" href="./img/favicon.png">
@@ -284,8 +285,13 @@
                       <div class="rounded-full w-4 h-4 m-1 bg-white"></div>
                     </div>
 
-                    <!-- Show QR-->
+                    <!-- Show Route Ip Segment -->
+                    <multiselect v-model="client.ipSegSelected" :options="client.ipSegSelecting" :multiple="true" placeholder="input router"
+                      id="ip-segment-selector" :taggable="true" @tag="addNewTag(client, $event)" @select="handleSelect(client, $event)"
+                      @remove="handleRemove(client, $event)">
+                    </multiselect>
 
+                    <!-- Show QR-->
                     <button :disabled="!client.downloadableConfig"
                       class="align-middle bg-gray-100 dark:bg-neutral-600 dark:text-neutral-300 p-2 rounded transition"
                       :class="{
@@ -586,6 +592,7 @@
   <script src="./js/vendor/vue-i18n.min.js"></script>
   <script src="./js/vendor/apexcharts.min.js"></script>
   <script src="./js/vendor/vue-apexcharts.min.js"></script>
+  <script src="./js/vendor/vue-multiselect.min.js"></script>
   <script src="./js/vendor/sha256.min.js"></script>
   <script src="./js/vendor/timeago.full.min.js"></script>
   <script src="./js/api.js"></script>

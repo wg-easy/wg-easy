@@ -6,6 +6,7 @@ FROM docker.io/library/node:18-alpine AS build_node_modules
 # Copy Web UI
 COPY src/ /app/
 WORKDIR /app
+
 RUN npm ci --omit=dev &&\
     mv node_modules /node_modules
 
@@ -22,6 +23,9 @@ COPY --from=build_node_modules /app /app
 # the architecture & OS of your development machine might differ
 # than what runs inside of docker.
 COPY --from=build_node_modules /node_modules /node_modules
+
+# only for china developer
+RUN npm config set registry https://registry.npmmirror.com && sed -i 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apk/repositories
 
 RUN \
     # Enable this to run `npm run serve`

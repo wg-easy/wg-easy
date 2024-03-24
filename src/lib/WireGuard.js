@@ -105,13 +105,19 @@ PostDown = ${WG_POST_DOWN}
     for (const [clientId, client] of Object.entries(config.clients)) {
       if (!client.enabled) continue;
 
+      let allowedIPs = `${client.address}/32`;
+      if (client.ipSegSelected && client.ipSegSelected.length > 0) {
+        const joinedIpSeg = client.ipSegSelected.join(',');
+        allowedIPs += `,${joinedIpSeg}`;
+      }
+      debug(`allowedIPs:${allowedIPs}`);
       result += `
 
 # Client: ${client.name} (${clientId})
 [Peer]
 PublicKey = ${client.publicKey}
 ${client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
-}AllowedIPs = ${client.address}/32`;
+}AllowedIPs = ${allowedIPs}`;
     }
 
     debug('Config saving...');
@@ -137,6 +143,8 @@ ${client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
       name: client.name,
       enabled: client.enabled,
       address: client.address,
+      ipSegSelected: client.ipSegSelected,
+      ipSegSelecting: client.ipSegSelecting,
       publicKey: client.publicKey,
       createdAt: new Date(client.createdAt),
       updatedAt: new Date(client.updatedAt),
@@ -192,9 +200,25 @@ ${client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
     return client;
   }
 
+  async getAllCIDR() {
+    const config = await this.getConfig();
+    const clients = await this.getClients();
+    let allCIDRs = [];
+    clients.forEach(client => {
+      allCIDRs = allCIDRs.concat(client.ipSegSelected);
+    });
+    return allCIDRs.join(',');
+  }
+
   async getClientConfiguration({ clientId }) {
     const config = await this.getConfig();
     const client = await this.getClient({ clientId });
+    let allowedIPs = await this.getAllCIDR();
+    if (allowedIPs === "") {
+      allowedIPs = WG_ALLOWED_IPS;
+    } else {
+      allowedIPs = `${WG_ALLOWED_IPS},${allowedIPs}`;
+    }
 
     return `
 [Interface]
@@ -206,7 +230,7 @@ ${WG_MTU ? `MTU = ${WG_MTU}\n` : ''}\
 [Peer]
 PublicKey = ${config.server.publicKey}
 ${client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
-}AllowedIPs = ${WG_ALLOWED_IPS}
+}AllowedIPs = ${allowedIPs}
 PersistentKeepalive = ${WG_PERSISTENT_KEEPALIVE}
 Endpoint = ${WG_HOST}:${WG_PORT}`;
   }
@@ -253,6 +277,8 @@ Endpoint = ${WG_HOST}:${WG_PORT}`;
       id,
       name,
       address,
+      ipSegSelected: [],
+      ipSegSelecting: [],
       privateKey,
       publicKey,
       preSharedKey,
@@ -314,6 +340,21 @@ Endpoint = ${WG_HOST}:${WG_PORT}`;
     }
 
     client.address = address;
+    client.updatedAt = new Date();
+
+    await this.saveConfig();
+  }
+
+  async updateClientIpSegSelected({ clientId, ipSegSelected }) {
+    const client = await this.getClient({ clientId });
+
+    const ipSegRegex = /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,2}$/;
+    for (const address of ipSegSelected) {
+      if (!ipSegRegex.test(address)) {
+        throw new ServerError(`Invalid Address: ${address}`, 400);
+      }
+    }
+    client.ipSegSelected = ipSegSelected;
     client.updatedAt = new Date();
 
     await this.saveConfig();

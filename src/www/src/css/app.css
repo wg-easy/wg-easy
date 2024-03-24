@@ -1,3 +1,22 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@layer components {
+    .multiselect--active,
+    .multiselect__content-wrapper,
+    .multiselect,
+    .multiselect__input,
+    .multiselect__tags {
+      @apply dark:bg-neutral-600 dark:text-neutral-300 dark:placeholder:text-neutral-400;
+    }
+    .multiselect__tag {
+      @apply bg-red-800;
+    }
+    .multiselect__tag-icon {
+      @apply bg-red-800 hover:bg-red-700;
+    }
+    .multiselect__content-wrapper,
+    .multiselect__content {
+      @apply hidden;
+    }
+  }
