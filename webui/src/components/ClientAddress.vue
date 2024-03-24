@@ -26,17 +26,25 @@
 <script setup>
 import { ref, nextTick } from 'vue';
 import IconEdit from './icons/IconEdit.vue';
+import API from '@/services/api';
 
-const props = defineProps(['client']);
+const api = new API();
+
+const props = defineProps({
+  client: {
+    type: Object,
+    required: true,
+  },
+});
 const editAddress = ref(null);
 const editAddressId = ref(null);
 
-const emit = defineEmits(['inFocus', 'submit', 'update-address']);
-
 const updateAddress = () => {
-  console.log('emit');
+  api.updateClientAddress({
+    clientId: editAddressId.value,
+    address: editAddress.value,
+  });
 
-  emit('update-address', props.client, editAddress.value);
   editAddress.value = null;
   editAddressId.value = null;
 };
@@ -49,6 +57,8 @@ const cancelEdit = () => {
 const edit = () => {
   editAddress.value = props.client.address;
   editAddressId.value = props.client.id;
+
+  // ? remove this ?
   nextTick(() => {
     const clientAddressRef = ['client-' + props.client.id + '-address'];
     if (clientAddressRef.value) {

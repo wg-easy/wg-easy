@@ -24,11 +24,11 @@ const { bytes } = useBytes();
 
 defineProps({
   transferData: {
-    type: Object,
+    type: Number,
     default: null,
   },
   transferDataCurrent: {
-    type: Object,
+    type: Number,
     default: null,
   },
   type: {

@@ -26,9 +26,9 @@
         </ClientTransfer>
         <!-- Last seen -->
         <span v-if="client.latestHandshakeAt" :title="'Last seen on ' + dateTime(new Date(client.latestHandshakeAt))">
-          <!-- FIXME: add "timeago" -->
-          <!-- · {{ new Date(client.latestHandshakeAt) | timeago }} -->
-          {{ !uiTrafficStats ? ' · ' : '' }}{{ timeago(client.latestHandshakeAt) }}
+          {{ !uiTrafficStats ? ' · ' : '' }}
+          <!-- eslint-disable-next-line vue/no-undef-components -->
+          <Timeago :datetime="client.latestHandshakeAt" :locale="dateFnsLocale" />
         </span>
       </div>
     </div>
@@ -53,7 +53,6 @@
 <script setup>
 import { storeToRefs } from 'pinia';
 
-import API from '@/services/api';
 import { useStore } from '@/store/store';
 
 import ClientName from '@/components/ClientName.vue';
@@ -64,7 +63,6 @@ import ClientTransfer from '@/components/ClientTransfer.vue';
 import ClientTrafficStat from '@/components/ClientTrafficStat.vue';
 
 import { useDateTime } from '@/composables/useDateTime';
-import { useTimeAgo } from '@/composables/useTimeAgo';
 import { useBytes } from '@/composables/useBytes';
 
 defineProps({
@@ -72,11 +70,8 @@ defineProps({
 });
 
 const store = useStore();
-const { uiTrafficStats } = storeToRefs(store);
+const { uiTrafficStats, dateFnsLocale } = storeToRefs(store);
 
 const { dateTime } = useDateTime();
-const { timeago } = useTimeAgo();
 const { bytes } = useBytes();
-
-const api = new API();
 </script>
