@@ -5,6 +5,7 @@ module.exports = {
     es2021: true,
   },
   extends: ['eslint:recommended', 'plugin:vue/vue3-recommended', 'prettier'],
+  ignorePatterns: ['dist/**/*', 'node_modules/**/*'],
   parser: 'vue-eslint-parser',
   // parserOptions: {
   //   parser: '@typescript-eslint/parser',
@@ -15,7 +16,5 @@ module.exports = {
     'vue/no-v-html': 'off',
     'vue/multi-word-component-names': 'off',
     'prettier/prettier': ['error'],
-    'vue/no-undef-components': ['error'],
-    'vue/no-undef-properties': ['error'],
   },
 };

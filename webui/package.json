@@ -7,7 +7,8 @@
     "dev": "vite --host",
     "build": "vite build",
     "build:watch": "vite build --watch",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "lint": "eslint ."
   },
   "dependencies": {
     "apexcharts": "^3.48.0",
