@@ -26,9 +26,7 @@
 <script setup>
 import { ref, nextTick } from 'vue';
 import IconEdit from './icons/IconEdit.vue';
-import API from '@/services/api';
-
-const api = new API();
+import api from '@/services/apiInstance';
 
 const props = defineProps({
   client: {

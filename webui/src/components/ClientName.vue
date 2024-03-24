@@ -52,8 +52,9 @@
 import { ref, nextTick } from 'vue';
 import { useDateTime } from '../composables/useDateTime';
 import IconEdit from './icons/IconEdit.vue';
-import API from '@/services/api';
 import { useStore } from '@/store/store';
+
+import api from '@/services/apiInstance';
 
 const props = defineProps({
   client: {
@@ -68,8 +69,6 @@ const { dateTime } = useDateTime();
 
 const clientEditName = ref(null);
 const clientEditNameId = ref(null);
-
-const api = new API();
 
 const cancelEdit = () => {
   clientEditName.value = null;

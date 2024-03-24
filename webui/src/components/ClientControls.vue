@@ -73,8 +73,7 @@ import IconQRCode from '@/components/icons/IconQRCode.vue';
 import IconDownload from '@/components/icons/IconDownload.vue';
 import IconDelete from '@/components/icons/IconDelete.vue';
 
-import API from '@/services/api';
-const api = new API();
+import api from '@/services/apiInstance';
 
 import { useStore } from '@/store/store';
 const store = useStore();
