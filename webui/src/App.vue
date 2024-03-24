@@ -8,7 +8,7 @@
         <div class="shadow-md rounded-lg bg-white dark:bg-neutral-700 overflow-hidden">
           <div class="flex flex-row flex-auto items-center p-3 px-5 border-b-2 border-gray-100 dark:border-neutral-600">
             <div class="flex-grow">
-              <p class="text-2xl font-medium dark:text-neutral-200">Clients</p>
+              <p class="text-2xl font-medium dark:text-neutral-200">{{ $t('clients') }}</p>
             </div>
             <div class="flex-shrink-0">
               <ClientNewButton />
@@ -23,7 +23,7 @@
           </div>
           <div v-if="clients && clients.length === 0">
             <p class="text-center m-10 text-gray-400 dark:text-neutral-400 text-sm">
-              There are no clients yet.<br /><br />
+              {{ $t('noClients') }}<br /><br />
               <ClientNewButton />
             </p>
           </div>
@@ -84,10 +84,19 @@ import { storeToRefs } from 'pinia';
 const i18n = useI18n();
 
 const store = useStore();
-const { authenticated, requiresPassword } = storeToRefs(store);
 
-const { clients, clientCreateShowModal, clientToDelete, qrcode, prefersDarkScheme, uiTheme, uiChartType } =
-  storeToRefs(store);
+const {
+  authenticated,
+  requiresPassword,
+  clients,
+  clientCreateShowModal,
+  clientToDelete,
+  qrcode,
+  prefersDarkScheme,
+  uiTheme,
+  uiChartType,
+  uiTrafficStats,
+} = storeToRefs(store);
 
 const currentRelease = ref(null);
 const latestRelease = ref(null);
@@ -122,6 +131,7 @@ onBeforeMount(() => {
   getChartType();
   getRelease();
   getLang();
+  getUiTrafficStats();
 });
 
 onBeforeUnmount(() => {
@@ -176,6 +186,17 @@ async function getChartType() {
     })
     .catch(() => {
       uiChartType.value = 0;
+    });
+}
+
+async function getUiTrafficStats() {
+  api
+    .getUiTrafficStats()
+    .then((res) => {
+      uiTrafficStats.value = res;
+    })
+    .catch(() => {
+      uiTrafficStats.value = false;
     });
 }
 </script>

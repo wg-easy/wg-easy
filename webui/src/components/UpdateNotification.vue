@@ -1,9 +1,3 @@
-<script>
-export default {
-  props: ['latestRelease', 'currentRelease'],
-};
-</script>
-
 <template>
   <div
     v-if="latestRelease"
@@ -12,7 +6,7 @@ export default {
   >
     <div class="container mx-auto flex flex-row flex-auto items-center">
       <div class="flex-grow">
-        <p class="font-bold">There is an update available!</p>
+        <p class="font-bold">{{ $t('updateAvailable') }}</p>
         <p>{{ latestRelease.changelog }}</p>
       </div>
 
@@ -21,8 +15,23 @@ export default {
         target="_blank"
         class="p-3 rounded-md bg-white dark:bg-red-100 float-right font-sm font-semibold text-red-800 dark:text-red-600 flex-shrink-0 border-2 border-red-800 dark:border-red-600 hover:border-white dark:hover:border-red-600 hover:text-white dark:hover:text-red-100 hover:bg-red-800 dark:hover:bg-red-600 transition-all"
       >
-        Update →
+        {{ $t('update') }} →
       </a>
     </div>
   </div>
 </template>
+
+<script setup>
+import { defineProps } from 'vue';
+
+defineProps({
+  latestRelease: {
+    type: Object,
+    required: true,
+  },
+  currentRelease: {
+    type: String,
+    required: true,
+  },
+});
+</script>

@@ -1,67 +1,82 @@
 <template>
-  <div class="flex-grow">
-    <!-- Name -->
-    <ClientName
-      :client="client"
-      @update-client-name="updateClientName"
-    />
-
-    <!-- Info -->
-    <div class="text-gray-400 dark:text-neutral-400 text-xs">
-      <!-- Address -->
-      <ClientAddress :client="client" @update-address="updateClientAddress" />
-      <!-- Transfer TX -->
-      <ClientTransfer
-        :transferData="client.transferTx"
-        :transferDataCurrent="client.transferTxCurrent"
-        :title="'Total Download: ' + bytes(client.transferTx)"
-        ><IconDownArrow
-      /></ClientTransfer>
-
-      <!-- Transfer RX -->
-      <ClientTransfer
-        :transferData="client.transferRx"
-        :transferDataCurrent="client.transferRxCurrent"
-        :title="'Total Upload: ' + bytes(client.transferRx)"
-      >
-        <IconUpArrow />
-      </ClientTransfer>
-
-      <!-- Last seen -->
-      <span
-        v-if="client.latestHandshakeAt"
-        :title="'Last seen on ' + dateTime(new Date(client.latestHandshakeAt))"
-      >
-        <!-- FIXME: add "timeago" -->
-        <!-- · {{ new Date(client.latestHandshakeAt) | timeago }} -->
-        · {{ timeago(client.latestHandshakeAt) }}
-      </span>
+  <div class="flex flex-col xxs:flex-row w-full gap-2">
+    <div class="flex flex-col flex-grow gap-1">
+      <!-- Name -->
+      <ClientName :client="client" />
+      <!-- Info -->
+      <div class="text-gray-400 dark:text-neutral-400 text-xs">
+        <!-- Address -->
+        <ClientAddress :client="client" />
+        <!-- Transfer TX -->
+        <ClientTransfer
+          v-if="!uiTrafficStats && client.transferTx"
+          :transfer-data="client.transferTx"
+          :transfer-data-current="client.transferTxCurrent"
+          :title="$t('totalDownload') + bytes(client.transferTx)"
+          ><IconDownArrow
+        /></ClientTransfer>
+        <!-- Transfer RX -->
+        <ClientTransfer
+          v-if="!uiTrafficStats && client.transferTx"
+          :transfer-data="client.transferRx"
+          :transfer-data-current="client.transferRxCurrent"
+          :title="$t('totalUpload') + bytes(client.transferRx)"
+        >
+          <IconUpArrow />
+        </ClientTransfer>
+        <!-- Last seen -->
+        <span v-if="client.latestHandshakeAt" :title="'Last seen on ' + dateTime(new Date(client.latestHandshakeAt))">
+          <!-- FIXME: add "timeago" -->
+          <!-- · {{ new Date(client.latestHandshakeAt) | timeago }} -->
+          {{ !uiTrafficStats ? ' · ' : '' }}{{ timeago(client.latestHandshakeAt) }}
+        </span>
+      </div>
+    </div>
+    <div
+      v-if="uiTrafficStats && client.transferTx && client.transferRx"
+      class="flex gap-2 items-center shrink-0 text-gray-400 dark:text-neutral-400 text-xs mt-px justify-end"
+    >
+      <ClientTrafficStat
+        :transfer-data-current="client.transferTxCurrent"
+        :transfer-data="client.transferTx"
+        type="tx"
+      />
+      <ClientTrafficStat
+        :transfer-data-current="client.transferRxCurrent"
+        :transfer-data="client.transferRx"
+        type="rx"
+      />
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { storeToRefs } from 'pinia';
+
+import API from '@/services/api';
+import { useStore } from '@/store/store';
+
 import ClientName from '@/components/ClientName.vue';
 import ClientAddress from '@/components/ClientAddress.vue';
 import IconUpArrow from '@/components/icons/IconUpArrow.vue';
 import IconDownArrow from '@/components/icons/IconDownArrow.vue';
 import ClientTransfer from '@/components/ClientTransfer.vue';
+import ClientTrafficStat from '@/components/ClientTrafficStat.vue';
 
 import { useDateTime } from '@/composables/useDateTime';
 import { useTimeAgo } from '@/composables/useTimeAgo';
 import { useBytes } from '@/composables/useBytes';
-import API from '@/services/api';
 
 defineProps({
   client: {},
 });
+
+const store = useStore();
+const { uiTrafficStats } = storeToRefs(store);
 
 const { dateTime } = useDateTime();
 const { timeago } = useTimeAgo();
 const { bytes } = useBytes();
 
 const api = new API();
-
-
 </script>

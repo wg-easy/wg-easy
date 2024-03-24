@@ -6,7 +6,7 @@
       @click="handleNewClient()"
     >
       <IconNew class="w-4 mr-2" />
-      <span class="text-sm">New</span>
+      <span class="text-sm">{{ $t('new') }}</span>
     </button>
   </div>
 </template>
