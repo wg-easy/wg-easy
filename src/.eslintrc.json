@@ -1,7 +1,7 @@
 {
   "extends": "athom",
   "ignorePatterns": [
-    "**/vendor/*.js"
+    "node_modules/**/*"
   ],
   "rules": {
     "consistent-return": "off",

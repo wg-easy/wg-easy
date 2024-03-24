@@ -2,13 +2,9 @@ export function useBytes() {
   const bytes = (bytes, decimals, kib, maxunit) => {
     kib = kib || false;
     if (bytes === 0) return '0 B';
-    if (Number.isNaN(parseFloat(bytes)) && !Number.isFinite(bytes))
-      return 'NaN';
+    if (Number.isNaN(parseFloat(bytes)) && !Number.isFinite(bytes)) return 'NaN';
     const k = kib ? 1024 : 1000;
-    const dm =
-      decimals != null && !Number.isNaN(decimals) && decimals >= 0
-        ? decimals
-        : 2;
+    const dm = decimals != null && !Number.isNaN(decimals) && decimals >= 0 ? decimals : 2;
     const sizes = kib
       ? ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB', 'BiB']
       : ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB', 'BB'];
