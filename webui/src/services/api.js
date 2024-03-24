@@ -1,6 +1,8 @@
 export default class API {
   constructor() {
-    this.SERVER = 'http://localhost:51821'; //! DEV
+    this.isDev = import.meta.env.MODE === 'development';
+
+    this.SERVER = this.isDev ? import.meta.env.VITE_SERVER_URL_DEV : '.';
   }
   async call({ method, path, body }) {
     const res = await fetch(`${this.SERVER}/api${path}`, {
@@ -8,7 +10,7 @@ export default class API {
       headers: {
         'Content-Type': 'application/json',
       },
-      credentials: 'include', //! DEV
+      credentials: this.isDev ? 'include' : 'same-origin', //DEV
       body: body ? JSON.stringify(body) : undefined,
     });
 

@@ -26,11 +26,11 @@ import { defineProps } from 'vue';
 
 defineProps({
   latestRelease: {
-    type: Object,
+    type: [String, null],
     required: true,
   },
   currentRelease: {
-    type: String,
+    type: [String, null],
     required: true,
   },
 });

@@ -1,10 +1,9 @@
-import API from '@/services/api';
 import { ref, computed } from 'vue';
 import sha256 from 'crypto-js/sha256';
 
 import { defineStore } from 'pinia';
 
-const api = new API();
+import api from '@/services/apiInstance';
 
 export const useStore = defineStore('store', () => {
   const authenticated = ref(null);
@@ -111,8 +110,11 @@ export const useStore = defineStore('store', () => {
         }
 
         // Debug
-        // client.transferRx = clientsPersist[client.id].transferRxPrevious + Math.random() * 1000;
-        // client.transferTx = clientsPersist[client.id].transferTxPrevious + Math.random() * 1000;
+        if (api.isDev) {
+          client.transferRx = clientsPersist[client.id].transferRxPrevious + Math.random() * 1000;
+          client.transferTx = clientsPersist[client.id].transferTxPrevious + Math.random() * 1000;
+          client.latestHandshakeAt = new Date('2024-03-20');
+        }
 
         if (updateCharts.value) {
           clientsPersist[client.id].transferRxCurrent =

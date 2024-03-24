@@ -1,5 +1,5 @@
 <template>
-  <div class="h-10 w-10 mr-5 rounded-full bg-gray-50 relative">
+  <div class="h-10 w-10 rounded-full bg-gray-50 relative">
     <IconAvatarDefault class="w-6 m-2 text-gray-300" />
     <img v-if="props.client.avatar" :src="props.client.avatar" class="w-10 rounded-full absolute top-0 left-0" />
 

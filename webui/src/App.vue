@@ -80,7 +80,7 @@ import ModalCreateClient from '@/components/ModalCreateClient.vue';
 import ModalDeleteClient from '@/components/ModalDeleteClient.vue';
 import Header from '@/components/Header.vue';
 
-import API from '@/services/api';
+import api from '@/services/apiInstance';
 import Client from '@/components/Client.vue';
 
 import { useStore } from '@/store/store';
@@ -113,12 +113,10 @@ const latestRelease = ref(null);
 
 const refreshInterval = ref(null);
 
-const api = new API();
-
 const refresh = store.refresh;
 const setTheme = store.setTheme;
 
-watch(prefersDarkScheme.value, () => {
+watch(prefersDarkScheme, () => {
   setTheme(uiTheme.value);
 });
 
