@@ -17,7 +17,11 @@
 
           <div v-if="clients && clients.length > 0">
             <!-- Client -->
-            <div v-for="client in clients" :key="client.id">
+            <div
+              v-for="client in clients"
+              :key="client.id"
+              class="relative overflow-hidden border-b last:border-b-0 border-gray-100 dark:border-neutral-600 border-solid"
+            >
               <Client :client="client" />
             </div>
           </div>
@@ -125,7 +129,6 @@ onBeforeMount(() => {
     .getSession()
     .then((session) => {
       authenticated.value = session.authenticated;
-      // authenticated.value = false; //debug
       requiresPassword.value = session.requiresPassword;
       refresh();
       refreshInterval.value = setInterval(refresh, 1000);

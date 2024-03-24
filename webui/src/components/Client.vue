@@ -1,8 +1,5 @@
 <template>
-  <div
-    v-if="client"
-    class="relative overflow-hidden border-b last:border-b-0 border-gray-100 dark:border-neutral-600 border-solid"
-  >
+  <div v-if="client">
     <!-- Chart -->
     <ClientCharts :client="client" />
 

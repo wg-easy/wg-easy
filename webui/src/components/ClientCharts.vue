@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- TODO: Individual bars are too wide -->
-    <div v-if="uiChartType && uiShowCharts" class="absolute z-0 bottom-0 left-0 right-0 h-6">
+    <div v-if="updateCharts" class="absolute z-0 bottom-0 left-0 right-0 h-6">
       <VueApexCharts
         width="100%"
         height="100%"
@@ -9,7 +9,7 @@
         :series="[{ name: 'Upload (TX)', data: client?.transferTxHistory }]"
       />
     </div>
-    <div v-if="uiChartType && uiShowCharts" class="absolute z-0 top-0 left-0 right-0 h-6">
+    <div v-if="updateCharts" class="absolute z-0 top-0 left-0 right-0 h-6">
       <VueApexCharts
         width="100%"
         height="100%"
@@ -46,7 +46,7 @@ defineProps({
 });
 
 const store = useStore();
-const { uiShowCharts, uiChartType, uiTheme, prefersDarkScheme } = storeToRefs(store);
+const { uiChartType, uiTheme, prefersDarkScheme, updateCharts } = storeToRefs(store);
 
 const darkOrLight = computed(() => {
   if (uiTheme.value === 'auto') {

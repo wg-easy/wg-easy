@@ -1,5 +1,5 @@
 import API from '@/services/api';
-import { ref, reactive } from 'vue';
+import { ref, computed } from 'vue';
 import sha256 from 'crypto-js/sha256';
 
 import { defineStore } from 'pinia';
@@ -13,7 +13,7 @@ export const useStore = defineStore('store', () => {
   const requiresPassword = ref(null);
 
   const clients = ref(null);
-  const clientsPersist = reactive({});
+  const clientsPersist = ref({});
   const clientToDelete = ref(null);
   const clientCreateShowModal = ref(null);
   const clientCreateName = ref('');
@@ -27,6 +27,10 @@ export const useStore = defineStore('store', () => {
   const uiChartType = ref(0);
   const uiShowCharts = ref(localStorage.getItem('uiShowCharts') === '1');
   const uiTrafficStats = ref(false);
+
+  const updateCharts = computed(() => {
+    return uiChartType.value > 0 && uiShowCharts.value;
+  });
 
   function login(e) {
     e.preventDefault();
@@ -88,7 +92,7 @@ export const useStore = defineStore('store', () => {
     clientToDelete.value = null;
   }
 
-  async function refresh({ updateCharts = false } = {}) {
+  async function refresh() {
     if (!authenticated.value) return;
 
     try {
@@ -107,11 +111,10 @@ export const useStore = defineStore('store', () => {
         }
 
         // Debug
-        client.transferRx = clientsPersist[client.id].transferRxPrevious + Math.random() * 1000;
-        client.transferTx = clientsPersist[client.id].transferTxPrevious + Math.random() * 1000;
-        updateCharts = true; // DEV TODO: Update. Get from settings
+        // client.transferRx = clientsPersist[client.id].transferRxPrevious + Math.random() * 1000;
+        // client.transferTx = clientsPersist[client.id].transferTxPrevious + Math.random() * 1000;
 
-        if (updateCharts) {
+        if (updateCharts.value) {
           clientsPersist[client.id].transferRxCurrent =
             client.transferRx - clientsPersist[client.id].transferRxPrevious;
           clientsPersist[client.id].transferRxPrevious = client.transferRx;
@@ -185,6 +188,7 @@ export const useStore = defineStore('store', () => {
     uiChartType,
     uiShowCharts,
     uiTrafficStats,
+    updateCharts,
     login,
     logout,
     createClient,
