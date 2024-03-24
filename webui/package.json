@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host",
     "build": "vite build",
     "build:watch": "vite build --watch",
     "preview": "vite preview"
@@ -12,9 +12,11 @@
   "dependencies": {
     "apexcharts": "^3.48.0",
     "crypto-js": "^4.2.0",
+    "date-fns": "^3.6.0",
     "pinia": "^2.1.7",
     "vue": "^3.3.11",
     "vue-i18n": "^9.10.2",
+    "vue-timeago3": "^2.3.2",
     "vue3-apexcharts": "^1.5.2"
   },
   "devDependencies": {

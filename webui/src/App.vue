@@ -64,6 +64,7 @@
 <script setup>
 import { ref, onBeforeUnmount, onBeforeMount, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import * as Locales from 'date-fns/locale';
 
 import Auth from '@/components/Auth.vue';
 import UpdateNotification from '@/components/UpdateNotification.vue';
@@ -81,7 +82,10 @@ import Client from '@/components/Client.vue';
 import { useStore } from '@/store/store';
 import { storeToRefs } from 'pinia';
 
-const i18n = useI18n();
+const i18n = useI18n({
+  inheritLocale: true,
+  useScope: 'global',
+});
 
 const store = useStore();
 
@@ -96,6 +100,8 @@ const {
   uiTheme,
   uiChartType,
   uiTrafficStats,
+  lang,
+  dateFnsLocale,
 } = storeToRefs(store);
 
 const currentRelease = ref(null);
@@ -131,6 +137,7 @@ onBeforeMount(() => {
   getChartType();
   getRelease();
   getLang();
+  getDateFnsLocale();
   getUiTrafficStats();
 });
 
@@ -139,12 +146,27 @@ onBeforeUnmount(() => {
 });
 
 async function getLang() {
-  const lang = await api.getLang();
+  try {
+    const configLang = await api.getLang();
 
-  if (lang !== localStorage.getItem('lang') && i18n.availableLocales.includes(lang)) {
-    localStorage.setItem('lang', lang);
-    i18n.global.locale = lang;
+    if (i18n.availableLocales.includes(configLang)) {
+      localStorage.setItem('lang', configLang);
+      i18n.locale.value = configLang;
+      lang.value = configLang;
+    } else {
+      lang.value = 'en';
+      localStorage.setItem('lang', lang.value);
+      console.warn(`Configured language '${configLang}' is not available. Using default locale.`);
+    }
+  } catch (error) {
+    lang.value = 'en';
+    console.error(`Failed to get lang. Using default. ${error.message}`);
   }
+}
+
+function getDateFnsLocale() {
+  const localeCode = Object.keys(Locales).find((key) => key.slice(0, 2).includes(lang.value));
+  dateFnsLocale.value = Locales[localeCode] ?? Locales.enUS;
 }
 
 async function getRelease() {
@@ -181,8 +203,6 @@ async function getChartType() {
     .getChartType()
     .then((res) => {
       uiChartType.value = parseInt(res, 10);
-      console.log(res);
-      console.log(uiChartType.value);
     })
     .catch(() => {
       uiChartType.value = 0;

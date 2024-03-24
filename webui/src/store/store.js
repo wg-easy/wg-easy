@@ -18,6 +18,8 @@ export const useStore = defineStore('store', () => {
   const clientCreateShowModal = ref(null);
   const clientCreateName = ref('');
   const qrcode = ref(null);
+  const lang = ref('en');
+  const dateFnsLocale = ref();
 
   const uiTheme = ref(localStorage.theme || 'auto');
   const prefersDarkScheme = ref(window.matchMedia('(prefers-color-scheme: dark)'));
@@ -107,7 +109,6 @@ export const useStore = defineStore('store', () => {
         // Debug
         client.transferRx = clientsPersist[client.id].transferRxPrevious + Math.random() * 1000;
         client.transferTx = clientsPersist[client.id].transferTxPrevious + Math.random() * 1000;
-        client.latestHandshakeAt = new Date('2024-03-20');
         updateCharts = true; // DEV TODO: Update. Get from settings
 
         if (updateCharts) {
@@ -179,6 +180,8 @@ export const useStore = defineStore('store', () => {
     qrcode,
     uiTheme,
     prefersDarkScheme,
+    lang,
+    dateFnsLocale,
     uiChartType,
     uiShowCharts,
     uiTrafficStats,
