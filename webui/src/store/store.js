@@ -24,6 +24,7 @@ export const useStore = defineStore('store', () => {
 
   const uiChartType = ref(0);
   const uiShowCharts = ref(localStorage.getItem('uiShowCharts') === '1');
+  const uiTrafficStats = ref(false);
 
   function login(e) {
     e.preventDefault();
@@ -180,6 +181,7 @@ export const useStore = defineStore('store', () => {
     prefersDarkScheme,
     uiChartType,
     uiShowCharts,
+    uiTrafficStats,
     login,
     logout,
     createClient,

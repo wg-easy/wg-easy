@@ -3,15 +3,16 @@
     <!-- Enable/Disable -->
     <div
       v-if="client.enabled === true"
-      title="Disable Client"
+      :title="$t('disableClient')"
       class="inline-block align-middle rounded-full w-10 h-6 mr-1 bg-red-800 cursor-pointer hover:bg-red-700 transition-all"
       @click="disableClient"
     >
       <div class="rounded-full w-4 h-4 m-1 ml-5 bg-white"></div>
     </div>
+
     <div
       v-if="client.enabled === false"
-      title="Enable Client"
+      :title="$t('enableClient')"
       class="inline-block align-middle rounded-full w-10 h-6 mr-1 bg-gray-200 dark:bg-neutral-400 cursor-pointer hover:bg-gray-300 dark:hover:bg-neutral-500 transition-all"
       @click="enableClient"
     >
@@ -19,9 +20,15 @@
     </div>
 
     <!-- Show QR-->
+
     <button
-      class="align-middle bg-gray-100 dark:bg-neutral-600 dark:text-neutral-300 hover:bg-red-800 dark:hover:bg-red-800 hover:text-white dark:hover:text-white p-2 rounded transition"
-      title="Show QR Code"
+      :disabled="!client.downloadableConfig"
+      class="align-middle bg-gray-100 dark:bg-neutral-600 dark:text-neutral-300 p-2 rounded transition"
+      :class="{
+        'hover:bg-red-800 dark:hover:bg-red-800 hover:text-white dark:hover:text-white': client.downloadableConfig,
+        'is-disabled': !client.downloadableConfig,
+      }"
+      :title="!client.downloadableConfig ? $t('noPrivKey') : $t('showQR')"
       @click="getQrCode"
     >
       <IconQRCode />
@@ -29,18 +36,29 @@
 
     <!-- Download Config -->
     <a
+      :disabled="!client.downloadableConfig"
       :href="'./api/wireguard/client/' + client.id + '/configuration'"
-      download
-      class="align-middle inline-block bg-gray-100 dark:bg-neutral-600 dark:text-neutral-300 hover:bg-red-800 dark:hover:bg-red-800 hover:text-white dark:hover:text-white p-2 rounded transition"
-      title="Download Configuration"
+      :download="client.downloadableConfig ? 'configuration' : null"
+      class="align-middle inline-block bg-gray-100 dark:bg-neutral-600 dark:text-neutral-300 p-2 rounded transition"
+      :class="{
+        'hover:bg-red-800 dark:hover:bg-red-800 hover:text-white dark:hover:text-white': client.downloadableConfig,
+        'is-disabled': !client.downloadableConfig,
+      }"
+      :title="!client.downloadableConfig ? $t('noPrivKey') : $t('downloadConfig')"
+      @click="
+        if (!client.downloadableConfig) {
+          $event.preventDefault();
+        }
+      "
     >
       <IconDownload />
     </a>
 
     <!-- Delete -->
+
     <button
       class="align-middle bg-gray-100 dark:bg-neutral-600 dark:text-neutral-300 hover:bg-red-800 dark:hover:bg-red-800 hover:text-white dark:hover:text-white p-2 rounded transition"
-      title="Delete Client"
+      :title="$t('deleteClient')"
       @click="handleDeleteClick"
     >
       <IconDelete />

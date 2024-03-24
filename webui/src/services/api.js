@@ -40,7 +40,7 @@ export default class API {
     return res.slice(0, 2);
   }
 
-  async getuiTrafficStats() {
+  async getUiTrafficStats() {
     return this.call({
       method: 'get',
       path: '/ui-traffic-stats',

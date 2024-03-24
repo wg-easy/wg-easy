@@ -6,8 +6,8 @@
     <!-- Chart -->
     <ClientCharts :client="client" />
 
-    <div class="relative p-5 z-10 flex flex-col md:flex-row justify-between">
-      <div class="flex items-center pb-2 md:pb-0">
+    <div class="relative py-3 md:py-5 px-3 z-10 flex flex-col sm:flex-row justify-between gap-3">
+      <div class="flex gap-3 md:gap-4 w-full items-center">
         <ClientAvatar :client="client" />
         <ClientInfo :client="client" />
       </div>
@@ -26,9 +26,7 @@ import ClientInfo from '@/components/ClientInfo.vue';
 import ClientAvatar from '@/components/ClientAvatar.vue';
 import ClientControls from '@/components/ClientControls.vue';
 
-
 defineProps({
   client: {},
 });
-
 </script>
