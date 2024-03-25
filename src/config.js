@@ -21,7 +21,7 @@ module.exports.WG_DEFAULT_DNS = typeof process.env.WG_DEFAULT_DNS === 'string'
   : '1.1.1.1';
 module.exports.WG_ALLOWED_IPS = process.env.WG_ALLOWED_IPS || '0.0.0.0/0, ::/0';
 
-module.exports.WG_SUBNET = ip.subnet(module.exports.WG_DEFAULT_ADDRESS, `255.255.255.${256 - 2 ** (32 - module.exports.WG_DEFAULT_ADDRESS_RANGE)}`);
+module.exports.WG_SUBNET = ip.cidrSubnet(`${module.exports.WG_DEFAULT_ADDRESS}/${module.exports.WG_DEFAULT_ADDRESS_RANGE}`);
 module.exports.WG_SERVER_ADDRESS = module.exports.WG_SUBNET.firstAddress;
 module.exports.WG_CLIENT_FIRST_ADDRESS = ip.toLong(module.exports.WG_SERVER_ADDRESS) + 1;
 module.exports.WG_CLIENT_LAST_ADDRESS = ip.toLong(module.exports.WG_SUBNET.lastAddress) - 1; // Exclude the broadcast address
@@ -36,7 +36,7 @@ iptables -A FORWARD -o wg0 -j ACCEPT;
 
 module.exports.WG_PRE_DOWN = process.env.WG_PRE_DOWN || '';
 module.exports.WG_POST_DOWN = process.env.WG_POST_DOWN || `
-iptables -t nat -D POSTROUTING -s ${module.exports.WG_DEFAULT_ADDRESS.replace('x', '0')}/24 -o ${module.exports.WG_DEVICE} -j MASQUERADE;
+iptables -t nat -D POSTROUTING -s ${module.exports.WG_SERVER_ADDRESS}/${module.exports.WG_DEFAULT_ADDRESS_RANGE} -o ${module.exports.WG_DEVICE} -j MASQUERADE;
 iptables -D INPUT -p udp -m udp --dport 51820 -j ACCEPT;
 iptables -D FORWARD -i wg0 -j ACCEPT;
 iptables -D FORWARD -o wg0 -j ACCEPT;
