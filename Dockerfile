@@ -6,7 +6,8 @@ FROM docker.io/library/node:18-alpine AS build_node_modules
 RUN npm install -g npm@latest
 
 # Copy Web UI
-COPY src /app
+COPY src/ /app/
+COPY webui/dist/ /app/www/
 WORKDIR /app
 RUN npm ci --omit=dev &&\
     mv node_modules /node_modules
@@ -44,5 +45,5 @@ RUN update-alternatives --install /sbin/iptables iptables /sbin/iptables-legacy 
 ENV DEBUG=Server,WireGuard
 
 # Run Web UI
-WORKDIR /app/server
+WORKDIR /app
 CMD ["/usr/bin/dumb-init", "node", "server.js"]
