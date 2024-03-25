@@ -117,19 +117,17 @@ export const useStore = defineStore('store', () => {
         }
 
         if (updateCharts.value) {
-          clientsPersist[client.id].transferRxCurrent =
-            client.transferRx - clientsPersist[client.id].transferRxPrevious;
-          clientsPersist[client.id].transferRxPrevious = client.transferRx;
-          clientsPersist[client.id].transferTxCurrent =
-            client.transferTx - clientsPersist[client.id].transferTxPrevious;
-          clientsPersist[client.id].transferTxPrevious = client.transferTx;
-
           clientsPersist[client.id].transferRxHistory.push(clientsPersist[client.id].transferRxCurrent);
           clientsPersist[client.id].transferRxHistory.shift();
 
           clientsPersist[client.id].transferTxHistory.push(clientsPersist[client.id].transferTxCurrent);
           clientsPersist[client.id].transferTxHistory.shift();
         }
+
+        clientsPersist[client.id].transferRxCurrent = client.transferRx - clientsPersist[client.id].transferRxPrevious;
+        clientsPersist[client.id].transferRxPrevious = client.transferRx;
+        clientsPersist[client.id].transferTxCurrent = client.transferTx - clientsPersist[client.id].transferTxPrevious;
+        clientsPersist[client.id].transferTxPrevious = client.transferTx;
 
         client.transferTxCurrent = clientsPersist[client.id].transferTxCurrent;
         client.transferRxCurrent = clientsPersist[client.id].transferRxCurrent;
