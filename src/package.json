@@ -5,8 +5,8 @@
   "description": "The easiest way to run WireGuard VPN + Web-based Admin UI.",
   "main": "server.js",
   "scripts": {
-    "serve": "DEBUG=Server,WireGuard nodemon server.js",
-    "serve-with-password": "PASSWORD=wg npm run serve",
+    "serve": "nodemon server.js",
+    "serve-with-password": "npm run serve",
     "lint": "eslint .",
     "buildcss": "npx tailwindcss -i ./www/src/css/app.css -o ./www/css/app.css"
   },
@@ -15,8 +15,9 @@
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "debug": "^4.3.4",
-    "express": "^4.18.3",
+    "dotenv": "^16.4.5",
     "express-session": "^1.18.0",
+    "h3": "^1.11.1",
     "qrcode": "^1.5.3",
     "uuid": "^9.0.1"
   },

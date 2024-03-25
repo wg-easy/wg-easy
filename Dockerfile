@@ -5,13 +5,16 @@ FROM docker.io/library/node:18-alpine AS build_node_modules
 
 # Copy Web UI
 COPY src/ /app/
+COPY webui/dist/ /app/www/
 WORKDIR /app
-RUN npm ci --omit=dev &&\
+RUN npm ci &&\
     mv node_modules /node_modules
 
 # Copy build result to a new image.
 # This saves a lot of disk space.
 FROM docker.io/library/node:18-alpine
+
+# Copy the server files and the built static files
 COPY --from=build_node_modules /app /app
 
 # Move node_modules one directory up, so during development
