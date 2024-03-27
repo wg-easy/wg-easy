@@ -4,7 +4,6 @@ const fs = require('fs').promises;
 const path = require('path');
 
 const debug = require('debug')('WireGuard');
-const ip = require('ip');
 const uuid = require('uuid');
 const QRCode = require('qrcode');
 
@@ -17,12 +16,9 @@ const {
   WG_PORT,
   WG_MTU,
   WG_DEFAULT_DNS,
-  WG_DEFAULT_ADDRESS_RANGE,
+  WG_DEFAULT_ADDRESS,
   WG_PERSISTENT_KEEPALIVE,
   WG_ALLOWED_IPS,
-  WG_SERVER_ADDRESS,
-  WG_CLIENT_FIRST_ADDRESS,
-  WG_CLIENT_LAST_ADDRESS,
   WG_PRE_UP,
   WG_POST_UP,
   WG_PRE_DOWN,
@@ -49,15 +45,13 @@ module.exports = class WireGuard {
           const publicKey = await Util.exec(`echo ${privateKey} | wg pubkey`, {
             log: 'echo ***hidden*** | wg pubkey',
           });
-          const address = WG_SERVER_ADDRESS;
-          const cidrBlock = WG_DEFAULT_ADDRESS_RANGE;
+          const address = WG_DEFAULT_ADDRESS.replace('x', '1');
 
           config = {
             server: {
               privateKey,
               publicKey,
               address,
-              cidrBlock,
             },
             clients: {},
           };
@@ -73,7 +67,7 @@ module.exports = class WireGuard {
 
           throw err;
         });
-        // await Util.exec(`iptables -t nat -A POSTROUTING -s ${WG_SERVER_ADDRESS}/${WG_DEFAULT_ADDRESS_RANGE} -o ' + WG_DEVICE + ' -j MASQUERADE`);
+        // await Util.exec(`iptables -t nat -A POSTROUTING -s ${WG_DEFAULT_ADDRESS.replace('x', '0')}/24 -o ' + WG_DEVICE + ' -j MASQUERADE`);
         // await Util.exec('iptables -A INPUT -p udp -m udp --dport 51820 -j ACCEPT');
         // await Util.exec('iptables -A FORWARD -i wg0 -j ACCEPT');
         // await Util.exec('iptables -A FORWARD -o wg0 -j ACCEPT');
@@ -100,7 +94,7 @@ module.exports = class WireGuard {
 # Server
 [Interface]
 PrivateKey = ${config.server.privateKey}
-Address = ${config.server.address}/${config.server.cidrBlock}
+Address = ${config.server.address}/24
 ListenPort = 51820
 PreUp = ${WG_PRE_UP}
 PostUp = ${WG_POST_UP}
@@ -143,7 +137,6 @@ ${client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
       name: client.name,
       enabled: client.enabled,
       address: client.address,
-      cidrBlock: client.cidrBlock,
       publicKey: client.publicKey,
       createdAt: new Date(client.createdAt),
       updatedAt: new Date(client.updatedAt),
@@ -206,7 +199,7 @@ ${client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
     return `
 [Interface]
 PrivateKey = ${client.privateKey ? `${client.privateKey}` : 'REPLACE_ME'}
-Address = ${client.address}/${client.cidrBlock}
+Address = ${client.address}/24
 ${WG_DEFAULT_DNS ? `DNS = ${WG_DEFAULT_DNS}\n` : ''}\
 ${WG_MTU ? `MTU = ${WG_MTU}\n` : ''}\
 
@@ -237,16 +230,15 @@ Endpoint = ${WG_HOST}:${WG_PORT}`;
     const publicKey = await Util.exec(`echo ${privateKey} | wg pubkey`);
     const preSharedKey = await Util.exec('wg genpsk');
 
-    // find next IP
+    // Calculate next IP
     let address;
-    for (let i = WG_CLIENT_FIRST_ADDRESS; i <= WG_CLIENT_LAST_ADDRESS; i++) {
-      const currentIp = ip.fromLong(i);
+    for (let i = 2; i < 255; i++) {
       const client = Object.values(config.clients).find((client) => {
-        return client.address === currentIp;
+        return client.address === WG_DEFAULT_ADDRESS.replace('x', i);
       });
 
       if (!client) {
-        address = currentIp;
+        address = WG_DEFAULT_ADDRESS.replace('x', i);
         break;
       }
     }
@@ -257,12 +249,10 @@ Endpoint = ${WG_HOST}:${WG_PORT}`;
 
     // Create Client
     const id = uuid.v4();
-    const cidrBlock = WG_DEFAULT_ADDRESS_RANGE;
     const client = {
       id,
       name,
       address,
-      cidrBlock,
       privateKey,
       publicKey,
       preSharedKey,
@@ -319,7 +309,7 @@ Endpoint = ${WG_HOST}:${WG_PORT}`;
   async updateClientAddress({ clientId, address }) {
     const client = await this.getClient({ clientId });
 
-    if (!ip.isV4Format(address)) {
+    if (!Util.isValidIPv4(address)) {
       throw new ServerError(`Invalid Address: ${address}`, 400);
     }
 
