@@ -7,10 +7,14 @@ RUN npm install -g npm@latest
 
 # Copy Web UI
 COPY src/ /app/
-COPY webui/dist/ /app/www/
+COPY webui/ /webui/
 WORKDIR /app
 RUN npm ci --omit=dev &&\
     mv node_modules /node_modules
+WORKDIR /webui
+RUN npm ci &&\
+    npm run build
+COPY webui/dist/ /app/www/
 
 # Copy build result to a new image.
 # This saves a lot of disk space.
