@@ -31,5 +31,8 @@
     "postcss": "^8.4.33",
     "tailwindcss": "^3.4.1",
     "vite": "^5.0.10"
+  },
+  "overrides": {
+    "rollup": "npm:@rollup/wasm-node"
   }
 }
