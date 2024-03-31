@@ -9,7 +9,7 @@
 
 You have found the easiest way to install & manage WireGuard on any Linux host !
 
-<p> align="center">
+<p align="center"
   <img src="./assets/screenshot.png" alt="Alternate text" width="802" /img>
 </p>
 
@@ -47,11 +47,11 @@ And log in again.
 
 To automatically install & run wg-easy, simply run:
 
-<pre>
+<pre
 $ docker run -d \
   --name=wg-easy \
-  -e WG_HOST=<b>🚨YOUR_SERVER_IP</b> \
-  -e PASSWORD=<b>🚨YOUR_ADMIN_PASSWORD</b> \
+  -e WG_HOST=<b🚨YOUR_SERVER_IP</b> \
+  -e PASSWORD=<b🚨YOUR_ADMIN_PASSWORD</b> \
   -v ~/.wg-easy:/etc/wireguard \
   -p 51820:51820/udp \
   -p 51821:51821/tcp \
