@@ -50,8 +50,8 @@ To automatically install & run wg-easy, simply run:
 <pre>
 docker run -d \
   --name=wg-easy \
-  -e WG_HOST=<b🚨YOUR_SERVER_IP</b> \
-  -e PASSWORD=<b🚨YOUR_ADMIN_PASSWORD</b> \
+  -e WG_HOST=<b>🚨YOUR_SERVER_IP</b> \
+  -e PASSWORD=<b>🚨YOUR_ADMIN_PASSWORD</b> \
   -v ~/.wg-easy:/etc/wireguard \
   -p 51820:51820/udp \
   -p 51821:51821/tcp \
@@ -60,7 +60,7 @@ docker run -d \
   --sysctl="net.ipv4.conf.all.src_valid_mark=1" \
   --sysctl="net.ipv4.ip_forward=1" \
   --restart unless-stopped \
-  weejewel/wg-easy
+  ghcr.io/weejewel/wg-easy
 </pre>
 
 > 💡 Replace `YOUR_SERVER_IP` with your WAN IP, or a Dynamic DNS hostname.
