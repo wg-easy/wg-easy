@@ -1,0 +1,14 @@
+{
+    "MD033": {
+        "allowed_elements": [
+            "p",
+            "img",
+            "pre",
+            "b"
+        ]
+    },
+    "MD013": {
+        "line_length": 193,
+        "code_block_line_length": 120
+    }
+}
