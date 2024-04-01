@@ -49,9 +49,8 @@ And log in again.
 
 To automatically install & run wg-easy, simply run:
 
-<pre>
-$ docker run -d \
-  --name=wg-easy \
+```
+  docker run -d \  --name=wg-easy \
   -e LANG=de \
   -e WG_HOST=<b>🚨YOUR_SERVER_IP</b> \
   -e PASSWORD=<b>🚨YOUR_ADMIN_PASSWORD</b> \
@@ -64,7 +63,7 @@ $ docker run -d \
   --sysctl="net.ipv4.ip_forward=1" \
   --restart unless-stopped \
   ghcr.io/wg-easy/wg-easy
-</pre>
+```
 
 > 💡 Replace `YOUR_SERVER_IP` with your WAN IP, or a Dynamic DNS hostname.
 >
