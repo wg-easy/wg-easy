@@ -275,6 +275,8 @@ const messages = { // eslint-disable-line no-unused-vars
     downloadConfig: 'Descargar configuración',
     madeBy: 'Hecho por',
     donate: 'Donar',
+    toggleCharts: 'Mostrar/Ocultar gráficos',
+    theme: { dark: 'Modo oscuro', light: 'Modo claro', auto: 'Modo automático' },
   },
   ko: {
     name: '이름',
