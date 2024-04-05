@@ -13,7 +13,6 @@ You have found the easiest way to install & manage WireGuard on any Linux host!
 </p>
 
 ## Features
-
 * All-in-one: WireGuard + Web UI.
 * Easy installation, simple to use.
 * List, create, edit, delete, enable & disable clients.
