@@ -25,7 +25,7 @@ services:
       # - WG_PRE_DOWN=echo "Pre Down" > /etc/wireguard/pre-down.txt
       # - WG_POST_DOWN=echo "Post Down" > /etc/wireguard/post-down.txt
       # - UI_TRAFFIC_STATS=true
-      # - UI_CHART_TYPE=0 (0 # Charts disabled, 1 # Line chart, 2 # Area chart, 3 # Bar chart)
+      # - UI_CHART_TYPE=0 # (0 Charts disabled, 1 # Line chart, 2 # Area chart, 3 # Bar chart)
 
     image: ghcr.io/wg-easy/wg-easy
     container_name: wg-easy
