@@ -39,15 +39,23 @@ module.exports = class Server {
     const app = createApp();
     this.app = app;
 
-    app.use(
-      fromNodeMiddleware(
-        expressSession({
-          secret: crypto.randomBytes(256).toString('hex'),
-          resave: true,
-          saveUninitialized: true,
-        })
-      )
-    );
+    // Middleware to add CORS headers
+    app.use('*', defineEventHandler((event) => {
+      setHeader(event, 'Access-Control-Allow-Origin', '*'); // Allows all origins
+      setHeader(event, 'Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS'); // Allowed methods
+      setHeader(event, 'Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept'); // Allowed headers
+      // If the request method is OPTIONS, return an early response
+      if (event.req.method === 'OPTIONS') {
+        event.res.statusCode = 204;
+        return '';
+      }
+    }));
+
+    app.use(fromNodeMiddleware(expressSession({
+      secret: crypto.randomBytes(256).toString('hex'),
+      resave: true,
+      saveUninitialized: true,
+    })));
 
     const router = createRouter();
     app.use(router);
