@@ -6,7 +6,7 @@
         <UpdateNotification :latest-release="latestRelease" :current-release="currentRelease" />
 
         <div class="shadow-md rounded-lg bg-white dark:bg-neutral-700 overflow-hidden">
-          <div class="flex flex-row flex-auto items-center p-3 px-5 border-b-2 border-gray-100 dark:border-neutral-600">
+          <div class="flex flex-row flex-auto items-center p-3 px-5 border-b-2 border-neutral-200 dark:border-neutral-600">
             <div class="flex-grow">
               <p class="text-2xl font-medium dark:text-neutral-200">{{ $t('clients') }}</p>
             </div>
@@ -20,7 +20,7 @@
             <div
               v-for="client in clients"
               :key="client.id"
-              class="relative overflow-hidden border-b last:border-b-0 border-gray-100 dark:border-neutral-600 border-solid"
+              class="relative overflow-hidden border-b last:border-b-0 border-neutral-200 dark:border-neutral-600 border-solid"
             >
               <Client :client="client" />
             </div>

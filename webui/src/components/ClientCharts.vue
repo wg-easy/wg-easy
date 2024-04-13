@@ -36,9 +36,9 @@ const UI_CHART_TYPES = [
 ];
 
 const CHART_COLORS = {
-  rx: { light: 'rgba(128,128,128,0.3)', dark: 'rgba(255,255,255,0.3)' },
-  tx: { light: 'rgba(128,128,128,0.4)', dark: 'rgba(255,255,255,0.3)' },
-  gradient: { light: ['rgba(0,0,0,0.1)', 'rgba(0,0,0,1.0)'], dark: ['rgba(128,128,128,0)', 'rgba(128,128,128,0)'] },
+  rx: 'rgba(0,0,0,0.2)' ,
+  tx: 'rgba(0,0,0,0.3)' ,
+  gradient: ['rgba(0,0,0,0.1)', 'rgba(0,0,0,1.0)'] ,
 };
 
 defineProps({
@@ -48,31 +48,24 @@ defineProps({
 const store = useStore();
 const { uiChartType, uiTheme, prefersDarkScheme, updateCharts } = storeToRefs(store);
 
-const darkOrLight = computed(() => {
-  if (uiTheme.value === 'auto') {
-    return prefersDarkScheme.value.matches ? 'dark' : 'light';
-  }
-  return uiTheme.value;
-});
-
 const chartOptionsTX = computed(() => {
   const opts = {
     ...chartOptions,
-    colors: [CHART_COLORS.tx[darkOrLight.value]],
+    colors: [CHART_COLORS.tx],
   };
   opts.chart.type = UI_CHART_TYPES[uiChartType.value].type || false;
   opts.stroke.width = UI_CHART_TYPES[uiChartType.value].strokeWidth;
-  opts.fill.gradient.gradientToColors = CHART_COLORS.gradient[darkOrLight.value];
+  opts.fill.gradient.gradientToColors = CHART_COLORS.gradient;
   return opts;
 });
 const chartOptionsRX = computed(() => {
   const opts = {
     ...chartOptions,
-    colors: [CHART_COLORS.rx[darkOrLight.value]],
+    colors: [CHART_COLORS.rx],
   };
   opts.chart.type = UI_CHART_TYPES[uiChartType.value].type || false;
   opts.stroke.width = UI_CHART_TYPES[uiChartType.value].strokeWidth;
-  opts.fill.gradient.gradientToColors = CHART_COLORS.gradient[darkOrLight.value];
+  opts.fill.gradient.gradientToColors = CHART_COLORS.gradient;
   return opts;
 });
 </script>

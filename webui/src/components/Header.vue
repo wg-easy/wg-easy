@@ -8,7 +8,7 @@
     <div class="flex items-center grow-0 gap-3 items-end self-end xxs:self-center">
       <!-- Dark / light theme -->
       <button
-        class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 dark:bg-neutral-700 dark:hover:bg-neutral-600 transition"
+        class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 dark:bg-neutral-700 dark:hover:bg-neutral-600"
         :title="$t(`theme.${uiTheme}`)"
         @click="toggleTheme"
       >
@@ -17,7 +17,7 @@
       <!-- Show / hide charts -->
       <label
         v-if="uiChartType > 0"
-        class="inline-flex items-center justify-center cursor-pointer w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 dark:bg-neutral-700 dark:hover:bg-neutral-600 whitespace-nowrap transition group"
+        class="inline-flex items-center justify-center cursor-pointer w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 dark:bg-neutral-700 dark:hover:bg-neutral-600 whitespace-nowrap group"
         :title="$t('toggleCharts')"
       >
         <input v-model="uiShowCharts" type="checkbox" value="" class="sr-only peer" @change="toggleCharts" />

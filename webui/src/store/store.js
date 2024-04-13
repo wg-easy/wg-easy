@@ -27,6 +27,8 @@ export const useStore = defineStore('store', () => {
   const uiShowCharts = ref(localStorage.getItem('uiShowCharts') === '1');
   const uiTrafficStats = ref(false);
 
+  const pauseCharts = ref(false);
+
   const updateCharts = computed(() => {
     return uiChartType.value > 0 && uiShowCharts.value;
   });
@@ -116,7 +118,7 @@ export const useStore = defineStore('store', () => {
           client.latestHandshakeAt = new Date('2024-03-20');
         }
 
-        if (updateCharts.value) {
+        if (updateCharts.value && !pauseCharts.value) {
           clientsPersist[client.id].transferRxHistory.push(clientsPersist[client.id].transferRxCurrent);
           clientsPersist[client.id].transferRxHistory.shift();
 
@@ -147,12 +149,18 @@ export const useStore = defineStore('store', () => {
   }
 
   function toggleTheme() {
+    pauseCharts.value = true;
+
     const themes = ['light', 'dark', 'auto'];
     const currentIndex = themes.indexOf(uiTheme.value);
     const newIndex = (currentIndex + 1) % themes.length;
     uiTheme.value = themes[newIndex];
     localStorage.theme = uiTheme.value;
     setTheme(uiTheme.value);
+    
+    setTimeout(() => {
+      pauseCharts.value = false;
+    }, 300);
   }
   function setTheme(theme) {
     const { classList } = document.documentElement;
