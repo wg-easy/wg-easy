@@ -1,3 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer utilities {
+  html * {
+    @apply transition-colors ease-linear duration-200;
+  }
+}
+
+html.dark .vue-apexcharts {
+  filter: invert(1);
+}

@@ -28,7 +28,7 @@
       <input
         v-if="!authenticating && password"
         type="submit"
-        class="bg-red-800 dark:bg-red-800 w-full rounded shadow py-2 text-sm text-white dark:text-white hover:bg-red-700 dark:hover:bg-red-700 transition cursor-pointer"
+        class="bg-red-800 dark:bg-red-800 w-full rounded shadow py-2 text-sm text-white dark:text-white hover:bg-red-700 dark:hover:bg-red-700 cursor-pointer"
         value="Sign In"
       />
       <input

@@ -4,7 +4,7 @@
     <div
       v-if="client.enabled === true"
       :title="$t('disableClient')"
-      class="inline-block align-middle rounded-full w-10 h-6 mr-1 bg-red-800 cursor-pointer hover:bg-red-700 transition-all"
+      class="inline-block align-middle rounded-full w-10 h-6 mr-1 bg-red-800 cursor-pointer hover:bg-red-700"
       @click="disableClient"
     >
       <div class="rounded-full w-4 h-4 m-1 ml-5 bg-white"></div>
@@ -13,7 +13,7 @@
     <div
       v-if="client.enabled === false"
       :title="$t('enableClient')"
-      class="inline-block align-middle rounded-full w-10 h-6 mr-1 bg-gray-200 dark:bg-neutral-400 cursor-pointer hover:bg-gray-300 dark:hover:bg-neutral-500 transition-all"
+      class="inline-block align-middle rounded-full w-10 h-6 mr-1 bg-gray-200 dark:bg-neutral-400 cursor-pointer hover:bg-gray-300 dark:hover:bg-neutral-500"
       @click="enableClient"
     >
       <div class="rounded-full w-4 h-4 m-1 bg-white"></div>
@@ -23,7 +23,7 @@
 
     <button
       :disabled="!client.downloadableConfig"
-      class="align-middle bg-gray-100 dark:bg-neutral-600 dark:text-neutral-300 p-2 rounded transition"
+      class="align-middle bg-gray-100 dark:bg-neutral-600 dark:text-neutral-300 p-2 rounded"
       :class="{
         'hover:bg-red-800 dark:hover:bg-red-800 hover:text-white dark:hover:text-white': client.downloadableConfig,
         'is-disabled': !client.downloadableConfig,
@@ -39,7 +39,7 @@
       :disabled="!client.downloadableConfig"
       :href="'./api/wireguard/client/' + client.id + '/configuration'"
       :download="client.downloadableConfig ? 'configuration' : null"
-      class="align-middle inline-block bg-gray-100 dark:bg-neutral-600 dark:text-neutral-300 p-2 rounded transition"
+      class="align-middle inline-block bg-gray-100 dark:bg-neutral-600 dark:text-neutral-300 p-2 rounded"
       :class="{
         'hover:bg-red-800 dark:hover:bg-red-800 hover:text-white dark:hover:text-white': client.downloadableConfig,
         'is-disabled': !client.downloadableConfig,
@@ -57,7 +57,7 @@
     <!-- Delete -->
 
     <button
-      class="align-middle bg-gray-100 dark:bg-neutral-600 dark:text-neutral-300 hover:bg-red-800 dark:hover:bg-red-800 hover:text-white dark:hover:text-white p-2 rounded transition"
+      class="align-middle bg-gray-100 dark:bg-neutral-600 dark:text-neutral-300 hover:bg-red-800 dark:hover:bg-red-800 hover:text-white dark:hover:text-white p-2 rounded"
       :title="$t('deleteClient')"
       @click="handleDeleteClick"
     >
