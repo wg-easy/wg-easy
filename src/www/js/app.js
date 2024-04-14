@@ -59,13 +59,12 @@ new Vue({
     clientDelete: null,
     clientCreate: null,
     clientCreateName: '',
-    clientCreateAllowedIps: '',
     clientEditName: null,
     clientEditNameId: null,
     clientEditAddress: null,
     clientEditAddressId: null,
     clientEditAllowedIPs: null,
-    userInputIP: [0, 0, 0, 0, 0],
+    userInputIP: [],
     qrcode: null,
 
     currentRelease: null,
@@ -271,10 +270,9 @@ new Vue({
     },
     createClient() {
       const name = this.clientCreateName;
-      const allowedIps = this.clientCreateAllowedIps;
       if (!name) return;
 
-      this.api.createClient({ name, allowedIps })
+      this.api.createClient({ name })
         .catch((err) => alert(err.message || err.toString()))
         .finally(() => this.refresh().catch(console.error));
     },
@@ -324,13 +322,19 @@ new Vue({
         .catch((err) => alert(err.message || err.toString()))
         .finally(() => this.refresh().catch(console.error));
     },
+    handleKeyDown(event, key, nextInputRef) {
+      if (event.key === key) {
+        event.preventDefault();
+        this.$refs[nextInputRef].focus();
+      }
+    },
     addNewIP() {
       const address = this.userInputIP.slice(0, 4).join('.');
       const allowedIPs = [...this.clientEditAllowedIPs.allowedIPs];
       const obj = { type: 'ipv4', address, cidr: this.userInputIP[4] };
       allowedIPs.push(obj);
       this.clientEditAllowedIPs.allowedIPs = allowedIPs;
-      this.userInputIP = [0, 0, 0, 0, 0];
+      this.userInputIP = [];
     },
     removeIP(index) {
       const allowedIPs = [...this.clientEditAllowedIPs.allowedIPs];
