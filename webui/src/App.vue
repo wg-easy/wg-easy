@@ -101,7 +101,6 @@ const {
   clientToDelete,
   qrcode,
   prefersDarkScheme,
-  uiTheme,
   uiChartType,
   uiTrafficStats,
   lang,
@@ -116,12 +115,9 @@ const refreshInterval = ref(null);
 const refresh = store.refresh;
 const setTheme = store.setTheme;
 
-watch(prefersDarkScheme, () => {
-  setTheme(uiTheme.value);
-});
-
 onBeforeMount(() => {
-  setTheme(uiTheme.value);
+  setTheme();
+  prefersDarkScheme.value.addEventListener('change', setTheme);
 
   api
     .getSession()
@@ -143,6 +139,7 @@ onBeforeMount(() => {
 });
 
 onBeforeUnmount(() => {
+  prefersDarkScheme.value.removeEventListener('change', setTheme);
   clearInterval(refreshInterval.value);
 });
 

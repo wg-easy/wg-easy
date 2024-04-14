@@ -21,7 +21,9 @@ export const useStore = defineStore('store', () => {
   const dateFnsLocale = ref();
 
   const uiTheme = ref(localStorage.theme || 'auto');
-  const prefersDarkScheme = ref(window.matchMedia('(prefers-color-scheme: dark)'));
+  const prefersDarkScheme = computed(() =>
+    window.matchMedia('(prefers-color-scheme: dark)')
+  );
 
   const uiChartType = ref(0);
   const uiShowCharts = ref(localStorage.getItem('uiShowCharts') === '1');
@@ -156,22 +158,16 @@ export const useStore = defineStore('store', () => {
     const newIndex = (currentIndex + 1) % themes.length;
     uiTheme.value = themes[newIndex];
     localStorage.theme = uiTheme.value;
-    setTheme(uiTheme.value);
-    
+    setTheme();
+
     setTimeout(() => {
       pauseCharts.value = false;
     }, 300);
   }
-  function setTheme(theme) {
+  function setTheme() {
     const { classList } = document.documentElement;
-    const shouldAddDarkClass = theme === 'dark' || (theme === 'auto' && prefersDarkScheme.value.matches);
+    const shouldAddDarkClass = uiTheme.value === 'dark' || (uiTheme.value === 'auto' && prefersDarkScheme.value.matches);
     classList.toggle('dark', shouldAddDarkClass);
-  }
-
-  function handlePrefersChange(e) {
-    if (localStorage.theme === 'auto') {
-      setTheme(e.matches ? 'dark' : 'light');
-    }
   }
 
   function toggleCharts() {
@@ -204,7 +200,6 @@ export const useStore = defineStore('store', () => {
     refresh,
     toggleTheme,
     setTheme,
-    handlePrefersChange,
     toggleCharts,
   };
 });
