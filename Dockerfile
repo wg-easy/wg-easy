@@ -14,7 +14,6 @@ RUN npm ci --omit=dev &&\
 WORKDIR /webui
 RUN npm ci &&\
     npm run build
-COPY webui/dist/ /app/www/
 
 # Copy build result to a new image.
 # This saves a lot of disk space.
@@ -23,7 +22,7 @@ HEALTHCHECK CMD /usr/bin/timeout 5s /bin/sh -c "/usr/bin/wg show | /bin/grep -q 
 
 # Copy the server files and the built static files
 COPY --from=build_node_modules /app /app
-COPY --from=build_node_modules /webui/dist /app/www
+COPY --from=build_node_modules /webui/dist/ /app/www
 
 # Move node_modules one directory up, so during development
 # we don't have to mount it in a volume.
