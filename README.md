@@ -49,7 +49,8 @@ And log in again.
 To automatically install & run wg-easy, simply run:
 
 ```
-  docker run -d \ --name=wg-easy \
+  docker run -d \
+  --name=wg-easy \
   -e LANG=de \
   -e WG_HOST=<🚨YOUR_SERVER_IP> \
   -e PASSWORD=<🚨YOUR_ADMIN_PASSWORD> \
