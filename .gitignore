@@ -14,8 +14,8 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
-/webui/dist
 .DS_Store
+dist
 dist-ssr
 coverage
 *.local
