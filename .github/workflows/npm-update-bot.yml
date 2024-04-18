@@ -35,6 +35,7 @@ jobs:
           cd src
           ncu -u
           npm update
+          npx update-browserslist-db@latest
           npm run buildcss
           git config --global user.name 'NPM Update Bot'
           git config --global user.email 'npmupbot@users.noreply.github.com'
