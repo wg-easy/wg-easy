@@ -7,7 +7,7 @@ RUN npm ci --omit=dev &&\
     # Enable this to run `npm run serve`
     npm i -g nodemon &&\
     # Delete unnecessary files 
-    npm cache clean --force && rm -rf ~/.npm
+    npm cache clean --force && rm -rf ~/.npm &&\
     mv node_modules /node_modules
 
 # Copy build result to a new image.
