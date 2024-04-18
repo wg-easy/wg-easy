@@ -1,9 +1,11 @@
-FROM docker.io/library/node:20-alpine AS build_node_modules
+FROM docker.io/library/node:18-alpine AS build_node_modules
 
 # Copy Web UI
 COPY src/ /app/
 WORKDIR /app
 RUN npm ci --omit=dev &&\
+    # Enable this to run `npm run serve`
+    npm i -g nodemon &&\
     mv node_modules /node_modules
 
 # Copy build result to a new image.
@@ -20,11 +22,8 @@ COPY --from=build_node_modules /app /app
 # than what runs inside of docker.
 COPY --from=build_node_modules /node_modules /node_modules
 
-RUN \
-    # Enable this to run `npm run serve`
-    npm i -g nodemon &&\
-    # Delete unnecessary files 
-    npm cache clean --force && rm -rf ~/.npm
+# Delete unnecessary files 
+RUN npm cache clean --force && rm -rf ~/.npm
 
 # Install Linux packages
 RUN apk add --no-cache \
