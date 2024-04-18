@@ -6,6 +6,8 @@ WORKDIR /app
 RUN npm ci --omit=dev &&\
     # Enable this to run `npm run serve`
     npm i -g nodemon &&\
+    # Delete unnecessary files 
+    npm cache clean --force && rm -rf ~/.npm
     mv node_modules /node_modules
 
 # Copy build result to a new image.
@@ -21,9 +23,6 @@ COPY --from=build_node_modules /app /app
 # the architecture & OS of your development machine might differ
 # than what runs inside of docker.
 COPY --from=build_node_modules /node_modules /node_modules
-
-# Delete unnecessary files 
-RUN npm cache clean --force && rm -rf ~/.npm
 
 # Install Linux packages
 RUN apk add --no-cache \
