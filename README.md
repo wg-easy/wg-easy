@@ -54,6 +54,8 @@ To automatically install & run wg-easy, simply run:
   -e LANG=de \
   -e WG_HOST=<🚨YOUR_SERVER_IP> \
   -e PASSWORD=<🚨YOUR_ADMIN_PASSWORD> \
+  -e PORT=51821 \
+  -e WG_PORT=51820 \
   -v ~/.wg-easy:/etc/wireguard \
   -p 51820:51820/udp \
   -p 51821:51821/tcp \
