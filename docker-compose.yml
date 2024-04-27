@@ -42,3 +42,8 @@ services:
     sysctls:
       - net.ipv4.ip_forward=1
       - net.ipv4.conf.all.src_valid_mark=1
+    healthcheck:
+      test: /usr/bin/timeout 5s /bin/sh -c "/usr/bin/wg show | /bin/grep -q interface || exit 1"
+      interval: 1m
+      timeout: 5s
+      retries: 3
