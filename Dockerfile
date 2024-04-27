@@ -15,6 +15,7 @@ RUN npm ci --omit=dev &&\
 # Copy build result to a new image.
 # This saves a lot of disk space.
 FROM docker.io/library/node:20-alpine
+HEALTHCHECK --interval=1m --timeout=5s --retries=3 CMD "/usr/bin/wg show | /bin/grep -q interface || exit 1"
 COPY --from=build_node_modules /app /app
 
 # Move node_modules one directory up, so during development
