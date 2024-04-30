@@ -22,7 +22,7 @@ process.on('SIGTERM', async () => {
   process.exit(0);
 });
 
-// Handle interupt signal
+// Handle interrupt signal
 process.on('SIGINT', () => {
   // eslint-disable-next-line no-console
   console.log('SIGINT signal received.');
