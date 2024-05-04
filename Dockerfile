@@ -3,8 +3,8 @@
 FROM docker.io/library/node:18-alpine AS build_node_modules
 
 # Update Linux packages
-RUN apk update \
-    apk add --upgrade apk-tools \
+RUN apk update &&\
+    apk add --upgrade apk-tools &&\
     apk upgrade --available
 
 # Copy Web UI
