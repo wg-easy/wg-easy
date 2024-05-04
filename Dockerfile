@@ -1,4 +1,11 @@
-FROM docker.io/library/node:22-alpine AS build_node_modules
+# As a workaround we have to build on nodejs 18
+# nodejs 20 hangs on build with armv6/armv7
+FROM docker.io/library/node:18-alpine AS build_node_modules
+
+# Update Linux packages
+RUN apk update \
+    apk add --upgrade apk-tools \
+    apk upgrade --available
 
 # Copy Web UI
 COPY src /app
