@@ -3,7 +3,7 @@
 FROM docker.io/library/node:18-alpine AS build_node_modules
 
 # Update npm to latest version
-RUN npm install -g npm@latest
+RUN npm install -g npm@10.5.2
 
 # Copy Web UI
 COPY src /app
