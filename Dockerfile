@@ -2,7 +2,7 @@
 # nodejs 22 hangs on build with armv6/armv7
 FROM docker.io/library/node:18-alpine AS build_node_modules
 
-# Update npm to latest version
+# Update npm to patched version of latest nodejs lts
 RUN npm install -g npm@10.5.2
 
 # Copy Web UI
