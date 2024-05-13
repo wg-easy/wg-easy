@@ -35,3 +35,4 @@ iptables -D FORWARD -o wg0 -j ACCEPT;
 `.split('\n').join(' ');
 module.exports.LANG = process.env.LANG || 'en';
 module.exports.UI_TRAFFIC_STATS = process.env.UI_TRAFFIC_STATS || 'false';
+module.exports.UI_CHART_TYPE = process.env.UI_CHART_TYPE || 0;
