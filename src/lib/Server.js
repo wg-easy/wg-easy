@@ -213,7 +213,7 @@ module.exports = class Server {
       }));
 
     // Static assets
-    const publicDir = '/app/www';
+    const publicDir = '/home/ubuntu/wg-easy/src/www';
     app.use(
       defineEventHandler((event) => {
         return serveStatic(event, {
