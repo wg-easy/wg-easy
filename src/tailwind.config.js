@@ -3,7 +3,7 @@
 'use strict';
 
 module.exports = {
-  darkMode: 'media',
+  darkMode: 'selector',
   content: ['./www/**/*.{html,js}'],
   theme: {
     screens: {

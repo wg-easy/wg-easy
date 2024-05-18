@@ -13,7 +13,6 @@ You have found the easiest way to install & manage WireGuard on any Linux host!
 </p>
 
 ## Features
-
 * All-in-one: WireGuard + Web UI.
 * Easy installation, simple to use.
 * List, create, edit, delete, enable & disable clients.
@@ -49,12 +48,14 @@ And log in again.
 
 To automatically install & run wg-easy, simply run:
 
-<pre>
-$ docker run -d \
+```
+  docker run -d \
   --name=wg-easy \
   -e LANG=de \
-  -e WG_HOST=<b>🚨YOUR_SERVER_IP</b> \
-  -e PASSWORD=<b>🚨YOUR_ADMIN_PASSWORD</b> \
+  -e WG_HOST=<🚨YOUR_SERVER_IP> \
+  -e PASSWORD=<🚨YOUR_ADMIN_PASSWORD> \
+  -e PORT=51821 \
+  -e WG_PORT=51820 \
   -v ~/.wg-easy:/etc/wireguard \
   -p 51820:51820/udp \
   -p 51821:51821/tcp \
@@ -64,7 +65,7 @@ $ docker run -d \
   --sysctl="net.ipv4.ip_forward=1" \
   --restart unless-stopped \
   ghcr.io/wg-easy/wg-easy
-</pre>
+```
 
 > 💡 Replace `YOUR_SERVER_IP` with your WAN IP, or a Dynamic DNS hostname.
 >
@@ -93,7 +94,7 @@ These options can be configured by setting environment variables using `-e KEY="
 | `PASSWORD` | - | `foobar123` | When set, requires a password when logging in to the Web UI. |
 | `WG_HOST` | - | `vpn.myserver.com` | The public hostname of your VPN server. |
 | `WG_DEVICE` | `eth0` | `ens6f0` | Ethernet device the wireguard traffic should be forwarded through. |
-| `WG_PORT` | `51820` | `12345` | The public UDP port of your VPN server. WireGuard will always listen on 51820 inside the Docker container. |
+| `WG_PORT` | `51820` | `12345` | The public UDP port of your VPN server. WireGuard will listen on that (othwise default) inside the Docker container. |
 | `WG_MTU` | `null` | `1420` | The MTU the clients will use. Server uses default WG MTU. |
 | `WG_PERSISTENT_KEEPALIVE` | `0` | `25` | Value in seconds to keep the "connection" open. If this value is 0, then connections won't be kept alive. |
 | `WG_DEFAULT_ADDRESS` | `10.8.0.x` | `10.6.0.x` | Clients IP address range. |
@@ -120,13 +121,11 @@ docker pull ghcr.io/wg-easy/wg-easy
 
 And then run the `docker run -d \ ...` command above again.
 
-To update using Docker Compose:
-
-```shell
-docker compose pull
-docker compose up --detach
-```
-
+With Docker Compose WireGuard Easy can be updated with a single command:
+`docker compose up --detach --pull always` (if an image tag is specified in the
+Compose file and it is not `latest`, make sure that it is changed to the desired
+one; by default it is omitted and
+[defaults to `latest`](https://docs.docker.com/engine/reference/run/#image-references)). \
 The WireGuared Easy container will be automatically recreated if a newer image
 was pulled.
 
