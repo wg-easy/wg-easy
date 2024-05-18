@@ -30,6 +30,17 @@ You have found the easiest way to install & manage WireGuard on any Linux host!
 * A host with a kernel that supports WireGuard (all modern kernels).
 * A host with Docker installed.
 
+## Versions
+
+We provide more then 1 docker image to get, this will help you decide which one is best for you.
+
+| tag | Branch | Example | Description |
+| - | - | - | - |
+| `latest` | production | `ghcr.io/wg-easy/wg-easy:latest` or `ghcr.io/wg-easy/wg-easy` | stable as possbile get bug fixes quickly when needed, deployed against `production`. |
+| `13` | production | `ghcr.io/wg-easy/wg-easy:13` | same as latest, stick to a version tag. |
+| `nightly` | master | `ghcr.io/wg-easy/wg-easy:nightly` | mostly unstable gets frequent package and code updates, deployed against `master`. |
+| `development` | pull requests | `ghcr.io/wg-easy/wg-easy:development` | used for development, testing code from PRs before landing into `master`. |
+
 ## Installation
 
 ### 1. Install Docker
