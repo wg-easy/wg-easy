@@ -21,9 +21,7 @@ export const useStore = defineStore('store', () => {
   const dateFnsLocale = ref();
 
   const uiTheme = ref(localStorage.theme || 'auto');
-  const prefersDarkScheme = computed(() =>
-    window.matchMedia('(prefers-color-scheme: dark)')
-  );
+  const prefersDarkScheme = computed(() => window.matchMedia('(prefers-color-scheme: dark)'));
 
   const uiChartType = ref(0);
   const uiShowCharts = ref(localStorage.getItem('uiShowCharts') === '1');
@@ -166,7 +164,8 @@ export const useStore = defineStore('store', () => {
   }
   function setTheme() {
     const { classList } = document.documentElement;
-    const shouldAddDarkClass = uiTheme.value === 'dark' || (uiTheme.value === 'auto' && prefersDarkScheme.value.matches);
+    const shouldAddDarkClass =
+      uiTheme.value === 'dark' || (uiTheme.value === 'auto' && prefersDarkScheme.value.matches);
     classList.toggle('dark', shouldAddDarkClass);
   }
 

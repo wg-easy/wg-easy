@@ -64,11 +64,12 @@ const isPasswordValid = (password) => {
 };
 
 module.exports = class Server {
+
   constructor() {
     const app = createApp();
     this.app = app;
 
-        // Middleware to add CORS headers
+    // Middleware to add CORS headers
     app.use('*', defineEventHandler((event) => {
       setHeader(event, 'Access-Control-Allow-Origin', '*'); // Allows all origins
       setHeader(event, 'Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS'); // Allowed methods
@@ -340,4 +341,5 @@ module.exports = class Server {
     createServer(toNodeListener(app)).listen(PORT, WEBUI_HOST);
     debug(`Listening on http://${WEBUI_HOST}:${PORT}`);
   }
+
 };
