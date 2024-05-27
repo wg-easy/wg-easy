@@ -1,10 +1,9 @@
 'use strict';
 
-const fs = require('fs').promises;
+const fs = require('node:fs/promises');
 const path = require('path');
-
 const debug = require('debug')('WireGuard');
-const uuid = require('uuid');
+const crypto = require('node:crypto');
 const QRCode = require('qrcode');
 
 const Util = require('./Util');
@@ -248,7 +247,7 @@ Endpoint = ${WG_HOST}:${WG_PORT}`;
     }
 
     // Create Client
-    const id = uuid.v4();
+    const id = crypto.randomUUID();
     const client = {
       id,
       name,
