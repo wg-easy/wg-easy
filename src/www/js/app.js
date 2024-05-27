@@ -390,9 +390,6 @@ new Vue({
           return releasesArray[0];
         });
 
-      console.log(`Current Release: ${currentRelease}`);
-      console.log(`Latest Release: ${latestRelease.version}`);
-
       if (currentRelease >= latestRelease.version) return;
 
       this.currentRelease = currentRelease;

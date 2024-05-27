@@ -13,12 +13,10 @@
   "author": "Emile Nijssen",
   "license": "GPL",
   "dependencies": {
-    "bcryptjs": "^2.4.3",
     "debug": "^4.3.4",
     "express-session": "^1.18.0",
     "h3": "^1.11.1",
-    "qrcode": "^1.5.3",
-    "uuid": "^9.0.1"
+    "qrcode": "^1.5.3"
   },
   "devDependencies": {
     "eslint-config-athom": "^3.1.3",
