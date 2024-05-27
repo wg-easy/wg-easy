@@ -3,7 +3,7 @@
 const crypto = require('node:crypto');
 const { createServer } = require('node:http');
 const { stat, readFile } = require('node:fs/promises');
-const { join } = require('node:path');
+const { resolve, sep } = require('node:path');
 
 const expressSession = require('express-session');
 const debug = require('debug')('Server');
@@ -202,15 +202,41 @@ module.exports = class Server {
         return { success: true };
       }));
 
+    const safePathJoin = (base, target) => {
+      // Manage web root (edge case)
+      if (target === '/') {
+        return `${base}${sep}`;
+      }
+
+      // Prepend './' to prevent absolute paths
+      const targetPath = `.${sep}${target}`;
+
+      // Resolve the absolute path
+      const resolvedPath = resolve(base, targetPath);
+
+      // Check if resolvedPath is a subpath of base
+      if (resolvedPath.startsWith(`${base}${sep}`)) {
+        return resolvedPath;
+      }
+
+      throw createError({
+        status: 400,
+        message: 'Bad Request',
+      });
+    };
+
     // Static assets
     const publicDir = '/app/www';
     app.use(
       defineEventHandler((event) => {
         return serveStatic(event, {
-          getContents: (id) => readFile(join(publicDir, id)),
+          getContents: (id) => {
+            return readFile(safePathJoin(publicDir, id));
+          },
           getMeta: async (id) => {
-            const stats = await stat(join(publicDir, id)).catch(() => {});
+            const filePath = safePathJoin(publicDir, id);
 
+            const stats = await stat(filePath).catch(() => {});
             if (!stats || !stats.isFile()) {
               return;
             }
