@@ -30,6 +30,17 @@ You have found the easiest way to install & manage WireGuard on any Linux host!
 * A host with a kernel that supports WireGuard (all modern kernels).
 * A host with Docker installed.
 
+## Versions
+
+We provide more then 1 docker image to get, this will help you decide which one is best for you.
+
+| tag | Branch | Example | Description |
+| - | - | - | - |
+| `latest` | production | `ghcr.io/wg-easy/wg-easy:latest` or `ghcr.io/wg-easy/wg-easy` | stable as possbile get bug fixes quickly when needed, deployed against `production`. |
+| `13` | production | `ghcr.io/wg-easy/wg-easy:13` | same as latest, stick to a version tag. |
+| `nightly` | master | `ghcr.io/wg-easy/wg-easy:nightly` | mostly unstable gets frequent package and code updates, deployed against `master`. |
+| `development` | pull requests | `ghcr.io/wg-easy/wg-easy:development` | used for development, testing code from PRs before landing into `master`. |
+
 ## Installation
 
 ### 1. Install Docker
@@ -106,6 +117,7 @@ These options can be configured by setting environment variables using `-e KEY="
 | `WG_POST_DOWN` | `...` | `iptables ...` | See [config.js](https://github.com/wg-easy/wg-easy/blob/master/src/config.js#L28) for the default value. |
 | `LANG` | `en` | `de` | Web UI language (Supports: en, ua, ru, tr, no, pl, fr, de, ca, es, ko, vi, nl, is, pt, chs, cht, it, th, hi). |
 | `UI_TRAFFIC_STATS` | `false` | `true` | Enable detailed RX / TX client stats in Web UI |
+| `UI_CHART_TYPE` | `0` | `1` | UI_CHART_TYPE=0 # Charts disabled, UI_CHART_TYPE=1 # Line chart, UI_CHART_TYPE=2 # Area chart, UI_CHART_TYPE=3 # Bar chart |
 
 > If you change `WG_PORT`, make sure to also change the exposed port.
 
