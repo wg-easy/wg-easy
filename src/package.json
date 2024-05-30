@@ -11,7 +11,7 @@
     "buildcss": "npx tailwindcss -i ./www/src/css/app.css -o ./www/css/app.css"
   },
   "author": "Emile Nijssen",
-  "license": "GPL",
+  "license": "CC BY-NC-SA 4.0",
   "dependencies": {
     "debug": "^4.3.4",
     "express-session": "^1.18.0",
