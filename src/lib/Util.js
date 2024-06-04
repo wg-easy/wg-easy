@@ -77,4 +77,8 @@ module.exports = class Util {
     });
   }
 
+  static replaceAll(str, match, substitute) {
+    return str.split(match).join(substitute);
+  }
+
 };
