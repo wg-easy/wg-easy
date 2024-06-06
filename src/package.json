@@ -20,8 +20,8 @@
   },
   "devDependencies": {
     "eslint-config-athom": "^3.1.3",
-    "nodemon": "^3.1.2",
-    "tailwindcss": "^3.4.3"
+    "nodemon": "^3.1.3",
+    "tailwindcss": "^3.4.4"
   },
   "nodemonConfig": {
     "ignore": [
