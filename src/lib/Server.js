@@ -103,7 +103,7 @@ module.exports = class Server {
 
         debug(`New Session: ${event.node.req.session.id}`);
 
-        return { succcess: true };
+        return { success: true };
       }));
 
     // WireGuard
