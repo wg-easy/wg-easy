@@ -15,6 +15,7 @@ services:
       # - PASSWORD=foobar123
       # - PORT=51821
       # - WG_PORT=51820
+      # - WG_CONFIG_PORT=92820
       # - WG_DEFAULT_ADDRESS=10.8.0.x
       # - WG_DEFAULT_DNS=1.1.1.1
       # - WG_MTU=1420
