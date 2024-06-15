@@ -18,7 +18,9 @@ services:
       # - WG_PORT=51820
       # - WG_CONFIG_PORT=92820
       # - WG_DEFAULT_ADDRESS=10.8.0.x
+      # - WG_DEFAULT_ADDRESS6=fd00::cafe:x
       # - WG_DEFAULT_DNS=1.1.1.1
+      # - WG_DEFAULT_ADDRESS6=fdcc:ad94:bacf:61a4::cafe:x
       # - WG_MTU=1420
       # - WG_ALLOWED_IPS=192.168.15.0/24, 10.0.1.0/24
       # - WG_PERSISTENT_KEEPALIVE=25
@@ -31,6 +33,10 @@ services:
 
     image: ghcr.io/wg-easy/wg-easy
     container_name: wg-easy
+    networks:
+      wg:
+        ipv4_address: 10.42.42.42
+        ipv6_address: fdcc:ad94:bacf:61a3::2a
     volumes:
       - etc_wireguard:/etc/wireguard
     ports:
@@ -44,3 +50,16 @@ services:
     sysctls:
       - net.ipv4.ip_forward=1
       - net.ipv4.conf.all.src_valid_mark=1
+      - net.ipv6.conf.all.disable_ipv6=0
+      - net.ipv6.conf.all.forwarding=1
+      - net.ipv6.conf.default.forwarding=1
+
+networks:
+  wg:
+    driver: bridge
+    enable_ipv6: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.42.42.0/24
+        - subnet: fdcc:ad94:bacf:61a3::/64

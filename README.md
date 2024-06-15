@@ -111,7 +111,9 @@ These options can be configured by setting environment variables using `-e KEY="
 | `WG_MTU` | `null` | `1420` | The MTU the clients will use. Server uses default WG MTU. |
 | `WG_PERSISTENT_KEEPALIVE` | `0` | `25` | Value in seconds to keep the "connection" open. If this value is 0, then connections won't be kept alive. |
 | `WG_DEFAULT_ADDRESS` | `10.8.0.x` | `10.6.0.x` | Clients IP address range. |
+| `WG_DEFAULT_ADDRESS6` | `fdcc:ad94:bacf:61a4::cafe:x` | `fdcc:ad94:bacf:61a4::42:x` | Clients IPv6 address range. Has to be a valid IPv6 ULA address. |
 | `WG_DEFAULT_DNS` | `1.1.1.1` | `8.8.8.8, 8.8.4.4` | DNS server clients will use. If set to blank value, clients will not use any DNS. |
+| `WG_DEFAULT_DNS6` | `2606:4700:4700::1111` | `2606:4700:4700::1001, 2606:4700:4700::1111` | DNSv6 server clients will use. |
 | `WG_ALLOWED_IPS` | `0.0.0.0/0, ::/0` | `192.168.15.0/24, 10.0.1.0/24` | Allowed IPs clients will use. |
 | `WG_PRE_UP` | `...` | - | See [config.js](https://github.com/wg-easy/wg-easy/blob/master/src/config.js#L19) for the default value. |
 | `WG_POST_UP` | `...` | `iptables ...` | See [config.js](https://github.com/wg-easy/wg-easy/blob/master/src/config.js#L20) for the default value. |
