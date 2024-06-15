@@ -240,6 +240,14 @@ module.exports = class Server {
         const { address } = await readBody(event);
         await WireGuard.updateClientAddress({ clientId, address });
         return { success: true };
+      }))
+      .put('/api/wireguard/client/:clientId/address6', Util.promisify(async (event) => {
+        const clientId = getRouterParam(event, 'clientId');
+        if (clientId === '__proto__' || clientId === 'constructor' || clientId === 'prototype') {
+          throw createError({ status: 403 });
+        }
+        const { address6 } = await readBody(event);
+        return WireGuard.updateClientAddress6({ clientId, address6 });
       }));
 
     const safePathJoin = (base, target) => {
