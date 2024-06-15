@@ -3,9 +3,6 @@
 ARG BASE_IMAGE=node:20-alpine
 FROM --platform=$TARGETPLATFORM ${BASE_IMAGE} AS build_node_modules
 
-# Update npm to latest
-RUN npm install -g npm@latest
-
 # Copy Web UI
 COPY src /app
 WORKDIR /app
