@@ -355,7 +355,7 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
 
     client.address6 = address6;
     client.updatedAt = new Date();
-    
+
     await this.saveConfig();
   }
 
