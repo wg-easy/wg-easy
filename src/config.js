@@ -1,5 +1,6 @@
 'use strict';
 
+const childProcess = require('child_process');
 const { release } = require('./package.json');
 
 module.exports.RELEASE = release;
