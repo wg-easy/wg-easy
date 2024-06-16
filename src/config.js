@@ -29,6 +29,7 @@ module.exports.WG_ALLOWED_IPS = process.env.WG_ALLOWED_IPS || '0.0.0.0/0, ::/0';
 const modules = childProcess.execSync('lsmod', {
   shell: 'bash',
 });
+module.exports.WG_PRE_UP = process.env.WG_PRE_UP || '';
 module.exports.WG_POST_UP = process.env.WG_POST_UP;
 if (!process.env.WG_POST_UP) {
   module.exports.WG_POST_UP = `  
