@@ -1,5 +1,6 @@
 'use strict';
 
+const bcrypt = require('bcryptjs');
 const crypto = require('node:crypto');
 const { createServer } = require('node:http');
 const { stat, readFile } = require('node:fs/promises');
@@ -115,6 +116,15 @@ module.exports = class Server {
 
         if (req.session && req.session.authenticated) {
           return next();
+        }
+
+        if (req.url.startsWith('/api/') && req.headers['authorization']) {
+          if (bcrypt.compareSync(req.headers['authorization'], bcrypt.hashSync(PASSWORD, 10))) {
+            return next();
+          }
+          return res.status(401).json({
+            error: 'Incorrect Password',
+          });
         }
 
         return res.status(401).json({

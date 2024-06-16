@@ -13,6 +13,7 @@
   "author": "Emile Nijssen",
   "license": "CC BY-NC-SA 4.0",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "debug": "^4.3.5",
     "express-session": "^1.18.0",
     "h3": "^1.11.1",
