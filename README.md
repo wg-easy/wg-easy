@@ -80,7 +80,7 @@ To automatically install & run wg-easy, simply run:
 
 > 💡 Replace `YOUR_SERVER_IP` with your WAN IP, or a Dynamic DNS hostname.
 >
-> 💡 Replace `YOUR_ADMIN_PASSWORD_HASH` with a bycrpt hashed password to log in on the Web UI.
+> 💡 Replace `YOUR_ADMIN_PASSWORD_HASH` with a bcrypt password hash to log in on the Web UI.
 
 The Web UI will now be available on `http://0.0.0.0:51821`.
 
@@ -103,7 +103,7 @@ These options can be configured by setting environment variables using `-e KEY="
 | `PORT` | `51821` | `6789` | TCP port for Web UI. |
 | `WEBUI_HOST` | `0.0.0.0` | `localhost` | IP address web UI binds to. |
 | `PASSWORD_HASH` | - | `$2y$05$Ci...` | When set, requires a password when logging in to the Web UI. |
-| `PASSWORD` (deprecated) | - | `foobar123` | DO NOT USE IT! When set, requires a password when logging in to the Web UI. Prefer `PASSWORD_HASH` to not put the clear text password in the environment. If `PASSWORD_HASH` is set `PASSWORD` is ignored. |
+| `PASSWORD` (deprecated) | - | `foobar123` | When set, requires a password when logging in to the Web UI. *(Not used if `PASSWORD_HASH` is set)* |
 | `WG_HOST` | - | `vpn.myserver.com` | The public hostname of your VPN server. |
 | `WG_DEVICE` | `eth0` | `ens6f0` | Ethernet device the wireguard traffic should be forwarded through. |
 | `WG_PORT` | `51820` | `12345` | The public UDP port of your VPN server. WireGuard will listen on that (othwise default) inside the Docker container. |
