@@ -1,4 +1,3 @@
-version: "3.8"
 volumes:
   etc_wireguard:
 
@@ -6,7 +5,7 @@ services:
   wg-easy:
     environment:
       # Change Language:
-      # (Supports: en, ua, ru, tr, no, pl, fr, de, ca, es, pt, chs, cht)
+      # (Supports: en, ua, ru, tr, no, pl, fr, de, ca, es, ko, vi, nl, is, pt, chs, cht, it, th, hi)
       - LANG=de
       # ⚠️ Required:
       # Change this to your host's public address
@@ -14,7 +13,9 @@ services:
 
       # Optional:
       # - PASSWORD=foobar123
+      # - PORT=51821
       # - WG_PORT=51820
+      # - WG_CONFIG_PORT=92820
       # - WG_DEFAULT_ADDRESS=10.8.0.x
       # - WG_DEFAULT_DNS=1.1.1.1
       # - WG_MTU=1420
@@ -24,6 +25,8 @@ services:
       # - WG_POST_UP=echo "Post Up" > /etc/wireguard/post-up.txt
       # - WG_PRE_DOWN=echo "Pre Down" > /etc/wireguard/pre-down.txt
       # - WG_POST_DOWN=echo "Post Down" > /etc/wireguard/post-down.txt
+      # - UI_TRAFFIC_STATS=true
+      # - UI_CHART_TYPE=0 # (0 Charts disabled, 1 # Line chart, 2 # Area chart, 3 # Bar chart)
 
     image: ghcr.io/wg-easy/wg-easy
     container_name: wg-easy
@@ -36,6 +39,7 @@ services:
     cap_add:
       - NET_ADMIN
       - SYS_MODULE
+      # - NET_RAW # ⚠️ Uncomment if using Podman 
     sysctls:
       - net.ipv4.ip_forward=1
       - net.ipv4.conf.all.src_valid_mark=1

@@ -4,7 +4,7 @@ on:
   push:
     branches: [ "master" ]
   schedule:
-    - cron: "0 0 * * *"
+    - cron: "0 0 * * 1"
 
 jobs:
   npmupbot:
@@ -19,12 +19,9 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
           check-latest: true
           cache: 'npm'
-          cache-dependency-path: |
-            package-lock.json
-            src/package-lock.json
 
       - name: Bot 🤖 "Updating NPM Packages..."
         run: |
