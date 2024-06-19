@@ -9,5 +9,7 @@
   "8": "Updated to Node.js v18.",
   "9": "Fixed issue running on devices with older kernels.",
   "10": "Added sessionless HTTP API auth & automatic dark mode.",
-  "11": "Multilanguage Support & various bugfixes"
+  "11": "Multilanguage Support & various bugfixes.",
+  "12": "UI_TRAFFIC_STATS, Import json configurations with no PreShared-Key, allow clients with no privateKey & more.",
+  "13": "New framework (h3), UI_CHART_TYPE, some bugfixes and more."
 }

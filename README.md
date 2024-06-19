@@ -13,7 +13,6 @@ You have found the easiest way to install & manage WireGuard on any Linux host!
 </p>
 
 ## Features
-
 * All-in-one: WireGuard + Web UI.
 * Easy installation, simple to use.
 * List, create, edit, delete, enable & disable clients.
@@ -23,11 +22,24 @@ You have found the easiest way to install & manage WireGuard on any Linux host!
 * Tx/Rx charts for each connected client.
 * Gravatar support.
 * Automatic Light / Dark Mode
+* Multilanguage Support
+* UI_TRAFFIC_STATS (default off)
 
 ## Requirements
 
 * A host with a kernel that supports WireGuard (all modern kernels).
 * A host with Docker installed.
+
+## Versions
+
+We provide more then 1 docker image to get, this will help you decide which one is best for you.
+
+| tag | Branch | Example | Description |
+| - | - | - | - |
+| `latest` | production | `ghcr.io/wg-easy/wg-easy:latest` or `ghcr.io/wg-easy/wg-easy` | stable as possbile get bug fixes quickly when needed, deployed against `production`. |
+| `13` | production | `ghcr.io/wg-easy/wg-easy:13` | same as latest, stick to a version tag. |
+| `nightly` | master | `ghcr.io/wg-easy/wg-easy:nightly` | mostly unstable gets frequent package and code updates, deployed against `master`. |
+| `development` | pull requests | `ghcr.io/wg-easy/wg-easy:development` | used for development, testing code from PRs before landing into `master`. |
 
 ## Installation
 
@@ -36,9 +48,9 @@ You have found the easiest way to install & manage WireGuard on any Linux host!
 If you haven't installed Docker yet, install it by running:
 
 ```bash
-$ curl -sSL https://get.docker.com | sh
-$ sudo usermod -aG docker $(whoami)
-$ exit
+curl -sSL https://get.docker.com | sh
+sudo usermod -aG docker $(whoami)
+exit
 ```
 
 And log in again.
@@ -47,12 +59,14 @@ And log in again.
 
 To automatically install & run wg-easy, simply run:
 
-<pre>
-$ docker run -d \
+```
+  docker run -d \
   --name=wg-easy \
   -e LANG=de \
-  -e WG_HOST=<b>🚨YOUR_SERVER_IP</b> \
-  -e PASSWORD=<b>🚨YOUR_ADMIN_PASSWORD</b> \
+  -e WG_HOST=<🚨YOUR_SERVER_IP> \
+  -e PASSWORD_HASH=<🚨YOUR_ADMIN_PASSWORD_HASH> \
+  -e PORT=51821 \
+  -e WG_PORT=51820 \
   -v ~/.wg-easy:/etc/wireguard \
   -p 51820:51820/udp \
   -p 51821:51821/tcp \
@@ -62,15 +76,19 @@ $ docker run -d \
   --sysctl="net.ipv4.ip_forward=1" \
   --restart unless-stopped \
   ghcr.io/wg-easy/wg-easy
-</pre>
+```
 
 > 💡 Replace `YOUR_SERVER_IP` with your WAN IP, or a Dynamic DNS hostname.
 >
-> 💡 Replace `YOUR_ADMIN_PASSWORD` with a password to log in on the Web UI.
+> 💡 Replace `YOUR_ADMIN_PASSWORD_HASH` with a bcrypt password hash to log in on the Web UI.
 
 The Web UI will now be available on `http://0.0.0.0:51821`.
 
 > 💡 Your configuration files will be saved in `~/.wg-easy`
+
+WireGuard Easy can be launched with Docker Compose as well - just download
+[`docker-compose.yml`](docker-compose.yml), make necessary adjustments and
+execute `docker compose up --detach`.
 
 ### 3. Sponsor
 
@@ -84,10 +102,12 @@ These options can be configured by setting environment variables using `-e KEY="
 | - | - | - | - |
 | `PORT` | `51821` | `6789` | TCP port for Web UI. |
 | `WEBUI_HOST` | `0.0.0.0` | `localhost` | IP address web UI binds to. |
-| `PASSWORD` | - | `foobar123` | When set, requires a password when logging in to the Web UI. |
+| `PASSWORD_HASH` | - | `$2y$05$Ci...` | When set, requires a password when logging in to the Web UI. |
+| `PASSWORD` (deprecated) | - | `foobar123` | When set, requires a password when logging in to the Web UI. *(Not used if `PASSWORD_HASH` is set)* |
 | `WG_HOST` | - | `vpn.myserver.com` | The public hostname of your VPN server. |
 | `WG_DEVICE` | `eth0` | `ens6f0` | Ethernet device the wireguard traffic should be forwarded through. |
-| `WG_PORT` | `51820` | `12345` | The public UDP port of your VPN server. WireGuard will always listen on 51820 inside the Docker container. |
+| `WG_PORT` | `51820` | `12345` | The public UDP port of your VPN server. WireGuard will listen on that (othwise default) inside the Docker container. |
+| `WG_CONFIG_PORT`| `51820` | `12345` | The UDP port used on [Home Assistent Plugin](https://github.com/adriy-be/homeassistant-addons-jdeath/tree/main/wgeasy)
 | `WG_MTU` | `null` | `1420` | The MTU the clients will use. Server uses default WG MTU. |
 | `WG_PERSISTENT_KEEPALIVE` | `0` | `25` | Value in seconds to keep the "connection" open. If this value is 0, then connections won't be kept alive. |
 | `WG_DEFAULT_ADDRESS` | `10.8.0.x` | `10.6.0.x` | Clients IP address range. |
@@ -97,7 +117,9 @@ These options can be configured by setting environment variables using `-e KEY="
 | `WG_POST_UP` | `...` | `iptables ...` | See [config.js](https://github.com/wg-easy/wg-easy/blob/master/src/config.js#L20) for the default value. |
 | `WG_PRE_DOWN` | `...` | - | See [config.js](https://github.com/wg-easy/wg-easy/blob/master/src/config.js#L27) for the default value. |
 | `WG_POST_DOWN` | `...` | `iptables ...` | See [config.js](https://github.com/wg-easy/wg-easy/blob/master/src/config.js#L28) for the default value. |
-| `LANG` | `en` | `de` | Web UI language (Supports: en, ru, tr, no, pl, fr, de, ca, es, vi, nl, is, chs, cht,). |
+| `LANG` | `en` | `de` | Web UI language (Supports: en, ua, ru, tr, no, pl, fr, de, ca, es, ko, vi, nl, is, pt, chs, cht, it, th, hi). |
+| `UI_TRAFFIC_STATS` | `false` | `true` | Enable detailed RX / TX client stats in Web UI |
+| `UI_CHART_TYPE` | `0` | `1` | UI_CHART_TYPE=0 # Charts disabled, UI_CHART_TYPE=1 # Line chart, UI_CHART_TYPE=2 # Area chart, UI_CHART_TYPE=3 # Bar chart |
 
 > If you change `WG_PORT`, make sure to also change the exposed port.
 
@@ -112,6 +134,14 @@ docker pull ghcr.io/wg-easy/wg-easy
 ```
 
 And then run the `docker run -d \ ...` command above again.
+
+With Docker Compose WireGuard Easy can be updated with a single command:
+`docker compose up --detach --pull always` (if an image tag is specified in the
+Compose file and it is not `latest`, make sure that it is changed to the desired
+one; by default it is omitted and
+[defaults to `latest`](https://docs.docker.com/engine/reference/run/#image-references)). \
+The WireGuared Easy container will be automatically recreated if a newer image
+was pulled.
 
 ## Common Use Cases
 
