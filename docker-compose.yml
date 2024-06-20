@@ -13,7 +13,7 @@ services:
 
       # Optional:
       # - PASSWORD=foobar123 (deprecated use `PASSWORD_HASH` instead)
-      # - PASSWORD_HASH=$2y$05$Ci...
+      # - PASSWORD_HASH='$2y$10$hBCoykrB95WSzuV4fafBzOHWKu9sbyVa34GJr8VV5R/pIelfEMYyG' (hash of 'foobar123')
       # - PORT=51821
       # - WG_PORT=51820
       # - WG_CONFIG_PORT=92820
