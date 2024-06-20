@@ -12,7 +12,8 @@ services:
       - WG_HOST=raspberrypi.local
 
       # Optional:
-      # - PASSWORD=foobar123
+      # - PASSWORD=foobar123 (deprecated use `PASSWORD_HASH` instead)
+      # - PASSWORD_HASH=$2y$05$Ci...
       # - PORT=51821
       # - WG_PORT=51820
       # - WG_CONFIG_PORT=92820
