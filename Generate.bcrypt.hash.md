@@ -1,3 +1,4 @@
+<!-- created by Mathys Lopinto (@mathys-lopinto) -->
 # How to generate bcrypt
 
 ## Prerequisites
