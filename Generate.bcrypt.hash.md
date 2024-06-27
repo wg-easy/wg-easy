@@ -27,6 +27,30 @@ pip3 install bcrypt
 pip3 install bcrypt --break-system-packages
 ```
 
+### Fedora based distributions
+```bash
+sudo dnf update
+sudo dnf install python3 python3-pip
+# If you use have install python using apt
+sudo dnf install python3-bcrypt
+# If don't install python using apt
+pip3 install bcrypt
+# If you got externally-managed-environment error
+pip3 install bcrypt --break-system-packages
+```
+
+### Arch Linux based distributions
+```bash
+sudo pacman -Syy
+sudo pacman -S python python-pip
+# If you use have install python using apt
+sudo pacman -S python-bcrypt
+# If don't install python using apt
+pip3 install bcrypt
+# If you got externally-managed-environment error
+pip3 install bcrypt --break-system-packages
+```
+
 ## Generating bcrypt
 ### Do not name the file `bcrypt.py` as it will cause an error.
 Create a python file with the following content:
