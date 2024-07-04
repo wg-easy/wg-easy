@@ -1,5 +1,5 @@
 <!-- created by Mathys Lopinto (@mathys-lopinto) -->
-# How to generate bcrypt
+# How to generate bcrypt hash
 
 ## Prerequisites
 - Python 3
@@ -51,20 +51,51 @@ pip3 install bcrypt
 pip3 install bcrypt --break-system-packages
 ```
 
-## Generating bcrypt
+## Generating bcrypt hash from the command line
+You can use the following one-liner command to generate a bcrypt hash directly in the cmd/ terminal: 
+```bash
+python3 -c "import bcrypt; password = b'your_password_here'; assert len(password) < 72, 'Password must be less than 72 bytes due to bcrypt limitation'; hashed = bcrypt.hashpw(password, bcrypt.gensalt()); print(f'The hashed password is: {hashed.decode()}'); docker_interpolation = hashed.decode().replace('$', '$$'); print(f'The hashed password for a Docker env is: {docker_interpolation}')" # or python if you run this on Windows. CHANGE your_password_here BY YOUR PASSWORD
+```
+Please change ``your_password_here`` in the line by your own password.
+
+## Generating bcrypt hash from an script file
 ### Do not name the file `bcrypt.py` as it will cause an error.
 Create a python file with the following content:
 ```python
 import bcrypt
-password = b"your_password_here" # DO NOT REMOVE THE b
+
+# Initial password
+password = b"your_password_here"  # DO NOT REMOVE THE b
+
+# Assert that the password is under 72 bytes
+assert len(password) < 72, "Password must be less than 72 bytes due to bcrypt limitation"
+
+# Generate a salt and hash the password
 hashed = bcrypt.hashpw(password, bcrypt.gensalt())
+
+# Print the hashed password
 print(f'The hashed password is: {hashed.decode()}')
 
-docker_interpolation= hashed.decode().replace("$", "$$")
-print(f'The hashed password for an docker env is: {docker_interpolation}')
+# Prepare the hashed password for Docker environment variables
+docker_interpolation = hashed.decode().replace("$", "$$")
+print(f'The hashed password for a Docker env is: {docker_interpolation}')
 ```
 
 Replace `your_password_here` with the password you want to hash.
 
 Run the python file and you will get the hashed password.
+
+## Get the right hash
 Copy the 2nd line of the output (after the : ) and use it as your hashed password.
+
+__Exemple__
+If the output is:
+```txt
+The hashed password is: $2b$12$NRiL4Kw4dKid.ix2WvZltOmaQBZjoX30shjHJXRVdEGshAxYWXXMe
+The hashed password for an docker env is: $$2b$$12$$NRiL4Kw4dKid.ix2WvZltOmaQBZjoX30shjHJXRVdEGshAxYWXXMe
+``` 
+
+The docker line ``PASSWORD_HASH`` will be:
+```txt
+PASSWORD_HASH=$$2b$$12$$NRiL4Kw4dKid.ix2WvZltOmaQBZjoX30shjHJXRVdEGshAxYWXXMe
+```
