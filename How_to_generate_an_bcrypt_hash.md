@@ -31,9 +31,9 @@ pip3 install bcrypt --break-system-packages
 ```bash
 sudo dnf update
 sudo dnf install python3 python3-pip
-# If you use have install python using apt
+# If you use have install python using dnf
 sudo dnf install python3-bcrypt
-# If don't install python using apt
+# If don't install python using dnf
 pip3 install bcrypt
 # If you got externally-managed-environment error
 pip3 install bcrypt --break-system-packages
@@ -43,9 +43,9 @@ pip3 install bcrypt --break-system-packages
 ```bash
 sudo pacman -Syy
 sudo pacman -S python python-pip
-# If you use have install python using apt
+# If you use have install python using pacman
 sudo pacman -S python-bcrypt
-# If don't install python using apt
+# If don't install python using pacman
 pip3 install bcrypt
 # If you got externally-managed-environment error
 pip3 install bcrypt --break-system-packages
