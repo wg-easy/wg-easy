@@ -17,7 +17,8 @@ services:
       # - PORT=51821
       # - WG_PORT=51820
       # - WG_CONFIG_PORT=92820
-      # - WG_DEFAULT_ADDRESS=10.8.0.x
+      # - WG_DEFAULT_ADDRESS=10.8.0.0
+      # - WG_DEFAULT_ADDRESS_RANGE=24
       # - WG_DEFAULT_DNS=1.1.1.1
       # - WG_MTU=1420
       # - WG_ALLOWED_IPS=192.168.15.0/24, 10.0.1.0/24
@@ -40,7 +41,7 @@ services:
     cap_add:
       - NET_ADMIN
       - SYS_MODULE
-      # - NET_RAW # ⚠️ Uncomment if using Podman 
+      # - NET_RAW # ⚠️ Uncomment if using Podman
     sysctls:
       - net.ipv4.ip_forward=1
       - net.ipv4.conf.all.src_valid_mark=1
