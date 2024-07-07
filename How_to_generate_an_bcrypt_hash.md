@@ -51,6 +51,13 @@ pip3 install bcrypt
 pip3 install bcrypt --break-system-packages
 ```
 
+### macOS
+```bash
+pip3 install bcrypt
+# If you got externally-managed-environment error
+pip3 install bcrypt --break-system-packages
+```
+
 ## Generating bcrypt hash from the command line
 You can use the following one-liner command to generate a bcrypt hash directly in the cmd/ terminal: 
 ```bash
