@@ -53,6 +53,8 @@ pip3 install bcrypt --break-system-packages
 
 ### macOS
 ```bash
+brew install bcrypt
+# If don't install bcrypt using homebrew
 pip3 install bcrypt
 # If you got externally-managed-environment error
 pip3 install bcrypt --break-system-packages
