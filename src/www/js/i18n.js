@@ -11,6 +11,8 @@ const messages = { // eslint-disable-line no-unused-vars
     clients: 'Clients',
     new: 'New',
     deleteClient: 'Delete Client',
+    upload: 'Upload',
+    download: 'Download',
     deleteDialog1: 'Are you sure you want to delete',
     deleteDialog2: 'This action cannot be undone.',
     cancel: 'Cancel',

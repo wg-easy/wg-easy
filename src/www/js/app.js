@@ -299,6 +299,22 @@ new Vue({
         .catch((err) => alert(err.message || err.toString()))
         .finally(() => this.refresh().catch(console.error));
     },
+    importConfig(e) {
+      e.preventDefault();
+      const file = e.currentTarget.files.item(0);
+      file.text()
+        .then(content => {
+          this.api.uploadConfiguration(content)
+            .then((_result) => {
+              alert("The configuration was updated.");
+              document.location.reload();
+            })
+            .catch((err) => alert(err.message || err.toString()))
+            .finally(() => this.refresh().catch(console.error));
+        })
+        .catch((err) => alert(err.message || err.toString()))
+        .finally(() => this.refresh().catch(console.error));
+    },
     toggleTheme() {
       const themes = ['light', 'dark', 'auto'];
       const currentIndex = themes.indexOf(this.uiTheme);

@@ -265,6 +265,23 @@ module.exports = class Server {
       });
     };
 
+    // import_export
+    const router3 = createRouter();
+    app.use(router3);
+
+    router3
+      .get('/api/wireguard/dl', defineEventHandler((event) => {
+        const config = WireGuard.downloadConfiguration();
+        setHeader(event, 'Content-Disposition', 'attachment; filename="wg0.json"');
+        setHeader(event, 'Content-Type', 'text/json');
+        return config;
+      }))
+      .put('/api/wireguard/upload', defineEventHandler(async (event) => {
+        const { file } = await readBody(event);
+        await WireGuard.uploadConfiguration(file);
+        return { success: true }
+      }));
+
     // Static assets
     const publicDir = '/app/www';
     app.use(
@@ -276,7 +293,7 @@ module.exports = class Server {
           getMeta: async (id) => {
             const filePath = safePathJoin(publicDir, id);
 
-            const stats = await stat(filePath).catch(() => {});
+            const stats = await stat(filePath).catch(() => { });
             if (!stats || !stats.isFile()) {
               return;
             }
