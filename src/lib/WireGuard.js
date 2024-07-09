@@ -111,7 +111,7 @@ PostDown = ${WG_POST_DOWN}
 [Peer]
 PublicKey = ${client.publicKey}
 ${client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
-}AllowedIPs = ${client.address}/32`;
+        }AllowedIPs = ${client.address}/32`;
     }
 
     debug('Config saving...');
@@ -206,7 +206,7 @@ ${WG_MTU ? `MTU = ${WG_MTU}\n` : ''}\
 [Peer]
 PublicKey = ${config.server.publicKey}
 ${client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
-}AllowedIPs = ${WG_ALLOWED_IPS}
+      }AllowedIPs = ${WG_ALLOWED_IPS}
 PersistentKeepalive = ${WG_PERSISTENT_KEEPALIVE}
 Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
   }
@@ -317,6 +317,17 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
     client.updatedAt = new Date();
 
     await this.saveConfig();
+  }
+
+  async uploadConfiguration(config) {
+    const _config = JSON.parse(config);
+    await this.__saveConfig(_config);
+    await this.__syncConfig();
+  }
+
+  async downloadConfiguration() {
+    const config = await this.getConfig();
+    return JSON.stringify(config, null, 2);
   }
 
   // Shutdown wireguard
