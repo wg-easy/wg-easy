@@ -141,15 +141,15 @@ class API {
   async uploadConfiguration(file) {
     return this.call({
       method: 'put',
-      path: `/wireguard/upload`,
-      body: { file }
+      path: '/wireguard/upload',
+      body: { file },
     });
   }
 
   async downloadConfiguration() {
     return this.call({
       method: 'get',
-      path: `/wireguard/dl`,
+      path: '/wireguard/dl',
     });
   }
 
