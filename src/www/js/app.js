@@ -303,12 +303,9 @@ new Vue({
       e.preventDefault();
       const file = e.currentTarget.files.item(0);
       file.text()
-        .then(content => {
+        .then((content) => {
           this.api.uploadConfiguration(content)
-            .then((_result) => {
-              alert("The configuration was updated.");
-              document.location.reload();
-            })
+            .then((_result) => alert('The configuration was updated.'))
             .catch((err) => alert(err.message || err.toString()))
             .finally(() => this.refresh().catch(console.error));
         })
