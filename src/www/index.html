@@ -108,7 +108,7 @@
                 </svg>
                 <span class="text-sm">{{$t("restore")}}</span>
                 <input id="inputRC" type="file" name="configurationfile" accept="text/*,.json" @change="restoreConfig"
-                  class="hidden -z-[1]" />
+                  class="hidden" />
               </label>
               <!-- Backup configuration -->
               <a href="./api/wireguard/backup" :title="$t('titleBackupConfig')"
