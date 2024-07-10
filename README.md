@@ -62,7 +62,7 @@ To automatically install & run wg-easy, simply run:
 ```
   docker run -d \
   --name=wg-easy \
-  -e LANG=de \
+  -e LANG=en \
   -e WG_HOST=<🚨YOUR_SERVER_IP> \
   -e PASSWORD_HASH=<🚨YOUR_ADMIN_PASSWORD_HASH> \
   -e PORT=51821 \
@@ -121,7 +121,7 @@ These options can be configured by setting environment variables using `-e KEY="
 | `UI_TRAFFIC_STATS` | `false` | `true` | Enable detailed RX / TX client stats in Web UI                                                                                                       |
 | `UI_CHART_TYPE` | `0` | `1` | UI_CHART_TYPE=0 # Charts disabled, UI_CHART_TYPE=1 # Line chart, UI_CHART_TYPE=2 # Area chart, UI_CHART_TYPE=3 # Bar chart                           |
 
-> If you change `WG_PORT`, make sure to also change the exposed port.
+> If you change `WG_PORT`, make sure also to change the exposed port.
 
 ## Updating
 
