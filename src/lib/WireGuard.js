@@ -319,15 +319,18 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
     await this.saveConfig();
   }
 
-  async uploadConfiguration(config) {
-    const _config = JSON.parse(config);
-    await this.__saveConfig(_config);
-    // force restart
+  async ___forceRestart() {
     this.__configPromise = null;
     await this.saveConfig();
   }
 
-  async downloadConfiguration() {
+  async restoreConfiguration(config) {
+    const _config = JSON.parse(config);
+    await this.__saveConfig(_config);
+    await this.___forceRestart();
+  }
+
+  async backupConfiguration() {
     const config = await this.getConfig();
     return JSON.stringify(config, null, 2);
   }
