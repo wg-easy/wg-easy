@@ -270,15 +270,15 @@ module.exports = class Server {
     app.use(router3);
 
     router3
-      .get('/api/wireguard/dl', defineEventHandler(async (event) => {
-        const config = await WireGuard.downloadConfiguration();
+      .get('/api/wireguard/backup', defineEventHandler(async (event) => {
+        const config = await WireGuard.backupConfiguration();
         setHeader(event, 'Content-Disposition', 'attachment; filename="wg0.json"');
         setHeader(event, 'Content-Type', 'text/json');
         return config;
       }))
-      .put('/api/wireguard/upload', defineEventHandler(async (event) => {
+      .put('/api/wireguard/restore', defineEventHandler(async (event) => {
         const { file } = await readBody(event);
-        await WireGuard.uploadConfiguration(file);
+        await WireGuard.restoreConfiguration(file);
         return { success: true };
       }));
 

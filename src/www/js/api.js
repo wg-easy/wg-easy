@@ -138,18 +138,11 @@ class API {
     });
   }
 
-  async uploadConfiguration(file) {
+  async restoreConfiguration(file) {
     return this.call({
       method: 'put',
-      path: '/wireguard/upload',
+      path: '/wireguard/restore',
       body: { file },
-    });
-  }
-
-  async downloadConfiguration() {
-    return this.call({
-      method: 'get',
-      path: '/wireguard/dl',
     });
   }
 
