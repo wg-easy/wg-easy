@@ -668,10 +668,6 @@ video {
   top: 1rem;
 }
 
-.-z-\[1\] {
-  z-index: -1;
-}
-
 .z-0 {
   z-index: 0;
 }
@@ -1460,6 +1456,10 @@ video {
 
 .last\:border-b-0:last-child {
   border-bottom-width: 0px;
+}
+
+.hover\:cursor-pointer:hover {
+  cursor: pointer;
 }
 
 .hover\:border-red-800:hover {
