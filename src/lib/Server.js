@@ -265,23 +265,6 @@ module.exports = class Server {
       });
     };
 
-    // import_export
-    const router3 = createRouter();
-    app.use(router3);
-
-    router3
-      .get('/api/wireguard/backup', defineEventHandler(async (event) => {
-        const config = await WireGuard.backupConfiguration();
-        setHeader(event, 'Content-Disposition', 'attachment; filename="wg0.json"');
-        setHeader(event, 'Content-Type', 'text/json');
-        return config;
-      }))
-      .put('/api/wireguard/restore', defineEventHandler(async (event) => {
-        const { file } = await readBody(event);
-        await WireGuard.restoreConfiguration(file);
-        return { success: true };
-      }));
-
     // Static assets
     const publicDir = '/app/www';
     app.use(
