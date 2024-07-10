@@ -319,6 +319,22 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
     await this.saveConfig();
   }
 
+  async ___forceRestart() {
+    this.__configPromise = null;
+    await this.saveConfig();
+  }
+
+  async restoreConfiguration(config) {
+    const _config = JSON.parse(config);
+    await this.__saveConfig(_config);
+    await this.___forceRestart();
+  }
+
+  async backupConfiguration() {
+    const config = await this.getConfig();
+    return JSON.stringify(config, null, 2);
+  }
+
   // Shutdown wireguard
   async Shutdown() {
     await Util.exec('wg-quick down wg0').catch(() => { });
