@@ -265,7 +265,7 @@ module.exports = class Server {
       });
     };
 
-    // import_export
+    // backup_restore
     const router3 = createRouter();
     app.use(router3);
 
@@ -293,7 +293,7 @@ module.exports = class Server {
           getMeta: async (id) => {
             const filePath = safePathJoin(publicDir, id);
 
-            const stats = await stat(filePath).catch(() => { });
+            const stats = await stat(filePath).catch(() => {});
             if (!stats || !stats.isFile()) {
               return;
             }
