@@ -232,7 +232,7 @@ const messages = { // eslint-disable-line no-unused-vars
     restore: 'Wiederherstellen',
     backup: 'Sichern',
     titleRestoreConfig: 'Stelle deine Konfiguration wieder her',
-    titleBackupConfig: 'Sichere deine Konfiguraion',
+    titleBackupConfig: 'Sichere deine Konfiguration',
   },
   ca: { // github.com/guillembonet
     name: 'Nom',
