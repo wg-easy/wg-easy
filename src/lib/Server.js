@@ -265,7 +265,7 @@ module.exports = class Server {
       });
     };
 
-    // backup_restore
+    // import_export
     const router3 = createRouter();
     app.use(router3);
 
