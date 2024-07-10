@@ -229,10 +229,6 @@ const messages = { // eslint-disable-line no-unused-vars
     downloadConfig: 'Konfiguration herunterladen',
     madeBy: 'Erstellt von',
     donate: 'Spenden',
-    restore: 'Wiederherstellen',
-    backup: 'Sichern',
-    titleRestoreConfig: 'Stelle deine Konfiguration wieder her',
-    titleBackupConfig: 'Sichere deine Konfiguraion',
   },
   ca: { // github.com/guillembonet
     name: 'Nom',
