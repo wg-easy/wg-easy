@@ -1,5 +1,5 @@
 # Build wg-password binary using Rust on Alpine
-FROM rust:1.79.0-alpine AS build_password_binary
+FROM docker.io/library/rust:1.79.0-alpine AS build_password_binary
 
 WORKDIR /wg-password
 COPY wg-password .
