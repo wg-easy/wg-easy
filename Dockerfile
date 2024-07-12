@@ -1,3 +1,12 @@
+# Build wg-password binary using Rust on Alpine
+FROM rust:1.79.0-alpine AS build_password_binary
+
+WORKDIR /wg-password
+COPY wg-password .
+
+# Build the Rust project
+RUN cargo build --release
+
 # As a workaround we have to build on nodejs 18
 # nodejs 20 hangs on build with armv6/armv7
 FROM docker.io/library/node:18-alpine AS build_node_modules
@@ -25,6 +34,9 @@ COPY --from=build_node_modules /app /app
 # the architecture & OS of your development machine might differ
 # than what runs inside of docker.
 COPY --from=build_node_modules /node_modules /node_modules
+
+# Copy the compiled password binary from the build stage to /bin/
+COPY --from=build_password_binary /wg-password/target/release/wgpw /bin/
 
 # Install Linux packages
 RUN apk add --no-cache \

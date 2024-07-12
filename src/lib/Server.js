@@ -28,22 +28,18 @@ const {
   PORT,
   WEBUI_HOST,
   RELEASE,
-  PASSWORD,
   PASSWORD_HASH,
   LANG,
   UI_TRAFFIC_STATS,
   UI_CHART_TYPE,
 } = require('../config');
 
-const requiresPassword = !!PASSWORD || !!PASSWORD_HASH;
+const requiresPassword = !!PASSWORD_HASH;
 
 /**
  * Checks if `password` matches the PASSWORD_HASH.
  *
- * For backward compatibility it also allows `password` to match the clear text PASSWORD,
- * but only if no PASSWORD_HASH is provided.
- *
- * If both enviornment variables are not set, the password is always invalid.
+ * If environment variable is not set, the password is always invalid.
  *
  * @param {string} password String to test
  * @returns {boolean} true if matching environment, otherwise false
@@ -55,9 +51,6 @@ const isPasswordValid = (password) => {
 
   if (PASSWORD_HASH) {
     return bcrypt.compareSync(password, PASSWORD_HASH);
-  }
-  if (PASSWORD) {
-    return password === PASSWORD;
   }
 
   return false;
