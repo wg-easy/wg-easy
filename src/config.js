@@ -39,7 +39,7 @@ if (!process.env.WG_POST_UP) {
   iptables -A FORWARD -o wg0 -j ACCEPT;`;
 
   if (modules.includes('ip6table_nat')) {
-    module.exports.WG_POST_UP += `ip6tables -t nat -A POSTROUTING -s ${module.exports.WG_DEFAULT_ADDRESS6.replace('x', '0')}/64 -o eth0 -j MASQUERADE;
+    module.exports.WG_POST_UP += `ip6tables -t nat -A POSTROUTING -s ${module.exports.WG_DEFAULT_ADDRESS6.replace('x', '0')}/64 -o ${module.exports.WG_DEVICE} -j MASQUERADE;
   ip6tables -A INPUT -p udp -m udp --dport 51820 -j ACCEPT;
   ip6tables -A FORWARD -i wg0 -j ACCEPT;
   ip6tables -A FORWARD -o wg0 -j ACCEPT;`;
