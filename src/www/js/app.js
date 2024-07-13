@@ -301,10 +301,21 @@ new Vue({
         .catch((err) => alert(err.message || err.toString()))
         .finally(() => this.refresh().catch(console.error));
     },
-    updateClientAddress6(client, address6) {
-      this.api.updateClientAddress6({ clientId: client.id, address6 })
-        .catch((err) => alert(err.message || err.toString()))
-        .finally(() => this.refresh().catch(console.error));
+    restoreConfig(e) {
+      e.preventDefault();
+      const file = e.currentTarget.files.item(0);
+      if (file) {
+        file.text()
+          .then((content) => {
+            this.api.restoreConfiguration(content)
+              .then((_result) => alert('The configuration was updated.'))
+              .catch((err) => alert(err.message || err.toString()))
+              .finally(() => this.refresh().catch(console.error));
+          })
+          .catch((err) => alert(err.message || err.toString()));
+      } else {
+        alert('Failed to load your file!');
+      }
     },
     toggleTheme() {
       const themes = ['light', 'dark', 'auto'];

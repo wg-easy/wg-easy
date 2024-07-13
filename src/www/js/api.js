@@ -138,11 +138,11 @@ class API {
     });
   }
 
-  async updateClientAddress6({ clientId, address6 }) {
+  async restoreConfiguration(file) {
     return this.call({
       method: 'put',
-      path: `/wireguard/client/${clientId}/address6/`,
-      body: { address6 },
+      path: '/wireguard/restore',
+      body: { file },
     });
   }
 

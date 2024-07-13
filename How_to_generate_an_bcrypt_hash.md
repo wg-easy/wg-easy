@@ -31,9 +31,9 @@ pip3 install bcrypt --break-system-packages
 ```bash
 sudo dnf update
 sudo dnf install python3 python3-pip
-# If you use have install python using apt
+# If you use have install python using dnf
 sudo dnf install python3-bcrypt
-# If don't install python using apt
+# If don't install python using dnf
 pip3 install bcrypt
 # If you got externally-managed-environment error
 pip3 install bcrypt --break-system-packages
@@ -43,9 +43,18 @@ pip3 install bcrypt --break-system-packages
 ```bash
 sudo pacman -Syy
 sudo pacman -S python python-pip
-# If you use have install python using apt
+# If you use have install python using pacman
 sudo pacman -S python-bcrypt
-# If don't install python using apt
+# If don't install python using pacman
+pip3 install bcrypt
+# If you got externally-managed-environment error
+pip3 install bcrypt --break-system-packages
+```
+
+### macOS
+```bash
+brew install bcrypt
+# If don't install bcrypt using homebrew
 pip3 install bcrypt
 # If you got externally-managed-environment error
 pip3 install bcrypt --break-system-packages
@@ -54,7 +63,7 @@ pip3 install bcrypt --break-system-packages
 ## Generating bcrypt hash from the command line
 You can use the following one-liner command to generate a bcrypt hash directly in the cmd/ terminal: 
 ```bash
-python3 -c "import bcrypt; password = b'your_password_here'; assert len(password) < 72, 'Password must be less than 72 bytes due to bcrypt limitation'; hashed = bcrypt.hashpw(password, bcrypt.gensalt()); print(f'The hashed password is: {hashed.decode()}'); docker_interpolation = hashed.decode().replace('$', '$$'); print(f'The hashed password for a Docker env is: {docker_interpolation}')" # or python if you run this on Windows. CHANGE your_password_here BY YOUR PASSWORD
+python3 -c "import bcrypt; password = b'your_password_here'; assert len(password) < 72, 'Password must be less than 72 bytes due to bcrypt limitation'; hashed = bcrypt.hashpw(password, bcrypt.gensalt()); print(f'The hashed password is: {hashed.decode()}'); docker_interpolation = hashed.decode().replace('$', '$'*2); print(f'The hashed password for a Docker env is: {docker_interpolation}')" # or python if you run this on Windows. CHANGE your_password_here BY YOUR PASSWORD
 ```
 Please change ``your_password_here`` in the line by your own password.
 
