@@ -50,6 +50,7 @@ If you haven't installed Docker yet, install it by running:
 ```bash
 curl -sSL https://get.docker.com | sh
 sudo usermod -aG docker $(whoami)
+exit
 ```
 
 And log in again.
@@ -59,10 +60,12 @@ And log in again.
 To automatically install & run wg-easy, simply run:
 
 ```
-  docker run -d \
+IP=$(curl -s http://checkip.amazonaws.com)
+
+docker run -d \
   --name=wg-easy \
   -e LANG=en \
-  -e WG_HOST=<🚨YOUR_SERVER_IP> \
+  -e WG_HOST=$IP \
   -e PASSWORD_HASH=<🚨YOUR_ADMIN_PASSWORD_HASH> \
   -e PORT=51821 \
   -e WG_PORT=51820 \
