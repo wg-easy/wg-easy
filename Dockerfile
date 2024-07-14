@@ -11,12 +11,6 @@ WORKDIR /app
 RUN npm ci --omit=dev &&\
     mv node_modules /node_modules
 
-# Copy script wg-password
-COPY wg-password /wgpw
-WORKDIR /wgpw
-RUN npm i --omit=dev &&\
-    mv node_modules /node_modules_wg
-
 # Copy build result to a new image.
 # This saves a lot of disk space.
 FROM docker.io/library/node:20-alpine
@@ -33,10 +27,7 @@ COPY --from=build_node_modules /app /app
 COPY --from=build_node_modules /node_modules /node_modules
 
 # Copy the needed wg-password scripts
-COPY --from=build_node_modules /node_modules_wg /node_modules_wg
-COPY --from=build_node_modules /wgpw/index.mjs /wgpw/index.mjs
-COPY --from=build_node_modules /wgpw/wgpw.sh /bin/wgpw
-
+COPY --from=build_node_modules /app/wgpw.sh /bin/wgpw
 RUN chmod +x /bin/wgpw
 
 # Install Linux packages
