@@ -59,7 +59,7 @@ pip3 install bcrypt
 # If you got externally-managed-environment error
 pip3 install bcrypt --break-system-packages
 ```
-Alternatively (for macOS), a softer way recommended, instead of --break-system-packages
+Alternatively (for macOS), a softer way recommended, instead of --break-system-packages.
 
 ```bash
 ~ % python3 -m venv path/to/venv
