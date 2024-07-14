@@ -59,6 +59,16 @@ pip3 install bcrypt
 # If you got externally-managed-environment error
 pip3 install bcrypt --break-system-packages
 ```
+Alternatively (for macOS), a softer way recommended, instead of --break-system-packages
+
+```bash
+~ % python3 -m venv path/to/venv
+~ % source path/to/venv/bin/activate
+(venv) ~ % python3 -m pip install --upgrade pip
+(venv)  ~ % python3 -c "import bcrypt; password = b'XXXXXXXXX'; assert len(password) < 72, 'Password must be less than 72 bytes due to bcrypt limitation'; hashed = bcrypt.hashpw(password, bcrypt.gensalt()); print(f'The hashed password is: {hashed.decode()}'); docker_interpolation = hashed.decode().replace('$', '$$'); print(f'The hashed password for a Docker env is: {docker_interpolation}')" # or python if you run this on Windows. CHANGE your_password_here BY YOUR PASSWORD
+The hashed password is: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+The hashed password for a Docker env is: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+```
 
 ## Generating bcrypt hash from the command line
 You can use the following one-liner command to generate a bcrypt hash directly in the cmd/ terminal: 
