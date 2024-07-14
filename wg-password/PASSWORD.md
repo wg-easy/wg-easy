@@ -1,6 +1,6 @@
 # wg-password
 
-`wg-password` is a Rust binary that generates bcrypt password hashes for use with `wg-easy`, enhancing security by requiring passwords.
+`wg-password` is a script that generates bcrypt password hashes for use with `wg-easy`, enhancing security by requiring passwords.
 
 ## Features
 

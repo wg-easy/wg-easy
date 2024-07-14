@@ -1,3 +1,2 @@
 /src/node_modules
-/wg-password/target
-/wg-password/index.js
+/wg-password/node_modules

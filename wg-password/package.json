@@ -1,0 +1,13 @@
+{
+  "name": "wg-password",
+  "version": "1.0.1",
+  "description": "A binary to create bcrypt password hashes for wg-easy, enhancing security.",
+  "main": "index.mjs",
+  "author": "tetuaoro <65575727+tetuaoro@users.noreply.github.com>",
+  "dependencies": {
+    "bcryptjs": "^2.4.3"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
