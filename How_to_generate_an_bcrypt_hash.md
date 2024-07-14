@@ -65,7 +65,7 @@ Alternatively (for macOS), a softer way recommended, instead of --break-system-p
 ~ % python3 -m venv path/to/venv
 ~ % source path/to/venv/bin/activate
 (venv) ~ % python3 -m pip install --upgrade pip
-(venv)  ~ % python3 -c "import bcrypt; password = b'XXXXXXXXX'; assert len(password) < 72, 'Password must be less than 72 bytes due to bcrypt limitation'; hashed = bcrypt.hashpw(password, bcrypt.gensalt()); print(f'The hashed password is: {hashed.decode()}'); docker_interpolation = hashed.decode().replace('$', '$$'); print(f'The hashed password for a Docker env is: {docker_interpolation}')" # or python if you run this on Windows. CHANGE your_password_here BY YOUR PASSWORD
+(venv)  ~ % python3 -c "import bcrypt; password = b'your_password_here'; assert len(password) < 72, 'Password must be less than 72 bytes due to bcrypt limitation'; hashed = bcrypt.hashpw(password, bcrypt.gensalt()); print(f'The hashed password is: {hashed.decode()}'); docker_interpolation = hashed.decode().replace('$', '$$'); print(f'The hashed password for a Docker env is: {docker_interpolation}')" # or python if you run this on Windows. CHANGE your_password_here BY YOUR PASSWORD
 The hashed password is: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 The hashed password for a Docker env is: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 ```
