@@ -1,6 +1,6 @@
 # wg-password
 
-`wg-password` (wgpg) is a script that generates bcrypt password hashes for use with `wg-easy`, enhancing security by requiring passwords.
+`wg-password` (wgpw) is a script that generates bcrypt password hashes for use with `wg-easy`, enhancing security by requiring passwords.
 
 ## Features
 
