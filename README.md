@@ -80,7 +80,7 @@ To automatically install & run wg-easy, simply run:
 
 > 💡 Replace `YOUR_SERVER_IP` with your WAN IP, or a Dynamic DNS hostname.
 >
-> 💡 Replace `YOUR_ADMIN_PASSWORD_HASH` with a bcrypt password hash to log in on the Web UI. See How_to_generate_an_bcrypt_hash.md for know how generate the hash.
+> 💡 Replace `YOUR_ADMIN_PASSWORD_HASH` with a bcrypt password hash to log in on the Web UI. See [How_to_generate_an_bcrypt_hash.md](./How_to_generate_an_bcrypt_hash.md) for know how generate the hash.
 
 The Web UI will now be available on `http://0.0.0.0:51821`.
 
