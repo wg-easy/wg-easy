@@ -299,6 +299,22 @@ new Vue({
         .catch((err) => alert(err.message || err.toString()))
         .finally(() => this.refresh().catch(console.error));
     },
+    restoreConfig(e) {
+      e.preventDefault();
+      const file = e.currentTarget.files.item(0);
+      if (file) {
+        file.text()
+          .then((content) => {
+            this.api.restoreConfiguration(content)
+              .then((_result) => alert('The configuration was updated.'))
+              .catch((err) => alert(err.message || err.toString()))
+              .finally(() => this.refresh().catch(console.error));
+          })
+          .catch((err) => alert(err.message || err.toString()));
+      } else {
+        alert('Failed to load your file!');
+      }
+    },
     toggleTheme() {
       const themes = ['light', 'dark', 'auto'];
       const currentIndex = themes.indexOf(this.uiTheme);
@@ -389,9 +405,6 @@ new Vue({
 
           return releasesArray[0];
         });
-
-      console.log(`Current Release: ${currentRelease}`);
-      console.log(`Latest Release: ${latestRelease.version}`);
 
       if (currentRelease >= latestRelease.version) return;
 
