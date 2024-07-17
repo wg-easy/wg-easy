@@ -293,9 +293,7 @@ module.exports = class Server {
       }));
 
     // Static assets
-    // const publicDir = '/app/www';
-    // const publicDir = path.resolve(__dirname, './www');
-    const publicDir = '/home/ubuntu/wg-easy/src/www';
+    const publicDir = path.resolve(__dirname, '../www');  //make sure this will not change or else webui not working
     app.use(
       defineEventHandler((event) => {
         return serveStatic(event, {
