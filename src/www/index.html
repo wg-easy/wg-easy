@@ -91,24 +91,6 @@
               <p class="text-2xl font-medium dark:text-neutral-200">{{$t("clients")}}</p>
             </div>
             <div class="flex-shrink-0">
-              <!-- Restore configuration -->
-              <label for="inputRC" :title="$t('titleRestoreConfig')"
-                class="hover:cursor-pointer hover:bg-red-800 hover:border-red-800 hover:text-white text-gray-700 dark:text-neutral-200 border-2 border-gray-100 dark:border-neutral-600 py-2 px-4 rounded inline-flex items-center transition">
-                <svg inline class="w-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"></path>
-                </svg>
-                <span class="text-sm">{{$t("restore")}}</span>
-                <input id="inputRC" type="file" name="configurationfile" accept="text/*,.json" @change="restoreConfig" class="hidden"/>
-              </label>
-              <!-- Backup configuration -->
-              <a href="./api/wireguard/backup" :title="$t('titleBackupConfig')"
-                class="hover:bg-red-800 hover:border-red-800 hover:text-white text-gray-700 dark:text-neutral-200 border-2 border-gray-100 dark:border-neutral-600 py-2 px-4 rounded inline-flex items-center transition">
-                <svg inline class="w-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 14.25h13.5m-13.5 0a3 3 0 0 1-3-3m3 3a3 3 0 1 0 0 6h13.5a3 3 0 1 0 0-6m-16.5-3a3 3 0 0 1 3-3h13.5a3 3 0 0 1 3 3m-19.5 0a4.5 4.5 0 0 1 .9-2.7L5.737 5.1a3.375 3.375 0 0 1 2.7-1.35h7.126c1.062 0 2.062.5 2.7 1.35l2.587 3.45a4.5 4.5 0 0 1 .9 2.7m0 0a3 3 0 0 1-3 3m0 3h.008v.008h-.008v-.008Zm0-6h.008v.008h-.008v-.008Zm-3 6h.008v.008h-.008v-.008Zm0-6h.008v.008h-.008v-.008Z"></path>
-                </svg>
-                <span class="text-sm">{{$t("backup")}}</span>
-              </a>
-              <!-- New client -->
               <button @click="clientCreate = true; clientCreateName = '';"
                 class="hover:bg-red-800 hover:border-red-800 hover:text-white text-gray-700 dark:text-neutral-200 border-2 border-gray-100 dark:border-neutral-600 py-2 px-4 rounded inline-flex items-center transition">
                 <svg class="w-4 mr-2" inline xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -243,31 +225,6 @@
                     <!-- Info -->
                     <div v-if="uiTrafficStats"
                       class="flex gap-2 items-center shrink-0 text-gray-400 dark:text-neutral-400 text-xs mt-px justify-end">
-
-                      <!-- Address6 -->
-                      <span class="group">
-
-                        <!-- Show -->
-                        <input v-show="clientEditAddress6Id === client.id" v-model="clientEditAddress6"
-                          v-on:keyup.enter="updateClientAddress6(client, clientEditAddress6); clientEditAddress6 = null; clientEditAddress6Id = null;"
-                          v-on:keyup.escape="clientEditAddress6 = null; clientEditAddress6Id = null;"
-                          :ref="'client-' + client.id + '-address6'"
-                          class="rounded border-2 border-gray-100 focus:border-gray-200 outline-none w-20 text-black" />
-                        <span v-show="clientEditAddress6Id !== client.id"
-                          class="inline-block border-t-2 border-b-2 border-transparent">{{client.address6}}</span>
-
-                        <!-- Edit -->
-                        <span v-show="clientEditAddress6Id !== client.id"
-                          @click="clientEditAddress6 = client.address6; clientEditAddress6Id = client.id; setTimeout(() => $refs['client-' + client.id + '-address6'][0].select(), 1);"
-                          class="cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity">
-                          <svg xmlns="http://www.w3.org/2000/svg"
-                            class="h-4 w-4 inline align-middle opacity-25 hover:opacity-100" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                          </svg>
-                        </span>
-                      </span>
 
                       <!-- Transfer TX -->
                       <div class="min-w-20 md:min-w-24" v-if="client.transferTx">

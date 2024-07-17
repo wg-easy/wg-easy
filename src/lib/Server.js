@@ -5,6 +5,7 @@ const crypto = require('node:crypto');
 const { createServer } = require('node:http');
 const { stat, readFile } = require('node:fs/promises');
 const { resolve, sep } = require('node:path');
+const path = require('path');
 
 const expressSession = require('express-session');
 const debug = require('debug')('Server');
@@ -292,7 +293,9 @@ module.exports = class Server {
       }));
 
     // Static assets
-    const publicDir = '/app/www';
+    // const publicDir = '/app/www';
+    // const publicDir = path.resolve(__dirname, './www');
+    const publicDir = '/home/ubuntu/wg-easy/src/www';
     app.use(
       defineEventHandler((event) => {
         return serveStatic(event, {

@@ -23,7 +23,10 @@ process.on('SIGTERM', async () => {
 });
 
 // Handle interrupt signal
-process.on('SIGINT', () => {
+process.on('SIGINT', () => async () => {
   // eslint-disable-next-line no-console
   console.log('SIGINT signal received.');
+  await WireGuard.Shutdown();
+  // eslint-disable-next-line no-process-exit
+  process.exit(0);
 });

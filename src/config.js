@@ -2,6 +2,7 @@
 
 const childProcess = require('child_process');
 const { release } = require('../package.json');
+const path = require('path');
 
 module.exports.RELEASE = release;
 module.exports.PORT = process.env.PORT || '51821';
@@ -16,14 +17,14 @@ module.exports.WG_CONFIG_PORT = process.env.WG_CONFIG_PORT || process.env.WG_POR
 module.exports.WG_MTU = process.env.WG_MTU || '1412';
 module.exports.WG_PERSISTENT_KEEPALIVE = process.env.WG_PERSISTENT_KEEPALIVE || '25';
 module.exports.WG_DEFAULT_ADDRESS = process.env.WG_DEFAULT_ADDRESS || '10.8.0.x';
-module.exports.WG_DEFAULT_ADDRESS6 = process.env.WG_DEFAULT_ADDRESS6 || 'fdcc:ad94:bacf:61a4::cafe:x';
+module.exports.WG_DEFAULT_ADDRESS6 = process.env.WG_DEFAULT_ADDRESS6 || 'fd01:1:1::x';
 module.exports.WG_DEFAULT_DNS = typeof process.env.WG_DEFAULT_DNS === 'string'
   ? process.env.WG_DEFAULT_DNS
-  : '1.1.1.1';
-// module.exports.WG_DEFAULT_DNS6 = typeof process.env.WG_DEFAULT_DNS6 === 'string'
-//   ? process.env.WG_DEFAULT_DNS6
-//   : '2606:4700:4700::1111';
-module.exports.WG_ALLOWED_IPS = process.env.WG_ALLOWED_IPS || '10.250.0.0/22, 10.254.1.0/24, fdcc:ad94:bacf:61a4::cafe:0/64';
+  : '10.250.0.2';
+module.exports.WG_DEFAULT_DNS6 = typeof process.env.WG_DEFAULT_DNS6 === 'string'
+  ? process.env.WG_DEFAULT_DNS6
+  : 'fd01:0:1::2';
+module.exports.WG_ALLOWED_IPS = process.env.WG_ALLOWED_IPS || '10.250.0.0/22, 10.254.1.0/24, fd01:1:1::0/64';
 
 // Set WG_POST_UP to allow IPv6 NAT and forwarding only if the required kernel module is available
 const modules = childProcess.execSync('lsmod', {

@@ -7,7 +7,7 @@ IPT6="/sbin/ip6tables"
 IN_FACE="enp0s3"                   # NIC connected to the internet
 WG_FACE="wg0"                    # WG NIC
 SUB_NET="10.250.1.0/24"          # WG IPv4 sub/net aka CIDR
-SUB_NET_6="fdcc:ad94:bacf:61a4::cafe:0/64"  # WG IPv6 sub/net
+SUB_NET_6="fd01:1:1::0/64"  # WG IPv6 sub/net
 WG_PORT="51820"                  # WG udp port
 # WG_TABLE='10'
 
@@ -21,7 +21,7 @@ $IPT -D FORWARD -o $WG_FACE -j ACCEPT   #for internet
 # IPv4 rules #
 $IPT6 -D INPUT -p udp --dport $WG_PORT -j ACCEPT   # for incoming connection
 $IPT6 -D INPUT -p tcp --dport 51821 -j ACCEPT      # for webui
-$IPT6 -t nat -D POSTROUTING -s $SUB_NET -o $IN_FACE -j MASQUERADE
+$IPT6 -t nat -D POSTROUTING -s $SUB_NET_6 -o $IN_FACE -j MASQUERADE
 $IPT6 -D FORWARD -i $WG_FACE -j ACCEPT   #for internet
 $IPT6 -D FORWARD -o $WG_FACE -j ACCEPT   #for internet
 

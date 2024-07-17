@@ -63,8 +63,6 @@ new Vue({
     clientEditNameId: null,
     clientEditAddress: null,
     clientEditAddressId: null,
-    clientEditAddress6: null,
-    clientEditAddress6Id: null,
     qrcode: null,
 
     currentRelease: null,
@@ -300,22 +298,6 @@ new Vue({
       this.api.updateClientAddress({ clientId: client.id, address })
         .catch((err) => alert(err.message || err.toString()))
         .finally(() => this.refresh().catch(console.error));
-    },
-    restoreConfig(e) {
-      e.preventDefault();
-      const file = e.currentTarget.files.item(0);
-      if (file) {
-        file.text()
-          .then((content) => {
-            this.api.restoreConfiguration(content)
-              .then((_result) => alert('The configuration was updated.'))
-              .catch((err) => alert(err.message || err.toString()))
-              .finally(() => this.refresh().catch(console.error));
-          })
-          .catch((err) => alert(err.message || err.toString()));
-      } else {
-        alert('Failed to load your file!');
-      }
     },
     toggleTheme() {
       const themes = ['light', 'dark', 'auto'];
