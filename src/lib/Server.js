@@ -100,16 +100,19 @@ module.exports = class Server {
       }))
 
       // Authentication
-      .get('/api/session', defineEventHandler((event) => {
-        const authenticated = requiresPassword
-          ? !!(event.node.req.session && event.node.req.session.authenticated)
-          : true;
+      .get(
+        '/api/session',
+        defineEventHandler((event) => {
+          const authenticated = requiresPassword
+            ? !!(event.node.req.session && event.node.req.session.authenticated)
+            : true;
 
-        return {
-          requiresPassword,
-          authenticated,
-        };
-      }))
+          return {
+            requiresPassword,
+            authenticated,
+          };
+        }),
+      )
       .post('/api/session', defineEventHandler(async (event) => {
         const { password } = await readBody(event);
 
@@ -270,20 +273,30 @@ module.exports = class Server {
     app.use(router3);
 
     router3
-      .get('/api/wireguard/backup', defineEventHandler(async (event) => {
-        const config = await WireGuard.backupConfiguration();
-        setHeader(event, 'Content-Disposition', 'attachment; filename="wg0.json"');
-        setHeader(event, 'Content-Type', 'text/json');
-        return config;
-      }))
-      .put('/api/wireguard/restore', defineEventHandler(async (event) => {
-        const { file } = await readBody(event);
-        await WireGuard.restoreConfiguration(file);
-        return { success: true };
-      }));
+      .get(
+        '/api/wireguard/backup',
+        defineEventHandler(async (event) => {
+          const config = await WireGuard.backupConfiguration();
+          setHeader(
+            event,
+            'Content-Disposition',
+            'attachment; filename="wg0.json"',
+          );
+          setHeader(event, 'Content-Type', 'text/json');
+          return config;
+        }),
+      )
+      .put(
+        '/api/wireguard/restore',
+        defineEventHandler(async (event) => {
+          const { file } = await readBody(event);
+          await WireGuard.restoreConfiguration(file);
+          return { success: true };
+        }),
+      );
 
     // Static assets
-    const publicDir = '/app/www';
+    const publicDir = 'www';
     app.use(
       defineEventHandler((event) => {
         return serveStatic(event, {
