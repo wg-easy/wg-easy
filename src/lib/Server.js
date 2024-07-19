@@ -107,38 +107,38 @@ module.exports = class Server {
             ? !!(event.node.req.session && event.node.req.session.authenticated)
             : true;
 
-        return {
-          requiresPassword,
-          authenticated,
-        };
-      }))
+          return {
+            requiresPassword,
+            authenticated,
+          };
+        }),
+      )
       .post('/api/session', defineEventHandler(async (event) => {
         const { password } = await readBody(event);
 
-          if (!requiresPassword) {
-            // if no password is required, the API should never be called.
-            // Do not automatically authenticate the user.
-            throw createError({
-              status: 401,
-              message: 'Invalid state',
-            });
-          }
+        if (!requiresPassword) {
+          // if no password is required, the API should never be called.
+          // Do not automatically authenticate the user.
+          throw createError({
+            status: 401,
+            message: 'Invalid state',
+          });
+        }
 
-          if (!isPasswordValid(password)) {
-            throw createError({
-              status: 401,
-              message: 'Incorrect Password',
-            });
-          }
+        if (!isPasswordValid(password)) {
+          throw createError({
+            status: 401,
+            message: 'Incorrect Password',
+          });
+        }
 
         event.node.req.session.authenticated = true;
         event.node.req.session.save();
 
         debug(`New Session: ${event.node.req.session.id}`);
 
-          return { success: true };
-        })
-      );
+        return { success: true };
+      }));
 
     // WireGuard
     app.use(
@@ -280,11 +280,11 @@ module.exports = class Server {
           setHeader(
             event,
             'Content-Disposition',
-            'attachment; filename="wg0.json"'
+            'attachment; filename="wg0.json"',
           );
           setHeader(event, 'Content-Type', 'text/json');
           return config;
-        })
+        }),
       )
       .put(
         '/api/wireguard/restore',
@@ -292,7 +292,7 @@ module.exports = class Server {
           const { file } = await readBody(event);
           await WireGuard.restoreConfiguration(file);
           return { success: true };
-        })
+        }),
       );
 
     // Static assets
