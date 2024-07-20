@@ -1686,6 +1686,10 @@ video {
     font-size: 1rem;
     line-height: 1.5rem;
   }
+  .md\:text-base-small {
+    font-size: 0.9rem;
+    line-height: 1.1rem;
+  }
 }
 
 .dark\:border-neutral-500:where(.dark, .dark *) {

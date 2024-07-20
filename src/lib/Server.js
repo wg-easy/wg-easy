@@ -223,6 +223,15 @@ module.exports = class Server {
         await WireGuard.disableClient({ clientId });
         return { success: true };
       }))
+      .put('/api/wireguard/client/:clientId/enableduntil', defineEventHandler(async (event) => {
+        const clientId = getRouterParam(event, 'clientId');
+        if (clientId === '__proto__' || clientId === 'constructor' || clientId === 'prototype') {
+          throw createError({ status: 403 });
+        }
+        const { date } = await readBody(event);
+        await WireGuard.changeEnabledUntilDate({ clientId, date });
+        return { success: true };
+      }))
       .put('/api/wireguard/client/:clientId/name', defineEventHandler(async (event) => {
         const clientId = getRouterParam(event, 'clientId');
         if (clientId === '__proto__' || clientId === 'constructor' || clientId === 'prototype') {

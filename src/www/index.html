@@ -271,7 +271,13 @@
 
                 <div class="flex items-center justify-end">
                   <div class="text-gray-400 dark:text-neutral-400 flex gap-1 items-center justify-between">
-
+                    
+                    <!-- Enable until data -->
+                    <div class="flex flex-col flex-grow gap-1" style="margin-right: 30px;">
+                      <input type="date" :title="$t('enabledUntil')" v-model="client.enabledUntil" @change="changeEnabledUntilDate(client, client.enabledUntil)" 
+                      class="rounded border-2 dark:bg-neutral-700 border-gray-100 dark:border-neutral-600 focus:border-gray-200 dark:focus:border-neutral-500 outline-none text-black dark:text-neutral-300 dark:placeholder:text-neutral-500">
+                    </div>
+                    
                     <!-- Enable/Disable -->
                     <div @click="disableClient(client)" v-if="client.enabled === true" :title="$t('disableClient')"
                       class="inline-block align-middle rounded-full w-10 h-6 mr-1 bg-red-800 cursor-pointer hover:bg-red-700 transition-all">

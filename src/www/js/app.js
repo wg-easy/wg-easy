@@ -195,6 +195,9 @@ new Vue({
         this.clientsPersist[client.id].transferRxPrevious = client.transferRx;
         this.clientsPersist[client.id].transferTxCurrent = client.transferTx - this.clientsPersist[client.id].transferTxPrevious;
         this.clientsPersist[client.id].transferTxPrevious = client.transferTx;
+        this.clientsPersist[client.id].enabledUntil = client.enabledUntil !== null
+        ? new Date(client.enabledUntil).toISOString().slice(0, 10)
+        :  null;
 
         if (updateCharts) {
           this.clientsPersist[client.id].transferRxHistory.push(this.clientsPersist[client.id].transferRxCurrent);
@@ -226,6 +229,7 @@ new Vue({
 
         client.hoverTx = this.clientsPersist[client.id].hoverTx;
         client.hoverRx = this.clientsPersist[client.id].hoverRx;
+        client.enabledUntil = this.clientsPersist[client.id].enabledUntil;
 
         return client;
       });
@@ -286,6 +290,19 @@ new Vue({
     },
     disableClient(client) {
       this.api.disableClient({ clientId: client.id })
+        .catch((err) => alert(err.message || err.toString()))
+        .finally(() => this.refresh().catch(console.error));
+    },
+    changeEnabledUntilDate(client, date){
+      const dateObj = new Date(date);
+      const currentDate = new Date();
+      
+      if (dateObj < currentDate) {
+        alert('The date cannot be less than the current date');
+        return;
+      }
+
+      this.api.changeEnabledUntilDate({ clientId: client.id, date })
         .catch((err) => alert(err.message || err.toString()))
         .finally(() => this.refresh().catch(console.error));
     },

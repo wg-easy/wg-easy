@@ -122,6 +122,14 @@ class API {
     });
   }
 
+  async changeEnabledUntilDate({ clientId, date }) {
+    return this.call({
+      method: 'put',
+      path: `/wireguard/client/${clientId}/enableduntil/`,
+      body: { date },
+    });
+  }
+
   async updateClientName({ clientId, name }) {
     return this.call({
       method: 'put',

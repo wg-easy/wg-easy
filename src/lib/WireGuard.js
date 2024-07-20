@@ -136,6 +136,9 @@ ${client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
       id: clientId,
       name: client.name,
       enabled: client.enabled,
+      enabledUntil: client.enabledUntil !== null
+      ? new Date(client.enabledUntil)
+      : null,
       address: client.address,
       publicKey: client.publicKey,
       createdAt: new Date(client.createdAt),
@@ -261,6 +264,7 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
       updatedAt: new Date(),
 
       enabled: true,
+      enabledUntil: null
     };
 
     config.clients[id] = client;
@@ -293,6 +297,14 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
 
     client.enabled = false;
     client.updatedAt = new Date();
+
+    await this.saveConfig();
+  }
+
+  async changeEnabledUntilDate({ clientId, date }) {
+    const client = await this.getClient({ clientId });
+    const dateObj = new Date(date);
+    client.enabledUntil = dateObj;
 
     await this.saveConfig();
   }
