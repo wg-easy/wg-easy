@@ -15,6 +15,9 @@
   [v-cloak] {
     display: none;
   }
+  .line-chart .apexcharts-svg{
+    transform: translateY(3px);
+  }
 </style>
 
 <body class="bg-gray-50 dark:bg-neutral-800">
@@ -127,11 +130,11 @@
               class="relative overflow-hidden border-b last:border-b-0 border-gray-100 dark:border-neutral-600 border-solid">
 
               <!-- Chart -->
-              <div v-if="uiChartType" class="absolute z-0 bottom-0 left-0 right-0 h-6" >
+              <div v-if="uiChartType" :class="`absolute z-0 bottom-0 left-0 right-0 h-6 ${uiChartType === 1 && 'line-chart'}`" >
                 <apexchart width="100%" height="100%" :options="chartOptionsTX" :series="client.transferTxSeries">
                 </apexchart>
               </div>
-              <div v-if="uiChartType" class="absolute z-0 top-0 left-0 right-0 h-6" >
+              <div v-if="uiChartType" :class="`absolute z-0 top-0 left-0 right-0 h-6 ${uiChartType === 1 && 'line-chart'}`" >
                 <apexchart width="100%" height="100%" :options="chartOptionsRX" :series="client.transferRxSeries"
                   style="transform: scaleY(-1);">
                 </apexchart>
