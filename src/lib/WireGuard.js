@@ -47,12 +47,14 @@ module.exports = class WireGuard {
           log: 'echo ***hidden*** | wg pubkey',
         });
         const address = WG_DEFAULT_ADDRESS.replace('x', '1');
+        const address6 = WG_DEFAULT_ADDRESS6.replace('x', '1');
 
         config = {
           server: {
             privateKey,
             publicKey,
             address,
+            address6,
           },
           clients: {},
         };
@@ -145,6 +147,7 @@ ${client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
       name: client.name,
       enabled: client.enabled,
       address: client.address,
+      address6: client.address6,
       publicKey: client.publicKey,
       createdAt: new Date(client.createdAt),
       updatedAt: new Date(client.updatedAt),
@@ -343,6 +346,19 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
     }
 
     client.address = address;
+    client.updatedAt = new Date();
+
+    await this.saveConfig();
+  }
+
+  async updateClientAddress6({ clientId, address6 }) {
+    const client = await this.getClient({ clientId });
+
+    if (!Util.isValidIPv6(address6)) {
+      throw new ServerError(`Invalid Address: ${address6}`, 400);
+    }
+
+    client.address6 = address6;
     client.updatedAt = new Date();
 
     await this.saveConfig();
