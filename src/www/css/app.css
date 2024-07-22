@@ -1533,6 +1533,10 @@ video {
 }
 
 @media not all and (min-width: 768px) {
+  .max-md\:hidden {
+    display: none;
+  }
+
   .max-md\:border-x-0 {
     border-left-width: 0px;
     border-right-width: 0px;
