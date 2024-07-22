@@ -383,6 +383,86 @@
           </div>
         </div>
 
+        <!-- Firewall -->
+        <div class="shadow-md rounded-lg bg-white dark:bg-neutral-700 overflow-hidden">
+          <div
+            class="flex flex-row flex-auto items-center mb-4 p-3 px-5 border-b-2 border-gray-100 dark:border-neutral-600">
+            <div class="flex-grow">
+              <p class="text-2xl font-medium dark:text-neutral-200">Firewall</p>
+            </div>
+          </div>
+
+          <table class="table-auto w-[70%] dark:text-neutral-200 mb-4">
+            <thead>
+              <tr>
+                <th>Interface</th>
+                <th>IPv4 address</th>
+                <th>IPv6 address</th>
+              </tr>
+            </thead>
+            <tbody class="text-center">
+              <tr>
+                <td>eth0</td>
+                <td>192.168.1.1</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>wg0</td>
+                <td>10.8.0.1</td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <table class="table-auto border-t-2 dark:border-neutral-200 w-full dark:text-neutral-200">
+            <thead class="bg-gray-200 dark:bg-gray-600">
+              <tr>
+                <th></th>
+                <th class="border-x-2 dark:border-neutral-200">Source</th>
+                <th class="border-x-2 dark:border-neutral-200">Destination</th>
+                <th class="border-x-2 dark:border-neutral-200">Protocol</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody class="text-center">
+              <tr>
+                <td class="border border-gray-600 p-1">delete</td>
+                <td class="border border-gray-600 p-1">192.168.11.3</td>
+                <td class="border border-gray-600 p-1">10.9.8.1</td>
+                <td class="border border-gray-600 p-1">udp</td>
+                <td class="border border-gray-600 p-1"></td>
+              </tr>
+              <tr>
+                <td class="border border-gray-600 p-1">
+                  <form id="fw">
+                    <input form="fw" type="submit" value="send"
+                      class="w-full outline-none bg-transparent text-center"/>
+                  </form>
+                </td>
+                <td class="border border-gray-600">
+                  <input form="fw" type="text" name="source" class="w-full outline-none bg-transparent text-center"/>
+                </td>
+                <td class="border border-gray-600">
+                  <input form="fw" type="text" name="destination"
+                    class="w-full outline-none bg-transparent text-center"/>
+                </td>
+                <td class="border border-gray-600">
+                  <select form="fw" name="protocol" class="bg-transparent">
+                    <option value="tcp">tcp</option>
+                    <option value="udp">udp</option>
+                  </select>
+                </td>
+                <td class="border border-gray-600 p-1">
+                  <select form="fw" name="action" class="bg-transparent">
+                    <option value="allow">allow</option>
+                    <option value="block">block</option>
+                  </select>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
         <!-- QR Code-->
         <div v-if="qrcode">
           <div class="bg-black bg-opacity-50 fixed top-0 right-0 left-0 bottom-0 flex items-center justify-center z-20">
