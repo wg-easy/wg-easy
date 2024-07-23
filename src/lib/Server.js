@@ -284,6 +284,22 @@ module.exports = class Server {
       .get('/api/fw/interfaces', defineEventHandler(async (event) => {
         setHeader(event, 'Content-Type', 'text/json');
         return Firewall.getInterfaces();
+      }))
+      .get('/api/fw/rules', defineEventHandler(async (event) => {
+        setHeader(event, 'Content-Type', 'text/json');
+        return Firewall.getIptablesRules();
+      }))
+      .post('/api/fw/rule', defineEventHandler(async (event) => {
+        const {
+          source, destination, protocol, target,
+        } = await readBody(event);
+        await Firewall.addIptablesRule(source, destination, protocol, target);
+        return { success: true };
+      }))
+      .delete('/api/fw/rule', defineEventHandler(async (event) => {
+        const { num } = await readBody(event);
+        await Firewall.deleteIptablesRule(num);
+        return { success: true };
       }));
 
     // Static assets

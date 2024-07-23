@@ -2,6 +2,30 @@
 
 const childProcess = require('child_process');
 
+const Protocol = Object.freeze({
+  ALL: 0,
+  TCP: 6,
+  UDP: 17,
+});
+
+const ProtocolName = Object.freeze({
+  [Protocol.ALL]: '*',
+  [Protocol.TCP]: 'TCP',
+  [Protocol.UDP]: 'UDP',
+});
+
+const Target = Object.freeze({
+  RETURN: 'RETURN',
+  ALLOW: 'ACCEPT',
+  BLOCK: 'DROP',
+});
+
+const TargetName = Object.freeze({
+  [Target.RETURN]: 'RETURN',
+  [Target.ALLOW]: 'ALLOW',
+  [Target.BLOCK]: 'BLOCK',
+});
+
 module.exports = class Util {
 
   static isValidIPv4(str) {
@@ -75,6 +99,14 @@ module.exports = class Util {
         return resolve(String(stdout).trim());
       });
     });
+  }
+
+  static getProtocolName(protocolNumber) {
+    return ProtocolName[protocolNumber] || 'Unknown Protocol';
+  }
+
+  static getTargetName(target) {
+    return TargetName[target] || 'Unknown Target';
   }
 
 };

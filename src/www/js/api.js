@@ -153,4 +153,31 @@ class API {
     });
   }
 
+  async getRules() {
+    return this.call({
+      method: 'get',
+      path: '/fw/rules',
+    });
+  }
+
+  async addRule({
+    source, destination, protocol, target,
+  }) {
+    return this.call({
+      method: 'post',
+      path: '/fw/rule',
+      body: {
+        source, destination, protocol, target,
+      },
+    });
+  }
+
+  async deleteRule({ num }) {
+    return this.call({
+      method: 'delete',
+      path: '/fw/rule',
+      body: { num },
+    });
+  }
+
 }

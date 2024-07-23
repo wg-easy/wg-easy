@@ -4,7 +4,7 @@
 
 module.exports = {
   darkMode: 'selector',
-  content: ['./www/**/*.{html,js}'],
+  content: ['./www/**/*.{html,js,vue}'],
   theme: {
     screens: {
       xxs: '450px',

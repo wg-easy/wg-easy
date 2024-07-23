@@ -46,6 +46,7 @@ module.exports = class Firewall {
 
   async getIptablesRules() {
     // iptables list the rules WG_IPT_CHAIN_NAME chain
+<<<<<<< HEAD
     //
     // $ iptables -L WGEASY -nv --line-numbers
     // Chain WGEASY (0 references)
@@ -56,6 +57,18 @@ module.exports = class Firewall {
     // Chain (0 references)
     // num target prot source destination
     // 1 ACCEPT 6 172.16.7.2 10.8.2.5
+=======
+    // $ iptables -L ${WG_IPT_CHAIN_NAME} -n -v
+    // Chain WGEASY (0 references)
+    // num pkts bytes target     prot opt in     out     source               destination
+    //   1    0     0 DROP       6    --  *      *       172.16.8.2           172.16.8.3
+    //   2    0     0 ACCEPT     6    --  *      *       172.16.9.2           172.16.8.3
+    // $ iptables -L ${WG_IPT_CHAIN_NAME} -n -v | awk '{print $3,$4,$8,$9}'
+    // (0 references)
+    // num target prot source destination
+    // 1 DROP 6 172.16.8.2 172.16.8.3
+    // 2 ACCEPT 6 172.16.9.2 172.16.8.3
+>>>>>>> 9ec7359 (feat: firewall)
     const stdout = await Util.exec(`iptables -L ${WG_IPT_CHAIN_NAME} -nv --line-numbers | awk '{print $1,$4,$5,$9,$10}'`);
 
     const lines = stdout.split(/\r?\n/);
@@ -74,6 +87,7 @@ module.exports = class Firewall {
 
   async addIptablesRule(source, destination, protocol, target) {
     debug('Rule adding...');
+<<<<<<< HEAD
     // Validate target & protocol
     if (!Util.isTarget(target) || !Util.isProtocol(protocol)) {
       throw new Error('Invalid target or protocol.');
@@ -117,6 +131,14 @@ module.exports = class Firewall {
     iptablesCommand += ` -p ${protocol} -j ${target}`;
 
     await Util.exec(iptablesCommand);
+=======
+    // Validate target
+    if (target !== 'ACCEPT' && target !== 'DROP') {
+      throw new Error('Invalid action. Must be "ACCEPT" or "DROP".');
+    }
+
+    await Util.exec(`iptables -A ${WG_IPT_CHAIN_NAME} -s ${source} -d ${destination} -p ${protocol} -j ${target}`);
+>>>>>>> 9ec7359 (feat: firewall)
     await this.__saveIptablesRules();
     debug('Rule added');
   }

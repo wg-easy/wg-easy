@@ -1,13 +1,22 @@
 'use strict';
 
 require('./services/Server');
-require('./services/Firewall');
 
 const WireGuard = require('./services/WireGuard');
+const Firewall = require('./services/Firewall');
 
 WireGuard.getConfig()
+  .then(() => {
+    Firewall.init().catch((err) => {
+      // eslint-disable-next-line no-console
+      console.error(err);
+
+      // eslint-disable-next-line no-process-exit
+      process.exit(1);
+    });
+  })
   .catch((err) => {
-  // eslint-disable-next-line no-console
+    // eslint-disable-next-line no-console
     console.error(err);
 
     // eslint-disable-next-line no-process-exit
