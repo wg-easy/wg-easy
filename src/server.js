@@ -1,6 +1,7 @@
 'use strict';
 
 require('./services/Server');
+require('./services/Firewall');
 
 const WireGuard = require('./services/WireGuard');
 

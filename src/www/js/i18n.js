@@ -34,6 +34,7 @@ const messages = { // eslint-disable-line no-unused-vars
     backup: 'Backup',
     titleRestoreConfig: 'Restore your configuration',
     titleBackupConfig: 'Backup your configuration',
+    firewall: 'Firewall',
   },
   ua: {
     name: 'Ім`я',

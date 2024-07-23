@@ -46,6 +46,7 @@ new Vue({
   el: '#app',
   components: {
     apexchart: VueApexCharts,
+    firewall: VueFirewall,
   },
   i18n,
   data: {

@@ -146,4 +146,11 @@ class API {
     });
   }
 
+  async getInterfaces() {
+    return this.call({
+      method: 'get',
+      path: '/fw/interfaces',
+    });
+  }
+
 }

@@ -23,6 +23,7 @@ const {
 } = require('h3');
 
 const WireGuard = require('../services/WireGuard');
+const Firewall = require('../services/Firewall');
 
 const {
   PORT,
@@ -259,10 +260,10 @@ module.exports = class Server {
     };
 
     // backup_restore
-    const router3 = createRouter();
-    app.use(router3);
+    const routerBackupRestore = createRouter();
+    app.use(routerBackupRestore);
 
-    router3
+    routerBackupRestore
       .get('/api/wireguard/backup', defineEventHandler(async (event) => {
         const config = await WireGuard.backupConfiguration();
         setHeader(event, 'Content-Disposition', 'attachment; filename="wg0.json"');
@@ -273,6 +274,16 @@ module.exports = class Server {
         const { file } = await readBody(event);
         await WireGuard.restoreConfiguration(file);
         return { success: true };
+      }));
+
+    // firewall
+    const routerFirewall = createRouter();
+    app.use(routerFirewall);
+
+    routerFirewall
+      .get('/api/fw/interfaces', defineEventHandler(async (event) => {
+        setHeader(event, 'Content-Type', 'text/json');
+        return Firewall.getInterfaces();
       }));
 
     // Static assets

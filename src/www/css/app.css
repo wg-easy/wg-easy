@@ -1567,10 +1567,6 @@ video {
 }
 
 @media not all and (min-width: 768px) {
-  .max-md\:flex {
-    display: flex;
-  }
-
   .max-md\:hidden {
     display: none;
   }
@@ -1718,6 +1714,10 @@ video {
 @media (min-width: 768px) {
   .md\:mr-2 {
     margin-right: 0.5rem;
+  }
+
+  .md\:block {
+    display: block;
   }
 
   .md\:inline-block {
