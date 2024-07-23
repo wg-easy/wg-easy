@@ -1,3 +1,5 @@
+<!-- If you modify this file, run `(p)npm run buildfirewall` -->
+
 <script>
 export default {
   name: 'Firewall',
@@ -74,8 +76,8 @@ export default {
       <thead>
         <tr>
           <th>{{ $t('fwInterface') }}</th>
-          <th>{{ $t('fwIv4') }}</th>
-          <th>{{ $t('fwIv6') }}</th>
+          <th>{{ $t('fwIpv4') }}</th>
+          <th>{{ $t('fwIpv6') }}</th>
         </tr>
       </thead>
       <tbody class="text-center">
@@ -103,7 +105,7 @@ export default {
             <button @click="deleteRule(rule.num)">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                 stroke="currentColor" class="size-6">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
               </svg>
             </button>
           </td>
@@ -119,18 +121,18 @@ export default {
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                   stroke="currentColor" class="size-6">
                   <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                    d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
                 </svg>
               </button>
             </form>
           </td>
           <td class="border border-gray-600">
             <input form="fw" type="text" name="source" v-model="newRule.source"
-              class="w-full outline-none bg-transparent text-center" />
+              class="w-full outline-none bg-transparent text-center"/>
           </td>
           <td class="border border-gray-600">
             <input form="fw" type="text" name="destination" v-model="newRule.destination"
-              class="w-full outline-none bg-transparent text-center" />
+              class="w-full outline-none bg-transparent text-center"/>
           </td>
           <td class="border border-gray-600">
             <select form="fw" name="protocol" v-model="newRule.protocol" class="bg-transparent">
