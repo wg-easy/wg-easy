@@ -163,25 +163,32 @@ module.exports = class Firewall {
       throw new Error('Invalid target or protocol.');
     }
 
+<<<<<<< HEAD
     // If empty source or destination
     if (!source || !destination) {
       throw new Error('Invalid source or destination address.')
 >>>>>>> a20e416 (fix: source & destination are required)
     }
 
+=======
+>>>>>>> 48f8be5 (fix: lint)
     /*
       Support command :
-      iptables -A CHAIN -s [IP | IP/CIDR] -d [IP | IP/CIDR] -p PROTOCOL -j TARGET
+      iptables -A CHAIN -s [IPv4 | IPv4/CIDR] -d [IPv4 | IPv4/CIDR] -p PROTOCOL -j TARGET
      */
 
     let iptablesCommand = `iptables -A ${WG_IPT_CHAIN_NAME}`;
 
-    if (Util.isIPAddress(source) || Util.isCIDR(source)) {
+    if (source && (Util.isIPAddress(source) || Util.isCIDR(source))) {
       iptablesCommand += ` -s ${source}`;
+    } else {
+      throw new Error('Invalid source address.');
     }
 
-    if (Util.isIPAddress(destination) || Util.isCIDR(destination)) {
+    if (destination && (Util.isIPAddress(destination) || Util.isCIDR(destination))) {
       iptablesCommand += ` -d ${destination}`;
+    } else {
+      throw new Error('Invalid destination address.');
     }
 
     iptablesCommand += ` -p ${protocol} -j ${target}`;
