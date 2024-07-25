@@ -96,11 +96,11 @@ export default {
         <table class=" dark:text-neutral-200 border-t-2 border-collapse dark:border-neutral-200 p-2">
           <thead class="bg-gray-200 dark:bg-neutral-600">
             <tr>
-              <th class="border dark:border-neutral-200">{{ $t('fwAction') }}</th>
-              <th class="border dark:border-neutral-200">{{ $t('fwSource') }}</th>
-              <th class="border dark:border-neutral-200">{{ $t('fwDestination') }}</th>
-              <th class="border dark:border-neutral-200">{{ $t('fwProtocol') }}</th>
-              <th class="border dark:border-neutral-200">{{ $t('fwTarget') }}</th>
+              <th class="border dark:border-neutral-200 p-1">{{ $t('fwAction') }}</th>
+              <th class="border dark:border-neutral-200 p-1">{{ $t('fwSource') }}</th>
+              <th class="border dark:border-neutral-200 p-1">{{ $t('fwDestination') }}</th>
+              <th class="border dark:border-neutral-200 p-1">{{ $t('fwProtocol') }}</th>
+              <th class="border dark:border-neutral-200 p-1">{{ $t('fwTarget') }}</th>
             </tr>
           </thead>
           <tbody class="text-center">
