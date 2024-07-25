@@ -21,7 +21,7 @@ const Target = Object.freeze({
 });
 
 const TargetName = Object.freeze({
-  [Target.RETURN]: 'RETURN',
+  [Target.RETURN]: '*',
   [Target.ALLOW]: 'ALLOW',
   [Target.BLOCK]: 'BLOCK',
 });
@@ -99,6 +99,26 @@ module.exports = class Util {
         return resolve(String(stdout).trim());
       });
     });
+  }
+
+  static isCIDR(ip) {
+    // https://stackoverflow.com/a/27434991
+    const cidrRegex = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\/([0-9]|[12][0-9]|3[0-2]))$/;
+    return cidrRegex.test(ip);
+  }
+
+  static isIPAddress(ip) {
+    // https://stackoverflow.com/a/27434991
+    const ipRegex = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+    return ipRegex.test(ip);
+  }
+
+  static isValidIptablesTarget(target) {
+    return Object.values(Target).includes(target);
+  }
+
+  static isValidIptablesProtocol(protocol) {
+    return Object.keys(Protocol).includes(protocol);
   }
 
   static getProtocolName(protocolNumber) {

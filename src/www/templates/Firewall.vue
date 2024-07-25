@@ -7,10 +7,10 @@ export default {
     let interfaces = [];
     let rules = [];
     let newRule = {
-      source: '',
-      destination: '',
-      protocol: '',
-      target: '',
+      source: '*',
+      destination: '*',
+      protocol: 'TCP',
+      target: 'DROP',
     };
     return { interfaces, rules, newRule };
   },
@@ -37,10 +37,10 @@ export default {
       const { source, destination, protocol, target } = this.newRule;
       this.api.addRule({ source, destination, protocol, target }).then(() => {
         this.newRule = {
-          source: '',
-          destination: '',
-          protocol: '',
-          target: '',
+          source: '*',
+          destination: '*',
+          protocol: 'TCP',
+          target: 'DROP',
         };
       }).catch((err) => {
         alert(err.message || err.toString());
@@ -93,7 +93,7 @@ export default {
       <form id="fw" @submit="addRule"></form>
 
       <div class="overflow-x-auto">
-        <table class=" dark:text-neutral-200 border-t-2 border-collapse dark:border-neutral-200 p-2">
+        <table class="dark:text-neutral-200 border-t-2 border-collapse dark:border-neutral-200 p-2">
           <thead class="bg-gray-200 dark:bg-neutral-600">
             <tr>
               <th class="border dark:border-neutral-200 p-1">{{ $t('fwAction') }}</th>
@@ -110,7 +110,7 @@ export default {
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                     stroke="currentColor" class="size-6">
                     <path stroke-linecap="round" stroke-linejoin="round"
-                      d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                      d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/>
                   </svg>
                 </button>
               </td>
@@ -124,28 +124,29 @@ export default {
                 <button form="fw" type="submit">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                     stroke="currentColor" class="size-6">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
                   </svg>
                 </button>
               </td>
               <td class="border border-neutral-500/50">
                 <input form="fw" type="text" name="source" v-model="newRule.source"
-                  class=" outline-none bg-transparent text-center" />
+                  class="outline-none bg-transparent text-center"/>
               </td>
               <td class="border border-neutral-500/50">
                 <input form="fw" type="text" name="destination" v-model="newRule.destination"
-                  class=" outline-none bg-transparent text-center" />
+                  class="outline-none bg-transparent text-center"/>
               </td>
               <td class="border border-neutral-500/50">
-                <select form="fw" name="protocol" v-model="newRule.protocol" class="bg-transparent">
-                  <option class="dark:text-white dark:bg-neutral-700" value="tcp">TCP</option>
-                  <option class="dark:text-white dark:bg-neutral-700" value="udp">UDP</option>
+                <select form="fw" name="protocol" @change="(e) => newRule.protocol = e.target.value"
+                  class="bg-transparent">
+                  <option class="dark:text-white dark:bg-neutral-700" selected value="TCP">TCP</option>
+                  <option class="dark:text-white dark:bg-neutral-700" value="UDP">UDP</option>
                 </select>
               </td>
               <td class="border border-neutral-500/50 p-1">
                 <select form="fw" name="target" v-model="newRule.target" class="bg-transparent">
                   <option class="dark:text-white dark:bg-neutral-700" value="ACCEPT">ALLOW</option>
-                  <option class="dark:text-white dark:bg-neutral-700" value="DROP">BLOCK</option>
+                  <option class="dark:text-white dark:bg-neutral-700" selected value="DROP">BLOCK</option>
                 </select>
               </td>
             </tr>

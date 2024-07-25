@@ -279,7 +279,7 @@ module.exports = class Server {
     // templates directory & vue files
     app.use(
       fromNodeMiddleware((req, res, next) => {
-        if (req.url.startsWith('/templates/') || req.url.endsWith('vue')) {
+        if (req.url.startsWith('/templates/') || req.url.endsWith('.vue')) {
           return res.status(403).json({
             error: 'Forbidden',
           });

@@ -1,7 +1,8 @@
 {
   "extends": "athom",
   "ignorePatterns": [
-    "**/vendor/*.js"
+    "**/vendor/*.js",
+    "**/test/*.js"
   ],
   "rules": {
     "consistent-return": "off",

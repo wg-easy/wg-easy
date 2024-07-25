@@ -145,12 +145,38 @@ module.exports = class Firewall {
     await Util.exec(iptablesCommand);
 =======
     // Validate target
-    if (target !== 'ACCEPT' && target !== 'DROP') {
-      throw new Error('Invalid action. Must be "ACCEPT" or "DROP".');
+    if (!Util.isValidIptablesTarget(target)) {
+      throw new Error('Invalid target.');
     }
 
+<<<<<<< HEAD
     await Util.exec(`iptables -A ${WG_IPT_CHAIN_NAME} -s ${source} -d ${destination} -p ${protocol} -j ${target}`);
 >>>>>>> 9ec7359 (feat: firewall)
+=======
+    // Validate protocol
+    if (!Util.isValidIptablesProtocol(protocol)) {
+      throw new Error('Invalid protocol.');
+    }
+
+    /*
+      Support command :
+      iptables -A CHAIN -s [IP | IP/CIDR] -d [IP | IP/CIDR] -p PROTOCOL -j TARGET
+     */
+
+    let iptablesCommand = `iptables -A ${WG_IPT_CHAIN_NAME}`;
+
+    if (Util.isIPAddress(source) || Util.isCIDR(source)) {
+      iptablesCommand += ` -s ${source}`;
+    }
+
+    if (Util.isIPAddress(destination) || Util.isCIDR(destination)) {
+      iptablesCommand += ` -d ${destination}`;
+    }
+
+    iptablesCommand += ` -p ${protocol} -j ${target}`;
+
+    await Util.exec(iptablesCommand);
+>>>>>>> 88b4ba1 (update: support @ip range with CIDR)
     await this.__saveIptablesRules();
     debug('Rule added');
   }
