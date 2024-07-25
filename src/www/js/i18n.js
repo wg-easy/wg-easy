@@ -220,7 +220,7 @@ const messages = { // eslint-disable-line no-unused-vars
     fwFirewall: 'Parefeu',
     fwInterface: 'Interface',
     fwIpv4: 'Adresse IPv4',
-    fwIpv6: 'Adresse IPv4',
+    fwIpv6: 'Adresse IPv6',
     fwAction: 'Action',
     fwSource: 'Source',
     fwDestination: 'Destination',
