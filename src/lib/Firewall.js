@@ -100,6 +100,7 @@ module.exports = class Firewall {
   async addIptablesRule(source, destination, protocol, target) {
     debug('Rule adding...');
 <<<<<<< HEAD
+<<<<<<< HEAD
     // Validate target & protocol
     if (!Util.isTarget(target) || !Util.isProtocol(protocol)) {
       throw new Error('Invalid target or protocol.');
@@ -156,6 +157,16 @@ module.exports = class Firewall {
     // Validate protocol
     if (!Util.isValidIptablesProtocol(protocol)) {
       throw new Error('Invalid protocol.');
+=======
+    // Validate target & protocol
+    if (!Util.isValidIptablesTarget(target) || !Util.isValidIptablesProtocol(protocol)) {
+      throw new Error('Invalid target or protocol.');
+    }
+
+    // If empty source or destination
+    if (!source || !destination) {
+      throw new Error('Invalid source or destination address.')
+>>>>>>> a20e416 (fix: source & destination are required)
     }
 
     /*
