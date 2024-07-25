@@ -276,6 +276,19 @@ module.exports = class Server {
         return { success: true };
       }));
 
+    // templates directory & vue files
+    app.use(
+      fromNodeMiddleware((req, res, next) => {
+        if (req.url.startsWith('/templates/') || req.url.endsWith('vue')) {
+          return res.status(403).json({
+            error: 'Forbidden',
+          });
+        }
+
+        next()
+      }),
+    );
+
     // firewall
     const routerFirewall = createRouter();
     app.use(routerFirewall);

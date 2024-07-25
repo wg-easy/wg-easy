@@ -47,6 +47,7 @@ module.exports = class Firewall {
   async getIptablesRules() {
     // iptables list the rules WG_IPT_CHAIN_NAME chain
 <<<<<<< HEAD
+<<<<<<< HEAD
     //
     // $ iptables -L WGEASY -nv --line-numbers
     // Chain WGEASY (0 references)
@@ -59,16 +60,24 @@ module.exports = class Firewall {
     // 1 ACCEPT 6 172.16.7.2 10.8.2.5
 =======
     // $ iptables -L ${WG_IPT_CHAIN_NAME} -n -v
+=======
+    //
+    // $ iptables -L WGEASY -nv --line-numbers
+>>>>>>> b4f7165 (fix: restrict access to vue templates directory)
     // Chain WGEASY (0 references)
-    // num pkts bytes target     prot opt in     out     source               destination
-    //   1    0     0 DROP       6    --  *      *       172.16.8.2           172.16.8.3
-    //   2    0     0 ACCEPT     6    --  *      *       172.16.9.2           172.16.8.3
-    // $ iptables -L ${WG_IPT_CHAIN_NAME} -n -v | awk '{print $3,$4,$8,$9}'
-    // (0 references)
+    // num   pkts bytes target     prot opt in     out     source               destination         
+    // 1        0     0 ACCEPT     6    --  *      *       172.16.7.2           10.8.2.5
+    //
+    // $ iptables -L ${WG_IPT_CHAIN_NAME} -nv --line-numbers | awk '{print $1,$4,$5,$9,$10}'
+    // Chain (0 references)
     // num target prot source destination
+<<<<<<< HEAD
     // 1 DROP 6 172.16.8.2 172.16.8.3
     // 2 ACCEPT 6 172.16.9.2 172.16.8.3
 >>>>>>> 9ec7359 (feat: firewall)
+=======
+    // 1 ACCEPT 6 172.16.7.2 10.8.2.5
+>>>>>>> b4f7165 (fix: restrict access to vue templates directory)
     const stdout = await Util.exec(`iptables -L ${WG_IPT_CHAIN_NAME} -nv --line-numbers | awk '{print $1,$4,$5,$9,$10}'`);
 
     const lines = stdout.split(/\r?\n/);
