@@ -285,7 +285,7 @@ module.exports = class Server {
           });
         }
 
-        next()
+        next();
       }),
     );
 

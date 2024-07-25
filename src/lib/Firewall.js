@@ -52,6 +52,7 @@ module.exports = class Firewall {
     // $ iptables -L WGEASY -nv --line-numbers
     // Chain WGEASY (0 references)
     // num   pkts bytes target     prot opt in     out     source               destination
+<<<<<<< HEAD
     // 1        0     0 ACCEPT     6    --  *      *       172.16.7.2           10.8.2.5
     //
     // $ iptables -L ${WG_IPT_CHAIN_NAME} -nv --line-numbers | awk '{print $1,$4,$5,$9,$10}'
@@ -66,6 +67,8 @@ module.exports = class Firewall {
 >>>>>>> b4f7165 (fix: restrict access to vue templates directory)
     // Chain WGEASY (0 references)
     // num   pkts bytes target     prot opt in     out     source               destination         
+=======
+>>>>>>> 2bac779 (fix: lint)
     // 1        0     0 ACCEPT     6    --  *      *       172.16.7.2           10.8.2.5
     //
     // $ iptables -L ${WG_IPT_CHAIN_NAME} -nv --line-numbers | awk '{print $1,$4,$5,$9,$10}'
