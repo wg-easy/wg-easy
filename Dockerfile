@@ -1,5 +1,7 @@
 FROM ghcr.io/vikashloomba/capmvm-k8s-os:1.23.5
-RUN apt install -y nodejs npm
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash && \
+    nvm install 20
+
 # Update npm to latest
 RUN npm install -g npm@latest
 
