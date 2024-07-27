@@ -6,7 +6,6 @@ RUN npm install -g npm@latest
 # Copy Web UI
 COPY src /app
 WORKDIR /app
-RUN npm ci --omit=dev &&\
-    mv node_modules /node_modules
+RUN npm ci --omit=dev
 # Set Environment
 ENV DEBUG=Server,WireGuard
