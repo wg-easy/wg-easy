@@ -10,7 +10,7 @@ services:
     container_name: wg-easy
     hostname: wg-easy
     volumes:
-      - ~/.wg-easy:/etc/wireguard
+      - ${HOME}/.wg-easy:/etc/wireguard
     ports:
       - "51820:51820/udp"
     restart: unless-stopped
@@ -26,7 +26,7 @@ services:
     container_name: nginx
     hostname: nginx
     volumes:
-      - ~/.nginx/servers/:/etc/nginx/servers/
+      - ${HOME}/.nginx/servers/:/etc/nginx/servers/
       - ./.nginx/letsencrypt/:/etc/letsencrypt/
     ports:
       - "80:80/tcp"
