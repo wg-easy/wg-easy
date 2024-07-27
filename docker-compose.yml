@@ -9,8 +9,6 @@ services:
     image: ghcr.io/wg-easy/wg-easy
     container_name: wg-easy
     hostname: wg-easy
-    volumes:
-      - ${HOME}/.wg-easy:/etc/wireguard
     ports:
       - "51820:51820/udp"
     restart: unless-stopped
