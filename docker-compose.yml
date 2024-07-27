@@ -3,7 +3,7 @@ version: "3.8"
 services:
   wg-easy:
     environment:
-      - WG_HOST=${cust}.wg.automatalabs.io
+      - WG_HOST=${HOST}
       # ⚠️ Change the Web UI Password:
       - PASSWORD=foobar123
     image: ghcr.io/vikashloomba/wg-easy
