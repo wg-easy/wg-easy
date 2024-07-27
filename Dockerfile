@@ -26,6 +26,4 @@ COPY --from=build_node_modules /node_modules /node_modules
 
 # Copy the needed wg-password scripts
 COPY --from=build_node_modules /app/wgpw.sh /bin/wgpw
-
-# Update npm to latest
-RUN npm install -g npm@latest
+RUN chmod +x /bin/wgpw
