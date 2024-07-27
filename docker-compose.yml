@@ -19,14 +19,14 @@ services:
       - net.ipv4.ip_forward=1
       - net.ipv4.conf.all.src_valid_mark=1
 
-  nginx:
-    image: weejewel/nginx-with-certbot
-    container_name: nginx
-    hostname: nginx
-    volumes:
-      - ${HOME}/.nginx/servers/:/etc/nginx/servers/
-      - ./.nginx/letsencrypt/:/etc/letsencrypt/
-    ports:
-      - "80:80/tcp"
-      - "443:443/tcp"
-    restart: unless-stopped
+  # nginx:
+  #   image: weejewel/nginx-with-certbot
+  #   container_name: nginx
+  #   hostname: nginx
+  #   volumes:
+  #     - ${HOME}/.nginx/servers/:/etc/nginx/servers/
+  #     - ./.nginx/letsencrypt/:/etc/letsencrypt/
+  #   ports:
+  #     - "80:80/tcp"
+  #     - "443:443/tcp"
+  #   restart: unless-stopped
