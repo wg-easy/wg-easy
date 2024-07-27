@@ -40,7 +40,7 @@ And log in again.
 <pre>
 $ docker run -d \
   --name=amnezia-wg-easy \
-  -e LANG=en \
+  -e LANGUAGE=en \
   -e WG_HOST=<b>🚨YOUR_SERVER_IP</b> \
   -e PASSWORD=<b>🚨YOUR_ADMIN_PASSWORD</b> \
   -v ~/.amnezia-wg-easy:/etc/wireguard \
