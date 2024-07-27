@@ -1,8 +1,8 @@
 'use strict';
 
-const { release } = require('./package.json');
+const { release: { version } } = require('./package.json');
 
-module.exports.RELEASE = release;
+module.exports.RELEASE = version;
 module.exports.PORT = process.env.PORT || '51821';
 module.exports.WEBUI_HOST = process.env.WEBUI_HOST || '0.0.0.0';
 module.exports.PASSWORD_HASH = process.env.PASSWORD_HASH;
