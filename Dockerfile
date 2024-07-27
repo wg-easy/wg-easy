@@ -1,4 +1,5 @@
 FROM ghcr.io/vikashloomba/capmvm-k8s-os:1.23.5
+RUN apt-get install -y unzip
 RUN curl -fsSL https://fnm.vercel.app/install | bash
 RUN source ~/.bashrc
 RUN fnm use --install-if-missing 20
