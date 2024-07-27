@@ -1,5 +1,5 @@
 FROM ghcr.io/vikashloomba/capmvm-k8s-os:1.23.5
-RUN apt install -y nodejs
+RUN apt install -y nodejs npm
 # Update npm to latest
 RUN npm install -g npm@latest
 
