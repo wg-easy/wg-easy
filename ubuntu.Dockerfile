@@ -8,3 +8,5 @@ COPY src /app
 WORKDIR /app
 RUN npm ci --omit=dev &&\
     mv node_modules /node_modules
+# Set Environment
+ENV DEBUG=Server,WireGuard
