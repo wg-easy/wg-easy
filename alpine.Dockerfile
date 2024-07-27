@@ -13,7 +13,7 @@ RUN npm ci --omit=dev &&\
 
 # Copy build result to a new image.
 # This saves a lot of disk space.
-FROM docker.io/library/node:20-alpine AS my-rootfs
+FROM docker.io/library/node:20-alpine
 HEALTHCHECK CMD /usr/bin/timeout 5s /bin/sh -c "/usr/bin/wg show | /bin/grep -q interface || exit 1" --interval=1m --timeout=5s --retries=3
 COPY --from=build_node_modules /app /app
 
@@ -41,20 +41,8 @@ RUN apk add --no-cache \
 # Use iptables-legacy
 RUN update-alternatives --install /sbin/iptables iptables /sbin/iptables-legacy 10 --slave /sbin/iptables-restore iptables-restore /sbin/iptables-legacy-restore --slave /sbin/iptables-save iptables-save /sbin/iptables-legacy-save
 
-# Include firecracker wrapper and scripts
-FROM ghcr.io/balena-io-experimental/container-jail
-
-# Copy the root file system from your existing final stage
-COPY --from=my-rootfs / /usr/src/app/rootfs
-
-# Provide your desired command to exec after init.
-# Setting your own ENTRYPOINT is unsupported, use the CMD field only.
-# CMD /start.sh
-
 # Set Environment
 ENV DEBUG=Server,WireGuard
-
-
 
 # Run Web UI
 WORKDIR /app
