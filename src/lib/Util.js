@@ -113,12 +113,38 @@ module.exports = class Util {
     return ipRegex.test(ip);
   }
 
-  static isValidIptablesTarget(target) {
+  static isTarget(target) {
     return Object.values(Target).includes(target);
   }
 
-  static isValidIptablesProtocol(protocol) {
+  static isProtocol(protocol) {
     return Object.keys(Protocol).includes(protocol);
+  }
+
+  static isPort(port) {
+    return port >= 0 && port <= 65535;
+  }
+
+  static isRangeAddresses() {
+    /* implement */
+  }
+
+  static isRangePorts() {
+    /* implement */
+  }
+
+  /* Support addresses are :
+    192.168.1.1
+    192.168.1.1:53
+    192.168.1.0/24
+    192.168.1.0/24:53
+  */
+  static isSupportedAddress(address) {
+    const parts = address.split(':');
+    if (parts.length > 2) return false;
+    const isAddress = this.isIPAddress(parts[0]) || this.isCIDR(parts[0]);
+    if (parts[1]) return this.isPort(parts[1]) && isAddress;
+    return isAddress;
   }
 
   static getProtocolName(protocolNumber) {

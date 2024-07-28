@@ -46,51 +46,46 @@ module.exports = class Firewall {
 
   async getIptablesRules() {
     // iptables list the rules WG_IPT_CHAIN_NAME chain
-<<<<<<< HEAD
-<<<<<<< HEAD
     //
     // $ iptables -L WGEASY -nv --line-numbers
     // Chain WGEASY (0 references)
     // num   pkts bytes target     prot opt in     out     source               destination
-<<<<<<< HEAD
-    // 1        0     0 ACCEPT     6    --  *      *       172.16.7.2           10.8.2.5
+    // 1        0     0 ACCEPT     6    --  *      *       172.16.7.2           10.8.2.5          tcp spt:22565 dpt:53
     //
-    // $ iptables -L ${WG_IPT_CHAIN_NAME} -nv --line-numbers | awk '{print $1,$4,$5,$9,$10}'
+    // $ iptables -L ${WG_IPT_CHAIN_NAME} -nv --line-numbers | awk '{print $1,$4,$5,$9,$10,$12,$13}'
     // Chain (0 references)
     // num target prot source destination
     // 1 ACCEPT 6 172.16.7.2 10.8.2.5
-=======
-    // $ iptables -L ${WG_IPT_CHAIN_NAME} -n -v
-=======
-    //
-    // $ iptables -L WGEASY -nv --line-numbers
->>>>>>> b4f7165 (fix: restrict access to vue templates directory)
-    // Chain WGEASY (0 references)
-    // num   pkts bytes target     prot opt in     out     source               destination         
-=======
->>>>>>> 2bac779 (fix: lint)
-    // 1        0     0 ACCEPT     6    --  *      *       172.16.7.2           10.8.2.5
-    //
-    // $ iptables -L ${WG_IPT_CHAIN_NAME} -nv --line-numbers | awk '{print $1,$4,$5,$9,$10}'
-    // Chain (0 references)
-    // num target prot source destination
-<<<<<<< HEAD
-    // 1 DROP 6 172.16.8.2 172.16.8.3
-    // 2 ACCEPT 6 172.16.9.2 172.16.8.3
->>>>>>> 9ec7359 (feat: firewall)
-=======
-    // 1 ACCEPT 6 172.16.7.2 10.8.2.5
->>>>>>> b4f7165 (fix: restrict access to vue templates directory)
-    const stdout = await Util.exec(`iptables -L ${WG_IPT_CHAIN_NAME} -nv --line-numbers | awk '{print $1,$4,$5,$9,$10}'`);
+    const stdout = await Util.exec(`iptables -L ${WG_IPT_CHAIN_NAME} -nv --line-numbers | awk '{print $1,$4,$5,$9,$10,$12,$13}'`);
 
     const lines = stdout.split(/\r?\n/);
     const rules = lines.slice(2).map((line) => {
-      const [num, target, protocol, source, destination] = line.trim().split(' ');
+      const [num, target, protocol, source, destination, spt, dpt] = line.trim().split(' ');
       const targetToName = Util.getTargetName(target);
       const protocolToName = Util.getProtocolName(protocol);
 
+      let newSource = source;
+      let newDestination = destination;
+
+      if (spt) {
+        // eslint-disable-next-line no-unused-vars
+        const [_, sPort] = spt.split(':');
+        if (spt.startsWith('spt')) {
+          newSource += `:${sPort}`;
+        }
+        if (spt.startsWith('dpt')) {
+          newDestination += `:${sPort}`;
+        }
+      }
+
+      if (dpt) {
+        // eslint-disable-next-line no-unused-vars
+        const [_, dPort] = dpt.split(':');
+        newDestination += `:${dPort}`;
+      }
+
       return {
-        num, target: targetToName, source, destination, protocol: protocolToName,
+        num, target: targetToName, source: newSource, destination: newDestination, protocol: protocolToName,
       };
     }).filter((rule) => rule !== null);
 
@@ -99,8 +94,6 @@ module.exports = class Firewall {
 
   async addIptablesRule(source, destination, protocol, target) {
     debug('Rule adding...');
-<<<<<<< HEAD
-<<<<<<< HEAD
     // Validate target & protocol
     if (!Util.isTarget(target) || !Util.isProtocol(protocol)) {
       throw new Error('Invalid target or protocol.');
@@ -108,93 +101,38 @@ module.exports = class Firewall {
 
     /*
       Support command :
-      iptables -A CHAIN -s [IPv4 | IPv4/CIDR] [--sport PORT] -d [IPv4 | IPv4/CIDR]  [--dport PORT] -p PROTOCOL -j TARGET
+      iptables -A CHAIN -s [IPv4 | IPv4/CIDR] -d [IPv4 | IPv4/CIDR] -p PROTOCOL [--sport PORT] [--dport PORT] -j TARGET
     */
 
     let iptablesCommand = `iptables -A ${WG_IPT_CHAIN_NAME}`;
 
-    if (Util.isSupportedAddress(source)) {
-      const [address, port] = source.split(':');
-      if (Util.isIPAddress(address) || Util.isCIDR(address)) {
-        iptablesCommand += ` -s ${address}`;
-        if (port) {
-          iptablesCommand += ` --sport ${port}`;
-        }
+    if (Util.isSupportedAddress(source) && Util.isSupportedAddress(destination)) {
+      const [sAddress, sPort] = source.split(':');
+      const [dAddress, dPort] = destination.split(':');
+      if (Util.isIPAddress(sAddress) || Util.isCIDR(sAddress)) {
+        iptablesCommand += ` -s ${sAddress}`;
       } else {
         throw new Error('Invalid source address.');
       }
-    } else {
-      throw new Error('Invalid source format.');
-    }
-
-    if (Util.isSupportedAddress(destination)) {
-      const [address, port] = destination.split(':');
-      if (Util.isIPAddress(address) || Util.isCIDR(address)) {
-        iptablesCommand += ` -d ${address}`;
-        if (port) {
-          iptablesCommand += ` --dport ${port}`;
-        }
+      if (Util.isIPAddress(dAddress) || Util.isCIDR(dAddress)) {
+        iptablesCommand += ` -d ${dAddress}`;
       } else {
         throw new Error('Invalid destination address.');
       }
+      iptablesCommand += ` -p ${protocol}`;
+      if (sPort) {
+        iptablesCommand += ` --sport ${sPort}`;
+      }
+      if (dPort) {
+        iptablesCommand += ` --dport ${dPort}`;
+      }
     } else {
-      throw new Error('Invalid destination format.');
+      throw new Error('Invalid source/destination format.');
     }
 
-    iptablesCommand += ` -p ${protocol} -j ${target}`;
+    iptablesCommand += ` -j ${target}`;
 
     await Util.exec(iptablesCommand);
-=======
-    // Validate target
-    if (!Util.isValidIptablesTarget(target)) {
-      throw new Error('Invalid target.');
-    }
-
-<<<<<<< HEAD
-    await Util.exec(`iptables -A ${WG_IPT_CHAIN_NAME} -s ${source} -d ${destination} -p ${protocol} -j ${target}`);
->>>>>>> 9ec7359 (feat: firewall)
-=======
-    // Validate protocol
-    if (!Util.isValidIptablesProtocol(protocol)) {
-      throw new Error('Invalid protocol.');
-=======
-    // Validate target & protocol
-    if (!Util.isValidIptablesTarget(target) || !Util.isValidIptablesProtocol(protocol)) {
-      throw new Error('Invalid target or protocol.');
-    }
-
-<<<<<<< HEAD
-    // If empty source or destination
-    if (!source || !destination) {
-      throw new Error('Invalid source or destination address.')
->>>>>>> a20e416 (fix: source & destination are required)
-    }
-
-=======
->>>>>>> 48f8be5 (fix: lint)
-    /*
-      Support command :
-      iptables -A CHAIN -s [IPv4 | IPv4/CIDR] -d [IPv4 | IPv4/CIDR] -p PROTOCOL -j TARGET
-     */
-
-    let iptablesCommand = `iptables -A ${WG_IPT_CHAIN_NAME}`;
-
-    if (source && (Util.isIPAddress(source) || Util.isCIDR(source))) {
-      iptablesCommand += ` -s ${source}`;
-    } else {
-      throw new Error('Invalid source address.');
-    }
-
-    if (destination && (Util.isIPAddress(destination) || Util.isCIDR(destination))) {
-      iptablesCommand += ` -d ${destination}`;
-    } else {
-      throw new Error('Invalid destination address.');
-    }
-
-    iptablesCommand += ` -p ${protocol} -j ${target}`;
-
-    await Util.exec(iptablesCommand);
->>>>>>> 88b4ba1 (update: support @ip range with CIDR)
     await this.__saveIptablesRules();
     debug('Rule added');
   }

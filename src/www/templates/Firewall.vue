@@ -7,8 +7,8 @@ export default {
     let interfaces = [];
     let rules = [];
     let newRule = {
-      source: '*',
-      destination: '*',
+      source: '',
+      destination: '',
       protocol: 'TCP',
       target: 'DROP',
     };
@@ -37,8 +37,8 @@ export default {
       const { source, destination, protocol, target } = this.newRule;
       this.api.addRule({ source, destination, protocol, target }).then(() => {
         this.newRule = {
-          source: '*',
-          destination: '*',
+          source: '',
+          destination: '',
           protocol: 'TCP',
           target: 'DROP',
         };
@@ -104,7 +104,7 @@ export default {
             </tr>
           </thead>
           <tbody class="text-center">
-            <tr v-for="(rule, index) in rules" :key="index">
+            <tr v-for="(rule, index) in rules" :key="index" :class="[rule.target == 'BLOCK' ? 'bg-red-500/50' : '']">
               <td class="border border-neutral-500/50 p-1 hover:bg-red-800/50 transition">
                 <button type="button" @click="deleteRule(rule.num)">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"

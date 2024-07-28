@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# The buildall.sh script is designed to streamline the build process for the project.
+# The buildall.sh script is a tool to build the project and help developers.
 # It allows you to run different build commands based on whether you are using "sudo" and supports multiple package managers.
 # If you need to run the build commands with "sudo[script]" (look at package.json scripts), provide the "with-sudo" argument :
 #
