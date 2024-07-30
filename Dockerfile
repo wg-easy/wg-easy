@@ -2,18 +2,6 @@
 # nodejs 20 hangs on build with armv6/armv7
 FROM docker.io/library/node:18-alpine AS build_node_modules
 
-# Set the platform to build image for
-ARG TARGETPLATFORM
-ENV TARGETPLATFORM=${TARGETPLATFORM:-linux/amd64}
-
-# Install additional tools needed if on arm64 / armv7 / armv6
-RUN \
-  case "${TARGETPLATFORM}" in \
-  'linux/arm64') apk add --no-cache python3 make g++ ;; \
-  'linux/arm/v7') apk add --no-cache python3 make g++ ;; \
-  'linux/arm/v6') apk add --no-cache python3 make g++ ;; \
-  esac
-
 # Update npm to latest
 RUN npm install -g npm@latest
 
