@@ -5,5 +5,5 @@ services:
     volumes:
       - ./src/:/app/
     environment:
-      # - PASSWORD=p
+      # - PASSWORD_HASH=p
       - WG_HOST=192.168.1.233
