@@ -64,11 +64,11 @@ class API {
     });
   }
 
-  async createSession({ password }) {
+  async createSession({ username, password }) {
     return this.call({
       method: 'post',
       path: '/session',
-      body: { password },
+      body: { username, password },
     });
   }
 
@@ -143,6 +143,14 @@ class API {
       method: 'put',
       path: '/wireguard/restore',
       body: { file },
+    });
+  }
+
+  async updatePassword({ username, oldPassword, newPassword }) {
+    return this.call({
+      method: 'put',
+      path: '/dashboard/setting/password',
+      body: { username, oldPassword, newPassword },
     });
   }
 

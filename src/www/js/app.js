@@ -46,11 +46,14 @@ new Vue({
   el: '#app',
   components: {
     apexchart: VueApexCharts,
+    dashboard: VueDashboard,
   },
   i18n,
   data: {
     authenticated: null,
     authenticating: false,
+    // temp username 'admin'
+    username: 'admin',
     password: null,
     requiresPassword: null,
 
@@ -155,6 +158,8 @@ new Vue({
         },
       },
     },
+
+    showPage: 'home',
   },
   methods: {
     dateTime: (value) => {
@@ -238,6 +243,8 @@ new Vue({
 
       this.authenticating = true;
       this.api.createSession({
+        // temp username 'admin'
+        username: this.username,
         password: this.password,
       })
         .then(async () => {

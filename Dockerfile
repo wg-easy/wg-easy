@@ -26,10 +26,6 @@ COPY --from=build_node_modules /app /app
 # than what runs inside of docker.
 COPY --from=build_node_modules /node_modules /node_modules
 
-# Copy the needed wg-password scripts
-COPY --from=build_node_modules /app/wgpw.sh /bin/wgpw
-RUN chmod +x /bin/wgpw
-
 # Install Linux packages
 RUN apk add --no-cache \
     dpkg \
@@ -42,7 +38,7 @@ RUN apk add --no-cache \
 RUN update-alternatives --install /sbin/iptables iptables /sbin/iptables-legacy 10 --slave /sbin/iptables-restore iptables-restore /sbin/iptables-legacy-restore --slave /sbin/iptables-save iptables-save /sbin/iptables-legacy-save
 
 # Set Environment
-ENV DEBUG=Server,WireGuard
+ENV DEBUG=Server,WireGuard,Database
 
 # Run Web UI
 WORKDIR /app

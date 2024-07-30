@@ -34,6 +34,13 @@ const messages = { // eslint-disable-line no-unused-vars
     backup: 'Backup',
     titleRestoreConfig: 'Restore your configuration',
     titleBackupConfig: 'Backup your configuration',
+    navHome: 'Home',
+    navDashboard: 'Dashboard',
+    dashboard: 'Dashboard',
+    currentPassword: 'Current Password',
+    newPassword: 'New Password',
+    confirmNewPassword: 'Confirm New Password',
+    updatePassword: 'Update Password',
   },
   ua: {
     name: 'Ім`я',

@@ -1,6 +1,5 @@
 'use strict';
 
-const bcrypt = require('bcryptjs');
 const crypto = require('node:crypto');
 const { createServer } = require('node:http');
 const { stat, readFile } = require('node:fs/promises');
@@ -23,37 +22,33 @@ const {
 } = require('h3');
 
 const WireGuard = require('../services/WireGuard');
+const Database = require('../services/Database');
 
 const {
   PORT,
   WEBUI_HOST,
   RELEASE,
-  PASSWORD_HASH,
   LANG,
   UI_TRAFFIC_STATS,
   UI_CHART_TYPE,
 } = require('../config');
 
-const requiresPassword = !!PASSWORD_HASH;
+const requiresPassword = true;
 
 /**
- * Checks if `password` matches the PASSWORD_HASH.
+ * Checks if `username` & `password` credentials are valid.
  *
- * If environment variable is not set, the password is always invalid.
- *
+ * @param {string} username String to test
  * @param {string} password String to test
- * @returns {boolean} true if matching environment, otherwise false
+ * @returns {Promise<boolean>} true if matching, otherwise false
+ *
  */
-const isPasswordValid = (password) => {
-  if (typeof password !== 'string') {
+const isPasswordValid = async (username, password) => {
+  if (typeof username !== 'string' || typeof password !== 'string') {
     return false;
   }
 
-  if (PASSWORD_HASH) {
-    return bcrypt.compareSync(password, PASSWORD_HASH);
-  }
-
-  return false;
+  return Database.comparePassword(username, password);
 };
 
 module.exports = class Server {
@@ -104,7 +99,7 @@ module.exports = class Server {
         };
       }))
       .post('/api/session', defineEventHandler(async (event) => {
-        const { password } = await readBody(event);
+        const { username, password } = await readBody(event);
 
         if (!requiresPassword) {
           // if no password is required, the API should never be called.
@@ -115,7 +110,8 @@ module.exports = class Server {
           });
         }
 
-        if (!isPasswordValid(password)) {
+        const isMatch = await isPasswordValid(username, password);
+        if (!isMatch) {
           throw createError({
             status: 401,
             message: 'Incorrect Password',
@@ -142,12 +138,7 @@ module.exports = class Server {
         }
 
         if (req.url.startsWith('/api/') && req.headers['authorization']) {
-          if (isPasswordValid(req.headers['authorization'])) {
-            return next();
-          }
-          return res.status(401).json({
-            error: 'Incorrect Password',
-          });
+          return next();
         }
 
         return res.status(401).json({
@@ -258,11 +249,11 @@ module.exports = class Server {
       });
     };
 
-    // backup_restore
-    const router3 = createRouter();
-    app.use(router3);
+    // backup & restore
+    const routerBackupRestore = createRouter();
+    app.use(routerBackupRestore);
 
-    router3
+    routerBackupRestore
       .get('/api/wireguard/backup', defineEventHandler(async (event) => {
         const config = await WireGuard.backupConfiguration();
         setHeader(event, 'Content-Disposition', 'attachment; filename="wg0.json"');
@@ -272,6 +263,17 @@ module.exports = class Server {
       .put('/api/wireguard/restore', defineEventHandler(async (event) => {
         const { file } = await readBody(event);
         await WireGuard.restoreConfiguration(file);
+        return { success: true };
+      }));
+
+    // admin dashboard
+    const routerDashboard = createRouter();
+    app.use(routerDashboard);
+
+    routerDashboard
+      .put('/api/dashboard/setting/password', defineEventHandler(async (event) => {
+        const { username, oldPassword, newPassword } = await readBody(event);
+        await Database.updatePassword(username, oldPassword, newPassword);
         return { success: true };
       }));
 

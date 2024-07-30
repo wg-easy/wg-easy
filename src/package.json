@@ -8,7 +8,6 @@
   "main": "server.js",
   "scripts": {
     "serve": "DEBUG=Server,WireGuard npx nodemon server.js",
-    "serve-with-password": "PASSWORD=wg npm run serve",
     "lint": "eslint .",
     "buildcss": "npx tailwindcss -i ./www/src/css/app.css -o ./www/css/app.css"
   },
@@ -19,7 +18,8 @@
     "debug": "^4.3.6",
     "express-session": "^1.18.0",
     "h3": "^1.12.0",
-    "qrcode": "^1.5.3"
+    "qrcode": "^1.5.3",
+    "sqlite3": "^5.1.7"
   },
   "devDependencies": {
     "eslint-config-athom": "^3.1.3",

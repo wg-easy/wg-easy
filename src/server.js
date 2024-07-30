@@ -3,10 +3,21 @@
 require('./services/Server');
 
 const WireGuard = require('./services/WireGuard');
+const Database = require('./services/Database');
 
 WireGuard.getConfig()
+  .then(() => {
+    Database.initDb()
+      .catch((err) => {
+        // eslint-disable-next-line no-console
+        console.error(err);
+
+        // eslint-disable-next-line no-process-exit
+        process.exit(1);
+      });
+  })
   .catch((err) => {
-  // eslint-disable-next-line no-console
+    // eslint-disable-next-line no-console
     console.error(err);
 
     // eslint-disable-next-line no-process-exit
