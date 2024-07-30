@@ -5,10 +5,17 @@ FROM docker.io/library/node:18-alpine AS build_node_modules
 # Update npm to latest
 RUN npm install -g npm@latest
 
+# Sqlite build
+RUN apk add --no-cache \
+    build-base \
+    sqlite-dev \
+    python3 \
+    py3-pip
+
 # Copy Web UI
 COPY src /app
 WORKDIR /app
-RUN npm ci --omit=dev &&\
+RUN npm ci --build-from-source --omit=dev &&\
     mv node_modules /node_modules
 
 # Copy build result to a new image.
