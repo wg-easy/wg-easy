@@ -8,8 +8,7 @@ RUN npm install -g npm@latest
 # Copy Web UI
 COPY src /app
 WORKDIR /app
-RUN npm rebuild --build-from-source=sqlite3 &&\
-    npm ci --omit=dev &&\
+RUN npm ci --omit=dev &&\
     mv node_modules /node_modules
 
 # Copy build result to a new image.
