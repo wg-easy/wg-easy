@@ -28,7 +28,7 @@ function bytes(bytes, decimals, kib, maxunit) {
  *
  * @param {Array} array - The array of objects to be sorted.
  * @param {string} property - The property to sort the array by.
- * @param {boolean} [sort=true] - Whether to sort the array in descending (default) or ascending order.
+ * @param {boolean} [sort=true] - Whether to sort the array in ascending (default) or descending order.
  * @return {Array} - The sorted array of objects.
  */
 function sortByProperty(array, property, sort = true) {
@@ -172,7 +172,7 @@ new Vue({
       },
     },
 
-    sortClient: true // Sort clients by name, true = desc, false = asc
+    sortClient: true // Sort clients by name, true = asc, false = desc
   },
   methods: {
     dateTime: (value) => {
