@@ -111,6 +111,12 @@
                 </svg>
                 <span class="max-md:hidden text-sm">{{$t("backup")}}</span>
               </a>
+              <!-- Sort client -->
+              <button @click="sortClient = !sortClient;"
+                class="hover:bg-red-800 hover:border-red-800 hover:text-white text-gray-700 dark:text-neutral-200 max-md:border-l-0 border-2 border-gray-100 dark:border-neutral-600 py-2 px-4 rounded-r-full md:rounded inline-flex items-center transition">
+                <span v-if="sortClient === false" class="max-md:hidden text-sm">{{$t("sort")}} ↑</span>
+                <span v-if="sortClient === true" class="max-md:hidden text-sm">{{$t("sort")}} ↓</span>
+              </button>
               <!-- New client -->
               <button @click="clientCreate = true; clientCreateName = '';"
                 class="hover:bg-red-800 hover:border-red-800 hover:text-white text-gray-700 dark:text-neutral-200 max-md:border-l-0 border-2 border-gray-100 dark:border-neutral-600 py-2 px-4 rounded-r-full md:rounded inline-flex items-center transition">

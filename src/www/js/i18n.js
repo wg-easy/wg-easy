@@ -34,6 +34,7 @@ const messages = { // eslint-disable-line no-unused-vars
     backup: 'Backup',
     titleRestoreConfig: 'Restore your configuration',
     titleBackupConfig: 'Backup your configuration',
+    sort: 'Sort',
   },
   ua: {
     name: 'Ім`я',
@@ -328,7 +329,7 @@ const messages = { // eslint-disable-line no-unused-vars
     madeBy: '만든 사람',
     donate: '기부',
   },
-  vi: {
+  vi: { // https://github.com/hoangneeee
     name: 'Tên',
     password: 'Mật khẩu',
     signIn: 'Đăng nhập',
@@ -354,6 +355,13 @@ const messages = { // eslint-disable-line no-unused-vars
     downloadConfig: 'Tải xuống cấu hình',
     madeBy: 'Được tạo bởi',
     donate: 'Ủng hộ',
+    toggleCharts: 'Mở/Ẩn Biểu đồ',
+    theme: { dark: 'Dark theme', light: 'Light theme', auto: 'Auto theme' },
+    restore: 'Khôi phục',
+    backup: 'Sao lưu',
+    titleRestoreConfig: 'Khôi phục cấu hình của bạn',
+    titleBackupConfig: 'Sao lưu cấu hình của bạn',
+    sort: 'Sắp xếp'
   },
   nl: {
     name: 'Naam',

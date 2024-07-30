@@ -23,6 +23,22 @@ function bytes(bytes, decimals, kib, maxunit) {
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
 }
 
+/**
+ * Sorts an array of objects by a specified property in ascending or descending order.
+ *
+ * @param {Array} array - The array of objects to be sorted.
+ * @param {string} property - The property to sort the array by.
+ * @param {boolean} [sort=true] - Whether to sort the array in descending (default) or ascending order.
+ * @return {Array} - The sorted array of objects.
+ */
+function sortByProperty(array, property, sort = true) {
+  if (sort) {
+    return array.sort((a, b) => typeof a[property] === "string" ? a[property].localeCompare(b[property]) : a[property] - b[property]);
+  } else {
+    return array.sort((a, b) => typeof a[property] === "string" ? b[property].localeCompare(a[property]) : b[property] - a[property]);
+  }
+}
+
 const i18n = new VueI18n({
   locale: localStorage.getItem('lang') || 'en',
   fallbackLocale: 'en',
@@ -155,6 +171,8 @@ new Vue({
         },
       },
     },
+
+    sortClient: true // Sort clients by name, true = desc, false = asc
   },
   methods: {
     dateTime: (value) => {
@@ -229,6 +247,7 @@ new Vue({
 
         return client;
       });
+      this.clients = sortByProperty(this.clients, 'name', this.sortClient);
     },
     login(e) {
       e.preventDefault();
