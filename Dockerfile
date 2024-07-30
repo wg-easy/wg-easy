@@ -32,6 +32,7 @@ RUN apk add --no-cache \
     dumb-init \
     iptables \
     iptables-legacy \
+    python3 \
     wireguard-tools
 
 # Use iptables-legacy
