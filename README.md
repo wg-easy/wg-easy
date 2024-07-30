@@ -32,7 +32,8 @@ You have found the easiest way to install & manage WireGuard on any Linux host!
 
 ## Versions
 
-We provide more then 1 docker image to get, this will help you decide which one is best for you.
+We provide more then 1 docker image to get, this will help you decide which one is best for you. <br>
+For **stable** versions instead of nightly or development please read **README** from the **production** branch!
 
 | tag | Branch | Example | Description |
 | - | - | - | - |
