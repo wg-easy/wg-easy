@@ -361,7 +361,7 @@ const messages = { // eslint-disable-line no-unused-vars
     backup: 'Sao lưu',
     titleRestoreConfig: 'Khôi phục cấu hình của bạn',
     titleBackupConfig: 'Sao lưu cấu hình của bạn',
-    sort: 'Sắp xếp'
+    sort: 'Sắp xếp',
   },
   nl: {
     name: 'Naam',

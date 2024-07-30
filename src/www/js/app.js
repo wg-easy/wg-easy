@@ -33,10 +33,10 @@ function bytes(bytes, decimals, kib, maxunit) {
  */
 function sortByProperty(array, property, sort = true) {
   if (sort) {
-    return array.sort((a, b) => typeof a[property] === "string" ? a[property].localeCompare(b[property]) : a[property] - b[property]);
-  } else {
-    return array.sort((a, b) => typeof a[property] === "string" ? b[property].localeCompare(a[property]) : b[property] - a[property]);
+    return array.sort((a, b) => (typeof a[property] === 'string' ? a[property].localeCompare(b[property]) : a[property] - b[property]));
   }
+
+  return array.sort((a, b) => (typeof a[property] === 'string' ? b[property].localeCompare(a[property]) : b[property] - a[property]));
 }
 
 const i18n = new VueI18n({
@@ -172,7 +172,7 @@ new Vue({
       },
     },
 
-    sortClient: true // Sort clients by name, true = asc, false = desc
+    sortClient: true, // Sort clients by name, true = asc, false = desc
   },
   methods: {
     dateTime: (value) => {
