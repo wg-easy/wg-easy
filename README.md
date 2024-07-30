@@ -97,10 +97,6 @@ Are you enjoying this project? [Buy Emile a beer!](https://github.com/sponsors/W
 
 These options can be configured by setting environment variables using `-e KEY="VALUE"` in the `docker run` command.
 
-### Password
-
-Until version 13, we used PASSWORD or PASSWORD_HASH. Now, the initial deployment of the docker container uses the default password 'admin'.
-
 | Env | Default | Example | Description                                                                                                                                          |
 | - | - | - |------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `PORT` | `51821` | `6789` | TCP port for Web UI.                                                                                                                                 |
