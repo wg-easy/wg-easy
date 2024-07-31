@@ -15,7 +15,7 @@ RUN apk add --no-cache \
 # Copy Web UI
 COPY src /app
 WORKDIR /app
-RUN npm ci --build-from-source --omit=dev &&\
+RUN npm ci --build-from-source=sqlite3 --omit=dev &&\
     mv node_modules /node_modules
 
 # Copy build result to a new image.
