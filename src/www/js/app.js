@@ -46,7 +46,7 @@ new Vue({
   el: '#app',
   components: {
     apexchart: VueApexCharts,
-    dashboard: VueDashboard,
+    settings: VueSettings,
   },
   i18n,
   data: {

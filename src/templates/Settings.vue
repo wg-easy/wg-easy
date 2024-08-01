@@ -1,6 +1,8 @@
+<!-- vue-cli-service build --dest src/www/js/vendor --no-module --formats umd-min --target lib --name VueSettings --filename vue-settings --no-clean src/templates/Settings.vue -->
+
 <script>
 export default {
-  name: 'Dashboard',
+  name: 'Settings',
   data() {
     return {
       currentPassword: '',
@@ -21,7 +23,7 @@ export default {
         username: 'admin',
         oldPassword: this.currentPassword,
         newPassword: this.newPassword
-      }).then((result) => {
+      }).then((_result) => {
           this.currentPassword = '';
           this.newPassword = '';
           this.confirmNewPassword = '';
@@ -41,7 +43,7 @@ export default {
   <div class="w-full shadow-md rounded-lg bg-white dark:bg-neutral-700 overflow-hidden">
     <div class="flex flex-row flex-auto items-center p-3 px-5 border-b-2 border-neutral-500/50 dark:border-neutral-600">
       <div class="flex-grow">
-        <p class="text-2xl font-medium dark:text-neutral-200">{{ $t('dashboard') }}</p>
+        <p class="text-2xl font-medium dark:text-neutral-200">{{ $t('settings') }}</p>
       </div>
     </div>
 
@@ -51,7 +53,7 @@ export default {
           <label for="currentPassword" class="block text-sm font-medium dark:text-neutral-200 mb-4">
             {{ $t('currentPassword') }}
           </label>
-          <input id="currentPassword" v-model="currentPassword" type="password" placeholder="Current Password"
+          <input id="currentPassword" v-model="currentPassword" type="password" :placeholder="$t('currentPassword')"
             class="outline-none bg-transparent border border-neutral-500 p-2 rounded-md w-full" required />
         </div>
 
@@ -59,7 +61,7 @@ export default {
           <label for="newPassword" class="block text-sm font-medium dark:text-neutral-200 mb-4">
             {{ $t('newPassword') }}
           </label>
-          <input id="newPassword" v-model="newPassword" type="password" placeholder="New Password"
+          <input id="newPassword" v-model="newPassword" type="password" :placeholder="$t('newPassword')"
             class="outline-none bg-transparent border border-neutral-500 p-2 rounded-md w-full" required />
         </div>
 
@@ -67,7 +69,7 @@ export default {
           <label for="confirmNewPassword" class="block text-sm font-medium dark:text-neutral-200 mb-4">
             {{ $t('confirmNewPassword') }}
           </label>
-          <input id="confirmNewPassword" v-model="confirmNewPassword" type="password" placeholder="Confirm New Password"
+          <input id="confirmNewPassword" v-model="confirmNewPassword" type="password" :placeholder="$t('confirmNewPassword')"
             class="outline-none bg-transparent border border-neutral-500 p-2 rounded-md w-full" required />
         </div>
 

@@ -149,7 +149,7 @@ class API {
   async updatePassword({ username, oldPassword, newPassword }) {
     return this.call({
       method: 'put',
-      path: '/dashboard/setting/password',
+      path: '/setting/password',
       body: { username, oldPassword, newPassword },
     });
   }

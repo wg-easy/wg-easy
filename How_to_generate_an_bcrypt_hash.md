@@ -25,4 +25,8 @@ $ echo "$2b$12$coPqCsPtcF"
 b2
 $ echo '$2b$12$coPqCsPtcF'
 $2b$12$coPqCsPtcF
+<<<<<<< HEAD
 ```
+=======
+```
+>>>>>>> a13c652 (update: use lowdb)

@@ -1,13 +1,14 @@
 'use strict';
 
-const SQLiteDatabase = require('../lib/database/SQLite');
+const Lowdb = require('../lib/database/Lowdb');
 // const MySqlDatabase = require('../lib/database/MySql');
 
 /*
   module.exports = {
     SQLiteDatabase: new SQLiteDatabase(),
+    MySqlDatabase: new MySqlDatabase(),
     ...
   };
 */
 
-module.exports = new SQLiteDatabase();
+module.exports = new Lowdb();

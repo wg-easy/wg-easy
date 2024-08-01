@@ -138,6 +138,13 @@ module.exports = class Server {
         }
 
         if (req.url.startsWith('/api/') && req.headers['authorization']) {
+          // when I debug req.headers['authorization'], I have nothing
+          // if (isPasswordValid(req.headers['authorization'])) {
+          //   return next();
+          // }
+          // return res.status(401).json({
+          //   error: 'Incorrect Password',
+          // });
           return next();
         }
 
@@ -266,12 +273,12 @@ module.exports = class Server {
         return { success: true };
       }));
 
-    // admin dashboard
-    const routerDashboard = createRouter();
-    app.use(routerDashboard);
+    // setting
+    const routerSetting = createRouter();
+    app.use(routerSetting);
 
-    routerDashboard
-      .put('/api/dashboard/setting/password', defineEventHandler(async (event) => {
+    routerSetting
+      .put('/api/setting/password', defineEventHandler(async (event) => {
         const { username, oldPassword, newPassword } = await readBody(event);
         await Database.updatePassword(username, oldPassword, newPassword);
         return { success: true };
