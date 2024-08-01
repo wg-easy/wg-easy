@@ -37,10 +37,10 @@ And log in again.
 
 ### 2. Run AmneziaWG Easy
 
-```bash
+<pre>
 $ docker run -d \
   --name=amnezia-wg-easy \
-  -e LANG=en \
+  -e LANGUAGE=en \
   -e WG_HOST=<b>🚨YOUR_SERVER_IP</b> \
   -e PASSWORD=<b>🚨YOUR_ADMIN_PASSWORD</b> \
   -v ~/.amnezia-wg-easy:/etc/wireguard \
@@ -53,7 +53,11 @@ $ docker run -d \
   --device=/dev/net/tun:/dev/net/tun \
   --restart unless-stopped \
   ghcr.io/spcfox/amnezia-wg-easy
-```
+</pre>
+
+> 💡 Replace `YOUR_SERVER_IP` with your WAN IP, or a Dynamic DNS hostname.
+>
+> 💡 Replace `YOUR_ADMIN_PASSWORD` with a password to log in on the Web UI.
 
 The Web UI will now be available on `http://0.0.0.0:51821`.
 
@@ -91,6 +95,8 @@ These options can be configured by setting environment variables using `-e KEY="
 | `H2` | `random` | `1234567892` | Response packet magic header — header of the first byte of the handshake response. Must be < uint_max. |
 | `H3` | `random` | `1234567893` | Underload packet magic header — UnderLoad packet header. Must be < uint_max. |
 | `H4` | `random` | `1234567894` | Transport packet magic header — header of the packet of the data packet. Must be < uint_max. |
+
+> If you change `WG_PORT`, make sure to also change the exposed port.
 
 ## Updating
 
