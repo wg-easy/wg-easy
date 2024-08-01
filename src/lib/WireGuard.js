@@ -130,14 +130,6 @@ H2 = ${config.server.h2}
 H3 = ${config.server.h3}
 H4 = ${config.server.h4}
 Jc = ${config.server.jc}
-Jmin = ${config.server.jmin}
-Jmax = ${config.server.jmax}
-S1 = ${config.server.s1}
-S2 = ${config.server.s2}
-H1 = ${config.server.h1}
-H2 = ${config.server.h2}
-H3 = ${config.server.h3}
-H4 = ${config.server.h4}
 `;
 
     for (const [clientId, client] of Object.entries(config.clients)) {
