@@ -1,9 +1,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-undef */
 
-'use strict';
-
-class API {
+export default class API {
 
   async call({ method, path, body }) {
     const res = await fetch(`./api${path}`, {

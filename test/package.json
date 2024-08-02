@@ -1,0 +1,22 @@
+{
+  "release": {
+    "version": "14"
+  },
+  "name": "wg-easy",
+  "version": "1.0.1",
+  "description": "The easiest way to run WireGuard VPN + Web-based Admin UI.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "@nuxtjs/i18n": "^8.3.3",
+    "nuxt": "^3.12.4",
+    "vue": "latest"
+  }
+}
