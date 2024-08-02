@@ -129,7 +129,7 @@ module.exports = class Server {
     // WireGuard
     app.use(
       fromNodeMiddleware(async (req, res, next) => {
-        if (!requiresPassword || !req.url.startsWith('/api/')) {
+        if (!req.url.startsWith('/api/')) {
           return next();
         }
 
@@ -273,12 +273,33 @@ module.exports = class Server {
         return { success: true };
       }));
 
-    // setting
-    const routerSetting = createRouter();
-    app.use(routerSetting);
+    // Setup
+    const routerSetup = createRouter();
+    app.use(routerSetup);
 
-    routerSetting
-      .put('/api/setting/password', defineEventHandler(async (event) => {
+    routerSetup
+      .get('/setup', defineEventHandler((_event) => {
+        const isFirstSetup = Database.firstSetupAuth();
+        return { success: isFirstSetup };
+      }))
+      .post('/setup/user', defineEventHandler(async (event) => {
+        try {
+          const { username, password } = await readBody(event);
+          await Database.addAdminUser(username, password);
+          return { success: true };
+        } catch (error) {
+          return createError({
+            status: error.statusCode,
+            data: { errorMessage: error.message || error.toString() },
+          });
+        }
+      }))
+      .post('/api/setup/user', defineEventHandler(async (event) => {
+        const { username, password } = await readBody(event);
+        await Database.addUser(username, password);
+        return { success: true };
+      }))
+      .put('/api/setup/user', defineEventHandler(async (event) => {
         const { username, oldPassword, newPassword } = await readBody(event);
         await Database.updatePassword(username, oldPassword, newPassword);
         return { success: true };

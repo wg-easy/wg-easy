@@ -47,9 +47,11 @@ new Vue({
   components: {
     apexchart: VueApexCharts,
     settings: VueSettings,
+    setup: VueSetup,
   },
   i18n,
   data: {
+    firstSetup: false,
     authenticated: null,
     authenticating: false,
     // temp username 'admin'
@@ -355,6 +357,12 @@ new Vue({
     this.setTheme(this.uiTheme);
 
     this.api = new API();
+    this.api.checkFirstSetup()
+      .then((response) => {
+        this.firstSetup = response.success;
+      }).catch((err) => {
+        alert(err.message || err.toString());
+      });
     this.api.getSession()
       .then((session) => {
         this.authenticated = session.authenticated;

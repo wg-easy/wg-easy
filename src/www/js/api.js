@@ -5,8 +5,10 @@
 
 class API {
 
-  async call({ method, path, body }) {
-    const res = await fetch(`./api${path}`, {
+  async call({
+    method, path, body, fullPath,
+  }) {
+    const res = await fetch(fullPath || `./api${path}`, {
       method,
       headers: {
         'Content-Type': 'application/json',
@@ -146,10 +148,25 @@ class API {
     });
   }
 
+  async checkFirstSetup() {
+    return this.call({
+      method: 'get',
+      fullPath: '/setup',
+    });
+  }
+
+  async addAdminUser({ username, password }) {
+    return this.call({
+      method: 'post',
+      fullPath: '/setup/user',
+      body: { username, password },
+    });
+  }
+
   async updatePassword({ username, oldPassword, newPassword }) {
     return this.call({
       method: 'put',
-      path: '/setting/password',
+      path: '/setup/user',
       body: { username, oldPassword, newPassword },
     });
   }
