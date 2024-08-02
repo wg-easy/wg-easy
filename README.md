@@ -95,6 +95,12 @@ execute `docker compose up --detach`.
 
 Are you enjoying this project? [Buy Emile a beer!](https://github.com/sponsors/WeeJeWel) 🍻
 
+## Password initialization
+
+When the application initializes the database for the first time, it sets up an admin user with a default password : `admin`. You have the option to set your own password instead using either the `PASSWORD` environment variable or the `PASSWORD_HASH` environment variable. Follow [this link](./How_to_generate_an_bcrypt_hash.md) to generate a bcrypt hash password.
+
+The `PASSWORD` environment variable is plain text and will be hashed at runtime by wg-easy. On the other hand, the `PASSWORD_HASH` environment variable is already hashed.
+
 ## Options
 
 These options can be configured by setting environment variables using `-e KEY="VALUE"` in the `docker run` command.
