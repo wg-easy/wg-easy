@@ -54,7 +54,7 @@ export default {
             {{ $t('currentPassword') }}
           </label>
           <input id="currentPassword" v-model="currentPassword" type="password" :placeholder="$t('currentPassword')"
-            class="outline-none bg-transparent border border-neutral-500 p-2 rounded-md w-full" required />
+            class="outline-none focus:border-red-800 bg-transparent border border-neutral-500 p-2 rounded-md w-full" required />
         </div>
 
         <div class="mb-4">
@@ -62,7 +62,7 @@ export default {
             {{ $t('newPassword') }}
           </label>
           <input id="newPassword" v-model="newPassword" type="password" :placeholder="$t('newPassword')"
-            class="outline-none bg-transparent border border-neutral-500 p-2 rounded-md w-full" required />
+            class="outline-none focus:border-red-800 bg-transparent border border-neutral-500 p-2 rounded-md w-full" required />
         </div>
 
         <div class="mb-4">
@@ -70,10 +70,10 @@ export default {
             {{ $t('confirmNewPassword') }}
           </label>
           <input id="confirmNewPassword" v-model="confirmNewPassword" type="password" :placeholder="$t('confirmNewPassword')"
-            class="outline-none bg-transparent border border-neutral-500 p-2 rounded-md w-full" required />
+            class="outline-none focus:border-red-800 bg-transparent border border-neutral-500 p-2 rounded-md w-full" required />
         </div>
 
-        <button type="submit" class="bg-neutral-400 text-white p-2 rounded-md w-full hover:bg-red-800 transition">
+        <button type="submit" :disabled="!newPassword || !confirmNewPassword || newPassword != confirmNewPassword" :class="!newPassword || !confirmNewPassword || newPassword != confirmNewPassword ? 'bg-neutral-400 text-white p-2 rounded-md w-full transition' : 'bg-red-800 text-white p-2 rounded-md w-full transition'">
           {{ $t('updatePassword') }}
         </button>
       </form>

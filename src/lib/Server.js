@@ -128,7 +128,7 @@ module.exports = class Server {
 
     // WireGuard
     app.use(
-      fromNodeMiddleware((req, res, next) => {
+      fromNodeMiddleware(async (req, res, next) => {
         if (!requiresPassword || !req.url.startsWith('/api/')) {
           return next();
         }
@@ -138,14 +138,14 @@ module.exports = class Server {
         }
 
         if (req.url.startsWith('/api/') && req.headers['authorization']) {
-          // when I debug req.headers['authorization'], I have nothing
-          // if (isPasswordValid(req.headers['authorization'])) {
-          //   return next();
-          // }
-          // return res.status(401).json({
-          //   error: 'Incorrect Password',
-          // });
-          return next();
+          // headers are base64
+          const [username, password] = Buffer.from(req.headers['authorization'].split(' ')[1], 'base64')
+            .toString()
+            .split(':');
+
+          if (await isPasswordValid(username, password)) {
+            return next();
+          }
         }
 
         return res.status(401).json({

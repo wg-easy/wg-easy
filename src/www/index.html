@@ -25,12 +25,12 @@
   <div id="app">
     <div v-cloak class="container mx-auto max-w-5xl px-3 md:px-0 mt-4 xs:mt-6">
       <div v-if="authenticated === true">
-        <div class="flex flex-col-reverse xxs:flex-row flex-auto items-end gap-3">
+        <div class="flex flex-col-reverse xxs:flex-row flex-auto items-center items-end gap-3">
           <h1 class="text-4xl dark:text-neutral-200 font-medium flex-grow self-start mb-4">
             <img src="./img/logo.png" width="32" class="inline align-middle dark:bg mr-2"/><span
               class="align-middle">WireGuard</span>
           </h1>
-          <div class="flex grow-0 gap-3 items-end self-end xxs:self-center">
+          <div class="flex grow-0 gap-3  items-center items-end self-end xxs:self-center">
             <!-- Dark / light theme -->
             <button @click="toggleTheme"
               class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 dark:bg-neutral-700 dark:hover:bg-neutral-600 transition"
@@ -96,11 +96,11 @@
 
         <div class="flex max-md:flex-col max-md:gap-y-8 md:gap-x-8">
           <!-- Navigation -->
-          <nav class="shadow-md rounded-lg bg-white dark:bg-neutral-700 text-white p-4">
+          <nav class="shadow-md rounded-lg bg-white dark:bg-neutral-700 text-gray-700 dark:text-white p-4">
             <div class="container mx-auto flex justify-between items-center">
               <div class="flex flex-col">
                 <button @click="showPage = 'home'"
-                  class="flex items-center rounded hover:bg-red-800 transition-colors px-3 py-2 text-lg">
+                  class="flex items-center rounded hover:bg-red-800 hover:text-white transition-colors px-3 py-2 text-lg">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 mr-2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
                   </svg>                  
@@ -109,7 +109,7 @@
                   </span>
                 </button>
                 <button @click="showPage = 'settings'"
-                  class="flex items-center rounded hover:bg-red-800 transition-colors px-3 py-2 text-lg">
+                  class="flex items-center rounded hover:bg-red-800 hover:text-white transition-colors px-3 py-2 text-lg">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 mr-2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
                   </svg>                  
