@@ -1,10 +1,9 @@
 'use strict';
 
-const fs = require('fs').promises;
+const fs = require('node:fs/promises');
 const path = require('path');
-
 const debug = require('debug')('WireGuard');
-const uuid = require('uuid');
+const crypto = require('node:crypto');
 const QRCode = require('qrcode');
 
 const Util = require('./Util');
@@ -115,7 +114,7 @@ module.exports = class WireGuard {
 [Interface]
 PrivateKey = ${config.server.privateKey}
 Address = ${config.server.address}/24
-ListenPort = 51820
+ListenPort = ${WG_PORT}
 PreUp = ${WG_PRE_UP}
 PostUp = ${WG_POST_UP}
 PreDown = ${WG_PRE_DOWN}
@@ -140,8 +139,8 @@ Jc = ${config.server.jc}
 # Client: ${client.name} (${clientId})
 [Peer]
 PublicKey = ${client.publicKey}
-PresharedKey = ${client.preSharedKey}
-AllowedIPs = ${client.address}/32`;
+${client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
+}AllowedIPs = ${client.address}/32`;
     }
 
     debug('Config saving...');
@@ -171,7 +170,7 @@ AllowedIPs = ${client.address}/32`;
       createdAt: new Date(client.createdAt),
       updatedAt: new Date(client.updatedAt),
       allowedIPs: client.allowedIPs,
-
+      downloadableConfig: 'privateKey' in client,
       persistentKeepalive: null,
       latestHandshakeAt: null,
       transferRx: null,
@@ -226,8 +225,9 @@ AllowedIPs = ${client.address}/32`;
     const config = await this.getConfig();
     const client = await this.getClient({ clientId });
 
-    return `[Interface]
-PrivateKey = ${client.privateKey}
+    return `
+[Interface]
+PrivateKey = ${client.privateKey ? `${client.privateKey}` : 'REPLACE_ME'}
 Address = ${client.address}
 ${WG_DEFAULT_DNS ? `DNS = ${WG_DEFAULT_DNS}\n` : ''}\
 ${WG_MTU ? `MTU = ${WG_MTU}\n` : ''}\
@@ -243,8 +243,8 @@ H4 = ${config.server.h4}
 
 [Peer]
 PublicKey = ${config.server.publicKey}
-PresharedKey = ${client.preSharedKey}
-AllowedIPs = ${WG_ALLOWED_IPS}
+${client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
+}AllowedIPs = ${WG_ALLOWED_IPS}
 PersistentKeepalive = ${WG_PERSISTENT_KEEPALIVE}
 Endpoint = ${WG_HOST}:${WG_PORT}`;
   }
@@ -286,7 +286,7 @@ Endpoint = ${WG_HOST}:${WG_PORT}`;
     }
 
     // Create Client
-    const id = uuid.v4();
+    const id = crypto.randomUUID();
     const client = {
       id,
       name,
@@ -355,6 +355,11 @@ Endpoint = ${WG_HOST}:${WG_PORT}`;
     client.updatedAt = new Date();
 
     await this.saveConfig();
+  }
+
+  // Shutdown wireguard
+  async Shutdown() {
+    await Util.exec('wg-quick down wg0').catch(() => { });
   }
 
 };

@@ -50,6 +50,20 @@ class API {
     });
   }
 
+  async getuiTrafficStats() {
+    return this.call({
+      method: 'get',
+      path: '/ui-traffic-stats',
+    });
+  }
+
+  async getChartType() {
+    return this.call({
+      method: 'get',
+      path: '/ui-chart-type',
+    });
+  }
+
   async getSession() {
     return this.call({
       method: 'get',

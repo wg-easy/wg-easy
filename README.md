@@ -16,10 +16,23 @@ You have found the easiest way to install & manage AmneziaWG on any Linux host!
 * Tx/Rx charts for each connected client.
 * Gravatar support.
 * Automatic Light / Dark Mode
+* Multilanguage Support
+* UI_TRAFFIC_STATS (default off)
 
 ## Requirements
 
 * A host with Docker installed.
+
+## Versions
+
+We provide more then 1 docker image to get, this will help you decide which one is best for you.
+
+| tag | Branch | Example | Description |
+| - | - | - | - |
+| `latest` | production | `ghcr.io/wg-easy/wg-easy:latest` or `ghcr.io/wg-easy/wg-easy` | stable as possbile get bug fixes quickly when needed, deployed against `production`. |
+| `13` | production | `ghcr.io/wg-easy/wg-easy:13` | same as latest, stick to a version tag. |
+| `nightly` | master | `ghcr.io/wg-easy/wg-easy:nightly` | mostly unstable gets frequent package and code updates, deployed against `master`. |
+| `development` | pull requests | `ghcr.io/wg-easy/wg-easy:development` | used for development, testing code from PRs before landing into `master`. |
 
 ## Installation
 
@@ -28,21 +41,23 @@ You have found the easiest way to install & manage AmneziaWG on any Linux host!
 If you haven't installed Docker yet, install it by running:
 
 ```bash
-$ curl -sSL https://get.docker.com | sh
-$ sudo usermod -aG docker $(whoami)
-$ exit
+curl -sSL https://get.docker.com | sh
+sudo usermod -aG docker $(whoami)
+exit
 ```
 
 And log in again.
 
 ### 2. Run AmneziaWG Easy
 
-<pre>
-$ docker run -d \
+```
+  docker run -d \
   --name=amnezia-wg-easy \
   -e LANGUAGE=en \
-  -e WG_HOST=<b>🚨YOUR_SERVER_IP</b> \
-  -e PASSWORD=<b>🚨YOUR_ADMIN_PASSWORD</b> \
+  -e WG_HOST=<🚨YOUR_SERVER_IP> \
+  -e PASSWORD=<🚨YOUR_ADMIN_PASSWORD> \
+  -e PORT=51821 \
+  -e WG_PORT=51820 \
   -v ~/.amnezia-wg-easy:/etc/wireguard \
   -p 51820:51820/udp \
   -p 51821:51821/tcp \
@@ -53,7 +68,7 @@ $ docker run -d \
   --device=/dev/net/tun:/dev/net/tun \
   --restart unless-stopped \
   ghcr.io/spcfox/amnezia-wg-easy
-</pre>
+```
 
 > 💡 Replace `YOUR_SERVER_IP` with your WAN IP, or a Dynamic DNS hostname.
 >
@@ -62,6 +77,10 @@ $ docker run -d \
 The Web UI will now be available on `http://0.0.0.0:51821`.
 
 > 💡 Your configuration files will be saved in `~/.amnezia-wg-easy`
+
+AmneziaWG Easy can be launched with Docker Compose as well - just download
+[`docker-compose.yml`](docker-compose.yml), make necessary adjustments and
+execute `docker compose up --detach`.
 
 ## Options
 
@@ -76,7 +95,7 @@ These options can be configured by setting environment variables using `-e KEY="
 | `PASSWORD` | - | `foobar123` | When set, requires a password when logging in to the Web UI. |
 | `WG_HOST` | - | `vpn.myserver.com` | The public hostname of your VPN server. |
 | `WG_DEVICE` | `eth0` | `ens6f0` | Ethernet device the AmneziaWG traffic should be forwarded through. |
-| `WG_PORT` | `51820` | `12345` | The public UDP port of your VPN server. AmneziaWG will always listen on 51820 inside the Docker container. |
+| `WG_PORT` | `51820` | `12345` | The public UDP port of your VPN server. AmneziaWG will listen on that (othwise default) inside the Docker container. |
 | `WG_MTU` | `null` | `1420` | The MTU the clients will use. Server uses default WG MTU. |
 | `WG_PERSISTENT_KEEPALIVE` | `0` | `25` | Value in seconds to keep the "connection" open. If this value is 0, then connections won't be kept alive. |
 | `WG_DEFAULT_ADDRESS` | `10.8.0.x` | `10.6.0.x` | Clients IP address range. |
@@ -86,6 +105,8 @@ These options can be configured by setting environment variables using `-e KEY="
 | `WG_POST_UP` | `...` | `iptables ...` | See [config.js](/src/config.js#L22) for the default value. |
 | `WG_PRE_DOWN` | `...` | - | See [config.js](/src/config.js#L29) for the default value. |
 | `WG_POST_DOWN` | `...` | `iptables ...` | See [config.js](/src/config.js#L30) for the default value. |
+| `UI_TRAFFIC_STATS` | `false` | `true` | Enable detailed RX / TX client stats in Web UI |
+| `UI_CHART_TYPE` | `0` | `1` | UI_CHART_TYPE=0 # Charts disabled, UI_CHART_TYPE=1 # Line chart, UI_CHART_TYPE=2 # Area chart, UI_CHART_TYPE=3 # Bar chart |
 | `JC` | `random` | `5` | Junk packet count — number of packets with random data that are sent before the start of the session. |
 | `JMIN` | `50` | `25` | Junk packet minimum size — minimum packet size for Junk packet. That is, all randomly generated packets will have a size no smaller than Jmin. |
 | `JMAX` | `1000` | `250` | Junk packet maximum size — maximum size for Junk packets. |
@@ -107,6 +128,16 @@ docker stop amnezia-wg-easy
 docker rm amnezia-wg-easy
 docker pull ghcr.io/spcfox/amnezia-wg-easy
 ```
+
+And then run the `docker run -d \ ...` command above again.
+
+With Docker Compose AmneziaWG Easy can be updated with a single command:
+`docker compose up --detach --pull always` (if an image tag is specified in the
+Compose file and it is not `latest`, make sure that it is changed to the desired
+one; by default it is omitted and
+[defaults to `latest`](https://docs.docker.com/engine/reference/run/#image-references)). \
+The WireGuared Easy container will be automatically recreated if a newer image
+was pulled.
 
 ## Thanks
 
