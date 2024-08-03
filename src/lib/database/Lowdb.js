@@ -46,22 +46,25 @@ module.exports = class Lowdb extends DatabaseInterface {
   }
 
   async initDb() {
-    debug('Loading database...');
+    // each function must call this method to check if the file exist
     // lowdb is an esm module
     // eslint-disable-next-line node/no-unsupported-features/es-syntax, import/no-unresolved, node/no-missing-import
     const { JSONFilePreset } = await import('lowdb/node');
     this.db = await JSONFilePreset(this.dbPath, Model);
+
     await this.db.read();
 
     if (!this.db.data.users) {
+      debug(`Created new database at ${this.dbPath}`);
       this.db.data = { users: [] };
       await this.db.write();
-      debug(`Created new database at ${this.dbPath}`);
     }
   }
 
   async comparePassword(username, password) {
     debug('Compare password');
+    this.initDb();
+
     const user = this.db.data.users.find((u) => u.username === username);
     if (!user) {
       throw new ServerError('User not found');
@@ -72,6 +75,7 @@ module.exports = class Lowdb extends DatabaseInterface {
 
   async updatePassword(username, oldPassword, newPassword) {
     debug('Update password');
+    this.initDb();
 
     if (!super.isPasswordComplex(newPassword)) {
       throw new ServerError('Password does not meet complexity requirements : 8 characters minimum, uppercase, lowercase, number and special char');
@@ -94,6 +98,7 @@ module.exports = class Lowdb extends DatabaseInterface {
 
   async addUser(username, password) {
     debug('Add user');
+    this.initDb();
 
     if (!super.isPasswordComplex(password)) {
       throw new ServerError('Password does not meet complexity requirements, minimum 8 characters, uppercase, lowercase, number and special char');
@@ -118,6 +123,7 @@ module.exports = class Lowdb extends DatabaseInterface {
 
   async addAdminUser(username, password) {
     debug('Add admin user');
+    this.initDb();
 
     if (!this.firstSetupAuth()) {
       // for the time being, when the first setup, this method is auth to be called, otherwise throw
@@ -146,6 +152,8 @@ module.exports = class Lowdb extends DatabaseInterface {
   }
 
   firstSetupAuth() {
+    this.initDb();
+
     return this.db.data.users.length === 0;
   }
 

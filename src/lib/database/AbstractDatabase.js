@@ -33,6 +33,17 @@ module.exports = class DatabaseInterface {
   }
 
   /**
+   * Check if database exist
+   *
+   * @abstract
+   * @returns {Promise<boolean>} Return `true` if it exists, otherwise `false`
+   * @throws {ServerError} If not implemented by the subclass
+   */
+  firstSetupAuth() {
+    throw new ServerError('You must implement this function');
+  }
+
+  /**
    * Initializes the database if does not exist
    *
    * @abstract
@@ -82,6 +93,20 @@ module.exports = class DatabaseInterface {
    * @throws {ServerError} If `newPassword` is not complex enough
    */
   async updatePassword(username, oldPassword, newPassword) {
+    throw new ServerError('You must implement this function');
+  }
+
+  /**
+   * Adds an admin user to the database if none exists
+   *
+   * @abstract
+   * @param {string} username - The username of the admin user
+   * @param {string} password - The password of the admin user
+   * @returns {Promise<void>}
+   * @throws {ServerError} If not implemented by the subclass
+   * @throws {ServerError} If `password` is not complex enough
+   */
+  async addAdminUser(username, password) {
     throw new ServerError('You must implement this function');
   }
 

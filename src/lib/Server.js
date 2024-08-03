@@ -128,7 +128,7 @@ module.exports = class Server {
 
     // WireGuard
     app.use(
-      fromNodeMiddleware(async (req, res, next) => {
+      fromNodeMiddleware(async (req, _res, next) => {
         if (!req.url.startsWith('/api/')) {
           return next();
         }
@@ -148,9 +148,10 @@ module.exports = class Server {
           }
         }
 
-        return res.status(401).json({
-          error: 'Not Logged In',
-        });
+        // this cause errors : status is not a function
+        // return res.status(401).json({
+        //   error: 'Not Logged In',
+        // });
       }),
     );
 

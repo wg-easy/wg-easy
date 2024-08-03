@@ -65,7 +65,6 @@ To automatically install & run wg-easy, simply run:
   --name=wg-easy \
   -e LANG=de \
   -e WG_HOST=<🚨YOUR_SERVER_IP> \
-  -e PASSWORD_HASH=<🚨YOUR_ADMIN_PASSWORD_HASH> \
   -e PORT=51821 \
   -e WG_PORT=51820 \
   -v ~/.wg-easy:/etc/wireguard \
@@ -80,8 +79,6 @@ To automatically install & run wg-easy, simply run:
 ```
 
 > 💡 Replace `YOUR_SERVER_IP` with your WAN IP, or a Dynamic DNS hostname.
->
-> 💡 Replace `YOUR_ADMIN_PASSWORD_HASH` with a bcrypt password hash to log in on the Web UI. See [How_to_generate_an_bcrypt_hash.md](./How_to_generate_an_bcrypt_hash.md) for know how generate the hash.
 
 The Web UI will now be available on `http://0.0.0.0:51821`.
 
@@ -95,12 +92,6 @@ execute `docker compose up --detach`.
 
 Are you enjoying this project? [Buy Emile a beer!](https://github.com/sponsors/WeeJeWel) 🍻
 
-## Password initialization
-
-When the application initializes the database for the first time, it sets up an admin user with a default password : `admin`. You have the option to set your own password instead using either the `PASSWORD` environment variable or the `PASSWORD_HASH` environment variable. Follow [this link](./How_to_generate_an_bcrypt_hash.md) to generate a bcrypt hash password.
-
-The `PASSWORD` environment variable is plain text and will be hashed at runtime by wg-easy. On the other hand, the `PASSWORD_HASH` environment variable is already hashed.
-
 ## Options
 
 These options can be configured by setting environment variables using `-e KEY="VALUE"` in the `docker run` command.
@@ -109,7 +100,6 @@ These options can be configured by setting environment variables using `-e KEY="
 | - | - | - |------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `PORT` | `51821` | `6789` | TCP port for Web UI.                                                                                                                                 |
 | `WEBUI_HOST` | `0.0.0.0` | `localhost` | IP address web UI binds to.                                                                                                                          |
-| `PASSWORD_HASH` | - | `$2y$05$Ci...` | When set, requires a password when logging in to the Web UI. See [How to generate an bcrypt hash.md]("https://github.com/wg-easy/wg-easy/blob/master/How_to_generate_an_bcrypt_hash.md") for know how generate the hash. |
 | `WG_HOST` | - | `vpn.myserver.com` | The public hostname of your VPN server.                                                                                                              |
 | `WG_DEVICE` | `eth0` | `ens6f0` | Ethernet device the wireguard traffic should be forwarded through.                                                                                   |
 | `WG_PORT` | `51820` | `12345` | The public UDP port of your VPN server. WireGuard will listen on that (othwise default) inside the Docker container.                                 |

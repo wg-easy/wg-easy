@@ -25,7 +25,7 @@ export default {
         this.username = '';
         this.newPassword = '';
         this.confirmNewPassword = '';
-        alert('User created');
+        alert('User created, please reload your current page');
         window.location.reload();
       }).catch((err) => {
         alert(err.message || err.toString());
@@ -53,21 +53,21 @@ export default {
         </svg>
       </div>
 
-      <div class="mb-4">
+      <div class="mb-3">
         <label for="username" class="block mb-2 text-gray-500 dark:text-white">{{ $t('setupUsername') }}</label>
         <input id="username" name="username" :placeholder="$t('setupUsername')" v-model="username" required
           autocomplete="username"
           class="px-3 py-2 text-sm dark:bg-neutral-700 text-gray-500 dark:text-gray-500 mb-5 border-2 border-gray-100 dark:border-neutral-800 rounded-lg w-full focus:border-red-800 dark:focus:border-red-800 dark:placeholder:text-neutral-400 outline-none" />
       </div>
 
-      <div class="mb-4">
+      <div class="mb-3">
         <label for="newPassword" class="block mb-2 text-gray-500 dark:text-white">{{ $t('newPassword') }}</label>
         <input id="newPassword" type="password" name="newPassword" :placeholder="$t('newPassword')"
           v-model="newPassword" required autocomplete="new-password"
           class="px-3 py-2 text-sm dark:bg-neutral-700 text-gray-500 dark:text-gray-500 mb-5 border-2 border-gray-100 dark:border-neutral-800 rounded-lg w-full focus:border-red-800 dark:focus:border-red-800 dark:placeholder:text-neutral-400 outline-none" />
       </div>
 
-      <div class="mb-4">
+      <div class="mb-3">
         <label for="confirmNewPassword" class="block mb-2 text-gray-500 dark:text-white">{{ $t('confirmNewPassword')
           }}</label>
         <input id="confirmNewPassword" type="password" name="confirmNewPassword" :placeholder="$t('confirmNewPassword')"

@@ -3,8 +3,12 @@
 <script>
 export default {
   name: 'Settings',
+  props: {
+    username: String,
+  },
   data() {
     return {
+      username: ref(props.username),
       currentPassword: '',
       newPassword: '',
       confirmNewPassword: '',
@@ -18,9 +22,8 @@ export default {
         return;
       }
 
-      // temp username 'admin'
       this.api.updatePassword({
-        username: 'admin',
+        username: this.username,
         oldPassword: this.currentPassword,
         newPassword: this.newPassword
       }).then((_result) => {
@@ -50,10 +53,18 @@ export default {
     <div class="container p-2 flex flex-col md:items-center py-8">
       <form @submit="updatePassword" class="w-full md:w-[75%]">
         <div class="mb-4">
+          <label for="username" class="block text-sm font-medium dark:text-neutral-200 mb-4">
+            {{ $t('setupUsername') }}
+          </label>
+          <input id="username" disabled v-model="username" :placeholder="$t('setupUsername')" autocomplete="username"
+            class="outline-none focus:border-red-800 bg-transparent border border-neutral-500 p-2 rounded-md w-full" required />
+        </div>
+
+        <div class="mb-4">
           <label for="currentPassword" class="block text-sm font-medium dark:text-neutral-200 mb-4">
             {{ $t('currentPassword') }}
           </label>
-          <input id="currentPassword" v-model="currentPassword" type="password" :placeholder="$t('currentPassword')"
+          <input id="currentPassword" v-model="currentPassword" type="password" :placeholder="$t('currentPassword')" autocomplete="current-password"
             class="outline-none focus:border-red-800 bg-transparent border border-neutral-500 p-2 rounded-md w-full" required />
         </div>
 
@@ -61,7 +72,7 @@ export default {
           <label for="newPassword" class="block text-sm font-medium dark:text-neutral-200 mb-4">
             {{ $t('newPassword') }}
           </label>
-          <input id="newPassword" v-model="newPassword" type="password" :placeholder="$t('newPassword')"
+          <input id="newPassword" v-model="newPassword" type="password" :placeholder="$t('newPassword')" autocomplete="new-password"
             class="outline-none focus:border-red-800 bg-transparent border border-neutral-500 p-2 rounded-md w-full" required />
         </div>
 
@@ -69,11 +80,11 @@ export default {
           <label for="confirmNewPassword" class="block text-sm font-medium dark:text-neutral-200 mb-4">
             {{ $t('confirmNewPassword') }}
           </label>
-          <input id="confirmNewPassword" v-model="confirmNewPassword" type="password" :placeholder="$t('confirmNewPassword')"
+          <input id="confirmNewPassword" v-model="confirmNewPassword" type="password" :placeholder="$t('confirmNewPassword')" autocomplete="new-password"
             class="outline-none focus:border-red-800 bg-transparent border border-neutral-500 p-2 rounded-md w-full" required />
         </div>
 
-        <button type="submit" :disabled="!newPassword || !confirmNewPassword || newPassword != confirmNewPassword" :class="!newPassword || !confirmNewPassword || newPassword != confirmNewPassword ? 'bg-neutral-400 text-white p-2 rounded-md w-full transition' : 'bg-red-800 text-white p-2 rounded-md w-full transition'">
+        <button type="submit" :disabled="!username || !currentPassword || !newPassword || !confirmNewPassword || newPassword != confirmNewPassword" :class="!newPassword || !confirmNewPassword || newPassword != confirmNewPassword ? 'bg-neutral-400 text-white p-2 rounded-md w-full transition' : 'bg-red-800 text-white p-2 rounded-md w-full transition'">
           {{ $t('updatePassword') }}
         </button>
       </form>

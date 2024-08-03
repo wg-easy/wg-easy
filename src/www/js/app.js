@@ -54,8 +54,7 @@ new Vue({
     firstSetup: false,
     authenticated: null,
     authenticating: false,
-    // temp username 'admin'
-    username: 'admin',
+    username: '',
     password: null,
     requiresPassword: null,
 
@@ -245,7 +244,6 @@ new Vue({
 
       this.authenticating = true;
       this.api.createSession({
-        // temp username 'admin'
         username: this.username,
         password: this.password,
       })
