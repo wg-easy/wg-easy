@@ -35,6 +35,7 @@
     "@types/debug": "^4.1.12",
     "@types/qrcode": "^1.5.5",
     "eslint": "^9.8.0",
+    "eslint-config-prettier": "^9.1.0",
     "prettier": "^3.3.3",
     "typescript": "^5.5.4",
     "vue-tsc": "^2.0.29"
