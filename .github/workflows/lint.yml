@@ -15,6 +15,11 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          run_install: false
       
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -22,8 +27,6 @@ jobs:
           node-version: '20'
           check-latest: true
           cache: 'pnpm'
-    
-      - uses: pnpm/action-setup@v4
 
       - name: pnpm lint
         run: |
