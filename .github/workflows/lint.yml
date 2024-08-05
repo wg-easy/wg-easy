@@ -18,18 +18,18 @@ jobs:
 
       - uses: pnpm/action-setup@v4
         name: Install pnpm
+        working-directory: ./src
         with:
           run_install: false
-      
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
           check-latest: true
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - name: pnpm lint
         run: |
-          cd src
           pnpm install
           pnpm lint
