@@ -1,6 +1,8 @@
 import type { Config } from 'tailwindcss';
+import type { PluginAPI } from 'tailwindcss/types/config';
 
 export default {
+  darkMode: 'selector',
   content: [],
   theme: {
     screens: {
@@ -14,7 +16,7 @@ export default {
     },
   },
   plugins: [
-    function addDisabledClass({ addUtilities }) {
+    function addDisabledClass({ addUtilities }: PluginAPI) {
       const newUtilities = {
         '.is-disabled': {
           opacity: '0.25',

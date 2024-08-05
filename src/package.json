@@ -25,6 +25,7 @@
     "js-sha256": "^0.11.0",
     "nuxt": "^3.12.4",
     "qrcode": "^1.5.3",
+    "tailwindcss": "^3.4.7",
     "timeago.js": "^4.0.2",
     "vue": "latest",
     "vue3-apexcharts": "^1.5.3"
