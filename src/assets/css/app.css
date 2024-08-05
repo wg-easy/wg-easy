@@ -1,6 +1,6 @@
 [v-cloak] {
-    display: none;
-  }
-  .line-chart .apexcharts-svg{
-    transform: translateY(3px);
-  }
+  display: none;
+}
+.line-chart .apexcharts-svg {
+  transform: translateY(3px);
+}

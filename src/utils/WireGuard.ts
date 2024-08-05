@@ -1,13 +1,27 @@
 import fs from 'node:fs/promises';
 import path from 'path';
-import debug_logger from 'debug'
+import debug_logger from 'debug';
 import crypto from 'node:crypto';
 import QRCode from 'qrcode';
 
-import { WG_PATH, WG_HOST, WG_PORT, WG_CONFIG_PORT, WG_MTU, WG_DEFAULT_DNS, WG_DEFAULT_ADDRESS, WG_PERSISTENT_KEEPALIVE, WG_ALLOWED_IPS, WG_PRE_UP, WG_POST_UP, WG_PRE_DOWN, WG_POST_DOWN } from '~/utils/config';
+import {
+  WG_PATH,
+  WG_HOST,
+  WG_PORT,
+  WG_CONFIG_PORT,
+  WG_MTU,
+  WG_DEFAULT_DNS,
+  WG_DEFAULT_ADDRESS,
+  WG_PERSISTENT_KEEPALIVE,
+  WG_ALLOWED_IPS,
+  WG_PRE_UP,
+  WG_POST_UP,
+  WG_PRE_DOWN,
+  WG_POST_DOWN,
+} from '~/utils/config';
 import { exec } from '~/utils/cmd';
 import { isValidIPv4 } from '~/utils/ip';
-const debug = debug_logger('WireGuard')
+const debug = debug_logger('WireGuard');
 
 class ServerError extends Error {
   statusCode: number;
@@ -15,10 +29,9 @@ class ServerError extends Error {
     super(message);
     this.statusCode = statusCode;
   }
-};
+}
 
 class WireGuard {
-
   async __buildConfig() {
     this.__configPromise = Promise.resolve().then(async () => {
       if (!WG_HOST) {
@@ -62,8 +75,14 @@ class WireGuard {
       await this.__saveConfig(config);
       await exec('wg-quick down wg0').catch(() => {});
       await exec('wg-quick up wg0').catch((err) => {
-        if (err && err.message && err.message.includes('Cannot find device "wg0"')) {
-          throw new Error('WireGuard exited with the error: Cannot find device "wg0"\nThis usually means that your host\'s kernel does not support WireGuard!');
+        if (
+          err &&
+          err.message &&
+          err.message.includes('Cannot find device "wg0"')
+        ) {
+          throw new Error(
+            'WireGuard exited with the error: Cannot find device "wg0"\nThis usually means that your host\'s kernel does not support WireGuard!'
+          );
         }
 
         throw err;
@@ -108,14 +127,19 @@ PostDown = ${WG_POST_DOWN}
 # Client: ${client.name} (${clientId})
 [Peer]
 PublicKey = ${client.publicKey}
-${client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
+${
+  client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
 }AllowedIPs = ${client.address}/32`;
     }
 
     debug('Config saving...');
-    await fs.writeFile(path.join(WG_PATH, 'wg0.json'), JSON.stringify(config, false, 2), {
-      mode: 0o660,
-    });
+    await fs.writeFile(
+      path.join(WG_PATH, 'wg0.json'),
+      JSON.stringify(config, false, 2),
+      {
+        mode: 0o660,
+      }
+    );
     await fs.writeFile(path.join(WG_PATH, 'wg0.conf'), result, {
       mode: 0o600,
     });
@@ -130,21 +154,23 @@ ${client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
 
   async getClients() {
     const config = await this.getConfig();
-    const clients = Object.entries(config.clients).map(([clientId, client]) => ({
-      id: clientId,
-      name: client.name,
-      enabled: client.enabled,
-      address: client.address,
-      publicKey: client.publicKey,
-      createdAt: new Date(client.createdAt),
-      updatedAt: new Date(client.updatedAt),
-      allowedIPs: client.allowedIPs,
-      downloadableConfig: 'privateKey' in client,
-      persistentKeepalive: null,
-      latestHandshakeAt: null,
-      transferRx: null,
-      transferTx: null,
-    }));
+    const clients = Object.entries(config.clients).map(
+      ([clientId, client]) => ({
+        id: clientId,
+        name: client.name,
+        enabled: client.enabled,
+        address: client.address,
+        publicKey: client.publicKey,
+        createdAt: new Date(client.createdAt),
+        updatedAt: new Date(client.updatedAt),
+        allowedIPs: client.allowedIPs,
+        downloadableConfig: 'privateKey' in client,
+        persistentKeepalive: null,
+        latestHandshakeAt: null,
+        transferRx: null,
+        transferTx: null,
+      })
+    );
 
     // Loop WireGuard status
     const dump = await exec('wg show wg0 dump', {
@@ -157,9 +183,9 @@ ${client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
       .forEach((line) => {
         const [
           publicKey,
-          _preSharedKey,  
-          _endpoint,  
-          _allowedIps,  
+          _preSharedKey,
+          _endpoint,
+          _allowedIps,
           latestHandshakeAt,
           transferRx,
           transferTx,
@@ -169,9 +195,10 @@ ${client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
         const client = clients.find((client) => client.publicKey === publicKey);
         if (!client) return;
 
-        client.latestHandshakeAt = latestHandshakeAt === '0'
-          ? null
-          : new Date(Number(`${latestHandshakeAt}000`));
+        client.latestHandshakeAt =
+          latestHandshakeAt === '0'
+            ? null
+            : new Date(Number(`${latestHandshakeAt}000`));
         client.transferRx = Number(transferRx);
         client.transferTx = Number(transferTx);
         client.persistentKeepalive = persistentKeepalive;
@@ -203,7 +230,8 @@ ${WG_MTU ? `MTU = ${WG_MTU}\n` : ''}\
 
 [Peer]
 PublicKey = ${config.server.publicKey}
-${client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
+${
+  client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
 }AllowedIPs = ${WG_ALLOWED_IPS}
 PersistentKeepalive = ${WG_PERSISTENT_KEEPALIVE}
 Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
@@ -344,7 +372,6 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
   async Shutdown() {
     await exec('wg-quick down wg0').catch(() => {});
   }
-
-};
+}
 
 export default new WireGuard();

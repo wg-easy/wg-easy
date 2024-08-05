@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs';
 
-import { PASSWORD_HASH } from "~/utils/config";
+import { PASSWORD_HASH } from '~/utils/config';
 
 /**
  * Checks if `password` matches the PASSWORD_HASH.
@@ -11,13 +11,13 @@ import { PASSWORD_HASH } from "~/utils/config";
  * @returns {boolean} true if matching environment, otherwise false
  */
 export function isPasswordValid(password: string): boolean {
-    if (typeof password !== 'string') {
-      return false;
-    }
-  
-    if (PASSWORD_HASH) {
-      return bcrypt.compareSync(password, PASSWORD_HASH);
-    }
-  
+  if (typeof password !== 'string') {
     return false;
-  };
+  }
+
+  if (PASSWORD_HASH) {
+    return bcrypt.compareSync(password, PASSWORD_HASH);
+  }
+
+  return false;
+}

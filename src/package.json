@@ -13,7 +13,8 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "format": "prettier . --write"
   },
   "dependencies": {
     "@nuxtjs/i18n": "^8.3.3",
@@ -34,6 +35,7 @@
     "@types/debug": "^4.1.12",
     "@types/qrcode": "^1.5.5",
     "eslint": "^9.8.0",
+    "prettier": "^3.3.3",
     "typescript": "^5.5.4",
     "vue-tsc": "^2.0.29"
   },

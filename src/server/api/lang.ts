@@ -1,7 +1,7 @@
-import { LANG } from "~/utils/config";
+import { LANG } from '~/utils/config';
 
 export default defineEventHandler((event) => {
-    assertMethod(event, "GET");
-    setHeader(event, 'Content-Type', 'application/json');
-    return `"${LANG}"`;
-})
+  assertMethod(event, 'GET');
+  setHeader(event, 'Content-Type', 'application/json');
+  return `"${LANG}"`;
+});
