@@ -49,7 +49,7 @@ iptables -D FORWARD -o wg0 -j ACCEPT;
     .join(' ');
 export const LANG = process.env.LANG || 'en';
 export const UI_TRAFFIC_STATS = process.env.UI_TRAFFIC_STATS || 'false';
-export const UI_CHART_TYPE = process.env.UI_CHART_TYPE || 0;
+export const UI_CHART_TYPE = process.env.UI_CHART_TYPE || '0';
 
 export const REQUIRES_PASSWORD = !!PASSWORD_HASH;
 

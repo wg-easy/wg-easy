@@ -117,4 +117,8 @@ class API {
   }
 }
 
+export type WGClient = Awaited<
+  ReturnType<typeof API.prototype.getClients>
+>[number];
+
 export default new API();

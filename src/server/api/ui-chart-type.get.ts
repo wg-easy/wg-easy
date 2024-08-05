@@ -1,4 +1,8 @@
 export default defineEventHandler((event) => {
   setHeader(event, 'Content-Type', 'application/json');
-  return `"${UI_CHART_TYPE}"`;
+  const number = Number.parseInt(UI_CHART_TYPE, 10);
+  if (Number.isNaN(number)) {
+    return 0;
+  }
+  return number;
 });

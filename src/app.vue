@@ -1201,22 +1201,6 @@ const authenticating = ref(false);
 const password = ref<null | string>(null);
 const requiresPassword = ref<null | boolean>(null);
 
-type Client = {
-  id: string;
-  name: string;
-  address: string;
-  enabled: boolean;
-  transferRx: number;
-  transferTx: number;
-  transferTxSeries: number;
-  transferRxSeries: number;
-  avatar?: string;
-  latestHandshakeAt: string | null;
-  createdAt: Date;
-  downloadableConfig: boolean;
-  updatedAt: Date;
-} & Omit<ClientPersist, 'transferRxSeries' | 'transferTxSeries'>;
-
 type ClientPersist = {
   transferRxHistory: number[];
   transferRxPrevious: number;
@@ -1230,7 +1214,7 @@ type ClientPersist = {
   hoverTx: unknown;
 };
 
-const clients = ref<null | Client[]>(null);
+const clients = ref<null | WGClient[]>(null);
 const clientsPersist = ref<Record<string, ClientPersist>>({});
 const clientDelete = ref<null | Client>(null);
 const clientCreate = ref<null | boolean>(null);
@@ -1241,7 +1225,7 @@ const clientEditAddress = ref<null | string>(null);
 const clientEditAddressId = ref<null | string>(null);
 const qrcode = ref<null | string>(null);
 
-const currentRelease = ref(null);
+const currentRelease = ref<null | number>(null);
 const latestRelease = ref<null | { version: number; changelog: string }>(null);
 
 const uiTrafficStats = ref(false);
@@ -1522,6 +1506,7 @@ function updateClientAddress(client: Client, address: string | null) {
 }
 function restoreConfig(e) {
   e.preventDefault();
+  console.log(e.currentTarget);
   const file = e.currentTarget.files.item(0);
   if (file) {
     file
@@ -1601,7 +1586,7 @@ onMounted(() => {
   api
     .getChartType()
     .then((res) => {
-      uiChartType.value = parseInt(res, 10);
+      uiChartType.value = res;
     })
     .catch(() => {
       uiChartType.value = 0;
@@ -1666,7 +1651,7 @@ const updateCharts = computed(() => {
   return uiChartType.value > 0 && uiShowCharts.value;
 });
 
-function bytes(bytes: number, decimals? = 2, kib? = false, maxunit?: string) {
+function bytes(bytes: number, decimals = 2, kib = false, maxunit?: string) {
   if (bytes === 0) return '0 B';
   if (Number.isNaN(bytes) && !Number.isFinite(bytes)) return 'NaN';
   const k = kib ? 1024 : 1000;
