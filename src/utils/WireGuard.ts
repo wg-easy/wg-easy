@@ -1,13 +1,13 @@
 import fs from 'node:fs/promises';
 import path from 'path';
 import debug_logger from 'debug'
-const debug = debug_logger('WireGuard')
 import crypto from 'node:crypto';
 import QRCode from 'qrcode';
 
 import { WG_PATH, WG_HOST, WG_PORT, WG_CONFIG_PORT, WG_MTU, WG_DEFAULT_DNS, WG_DEFAULT_ADDRESS, WG_PERSISTENT_KEEPALIVE, WG_ALLOWED_IPS, WG_PRE_UP, WG_POST_UP, WG_PRE_DOWN, WG_POST_DOWN } from '~/utils/config';
 import { exec } from '~/utils/cmd';
 import { isValidIPv4 } from '~/utils/ip';
+const debug = debug_logger('WireGuard')
 
 class ServerError extends Error {
   statusCode: number;
@@ -31,7 +31,7 @@ class WireGuard {
         config = await fs.readFile(path.join(WG_PATH, 'wg0.json'), 'utf8');
         config = JSON.parse(config);
         debug('Configuration loaded.');
-      } catch (err) {
+      } catch {
         const privateKey = await exec('wg genkey');
         const publicKey = await exec(`echo ${privateKey} | wg pubkey`, {
           log: 'echo ***hidden*** | wg pubkey',
@@ -157,9 +157,9 @@ ${client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
       .forEach((line) => {
         const [
           publicKey,
-          preSharedKey, // eslint-disable-line no-unused-vars
-          endpoint, // eslint-disable-line no-unused-vars
-          allowedIps, // eslint-disable-line no-unused-vars
+          _preSharedKey,  
+          _endpoint,  
+          _allowedIps,  
           latestHandshakeAt,
           transferRx,
           transferTx,

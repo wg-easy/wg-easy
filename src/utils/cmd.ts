@@ -1,13 +1,11 @@
 import childProcess from 'child_process';
 
-export function exec(cmd, {
-    log = true,
-  } = {}) {
+export function exec(cmd: string, {log}: {log: boolean|string} = {log: true}) {
     if (typeof log === 'string') {
-      // eslint-disable-next-line no-console
+       
       console.log(`$ ${log}`);
     } else if (log === true) {
-      // eslint-disable-next-line no-console
+       
       console.log(`$ ${cmd}`);
     }
 

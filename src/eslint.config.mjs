@@ -1,3 +1,3 @@
-import withNuxt from './.nuxt/eslint.config.mjs'
+import { createConfigForNuxt } from '@nuxt/eslint-config/flat'
 
-export default withNuxt()
+export default createConfigForNuxt({})
