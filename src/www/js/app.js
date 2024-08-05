@@ -172,6 +172,7 @@ new Vue({
       },
     },
 
+    enableSortClient: true,
     sortClient: true, // Sort clients by name, true = asc, false = desc
   },
   methods: {
@@ -247,7 +248,10 @@ new Vue({
 
         return client;
       });
-      this.clients = sortByProperty(this.clients, 'name', this.sortClient);
+
+      if (enableSortClient) {
+        this.clients = sortByProperty(this.clients, 'name', this.sortClient);
+      }
     },
     login(e) {
       e.preventDefault();
@@ -409,6 +413,8 @@ new Vue({
         localStorage.setItem('lang', lang);
         i18n.locale = lang;
       }
+
+      this.enableSortClient = await this.api.getUiSortClients();
 
       const currentRelease = await this.api.getRelease();
       const latestRelease = await fetch('https://wg-easy.github.io/wg-easy/changelog.json')
