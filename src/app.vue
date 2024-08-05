@@ -617,12 +617,12 @@ const CHART_COLORS = {
   gradient: { light: ['rgba(0,0,0,1.0)', 'rgba(0,0,0,1.0)'], dark: ['rgba(128,128,128,0)', 'rgba(128,128,128,0)'] },
 };
 
-const authenticated = ref(null);
+const authenticated = ref<null|boolean>(null);
 const authenticating = ref(false);
-const password = ref(null);
-const requiresPassword = ref(null);
+const password = ref<null|string>(null);
+const requiresPassword = ref<null|boolean>(null);
 
-const clients = ref(null);
+const clients = ref<null|unknown[]>(null);
 const clientsPersist = ref({});
 const clientDelete = ref(null);
 const clientCreate = ref(null);
@@ -745,8 +745,8 @@ async function refresh({
 } = {}) {
   if (!authenticated) return;
 
-  const clients = await api.getClients();
-  clients.value = clients.map((client) => {
+  const _clients = await api.getClients();
+  clients.value = _clients.map((client) => {
     if (client.name.includes('@') && client.name.includes('.')) {
       client.avatar = `https://gravatar.com/avatar/${sha256(client.name.toLowerCase().trim())}.jpg`;
     }
@@ -813,7 +813,7 @@ function login(e) {
 
   authenticating.value = true;
   api.createSession({
-    password: password,
+    password: password.value,
   })
     .then(async () => {
       const session = await api.getSession();
@@ -822,6 +822,7 @@ function login(e) {
       return refresh();
     })
     .catch((err) => {
+      console.log(err)
       alert(err.message || err.toString());
     })
     .finally(() => {
@@ -843,7 +844,7 @@ function logout(e) {
     });
 }
 function createClient() {
-  const name = clientCreateName;
+  const name = clientCreateName.value;
   if (!name) return;
 
   api.createClient({ name })
@@ -865,12 +866,12 @@ function disableClient(client) {
     .catch((err) => alert(err.message || err.toString()))
     .finally(() => refresh().catch(console.error));
 }
-function updateClientName(client, name) {
+function updateClientName(client, name: string) {
   api.updateClientName({ clientId: client.id, name })
     .catch((err) => alert(err.message || err.toString()))
     .finally(() => refresh().catch(console.error));
 }
-function updateClientAddress(client, address) {
+function updateClientAddress(client, address: string) {
   api.updateClientAddress({ clientId: client.id, address })
     .catch((err) => alert(err.message || err.toString()))
     .finally(() => refresh().catch(console.error));
@@ -904,7 +905,7 @@ function setTheme(theme) {
   const shouldAddDarkClass = theme === 'dark' || (theme === 'auto' && prefersDarkScheme?.matches);
   classList.toggle('dark', shouldAddDarkClass);
 }
-function handlePrefersChange(e) {
+function handlePrefersChange(e: MediaQueryListEventMap["change"]) {
   if (getItem('theme') === 'auto') {
     setTheme(e.matches ? 'dark' : 'light');
   }
@@ -916,8 +917,22 @@ function toggleCharts() {
 const {availableLocales, locale} = useI18n();
 
 onMounted(() => {
-  prefersDarkScheme?.addListener(handlePrefersChange);
+  prefersDarkScheme?.addEventListener("change", handlePrefersChange);
   setTheme(uiTheme.value);
+
+  api.getSession()
+      .then((session) => {
+        authenticated.value = session.authenticated;
+        requiresPassword.value = session.requiresPassword;
+        refresh({
+          updateCharts: updateCharts.value,
+        }).catch((err) => {
+          alert(err.message || err.toString());
+        });
+      })
+      .catch((err) => {
+        alert(err.message || err.toString());
+      });
 
   setInterval(() => {
       refresh({

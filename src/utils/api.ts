@@ -3,7 +3,11 @@
 
 class API {
 
-  async call({ method, path, body }) {
+  async call({ method, path, body }: {
+    method: string,
+    path: string,
+    body?: Record<string, unknown>
+  }) {
     const res = await fetch(`./api${path}`, {
       method,
       headers: {
@@ -21,7 +25,7 @@ class API {
     const json = await res.json();
 
     if (!res.ok) {
-      throw new Error(json.error || res.statusText);
+      throw new Error(json.message || res.statusText);
     }
 
     return json;
@@ -62,7 +66,7 @@ class API {
     });
   }
 
-  async createSession({ password }) {
+  async createSession({ password }: {password: string}) {
     return this.call({
       method: 'post',
       path: '/session',
@@ -91,7 +95,7 @@ class API {
     })));
   }
 
-  async createClient({ name }) {
+  async createClient({ name }: {name: string}) {
     return this.call({
       method: 'post',
       path: '/wireguard/client',
@@ -99,28 +103,28 @@ class API {
     });
   }
 
-  async deleteClient({ clientId }) {
+  async deleteClient({ clientId }: {clientId: string}) {
     return this.call({
       method: 'delete',
       path: `/wireguard/client/${clientId}`,
     });
   }
 
-  async enableClient({ clientId }) {
+  async enableClient({ clientId }: {clientId: string}) {
     return this.call({
       method: 'post',
       path: `/wireguard/client/${clientId}/enable`,
     });
   }
 
-  async disableClient({ clientId }) {
+  async disableClient({ clientId }: {clientId: string}) {
     return this.call({
       method: 'post',
       path: `/wireguard/client/${clientId}/disable`,
     });
   }
 
-  async updateClientName({ clientId, name }) {
+  async updateClientName({ clientId, name }: {clientId: string, name: string}) {
     return this.call({
       method: 'put',
       path: `/wireguard/client/${clientId}/name/`,
@@ -128,7 +132,7 @@ class API {
     });
   }
 
-  async updateClientAddress({ clientId, address }) {
+  async updateClientAddress({ clientId, address }: {clientId: string, address: string}) {
     return this.call({
       method: 'put',
       path: `/wireguard/client/${clientId}/address/`,
@@ -136,7 +140,7 @@ class API {
     });
   }
 
-  async restoreConfiguration(file) {
+  async restoreConfiguration(file: string) {
     return this.call({
       method: 'put',
       path: '/wireguard/restore',
