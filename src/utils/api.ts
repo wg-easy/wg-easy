@@ -1,6 +1,21 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-undef */
 
+export type APIClient = {
+  "id": string,
+  "name": string,
+  "enabled": boolean,
+  "address": string,
+  "publicKey": string,
+  "createdAt": string,
+  "updatedAt": string,
+  "downloadableConfig": boolean,
+  "persistentKeepalive": string,
+  "latestHandshakeAt": null,
+  "transferRx": number,
+  "transferTx": number
+}
+
 class API {
 
   async call({ method, path, body }: {
@@ -66,7 +81,7 @@ class API {
     });
   }
 
-  async createSession({ password }: {password: string}) {
+  async createSession({ password }: {password: string|null}) {
     return this.call({
       method: 'post',
       path: '/session',
@@ -85,7 +100,7 @@ class API {
     return this.call({
       method: 'get',
       path: '/wireguard/client',
-    }).then((clients) => clients.map((client) => ({
+    }).then((clients: APIClient[]) => clients.map((client) => ({
       ...client,
       createdAt: new Date(client.createdAt),
       updatedAt: new Date(client.updatedAt),

@@ -18,11 +18,15 @@
   "dependencies": {
     "@nuxtjs/i18n": "^8.3.3",
     "@nuxtjs/tailwindcss": "^6.12.1",
+    "apexcharts": "^3.51.0",
     "bcryptjs": "^2.4.3",
     "debug": "^4.3.6",
+    "js-sha256": "^0.11.0",
     "nuxt": "^3.12.4",
     "qrcode": "^1.5.3",
-    "vue": "latest"
+    "timeago.js": "^4.0.2",
+    "vue": "latest",
+    "vue3-apexcharts": "^1.5.3"
   },
   "devDependencies": {
     "@nuxt/eslint": "^0.5.0",

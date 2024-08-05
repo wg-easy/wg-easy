@@ -26,10 +26,8 @@
                 <path
                   d="M12,2.2c-5.4,0-9.8,4.4-9.8,9.8s4.4,9.8,9.8,9.8s9.8-4.4,9.8-9.8S17.4,2.2,12,2.2z M3.8,12c0-4.5,3.7-8.2,8.2-8.2v16.5C7.5,20.2,3.8,16.5,3.8,12z" />
               </svg>
-              <svg>
               <path stroke-linecap="round" stroke-linejoin="round"
                 d="M9 17.25v1.007a3 3 0 0 1-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0 1 15 18.257V17.25m6-12V15a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 15V5.25m18 0A2.25 2.25 0 0 0 18.75 3H5.25A2.25 2.25 0 0 0 3 5.25m18 0V12a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 12V5.25" />
-              </svg>
             </button>
             <!-- Show / hide charts -->
             <label v-if="uiChartType > 0"
@@ -216,7 +214,7 @@
                               d="M16.707 10.293a1 1 0 010 1.414l-6 6a1 1 0 01-1.414 0l-6-6a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l4.293-4.293a1 1 0 011.414 0z"
                               clip-rule="evenodd" />
                           </svg>
-                          {{ client.transferTxCurrent | bytes }}/s
+                          {{ bytes(client.transferTxCurrent) }}/s
                         </span>
 
                         <!-- Inline Transfer RX -->
@@ -229,13 +227,13 @@
                               d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z"
                               clip-rule="evenodd" />
                           </svg>
-                          {{ client.transferRxCurrent | bytes }}/s
+                          {{ bytes(client.transferRxCurrent) }}/s
                         </span>
                         <!-- Last seen -->
                         <span class="text-gray-400 dark:text-neutral-500 whitespace-nowrap"
                           v-if="client.latestHandshakeAt"
                           :title="$t('lastSeen') + dateTime(new Date(client.latestHandshakeAt))">
-                          {{ !uiTrafficStats ? " · " : "" }}{{ new Date(client.latestHandshakeAt) | timeago }}
+                          {{ !uiTrafficStats ? " · " : "" }}{{ timeago(new Date(client.latestHandshakeAt)) }}
                         </span>
                       </div>
                     </div>
@@ -254,8 +252,7 @@
                               clip-rule="evenodd" />
                           </svg>
                           <div>
-                            <span class="text-gray-700 dark:text-neutral-200">{{ client.transferTxCurrent |
-                              bytes }}/s</span>
+                            <span class="text-gray-700 dark:text-neutral-200">{{ bytes(client.transferTxCurrent) }}/s</span>
                             <!-- Total TX -->
                             <br><span class="font-regular" style="font-size:0.85em">{{ bytes(client.transferTx)
                               }}</span>
@@ -275,8 +272,7 @@
                               clip-rule="evenodd" />
                           </svg>
                           <div>
-                            <span class="text-gray-700 dark:text-neutral-200">{{ client.transferRxCurrent |
-                              bytes }}/s</span>
+                            <span class="text-gray-700 dark:text-neutral-200">{{ bytes(client.transferRxCurrent) }}/s</span>
                             <!-- Total RX -->
                             <br><span class="font-regular" style="font-size:0.85em">{{ bytes(client.transferRx)
                               }}</span>
@@ -601,10 +597,36 @@
 </template>
 
 <script setup lang="ts">
+import "~/assets/css/app.css";
+import {sha256} from "js-sha256";
+import {format as timeago} from "timeago.js";
+
 useHead({
   bodyAttrs: {
     class: 'bg-gray-50 dark:bg-neutral-800'
-  }
+  },
+  link: [
+    {
+      rel: "manifest",
+      href: "/manifest.json"
+    },
+    {
+      rel: "icon",
+      type: "image/png",
+      href: "/favicon.png"
+    },
+    {
+      rel: "apple-touch-icon",
+      href: "/apple-touch-icon.png"
+    }
+  ],
+  meta: [
+    {
+      name: "apple-mobile-web-app-capable",
+      content: "yes"
+    }
+  ],
+  title: "WireGuard"
 })
 
 const UI_CHART_TYPES = [
@@ -625,25 +647,54 @@ const authenticating = ref(false);
 const password = ref<null|string>(null);
 const requiresPassword = ref<null|boolean>(null);
 
-const clients = ref<null|unknown[]>(null);
-const clientsPersist = ref({});
-const clientDelete = ref(null);
-const clientCreate = ref(null);
-const clientCreateName = ref('');
-const clientEditName = ref(null);
-const clientEditNameId = ref(null);
-const clientEditAddress = ref(null);
-const clientEditAddressId = ref(null);
-const qrcode = ref(null);
+type Client = {
+  id: string,
+  name: string,
+  address: string
+  enabled: boolean,
+  transferRx: number,
+  transferTx: number,
+  transferTxSeries: number,
+  transferRxSeries: number,
+  avatar?: string,
+  latestHandshakeAt: string|null,
+  createdAt: Date,
+  downloadableConfig: boolean,
+  updatedAt: Date
+} & Omit<ClientPersist, 'transferRxSeries' | 'transferTxSeries'>
+
+type ClientPersist = {
+  transferRxHistory: number[],
+  transferRxPrevious: number
+  transferRxCurrent: number,
+  transferRxSeries: {name: string, data: number[]}[],
+  hoverRx: unknown
+  transferTxHistory: number[],
+  transferTxPrevious: number,
+  transferTxCurrent: number,
+  transferTxSeries: {name: string, data: number[]}[],
+  hoverTx: unknown,
+}
+
+const clients = ref<null|Client[]>(null);
+const clientsPersist = ref<Record<string, ClientPersist>>({});
+const clientDelete = ref<null|Client>(null);
+const clientCreate = ref<null|boolean>(null);
+const clientCreateName = ref<string>('');
+const clientEditName = ref<null|string>(null);
+const clientEditNameId = ref<null|string>(null);
+const clientEditAddress = ref<null|string>(null);
+const clientEditAddressId = ref<null|string>(null);
+const qrcode = ref<null|string>(null);
 
 const currentRelease = ref(null);
-const latestRelease = ref(null);
+const latestRelease = ref<null | {version: number, changelog: string}>(null);
 
 const uiTrafficStats = ref(false);
 
 const uiChartType = ref(0);
 const uiShowCharts = ref(getItem('uiShowCharts') === '1');
-const uiTheme = ref(getItem('theme') || 'auto');
+const uiTheme = ref<Theme>(getItem('theme') || 'auto');
 const prefersDarkScheme = import.meta.client ? window.matchMedia('(prefers-color-scheme: dark)') : null;
 
 const theme = computed(() => {
@@ -754,12 +805,12 @@ async function refresh({
       client.avatar = `https://gravatar.com/avatar/${sha256(client.name.toLowerCase().trim())}.jpg`;
     }
 
-    if (!clientsPersist[client.id]) {
-      clientsPersist[client.id] = {};
-      clientsPersist[client.id].transferRxHistory = Array(50).fill(0);
-      clientsPersist[client.id].transferRxPrevious = client.transferRx;
-      clientsPersist[client.id].transferTxHistory = Array(50).fill(0);
-      clientsPersist[client.id].transferTxPrevious = client.transferTx;
+    if (!clientsPersist.value[client.id]) {
+      clientsPersist.value[client.id] = {};
+      clientsPersist.value[client.id].transferRxHistory = Array(50).fill(0);
+      clientsPersist.value[client.id].transferRxPrevious = client.transferRx;
+      clientsPersist.value[client.id].transferTxHistory = Array(50).fill(0);
+      clientsPersist.value[client.id].transferTxPrevious = client.transferTx;
     }
 
     // Debug
@@ -768,47 +819,47 @@ async function refresh({
     // client.latestHandshakeAt = new Date();
     // this.requiresPassword = true;
 
-    clientsPersist[client.id].transferRxCurrent = client.transferRx - clientsPersist[client.id].transferRxPrevious;
-    clientsPersist[client.id].transferRxPrevious = client.transferRx;
-    clientsPersist[client.id].transferTxCurrent = client.transferTx - clientsPersist[client.id].transferTxPrevious;
-    clientsPersist[client.id].transferTxPrevious = client.transferTx;
+    clientsPersist.value[client.id].transferRxCurrent = client.transferRx - clientsPersist.value[client.id].transferRxPrevious;
+    clientsPersist.value[client.id].transferRxPrevious = client.transferRx;
+    clientsPersist.value[client.id].transferTxCurrent = client.transferTx - clientsPersist.value[client.id].transferTxPrevious;
+    clientsPersist.value[client.id].transferTxPrevious = client.transferTx;
 
     if (updateCharts) {
-      clientsPersist[client.id].transferRxHistory.push(clientsPersist[client.id].transferRxCurrent);
-      clientsPersist[client.id].transferRxHistory.shift();
+      clientsPersist.value[client.id].transferRxHistory.push(clientsPersist.value[client.id].transferRxCurrent);
+      clientsPersist.value[client.id].transferRxHistory.shift();
 
-      clientsPersist[client.id].transferTxHistory.push(clientsPersist[client.id].transferTxCurrent);
-      clientsPersist[client.id].transferTxHistory.shift();
+      clientsPersist.value[client.id].transferTxHistory.push(clientsPersist.value[client.id].transferTxCurrent);
+      clientsPersist.value[client.id].transferTxHistory.shift();
 
-      clientsPersist[client.id].transferTxSeries = [{
+      clientsPersist.value[client.id].transferTxSeries = [{
         name: 'Tx',
-        data: clientsPersist[client.id].transferTxHistory,
+        data: clientsPersist.value[client.id].transferTxHistory,
       }];
 
-      clientsPersist[client.id].transferRxSeries = [{
+      clientsPersist.value[client.id].transferRxSeries = [{
         name: 'Rx',
-        data: clientsPersist[client.id].transferRxHistory,
+        data: clientsPersist.value[client.id].transferRxHistory,
       }];
 
-      client.transferTxHistory = clientsPersist[client.id].transferTxHistory;
-      client.transferRxHistory = clientsPersist[client.id].transferRxHistory;
+      client.transferTxHistory = clientsPersist.value[client.id].transferTxHistory;
+      client.transferRxHistory = clientsPersist.value[client.id].transferRxHistory;
       client.transferMax = Math.max(...client.transferTxHistory, ...client.transferRxHistory);
 
-      client.transferTxSeries = clientsPersist[client.id].transferTxSeries;
-      client.transferRxSeries = clientsPersist[client.id].transferRxSeries;
+      client.transferTxSeries = clientsPersist.value[client.id].transferTxSeries;
+      client.transferRxSeries = clientsPersist.value[client.id].transferRxSeries;
     }
 
-    client.transferTxCurrent = clientsPersist[client.id].transferTxCurrent;
-    client.transferRxCurrent = clientsPersist[client.id].transferRxCurrent;
+    client.transferTxCurrent = clientsPersist.value[client.id].transferTxCurrent;
+    client.transferRxCurrent = clientsPersist.value[client.id].transferRxCurrent;
 
-    client.hoverTx = clientsPersist[client.id].hoverTx;
-    client.hoverRx = clientsPersist[client.id].hoverRx;
+    client.hoverTx = clientsPersist.value[client.id].hoverTx;
+    client.hoverRx = clientsPersist.value[client.id].hoverRx;
 
     return client;
   });
 }
 
-function login(e) {
+function login(e: Event) {
   e.preventDefault();
 
   if (!password) return;
@@ -816,7 +867,7 @@ function login(e) {
 
   authenticating.value = true;
   api.createSession({
-    password: password.value,
+    password: password.value
   })
     .then(async () => {
       const session = await api.getSession();
@@ -834,7 +885,7 @@ function login(e) {
     });
 }
 
-function logout(e) {
+function logout(e: Event) {
   e.preventDefault();
 
   api.deleteSession()
@@ -854,27 +905,36 @@ function createClient() {
     .catch((err) => alert(err.message || err.toString()))
     .finally(() => refresh().catch(console.error));
 }
-function deleteClient(client) {
+function deleteClient(client: Client|null) {
+  if (client === null) {
+    return;
+  }
   api.deleteClient({ clientId: client.id })
     .catch((err) => alert(err.message || err.toString()))
     .finally(() => refresh().catch(console.error));
 }
-function enableClient(client) {
+function enableClient(client: Client) {
   api.enableClient({ clientId: client.id })
     .catch((err) => alert(err.message || err.toString()))
     .finally(() => refresh().catch(console.error));
 }
-function disableClient(client) {
+function disableClient(client: Client) {
   api.disableClient({ clientId: client.id })
     .catch((err) => alert(err.message || err.toString()))
     .finally(() => refresh().catch(console.error));
 }
-function updateClientName(client, name: string) {
+function updateClientName(client: Client, name: string) {
+  if (name === null) {
+    return;
+  }
   api.updateClientName({ clientId: client.id, name })
     .catch((err) => alert(err.message || err.toString()))
     .finally(() => refresh().catch(console.error));
 }
-function updateClientAddress(client, address: string) {
+function updateClientAddress(client: Client, address: string|null) {
+  if (address === null) {
+    return;
+  }
   api.updateClientAddress({ clientId: client.id, address })
     .catch((err) => alert(err.message || err.toString()))
     .finally(() => refresh().catch(console.error));
@@ -895,15 +955,16 @@ function restoreConfig(e) {
     alert('Failed to load your file!');
   }
 }
+
 function toggleTheme() {
-  const themes = ['light', 'dark', 'auto'];
+  const themes = ['light', 'dark', 'auto'] as Theme[];
   const currentIndex = themes.indexOf(uiTheme.value);
   const newIndex = (currentIndex + 1) % themes.length;
   uiTheme.value = themes[newIndex];
   setItem('theme', uiTheme.value);
   setTheme(uiTheme.value);
 }
-function setTheme(theme) {
+function setTheme(theme: Theme) {
   const { classList } = document.documentElement;
   const shouldAddDarkClass = theme === 'dark' || (theme === 'auto' && prefersDarkScheme?.matches);
   classList.toggle('dark', shouldAddDarkClass);
@@ -914,7 +975,7 @@ function handlePrefersChange(e: MediaQueryListEventMap["change"]) {
   }
 }
 function toggleCharts() {
-  setItem('uiShowCharts', uiShowCharts.value ? 1 : 0);
+  setItem('uiShowCharts', uiShowCharts.value ? '1' : '0');
 }
 
 const {availableLocales, locale} = useI18n();
@@ -972,7 +1033,7 @@ onMounted(() => {
         .then((releases) => {
           const releasesArray = Object.entries(releases).map(([version, changelog]) => ({
             version: parseInt(version, 10),
-            changelog,
+            changelog: changelog as string,
           }));
           releasesArray.sort((a, b) => {
             return b.version - a.version;
@@ -1009,13 +1070,12 @@ const chartOptionsRX = computed(() => {
 })
 
 const updateCharts = computed(() => {
-  return uiChartType.value > 0 && uiShowCharts;
+  return uiChartType.value > 0 && uiShowCharts.value;
 })
 
-function bytes(bytes, decimals, kib, maxunit) {
-  kib = kib || false;
+function bytes(bytes: number, decimals? = 2, kib? = false, maxunit?: string) {
   if (bytes === 0) return '0 B';
-  if (Number.isNaN(parseFloat(bytes)) && !Number.isFinite(bytes)) return 'NaN';
+  if (Number.isNaN(bytes) && !Number.isFinite(bytes)) return 'NaN';
   const k = kib ? 1024 : 1000;
   const dm = decimals != null && !Number.isNaN(decimals) && decimals >= 0 ? decimals : 2;
   const sizes = kib
@@ -1026,26 +1086,7 @@ function bytes(bytes, decimals, kib, maxunit) {
     const index = sizes.indexOf(maxunit);
     if (index !== -1) i = index;
   }
-  // eslint-disable-next-line no-restricted-properties
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
-}
-
-function getItem(item: string) {
-  if (import.meta.client) {
-    return localStorage.getItem(item)
-  } else {
-    return undefined
-  }
-}
-
-function setItem(item: string, value: string) {
-  if (import.meta.client) {
-    localStorage.setItem(item, value)
-  
-    return true
-  } else {
-    return false
-  }
 }
 
 </script>
