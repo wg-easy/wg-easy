@@ -2,7 +2,7 @@ services:
   wg-easy:
     build:
       dockerfile: ./Dockerfile
-    command: npm run serve
+    command: pnpm run dev
     volumes:
       - ./src/:/app/
       # - ./data/:/etc/wireguard

@@ -1,31 +1,23 @@
-'use strict';
+import fs from 'node:fs/promises';
+import path from 'path';
+import debug_logger from 'debug'
+const debug = debug_logger('WireGuard')
+import crypto from 'node:crypto';
+import QRCode from 'qrcode';
 
-const fs = require('node:fs/promises');
-const path = require('path');
-const debug = require('debug')('WireGuard');
-const crypto = require('node:crypto');
-const QRCode = require('qrcode');
+import { WG_PATH, WG_HOST, WG_PORT, WG_CONFIG_PORT, WG_MTU, WG_DEFAULT_DNS, WG_DEFAULT_ADDRESS, WG_PERSISTENT_KEEPALIVE, WG_ALLOWED_IPS, WG_PRE_UP, WG_POST_UP, WG_PRE_DOWN, WG_POST_DOWN } from '~/utils/config';
+import { exec } from '~/utils/cmd';
+import { isValidIPv4 } from '~/utils/ip';
 
-const Util = require('./Util');
-const ServerError = require('./ServerError');
+class ServerError extends Error {
+  statusCode: number;
+  constructor(message: string, statusCode = 500) {
+    super(message);
+    this.statusCode = statusCode;
+  }
+};
 
-const {
-  WG_PATH,
-  WG_HOST,
-  WG_PORT,
-  WG_CONFIG_PORT,
-  WG_MTU,
-  WG_DEFAULT_DNS,
-  WG_DEFAULT_ADDRESS,
-  WG_PERSISTENT_KEEPALIVE,
-  WG_ALLOWED_IPS,
-  WG_PRE_UP,
-  WG_POST_UP,
-  WG_PRE_DOWN,
-  WG_POST_DOWN,
-} = require('../config');
-
-module.exports = class WireGuard {
+class WireGuard {
 
   async __buildConfig() {
     this.__configPromise = Promise.resolve().then(async () => {
@@ -40,8 +32,8 @@ module.exports = class WireGuard {
         config = JSON.parse(config);
         debug('Configuration loaded.');
       } catch (err) {
-        const privateKey = await Util.exec('wg genkey');
-        const publicKey = await Util.exec(`echo ${privateKey} | wg pubkey`, {
+        const privateKey = await exec('wg genkey');
+        const publicKey = await exec(`echo ${privateKey} | wg pubkey`, {
           log: 'echo ***hidden*** | wg pubkey',
         });
         const address = WG_DEFAULT_ADDRESS.replace('x', '1');
@@ -68,8 +60,8 @@ module.exports = class WireGuard {
       const config = await this.__buildConfig();
 
       await this.__saveConfig(config);
-      await Util.exec('wg-quick down wg0').catch(() => {});
-      await Util.exec('wg-quick up wg0').catch((err) => {
+      await exec('wg-quick down wg0').catch(() => {});
+      await exec('wg-quick up wg0').catch((err) => {
         if (err && err.message && err.message.includes('Cannot find device "wg0"')) {
           throw new Error('WireGuard exited with the error: Cannot find device "wg0"\nThis usually means that your host\'s kernel does not support WireGuard!');
         }
@@ -132,7 +124,7 @@ ${client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
 
   async __syncConfig() {
     debug('Config syncing...');
-    await Util.exec('wg syncconf wg0 <(wg-quick strip wg0)');
+    await exec('wg syncconf wg0 <(wg-quick strip wg0)');
     debug('Config synced.');
   }
 
@@ -155,7 +147,7 @@ ${client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
     }));
 
     // Loop WireGuard status
-    const dump = await Util.exec('wg show wg0 dump', {
+    const dump = await exec('wg show wg0 dump', {
       log: false,
     });
     dump
@@ -232,11 +224,11 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
 
     const config = await this.getConfig();
 
-    const privateKey = await Util.exec('wg genkey');
-    const publicKey = await Util.exec(`echo ${privateKey} | wg pubkey`, {
+    const privateKey = await exec('wg genkey');
+    const publicKey = await exec(`echo ${privateKey} | wg pubkey`, {
       log: 'echo ***hidden*** | wg pubkey',
     });
-    const preSharedKey = await Util.exec('wg genpsk');
+    const preSharedKey = await exec('wg genpsk');
 
     // Calculate next IP
     let address;
@@ -317,7 +309,7 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
   async updateClientAddress({ clientId, address }) {
     const client = await this.getClient({ clientId });
 
-    if (!Util.isValidIPv4(address)) {
+    if (!isValidIPv4(address)) {
       throw new ServerError(`Invalid Address: ${address}`, 400);
     }
 
@@ -350,7 +342,9 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
 
   // Shutdown wireguard
   async Shutdown() {
-    await Util.exec('wg-quick down wg0').catch(() => {});
+    await exec('wg-quick down wg0').catch(() => {});
   }
 
 };
+
+export default new WireGuard();

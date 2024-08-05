@@ -1,70 +1,54 @@
-<!DOCTYPE html>
-<html>
-
-<head>
-  <title>WireGuard</title>
-  <meta charset="utf-8"/>
-  <link href="./css/app.css" rel="stylesheet">
-  <link rel="manifest" href="./manifest.json">
-  <link rel="icon" type="image/png" href="./img/favicon.png">
-  <link rel="apple-touch-icon" href="./img/apple-touch-icon.png">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-</head>
-<style>
-  [v-cloak] {
-    display: none;
-  }
-  .line-chart .apexcharts-svg{
-    transform: translateY(3px);
-  }
-</style>
-
-<body class="bg-gray-50 dark:bg-neutral-800">
-  <div id="app">
+<template>
+  <div>
     <div v-cloak class="container mx-auto max-w-3xl px-3 md:px-0 mt-4 xs:mt-6">
       <div v-if="authenticated === true">
         <div class="flex flex-col-reverse xxs:flex-row flex-auto items-center items-end gap-3">
           <h1 class="text-4xl dark:text-neutral-200 font-medium flex-grow self-start mb-4">
-            <img src="./img/logo.png" width="32" class="inline align-middle dark:bg mr-2" /><span class="align-middle">WireGuard</span>
+            <img src="/logo.png" width="32" class="inline align-middle dark:bg mr-2" /><span
+              class="align-middle">WireGuard</span>
           </h1>
           <div class="flex items-center grow-0 gap-3 items-end self-end xxs:self-center">
             <!-- Dark / light theme -->
             <button @click="toggleTheme"
-              class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 dark:bg-neutral-700 dark:hover:bg-neutral-600 transition" :title="$t(`theme.${uiTheme}`)">
-              <svg v-if="uiTheme === 'light'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                class="w-5 h-5">
+              class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 dark:bg-neutral-700 dark:hover:bg-neutral-600 transition"
+              :title="$t(`theme.${uiTheme}`)">
+              <svg v-if="uiTheme === 'light'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                 <path stroke-linecap="round" stroke-linejoin="round"
                   d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
               </svg>
-              <svg v-else-if="uiTheme === 'dark'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                class="w-5 h-5 text-neutral-400">
+              <svg v-else-if="uiTheme === 'dark'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-neutral-400">
                 <path stroke-linecap="round" stroke-linejoin="round"
                   d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
               </svg>
-              <svg v-else xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" 
+              <svg v-else xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"
                 class="w-5 h-5 fill-gray-600 dark:fill-neutral-400">
                 <path
                   d="M12,2.2c-5.4,0-9.8,4.4-9.8,9.8s4.4,9.8,9.8,9.8s9.8-4.4,9.8-9.8S17.4,2.2,12,2.2z M3.8,12c0-4.5,3.7-8.2,8.2-8.2v16.5C7.5,20.2,3.8,16.5,3.8,12z" />
               </svg>
-                <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M9 17.25v1.007a3 3 0 0 1-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0 1 15 18.257V17.25m6-12V15a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 15V5.25m18 0A2.25 2.25 0 0 0 18.75 3H5.25A2.25 2.25 0 0 0 3 5.25m18 0V12a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 12V5.25" />
+              <svg>
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M9 17.25v1.007a3 3 0 0 1-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0 1 15 18.257V17.25m6-12V15a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 15V5.25m18 0A2.25 2.25 0 0 0 18.75 3H5.25A2.25 2.25 0 0 0 3 5.25m18 0V12a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 12V5.25" />
               </svg>
             </button>
             <!-- Show / hide charts -->
-            <label v-if="uiChartType > 0" class="inline-flex items-center justify-center cursor-pointer w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 dark:bg-neutral-700 dark:hover:bg-neutral-600 whitespace-nowrap transition group" :title="$t('toggleCharts')">
+            <label v-if="uiChartType > 0"
+              class="inline-flex items-center justify-center cursor-pointer w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 dark:bg-neutral-700 dark:hover:bg-neutral-600 whitespace-nowrap transition group"
+              :title="$t('toggleCharts')">
               <input type="checkbox" value="" class="sr-only peer" v-model="uiShowCharts" @change="toggleCharts">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" fill="currentColor"
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5"
+                fill="currentColor"
                 class="w-5 h-5 peer fill-gray-400 peer-checked:fill-gray-600 dark:fill-neutral-600 peer-checked:dark:fill-neutral-400 group-hover:dark:fill-neutral-500 transition">
-                  <path
-                    d="M18.375 2.25c-1.035 0-1.875.84-1.875 1.875v15.75c0 1.035.84 1.875 1.875 1.875h.75c1.035 0 1.875-.84 1.875-1.875V4.125c0-1.036-.84-1.875-1.875-1.875h-.75ZM9.75 8.625c0-1.036.84-1.875 1.875-1.875h.75c1.036 0 1.875.84 1.875 1.875v11.25c0 1.035-.84 1.875-1.875 1.875h-.75a1.875 1.875 0 0 1-1.875-1.875V8.625ZM3 13.125c0-1.036.84-1.875 1.875-1.875h.75c1.036 0 1.875.84 1.875 1.875v6.75c0 1.035-.84 1.875-1.875 1.875h-.75A1.875 1.875 0 0 1 3 19.875v-6.75Z" />
+                <path
+                  d="M18.375 2.25c-1.035 0-1.875.84-1.875 1.875v15.75c0 1.035.84 1.875 1.875 1.875h.75c1.035 0 1.875-.84 1.875-1.875V4.125c0-1.036-.84-1.875-1.875-1.875h-.75ZM9.75 8.625c0-1.036.84-1.875 1.875-1.875h.75c1.036 0 1.875.84 1.875 1.875v11.25c0 1.035-.84 1.875-1.875 1.875h-.75a1.875 1.875 0 0 1-1.875-1.875V8.625ZM3 13.125c0-1.036.84-1.875 1.875-1.875h.75c1.036 0 1.875.84 1.875 1.875v6.75c0 1.035-.84 1.875-1.875 1.875h-.75A1.875 1.875 0 0 1 3 19.875v-6.75Z" />
               </svg>
             </label>
             <span v-if="requiresPassword"
-              class="text-sm text-gray-400 dark:text-neutral-400 cursor-pointer hover:underline"
-              @click="logout">
-              {{$t("logout")}}
-              <svg class="h-3 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              class="text-sm text-gray-400 dark:text-neutral-400 cursor-pointer hover:underline" @click="logout">
+              {{ $t("logout") }}
+              <svg class="h-3 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
               </svg>
@@ -77,13 +61,13 @@
           :title="`v${currentRelease} → v${latestRelease.version}`">
           <div class="container mx-auto flex flex-row flex-auto items-center">
             <div class="flex-grow">
-              <p class="font-bold">{{$t("updateAvailable")}}</p>
-              <p>{{latestRelease.changelog}}</p>
+              <p class="font-bold">{{ $t("updateAvailable") }}</p>
+              <p>{{ latestRelease.changelog }}</p>
             </div>
 
             <a href="https://github.com/wg-easy/wg-easy#updating" target="_blank"
               class="p-3 rounded-md bg-white dark:bg-red-100 float-right font-sm font-semibold text-red-800 dark:text-red-600 flex-shrink-0 border-2 border-red-800 dark:border-red-600 hover:border-white dark:hover:border-red-600 hover:text-white dark:hover:text-red-100 hover:bg-red-800 dark:hover:bg-red-600 transition-all">
-              {{$t("update")}} →
+              {{ $t("update") }} →
             </a>
           </div>
         </div>
@@ -91,25 +75,32 @@
         <div class="shadow-md rounded-lg bg-white dark:bg-neutral-700 overflow-hidden">
           <div class="flex flex-row flex-auto items-center p-3 px-5 border-b-2 border-gray-100 dark:border-neutral-600">
             <div class="flex-grow">
-              <p class="text-2xl font-medium dark:text-neutral-200">{{$t("clients")}}</p>
+              <p class="text-2xl font-medium dark:text-neutral-200">{{ $t("clients") }}</p>
             </div>
             <div class="flex md:block md:flex-shrink-0">
               <!-- Restore configuration -->
               <label for="inputRC" :title="$t('titleRestoreConfig')"
                 class="hover:cursor-pointer hover:bg-red-800 hover:border-red-800 hover:text-white text-gray-700 dark:text-neutral-200 max-md:border-r-0 border-2 border-gray-100 dark:border-neutral-600 py-2 px-4 rounded-l-full md:rounded inline-flex items-center transition">
-                <svg inline class="w-4 md:mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"></path>
+                <svg inline class="w-4 md:mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                  stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99">
+                  </path>
                 </svg>
-                <span class="max-md:hidden text-sm">{{$t("restore")}}</span>
-                <input id="inputRC" type="file" name="configurationfile" accept="text/*,.json" @change="restoreConfig" class="hidden"/>
+                <span class="max-md:hidden text-sm">{{ $t("restore") }}</span>
+                <input id="inputRC" type="file" name="configurationfile" accept="text/*,.json" @change="restoreConfig"
+                  class="hidden" />
               </label>
               <!-- Backup configuration -->
               <a href="./api/wireguard/backup" :title="$t('titleBackupConfig')"
                 class="hover:bg-red-800 hover:border-red-800 hover:text-white text-gray-700 dark:text-neutral-200 max-md:border-x-0 border-2 border-gray-100 dark:border-neutral-600 py-2 px-4 md:rounded inline-flex items-center transition">
-                <svg inline class="w-4 md:mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 14.25h13.5m-13.5 0a3 3 0 0 1-3-3m3 3a3 3 0 1 0 0 6h13.5a3 3 0 1 0 0-6m-16.5-3a3 3 0 0 1 3-3h13.5a3 3 0 0 1 3 3m-19.5 0a4.5 4.5 0 0 1 .9-2.7L5.737 5.1a3.375 3.375 0 0 1 2.7-1.35h7.126c1.062 0 2.062.5 2.7 1.35l2.587 3.45a4.5 4.5 0 0 1 .9 2.7m0 0a3 3 0 0 1-3 3m0 3h.008v.008h-.008v-.008Zm0-6h.008v.008h-.008v-.008Zm-3 6h.008v.008h-.008v-.008Zm0-6h.008v.008h-.008v-.008Z"></path>
+                <svg inline class="w-4 md:mr-2 size-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                  stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M5.25 14.25h13.5m-13.5 0a3 3 0 0 1-3-3m3 3a3 3 0 1 0 0 6h13.5a3 3 0 1 0 0-6m-16.5-3a3 3 0 0 1 3-3h13.5a3 3 0 0 1 3 3m-19.5 0a4.5 4.5 0 0 1 .9-2.7L5.737 5.1a3.375 3.375 0 0 1 2.7-1.35h7.126c1.062 0 2.062.5 2.7 1.35l2.587 3.45a4.5 4.5 0 0 1 .9 2.7m0 0a3 3 0 0 1-3 3m0 3h.008v.008h-.008v-.008Zm0-6h.008v.008h-.008v-.008Zm-3 6h.008v.008h-.008v-.008Zm0-6h.008v.008h-.008v-.008Z">
+                  </path>
                 </svg>
-                <span class="max-md:hidden text-sm">{{$t("backup")}}</span>
+                <span class="max-md:hidden text-sm">{{ $t("backup") }}</span>
               </a>
               <!-- New client -->
               <button @click="clientCreate = true; clientCreateName = '';"
@@ -119,7 +110,7 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
-                <span class="max-md:hidden text-sm">{{$t("new")}}</span>
+                <span class="max-md:hidden text-sm">{{ $t("new") }}</span>
               </button>
             </div>
           </div>
@@ -130,11 +121,13 @@
               class="relative overflow-hidden border-b last:border-b-0 border-gray-100 dark:border-neutral-600 border-solid">
 
               <!-- Chart -->
-              <div v-if="uiChartType" :class="`absolute z-0 bottom-0 left-0 right-0 h-6 ${uiChartType === 1 && 'line-chart'}`" >
+              <div v-if="uiChartType"
+                :class="`absolute z-0 bottom-0 left-0 right-0 h-6 ${uiChartType === 1 && 'line-chart'}`">
                 <apexchart width="100%" height="100%" :options="chartOptionsTX" :series="client.transferTxSeries">
                 </apexchart>
               </div>
-              <div v-if="uiChartType" :class="`absolute z-0 top-0 left-0 right-0 h-6 ${uiChartType === 1 && 'line-chart'}`" >
+              <div v-if="uiChartType"
+                :class="`absolute z-0 top-0 left-0 right-0 h-6 ${uiChartType === 1 && 'line-chart'}`">
                 <apexchart width="100%" height="100%" :options="chartOptionsRX" :series="client.transferRxSeries"
                   style="transform: scaleY(-1);">
                 </apexchart>
@@ -153,7 +146,7 @@
                     <img v-if="client.avatar" :src="client.avatar" class="w-10 rounded-full absolute top-0 left-0" />
 
                     <div
-                      v-if="client.latestHandshakeAt && ((new Date() - new Date(client.latestHandshakeAt) < 1000 * 60 * 10))">
+                      v-if="client.latestHandshakeAt && ((new Date().getTime() - new Date(client.latestHandshakeAt).getTime() < 1000 * 60 * 10))">
                       <div
                         class="animate-ping w-4 h-4 p-1 bg-red-100 dark:bg-red-100 rounded-full absolute -bottom-1 -right-1">
                       </div>
@@ -176,7 +169,7 @@
                           :ref="'client-' + client.id + '-name'"
                           class="rounded px-1 border-2 dark:bg-neutral-700 border-gray-100 dark:border-neutral-600 focus:border-gray-200 dark:focus:border-neutral-500 dark:placeholder:text-neutral-500 outline-none w-30" />
                         <span v-show="clientEditNameId !== client.id"
-                          class="border-t-2 border-b-2 border-transparent">{{client.name}}</span>
+                          class="border-t-2 border-b-2 border-transparent">{{ client.name }}</span>
 
                         <!-- Edit -->
                         <span v-show="clientEditNameId !== client.id"
@@ -199,8 +192,8 @@
                             v-on:keyup.escape="clientEditAddress = null; clientEditAddressId = null;"
                             :ref="'client-' + client.id + '-address'"
                             class="rounded border-2 dark:bg-neutral-700 border-gray-100 dark:border-neutral-600 focus:border-gray-200 dark:focus:border-neutral-500 outline-none w-20 text-black dark:text-neutral-300 dark:placeholder:text-neutral-500" />
-                          <span v-show="clientEditAddressId !== client.id"
-                            class="inline-block ">{{client.address}}</span>
+                          <span v-show="clientEditAddressId !== client.id" class="inline-block ">{{ client.address
+                            }}</span>
 
                           <!-- Edit -->
                           <span v-show="clientEditAddressId !== client.id"
@@ -215,30 +208,35 @@
                           </span>
                         </span>
                         <!-- Inline Transfer TX -->
-                        <span v-if="!uiTrafficStats && client.transferTx" class="whitespace-nowrap" :title="$t('totalDownload') + bytes(client.transferTx)">
+                        <span v-if="!uiTrafficStats && client.transferTx" class="whitespace-nowrap"
+                          :title="$t('totalDownload') + bytes(client.transferTx)">
                           ·
-                          <svg class="align-middle h-3 inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                          <svg class="align-middle h-3 inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                            fill="currentColor">
                             <path fill-rule="evenodd"
                               d="M16.707 10.293a1 1 0 010 1.414l-6 6a1 1 0 01-1.414 0l-6-6a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l4.293-4.293a1 1 0 011.414 0z"
                               clip-rule="evenodd" />
                           </svg>
-                          {{client.transferTxCurrent | bytes}}/s
+                          {{ client.transferTxCurrent | bytes }}/s
                         </span>
-                        
+
                         <!-- Inline Transfer RX -->
-                        <span v-if="!uiTrafficStats && client.transferRx" class="whitespace-nowrap" :title="$t('totalUpload') + bytes(client.transferRx)">
+                        <span v-if="!uiTrafficStats && client.transferRx" class="whitespace-nowrap"
+                          :title="$t('totalUpload') + bytes(client.transferRx)">
                           ·
-                          <svg class="align-middle h-3 inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                          <svg class="align-middle h-3 inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                            fill="currentColor">
                             <path fill-rule="evenodd"
                               d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z"
                               clip-rule="evenodd" />
                           </svg>
-                          {{client.transferRxCurrent | bytes}}/s
+                          {{ client.transferRxCurrent | bytes }}/s
                         </span>
                         <!-- Last seen -->
-                        <span class="text-gray-400 dark:text-neutral-500 whitespace-nowrap" v-if="client.latestHandshakeAt"
+                        <span class="text-gray-400 dark:text-neutral-500 whitespace-nowrap"
+                          v-if="client.latestHandshakeAt"
                           :title="$t('lastSeen') + dateTime(new Date(client.latestHandshakeAt))">
-                          {{!uiTrafficStats ? " · " : ""}}{{new Date(client.latestHandshakeAt) | timeago}}
+                          {{ !uiTrafficStats ? " · " : "" }}{{ new Date(client.latestHandshakeAt) | timeago }}
                         </span>
                       </div>
                     </div>
@@ -257,10 +255,11 @@
                               clip-rule="evenodd" />
                           </svg>
                           <div>
-                            <span class="text-gray-700 dark:text-neutral-200">{{client.transferTxCurrent |
-                              bytes}}/s</span>
+                            <span class="text-gray-700 dark:text-neutral-200">{{ client.transferTxCurrent |
+                              bytes }}/s</span>
                             <!-- Total TX -->
-                            <br><span class="font-regular" style="font-size:0.85em">{{bytes(client.transferTx)}}</span>
+                            <br><span class="font-regular" style="font-size:0.85em">{{ bytes(client.transferTx)
+                              }}</span>
                           </div>
                         </span>
 
@@ -277,10 +276,11 @@
                               clip-rule="evenodd" />
                           </svg>
                           <div>
-                            <span class="text-gray-700 dark:text-neutral-200">{{client.transferRxCurrent |
-                              bytes}}/s</span>
+                            <span class="text-gray-700 dark:text-neutral-200">{{ client.transferRxCurrent |
+                              bytes }}/s</span>
                             <!-- Total RX -->
-                            <br><span class="font-regular" style="font-size:0.85em">{{bytes(client.transferRx)}}</span>
+                            <br><span class="font-regular" style="font-size:0.85em">{{ bytes(client.transferRx)
+                              }}</span>
                           </div>
                         </span>
                       </div>
@@ -312,8 +312,7 @@
                       :class="{
                         'hover:bg-red-800 dark:hover:bg-red-800 hover:text-white dark:hover:text-white': client.downloadableConfig,
                         'is-disabled': !client.downloadableConfig
-                      }"
-                      :title="!client.downloadableConfig ? $t('noPrivKey') : $t('showQR')"
+                      }" :title="!client.downloadableConfig ? $t('noPrivKey') : $t('showQR')"
                       @click="qrcode = `./api/wireguard/client/${client.id}/qrcode.svg`">
                       <svg class="w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
@@ -330,9 +329,8 @@
                       :class="{
                         'hover:bg-red-800 dark:hover:bg-red-800 hover:text-white dark:hover:text-white': client.downloadableConfig,
                         'is-disabled': !client.downloadableConfig
-                      }"
-                      :title="!client.downloadableConfig ? $t('noPrivKey') : $t('downloadConfig')"
-                      @click="if(!client.downloadableConfig) { $event.preventDefault(); }">
+                      }" :title="!client.downloadableConfig ? $t('noPrivKey') : $t('downloadConfig')"
+                      @click="if (!client.downloadableConfig) { $event.preventDefault(); }">
                       <svg class="w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -359,7 +357,7 @@
             </div>
             <div v-if="clients && clients.length === 0">
               <p class="text-center m-10 text-gray-400 dark:text-neutral-400 text-sm">
-                {{$t("noClients")}}<br /><br />
+                {{ $t("noClients") }}<br /><br />
                 <button @click="clientCreate = true; clientCreateName = '';"
                   class="bg-red-800 hover:bg-red-700 text-white border-2 border-none py-2 px-4 rounded inline-flex items-center transition">
                   <svg class="w-4 mr-2" inline xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -367,7 +365,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                   </svg>
-                  <span class="text-sm">{{$t("newClient")}}</span>
+                  <span class="text-sm">{{ $t("newClient") }}</span>
                 </button>
               </p>
             </div>
@@ -435,15 +433,15 @@
                 <div class="sm:flex sm:items-start">
                   <div
                     class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-800 sm:mx-0 sm:h-10 sm:w-10">
-                    <svg class="h-6 w-6 text-white" inline xmlns="http://www.w3.org/2000/svg"
-                      fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg class="h-6 w-6 text-white" inline xmlns="http://www.w3.org/2000/svg" fill="none"
+                      viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                     </svg>
                   </div>
                   <div class="flex-grow mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                     <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-neutral-200" id="modal-headline">
-                      {{$t("newClient")}}
+                      {{ $t("newClient") }}
                     </h3>
                     <div class="mt-2">
                       <p class="text-sm text-gray-500">
@@ -458,15 +456,15 @@
               <div class="bg-gray-50 dark:bg-neutral-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                 <button v-if="clientCreateName.length" type="button" @click="createClient(); clientCreate = null"
                   class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-800 text-base font-medium text-white hover:bg-red-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
-                  {{$t("create")}}
+                  {{ $t("create") }}
                 </button>
                 <button v-else type="button"
                   class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-gray-200 dark:bg-neutral-400 text-base font-medium text-white dark:text-neutral-300 sm:ml-3 sm:w-auto sm:text-sm cursor-not-allowed">
-                  {{$t("create")}}
+                  {{ $t("create") }}
                 </button>
                 <button type="button" @click="clientCreate = null"
                   class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-neutral-500 shadow-sm px-4 py-2 bg-white dark:bg-neutral-500 text-base font-medium text-gray-700 dark:text-neutral-50 hover:bg-gray-50 dark:hover:bg-neutral-600 dark:hover:border-neutral-600 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                  {{$t("cancel")}}
+                  {{ $t("cancel") }}
                 </button>
               </div>
             </div>
@@ -518,11 +516,11 @@
                   </div>
                   <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                     <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-neutral-200" id="modal-headline">
-                      {{$t("deleteClient")}}
+                      {{ $t("deleteClient") }}
                     </h3>
                     <div class="mt-2">
                       <p class="text-sm text-gray-500 dark:text-neutral-300">
-                        {{$t("deleteDialog1")}} <strong>{{clientDelete.name}}</strong>? {{$t("deleteDialog2")}}
+                        {{ $t("deleteDialog1") }} <strong>{{ clientDelete.name }}</strong>? {{ $t("deleteDialog2") }}
                       </p>
                     </div>
                   </div>
@@ -531,11 +529,11 @@
               <div class="bg-gray-50 dark:bg-neutral-600 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                 <button type="button" @click="deleteClient(clientDelete); clientDelete = null"
                   class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 dark:bg-red-600 text-base font-medium text-white dark:text-white hover:bg-red-700 dark:hover:bg-red-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
-                  {{$t("deleteClient")}}
+                  {{ $t("deleteClient") }}
                 </button>
                 <button type="button" @click="clientDelete = null"
                   class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-neutral-500 shadow-sm px-4 py-2 bg-white dark:bg-neutral-500 text-base font-medium text-gray-700 dark:text-neutral-50 hover:bg-gray-50 dark:hover:bg-neutral-600 dark:hover:border-neutral-600 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                  {{$t("cancel")}}
+                  {{ $t("cancel") }}
                 </button>
               </div>
             </div>
@@ -545,7 +543,7 @@
 
       <div v-if="authenticated === false">
         <h1 class="text-4xl font-medium my-16 text-gray-700 dark:text-neutral-200 text-center">
-          <img src="./img/logo.png" width="32" class="inline align-middle dark:bg" />
+          <img src="/logo.png" width="32" class="inline align-middle dark:bg" />
           <span class="align-middle">WireGuard</span>
         </h1>
 
@@ -553,8 +551,8 @@
           class="shadow rounded-md bg-white dark:bg-neutral-700 mx-auto w-64 p-5 overflow-hidden mt-10">
           <!-- Avatar -->
           <div class="h-20 w-20 mb-10 mt-5 mx-auto rounded-full bg-red-800 dark:bg-red-800 relative overflow-hidden">
-            <svg class="w-10 h-10 m-5 text-white dark:text-white" xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20" fill="currentColor">
+            <svg class="w-10 h-10 m-5 text-white dark:text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+              fill="currentColor">
               <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
             </svg>
           </div>
@@ -595,23 +593,441 @@
 
     </div>
 
-    <p v-cloak class="text-center m-10 text-gray-300 dark:text-neutral-600 text-xs"> <a class="hover:underline" target="_blank"
-        href="https://github.com/wg-easy/wg-easy">WireGuard Easy</a> © 2021-2024 by <a class="hover:underline" target="_blank"
-        href="https://emilenijssen.nl/?ref=wg-easy">Emile Nijssen</a> is licensed under <a class="hover:underline" target="_blank"
+    <p v-cloak class="text-center m-10 text-gray-300 dark:text-neutral-600 text-xs"> <a class="hover:underline"
+        target="_blank" href="https://github.com/wg-easy/wg-easy">WireGuard Easy</a> © 2021-2024 by <a
+        class="hover:underline" target="_blank" href="https://emilenijssen.nl/?ref=wg-easy">Emile Nijssen</a> is
+      licensed under <a class="hover:underline" target="_blank"
         href="http://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> · <a class="hover:underline"
-        href="https://github.com/sponsors/WeeJeWel" target="_blank">{{$t("donate")}}</a></p>
+        href="https://github.com/sponsors/WeeJeWel" target="_blank">{{ $t("donate") }}</a></p>
 
   </div>
+</template>
 
-  <script src="./js/vendor/vue.min.js"></script>
-  <script src="./js/vendor/vue-i18n.min.js"></script>
-  <script src="./js/vendor/apexcharts.min.js"></script>
-  <script src="./js/vendor/vue-apexcharts.min.js"></script>
-  <script src="./js/vendor/sha256.min.js"></script>
-  <script src="./js/vendor/timeago.full.min.js"></script>
-  <script src="./js/api.js"></script>
-  <script src="./js/i18n.js"></script>
-  <script src="./js/app.js"></script>
-</body>
+<script setup lang="ts">
+const UI_CHART_TYPES = [
+  { type: false, strokeWidth: 0 },
+  { type: 'line', strokeWidth: 3 },
+  { type: 'area', strokeWidth: 0 },
+  { type: 'bar', strokeWidth: 0 },
+];
 
-</html>
+const CHART_COLORS = {
+  rx: { light: 'rgba(128,128,128,0.3)', dark: 'rgba(255,255,255,0.3)' },
+  tx: { light: 'rgba(128,128,128,0.4)', dark: 'rgba(255,255,255,0.3)' },
+  gradient: { light: ['rgba(0,0,0,1.0)', 'rgba(0,0,0,1.0)'], dark: ['rgba(128,128,128,0)', 'rgba(128,128,128,0)'] },
+};
+
+const authenticated = ref(null);
+const authenticating = ref(false);
+const password = ref(null);
+const requiresPassword = ref(null);
+
+const clients = ref(null);
+const clientsPersist = ref({});
+const clientDelete = ref(null);
+const clientCreate = ref(null);
+const clientCreateName = ref('');
+const clientEditName = ref(null);
+const clientEditNameId = ref(null);
+const clientEditAddress = ref(null);
+const clientEditAddressId = ref(null);
+const qrcode = ref(null);
+
+const currentRelease = ref(null);
+const latestRelease = ref(null);
+
+const uiTrafficStats = ref(false);
+
+const uiChartType = ref(0);
+const uiShowCharts = ref(getItem('uiShowCharts') === '1');
+const uiTheme = ref(getItem('theme') || 'auto');
+const prefersDarkScheme = import.meta.client ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+
+const theme = computed(() => {
+  if (uiTheme.value === 'auto') {
+    return prefersDarkScheme?.matches ? 'dark' : 'light';
+  }
+  return uiTheme.value as 'dark' | 'light'
+})
+
+const chartOptions = {
+  chart: {
+    background: 'transparent',
+    stacked: false,
+    toolbar: {
+      show: false,
+    },
+    animations: {
+      enabled: false,
+    },
+    parentHeightOffset: 0,
+    sparkline: {
+      enabled: true,
+    },
+  },
+  colors: [],
+  stroke: {
+    curve: 'smooth',
+  },
+  fill: {
+    type: 'gradient',
+    gradient: {
+      shade: 'dark',
+      type: 'vertical',
+      shadeIntensity: 0,
+      gradientToColors: CHART_COLORS.gradient[theme.value],
+      inverseColors: false,
+      opacityTo: 0,
+      stops: [0, 100],
+    },
+  },
+  dataLabels: {
+    enabled: false,
+  },
+  plotOptions: {
+    bar: {
+      horizontal: false,
+    },
+  },
+  xaxis: {
+    labels: {
+      show: false,
+    },
+    axisTicks: {
+      show: false,
+    },
+    axisBorder: {
+      show: false,
+    },
+  },
+  yaxis: {
+    labels: {
+      show: false,
+    },
+    min: 0,
+  },
+  tooltip: {
+    enabled: false,
+  },
+  legend: {
+    show: false,
+  },
+  grid: {
+    show: false,
+    padding: {
+      left: -10,
+      right: 0,
+      bottom: -15,
+      top: -15,
+    },
+    column: {
+      opacity: 0,
+    },
+    xaxis: {
+      lines: {
+        show: false,
+      },
+    },
+  },
+}
+
+function dateTime(value: Date) {
+  return new Intl.DateTimeFormat(undefined, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+  }).format(value);
+}
+async function refresh({
+  updateCharts = false,
+} = {}) {
+  if (!authenticated) return;
+
+  const clients = await api.getClients();
+  clients.value = clients.map((client) => {
+    if (client.name.includes('@') && client.name.includes('.')) {
+      client.avatar = `https://gravatar.com/avatar/${sha256(client.name.toLowerCase().trim())}.jpg`;
+    }
+
+    if (!clientsPersist[client.id]) {
+      clientsPersist[client.id] = {};
+      clientsPersist[client.id].transferRxHistory = Array(50).fill(0);
+      clientsPersist[client.id].transferRxPrevious = client.transferRx;
+      clientsPersist[client.id].transferTxHistory = Array(50).fill(0);
+      clientsPersist[client.id].transferTxPrevious = client.transferTx;
+    }
+
+    // Debug
+    // client.transferRx = this.clientsPersist[client.id].transferRxPrevious + Math.random() * 1000;
+    // client.transferTx = this.clientsPersist[client.id].transferTxPrevious + Math.random() * 1000;
+    // client.latestHandshakeAt = new Date();
+    // this.requiresPassword = true;
+
+    clientsPersist[client.id].transferRxCurrent = client.transferRx - clientsPersist[client.id].transferRxPrevious;
+    clientsPersist[client.id].transferRxPrevious = client.transferRx;
+    clientsPersist[client.id].transferTxCurrent = client.transferTx - clientsPersist[client.id].transferTxPrevious;
+    clientsPersist[client.id].transferTxPrevious = client.transferTx;
+
+    if (updateCharts) {
+      clientsPersist[client.id].transferRxHistory.push(clientsPersist[client.id].transferRxCurrent);
+      clientsPersist[client.id].transferRxHistory.shift();
+
+      clientsPersist[client.id].transferTxHistory.push(clientsPersist[client.id].transferTxCurrent);
+      clientsPersist[client.id].transferTxHistory.shift();
+
+      clientsPersist[client.id].transferTxSeries = [{
+        name: 'Tx',
+        data: clientsPersist[client.id].transferTxHistory,
+      }];
+
+      clientsPersist[client.id].transferRxSeries = [{
+        name: 'Rx',
+        data: clientsPersist[client.id].transferRxHistory,
+      }];
+
+      client.transferTxHistory = clientsPersist[client.id].transferTxHistory;
+      client.transferRxHistory = clientsPersist[client.id].transferRxHistory;
+      client.transferMax = Math.max(...client.transferTxHistory, ...client.transferRxHistory);
+
+      client.transferTxSeries = clientsPersist[client.id].transferTxSeries;
+      client.transferRxSeries = clientsPersist[client.id].transferRxSeries;
+    }
+
+    client.transferTxCurrent = clientsPersist[client.id].transferTxCurrent;
+    client.transferRxCurrent = clientsPersist[client.id].transferRxCurrent;
+
+    client.hoverTx = clientsPersist[client.id].hoverTx;
+    client.hoverRx = clientsPersist[client.id].hoverRx;
+
+    return client;
+  });
+}
+
+function login(e) {
+  e.preventDefault();
+
+  if (!password) return;
+  if (authenticating.value) return;
+
+  authenticating.value = true;
+  api.createSession({
+    password: password,
+  })
+    .then(async () => {
+      const session = await api.getSession();
+      authenticated.value = session.authenticated;
+      requiresPassword.value = session.requiresPassword;
+      return refresh();
+    })
+    .catch((err) => {
+      alert(err.message || err.toString());
+    })
+    .finally(() => {
+      authenticating.value = false;
+      password.value = null;
+    });
+}
+
+function logout(e) {
+  e.preventDefault();
+
+  api.deleteSession()
+    .then(() => {
+      authenticated.value = false;
+      clients.value = null;
+    })
+    .catch((err) => {
+      alert(err.message || err.toString());
+    });
+}
+function createClient() {
+  const name = clientCreateName;
+  if (!name) return;
+
+  api.createClient({ name })
+    .catch((err) => alert(err.message || err.toString()))
+    .finally(() => refresh().catch(console.error));
+}
+function deleteClient(client) {
+  api.deleteClient({ clientId: client.id })
+    .catch((err) => alert(err.message || err.toString()))
+    .finally(() => refresh().catch(console.error));
+}
+function enableClient(client) {
+  api.enableClient({ clientId: client.id })
+    .catch((err) => alert(err.message || err.toString()))
+    .finally(() => refresh().catch(console.error));
+}
+function disableClient(client) {
+  api.disableClient({ clientId: client.id })
+    .catch((err) => alert(err.message || err.toString()))
+    .finally(() => refresh().catch(console.error));
+}
+function updateClientName(client, name) {
+  api.updateClientName({ clientId: client.id, name })
+    .catch((err) => alert(err.message || err.toString()))
+    .finally(() => refresh().catch(console.error));
+}
+function updateClientAddress(client, address) {
+  api.updateClientAddress({ clientId: client.id, address })
+    .catch((err) => alert(err.message || err.toString()))
+    .finally(() => refresh().catch(console.error));
+}
+function restoreConfig(e) {
+  e.preventDefault();
+  const file = e.currentTarget.files.item(0);
+  if (file) {
+    file.text()
+      .then((content) => {
+        api.restoreConfiguration(content)
+          .then((_result) => alert('The configuration was updated.'))
+          .catch((err) => alert(err.message || err.toString()))
+          .finally(() => refresh().catch(console.error));
+      })
+      .catch((err) => alert(err.message || err.toString()));
+  } else {
+    alert('Failed to load your file!');
+  }
+}
+function toggleTheme() {
+  const themes = ['light', 'dark', 'auto'];
+  const currentIndex = themes.indexOf(uiTheme.value);
+  const newIndex = (currentIndex + 1) % themes.length;
+  uiTheme.value = themes[newIndex];
+  setItem('theme', uiTheme.value);
+  setTheme(uiTheme.value);
+}
+function setTheme(theme) {
+  const { classList } = document.documentElement;
+  const shouldAddDarkClass = theme === 'dark' || (theme === 'auto' && prefersDarkScheme?.matches);
+  classList.toggle('dark', shouldAddDarkClass);
+}
+function handlePrefersChange(e) {
+  if (getItem('theme') === 'auto') {
+    setTheme(e.matches ? 'dark' : 'light');
+  }
+}
+function toggleCharts() {
+  setItem('uiShowCharts', uiShowCharts.value ? 1 : 0);
+}
+
+const {availableLocales, locale} = useI18n();
+
+onMounted(() => {
+  prefersDarkScheme?.addListener(handlePrefersChange);
+  setTheme(uiTheme.value);
+
+  setInterval(() => {
+      refresh({
+        updateCharts: updateCharts.value,
+      }).catch(console.error);
+    }, 1000);
+
+    api.getuiTrafficStats()
+      .then((res) => {
+        uiTrafficStats.value = res;
+      })
+      .catch(() => {
+        uiTrafficStats.value = false;
+      });
+
+    api.getChartType()
+      .then((res) => {
+        uiChartType.value = parseInt(res, 10);
+      })
+      .catch(() => {
+        uiChartType.value = 0;
+      });
+
+      Promise.resolve().then(async () => {
+      const lang = await api.getLang();
+      if (lang !== getItem('lang') && availableLocales.includes(lang)) {
+        setItem('lang', lang);
+        locale.value = lang;
+      }
+
+      const _currentRelease = await api.getRelease();
+      const _latestRelease = await fetch('https://wg-easy.github.io/wg-easy/changelog.json')
+        .then((res) => res.json())
+        .then((releases) => {
+          const releasesArray = Object.entries(releases).map(([version, changelog]) => ({
+            version: parseInt(version, 10),
+            changelog,
+          }));
+          releasesArray.sort((a, b) => {
+            return b.version - a.version;
+          });
+
+          return releasesArray[0];
+        });
+
+      if (_currentRelease >= _latestRelease.version) return;
+
+      currentRelease.value = _currentRelease;
+      latestRelease.value = _latestRelease;
+    }).catch((err) => console.error(err));
+})
+
+const chartOptionsTX = computed(() => {
+  const opts = {
+        ...chartOptions,
+        colors: [CHART_COLORS.tx[theme.value]],
+      };
+      opts.chart.type = UI_CHART_TYPES[uiChartType.value].type || false;
+      opts.stroke.width = UI_CHART_TYPES[uiChartType.value].strokeWidth;
+      return opts;
+})
+
+const chartOptionsRX = computed(() => {
+  const opts = {
+        ...chartOptions,
+        colors: [CHART_COLORS.rx[theme.value]],
+      };
+      opts.chart.type = UI_CHART_TYPES[uiChartType.value].type || false;
+      opts.stroke.width = UI_CHART_TYPES[uiChartType.value].strokeWidth;
+      return opts;
+})
+
+const updateCharts = computed(() => {
+  return uiChartType.value > 0 && uiShowCharts;
+})
+
+function bytes(bytes, decimals, kib, maxunit) {
+  kib = kib || false;
+  if (bytes === 0) return '0 B';
+  if (Number.isNaN(parseFloat(bytes)) && !Number.isFinite(bytes)) return 'NaN';
+  const k = kib ? 1024 : 1000;
+  const dm = decimals != null && !Number.isNaN(decimals) && decimals >= 0 ? decimals : 2;
+  const sizes = kib
+    ? ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB', 'BiB']
+    : ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB', 'BB'];
+  let i = Math.floor(Math.log(bytes) / Math.log(k));
+  if (maxunit !== undefined) {
+    const index = sizes.indexOf(maxunit);
+    if (index !== -1) i = index;
+  }
+  // eslint-disable-next-line no-restricted-properties
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+}
+
+function getItem(item: string) {
+  if (import.meta.client) {
+    return localStorage.getItem(item)
+  } else {
+    return undefined
+  }
+}
+
+function setItem(item: string, value: string) {
+  if (import.meta.client) {
+    localStorage.setItem(item, value)
+  
+    return true
+  } else {
+    return false
+  }
+}
+
+</script>

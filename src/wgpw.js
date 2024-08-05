@@ -1,5 +1,3 @@
-'use strict';
-
 // Import needed libraries
 import bcrypt from 'bcryptjs';
 

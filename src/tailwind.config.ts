@@ -1,10 +1,7 @@
-/** @type {import('tailwindcss').Config} */
+import type { Config } from 'tailwindcss'
 
-'use strict';
-
-module.exports = {
-  darkMode: 'selector',
-  content: ['./www/**/*.{html,js}'],
+export default {
+  content: [],
   theme: {
     screens: {
       xxs: '450px',
@@ -27,4 +24,5 @@ module.exports = {
       addUtilities(newUtilities);
     },
   ],
-};
+} satisfies Config
+
