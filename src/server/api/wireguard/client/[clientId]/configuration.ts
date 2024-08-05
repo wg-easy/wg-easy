@@ -1,5 +1,3 @@
-import WireGuard from '~/utils/WireGuard';
-
 export default defineEventHandler(async (event) => {
   assertMethod(event, 'GET');
   const clientId = getRouterParam(event, 'clientId');

@@ -1,7 +1,5 @@
 import bcrypt from 'bcryptjs';
 
-import { PASSWORD_HASH } from '~/utils/config';
-
 /**
  * Checks if `password` matches the PASSWORD_HASH.
  *

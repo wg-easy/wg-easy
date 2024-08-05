@@ -1,10 +1,3 @@
-import {
-  REQUIRES_PASSWORD,
-  SERVER_DEBUG,
-  SESSION_CONFIG,
-} from '~/utils/config';
-import { isPasswordValid } from '~/utils/password';
-
 export default defineEventHandler(async (event) => {
   if (isMethod(event, 'GET')) {
     const session = await useSession(event, SESSION_CONFIG);

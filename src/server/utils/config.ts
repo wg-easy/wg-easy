@@ -1,7 +1,6 @@
 import type { SessionConfig } from 'h3';
 
-import { getRandomHex } from '~/utils/crypto';
-import packageJSON from '../package.json';
+import packageJSON from '../../package.json';
 import debug from 'debug';
 const version = packageJSON.release.version;
 

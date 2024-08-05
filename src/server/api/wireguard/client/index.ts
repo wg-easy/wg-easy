@@ -1,5 +1,3 @@
-import WireGuard from '~/utils/WireGuard';
-
 export default defineEventHandler(async (event) => {
   if (isMethod(event, 'GET')) {
     return WireGuard.getClients();

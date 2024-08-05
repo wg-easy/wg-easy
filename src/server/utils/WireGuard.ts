@@ -4,23 +4,6 @@ import debug_logger from 'debug';
 import crypto from 'node:crypto';
 import QRCode from 'qrcode';
 
-import {
-  WG_PATH,
-  WG_HOST,
-  WG_PORT,
-  WG_CONFIG_PORT,
-  WG_MTU,
-  WG_DEFAULT_DNS,
-  WG_DEFAULT_ADDRESS,
-  WG_PERSISTENT_KEEPALIVE,
-  WG_ALLOWED_IPS,
-  WG_PRE_UP,
-  WG_POST_UP,
-  WG_PRE_DOWN,
-  WG_POST_DOWN,
-} from '~/utils/config';
-import { exec } from '~/utils/cmd';
-import { isValidIPv4 } from '~/utils/ip';
 const debug = debug_logger('WireGuard');
 
 class ServerError extends Error {
@@ -90,7 +73,7 @@ class WireGuard {
     const config = await this.__buildConfig();
 
     await this.__saveConfig(config);
-    await exec('wg-quick down wg0').catch(() => {});
+    await exec('wg-quick down wg0').catch(() => { });
     await exec('wg-quick up wg0').catch((err) => {
       if (
         err &&
@@ -142,9 +125,8 @@ PostDown = ${WG_POST_DOWN}
 # Client: ${client.name} (${clientId})
 [Peer]
 PublicKey = ${client.publicKey}
-${
-  client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
-}AllowedIPs = ${client.address}/32`;
+${client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
+        }AllowedIPs = ${client.address}/32`;
     }
 
     debug('Config saving...');
@@ -245,9 +227,8 @@ ${WG_MTU ? `MTU = ${WG_MTU}\n` : ''}\
 
 [Peer]
 PublicKey = ${config.server.publicKey}
-${
-  client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
-}AllowedIPs = ${WG_ALLOWED_IPS}
+${client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
+      }AllowedIPs = ${WG_ALLOWED_IPS}
 PersistentKeepalive = ${WG_PERSISTENT_KEEPALIVE}
 Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
   }
@@ -397,7 +378,7 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
 
   // Shutdown wireguard
   async Shutdown() {
-    await exec('wg-quick down wg0').catch(() => {});
+    await exec('wg-quick down wg0').catch(() => { });
   }
 }
 
