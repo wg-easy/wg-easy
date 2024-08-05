@@ -1,5 +1,4 @@
 <template>
-  <div>
     <div v-cloak class="container mx-auto max-w-3xl px-3 md:px-0 mt-4 xs:mt-6">
       <div v-if="authenticated === true">
         <div class="flex flex-col-reverse xxs:flex-row flex-auto items-center items-end gap-3">
@@ -599,11 +598,15 @@
       licensed under <a class="hover:underline" target="_blank"
         href="http://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> · <a class="hover:underline"
         href="https://github.com/sponsors/WeeJeWel" target="_blank">{{ $t("donate") }}</a></p>
-
-  </div>
 </template>
 
 <script setup lang="ts">
+useHead({
+  bodyAttrs: {
+    class: 'bg-gray-50 dark:bg-neutral-800'
+  }
+})
+
 const UI_CHART_TYPES = [
   { type: false, strokeWidth: 0 },
   { type: 'line', strokeWidth: 3 },
