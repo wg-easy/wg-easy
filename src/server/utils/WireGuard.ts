@@ -77,7 +77,7 @@ class WireGuard {
     const config = await this.__buildConfig();
 
     await this.__saveConfig(config);
-    await exec('wg-quick down wg0').catch(() => { });
+    await exec('wg-quick down wg0').catch(() => {});
     await exec('wg-quick up wg0').catch((err) => {
       if (
         err &&
@@ -130,8 +130,9 @@ PostDown = ${WG_POST_DOWN}
 # Client: ${client.name} (${clientId})
 [Peer]
 PublicKey = ${client.publicKey}
-${client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
-        }AllowedIPs = ${client.address}/32`;
+${
+  client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
+}AllowedIPs = ${client.address}/32`;
     }
 
     debug('Config saving...');
@@ -232,8 +233,9 @@ ${WG_MTU ? `MTU = ${WG_MTU}\n` : ''}\
 
 [Peer]
 PublicKey = ${config.server.publicKey}
-${client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
-      }AllowedIPs = ${WG_ALLOWED_IPS}
+${
+  client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
+}AllowedIPs = ${WG_ALLOWED_IPS}
 PersistentKeepalive = ${WG_PERSISTENT_KEEPALIVE}
 Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
   }
@@ -383,7 +385,7 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
 
   // Shutdown wireguard
   async Shutdown() {
-    await exec('wg-quick down wg0').catch(() => { });
+    await exec('wg-quick down wg0').catch(() => {});
   }
 }
 
