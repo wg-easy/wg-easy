@@ -32,7 +32,8 @@ You have found the easiest way to install & manage WireGuard on any Linux host!
 
 ## Versions
 
-We provide more then 1 docker image to get, this will help you decide which one is best for you.
+We provide more then 1 docker image to get, this will help you decide which one is best for you. <br>
+For **stable** versions instead of nightly or development please read **README** from the **production** branch!
 
 | tag | Branch | Example | Description |
 | - | - | - | - |
@@ -103,7 +104,6 @@ These options can be configured by setting environment variables using `-e KEY="
 | `PORT` | `51821` | `6789` | TCP port for Web UI.                                                                                                                                 |
 | `WEBUI_HOST` | `0.0.0.0` | `localhost` | IP address web UI binds to.                                                                                                                          |
 | `PASSWORD_HASH` | - | `$2y$05$Ci...` | When set, requires a password when logging in to the Web UI. See [How to generate an bcrypt hash.md]("https://github.com/wg-easy/wg-easy/blob/master/How_to_generate_an_bcrypt_hash.md") for know how generate the hash. |
-| `PASSWORD` (deprecated) | - | `foobar123` | When set, requires a password when logging in to the Web UI. *(Not used if `PASSWORD_HASH` is set)*                                                  |
 | `WG_HOST` | - | `vpn.myserver.com` | The public hostname of your VPN server.                                                                                                              |
 | `WG_DEVICE` | `eth0` | `ens6f0` | Ethernet device the wireguard traffic should be forwarded through.                                                                                   |
 | `WG_PORT` | `51820` | `12345` | The public UDP port of your VPN server. WireGuard will listen on that (othwise default) inside the Docker container.                                 |
