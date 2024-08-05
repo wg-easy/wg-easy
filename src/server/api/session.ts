@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
       : true;
 
     return {
-      REQUIRES_PASSWORD,
+      requiresPassword: REQUIRES_PASSWORD,
       authenticated,
     };
   } else if (isMethod(event, 'POST')) {
