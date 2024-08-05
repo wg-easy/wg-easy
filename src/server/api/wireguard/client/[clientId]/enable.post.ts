@@ -1,5 +1,4 @@
 export default defineEventHandler(async (event) => {
-  assertMethod(event, 'POST');
   const clientId = getRouterParam(event, 'clientId');
   if (
     clientId === '__proto__' ||

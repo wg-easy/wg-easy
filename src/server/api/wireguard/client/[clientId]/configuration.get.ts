@@ -1,5 +1,4 @@
 export default defineEventHandler(async (event) => {
-  assertMethod(event, 'GET');
   const clientId = getRouterParam(event, 'clientId');
   const client = await WireGuard.getClient({ clientId });
   const config = await WireGuard.getClientConfiguration({ clientId });
