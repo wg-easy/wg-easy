@@ -1,7 +1,7 @@
 services:
   wg-easy:
     build:
-      dockerfile: ./Dockerfile
+      dockerfile: ./Dockerfile-dev
     command: pnpm run dev
     volumes:
       - ./src/:/app/
