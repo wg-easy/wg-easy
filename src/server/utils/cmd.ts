@@ -14,7 +14,7 @@ export function exec(
     return Promise.resolve('');
   }
 
-  return new Promise((resolve, reject) => {
+  return new Promise<string>((resolve, reject) => {
     childProcess.exec(
       cmd,
       {

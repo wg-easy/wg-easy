@@ -1,104 +1,51 @@
-export type APIClient = {
-  id: string;
-  name: string;
-  enabled: boolean;
-  address: string;
-  publicKey: string;
-  createdAt: string;
-  updatedAt: string;
-  downloadableConfig: boolean;
-  persistentKeepalive: string;
-  latestHandshakeAt: null;
-  transferRx: number;
-  transferTx: number;
-};
-
 class API {
-  async call({
-    method,
-    path,
-    body,
-  }: {
-    method: string;
-    path: string;
-    body?: Record<string, unknown>;
-  }) {
-    const res = await fetch(`./api${path}`, {
-      method,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: body ? JSON.stringify(body) : undefined,
-    });
-
-    if (res.status === 204) {
-      return undefined;
-    }
-
-    const json = await res.json();
-
-    if (!res.ok) {
-      throw new Error(json.message || res.statusText);
-    }
-
-    return json;
-  }
-
   async getRelease() {
-    return this.call({
+    return $fetch('/api/release', {
       method: 'get',
-      path: '/release',
     });
   }
 
   async getLang() {
-    return this.call({
+    return $fetch('/api/lang', {
       method: 'get',
-      path: '/lang',
     });
   }
 
-  async getuiTrafficStats() {
-    return this.call({
+  async getUITrafficStats() {
+    return $fetch('/api/ui-traffic-stats', {
       method: 'get',
-      path: '/ui-traffic-stats',
     });
   }
 
   async getChartType() {
-    return this.call({
+    return $fetch('/api/ui-chart-type', {
       method: 'get',
-      path: '/ui-chart-type',
     });
   }
 
   async getSession() {
-    return this.call({
+    return $fetch('/api/session', {
       method: 'get',
-      path: '/session',
     });
   }
 
   async createSession({ password }: { password: string | null }) {
-    return this.call({
+    return $fetch('/api/session', {
       method: 'post',
-      path: '/session',
       body: { password },
     });
   }
 
   async deleteSession() {
-    return this.call({
+    return $fetch('/api/session', {
       method: 'delete',
-      path: '/session',
     });
   }
 
   async getClients() {
-    return this.call({
+    return $fetch('/api/wireguard/client', {
       method: 'get',
-      path: '/wireguard/client',
-    }).then((clients: APIClient[]) =>
+    }).then((clients) =>
       clients.map((client) => ({
         ...client,
         createdAt: new Date(client.createdAt),
@@ -112,31 +59,27 @@ class API {
   }
 
   async createClient({ name }: { name: string }) {
-    return this.call({
-      method: 'post',
-      path: '/wireguard/client',
+    return $fetch('/api/wireguard/client', {
+      method: 'POST',
       body: { name },
     });
   }
 
   async deleteClient({ clientId }: { clientId: string }) {
-    return this.call({
-      method: 'delete',
-      path: `/wireguard/client/${clientId}`,
+    return $fetch(`/api/wireguard/client/${clientId}`, {
+      method: 'DELETE',
     });
   }
 
   async enableClient({ clientId }: { clientId: string }) {
-    return this.call({
-      method: 'post',
-      path: `/wireguard/client/${clientId}/enable`,
+    return $fetch(`/api/wireguard/client/${clientId}/enable`, {
+      method: 'POST',
     });
   }
 
   async disableClient({ clientId }: { clientId: string }) {
-    return this.call({
-      method: 'post',
-      path: `/wireguard/client/${clientId}/disable`,
+    return $fetch(`/api/wireguard/client/${clientId}/disable`, {
+      method: 'POST',
     });
   }
 
@@ -147,9 +90,8 @@ class API {
     clientId: string;
     name: string;
   }) {
-    return this.call({
-      method: 'put',
-      path: `/wireguard/client/${clientId}/name/`,
+    return $fetch(`/api/wireguard/client/${clientId}/name`, {
+      method: 'PUT',
       body: { name },
     });
   }
@@ -161,17 +103,15 @@ class API {
     clientId: string;
     address: string;
   }) {
-    return this.call({
-      method: 'put',
-      path: `/wireguard/client/${clientId}/address/`,
+    return $fetch(`/api/wireguard/client/${clientId}/address`, {
+      method: 'PUT',
       body: { address },
     });
   }
 
   async restoreConfiguration(file: string) {
-    return this.call({
-      method: 'put',
-      path: '/wireguard/restore',
+    return $fetch('/api/wireguard/restore', {
+      method: 'PUT',
       body: { file },
     });
   }

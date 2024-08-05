@@ -21,15 +21,15 @@ type Server = {
 };
 
 type Client = {
-  enabled: boolean;
   name: string;
-  publicKey: string;
-  privateKey: string;
-  preSharedKey: string;
   address: string;
-  createdAt: number;
-  updatedAt: Date;
-  allowedIPs?: string[];
+  privateKey: string;
+  publicKey: string;
+  preSharedKey: string;
+  createdAt: string;
+  updatedAt: string;
+  enabled: boolean;
+  allowedIPs?: never;
 };
 
 type Config = {
@@ -168,10 +168,10 @@ ${
         updatedAt: new Date(client.updatedAt),
         allowedIPs: client.allowedIPs,
         downloadableConfig: 'privateKey' in client,
-        persistentKeepalive: null,
-        latestHandshakeAt: null,
-        transferRx: null,
-        transferTx: null,
+        persistentKeepalive: null as string | null,
+        latestHandshakeAt: null as Date | null,
+        transferRx: null as number | null,
+        transferTx: null as number | null,
       })
     );
 
@@ -265,11 +265,11 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
     let address;
     for (let i = 2; i < 255; i++) {
       const client = Object.values(config.clients).find((client) => {
-        return client.address === WG_DEFAULT_ADDRESS.replace('x', i);
+        return client.address === WG_DEFAULT_ADDRESS.replace('x', i.toString());
       });
 
       if (!client) {
-        address = WG_DEFAULT_ADDRESS.replace('x', i);
+        address = WG_DEFAULT_ADDRESS.replace('x', i.toString());
         break;
       }
     }
@@ -288,8 +288,8 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
       publicKey,
       preSharedKey,
 
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
 
       enabled: true,
     };
@@ -305,6 +305,7 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
     const config = await this.getConfig();
 
     if (config.clients[clientId]) {
+      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
       delete config.clients[clientId];
       await this.saveConfig();
     }
@@ -314,7 +315,7 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
     const client = await this.getClient({ clientId });
 
     client.enabled = true;
-    client.updatedAt = new Date();
+    client.updatedAt = new Date().toISOString();
 
     await this.saveConfig();
   }
@@ -323,7 +324,7 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
     const client = await this.getClient({ clientId });
 
     client.enabled = false;
-    client.updatedAt = new Date();
+    client.updatedAt = new Date().toISOString();
 
     await this.saveConfig();
   }
@@ -338,7 +339,7 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
     const client = await this.getClient({ clientId });
 
     client.name = name;
-    client.updatedAt = new Date();
+    client.updatedAt = new Date().toISOString();
 
     await this.saveConfig();
   }
@@ -357,7 +358,7 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
     }
 
     client.address = address;
-    client.updatedAt = new Date();
+    client.updatedAt = new Date().toISOString();
 
     await this.saveConfig();
   }

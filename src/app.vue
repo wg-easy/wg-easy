@@ -1590,7 +1590,7 @@ onMounted(() => {
   }, 1000);
 
   api
-    .getuiTrafficStats()
+    .getUITrafficStats()
     .then((res) => {
       uiTrafficStats.value = res;
     })
