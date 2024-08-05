@@ -38,6 +38,7 @@ type Config = {
 };
 
 class WireGuard {
+  #configCache: Config | null = null;
   async __buildConfig() {
     if (!WG_HOST) {
       throw new Error('WG_HOST Environment Variable Not Set!');
@@ -70,10 +71,13 @@ class WireGuard {
   }
 
   async getConfig(): Promise<Config> {
+    if (this.#configCache !== null) {
+      return this.#configCache;
+    }
     const config = await this.__buildConfig();
 
     await this.__saveConfig(config);
-    await exec('wg-quick down wg0').catch(() => {});
+    await exec('wg-quick down wg0').catch(() => { });
     await exec('wg-quick up wg0').catch((err) => {
       if (
         err &&
@@ -92,7 +96,8 @@ class WireGuard {
     // await Util.exec('iptables -A FORWARD -i wg0 -j ACCEPT');
     // await Util.exec('iptables -A FORWARD -o wg0 -j ACCEPT');
     await this.__syncConfig();
-    return config;
+    this.#configCache = config;
+    return this.#configCache;
   }
 
   async saveConfig() {
@@ -125,9 +130,8 @@ PostDown = ${WG_POST_DOWN}
 # Client: ${client.name} (${clientId})
 [Peer]
 PublicKey = ${client.publicKey}
-${
-  client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
-}AllowedIPs = ${client.address}/32`;
+${client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
+        }AllowedIPs = ${client.address}/32`;
     }
 
     debug('Config saving...');
@@ -228,9 +232,8 @@ ${WG_MTU ? `MTU = ${WG_MTU}\n` : ''}\
 
 [Peer]
 PublicKey = ${config.server.publicKey}
-${
-  client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
-}AllowedIPs = ${WG_ALLOWED_IPS}
+${client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
+      }AllowedIPs = ${WG_ALLOWED_IPS}
 PersistentKeepalive = ${WG_PERSISTENT_KEEPALIVE}
 Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
   }
@@ -380,7 +383,7 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
 
   // Shutdown wireguard
   async Shutdown() {
-    await exec('wg-quick down wg0').catch(() => {});
+    await exec('wg-quick down wg0').catch(() => { });
   }
 }
 
