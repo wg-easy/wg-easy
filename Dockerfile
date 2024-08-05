@@ -47,6 +47,7 @@ RUN update-alternatives --install /sbin/iptables iptables /sbin/iptables-legacy 
 
 # Set Environment
 ENV DEBUG=Server,WireGuard
+ENV PORT=51821
 
 # Run Web UI
 WORKDIR /app

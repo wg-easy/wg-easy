@@ -18,7 +18,7 @@
   "dependencies": {
     "@nuxtjs/i18n": "^8.3.3",
     "@nuxtjs/tailwindcss": "^6.12.1",
-    "bcrypt": "^5.1.1",
+    "bcryptjs": "^2.4.3",
     "debug": "^4.3.6",
     "nuxt": "^3.12.4",
     "qrcode": "^1.5.3",
@@ -26,7 +26,7 @@
   },
   "devDependencies": {
     "@nuxt/eslint": "^0.5.0",
-    "@types/bcrypt": "^5.0.2",
+    "@types/bcryptjs": "^2.4.6",
     "@types/debug": "^4.1.12",
     "@types/qrcode": "^1.5.5",
     "eslint": "^9.8.0",
