@@ -12,7 +12,8 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "lint": "eslint ."
   },
   "dependencies": {
     "@nuxtjs/i18n": "^8.3.3",
@@ -24,9 +25,13 @@
     "vue": "latest"
   },
   "devDependencies": {
+    "@nuxt/eslint": "^0.5.0",
     "@types/bcrypt": "^5.0.2",
     "@types/debug": "^4.1.12",
-    "@types/qrcode": "^1.5.5"
+    "@types/qrcode": "^1.5.5",
+    "eslint": "^9.8.0",
+    "typescript": "^5.5.4",
+    "vue-tsc": "^2"
   },
   "packageManager": "pnpm@8.15.4+sha1.c85a4305534f76d461407b59277b954bac97b5c4"
 }

@@ -15,15 +15,18 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           check-latest: true
-          cache: 'npm'
+          cache: 'pnpm'
+    
+      - uses: pnpm/action-setup@v4
 
-      - name: npm run lint
+      - name: pnpm lint
         run: |
           cd src
-          npm ci
-          npm run lint
+          pnpm install
+          pnpm lint
