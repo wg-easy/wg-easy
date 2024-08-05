@@ -12,9 +12,6 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     if: github.repository_owner == 'wg-easy'
-    defaults:
-      run:
-        working-directory: ./src
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -33,5 +30,6 @@ jobs:
 
       - name: pnpm lint
         run: |
+          cd src
           pnpm install
           pnpm lint
