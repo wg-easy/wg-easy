@@ -102,9 +102,9 @@ These options can be configured by setting environment variables using `-e KEY="
 | Env | Default | Example | Description                                                                                                                                          |
 | - | - | - |------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `PORT` | `51821` | `6789` | TCP port for Web UI.                                                                                                                                 |
-| `WEBUI_HOST` | `0.0.0.0` | `localhost` | IP address web UI binds to.                                                                                                                          |
+| `UI_HOST` | `0.0.0.0` | `localhost` | IP address web UI binds to.                                                                                                                          |
 | `PASSWORD_HASH` | - | `$2y$05$Ci...` | When set, requires a password when logging in to the Web UI. See [How to generate an bcrypt hash.md]("https://github.com/wg-easy/wg-easy/blob/master/How_to_generate_an_bcrypt_hash.md") for know how generate the hash. |
-| `WG_HOST` | - | `vpn.myserver.com` | The public hostname of your VPN server.                                                                                                              |
+| `WG_HOST` | - | `vpn.myserver.com` | The public hostname/IP of your VPN server or your router public IP(needs port forwarding from router to work).                                                                                                              |
 | `WG_DEVICE` | `eth0` | `ens6f0` | Ethernet device the wireguard traffic should be forwarded through.                                                                                   |
 | `WG_PORT` | `51820` | `12345` | The public UDP port of your VPN server. WireGuard will listen on that (othwise default) inside the Docker container.                                 |
 | `WG_CONFIG_PORT`| `51820` | `12345` | The UDP port used on [Home Assistant Plugin](https://github.com/adriy-be/homeassistant-addons-jdeath/tree/main/wgeasy)                               
