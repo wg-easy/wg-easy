@@ -14,7 +14,9 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "lint": "eslint .",
-    "format": "prettier . --write"
+    "format": "prettier . --write",
+    "format:check": "prettier . --check",
+    "typecheck": "nuxt typecheck"
   },
   "dependencies": {
     "@nuxtjs/i18n": "^8.3.3",
