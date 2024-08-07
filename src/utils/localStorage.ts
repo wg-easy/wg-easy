@@ -1,7 +1,4 @@
-export type Theme = 'light' | 'dark' | 'auto';
-
 export type LocalStorage = {
-  theme: Theme;
   uiShowCharts: '1' | '0';
   lang: string;
 };

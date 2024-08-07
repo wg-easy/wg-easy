@@ -19,11 +19,11 @@
           <!-- Dark / light theme -->
           <button
             class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 dark:bg-neutral-700 dark:hover:bg-neutral-600 transition"
-            :title="$t(`theme.${uiTheme}`)"
+            :title="$t(`theme.${theme.preference}`)"
             @click="toggleTheme"
           >
             <svg
-              v-if="uiTheme === 'light'"
+              v-if="theme.preference === 'light'"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -38,7 +38,7 @@
               />
             </svg>
             <svg
-              v-else-if="uiTheme === 'dark'"
+              v-else-if="theme.preference === 'dark'"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -1232,17 +1232,8 @@ const uiTrafficStats = ref(false);
 
 const uiChartType = ref(0);
 const uiShowCharts = ref(getItem('uiShowCharts') === '1');
-const uiTheme = ref<Theme>(getItem('theme') || 'auto');
-const prefersDarkScheme = import.meta.client
-  ? window.matchMedia('(prefers-color-scheme: dark)')
-  : null;
 
-const theme = computed(() => {
-  if (uiTheme.value === 'auto') {
-    return prefersDarkScheme?.matches ? 'dark' : 'light';
-  }
-  return uiTheme.value as 'dark' | 'light';
-});
+const theme = useTheme();
 
 const chartOptions = {
   chart: {
@@ -1526,24 +1517,15 @@ function restoreConfig(e) {
 }
 
 function toggleTheme() {
-  const themes = ['light', 'dark', 'auto'] as Theme[];
-  const currentIndex = themes.indexOf(uiTheme.value);
-  const newIndex = (currentIndex + 1) % themes.length;
-  uiTheme.value = themes[newIndex];
-  setItem('theme', uiTheme.value);
-  setTheme(uiTheme.value);
+  const themeCycle = {
+    system: 'light',
+    light: 'dark',
+    dark: 'system',
+  } as const;
+
+  theme.preference = themeCycle[theme.preference];
 }
-function setTheme(theme: Theme) {
-  const { classList } = document.documentElement;
-  const shouldAddDarkClass =
-    theme === 'dark' || (theme === 'auto' && prefersDarkScheme?.matches);
-  classList.toggle('dark', shouldAddDarkClass);
-}
-function handlePrefersChange(e: MediaQueryListEventMap['change']) {
-  if (getItem('theme') === 'auto') {
-    setTheme(e.matches ? 'dark' : 'light');
-  }
-}
+
 function toggleCharts() {
   setItem('uiShowCharts', uiShowCharts.value ? '1' : '0');
 }
@@ -1551,9 +1533,6 @@ function toggleCharts() {
 const { availableLocales, locale } = useI18n();
 
 onMounted(() => {
-  prefersDarkScheme?.addEventListener('change', handlePrefersChange);
-  setTheme(uiTheme.value);
-
   api
     .getSession()
     .then((session) => {
