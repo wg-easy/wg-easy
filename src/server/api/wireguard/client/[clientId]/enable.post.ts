@@ -1,12 +1,8 @@
 export default defineEventHandler(async (event) => {
-  const clientId = getRouterParam(event, 'clientId');
-  if (
-    clientId === '__proto__' ||
-    clientId === 'constructor' ||
-    clientId === 'prototype'
-  ) {
-    throw createError({ statusCode: 403 });
-  }
+  const { clientId } = await getValidatedRouterParams(
+    event,
+    validateZod(clientIdType)
+  );
   await WireGuard.enableClient({ clientId });
   return { success: true };
 });

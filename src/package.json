@@ -28,7 +28,8 @@
     "tailwindcss": "^3.4.7",
     "timeago.js": "^4.0.2",
     "vue": "latest",
-    "vue3-apexcharts": "^1.5.3"
+    "vue3-apexcharts": "^1.5.3",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@nuxt/eslint-config": "^0.5.0",
@@ -41,5 +42,5 @@
     "typescript": "^5.5.4",
     "vue-tsc": "^2.0.29"
   },
-  "packageManager": "pnpm@9.6.0"
+  "packageManager": "pnpm@9.7.0"
 }

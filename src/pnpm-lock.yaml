@@ -43,6 +43,9 @@ importers:
       vue3-apexcharts:
         specifier: ^1.5.3
         version: 1.5.3(apexcharts@3.51.0)(vue@3.4.35(typescript@5.5.4))
+      zod:
+        specifier: ^3.23.8
+        version: 3.23.8
     devDependencies:
       '@nuxt/eslint-config':
         specifier: ^0.5.0
@@ -7405,6 +7408,12 @@ packages:
       }
     engines: { node: '>= 14' }
 
+  zod@3.23.8:
+    resolution:
+      {
+        integrity: sha512-XBx9AXhXktjUqnepgTiE5flcKIYWi/rme0Eaj+5Y0lftuGBq+jyRu/md4WnuxqgP1ubdpNCsYEYPxrzVHD8d6g==,
+      }
+
 snapshots:
   '@alloc/quick-lru@5.2.0': {}
 
@@ -12213,3 +12222,5 @@ snapshots:
       archiver-utils: 5.0.2
       compress-commons: 6.0.2
       readable-stream: 4.5.2
+
+  zod@3.23.8: {}

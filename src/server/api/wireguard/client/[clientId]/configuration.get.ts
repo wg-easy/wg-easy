@@ -1,5 +1,8 @@
 export default defineEventHandler(async (event) => {
-  const clientId = getRouterParam(event, 'clientId');
+  const { clientId } = await getValidatedRouterParams(
+    event,
+    validateZod(clientIdType)
+  );
   const client = await WireGuard.getClient({ clientId });
   const config = await WireGuard.getClientConfiguration({ clientId });
   const configName = client.name

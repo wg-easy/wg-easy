@@ -1,6 +1,9 @@
 export default defineEventHandler(async (event) => {
   const session = await useWGSession(event);
-  const { password } = await readBody(event);
+  const { password } = await readValidatedBody(
+    event,
+    validateZod(passwordType)
+  );
 
   if (!REQUIRES_PASSWORD) {
     // if no password is required, the API should never be called.
