@@ -1,6 +1,13 @@
 export default defineEventHandler(async (event) => {
-  const session = await useSession(event, SESSION_CONFIG);
+  const session = await useWGSession(event);
   const sessionId = session.id;
+
+  if (sessionId === undefined) {
+    return createError({
+      status: 401,
+      message: 'Not logged in'
+    })
+  }
 
   await session.clear();
 

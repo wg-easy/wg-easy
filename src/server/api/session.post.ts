@@ -1,5 +1,5 @@
 export default defineEventHandler(async (event) => {
-  const session = await useSession(event, SESSION_CONFIG);
+  const session = await useWGSession(event);
   const { password } = await readBody(event);
 
   if (!REQUIRES_PASSWORD) {

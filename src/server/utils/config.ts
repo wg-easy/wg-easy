@@ -55,6 +55,7 @@ export const REQUIRES_PASSWORD = !!PASSWORD_HASH;
 
 export const SESSION_CONFIG = {
   password: getRandomHex(256),
+  name: 'wg-easy'
 } satisfies SessionConfig;
 
 export const SERVER_DEBUG = debug('Server');
