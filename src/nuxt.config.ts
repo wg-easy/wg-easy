@@ -12,5 +12,6 @@ export default defineNuxtConfig({
     preference: 'system',
     fallback: 'light',
     classSuffix: '',
+    storageKey: 'theme',
   },
 });
