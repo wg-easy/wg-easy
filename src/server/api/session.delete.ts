@@ -4,9 +4,9 @@ export default defineEventHandler(async (event) => {
 
   if (sessionId === undefined) {
     return createError({
-      status: 401,
-      message: 'Not logged in'
-    })
+      statusCode: 401,
+      statusMessage: 'Not logged in',
+    });
   }
 
   await session.clear();

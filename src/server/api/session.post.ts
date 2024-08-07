@@ -6,15 +6,14 @@ export default defineEventHandler(async (event) => {
     // if no password is required, the API should never be called.
     // Do not automatically authenticate the user.
     throw createError({
-      status: 401,
-      message: 'Invalid state',
+      statusCode: 401,
+      statusMessage: 'Invalid state',
     });
   }
-
   if (!isPasswordValid(password)) {
     throw createError({
-      status: 401,
-      message: 'Incorrect Password',
+      statusCode: 401,
+      statusMessage: 'Incorrect Password',
     });
   }
 

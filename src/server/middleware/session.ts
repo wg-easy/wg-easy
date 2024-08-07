@@ -1,8 +1,8 @@
 export default defineEventHandler(async (event) => {
   if (event.node.req.url === undefined) {
     throw createError({
-      status: 400,
-      message: 'Invalid request',
+      statusCode: 400,
+      statusMessage: 'Invalid request',
     });
   }
   if (
@@ -27,13 +27,13 @@ export default defineEventHandler(async (event) => {
       return;
     }
     throw createError({
-      status: 401,
-      message: 'Incorrect Password',
+      statusCode: 401,
+      statusMessage: 'Incorrect Password',
     });
   }
 
   throw createError({
-    status: 401,
-    message: 'Not logged in',
+    statusCode: 401,
+    statusMessage: 'Not logged in',
   });
 });

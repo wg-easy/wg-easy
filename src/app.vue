@@ -1434,6 +1434,7 @@ function login(e: Event) {
       return refresh();
     })
     .catch((err) => {
+      // TODO: replace alert with actual ui error message
       console.log(err);
       alert(err.message || err.toString());
     })

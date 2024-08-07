@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
     clientId === 'constructor' ||
     clientId === 'prototype'
   ) {
-    throw createError({ status: 403 });
+    throw createError({ statusCode: 403 });
   }
   await WireGuard.disableClient({ clientId });
   return { success: true };
