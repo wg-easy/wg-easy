@@ -1,5 +1,5 @@
 /*
-! tailwindcss v3.4.7 | MIT License | https://tailwindcss.com
+! tailwindcss v3.4.9 | MIT License | https://tailwindcss.com
 */
 
 /*
@@ -63,12 +63,9 @@ html,
 
 body {
   margin: 0;
+  /* 1 */
   line-height: inherit;
-  padding-top: env(safe-area-inset-top);
-  padding-bottom: env(safe-area-inset-bottom);
-  padding-left: env(safe-area-inset-left);
-  padding-right: env(safe-area-inset-right);
-  box-sizing: border-box;
+  /* 2 */
 }
 
 /*
