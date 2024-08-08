@@ -370,6 +370,7 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
 
   async restoreConfiguration(config: string) {
     debug('Starting configuration restore process.');
+    // TODO: sanitize config
     const _config = JSON.parse(config);
     await this.__saveConfig(_config);
     await this.__reloadConfig();

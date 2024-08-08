@@ -2,7 +2,7 @@
   <div v-cloak class="container mx-auto max-w-3xl px-3 md:px-0 mt-4 xs:mt-6">
     <div v-if="authenticated === true">
       <div
-        class="flex flex-col-reverse xxs:flex-row flex-auto items-center items-end gap-3"
+        class="flex flex-col-reverse xxs:flex-row flex-auto items-center gap-3"
       >
         <h1
           class="text-4xl dark:text-neutral-200 font-medium flex-grow self-start mb-4"
@@ -13,9 +13,7 @@
             class="inline align-middle dark:bg mr-2"
           /><span class="align-middle">WireGuard</span>
         </h1>
-        <div
-          class="flex items-center grow-0 gap-3 items-end self-end xxs:self-center"
-        >
+        <div class="flex items-center grow-0 gap-3 self-end xxs:self-center">
           <!-- Dark / light theme -->
           <button
             class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 dark:bg-neutral-700 dark:hover:bg-neutral-600 transition"
@@ -246,26 +244,29 @@
               v-if="uiChartType"
               :class="`absolute z-0 bottom-0 left-0 right-0 h-6 ${uiChartType === 1 && 'line-chart'}`"
             >
-              <apexchart
-                width="100%"
-                height="100%"
-                :options="chartOptionsTX"
-                :series="client.transferTxSeries"
-              />
+              <ClientOnly>
+                <apexchart
+                  width="100%"
+                  height="100%"
+                  :options="chartOptionsTX"
+                  :series="client.transferTxSeries"
+                />
+              </ClientOnly>
             </div>
             <div
               v-if="uiChartType"
               :class="`absolute z-0 top-0 left-0 right-0 h-6 ${uiChartType === 1 && 'line-chart'}`"
             >
-              <apexchart
-                width="100%"
-                height="100%"
-                :options="chartOptionsRX"
-                :series="client.transferRxSeries"
-                style="transform: scaleY(-1)"
-              />
+              <ClientOnly>
+                <apexchart
+                  width="100%"
+                  height="100%"
+                  :options="chartOptionsRX"
+                  :series="client.transferRxSeries"
+                  style="transform: scaleY(-1)"
+                />
+              </ClientOnly>
             </div>
-
             <div
               class="relative py-3 md:py-5 px-3 z-10 flex flex-col sm:flex-row justify-between gap-3"
             >
@@ -348,12 +349,8 @@
                         @click="
                           clientEditName = client.name;
                           clientEditNameId = client.id;
-                          setTimeout(
-                            () =>
-                              $refs[
-                                'client-' + client.id + '-name'
-                              ][0].select(),
-                            1
+                          nextTick(() =>
+                            $refs['client-' + client.id + '-name'][0].select()
                           );
                         "
                       >
@@ -407,12 +404,10 @@
                           @click="
                             clientEditAddress = client.address;
                             clientEditAddressId = client.id;
-                            setTimeout(
-                              () =>
-                                $refs[
-                                  'client-' + client.id + '-address'
-                                ][0].select(),
-                              1
+                            nextTick(() =>
+                              $refs[
+                                'client-' + client.id + '-address'
+                              ][0].select()
                             );
                           "
                         >
@@ -1202,22 +1197,27 @@ const authenticating = ref(false);
 const password = ref<null | string>(null);
 const requiresPassword = ref<null | boolean>(null);
 
+type LocalClient = WGClient & {
+  avatar?: string;
+  transferMax?: number;
+} & Omit<ClientPersist, 'transferRxPrevious' | 'transferTxPrevious'>;
+
 type ClientPersist = {
   transferRxHistory: number[];
   transferRxPrevious: number;
   transferRxCurrent: number;
   transferRxSeries: { name: string; data: number[] }[];
-  hoverRx: unknown;
+  hoverRx?: unknown;
   transferTxHistory: number[];
   transferTxPrevious: number;
   transferTxCurrent: number;
   transferTxSeries: { name: string; data: number[] }[];
-  hoverTx: unknown;
+  hoverTx?: unknown;
 };
 
-const clients = ref<null | WGClient[]>(null);
+const clients = ref<null | LocalClient[]>(null);
 const clientsPersist = ref<Record<string, ClientPersist>>({});
-const clientDelete = ref<null | Client>(null);
+const clientDelete = ref<null | WGClient>(null);
 const clientCreate = ref<null | boolean>(null);
 const clientCreateName = ref<string>('');
 const clientEditName = ref<null | string>(null);
@@ -1238,6 +1238,7 @@ const theme = useTheme();
 
 const chartOptions = {
   chart: {
+    type: false as string | boolean,
     background: 'transparent',
     stacked: false,
     toolbar: {
@@ -1254,6 +1255,7 @@ const chartOptions = {
   colors: [],
   stroke: {
     curve: 'smooth',
+    width: 0,
   },
   fill: {
     type: 'gradient',
@@ -1331,17 +1333,25 @@ async function refresh({ updateCharts = false } = {}) {
 
   const _clients = await api.getClients();
   clients.value = _clients.map((client) => {
+    let avatar = undefined;
     if (client.name.includes('@') && client.name.includes('.')) {
-      client.avatar = `https://gravatar.com/avatar/${sha256(client.name.toLowerCase().trim())}.jpg`;
+      avatar = `https://gravatar.com/avatar/${sha256(client.name.toLowerCase().trim())}.jpg`;
     }
 
     if (!clientsPersist.value[client.id]) {
-      clientsPersist.value[client.id] = {};
-      clientsPersist.value[client.id].transferRxHistory = Array(50).fill(0);
-      clientsPersist.value[client.id].transferRxPrevious = client.transferRx;
-      clientsPersist.value[client.id].transferTxHistory = Array(50).fill(0);
-      clientsPersist.value[client.id].transferTxPrevious = client.transferTx;
+      clientsPersist.value[client.id] = {
+        transferRxHistory: Array(50).fill(0),
+        transferRxPrevious: client.transferRx ?? 0,
+        transferTxHistory: Array(50).fill(0),
+        transferTxPrevious: client.transferTx ?? 0,
+        transferRxCurrent: 0,
+        transferTxCurrent: 0,
+        transferRxSeries: [],
+        transferTxSeries: [],
+      };
     }
+
+    const clientPersist = clientsPersist.value[client.id];
 
     // Debug
     // client.transferRx = this.clientsPersist[client.id].transferRxPrevious + Math.random() * 1000;
@@ -1349,62 +1359,58 @@ async function refresh({ updateCharts = false } = {}) {
     // client.latestHandshakeAt = new Date();
     // this.requiresPassword = true;
 
-    clientsPersist.value[client.id].transferRxCurrent =
-      client.transferRx - clientsPersist.value[client.id].transferRxPrevious;
-    clientsPersist.value[client.id].transferRxPrevious = client.transferRx;
-    clientsPersist.value[client.id].transferTxCurrent =
-      client.transferTx - clientsPersist.value[client.id].transferTxPrevious;
-    clientsPersist.value[client.id].transferTxPrevious = client.transferTx;
+    clientPersist.transferRxCurrent =
+      (client.transferRx ?? 0) - clientPersist.transferRxPrevious;
+
+    clientPersist.transferRxPrevious = client.transferRx ?? 0;
+
+    clientPersist.transferTxCurrent =
+      (client.transferTx ?? 0) - clientPersist.transferTxPrevious;
+
+    clientPersist.transferTxPrevious = client.transferTx ?? 0;
+
+    let transferMax = undefined;
 
     if (updateCharts) {
-      clientsPersist.value[client.id].transferRxHistory.push(
-        clientsPersist.value[client.id].transferRxCurrent
-      );
-      clientsPersist.value[client.id].transferRxHistory.shift();
+      clientPersist.transferRxHistory.push(clientPersist.transferRxCurrent);
+      clientPersist.transferRxHistory.shift();
 
-      clientsPersist.value[client.id].transferTxHistory.push(
-        clientsPersist.value[client.id].transferTxCurrent
-      );
-      clientsPersist.value[client.id].transferTxHistory.shift();
+      clientPersist.transferTxHistory.push(clientPersist.transferTxCurrent);
+      clientPersist.transferTxHistory.shift();
 
-      clientsPersist.value[client.id].transferTxSeries = [
+      clientPersist.transferTxSeries = [
         {
           name: 'Tx',
-          data: clientsPersist.value[client.id].transferTxHistory,
+          data: clientPersist.transferTxHistory,
         },
       ];
 
-      clientsPersist.value[client.id].transferRxSeries = [
+      clientPersist.transferRxSeries = [
         {
           name: 'Rx',
-          data: clientsPersist.value[client.id].transferRxHistory,
+          data: clientPersist.transferRxHistory,
         },
       ];
 
-      client.transferTxHistory =
-        clientsPersist.value[client.id].transferTxHistory;
-      client.transferRxHistory =
-        clientsPersist.value[client.id].transferRxHistory;
-      client.transferMax = Math.max(
-        ...client.transferTxHistory,
-        ...client.transferRxHistory
+      transferMax = Math.max(
+        ...clientPersist.transferTxHistory,
+        ...clientPersist.transferRxHistory
       );
-
-      client.transferTxSeries =
-        clientsPersist.value[client.id].transferTxSeries;
-      client.transferRxSeries =
-        clientsPersist.value[client.id].transferRxSeries;
     }
 
-    client.transferTxCurrent =
-      clientsPersist.value[client.id].transferTxCurrent;
-    client.transferRxCurrent =
-      clientsPersist.value[client.id].transferRxCurrent;
-
-    client.hoverTx = clientsPersist.value[client.id].hoverTx;
-    client.hoverRx = clientsPersist.value[client.id].hoverRx;
-
-    return client;
+    return {
+      ...client,
+      avatar,
+      transferTxHistory: clientPersist.transferTxHistory,
+      transferRxHistory: clientPersist.transferRxHistory,
+      transferMax,
+      transferTxSeries: clientPersist.transferTxSeries,
+      transferRxSeries: clientPersist.transferRxSeries,
+      transferTxCurrent: clientPersist.transferTxCurrent,
+      transferRxCurrent: clientPersist.transferRxCurrent,
+      hoverTx: clientPersist.hoverTx,
+      hoverRx: clientPersist.hoverRx,
+    };
   });
 }
 
@@ -1427,7 +1433,6 @@ function login(e: Event) {
     })
     .catch((err) => {
       // TODO: replace alert with actual ui error message
-      console.log(err);
       alert(err.message || err.toString());
     })
     .finally(() => {
@@ -1458,7 +1463,7 @@ function createClient() {
     .catch((err) => alert(err.message || err.toString()))
     .finally(() => refresh().catch(console.error));
 }
-function deleteClient(client: Client | null) {
+function deleteClient(client: WGClient | null) {
   if (client === null) {
     return;
   }
@@ -1467,19 +1472,19 @@ function deleteClient(client: Client | null) {
     .catch((err) => alert(err.message || err.toString()))
     .finally(() => refresh().catch(console.error));
 }
-function enableClient(client: Client) {
+function enableClient(client: WGClient) {
   api
     .enableClient({ clientId: client.id })
     .catch((err) => alert(err.message || err.toString()))
     .finally(() => refresh().catch(console.error));
 }
-function disableClient(client: Client) {
+function disableClient(client: WGClient) {
   api
     .disableClient({ clientId: client.id })
     .catch((err) => alert(err.message || err.toString()))
     .finally(() => refresh().catch(console.error));
 }
-function updateClientName(client: Client, name: string) {
+function updateClientName(client: WGClient, name: string | null) {
   if (name === null) {
     return;
   }
@@ -1488,7 +1493,7 @@ function updateClientName(client: Client, name: string) {
     .catch((err) => alert(err.message || err.toString()))
     .finally(() => refresh().catch(console.error));
 }
-function updateClientAddress(client: Client, address: string | null) {
+function updateClientAddress(client: WGClient, address: string | null) {
   if (address === null) {
     return;
   }
@@ -1497,17 +1502,16 @@ function updateClientAddress(client: Client, address: string | null) {
     .catch((err) => alert(err.message || err.toString()))
     .finally(() => refresh().catch(console.error));
 }
-function restoreConfig(e) {
+function restoreConfig(e: Event) {
   e.preventDefault();
-  console.log(e.currentTarget);
-  const file = e.currentTarget.files.item(0);
+  const file = (e.currentTarget as HTMLInputElement).files?.item(0);
   if (file) {
     file
       .text()
       .then((content) => {
         api
           .restoreConfiguration(content)
-          .then((_result) => alert('The configuration was updated.'))
+          .then(() => alert('The configuration was updated.'))
           .catch((err) => alert(err.message || err.toString()))
           .finally(() => refresh().catch(console.error));
       })
