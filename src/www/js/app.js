@@ -63,6 +63,8 @@ new Vue({
     clientEditNameId: null,
     clientEditAddress: null,
     clientEditAddressId: null,
+    clientEditAllowedIPs: null,
+    userInputIP: [],
     qrcode: null,
 
     currentRelease: null,
@@ -314,6 +316,30 @@ new Vue({
       } else {
         alert('Failed to load your file!');
       }
+    },
+    updateClientAllowedIPs(client) {
+      this.api.updateClientAllowedIPs({ clientId: client.id, allowedIPs: client.allowedIPs })
+        .catch((err) => alert(err.message || err.toString()))
+        .finally(() => this.refresh().catch(console.error));
+    },
+    handleKeyDown(event, key, nextInputRef) {
+      if (event.key === key) {
+        event.preventDefault();
+        this.$refs[nextInputRef].focus();
+      }
+    },
+    addNewIP() {
+      const address = this.userInputIP.slice(0, 4).join('.');
+      const allowedIPs = [...this.clientEditAllowedIPs.allowedIPs];
+      const obj = { type: 'ipv4', address, cidr: this.userInputIP[4] };
+      allowedIPs.push(obj);
+      this.clientEditAllowedIPs.allowedIPs = allowedIPs;
+      this.userInputIP = [];
+    },
+    removeIP(index) {
+      const allowedIPs = [...this.clientEditAllowedIPs.allowedIPs];
+      allowedIPs.splice(index, 1);
+      this.clientEditAllowedIPs.allowedIPs = allowedIPs;
     },
     toggleTheme() {
       const themes = ['light', 'dark', 'auto'];
