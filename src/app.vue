@@ -1043,6 +1043,7 @@
           type="password"
           name="password"
           :placeholder="$t('password')"
+          autocomplete="current-password"
           class="px-3 py-2 text-sm dark:bg-neutral-700 text-gray-500 dark:text-gray-500 mb-5 border-2 border-gray-100 dark:border-neutral-800 rounded-lg w-full focus:border-red-800 dark:focus:border-red-800 dark:placeholder:text-neutral-400 outline-none"
         />
 
