@@ -38,8 +38,8 @@ importers:
         specifier: ^2.2.1
         version: 2.2.1(typescript@5.5.4)(vue@3.4.35(typescript@5.5.4))
       qrcode:
-        specifier: ^1.5.3
-        version: 1.5.3
+        specifier: ^1.5.4
+        version: 1.5.4
       tailwindcss:
         specifier: ^3.4.7
         version: 3.4.7
@@ -3365,12 +3365,6 @@ packages:
         integrity: sha512-L18DaJsXSUk2+42pv8mLs5jJT2hqFkFE4j21wOmgbUqsZ2hL72NsUU785g9RXgo3s0ZNgVl42TiHp3ZtOv/Vyg==,
       }
 
-  encode-utf8@1.0.3:
-    resolution:
-      {
-        integrity: sha512-ucAnuBEhUK4boH2HjVYG5Q2mQyPorvv0u/ocS+zhdw0S8AlHYY+GOFhP1Gio5z4icpP2ivFSvhtFjQi8+T9ppw==,
-      }
-
   encodeurl@1.0.2:
     resolution:
       {
@@ -5877,10 +5871,10 @@ packages:
       }
     engines: { node: '>=6' }
 
-  qrcode@1.5.3:
+  qrcode@1.5.4:
     resolution:
       {
-        integrity: sha512-puyri6ApkEHYiVl4CFzo1tDkAZ+ATcnbJrJ6RiBM1Fhctdn/ix9MTE3hRph33omisEbC/2fcfemsseiKgBPKZg==,
+        integrity: sha512-1ca71Zgiu6ORjHqFBDpnSMTR2ReToX4l1Au1VFLyVeBTFavzQnv5JxMFr3ukHVKpSrSA2MCk0lNJSykjUfz7Zg==,
       }
     engines: { node: '>=10.13.0' }
     hasBin: true
@@ -9605,8 +9599,6 @@ snapshots:
 
   emoji-regex@9.2.2: {}
 
-  encode-utf8@1.0.3: {}
-
   encodeurl@1.0.2: {}
 
   enhanced-resolve@5.17.1:
@@ -11315,10 +11307,9 @@ snapshots:
 
   punycode@2.3.1: {}
 
-  qrcode@1.5.3:
+  qrcode@1.5.4:
     dependencies:
       dijkstrajs: 1.0.3
-      encode-utf8: 1.0.3
       pngjs: 5.0.0
       yargs: 15.4.1
 

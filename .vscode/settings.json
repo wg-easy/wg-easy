@@ -3,8 +3,10 @@
     "editor.useTabStops": false,
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true,
-    "vue.format.enable": false,
     "[vue]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
+    "nuxtr.vueFiles.style.addStyleTag": false,
+    "nuxtr.piniaFiles.defaultTemplate": "setup",
+    "nuxtr.monorepoMode.DirectoryName": "src"
 }
