@@ -26,6 +26,10 @@ COPY --from=build_node_modules /app /app
 # than what runs inside of docker.
 COPY --from=build_node_modules /node_modules /node_modules
 
+# Copy the needed wg-password scripts
+COPY --from=build_node_modules /app/wgpw.sh /bin/wgpw
+RUN chmod +x /bin/wgpw
+
 # Install Linux packages
 RUN apk add --no-cache \
     dpkg \

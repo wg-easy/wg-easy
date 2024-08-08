@@ -1,9 +1,17 @@
 services:
   wg-easy:
-    image: wg-easy
+    build:
+      dockerfile: ./Dockerfile
     command: npm run serve
     volumes:
       - ./src/:/app/
+      # - ./data/:/etc/wireguard
+    ports:
+      - "51820:51820/udp"
+      - "51821:51821/tcp"
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
     environment:
       # - PASSWORD=p
       - WG_HOST=192.168.1.233
