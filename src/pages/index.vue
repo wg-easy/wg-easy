@@ -150,59 +150,9 @@
           </div>
           <div class="flex md:block md:flex-shrink-0">
             <!-- Restore configuration -->
-            <label
-              for="inputRC"
-              :title="$t('titleRestoreConfig')"
-              class="hover:cursor-pointer hover:bg-red-800 hover:border-red-800 hover:text-white text-gray-700 dark:text-neutral-200 max-md:border-r-0 border-2 border-gray-100 dark:border-neutral-600 py-2 px-4 rounded-l-full md:rounded inline-flex items-center transition"
-            >
-              <svg
-                inline
-                class="w-4 md:mr-2"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
-                />
-              </svg>
-              <span class="max-md:hidden text-sm">{{ $t('restore') }}</span>
-              <input
-                id="inputRC"
-                type="file"
-                name="configurationfile"
-                accept="text/*,.json"
-                class="hidden"
-                @change="restoreConfig"
-              />
-            </label>
+            <ClientsCmp.RestoreConfig />
             <!-- Backup configuration -->
-            <a
-              href="./api/wireguard/backup"
-              :title="$t('titleBackupConfig')"
-              class="hover:bg-red-800 hover:border-red-800 hover:text-white text-gray-700 dark:text-neutral-200 max-md:border-x-0 border-2 border-gray-100 dark:border-neutral-600 py-2 px-4 md:rounded inline-flex items-center transition"
-            >
-              <svg
-                inline
-                class="w-4 md:mr-2"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M5.25 14.25h13.5m-13.5 0a3 3 0 0 1-3-3m3 3a3 3 0 1 0 0 6h13.5a3 3 0 1 0 0-6m-16.5-3a3 3 0 0 1 3-3h13.5a3 3 0 0 1 3 3m-19.5 0a4.5 4.5 0 0 1 .9-2.7L5.737 5.1a3.375 3.375 0 0 1 2.7-1.35h7.126c1.062 0 2.062.5 2.7 1.35l2.587 3.45a4.5 4.5 0 0 1 .9 2.7m0 0a3 3 0 0 1-3 3m0 3h.008v.008h-.008v-.008Zm0-6h.008v.008h-.008v-.008Zm-3 6h.008v.008h-.008v-.008Zm0-6h.008v.008h-.008v-.008Z"
-                />
-              </svg>
-              <span class="max-md:hidden text-sm">{{ $t('backup') }}</span>
-            </a>
+            <ClientsCmp.BackupConfig />
             <!-- New client -->
             <button
               class="hover:bg-red-800 hover:border-red-800 hover:text-white text-gray-700 dark:text-neutral-200 max-md:border-l-0 border-2 border-gray-100 dark:border-neutral-600 py-2 px-4 rounded-r-full md:rounded inline-flex items-center transition"
@@ -233,181 +183,124 @@
 
         <div>
           <!-- Client -->
-          <div
-            v-for="client in clients"
-            v-if="clients && clients.length > 0"
-            :key="client.id"
-            class="relative overflow-hidden border-b last:border-b-0 border-gray-100 dark:border-neutral-600 border-solid"
-          >
-            <!-- Chart -->
+          <div v-if="clients && clients.length > 0">
             <div
-              v-if="uiChartType"
-              :class="`absolute z-0 bottom-0 left-0 right-0 h-6 ${uiChartType === 1 && 'line-chart'}`"
+              v-for="client in clients"
+              :key="client.id"
+              class="relative overflow-hidden border-b last:border-b-0 border-gray-100 dark:border-neutral-600 border-solid"
             >
-              <ClientOnly>
-                <apexchart
-                  width="100%"
-                  height="100%"
-                  :options="chartOptionsTX"
-                  :series="client.transferTxSeries"
-                />
-              </ClientOnly>
-            </div>
-            <div
-              v-if="uiChartType"
-              :class="`absolute z-0 top-0 left-0 right-0 h-6 ${uiChartType === 1 && 'line-chart'}`"
-            >
-              <ClientOnly>
-                <apexchart
-                  width="100%"
-                  height="100%"
-                  :options="chartOptionsRX"
-                  :series="client.transferRxSeries"
-                  style="transform: scaleY(-1)"
-                />
-              </ClientOnly>
-            </div>
-            <div
-              class="relative py-3 md:py-5 px-3 z-10 flex flex-col sm:flex-row justify-between gap-3"
-            >
-              <div class="flex gap-3 md:gap-4 w-full items-center">
-                <!-- Avatar -->
-                <div
-                  class="h-10 w-10 mt-2 self-start rounded-full bg-gray-50 relative"
-                >
-                  <svg
-                    class="w-6 m-2 text-gray-300"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fill-rule="evenodd"
-                      d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                      clip-rule="evenodd"
-                    />
-                  </svg>
-                  <img
-                    v-if="client.avatar"
-                    :src="client.avatar"
-                    class="w-10 rounded-full absolute top-0 left-0"
+              <!-- Chart -->
+              <div
+                v-if="uiChartType"
+                :class="`absolute z-0 bottom-0 left-0 right-0 h-6 ${uiChartType === 1 && 'line-chart'}`"
+              >
+                <ClientOnly>
+                  <apexchart
+                    width="100%"
+                    height="100%"
+                    :options="chartOptionsTX"
+                    :series="client.transferTxSeries"
                   />
-
+                </ClientOnly>
+              </div>
+              <div
+                v-if="uiChartType"
+                :class="`absolute z-0 top-0 left-0 right-0 h-6 ${uiChartType === 1 && 'line-chart'}`"
+              >
+                <ClientOnly>
+                  <apexchart
+                    width="100%"
+                    height="100%"
+                    :options="chartOptionsRX"
+                    :series="client.transferRxSeries"
+                    style="transform: scaleY(-1)"
+                  />
+                </ClientOnly>
+              </div>
+              <div
+                class="relative py-3 md:py-5 px-3 z-10 flex flex-col sm:flex-row justify-between gap-3"
+              >
+                <div class="flex gap-3 md:gap-4 w-full items-center">
+                  <!-- Avatar -->
                   <div
-                    v-if="
-                      client.latestHandshakeAt &&
-                      new Date().getTime() -
-                        new Date(client.latestHandshakeAt).getTime() <
-                        1000 * 60 * 10
-                    "
+                    class="h-10 w-10 mt-2 self-start rounded-full bg-gray-50 relative"
                   >
-                    <div
-                      class="animate-ping w-4 h-4 p-1 bg-red-100 dark:bg-red-100 rounded-full absolute -bottom-1 -right-1"
+                    <svg
+                      class="w-6 m-2 text-gray-300"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                    <img
+                      v-if="client.avatar"
+                      :src="client.avatar"
+                      class="w-10 rounded-full absolute top-0 left-0"
                     />
-                    <div
-                      class="w-2 h-2 bg-red-800 dark:bg-red-600 rounded-full absolute bottom-0 right-0"
-                    />
-                  </div>
-                </div>
 
-                <!-- Name & Info -->
-                <div class="flex flex-col xxs:flex-row w-full gap-2">
-                  <!-- Name -->
-                  <div class="flex flex-col flex-grow gap-1">
                     <div
-                      class="text-gray-700 dark:text-neutral-200 group text-sm md:text-base"
-                      :title="
-                        $t('createdOn') + dateTime(new Date(client.createdAt))
+                      v-if="
+                        client.latestHandshakeAt &&
+                        new Date().getTime() -
+                          new Date(client.latestHandshakeAt).getTime() <
+                          1000 * 60 * 10
                       "
                     >
-                      <!-- Show -->
-                      <input
-                        v-show="clientEditNameId === client.id"
-                        :ref="'client-' + client.id + '-name'"
-                        v-model="clientEditName"
-                        class="rounded px-1 border-2 dark:bg-neutral-700 border-gray-100 dark:border-neutral-600 focus:border-gray-200 dark:focus:border-neutral-500 dark:placeholder:text-neutral-500 outline-none w-30"
-                        @keyup.enter="
-                          updateClientName(client, clientEditName);
-                          clientEditName = null;
-                          clientEditNameId = null;
-                        "
-                        @keyup.escape="
-                          clientEditName = null;
-                          clientEditNameId = null;
-                        "
+                      <div
+                        class="animate-ping w-4 h-4 p-1 bg-red-100 dark:bg-red-100 rounded-full absolute -bottom-1 -right-1"
                       />
-                      <span
-                        v-show="clientEditNameId !== client.id"
-                        class="border-t-2 border-b-2 border-transparent"
-                        >{{ client.name }}</span
-                      >
+                      <div
+                        class="w-2 h-2 bg-red-800 dark:bg-red-600 rounded-full absolute bottom-0 right-0"
+                      />
+                    </div>
+                  </div>
 
-                      <!-- Edit -->
-                      <span
-                        v-show="clientEditNameId !== client.id"
-                        class="cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity"
-                        @click="
-                          clientEditName = client.name;
-                          clientEditNameId = client.id;
-                          nextTick(() =>
-                            $refs['client-' + client.id + '-name'][0].select()
-                          );
+                  <!-- Name & Info -->
+                  <div class="flex flex-col xxs:flex-row w-full gap-2">
+                    <!-- Name -->
+                    <div class="flex flex-col flex-grow gap-1">
+                      <div
+                        class="text-gray-700 dark:text-neutral-200 group text-sm md:text-base"
+                        :title="
+                          $t('createdOn') + dateTime(new Date(client.createdAt))
                         "
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          class="h-4 w-4 inline align-middle opacity-25 hover:opacity-100"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                          />
-                        </svg>
-                      </span>
-                    </div>
-                    <!-- Address -->
-                    <div
-                      class="block md:inline-block pb-1 md:pb-0 text-gray-500 dark:text-neutral-400 text-xs"
-                    >
-                      <span class="group">
                         <!-- Show -->
                         <input
-                          v-show="clientEditAddressId === client.id"
-                          :ref="'client-' + client.id + '-address'"
-                          v-model="clientEditAddress"
-                          class="rounded border-2 dark:bg-neutral-700 border-gray-100 dark:border-neutral-600 focus:border-gray-200 dark:focus:border-neutral-500 outline-none w-20 text-black dark:text-neutral-300 dark:placeholder:text-neutral-500"
+                          v-show="clientEditNameId === client.id"
+                          :ref="'client-' + client.id + '-name'"
+                          v-model="clientEditName"
+                          class="rounded px-1 border-2 dark:bg-neutral-700 border-gray-100 dark:border-neutral-600 focus:border-gray-200 dark:focus:border-neutral-500 dark:placeholder:text-neutral-500 outline-none w-30"
                           @keyup.enter="
-                            updateClientAddress(client, clientEditAddress);
-                            clientEditAddress = null;
-                            clientEditAddressId = null;
+                            updateClientName(client, clientEditName);
+                            clientEditName = null;
+                            clientEditNameId = null;
                           "
                           @keyup.escape="
-                            clientEditAddress = null;
-                            clientEditAddressId = null;
+                            clientEditName = null;
+                            clientEditNameId = null;
                           "
                         />
                         <span
-                          v-show="clientEditAddressId !== client.id"
-                          class="inline-block"
-                          >{{ client.address }}</span
+                          v-show="clientEditNameId !== client.id"
+                          class="border-t-2 border-b-2 border-transparent"
+                          >{{ client.name }}</span
                         >
 
                         <!-- Edit -->
                         <span
-                          v-show="clientEditAddressId !== client.id"
+                          v-show="clientEditNameId !== client.id"
                           class="cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity"
                           @click="
-                            clientEditAddress = client.address;
-                            clientEditAddressId = client.id;
+                            clientEditName = client.name;
+                            clientEditNameId = client.id;
                             nextTick(() =>
-                              $refs[
-                                'client-' + client.id + '-address'
-                              ][0].select()
+                              $refs['client-' + client.id + '-name'][0].select()
                             );
                           "
                         >
@@ -426,259 +319,327 @@
                             />
                           </svg>
                         </span>
-                      </span>
-                      <!-- Inline Transfer TX -->
-                      <span
-                        v-if="!uiTrafficStats && client.transferTx"
-                        class="whitespace-nowrap"
-                        :title="$t('totalDownload') + bytes(client.transferTx)"
+                      </div>
+                      <!-- Address -->
+                      <div
+                        class="block md:inline-block pb-1 md:pb-0 text-gray-500 dark:text-neutral-400 text-xs"
                       >
-                        ·
-                        <svg
-                          class="align-middle h-3 inline"
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                        >
-                          <path
-                            fill-rule="evenodd"
-                            d="M16.707 10.293a1 1 0 010 1.414l-6 6a1 1 0 01-1.414 0l-6-6a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l4.293-4.293a1 1 0 011.414 0z"
-                            clip-rule="evenodd"
+                        <span class="group">
+                          <!-- Show -->
+                          <input
+                            v-show="clientEditAddressId === client.id"
+                            :ref="'client-' + client.id + '-address'"
+                            v-model="clientEditAddress"
+                            class="rounded border-2 dark:bg-neutral-700 border-gray-100 dark:border-neutral-600 focus:border-gray-200 dark:focus:border-neutral-500 outline-none w-20 text-black dark:text-neutral-300 dark:placeholder:text-neutral-500"
+                            @keyup.enter="
+                              updateClientAddress(client, clientEditAddress);
+                              clientEditAddress = null;
+                              clientEditAddressId = null;
+                            "
+                            @keyup.escape="
+                              clientEditAddress = null;
+                              clientEditAddressId = null;
+                            "
                           />
-                        </svg>
-                        {{ bytes(client.transferTxCurrent) }}/s
-                      </span>
+                          <span
+                            v-show="clientEditAddressId !== client.id"
+                            class="inline-block"
+                            >{{ client.address }}</span
+                          >
 
-                      <!-- Inline Transfer RX -->
-                      <span
-                        v-if="!uiTrafficStats && client.transferRx"
-                        class="whitespace-nowrap"
-                        :title="$t('totalUpload') + bytes(client.transferRx)"
-                      >
-                        ·
-                        <svg
-                          class="align-middle h-3 inline"
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
+                          <!-- Edit -->
+                          <span
+                            v-show="clientEditAddressId !== client.id"
+                            class="cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity"
+                            @click="
+                              clientEditAddress = client.address;
+                              clientEditAddressId = client.id;
+                              nextTick(() =>
+                                $refs[
+                                  'client-' + client.id + '-address'
+                                ][0].select()
+                              );
+                            "
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              class="h-4 w-4 inline align-middle opacity-25 hover:opacity-100"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                              />
+                            </svg>
+                          </span>
+                        </span>
+                        <!-- Inline Transfer TX -->
+                        <span
+                          v-if="!uiTrafficStats && client.transferTx"
+                          class="whitespace-nowrap"
+                          :title="
+                            $t('totalDownload') + bytes(client.transferTx)
+                          "
                         >
-                          <path
-                            fill-rule="evenodd"
-                            d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z"
-                            clip-rule="evenodd"
-                          />
-                        </svg>
-                        {{ bytes(client.transferRxCurrent) }}/s
-                      </span>
-                      <!-- Last seen -->
-                      <span
-                        v-if="client.latestHandshakeAt"
-                        class="text-gray-400 dark:text-neutral-500 whitespace-nowrap"
-                        :title="
-                          $t('lastSeen') +
-                          dateTime(new Date(client.latestHandshakeAt))
-                        "
+                          ·
+                          <svg
+                            class="align-middle h-3 inline"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path
+                              fill-rule="evenodd"
+                              d="M16.707 10.293a1 1 0 010 1.414l-6 6a1 1 0 01-1.414 0l-6-6a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l4.293-4.293a1 1 0 011.414 0z"
+                              clip-rule="evenodd"
+                            />
+                          </svg>
+                          {{ bytes(client.transferTxCurrent) }}/s
+                        </span>
+
+                        <!-- Inline Transfer RX -->
+                        <span
+                          v-if="!uiTrafficStats && client.transferRx"
+                          class="whitespace-nowrap"
+                          :title="$t('totalUpload') + bytes(client.transferRx)"
+                        >
+                          ·
+                          <svg
+                            class="align-middle h-3 inline"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path
+                              fill-rule="evenodd"
+                              d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z"
+                              clip-rule="evenodd"
+                            />
+                          </svg>
+                          {{ bytes(client.transferRxCurrent) }}/s
+                        </span>
+                        <!-- Last seen -->
+                        <span
+                          v-if="client.latestHandshakeAt"
+                          class="text-gray-400 dark:text-neutral-500 whitespace-nowrap"
+                          :title="
+                            $t('lastSeen') +
+                            dateTime(new Date(client.latestHandshakeAt))
+                          "
+                        >
+                          {{ !uiTrafficStats ? ' · ' : ''
+                          }}{{ timeago(new Date(client.latestHandshakeAt)) }}
+                        </span>
+                      </div>
+                    </div>
+
+                    <!-- Info -->
+                    <div
+                      v-if="uiTrafficStats"
+                      class="flex gap-2 items-center shrink-0 text-gray-400 dark:text-neutral-400 text-xs mt-px justify-end"
+                    >
+                      <!-- Transfer TX -->
+                      <div
+                        v-if="client.transferTx"
+                        class="min-w-20 md:min-w-24"
                       >
-                        {{ !uiTrafficStats ? ' · ' : ''
-                        }}{{ timeago(new Date(client.latestHandshakeAt)) }}
-                      </span>
+                        <span
+                          class="flex gap-1"
+                          :title="
+                            $t('totalDownload') + bytes(client.transferTx)
+                          "
+                        >
+                          <svg
+                            class="align-middle h-3 inline mt-0.5"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path
+                              fill-rule="evenodd"
+                              d="M16.707 10.293a1 1 0 010 1.414l-6 6a1 1 0 01-1.414 0l-6-6a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l4.293-4.293a1 1 0 011.414 0z"
+                              clip-rule="evenodd"
+                            />
+                          </svg>
+                          <div>
+                            <span class="text-gray-700 dark:text-neutral-200"
+                              >{{ bytes(client.transferTxCurrent) }}/s</span
+                            >
+                            <!-- Total TX -->
+                            <br /><span
+                              class="font-regular"
+                              style="font-size: 0.85em"
+                              >{{ bytes(client.transferTx) }}</span
+                            >
+                          </div>
+                        </span>
+                      </div>
+
+                      <!-- Transfer RX -->
+                      <div
+                        v-if="client.transferRx"
+                        class="min-w-20 md:min-w-24"
+                      >
+                        <span
+                          class="flex gap-1"
+                          :title="$t('totalUpload') + bytes(client.transferRx)"
+                        >
+                          <svg
+                            class="align-middle h-3 inline mt-0.5"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path
+                              fill-rule="evenodd"
+                              d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z"
+                              clip-rule="evenodd"
+                            />
+                          </svg>
+                          <div>
+                            <span class="text-gray-700 dark:text-neutral-200"
+                              >{{ bytes(client.transferRxCurrent) }}/s</span
+                            >
+                            <!-- Total RX -->
+                            <br /><span
+                              class="font-regular"
+                              style="font-size: 0.85em"
+                              >{{ bytes(client.transferRx) }}</span
+                            >
+                          </div>
+                        </span>
+                      </div>
                     </div>
                   </div>
-
-                  <!-- Info -->
-                  <div
-                    v-if="uiTrafficStats"
-                    class="flex gap-2 items-center shrink-0 text-gray-400 dark:text-neutral-400 text-xs mt-px justify-end"
-                  >
-                    <!-- Transfer TX -->
-                    <div v-if="client.transferTx" class="min-w-20 md:min-w-24">
-                      <span
-                        class="flex gap-1"
-                        :title="$t('totalDownload') + bytes(client.transferTx)"
-                      >
-                        <svg
-                          class="align-middle h-3 inline mt-0.5"
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                        >
-                          <path
-                            fill-rule="evenodd"
-                            d="M16.707 10.293a1 1 0 010 1.414l-6 6a1 1 0 01-1.414 0l-6-6a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l4.293-4.293a1 1 0 011.414 0z"
-                            clip-rule="evenodd"
-                          />
-                        </svg>
-                        <div>
-                          <span class="text-gray-700 dark:text-neutral-200"
-                            >{{ bytes(client.transferTxCurrent) }}/s</span
-                          >
-                          <!-- Total TX -->
-                          <br /><span
-                            class="font-regular"
-                            style="font-size: 0.85em"
-                            >{{ bytes(client.transferTx) }}</span
-                          >
-                        </div>
-                      </span>
-                    </div>
-
-                    <!-- Transfer RX -->
-                    <div v-if="client.transferRx" class="min-w-20 md:min-w-24">
-                      <span
-                        class="flex gap-1"
-                        :title="$t('totalUpload') + bytes(client.transferRx)"
-                      >
-                        <svg
-                          class="align-middle h-3 inline mt-0.5"
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                        >
-                          <path
-                            fill-rule="evenodd"
-                            d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z"
-                            clip-rule="evenodd"
-                          />
-                        </svg>
-                        <div>
-                          <span class="text-gray-700 dark:text-neutral-200"
-                            >{{ bytes(client.transferRxCurrent) }}/s</span
-                          >
-                          <!-- Total RX -->
-                          <br /><span
-                            class="font-regular"
-                            style="font-size: 0.85em"
-                            >{{ bytes(client.transferRx) }}</span
-                          >
-                        </div>
-                      </span>
-                    </div>
-                  </div>
+                  <!-- </div> -->
+                  <!-- <div class="flex flex-grow items-center"> -->
                 </div>
-                <!-- </div> -->
-                <!-- <div class="flex flex-grow items-center"> -->
-              </div>
 
-              <div class="flex items-center justify-end">
-                <div
-                  class="text-gray-400 dark:text-neutral-400 flex gap-1 items-center justify-between"
-                >
-                  <!-- Enable/Disable -->
+                <div class="flex items-center justify-end">
                   <div
-                    v-if="client.enabled === true"
-                    :title="$t('disableClient')"
-                    class="inline-block align-middle rounded-full w-10 h-6 mr-1 bg-red-800 cursor-pointer hover:bg-red-700 transition-all"
-                    @click="disableClient(client)"
+                    class="text-gray-400 dark:text-neutral-400 flex gap-1 items-center justify-between"
                   >
-                    <div class="rounded-full w-4 h-4 m-1 ml-5 bg-white" />
+                    <!-- Enable/Disable -->
+                    <div
+                      v-if="client.enabled === true"
+                      :title="$t('disableClient')"
+                      class="inline-block align-middle rounded-full w-10 h-6 mr-1 bg-red-800 cursor-pointer hover:bg-red-700 transition-all"
+                      @click="disableClient(client)"
+                    >
+                      <div class="rounded-full w-4 h-4 m-1 ml-5 bg-white" />
+                    </div>
+
+                    <div
+                      v-if="client.enabled === false"
+                      :title="$t('enableClient')"
+                      class="inline-block align-middle rounded-full w-10 h-6 mr-1 bg-gray-200 dark:bg-neutral-400 cursor-pointer hover:bg-gray-300 dark:hover:bg-neutral-500 transition-all"
+                      @click="enableClient(client)"
+                    >
+                      <div class="rounded-full w-4 h-4 m-1 bg-white" />
+                    </div>
+
+                    <!-- Show QR-->
+
+                    <button
+                      :disabled="!client.downloadableConfig"
+                      class="align-middle bg-gray-100 dark:bg-neutral-600 dark:text-neutral-300 p-2 rounded transition"
+                      :class="{
+                        'hover:bg-red-800 dark:hover:bg-red-800 hover:text-white dark:hover:text-white':
+                          client.downloadableConfig,
+                        'is-disabled': !client.downloadableConfig,
+                      }"
+                      :title="
+                        !client.downloadableConfig
+                          ? $t('noPrivKey')
+                          : $t('showQR')
+                      "
+                      @click="
+                        qrcode = `./api/wireguard/client/${client.id}/qrcode.svg`
+                      "
+                    >
+                      <svg
+                        class="w-5"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"
+                        />
+                      </svg>
+                    </button>
+
+                    <!-- Download Config -->
+                    <a
+                      :disabled="!client.downloadableConfig"
+                      :href="
+                        './api/wireguard/client/' + client.id + '/configuration'
+                      "
+                      :download="
+                        client.downloadableConfig ? 'configuration' : null
+                      "
+                      class="align-middle inline-block bg-gray-100 dark:bg-neutral-600 dark:text-neutral-300 p-2 rounded transition"
+                      :class="{
+                        'hover:bg-red-800 dark:hover:bg-red-800 hover:text-white dark:hover:text-white':
+                          client.downloadableConfig,
+                        'is-disabled': !client.downloadableConfig,
+                      }"
+                      :title="
+                        !client.downloadableConfig
+                          ? $t('noPrivKey')
+                          : $t('downloadConfig')
+                      "
+                      @click="
+                        if (!client.downloadableConfig) {
+                          $event.preventDefault();
+                        }
+                      "
+                    >
+                      <svg
+                        class="w-5"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                        />
+                      </svg>
+                    </a>
+
+                    <!-- Delete -->
+
+                    <button
+                      class="align-middle bg-gray-100 dark:bg-neutral-600 dark:text-neutral-300 hover:bg-red-800 dark:hover:bg-red-800 hover:text-white dark:hover:text-white p-2 rounded transition"
+                      :title="$t('deleteClient')"
+                      @click="clientDelete = client"
+                    >
+                      <svg
+                        class="w-5"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fill-rule="evenodd"
+                          d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                          clip-rule="evenodd"
+                        />
+                      </svg>
+                    </button>
                   </div>
-
-                  <div
-                    v-if="client.enabled === false"
-                    :title="$t('enableClient')"
-                    class="inline-block align-middle rounded-full w-10 h-6 mr-1 bg-gray-200 dark:bg-neutral-400 cursor-pointer hover:bg-gray-300 dark:hover:bg-neutral-500 transition-all"
-                    @click="enableClient(client)"
-                  >
-                    <div class="rounded-full w-4 h-4 m-1 bg-white" />
-                  </div>
-
-                  <!-- Show QR-->
-
-                  <button
-                    :disabled="!client.downloadableConfig"
-                    class="align-middle bg-gray-100 dark:bg-neutral-600 dark:text-neutral-300 p-2 rounded transition"
-                    :class="{
-                      'hover:bg-red-800 dark:hover:bg-red-800 hover:text-white dark:hover:text-white':
-                        client.downloadableConfig,
-                      'is-disabled': !client.downloadableConfig,
-                    }"
-                    :title="
-                      !client.downloadableConfig
-                        ? $t('noPrivKey')
-                        : $t('showQR')
-                    "
-                    @click="
-                      qrcode = `./api/wireguard/client/${client.id}/qrcode.svg`
-                    "
-                  >
-                    <svg
-                      class="w-5"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"
-                      />
-                    </svg>
-                  </button>
-
-                  <!-- Download Config -->
-                  <a
-                    :disabled="!client.downloadableConfig"
-                    :href="
-                      './api/wireguard/client/' + client.id + '/configuration'
-                    "
-                    :download="
-                      client.downloadableConfig ? 'configuration' : null
-                    "
-                    class="align-middle inline-block bg-gray-100 dark:bg-neutral-600 dark:text-neutral-300 p-2 rounded transition"
-                    :class="{
-                      'hover:bg-red-800 dark:hover:bg-red-800 hover:text-white dark:hover:text-white':
-                        client.downloadableConfig,
-                      'is-disabled': !client.downloadableConfig,
-                    }"
-                    :title="
-                      !client.downloadableConfig
-                        ? $t('noPrivKey')
-                        : $t('downloadConfig')
-                    "
-                    @click="
-                      if (!client.downloadableConfig) {
-                        $event.preventDefault();
-                      }
-                    "
-                  >
-                    <svg
-                      class="w-5"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                      />
-                    </svg>
-                  </a>
-
-                  <!-- Delete -->
-
-                  <button
-                    class="align-middle bg-gray-100 dark:bg-neutral-600 dark:text-neutral-300 hover:bg-red-800 dark:hover:bg-red-800 hover:text-white dark:hover:text-white p-2 rounded transition"
-                    :title="$t('deleteClient')"
-                    @click="clientDelete = client"
-                  >
-                    <svg
-                      class="w-5"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path
-                        fill-rule="evenodd"
-                        d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                        clip-rule="evenodd"
-                      />
-                    </svg>
-                  </button>
                 </div>
               </div>
             </div>
@@ -1107,46 +1068,47 @@
         />
       </svg>
     </div>
-  </div>
 
-  <p
-    v-cloak
-    class="text-center m-10 text-gray-300 dark:text-neutral-600 text-xs"
-  >
-    <a
-      class="hover:underline"
-      target="_blank"
-      href="https://github.com/wg-easy/wg-easy"
-      >WireGuard Easy</a
+    <p
+      v-cloak
+      class="text-center m-10 text-gray-300 dark:text-neutral-600 text-xs"
     >
-    © 2021-2024 by
-    <a
-      class="hover:underline"
-      target="_blank"
-      href="https://emilenijssen.nl/?ref=wg-easy"
-      >Emile Nijssen</a
-    >
-    is licensed under
-    <a
-      class="hover:underline"
-      target="_blank"
-      href="http://creativecommons.org/licenses/by-nc-sa/4.0/"
-      >CC BY-NC-SA 4.0</a
-    >
-    ·
-    <a
-      class="hover:underline"
-      href="https://github.com/sponsors/WeeJeWel"
-      target="_blank"
-      >{{ $t('donate') }}</a
-    >
-  </p>
+      <a
+        class="hover:underline"
+        target="_blank"
+        href="https://github.com/wg-easy/wg-easy"
+        >WireGuard Easy</a
+      >
+      © 2021-2024 by
+      <a
+        class="hover:underline"
+        target="_blank"
+        href="https://emilenijssen.nl/?ref=wg-easy"
+        >Emile Nijssen</a
+      >
+      is licensed under
+      <a
+        class="hover:underline"
+        target="_blank"
+        href="http://creativecommons.org/licenses/by-nc-sa/4.0/"
+        >CC BY-NC-SA 4.0</a
+      >
+      ·
+      <a
+        class="hover:underline"
+        href="https://github.com/sponsors/WeeJeWel"
+        target="_blank"
+        >{{ $t('donate') }}</a
+      >
+    </p>
+  </div>
 </template>
 
 <script setup lang="ts">
 import '~/assets/css/app.css';
 import { sha256 } from 'js-sha256';
 import { format as timeago } from 'timeago.js';
+import * as ClientsCmp from '@/components/Clients';
 
 useHead({
   bodyAttrs: {
@@ -1505,24 +1467,6 @@ function updateClientAddress(client: WGClient, address: string | null) {
     .updateClientAddress({ clientId: client.id, address })
     .catch((err) => alert(err.message || err.toString()))
     .finally(() => refresh().catch(console.error));
-}
-function restoreConfig(e: Event) {
-  e.preventDefault();
-  const file = (e.currentTarget as HTMLInputElement).files?.item(0);
-  if (file) {
-    file
-      .text()
-      .then((content) => {
-        api
-          .restoreConfiguration(content)
-          .then(() => alert('The configuration was updated.'))
-          .catch((err) => alert(err.message || err.toString()))
-          .finally(() => refresh().catch(console.error));
-      })
-      .catch((err) => alert(err.message || err.toString()));
-  } else {
-    alert('Failed to load your file!');
-  }
 }
 
 function toggleTheme() {
