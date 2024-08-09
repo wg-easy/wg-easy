@@ -1,8 +1,10 @@
 {
   "version": "1.0.1",
   "scripts": {
+    "sudobuild": "DOCKER_BUILDKIT=1 sudo docker build --tag wg-easy .",
     "build": "DOCKER_BUILDKIT=1 docker build --tag wg-easy .",
     "serve": "docker compose -f docker-compose.yml -f docker-compose.dev.yml up",
+    "sudostart": "sudo docker run --env WG_HOST=0.0.0.0 --name wg-easy --cap-add=NET_ADMIN --cap-add=SYS_MODULE --sysctl=\"net.ipv4.conf.all.src_valid_mark=1\" --mount type=bind,source=\"$(pwd)\"/config,target=/etc/wireguard -p 51820:51820/udp -p 51821:51821/tcp wg-easy",
     "start": "docker run --env WG_HOST=0.0.0.0 --name wg-easy --cap-add=NET_ADMIN --cap-add=SYS_MODULE --sysctl=\"net.ipv4.conf.all.src_valid_mark=1\" --mount type=bind,source=\"$(pwd)\"/config,target=/etc/wireguard -p 51820:51820/udp -p 51821:51821/tcp wg-easy"
   }
 }
