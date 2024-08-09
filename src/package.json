@@ -30,7 +30,7 @@
     "nuxt": "^3.12.4",
     "pinia": "^2.2.1",
     "qrcode": "^1.5.4",
-    "tailwindcss": "^3.4.7",
+    "tailwindcss": "^3.4.9",
     "timeago.js": "^4.0.2",
     "vue": "latest",
     "vue3-apexcharts": "^1.5.3",
