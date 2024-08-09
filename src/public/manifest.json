@@ -1,0 +1,11 @@
+{
+  "name": "WireGuard",
+  "display": "standalone",
+  "background_color": "#fff",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "type": "image/png"
+    }
+  ]
+}
