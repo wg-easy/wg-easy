@@ -150,9 +150,9 @@
           </div>
           <div class="flex md:block md:flex-shrink-0">
             <!-- Restore configuration -->
-            <ClientsCmp.RestoreConfig />
+            <ClientsRestoreConfig />
             <!-- Backup configuration -->
-            <ClientsCmp.BackupConfig />
+            <ClientsBackupConfig />
             <!-- New client -->
             <button
               class="hover:bg-red-800 hover:border-red-800 hover:text-white text-gray-700 dark:text-neutral-200 max-md:border-l-0 border-2 border-gray-100 dark:border-neutral-600 py-2 px-4 rounded-r-full md:rounded inline-flex items-center transition"
@@ -1108,7 +1108,6 @@
 import '~/assets/css/app.css';
 import { sha256 } from 'js-sha256';
 import { format as timeago } from 'timeago.js';
-import * as ClientsCmp from '@/components/Clients';
 
 useHead({
   bodyAttrs: {
