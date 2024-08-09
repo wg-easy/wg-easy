@@ -27,7 +27,7 @@ services:
       # - WG_POST_DOWN=echo "Post Down" > /etc/wireguard/post-down.txt
       # - UI_TRAFFIC_STATS=true
       # - UI_CHART_TYPE=0 # (0 Charts disabled, 1 # Line chart, 2 # Area chart, 3 # Bar chart)
-      # - UI_SORT_CLIENTS=true
+      # - UI_ENABLE_SORT_CLIENTS=true
 
     image: ghcr.io/wg-easy/wg-easy
     container_name: wg-easy
