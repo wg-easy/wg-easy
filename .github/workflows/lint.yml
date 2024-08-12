@@ -33,6 +33,7 @@ jobs:
           cd src
           pnpm install
           pnpm lint
+
   typecheck:
     name: Typecheck
     runs-on: ubuntu-latest
@@ -53,11 +54,12 @@ jobs:
           check-latest: true
           cache: "pnpm"
 
-      - name: pnpm lint
+      - name: pnpm typecheck
         run: |
           cd src
           pnpm install
           pnpm typecheck
+
   formatcheck:
     name: Check format
     runs-on: ubuntu-latest
@@ -78,7 +80,7 @@ jobs:
           check-latest: true
           cache: "pnpm"
 
-      - name: pnpm lint
+      - name: pnpm format:check
         run: |
           cd src
           pnpm install
