@@ -16,13 +16,13 @@ docker run ghcr.io/wg-easy/wg-easy wgpw YOUR_PASSWORD
 PASSWORD_HASH='$2b$12$coPqCsPtcFO.Ab99xylBNOW4.Iu7OOA2/ZIboHN6/oyxca3MWo7fW' // literally YOUR_PASSWORD
 ```
 
-*Important* : make sure to enclose your password in single quotes when you run `docker run` command :
+*Important* : make sure to enclose your password in **single quotes** when you run `docker run` command :
 
 ```bash
-$ echo $2b$12$coPqCsPtcF
+$ echo $2b$12$coPqCsPtcF <-- not correct
 b2
-$ echo "$2b$12$coPqCsPtcF"
+$ echo "$2b$12$coPqCsPtcF" <-- not correct
 b2
-$ echo '$2b$12$coPqCsPtcF'
+$ echo '$2b$12$coPqCsPtcF' <-- correct
 $2b$12$coPqCsPtcF
 ```
