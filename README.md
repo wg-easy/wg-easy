@@ -120,6 +120,7 @@ These options can be configured by setting environment variables using `-e KEY="
 | `LANG` | `en` | `de` | Web UI language (Supports: en, ua, ru, tr, no, pl, fr, de, ca, es, ko, vi, nl, is, pt, chs, cht, it, th, hi).                                        |
 | `UI_TRAFFIC_STATS` | `false` | `true` | Enable detailed RX / TX client stats in Web UI                                                                                                       |
 | `UI_CHART_TYPE` | `0` | `1` | UI_CHART_TYPE=0 # Charts disabled, UI_CHART_TYPE=1 # Line chart, UI_CHART_TYPE=2 # Area chart, UI_CHART_TYPE=3 # Bar chart                           |
+| `MAX_AGE` | `0` | `1440` | The maximum age of Web UI sessions in minutes. `0` means that the session will exist until the browser is closed.                                  |
 
 > If you change `WG_PORT`, make sure to also change the exposed port.
 

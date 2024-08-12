@@ -34,6 +34,8 @@ const messages = { // eslint-disable-line no-unused-vars
     backup: 'Backup',
     titleRestoreConfig: 'Restore your configuration',
     titleBackupConfig: 'Backup your configuration',
+    rememberMe: 'Remember me',
+    titleRememberMe: 'Stay logged after closing the browser',
   },
   ua: {
     name: 'Ім`я',
