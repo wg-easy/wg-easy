@@ -1,0 +1,218 @@
+<template>
+  <header class="container mx-auto max-w-3xl">
+    <div
+      class="flex flex-col-reverse xxs:flex-row flex-auto items-center gap-3"
+    >
+      <h1
+        class="text-4xl dark:text-neutral-200 font-medium flex-grow self-start mb-4"
+      >
+        <img
+          src="/logo.png"
+          width="32"
+          class="inline align-middle dark:bg mr-2"
+        /><span class="align-middle">WireGuard</span>
+      </h1>
+      <div class="flex items-center grow-0 gap-3 self-end xxs:self-center">
+        <!-- Dark / light theme -->
+        <button
+          class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 dark:bg-neutral-700 dark:hover:bg-neutral-600 transition"
+          :title="$t(`theme.${theme.preference}`)"
+          @click="toggleTheme"
+        >
+          <svg
+            v-if="theme.preference === 'light'"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="w-5 h-5"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"
+            />
+          </svg>
+          <svg
+            v-else-if="theme.preference === 'dark'"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="w-5 h-5 text-neutral-400"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z"
+            />
+          </svg>
+          <svg
+            v-else
+            xmlns="http://www.w3.org/2000/svg"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+            class="w-5 h-5 fill-gray-600 dark:fill-neutral-400"
+          >
+            <path
+              d="M12,2.2c-5.4,0-9.8,4.4-9.8,9.8s4.4,9.8,9.8,9.8s9.8-4.4,9.8-9.8S17.4,2.2,12,2.2z M3.8,12c0-4.5,3.7-8.2,8.2-8.2v16.5C7.5,20.2,3.8,16.5,3.8,12z"
+            />
+          </svg>
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M9 17.25v1.007a3 3 0 0 1-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0 1 15 18.257V17.25m6-12V15a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 15V5.25m18 0A2.25 2.25 0 0 0 18.75 3H5.25A2.25 2.25 0 0 0 3 5.25m18 0V12a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 12V5.25"
+          />
+        </button>
+        <!-- Show / hide charts -->
+        <label
+          v-if="uiChartType > 0"
+          class="inline-flex items-center justify-center cursor-pointer w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 dark:bg-neutral-700 dark:hover:bg-neutral-600 whitespace-nowrap transition group"
+          :title="$t('toggleCharts')"
+        >
+          <input
+            v-model="uiShowCharts"
+            type="checkbox"
+            value=""
+            class="sr-only peer"
+            @change="toggleCharts"
+          />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            fill="currentColor"
+            class="w-5 h-5 peer fill-gray-400 peer-checked:fill-gray-600 dark:fill-neutral-600 peer-checked:dark:fill-neutral-400 group-hover:dark:fill-neutral-500 transition"
+          >
+            <path
+              d="M18.375 2.25c-1.035 0-1.875.84-1.875 1.875v15.75c0 1.035.84 1.875 1.875 1.875h.75c1.035 0 1.875-.84 1.875-1.875V4.125c0-1.036-.84-1.875-1.875-1.875h-.75ZM9.75 8.625c0-1.036.84-1.875 1.875-1.875h.75c1.036 0 1.875.84 1.875 1.875v11.25c0 1.035-.84 1.875-1.875 1.875h-.75a1.875 1.875 0 0 1-1.875-1.875V8.625ZM3 13.125c0-1.036.84-1.875 1.875-1.875h.75c1.036 0 1.875.84 1.875 1.875v6.75c0 1.035-.84 1.875-1.875 1.875h-.75A1.875 1.875 0 0 1 3 19.875v-6.75Z"
+            />
+          </svg>
+        </label>
+        <span
+          v-if="requiresPassword && authenticated"
+          class="text-sm text-gray-400 dark:text-neutral-400 cursor-pointer hover:underline"
+          @click="logout"
+        >
+          {{ $t('logout') }}
+          <svg
+            class="h-3 inline"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+            />
+          </svg>
+        </span>
+      </div>
+    </div>
+    <div class="text-sm text-gray-400 dark:text-neutral-400 mb-5" />
+    <div
+      v-if="latestRelease"
+      class="bg-red-800 dark:bg-red-100 p-4 text-white dark:text-red-600 text-sm font-small mb-10 rounded-md shadow-lg"
+      :title="`v${currentRelease} → v${latestRelease.version}`"
+    >
+      <div class="container mx-auto flex flex-row flex-auto items-center">
+        <div class="flex-grow">
+          <p class="font-bold">{{ $t('updateAvailable') }}</p>
+          <p>{{ latestRelease.changelog }}</p>
+        </div>
+
+        <a
+          href="https://github.com/wg-easy/wg-easy#updating"
+          target="_blank"
+          class="p-3 rounded-md bg-white dark:bg-red-100 float-right font-sm font-semibold text-red-800 dark:text-red-600 flex-shrink-0 border-2 border-red-800 dark:border-red-600 hover:border-white dark:hover:border-red-600 hover:text-white dark:hover:text-red-100 hover:bg-red-800 dark:hover:bg-red-600 transition-all"
+        >
+          {{ $t('update') }} →
+        </a>
+      </div>
+    </div>
+  </header>
+</template>
+
+<script setup lang="ts">
+definePageMeta({
+  layout: 'header',
+});
+
+type ClientPersist = {
+  transferRxHistory: number[];
+  transferRxPrevious: number;
+  transferRxCurrent: number;
+  transferRxSeries: { name: string; data: number[] }[];
+  hoverRx?: unknown;
+  transferTxHistory: number[];
+  transferTxPrevious: number;
+  transferTxCurrent: number;
+  transferTxSeries: { name: string; data: number[] }[];
+  hoverTx?: unknown;
+};
+
+type LocalClient = WGClient & {
+  avatar?: string;
+  transferMax?: number;
+} & Omit<ClientPersist, 'transferRxPrevious' | 'transferTxPrevious'>;
+
+const authenticated = ref<null | boolean>(null);
+const requiresPassword = ref<null | boolean>(null);
+
+const clients = ref<null | LocalClient[]>(null);
+
+const currentRelease = ref<null | number>(null);
+const latestRelease = ref<null | { version: number; changelog: string }>(null);
+
+const theme = useTheme();
+
+const uiChartType = ref(0);
+const uiShowCharts = ref(getItem('uiShowCharts') === '1');
+
+function toggleTheme() {
+  const themeCycle = {
+    system: 'light',
+    light: 'dark',
+    dark: 'system',
+  } as const;
+
+  theme.preference = themeCycle[theme.preference];
+}
+
+function toggleCharts() {
+  setItem('uiShowCharts', uiShowCharts.value ? '1' : '0');
+}
+
+function logout(e: Event) {
+  e.preventDefault();
+
+  api
+    .deleteSession()
+    .then(() => {
+      authenticated.value = false;
+      clients.value = null;
+
+      window.location.replace('/login');
+    })
+    .catch((err) => {
+      alert(err.message || err.toString());
+    });
+}
+
+onMounted(() => {
+  api
+    .getSession()
+    .then((session) => {
+      authenticated.value = session.authenticated;
+      requiresPassword.value = session.requiresPassword;
+    })
+    .catch((err) => {
+      alert(err.message || err.toString());
+    });
+});
+</script>

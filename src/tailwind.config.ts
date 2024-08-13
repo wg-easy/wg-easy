@@ -1,5 +1,6 @@
 import type { Config } from 'tailwindcss';
 import type { PluginAPI } from 'tailwindcss/types/config';
+import * as colors from 'tailwindcss/colors.js';
 
 export default {
   darkMode: 'selector',
@@ -13,6 +14,12 @@ export default {
       lg: '1024px',
       xl: '1280px',
       '2xl': '1536px',
+    },
+    extend: {
+      colors: {
+        DEFAULT: colors.red[800],
+        primary: colors.red[800],
+      },
     },
   },
   plugins: [

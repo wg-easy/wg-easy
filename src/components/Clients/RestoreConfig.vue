@@ -34,15 +34,14 @@
 <script setup lang="ts">
 function restoreConfig(e: Event) {
   e.preventDefault();
-  const isFile = e.currentTarget;
-  if (isFile) {
-    const file = (isFile as HTMLInputElement).files?.item(0);
+  const file = (e.currentTarget as HTMLInputElement).files?.item(0);
+  if (file) {
     file
-      ?.text()
+      .text()
       .then((content) => {
         api
           .restoreConfiguration(content)
-          .then((_result) => alert('The configuration was updated.'))
+          .then(() => alert('The configuration was updated.'))
           .catch((err) => alert(err.message || err.toString()));
       })
       .catch((err) => alert(err.message || err.toString()));
