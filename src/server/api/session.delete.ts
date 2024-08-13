@@ -3,7 +3,7 @@ export default defineEventHandler(async (event) => {
   const sessionId = session.id;
 
   if (sessionId === undefined) {
-    return createError({
+    throw createError({
       statusCode: 401,
       statusMessage: 'Not logged in',
     });

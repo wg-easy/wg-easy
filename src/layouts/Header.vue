@@ -1,5 +1,5 @@
 <template>
-  <header class="container mx-auto max-w-3xl">
+  <header class="container mx-auto max-w-3xl px-3 md:px-0 mt-4 xs:mt-6">
     <div
       class="flex flex-col-reverse xxs:flex-row flex-auto items-center gap-3"
     >
@@ -92,7 +92,7 @@
           </svg>
         </label>
         <span
-          v-if="requiresPassword && authenticated"
+          v-if="authStore.requiresPassword && authStore.authenticated"
           class="text-sm text-gray-400 dark:text-neutral-400 cursor-pointer hover:underline"
           @click="logout"
         >
@@ -139,32 +139,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({
-  layout: 'header',
-});
-
-type ClientPersist = {
-  transferRxHistory: number[];
-  transferRxPrevious: number;
-  transferRxCurrent: number;
-  transferRxSeries: { name: string; data: number[] }[];
-  hoverRx?: unknown;
-  transferTxHistory: number[];
-  transferTxPrevious: number;
-  transferTxCurrent: number;
-  transferTxSeries: { name: string; data: number[] }[];
-  hoverTx?: unknown;
-};
-
-type LocalClient = WGClient & {
-  avatar?: string;
-  transferMax?: number;
-} & Omit<ClientPersist, 'transferRxPrevious' | 'transferTxPrevious'>;
-
-const authenticated = ref<null | boolean>(null);
-const requiresPassword = ref<null | boolean>(null);
-
-const clients = ref<null | LocalClient[]>(null);
+const authStore = useAuthStore();
 
 const currentRelease = ref<null | number>(null);
 const latestRelease = ref<null | { version: number; changelog: string }>(null);
@@ -188,31 +163,16 @@ function toggleCharts() {
   setItem('uiShowCharts', uiShowCharts.value ? '1' : '0');
 }
 
-function logout(e: Event) {
+async function logout(e: Event) {
   e.preventDefault();
-
-  api
-    .deleteSession()
-    .then(() => {
-      authenticated.value = false;
-      clients.value = null;
-
-      window.location.replace('/login');
-    })
-    .catch((err) => {
+  try {
+    await authStore.logout();
+    navigateTo('/login');
+  } catch (err) {
+    if (err instanceof Error) {
+      // TODO: better ui
       alert(err.message || err.toString());
-    });
+    }
+  }
 }
-
-onMounted(() => {
-  api
-    .getSession()
-    .then((session) => {
-      authenticated.value = session.authenticated;
-      requiresPassword.value = session.requiresPassword;
-    })
-    .catch((err) => {
-      alert(err.message || err.toString());
-    });
-});
 </script>

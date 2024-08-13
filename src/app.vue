@@ -9,8 +9,6 @@
 </template>
 
 <script setup lang="ts">
-import '~/assets/css/app.css';
-
 useHead({
   bodyAttrs: {
     class: 'bg-gray-50 dark:bg-neutral-800',

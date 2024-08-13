@@ -1,6 +1,6 @@
 import type { Config } from 'tailwindcss';
 import type { PluginAPI } from 'tailwindcss/types/config';
-import * as colors from 'tailwindcss/colors.js';
+// import { red } from 'tailwindcss/colors.js';
 
 export default {
   darkMode: 'selector',
@@ -17,8 +17,8 @@ export default {
     },
     extend: {
       colors: {
-        DEFAULT: colors.red[800],
-        primary: colors.red[800],
+        // DEFAULT: red[800],
+        // primary: red[800],
       },
     },
   },

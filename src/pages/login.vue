@@ -64,15 +64,16 @@
         </svg>
       </button>
       <input
-        v-if="!authenticating && password"
+        v-else
         type="submit"
-        class="bg-red-800 dark:bg-red-800 w-full rounded shadow py-2 text-sm text-white dark:text-white hover:bg-red-700 dark:hover:bg-red-700 transition cursor-pointer"
-        :value="$t('signIn')"
-      />
-      <input
-        v-if="!authenticating && !password"
-        type="submit"
-        class="bg-gray-200 dark:bg-neutral-800 w-full rounded shadow py-2 text-sm text-white dark:text-white cursor-not-allowed"
+        :class="[
+          {
+            'bg-red-800 dark:bg-red-800 hover:bg-red-700 dark:hover:bg-red-700 transition cursor-pointer':
+              password,
+            'bg-gray-200 dark:bg-neutral-800 cursor-not-allowed': !password,
+          },
+          'w-full rounded shadow py-2 text-sm text-white dark:text-white',
+        ]"
         :value="$t('signIn')"
       />
     </form>
@@ -80,43 +81,29 @@
 </template>
 
 <script setup lang="ts">
-const authenticated = ref<null | boolean>(null);
 const authenticating = ref(false);
 const password = ref<null | string>(null);
-const requiresPassword = ref<null | boolean>(null);
+const authStore = useAuthStore();
 
-function login(e: Event) {
+async function login(e: Event) {
   e.preventDefault();
 
   if (!password.value) return;
   if (authenticating.value) return;
 
   authenticating.value = true;
-  api
-    .createSession({
-      password: password.value,
-    })
-    .then(async () => {
-      const session = await api.getSession();
-      authenticated.value = session.authenticated;
-      requiresPassword.value = session.requiresPassword;
-      window.location.replace('/');
-    })
-    .catch((err) => {
+  try {
+    const res = await authStore.login(password.value);
+    if (res) {
+      await navigateTo('/');
+    }
+  } catch (err) {
+    if (err instanceof Error) {
       // TODO: replace alert with actual ui error message
       alert(err.message || err.toString());
-    })
-    .finally(() => {
-      authenticating.value = false;
-      password.value = null;
-    });
-}
-
-onMounted(() => {
-  api.getSession().then((session) => {
-    if (session.authenticated || !session.requiresPassword) {
-      window.location.replace('/');
     }
-  });
-});
+  }
+  authenticating.value = false;
+  password.value = null;
+}
 </script>

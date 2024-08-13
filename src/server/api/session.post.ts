@@ -26,5 +26,5 @@ export default defineEventHandler(async (event) => {
 
   SERVER_DEBUG(`New Session: ${data.id}`);
 
-  return { success: true };
+  return { success: true, requiresPassword: REQUIRES_PASSWORD };
 });

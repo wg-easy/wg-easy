@@ -1,9 +1,6 @@
 <template>
   <footer>
-    <p
-      v-cloak
-      class="text-center m-10 text-gray-300 dark:text-neutral-600 text-xs"
-    >
+    <p class="text-center m-10 text-gray-300 dark:text-neutral-600 text-xs">
       <a
         class="hover:underline"
         target="_blank"
@@ -35,8 +32,4 @@
   </footer>
 </template>
 
-<script setup lang="ts">
-definePageMeta({
-  layout: 'footer',
-});
-</script>
+<script setup lang="ts"></script>
