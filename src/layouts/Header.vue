@@ -1,9 +1,14 @@
 <template>
   <header class="container mx-auto max-w-3xl px-3 md:px-0 mt-4 xs:mt-6">
     <div
-      class="flex flex-col-reverse xxs:flex-row flex-auto items-center gap-3"
+      :class="
+        isLoginPage
+          ? 'flex justify-end'
+          : 'flex flex-col-reverse xxs:flex-row flex-auto items-center gap-3'
+      "
     >
       <h1
+        v-if="!isLoginPage"
         class="text-4xl dark:text-neutral-200 font-medium flex-grow self-start mb-4"
       >
         <img
@@ -140,6 +145,9 @@
 
 <script setup lang="ts">
 const authStore = useAuthStore();
+const route = useRoute();
+
+const isLoginPage = computed(() => route.path == '/login');
 
 const currentRelease = ref<null | number>(null);
 const latestRelease = ref<null | { version: number; changelog: string }>(null);
