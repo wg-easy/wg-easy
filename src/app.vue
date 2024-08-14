@@ -1,9 +1,7 @@
 <template>
   <NuxtLayout>
     <NuxtLayout name="header" />
-    <main>
-      <NuxtPage />
-    </main>
+    <NuxtPage />
     <NuxtLayout name="footer" />
   </NuxtLayout>
 </template>

@@ -16,6 +16,7 @@ export const useModalStore = defineStore('Modal', () => {
       .catch((err) => alert(err.message || err.toString()))
       .finally(() => clientsStore.refresh().catch(console.error));
   }
+
   function deleteClient(client: WGClient | null) {
     if (client === null) {
       return;
@@ -25,6 +26,7 @@ export const useModalStore = defineStore('Modal', () => {
       .catch((err) => alert(err.message || err.toString()))
       .finally(() => clientsStore.refresh().catch(console.error));
   }
+
   return {
     clientDelete,
     clientCreate,
