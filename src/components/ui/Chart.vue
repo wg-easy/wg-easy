@@ -1,13 +1,10 @@
 <template>
-  <apexchart
-    width="100%"
-    height="100%"
-    :options="chartOptionsTX"
-    :series="client.transferTxSeries"
-  />
+  <ClientOnly>
+    <apexchart width="100%" height="100%" :options="options" :series="series" />
+  </ClientOnly>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import type { VueApexChartsComponent } from 'vue3-apexcharts';
 
 defineProps<{

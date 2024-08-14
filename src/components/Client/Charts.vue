@@ -3,25 +3,23 @@
     v-if="globalStore.uiChartType"
     :class="`absolute z-0 bottom-0 left-0 right-0 h-6 ${globalStore.uiChartType === 1 && 'line-chart'}`"
   >
-    <ClientOnly>
-      <Chart :options="chartOptionsTX" :series="client.transferTxSeries" />
-    </ClientOnly>
+    <UiChart :options="chartOptionsTX" :series="client.transferTxSeries" />
   </div>
   <div
     v-if="globalStore.uiChartType"
     :class="`absolute z-0 top-0 left-0 right-0 h-6 ${globalStore.uiChartType === 1 && 'line-chart'}`"
   >
-    <ClientOnly>
-      <Chart
-        :options="chartOptionsRX"
-        :series="client.transferRxSeries"
-        style="transform: scaleY(-1)"
-      />
-    </ClientOnly>
+    <UiChart
+      :options="chartOptionsRX"
+      :series="client.transferRxSeries"
+      style="transform: scaleY(-1)"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
+import type { ApexOptions } from 'apexcharts';
+
 defineProps<{
   client: LocalClient;
 }>();
@@ -34,7 +32,7 @@ const chartOptionsTX = computed(() => {
     ...chartOptions,
     colors: [CHART_COLORS.tx[theme.value]],
   };
-  opts.chart.type = UI_CHART_TYPES[globalStore.uiChartType].type || false;
+  opts.chart.type = UI_CHART_TYPES[globalStore.uiChartType].type || undefined;
   opts.stroke.width = UI_CHART_TYPES[globalStore.uiChartType].strokeWidth;
   return opts;
 });
@@ -44,14 +42,14 @@ const chartOptionsRX = computed(() => {
     ...chartOptions,
     colors: [CHART_COLORS.rx[theme.value]],
   };
-  opts.chart.type = UI_CHART_TYPES[globalStore.uiChartType].type || false;
+  opts.chart.type = UI_CHART_TYPES[globalStore.uiChartType].type || undefined;
   opts.stroke.width = UI_CHART_TYPES[globalStore.uiChartType].strokeWidth;
   return opts;
 });
 
 const chartOptions = {
   chart: {
-    type: false as string | boolean,
+    type: undefined as ApexChart['type'],
     background: 'transparent',
     stacked: false,
     toolbar: {
@@ -130,7 +128,7 @@ const chartOptions = {
       },
     },
   },
-};
+} satisfies ApexOptions;
 </script>
 
 <style scoped lang="css">

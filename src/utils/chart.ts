@@ -1,9 +1,9 @@
 export const UI_CHART_TYPES = [
-  { type: false, strokeWidth: 0 },
+  { type: undefined, strokeWidth: 0 },
   { type: 'line', strokeWidth: 3 },
   { type: 'area', strokeWidth: 0 },
   { type: 'bar', strokeWidth: 0 },
-];
+] as const;
 
 export const CHART_COLORS = {
   rx: { light: 'rgba(128,128,128,0.3)', dark: 'rgba(255,255,255,0.3)' },
