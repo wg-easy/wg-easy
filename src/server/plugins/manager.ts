@@ -1,6 +1,6 @@
 export default defineNitroPlugin((nitroApp) => {
-  nitroApp.hooks.hook('close', () => {
+  nitroApp.hooks.hook('close', async () => {
     console.log('Shutting down');
-    WireGuard.Shutdown();
+    await WireGuard.Shutdown();
   });
 });
