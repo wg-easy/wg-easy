@@ -393,4 +393,10 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
   }
 }
 
-export default new WireGuard();
+const inst = new WireGuard();
+inst.getConfig().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});
+
+export default inst;
