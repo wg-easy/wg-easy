@@ -1,6 +1,6 @@
 <template>
   <BaseButton as="label" for="inputRC" :title="$t('titleRestoreConfig')">
-    <IconsArrowInf />
+    <IconsArrowInf class="w-4 md:mr-2" />
     <span class="max-md:hidden text-sm">{{ $t('restore') }}</span>
     <input
       id="inputRC"

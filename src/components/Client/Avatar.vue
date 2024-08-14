@@ -1,17 +1,6 @@
 <template>
   <div class="h-10 w-10 mt-2 self-start rounded-full bg-gray-50 relative">
-    <svg
-      class="w-6 m-2 text-gray-300"
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 20 20"
-      fill="currentColor"
-    >
-      <path
-        fill-rule="evenodd"
-        d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-        clip-rule="evenodd"
-      />
-    </svg>
+    <IconsAvatar class="w-6 m-2 text-gray-300" />
     <img
       v-if="client.avatar"
       :src="client.avatar"

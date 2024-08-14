@@ -3,12 +3,12 @@ export default defineEventHandler(async (event) => {
   const session = await useWGSession(event);
   if (url.pathname === '/login') {
     if (!REQUIRES_PASSWORD || session.data.authenticated) {
-      return sendRedirect(event, '/', 302)
+      return sendRedirect(event, '/', 302);
     }
   }
   if (url.pathname === '/') {
     if (!session.data.authenticated) {
-      return sendRedirect(event, '/login', 302)
+      return sendRedirect(event, '/login', 302);
     }
   }
 });

@@ -5,7 +5,7 @@
       modalStore.clientCreateName = '';
     "
   >
-    <IconsPlus />
+    <IconsPlus class="w-4 md:mr-2" />
     <span class="max-md:hidden text-sm">{{ $t('new') }}</span>
   </BaseButton>
 </template>
