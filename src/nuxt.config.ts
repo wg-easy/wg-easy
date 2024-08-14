@@ -6,12 +6,12 @@ export default defineNuxtConfig({
     '@nuxtjs/i18n',
     '@nuxtjs/tailwindcss',
     '@pinia/nuxt',
-    '@nuxtjs/color-mode',
+    '@eschricht/nuxt-color-mode'
   ],
   colorMode: {
     preference: 'system',
     fallback: 'light',
     classSuffix: '',
-    storageKey: 'theme',
+    cookieName: 'theme',
   },
 });

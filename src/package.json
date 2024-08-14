@@ -19,7 +19,7 @@
     "typecheck": "nuxt typecheck"
   },
   "dependencies": {
-    "@nuxtjs/color-mode": "^3.4.2",
+    "@eschricht/nuxt-color-mode": "^1.1.5",
     "@nuxtjs/i18n": "^8.3.3",
     "@nuxtjs/tailwindcss": "^6.12.1",
     "@pinia/nuxt": "^0.5.3",

@@ -267,6 +267,10 @@ const globalStore = useGlobalStore();
 const clientsStore = useClientsStore();
 const modalStore = useModalStore();
 
+watchEffect(() => {
+  console.log(modalStore.clientDelete, modalStore.clientDelete ? true : false);
+});
+
 const intervalId = ref<NodeJS.Timeout | null>(null);
 
 onMounted(() => {
