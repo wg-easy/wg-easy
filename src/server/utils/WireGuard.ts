@@ -206,7 +206,7 @@ ${
             : new Date(Number(`${latestHandshakeAt}000`));
         client.transferRx = Number(transferRx);
         client.transferTx = Number(transferTx);
-        client.persistentKeepalive = persistentKeepalive;
+        client.persistentKeepalive = persistentKeepalive ?? null;
       });
 
     return clients;

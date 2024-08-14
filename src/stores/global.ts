@@ -18,29 +18,12 @@ export const useGlobalStore = defineStore('Global', () => {
       locale.value = lang;
     }
 
-    const _currentRelease = await api.getRelease();
-    const _latestRelease = await fetch(
-      'https://wg-easy.github.io/wg-easy/changelog.json'
-    )
-      .then((res) => res.json())
-      .then((releases) => {
-        const releasesArray = Object.entries(releases).map(
-          ([version, changelog]) => ({
-            version: parseInt(version, 10),
-            changelog: changelog as string,
-          })
-        );
-        releasesArray.sort((a, b) => {
-          return b.version - a.version;
-        });
+    const release = await api.getRelease();
 
-        return releasesArray[0];
-      });
+    if (release.currentRelease >= release.latestRelease.version) return;
 
-    if (_currentRelease >= _latestRelease.version) return;
-
-    currentRelease.value = _currentRelease;
-    latestRelease.value = _latestRelease;
+    currentRelease.value = release.currentRelease;
+    latestRelease.value = release.latestRelease;
   }
 
   async function fetchChartType() {

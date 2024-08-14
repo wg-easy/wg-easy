@@ -32,8 +32,8 @@ const chartOptionsTX = computed(() => {
     ...chartOptions,
     colors: [CHART_COLORS.tx[theme.value]],
   };
-  opts.chart.type = UI_CHART_TYPES[globalStore.uiChartType].type || undefined;
-  opts.stroke.width = UI_CHART_TYPES[globalStore.uiChartType].strokeWidth;
+  opts.chart.type = UI_CHART_TYPES[globalStore.uiChartType]?.type || undefined;
+  opts.stroke.width = UI_CHART_TYPES[globalStore.uiChartType]?.strokeWidth ?? 0;
   return opts;
 });
 
@@ -42,8 +42,8 @@ const chartOptionsRX = computed(() => {
     ...chartOptions,
     colors: [CHART_COLORS.rx[theme.value]],
   };
-  opts.chart.type = UI_CHART_TYPES[globalStore.uiChartType].type || undefined;
-  opts.stroke.width = UI_CHART_TYPES[globalStore.uiChartType].strokeWidth;
+  opts.chart.type = UI_CHART_TYPES[globalStore.uiChartType]?.type || undefined;
+  opts.stroke.width = UI_CHART_TYPES[globalStore.uiChartType]?.strokeWidth ?? 0;
   return opts;
 });
 

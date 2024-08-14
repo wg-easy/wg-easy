@@ -1,9 +1,8 @@
-export default defineEventHandler((event) => {
-  setHeader(event, 'Content-Type', 'application/json');
+export default defineEventHandler(async () => {
   const release = Number.parseInt(RELEASE, 10);
-  if (isNaN(release)) {
-    return 0;
-  }
-  // TODO: move changelog logic here
-  return release;
+  const latestRelease = await fetchLatestRelease();
+  return {
+    currentRelease: release,
+    latestRelease: latestRelease,
+  };
 });

@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
     }
   }
   if (url.pathname === '/') {
-    if (!session.data.authenticated) {
+    if (!session.data.authenticated && REQUIRES_PASSWORD) {
       return sendRedirect(event, '/login', 302);
     }
   }

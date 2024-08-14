@@ -12,4 +12,5 @@
     "[typescript]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
+    "typescript.tsdk": "./src/node_modules/typescript/lib"
 }

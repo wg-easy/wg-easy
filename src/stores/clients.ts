@@ -44,7 +44,8 @@ export const useClientsStore = defineStore('Clients', () => {
         };
       }
 
-      const clientPersist = clientsPersist.value[client.id];
+      // We know that this can't be undefined
+      const clientPersist = clientsPersist.value[client.id]!;
 
       // Debug
       // client.transferRx = this.clientsPersist[client.id].transferRxPrevious + Math.random() * 1000;
