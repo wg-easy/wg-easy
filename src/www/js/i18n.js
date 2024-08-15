@@ -340,6 +340,12 @@ const messages = { // eslint-disable-line no-unused-vars
     downloadConfig: '구성 다운로드',
     madeBy: '만든 사람',
     donate: '기부',
+    toggleCharts: '차트 표시/숨기기',
+    theme: { dark: '어두운 테마', light: '밝은 테마', auto: '자동 테마' },
+    restore: '복원',
+    backup: '백업',
+    titleRestoreConfig: '구성 파일 복원',
+    titleBackupConfig: '구성 파일 백업',
   },
   vi: {
     name: 'Tên',
