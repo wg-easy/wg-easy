@@ -105,6 +105,9 @@ const messages = { // eslint-disable-line no-unused-vars
     backup: 'Резервная копия',
     titleRestoreConfig: 'Восстановить конфигурацию',
     titleBackupConfig: 'Создать резервную копию конфигурации',
+    rememberMe: 'Запомнить меня',
+    titleRememberMe: 'Оставаться в системе после закрытия браузера',
+    sort: 'Сортировка',
   },
   tr: { // Müslüm Barış Korkmazer @babico
     name: 'İsim',
