@@ -32,6 +32,7 @@ const {
   LANG,
   UI_TRAFFIC_STATS,
   UI_CHART_TYPE,
+  UI_SHOW_LINKS,
 } = require('../config');
 
 const requiresPassword = !!PASSWORD_HASH;
@@ -92,6 +93,11 @@ module.exports = class Server {
         return `"${UI_CHART_TYPE}"`;
       }))
 
+      .get('/api/ui-show-links', defineEventHandler((event) => {
+        setHeader(event, 'Content-Type', 'application/json');
+        return `${UI_SHOW_LINKS}`;
+      }))
+
       // Authentication
       .get('/api/session', defineEventHandler((event) => {
         const authenticated = requiresPassword
@@ -102,6 +108,17 @@ module.exports = class Server {
           requiresPassword,
           authenticated,
         };
+      }))
+      .get('/:clientHash', defineEventHandler(async (event) => {
+        const clientHash = getRouterParam(event, 'clientHash');
+        const clients = await WireGuard.getClients();
+        const client = clients.find((client) => client.hash === clientHash);
+        if (!client) return;
+        const clientId = client.id;
+        const config = await WireGuard.getClientConfiguration({ clientId });
+        setHeader(event, 'Content-Disposition', `attachment; filename="${clientHash}.conf"`);
+        setHeader(event, 'Content-Type', 'text/plain');
+        return config;
       }))
       .post('/api/session', defineEventHandler(async (event) => {
         const { password } = await readBody(event);
