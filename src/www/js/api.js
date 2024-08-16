@@ -64,6 +64,13 @@ class API {
     });
   }
 
+  async getUIShowLinks() {
+    return this.call({
+      method: 'get',
+      path: '/ui-show-links',
+    });
+  }
+
   async getSession() {
     return this.call({
       method: 'get',

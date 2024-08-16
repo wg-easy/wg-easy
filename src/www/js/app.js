@@ -73,6 +73,7 @@ new Vue({
     uiTrafficStats: false,
 
     uiChartType: 0,
+    uiShowLinks: false,
     uiShowCharts: localStorage.getItem('uiShowCharts') === '1',
     uiTheme: localStorage.theme || 'auto',
     prefersDarkScheme: window.matchMedia('(prefers-color-scheme: dark)'),
@@ -390,6 +391,14 @@ new Vue({
       })
       .catch(() => {
         this.uiChartType = 0;
+      });
+
+    this.api.getUIShowLinks()
+      .then((res) => {
+        this.uiShowLinks = res;
+      })
+      .catch(() => {
+        this.uiShowLinks = false;
       });
 
     Promise.resolve().then(async () => {

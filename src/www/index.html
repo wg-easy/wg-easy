@@ -43,7 +43,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round"
                   d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
               </svg>
-              <svg v-else xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" 
+              <svg v-else xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"
                 class="w-5 h-5 fill-gray-600 dark:fill-neutral-400">
                 <path
                   d="M12,2.2c-5.4,0-9.8,4.4-9.8,9.8s4.4,9.8,9.8,9.8s9.8-4.4,9.8-9.8S17.4,2.2,12,2.2z M3.8,12c0-4.5,3.7-8.2,8.2-8.2v16.5C7.5,20.2,3.8,16.5,3.8,12z" />
@@ -225,7 +225,7 @@
                           </svg>
                           {{client.transferTxCurrent | bytes}}/s
                         </span>
-                        
+
                         <!-- Inline Transfer RX -->
                         <span v-if="!uiTrafficStats && client.transferRx" class="whitespace-nowrap" :title="$t('totalUpload') + bytes(client.transferRx)">
                           ·
@@ -241,6 +241,9 @@
                           :title="$t('lastSeen') + dateTime(new Date(client.latestHandshakeAt))">
                           {{!uiTrafficStats ? " · " : ""}}{{new Date(client.latestHandshakeAt) | timeago}}
                         </span>
+                      </div>
+                      <div v-if="uiShowLinks" :ref="'client-' + client.id + '-hash'" class="text-gray-400 text-xs">
+                        <a :href="'./' + client.hash + ''">{{document.location.protocol}}//{{document.location.host}}/{{client.hash}}</a>
                       </div>
                     </div>
 
