@@ -5,7 +5,7 @@ const path = require('path');
 const debug = require('debug')('WireGuard');
 const crypto = require('node:crypto');
 const QRCode = require('qrcode');
-const CRC32 = require("crc-32");
+const CRC32 = require('crc-32');
 
 const Util = require('./Util');
 const ServerError = require('./ServerError');
