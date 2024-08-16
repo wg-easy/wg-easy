@@ -104,7 +104,7 @@ module.exports = class Server {
         setHeader(event, 'Content-Type', 'application/json');
         return `"${UI_SHOW_LINKS}"`;
       }))
-        
+
       .get('/api/ui-sort-clients', defineEventHandler((event) => {
         setHeader(event, 'Content-Type', 'application/json');
         return `"${UI_ENABLE_SORT_CLIENTS}"`;
