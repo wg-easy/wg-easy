@@ -43,6 +43,13 @@ class API {
     });
   }
 
+  async getRememberMeEnabled() {
+    return this.call({
+      method: 'get',
+      path: '/remember-me',
+    });
+  }
+
   async getuiTrafficStats() {
     return this.call({
       method: 'get',
@@ -71,11 +78,11 @@ class API {
     });
   }
 
-  async createSession({ password }) {
+  async createSession({ password, remember }) {
     return this.call({
       method: 'post',
       path: '/session',
-      body: { password },
+      body: { password, remember },
     });
   }
 

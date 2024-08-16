@@ -6,6 +6,7 @@ module.exports.RELEASE = version;
 module.exports.PORT = process.env.PORT || '51821';
 module.exports.WEBUI_HOST = process.env.WEBUI_HOST || '0.0.0.0';
 module.exports.PASSWORD_HASH = process.env.PASSWORD_HASH;
+module.exports.MAX_AGE = parseInt(process.env.MAX_AGE, 10) * 1000 * 60 || 0;
 module.exports.WG_PATH = process.env.WG_PATH || '/etc/wireguard/';
 module.exports.WG_DEVICE = process.env.WG_DEVICE || 'eth0';
 module.exports.WG_HOST = process.env.WG_HOST;
