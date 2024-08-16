@@ -90,6 +90,9 @@ new Vue({
 
     uiChartType: 0,
     uiShowLinks: false,
+    enableSortClient: false,
+    sortClient: true, // Sort clients by name, true = asc, false = desc
+
     uiShowCharts: localStorage.getItem('uiShowCharts') === '1',
     uiTheme: localStorage.theme || 'auto',
     prefersDarkScheme: window.matchMedia('(prefers-color-scheme: dark)'),
@@ -175,8 +178,6 @@ new Vue({
       },
     },
 
-    enableSortClient: true,
-    sortClient: true, // Sort clients by name, true = asc, false = desc
   },
   methods: {
     dateTime: (value) => {
@@ -252,7 +253,7 @@ new Vue({
         return client;
       });
 
-      if (enableSortClient) {
+      if (this.enableSortClient) {
         this.clients = sortByProperty(this.clients, 'name', this.sortClient);
       }
     },
@@ -424,14 +425,20 @@ new Vue({
         this.uiShowLinks = false;
       });
 
+    this.api.getUiSortClients()
+      .then((res) => {
+        this.enableSortClient = res;
+      })
+      .catch(() => {
+        this.enableSortClient = false;
+      });
+
     Promise.resolve().then(async () => {
       const lang = await this.api.getLang();
       if (lang !== localStorage.getItem('lang') && i18n.availableLocales.includes(lang)) {
         localStorage.setItem('lang', lang);
         i18n.locale = lang;
       }
-
-      this.enableSortClient = await this.api.getUiSortClients();
 
       const currentRelease = await this.api.getRelease();
       const latestRelease = await fetch('https://wg-easy.github.io/wg-easy/changelog.json')
