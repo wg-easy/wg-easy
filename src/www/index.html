@@ -10,6 +10,7 @@
   <link rel="apple-touch-icon" href="./img/apple-touch-icon.png">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 </head>
 <style>
   [v-cloak] {
@@ -42,7 +43,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round"
                   d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
               </svg>
-              <svg v-else xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" 
+              <svg v-else xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"
                 class="w-5 h-5 fill-gray-600 dark:fill-neutral-400">
                 <path
                   d="M12,2.2c-5.4,0-9.8,4.4-9.8,9.8s4.4,9.8,9.8,9.8s9.8-4.4,9.8-9.8S17.4,2.2,12,2.2z M3.8,12c0-4.5,3.7-8.2,8.2-8.2v16.5C7.5,20.2,3.8,16.5,3.8,12z" />
@@ -233,7 +234,7 @@
                           </svg>
                           {{client.transferTxCurrent | bytes}}/s
                         </span>
-                        
+
                         <!-- Inline Transfer RX -->
                         <span v-if="!uiTrafficStats && client.transferRx" class="whitespace-nowrap" :title="$t('totalUpload') + bytes(client.transferRx)">
                           ·
@@ -249,6 +250,9 @@
                           :title="$t('lastSeen') + dateTime(new Date(client.latestHandshakeAt))">
                           {{!uiTrafficStats ? " · " : ""}}{{new Date(client.latestHandshakeAt) | timeago}}
                         </span>
+                      </div>
+                      <div v-if="uiShowLinks" :ref="'client-' + client.id + '-hash'" class="text-gray-400 text-xs">
+                        <a :href="'./' + client.hash + ''">{{document.location.protocol}}//{{document.location.host}}/{{client.hash}}</a>
                       </div>
                     </div>
 
@@ -568,9 +572,27 @@
             </svg>
           </div>
 
-          <input type="password" name="password" :placeholder="$t('password')" v-model="password"
+          <input type="password" name="password" :placeholder="$t('password')" v-model="password" autocomplete="current-password"
             class="px-3 py-2 text-sm dark:bg-neutral-700 text-gray-500 dark:text-gray-500 mb-5 border-2 border-gray-100 dark:border-neutral-800 rounded-lg w-full focus:border-red-800 dark:focus:border-red-800 dark:placeholder:text-neutral-400 outline-none" />
+          
+          <!-- Remember me -->
+          <label v-if="rememberMeEnabled"
+            class="inline-block mb-5 cursor-pointer whitespace-nowrap" :title="$t('titleRememberMe')">
+            <input type="checkbox" class="sr-only" v-model="remember">
+            
+            <div v-if="remember"
+              class="inline-block align-middle rounded-full w-10 h-6 mr-1 bg-red-800 cursor-pointer hover:bg-red-700 transition-all">
+              <div class="rounded-full w-4 h-4 m-1 ml-5 bg-white"></div>
+            </div>
 
+            <div v-if="!remember"
+              class="inline-block align-middle rounded-full w-10 h-6 mr-1 bg-gray-200 dark:bg-neutral-400 cursor-pointer hover:bg-gray-300 dark:hover:bg-neutral-500 transition-all">
+              <div class="rounded-full w-4 h-4 m-1 bg-white"></div>
+            </div>
+
+            <span class="text-sm">{{$t("rememberMe")}}</span>
+          </label>
+  
           <button v-if="authenticating"
             class="bg-red-800 dark:bg-red-800 w-full rounded shadow py-2 text-sm text-white dark:text-white cursor-not-allowed">
             <svg class="w-5 animate-spin mx-auto" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"

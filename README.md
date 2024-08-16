@@ -24,6 +24,7 @@ You have found the easiest way to install & manage WireGuard on any Linux host!
 * Automatic Light / Dark Mode
 * Multilanguage Support
 * UI_TRAFFIC_STATS (default off)
+* UI_SHOW_LINKS (default off)
 
 ## Requirements
 
@@ -99,28 +100,29 @@ Are you enjoying this project? [Buy Emile a beer!](https://github.com/sponsors/W
 
 These options can be configured by setting environment variables using `-e KEY="VALUE"` in the `docker run` command.
 
-| Env | Default | Example                        | Description                                                                                                                                                                                                            |
-| - | - |--------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `PORT` | `51821` | `6789`                         | TCP port for Web UI.                                                                                                                                                                                                   |
-| `WEBUI_HOST` | `0.0.0.0` | `localhost`                    | IP address web UI binds to.                                                                                                                                                                                            |
-| `PASSWORD_HASH` | - | `$2y$05$Ci...`                 | When set, requires a password when logging in to the Web UI. See [How to generate an bcrypt hash.md]("https://github.com/wg-easy/wg-easy/blob/master/How_to_generate_an_bcrypt_hash.md") for know how generate the hash. |
-| `PASSWORD` (deprecated) | - | `foobar123`                    | When set, requires a password when logging in to the Web UI. *(Not used if `PASSWORD_HASH` is set)*                                                                                                                    |
-| `WG_HOST` | - | `vpn.myserver.com`             | The public hostname of your VPN server.                                                                                                                                                                                |
-| `WG_DEVICE` | `eth0` | `ens6f0`                       | Ethernet device the wireguard traffic should be forwarded through.                                                                                                                                                     |
-| `WG_PORT` | `51820` | `12345`                        | The public UDP port of your VPN server. WireGuard will listen on that (othwise default) inside the Docker container.                                                                                                   |
-| `WG_CONFIG_PORT`| `51820` | `12345`                        | The UDP port used on [Home Assistant Plugin](https://github.com/adriy-be/homeassistant-addons-jdeath/tree/main/wgeasy)                                                                                                 
-| `WG_MTU` | `null` | `1420`                         | The MTU the clients will use. Server uses default WG MTU.                                                                                                                                                              |
-| `WG_PERSISTENT_KEEPALIVE` | `0` | `25`                           | Value in seconds to keep the "connection" open. If this value is 0, then connections won't be kept alive.                                                                                                              |
-| `WG_DEFAULT_ADDRESS` | `10.8.0.x` | `10.6.0.x`                     | Clients IP address range.                                                                                                                                                                                              |
-| `WG_DEFAULT_DNS` | `1.1.1.1` | `8.8.8.8, 8.8.4.4`             | DNS server clients will use. If set to blank value, clients will not use any DNS.                                                                                                                                      |
-| `WG_ALLOWED_IPS` | `0.0.0.0/0, ::/0` | `192.168.15.0/24, 10.0.1.0/24` | Allowed IPs clients will use.                                                                                                                                                                                          |
-| `WG_PRE_UP` | `...` | -                              | See [config.js](https://github.com/wg-easy/wg-easy/blob/master/src/config.js#L19) for the default value.                                                                                                               |
-| `WG_POST_UP` | `...` | `iptables ...`                 | See [config.js](https://github.com/wg-easy/wg-easy/blob/master/src/config.js#L20) for the default value.                                                                                                               |
-| `WG_PRE_DOWN` | `...` | -                              | See [config.js](https://github.com/wg-easy/wg-easy/blob/master/src/config.js#L27) for the default value.                                                                                                               |
-| `WG_POST_DOWN` | `...` | `iptables ...`                 | See [config.js](https://github.com/wg-easy/wg-easy/blob/master/src/config.js#L28) for the default value.                                                                                                               |
-| `LANG` | `en` | `de`                           | Web UI language (Supports: en, ua, ru, tr, no, pl, fr, de, ca, es, ko, vi, nl, is, pt, chs, cht, it, th, hi).                                                                                                          |
-| `UI_TRAFFIC_STATS` | `false` | `true`                         | Enable detailed RX / TX client stats in Web UI                                                                                                                                                                         |
-| `UI_CHART_TYPE` | `0` | `1`                            | UI_CHART_TYPE=0 # Charts disabled, UI_CHART_TYPE=1 # Line chart, UI_CHART_TYPE=2 # Area chart, UI_CHART_TYPE=3 # Bar chart                                                                                             |
+| Env | Default | Example | Description                                                                                                                                          |
+| - | - | - |------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `PORT` | `51821` | `6789` | TCP port for Web UI.                                                                                                                                 |
+| `WEBUI_HOST` | `0.0.0.0` | `localhost` | IP address web UI binds to.                                                                                                                          |
+| `PASSWORD_HASH` | - | `$2y$05$Ci...` | When set, requires a password when logging in to the Web UI. See [How to generate an bcrypt hash.md]("https://github.com/wg-easy/wg-easy/blob/master/How_to_generate_an_bcrypt_hash.md") for know how generate the hash. |
+| `WG_HOST` | - | `vpn.myserver.com` | The public hostname of your VPN server.                                                                                                              |
+| `WG_DEVICE` | `eth0` | `ens6f0` | Ethernet device the wireguard traffic should be forwarded through.                                                                                   |
+| `WG_PORT` | `51820` | `12345` | The public UDP port of your VPN server. WireGuard will listen on that (othwise default) inside the Docker container.                                 |
+| `WG_CONFIG_PORT`| `51820` | `12345` | The UDP port used on [Home Assistant Plugin](https://github.com/adriy-be/homeassistant-addons-jdeath/tree/main/wgeasy)                               
+| `WG_MTU` | `null` | `1420` | The MTU the clients will use. Server uses default WG MTU.                                                                                            |
+| `WG_PERSISTENT_KEEPALIVE` | `0` | `25` | Value in seconds to keep the "connection" open. If this value is 0, then connections won't be kept alive.                                            |
+| `WG_DEFAULT_ADDRESS` | `10.8.0.x` | `10.6.0.x` | Clients IP address range.                                                                                                                            |
+| `WG_DEFAULT_DNS` | `1.1.1.1` | `8.8.8.8, 8.8.4.4` | DNS server clients will use. If set to blank value, clients will not use any DNS.                                                                    |
+| `WG_ALLOWED_IPS` | `0.0.0.0/0, ::/0` | `192.168.15.0/24, 10.0.1.0/24` | Allowed IPs clients will use.                                                                                                                        |
+| `WG_PRE_UP` | `...` | - | See [config.js](https://github.com/wg-easy/wg-easy/blob/master/src/config.js#L19) for the default value.                                             |
+| `WG_POST_UP` | `...` | `iptables ...` | See [config.js](https://github.com/wg-easy/wg-easy/blob/master/src/config.js#L20) for the default value.                                             |
+| `WG_PRE_DOWN` | `...` | - | See [config.js](https://github.com/wg-easy/wg-easy/blob/master/src/config.js#L27) for the default value.                                             |
+| `WG_POST_DOWN` | `...` | `iptables ...` | See [config.js](https://github.com/wg-easy/wg-easy/blob/master/src/config.js#L28) for the default value.                                             |
+| `LANG` | `en` | `de` | Web UI language (Supports: en, ua, ru, tr, no, pl, fr, de, ca, es, ko, vi, nl, is, pt, chs, cht, it, th, hi).                                        |
+| `UI_TRAFFIC_STATS` | `false` | `true` | Enable detailed RX / TX client stats in Web UI                                                                                                       |
+| `UI_CHART_TYPE` | `0` | `1` | UI_CHART_TYPE=0 # Charts disabled, UI_CHART_TYPE=1 # Line chart, UI_CHART_TYPE=2 # Area chart, UI_CHART_TYPE=3 # Bar chart                           |
+| `UI_SHOW_LINKS` | `false` | `true` | Enable display of a short download link in Web UI                                                                                                       |
+| `MAX_AGE` | `0` | `1440` | The maximum age of Web UI sessions in minutes. `0` means that the session will exist until the browser is closed.                                  |
 | `UI_ENABLE_SORT_CLIENTS` | `false` | `true`                         | Enable UI sort clients by name                                                                                                                                                                         |
 
 > If you change `WG_PORT`, make sure to also change the exposed port.

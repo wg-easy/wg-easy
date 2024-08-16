@@ -69,6 +69,8 @@ new Vue({
     authenticating: false,
     password: null,
     requiresPassword: null,
+    remember: false,
+    rememberMeEnabled: false,
 
     clients: null,
     clientsPersist: {},
@@ -87,6 +89,7 @@ new Vue({
     uiTrafficStats: false,
 
     uiChartType: 0,
+    uiShowLinks: false,
     uiShowCharts: localStorage.getItem('uiShowCharts') === '1',
     uiTheme: localStorage.theme || 'auto',
     prefersDarkScheme: window.matchMedia('(prefers-color-scheme: dark)'),
@@ -262,6 +265,7 @@ new Vue({
       this.authenticating = true;
       this.api.createSession({
         password: this.password,
+        remember: this.remember,
       })
         .then(async () => {
           const session = await this.api.getSession();
@@ -385,6 +389,11 @@ new Vue({
         alert(err.message || err.toString());
       });
 
+    this.api.getRememberMeEnabled()
+      .then((rememberMeEnabled) => {
+        this.rememberMeEnabled = rememberMeEnabled;
+      });
+
     setInterval(() => {
       this.refresh({
         updateCharts: this.updateCharts,
@@ -405,6 +414,14 @@ new Vue({
       })
       .catch(() => {
         this.uiChartType = 0;
+      });
+
+    this.api.getUIShowLinks()
+      .then((res) => {
+        this.uiShowLinks = res;
+      })
+      .catch(() => {
+        this.uiShowLinks = false;
       });
 
     Promise.resolve().then(async () => {
