@@ -5,6 +5,7 @@ const path = require('path');
 const debug = require('debug')('WireGuard');
 const crypto = require('node:crypto');
 const QRCode = require('qrcode');
+const CRC32 = require("crc-32");
 
 const Util = require('./Util');
 const ServerError = require('./ServerError');
@@ -147,6 +148,7 @@ ${client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
       createdAt: new Date(client.createdAt),
       updatedAt: new Date(client.updatedAt),
       allowedIPs: client.allowedIPs,
+      hash: Math.abs(CRC32.str(clientId)).toString(16),
       downloadableConfig: 'privateKey' in client,
       persistentKeepalive: null,
       latestHandshakeAt: null,
