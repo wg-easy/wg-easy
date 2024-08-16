@@ -123,6 +123,7 @@ These options can be configured by setting environment variables using `-e KEY="
 | `UI_CHART_TYPE` | `0` | `1` | UI_CHART_TYPE=0 # Charts disabled, UI_CHART_TYPE=1 # Line chart, UI_CHART_TYPE=2 # Area chart, UI_CHART_TYPE=3 # Bar chart                           |
 | `UI_SHOW_LINKS` | `false` | `true` | Enable display of a short download link in Web UI                                                                                                       |
 | `MAX_AGE` | `0` | `1440` | The maximum age of Web UI sessions in minutes. `0` means that the session will exist until the browser is closed.                                  |
+| `UI_ENABLE_SORT_CLIENTS` | `false` | `true`                         | Enable UI sort clients by name                                                                                                                                                                         |
 
 > If you change `WG_PORT`, make sure to also change the exposed port.
 

@@ -28,6 +28,7 @@ services:
       # - UI_TRAFFIC_STATS=true
       # - UI_CHART_TYPE=0 # (0 Charts disabled, 1 # Line chart, 2 # Area chart, 3 # Bar chart)
       # - UI_SHOW_LINKS=true
+      # - UI_ENABLE_SORT_CLIENTS=true
 
     image: ghcr.io/wg-easy/wg-easy
     container_name: wg-easy

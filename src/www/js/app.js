@@ -23,6 +23,22 @@ function bytes(bytes, decimals, kib, maxunit) {
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
 }
 
+/**
+ * Sorts an array of objects by a specified property in ascending or descending order.
+ *
+ * @param {Array} array - The array of objects to be sorted.
+ * @param {string} property - The property to sort the array by.
+ * @param {boolean} [sort=true] - Whether to sort the array in ascending (default) or descending order.
+ * @return {Array} - The sorted array of objects.
+ */
+function sortByProperty(array, property, sort = true) {
+  if (sort) {
+    return array.sort((a, b) => (typeof a[property] === 'string' ? a[property].localeCompare(b[property]) : a[property] - b[property]));
+  }
+
+  return array.sort((a, b) => (typeof a[property] === 'string' ? b[property].localeCompare(a[property]) : b[property] - a[property]));
+}
+
 const i18n = new VueI18n({
   locale: localStorage.getItem('lang') || 'en',
   fallbackLocale: 'en',
@@ -158,6 +174,9 @@ new Vue({
         },
       },
     },
+
+    enableSortClient: true,
+    sortClient: true, // Sort clients by name, true = asc, false = desc
   },
   methods: {
     dateTime: (value) => {
@@ -232,6 +251,10 @@ new Vue({
 
         return client;
       });
+
+      if (enableSortClient) {
+        this.clients = sortByProperty(this.clients, 'name', this.sortClient);
+      }
     },
     login(e) {
       e.preventDefault();
@@ -407,6 +430,8 @@ new Vue({
         localStorage.setItem('lang', lang);
         i18n.locale = lang;
       }
+
+      this.enableSortClient = await this.api.getUiSortClients();
 
       const currentRelease = await this.api.getRelease();
       const latestRelease = await fetch('https://wg-easy.github.io/wg-easy/changelog.json')

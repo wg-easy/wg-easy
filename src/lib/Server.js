@@ -34,6 +34,7 @@ const {
   UI_TRAFFIC_STATS,
   UI_CHART_TYPE,
   UI_SHOW_LINKS,
+  UI_ENABLE_SORT_CLIENTS,
 } = require('../config');
 
 const requiresPassword = !!PASSWORD_HASH;
@@ -101,7 +102,12 @@ module.exports = class Server {
 
       .get('/api/ui-show-links', defineEventHandler((event) => {
         setHeader(event, 'Content-Type', 'application/json');
-        return `${UI_SHOW_LINKS}`;
+        return `"${UI_SHOW_LINKS}"`;
+      }))
+
+      .get('/api/ui-sort-clients', defineEventHandler((event) => {
+        setHeader(event, 'Content-Type', 'application/json');
+        return `"${UI_ENABLE_SORT_CLIENTS}"`;
       }))
 
       // Authentication

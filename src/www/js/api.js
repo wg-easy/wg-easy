@@ -160,4 +160,11 @@ class API {
     });
   }
 
+  async getUiSortClients() {
+    return this.call({
+      method: 'get',
+      path: '/ui-sort-clients',
+    });
+  }
+
 }
