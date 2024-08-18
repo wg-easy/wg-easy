@@ -35,6 +35,7 @@ const {
   UI_CHART_TYPE,
   UI_SHOW_LINKS,
   UI_ENABLE_SORT_CLIENTS,
+  WG_ENABLE_EXPIRES_TIME,
 } = require('../config');
 
 const requiresPassword = !!PASSWORD_HASH;
@@ -57,6 +58,11 @@ const isPasswordValid = (password) => {
   }
 
   return false;
+};
+
+const cronJobEveryMinute = async () => {
+  await WireGuard.cronJobEveryMinute();
+  setTimeout(cronJobEveryMinute, 60 * 1000);
 };
 
 module.exports = class Server {
@@ -108,6 +114,11 @@ module.exports = class Server {
       .get('/api/ui-sort-clients', defineEventHandler((event) => {
         setHeader(event, 'Content-Type', 'application/json');
         return `${UI_ENABLE_SORT_CLIENTS}`;
+      }))
+
+      .get('/api/wg-enable-expire-time', defineEventHandler((event) => {
+        setHeader(event, 'Content-Type', 'application/json');
+        return `${WG_ENABLE_EXPIRES_TIME}`;
       }))
 
       // Authentication
@@ -224,7 +235,8 @@ module.exports = class Server {
       }))
       .post('/api/wireguard/client', defineEventHandler(async (event) => {
         const { name } = await readBody(event);
-        await WireGuard.createClient({ name });
+        const { expiredDate } = await readBody(event);
+        await WireGuard.createClient({ name, expiredDate });
         return { success: true };
       }))
       .delete('/api/wireguard/client/:clientId', defineEventHandler(async (event) => {
@@ -264,6 +276,15 @@ module.exports = class Server {
         }
         const { address } = await readBody(event);
         await WireGuard.updateClientAddress({ clientId, address });
+        return { success: true };
+      }))
+      .put('/api/wireguard/client/:clientId/expireDate', defineEventHandler(async (event) => {
+        const clientId = getRouterParam(event, 'clientId');
+        if (clientId === '__proto__' || clientId === 'constructor' || clientId === 'prototype') {
+          throw createError({ status: 403 });
+        }
+        const { expireDate } = await readBody(event);
+        await WireGuard.updateClientExpireDate({ clientId, expireDate });
         return { success: true };
       }));
 
@@ -340,6 +361,8 @@ module.exports = class Server {
 
     createServer(toNodeListener(app)).listen(PORT, WEBUI_HOST);
     debug(`Listening on http://${WEBUI_HOST}:${PORT}`);
+
+    cronJobEveryMinute();
   }
 
 };

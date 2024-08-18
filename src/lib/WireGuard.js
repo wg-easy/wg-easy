@@ -24,6 +24,7 @@ const {
   WG_POST_UP,
   WG_PRE_DOWN,
   WG_POST_DOWN,
+  WG_ENABLE_EXPIRES_TIME,
 } = require('../config');
 
 module.exports = class WireGuard {
@@ -147,6 +148,9 @@ ${client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
       publicKey: client.publicKey,
       createdAt: new Date(client.createdAt),
       updatedAt: new Date(client.updatedAt),
+      expiredAt: client.expiredAt !== null
+        ? new Date(client.expiredAt)
+        : null,
       allowedIPs: client.allowedIPs,
       hash: Math.abs(CRC32.str(clientId)).toString(16),
       downloadableConfig: 'privateKey' in client,
@@ -227,7 +231,7 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
     });
   }
 
-  async createClient({ name }) {
+  async createClient({ name, expiredDate }) {
     if (!name) {
       throw new Error('Missing: Name');
     }
@@ -256,7 +260,6 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
     if (!address) {
       throw new Error('Maximum number of clients reached.');
     }
-
     // Create Client
     const id = crypto.randomUUID();
     const client = {
@@ -269,10 +272,15 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
 
       createdAt: new Date(),
       updatedAt: new Date(),
-
+      expiredAt: null,
       enabled: true,
     };
-
+    if (expiredDate) {
+      client.expiredAt = new Date(expiredDate);
+      client.expiredAt.setHours(23);
+      client.expiredAt.setMinutes(59);
+      client.expiredAt.setSeconds(59);
+    }
     config.clients[id] = client;
 
     await this.saveConfig();
@@ -329,6 +337,22 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
     await this.saveConfig();
   }
 
+  async updateClientExpireDate({ clientId, expireDate }) {
+    const client = await this.getClient({ clientId });
+
+    if (expireDate) {
+      client.expiredAt = new Date(expireDate);
+      client.expiredAt.setHours(23);
+      client.expiredAt.setMinutes(59);
+      client.expiredAt.setSeconds(59);
+    } else {
+      client.expiredAt = null;
+    }
+    client.updatedAt = new Date();
+
+    await this.saveConfig();
+  }
+
   async __reloadConfig() {
     await this.__buildConfig();
     await this.__syncConfig();
@@ -353,6 +377,25 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
   // Shutdown wireguard
   async Shutdown() {
     await Util.exec('wg-quick down wg0').catch(() => {});
+  }
+
+  async cronJobEveryMinute() {
+    const config = await this.getConfig();
+    if (WG_ENABLE_EXPIRES_TIME === 'true') {
+      let needSaveConfig = false;
+      for (const client of Object.values(config.clients)) {
+        if (client.enabled !== true) continue;
+        if (client.expiredAt !== null && new Date() > new Date(client.expiredAt)) {
+          debug(`Client ${client.id} expired.`);
+          needSaveConfig = true;
+          client.enabled = false;
+          client.updatedAt = new Date();
+        }
+      }
+      if (needSaveConfig) {
+        await this.saveConfig();
+      }
+    }
   }
 
 };
