@@ -1,5 +1,6 @@
 'use strict';
 
+const bcrypt = require('bcryptjs');
 const crypto = require('node:crypto');
 const { createServer } = require('node:http');
 const { stat, readFile } = require('node:fs/promises');
@@ -27,11 +28,36 @@ const {
   PORT,
   WEBUI_HOST,
   RELEASE,
-  PASSWORD,
+  PASSWORD_HASH,
+  MAX_AGE,
   LANG,
   UI_TRAFFIC_STATS,
   UI_CHART_TYPE,
+  UI_SHOW_LINKS,
+  UI_ENABLE_SORT_CLIENTS,
 } = require('../config');
+
+const requiresPassword = !!PASSWORD_HASH;
+
+/**
+ * Checks if `password` matches the PASSWORD_HASH.
+ *
+ * If environment variable is not set, the password is always invalid.
+ *
+ * @param {string} password String to test
+ * @returns {boolean} true if matching environment, otherwise false
+ */
+const isPasswordValid = (password) => {
+  if (typeof password !== 'string') {
+    return false;
+  }
+
+  if (PASSWORD_HASH) {
+    return bcrypt.compareSync(password, PASSWORD_HASH);
+  }
+
+  return false;
+};
 
 module.exports = class Server {
 
@@ -59,9 +85,14 @@ module.exports = class Server {
         return `"${LANG}"`;
       }))
 
+      .get('/api/remember-me', defineEventHandler((event) => {
+        setHeader(event, 'Content-Type', 'application/json');
+        return MAX_AGE > 0;
+      }))
+
       .get('/api/ui-traffic-stats', defineEventHandler((event) => {
         setHeader(event, 'Content-Type', 'application/json');
-        return `"${UI_TRAFFIC_STATS}"`;
+        return `${UI_TRAFFIC_STATS}`;
       }))
 
       .get('/api/ui-chart-type', defineEventHandler((event) => {
@@ -69,9 +100,18 @@ module.exports = class Server {
         return `"${UI_CHART_TYPE}"`;
       }))
 
+      .get('/api/ui-show-links', defineEventHandler((event) => {
+        setHeader(event, 'Content-Type', 'application/json');
+        return `${UI_SHOW_LINKS}`;
+      }))
+
+      .get('/api/ui-sort-clients', defineEventHandler((event) => {
+        setHeader(event, 'Content-Type', 'application/json');
+        return `${UI_ENABLE_SORT_CLIENTS}`;
+      }))
+
       // Authentication
       .get('/api/session', defineEventHandler((event) => {
-        const requiresPassword = !!process.env.PASSWORD;
         const authenticated = requiresPassword
           ? !!(event.node.req.session && event.node.req.session.authenticated)
           : true;
@@ -81,40 +121,65 @@ module.exports = class Server {
           authenticated,
         };
       }))
+      .get('/:clientHash', defineEventHandler(async (event) => {
+        const clientHash = getRouterParam(event, 'clientHash');
+        const clients = await WireGuard.getClients();
+        const client = clients.find((client) => client.hash === clientHash);
+        if (!client) return;
+        const clientId = client.id;
+        const config = await WireGuard.getClientConfiguration({ clientId });
+        setHeader(event, 'Content-Disposition', `attachment; filename="${clientHash}.conf"`);
+        setHeader(event, 'Content-Type', 'text/plain');
+        return config;
+      }))
       .post('/api/session', defineEventHandler(async (event) => {
-        const { password } = await readBody(event);
+        const { password, remember } = await readBody(event);
 
-        if (typeof password !== 'string') {
+        if (!requiresPassword) {
+          // if no password is required, the API should never be called.
+          // Do not automatically authenticate the user.
           throw createError({
             status: 401,
-            message: 'Missing: Password',
+            message: 'Invalid state',
           });
         }
 
-        if (password !== PASSWORD) {
+        if (!isPasswordValid(password)) {
           throw createError({
             status: 401,
             message: 'Incorrect Password',
           });
         }
 
+        if (MAX_AGE && remember) {
+          event.node.req.session.cookie.maxAge = MAX_AGE;
+        }
         event.node.req.session.authenticated = true;
         event.node.req.session.save();
 
         debug(`New Session: ${event.node.req.session.id}`);
 
-        return { succcess: true };
+        return { success: true };
       }));
 
     // WireGuard
     app.use(
       fromNodeMiddleware((req, res, next) => {
-        if (!PASSWORD || !req.url.startsWith('/api/')) {
+        if (!requiresPassword || !req.url.startsWith('/api/')) {
           return next();
         }
 
         if (req.session && req.session.authenticated) {
           return next();
+        }
+
+        if (req.url.startsWith('/api/') && req.headers['authorization']) {
+          if (isPasswordValid(req.headers['authorization'])) {
+            return next();
+          }
+          return res.status(401).json({
+            error: 'Incorrect Password',
+          });
         }
 
         return res.status(401).json({
@@ -224,6 +289,23 @@ module.exports = class Server {
         message: 'Bad Request',
       });
     };
+
+    // backup_restore
+    const router3 = createRouter();
+    app.use(router3);
+
+    router3
+      .get('/api/wireguard/backup', defineEventHandler(async (event) => {
+        const config = await WireGuard.backupConfiguration();
+        setHeader(event, 'Content-Disposition', 'attachment; filename="wg0.json"');
+        setHeader(event, 'Content-Type', 'text/json');
+        return config;
+      }))
+      .put('/api/wireguard/restore', defineEventHandler(async (event) => {
+        const { file } = await readBody(event);
+        await WireGuard.restoreConfiguration(file);
+        return { success: true };
+      }));
 
     // Static assets
     const publicDir = '/app/www';

@@ -1,15 +1,17 @@
 'use strict';
 
-const { release } = require('./package.json');
+const { release: { version } } = require('./package.json');
 
-module.exports.RELEASE = release;
+module.exports.RELEASE = version;
 module.exports.PORT = process.env.PORT || '51821';
 module.exports.WEBUI_HOST = process.env.WEBUI_HOST || '0.0.0.0';
-module.exports.PASSWORD = process.env.PASSWORD;
+module.exports.PASSWORD_HASH = process.env.PASSWORD_HASH;
+module.exports.MAX_AGE = parseInt(process.env.MAX_AGE, 10) * 1000 * 60 || 0;
 module.exports.WG_PATH = process.env.WG_PATH || '/etc/wireguard/';
 module.exports.WG_DEVICE = process.env.WG_DEVICE || 'eth0';
 module.exports.WG_HOST = process.env.WG_HOST;
 module.exports.WG_PORT = process.env.WG_PORT || '51820';
+module.exports.WG_CONFIG_PORT = process.env.WG_CONFIG_PORT || process.env.WG_PORT || '51820';
 module.exports.WG_MTU = process.env.WG_MTU || null;
 module.exports.WG_PERSISTENT_KEEPALIVE = process.env.WG_PERSISTENT_KEEPALIVE || '0';
 module.exports.WG_DEFAULT_ADDRESS = process.env.WG_DEFAULT_ADDRESS || '10.8.0.x';
@@ -36,3 +38,5 @@ iptables -D FORWARD -o wg0 -j ACCEPT;
 module.exports.LANG = process.env.LANG || 'en';
 module.exports.UI_TRAFFIC_STATS = process.env.UI_TRAFFIC_STATS || 'false';
 module.exports.UI_CHART_TYPE = process.env.UI_CHART_TYPE || 0;
+module.exports.UI_SHOW_LINKS = process.env.UI_SHOW_LINKS || 'false';
+module.exports.UI_ENABLE_SORT_CLIENTS = process.env.UI_ENABLE_SORT_CLIENTS || 'false';
