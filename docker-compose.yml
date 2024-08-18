@@ -6,7 +6,7 @@ services:
     environment:
       # Change Language:
       # (Supports: en, ua, ru, tr, no, pl, fr, de, ca, es, ko, vi, nl, is, pt, chs, cht, it, th, hi)
-      - LANG=de
+      - LANG=en
       # ⚠️ Required:
       # Change this to your host's public address
       - WG_HOST=raspberrypi.local
@@ -29,6 +29,7 @@ services:
       # - UI_CHART_TYPE=0 # (0 Charts disabled, 1 # Line chart, 2 # Area chart, 3 # Bar chart)
       # - UI_SHOW_LINKS=true
       # - UI_ENABLE_SORT_CLIENTS=true
+      # - WG_ENABLE_EXPIRES_TIME=true
 
     image: ghcr.io/wg-easy/wg-easy
     container_name: wg-easy
