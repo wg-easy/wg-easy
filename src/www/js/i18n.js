@@ -37,6 +37,8 @@ const messages = { // eslint-disable-line no-unused-vars
     rememberMe: 'Remember me',
     titleRememberMe: 'Stay logged after closing the browser',
     sort: 'Sort',
+    ExpireDate: 'Expire Date',
+    Permanent: 'Permanent',
   },
   ua: {
     name: 'Ім`я',
@@ -108,6 +110,8 @@ const messages = { // eslint-disable-line no-unused-vars
     rememberMe: 'Запомнить меня',
     titleRememberMe: 'Оставаться в системе после закрытия браузера',
     sort: 'Сортировка',
+    ExpireDate: 'Дата истечения срока',
+    Permanent: 'Бессрочно',
   },
   tr: { // Müslüm Barış Korkmazer @babico
     name: 'İsim',

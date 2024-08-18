@@ -71,6 +71,13 @@ class API {
     });
   }
 
+  async getWGEnableExpireTime() {
+    return this.call({
+      method: 'get',
+      path: '/wg-enable-expire-time',
+    });
+  }
+
   async getSession() {
     return this.call({
       method: 'get',
@@ -101,17 +108,20 @@ class API {
       ...client,
       createdAt: new Date(client.createdAt),
       updatedAt: new Date(client.updatedAt),
+      expiredAt: client.expiredAt !== null
+        ? new Date(client.expiredAt)
+        : null,
       latestHandshakeAt: client.latestHandshakeAt !== null
         ? new Date(client.latestHandshakeAt)
         : null,
     })));
   }
 
-  async createClient({ name }) {
+  async createClient({ name, expiredDate }) {
     return this.call({
       method: 'post',
       path: '/wireguard/client',
-      body: { name },
+      body: { name, expiredDate },
     });
   }
 
@@ -149,6 +159,14 @@ class API {
       method: 'put',
       path: `/wireguard/client/${clientId}/address/`,
       body: { address },
+    });
+  }
+
+  async updateClientExpireDate({ clientId, expireDate }) {
+    return this.call({
+      method: 'put',
+      path: `/wireguard/client/${clientId}/expireDate/`,
+      body: { expireDate },
     });
   }
 

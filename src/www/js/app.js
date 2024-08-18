@@ -77,10 +77,13 @@ new Vue({
     clientDelete: null,
     clientCreate: null,
     clientCreateName: '',
+    clientExpiredDate: '',
     clientEditName: null,
     clientEditNameId: null,
     clientEditAddress: null,
     clientEditAddressId: null,
+    clientEditExpireDate: null,
+    clientEditExpireDateId: null,
     qrcode: null,
 
     currentRelease: null,
@@ -92,6 +95,7 @@ new Vue({
     uiShowLinks: false,
     enableSortClient: false,
     sortClient: true, // Sort clients by name, true = asc, false = desc
+    enableExpireTime: false,
 
     uiShowCharts: localStorage.getItem('uiShowCharts') === '1',
     uiTheme: localStorage.theme || 'auto',
@@ -296,9 +300,10 @@ new Vue({
     },
     createClient() {
       const name = this.clientCreateName;
+      const expiredDate = this.clientExpiredDate;
       if (!name) return;
 
-      this.api.createClient({ name })
+      this.api.createClient({ name, expiredDate })
         .catch((err) => alert(err.message || err.toString()))
         .finally(() => this.refresh().catch(console.error));
     },
@@ -324,6 +329,11 @@ new Vue({
     },
     updateClientAddress(client, address) {
       this.api.updateClientAddress({ clientId: client.id, address })
+        .catch((err) => alert(err.message || err.toString()))
+        .finally(() => this.refresh().catch(console.error));
+    },
+    updateClientExpireDate(client, expireDate) {
+      this.api.updateClientExpireDate({ clientId: client.id, expireDate })
         .catch((err) => alert(err.message || err.toString()))
         .finally(() => this.refresh().catch(console.error));
     },
@@ -369,6 +379,15 @@ new Vue({
     bytes,
     timeago: (value) => {
       return timeago.format(value, i18n.locale);
+    },
+    expiredDateFormat: (value) => {
+      if (value === null) return i18n.t('Permanent');
+      const dateTime = new Date(value);
+      const options = { year: 'numeric', month: 'long', day: 'numeric' };
+      return dateTime.toLocaleDateString(i18n.locale, options);
+    },
+    expiredDateEditFormat: (value) => {
+      if (value === null) return 'yyyy-MM-dd';
     },
   },
   mounted() {
@@ -431,6 +450,14 @@ new Vue({
       })
       .catch(() => {
         this.enableSortClient = false;
+      });
+
+    this.api.getWGEnableExpireTime()
+      .then((res) => {
+        this.enableExpireTime = res;
+      })
+      .catch(() => {
+        this.enableExpireTime = false;
       });
 
     Promise.resolve().then(async () => {
