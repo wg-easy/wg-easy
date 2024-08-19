@@ -418,7 +418,7 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
       }
       wireguardSentBytes += `wireguard_sent_bytes{interface="wg0",enabled="${client.enabled}",address="${client.address}",name="${client.name}"} ${Number(client.transferTx)}\n`;
       wireguardReceivedBytes += `wireguard_received_bytes{interface="wg0",enabled="${client.enabled}",address="${client.address}",name="${client.name}"} ${Number(client.transferRx)}\n`;
-      wireguardLatestHandshakeSeconds += `wireguard_latest_handshake_seconds{interface="wg0",enabled="${client.enabled}",address="${client.address}",name="${client.name}"} ${new Date(client.latestHandshakeAt).getTime() / 1000}\n`;
+      wireguardLatestHandshakeSeconds += `wireguard_latest_handshake_seconds{interface="wg0",enabled="${client.enabled}",address="${client.address}",name="${client.name}"} ${(new Date().getTime - new Date(client.latestHandshakeAt).getTime()) / 1000}\n`;
     }
 
     let returnText = '# HELP wg-easy and wireguard metrics\n';
