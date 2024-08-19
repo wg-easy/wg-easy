@@ -7,5 +7,5 @@
     "sudostart": "sudo docker run --env WG_HOST=0.0.0.0 --name wg-easy --cap-add=NET_ADMIN --cap-add=SYS_MODULE --sysctl=\"net.ipv4.conf.all.src_valid_mark=1\" --mount type=bind,source=\"$(pwd)\"/config,target=/etc/wireguard -p 51820:51820/udp -p 51821:51821/tcp wg-easy",
     "start": "docker run --env WG_HOST=0.0.0.0 --name wg-easy --cap-add=NET_ADMIN --cap-add=SYS_MODULE --sysctl=\"net.ipv4.conf.all.src_valid_mark=1\" --mount type=bind,source=\"$(pwd)\"/config,target=/etc/wireguard -p 51820:51820/udp -p 51821:51821/tcp wg-easy"
   },
-  "packageManager": "pnpm@9.7.0"
+  "packageManager": "pnpm@9.7.1"
 }

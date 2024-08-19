@@ -11,44 +11,59 @@ const safeStringRefine = z
 const id = z
   .string()
   .uuid('Client ID must be a valid UUID')
-  .and(safeStringRefine);
+  .pipe(safeStringRefine);
 
 const address = z
   .string({ message: 'Address must be a valid string' })
-  .and(safeStringRefine);
+  .pipe(safeStringRefine);
 
 const name = z
   .string({ message: 'Name must be a valid string' })
   .min(1, 'Name must be at least 1 Character')
-  .and(safeStringRefine);
+  .pipe(safeStringRefine);
 
 const file = z
   .string({ message: 'File must be a valid string' })
-  .and(safeStringRefine);
+  .pipe(safeStringRefine);
 
 const password = z
   .string({ message: 'Password must be a valid string' })
-  .and(safeStringRefine);
+  .pipe(safeStringRefine);
 
-export const clientIdType = z.object({
-  clientId: id,
-});
+export const clientIdType = z.object(
+  {
+    clientId: id,
+  },
+  { message: "This shouldn't happen" }
+);
 
-export const addressType = z.object({
-  address: address,
-});
+export const addressType = z.object(
+  {
+    address: address,
+  },
+  { message: 'Body must be a valid object' }
+);
 
-export const nameType = z.object({
-  name: name,
-});
+export const nameType = z.object(
+  {
+    name: name,
+  },
+  { message: 'Body must be a valid object' }
+);
 
-export const fileType = z.object({
-  file: file,
-});
+export const fileType = z.object(
+  {
+    file: file,
+  },
+  { message: 'Body must be a valid object' }
+);
 
-export const passwordType = z.object({
-  password: password,
-});
+export const passwordType = z.object(
+  {
+    password: password,
+  },
+  { message: 'Body must be a valid object' }
+);
 
 export function validateZod<T>(schema: ZodSchema<T>) {
   return async (data: unknown) => {

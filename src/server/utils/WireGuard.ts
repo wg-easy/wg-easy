@@ -6,14 +6,6 @@ import QRCode from 'qrcode';
 
 const debug = debug_logger('WireGuard');
 
-class ServerError extends Error {
-  statusCode: number;
-  constructor(message: string, statusCode = 500) {
-    super(message);
-    this.statusCode = statusCode;
-  }
-}
-
 type Server = {
   privateKey: string;
   publicKey: string;
@@ -216,7 +208,10 @@ ${
     const config = await this.getConfig();
     const client = config.clients[clientId];
     if (!client) {
-      throw new ServerError(`Client Not Found: ${clientId}`, 404);
+      throw createError({
+        statusCode: 404,
+        statusMessage: `Client Not Found: ${clientId}`,
+      });
     }
 
     return client;
@@ -356,7 +351,10 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
     const client = await this.getClient({ clientId });
 
     if (!isValidIPv4(address)) {
-      throw new ServerError(`Invalid Address: ${address}`, 400);
+      throw createError({
+        statusCode: 400,
+        statusMessage: `Invalid Address: ${address}`,
+      });
     }
 
     client.address = address;
