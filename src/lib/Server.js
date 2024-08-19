@@ -294,6 +294,13 @@ module.exports = class Server {
           return WireGuard.getMetrics();
         }
         return '';
+      }))
+      .get('/metrics/json', defineEventHandler(async (event) => {
+        setHeader(event, 'Content-Type', 'application/json');
+        if (ENABLE_PROMETHEUS_METRICS === 'true') {
+          return WireGuard.getMetricsJSON();
+        }
+        return '';
       }));
 
     const safePathJoin = (base, target) => {

@@ -450,4 +450,25 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
     return returnText;
   }
 
+  async getMetricsJSON() {
+    const clients = await this.getClients();
+    let wireguardPeerCount = 0;
+    let wireguardEnabledPeersCount = 0;
+    let wireguardConnectedPeersCount = 0;
+    for (const client of Object.values(clients)) {
+      wireguardPeerCount++;
+      if (client.enabled === true) {
+        wireguardEnabledPeersCount++;
+      }
+      if (client.endpoint !== null) {
+        wireguardConnectedPeersCount++;
+      }
+    }
+    return {
+      wireguard_configured_peers: Number(wireguardPeerCount),
+      wireguard_enabled_peers: Number(wireguardEnabledPeersCount),
+      wireguard_connected_peers: Number(wireguardConnectedPeersCount),
+    };
+  }
+
 };
