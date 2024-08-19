@@ -36,6 +36,7 @@ const {
   UI_SHOW_LINKS,
   UI_ENABLE_SORT_CLIENTS,
   WG_ENABLE_EXPIRES_TIME,
+  ENABLE_PROMETHEUS_METRICS,
 } = require('../config');
 
 const requiresPassword = !!PASSWORD_HASH;
@@ -286,6 +287,20 @@ module.exports = class Server {
         const { expireDate } = await readBody(event);
         await WireGuard.updateClientExpireDate({ clientId, expireDate });
         return { success: true };
+      }))
+      .get('/metrics', defineEventHandler(async (event) => {
+        setHeader(event, 'Content-Type', 'text/plain');
+        if (ENABLE_PROMETHEUS_METRICS === 'true') {
+          return WireGuard.getMetrics();
+        }
+        return '';
+      }))
+      .get('/metrics/json', defineEventHandler(async (event) => {
+        setHeader(event, 'Content-Type', 'application/json');
+        if (ENABLE_PROMETHEUS_METRICS === 'true') {
+          return WireGuard.getMetricsJSON();
+        }
+        return '';
       }));
 
     const safePathJoin = (base, target) => {
