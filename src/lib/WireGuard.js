@@ -158,6 +158,7 @@ ${client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
       latestHandshakeAt: null,
       transferRx: null,
       transferTx: null,
+      endpoint: null,
     }));
 
     // Loop WireGuard status
@@ -186,6 +187,7 @@ ${client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
         client.latestHandshakeAt = latestHandshakeAt === '0'
           ? null
           : new Date(Number(`${latestHandshakeAt}000`));
+        client.endpoint = endpoint === '(none)' ? null : endpoint;
         client.transferRx = Number(transferRx);
         client.transferTx = Number(transferTx);
         client.persistentKeepalive = persistentKeepalive;
@@ -411,7 +413,7 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
       if (client.enabled === true) {
         wireguardEnabledPeersCount++;
       }
-      if (client.endpoint) {
+      if (client.endpoint !== null) {
         wireguardConnectedPeersCount++;
       }
       wireguardSentBytes += `wireguard_sent_bytes{interface="wg0",enabled="${client.enabled}",address="${client.address}",name="${client.name}"} ${Number(client.transferTx)}\n`;
