@@ -312,6 +312,11 @@ new Vue({
         .catch((err) => alert(err.message || err.toString()))
         .finally(() => this.refresh().catch(console.error));
     },
+    showOneTimeLink(client) {
+      this.api.showOneTimeLink({ clientId: client.id })
+        .catch((err) => alert(err.message || err.toString()))
+        .finally(() => this.refresh().catch(console.error));
+    },
     enableClient(client) {
       this.api.enableClient({ clientId: client.id })
         .catch((err) => alert(err.message || err.toString()))

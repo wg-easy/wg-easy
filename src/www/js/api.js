@@ -132,6 +132,13 @@ class API {
     });
   }
 
+  async showOneTimeLink({ clientId }) {
+    return this.call({
+      method: 'post',
+      path: `/wireguard/client/${clientId}/generateOneTimeLink`,
+    });
+  }
+
   async enableClient({ clientId }) {
     return this.call({
       method: 'post',
