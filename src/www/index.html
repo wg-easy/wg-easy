@@ -256,8 +256,8 @@
                           {{!uiTrafficStats ? " · " : ""}}{{new Date(client.latestHandshakeAt) | timeago}}
                         </span>
                       </div>
-                      <div v-if="uiShowLinks" :ref="'client-' + client.id + '-hash'" class="text-gray-400 text-xs">
-                        <a :href="'./' + client.hash + ''">{{document.location.protocol}}//{{document.location.host}}/{{client.hash}}</a>
+                      <div v-if="uiShowLinks && client.oneTimeLink !== null && client.oneTimeLink !== ''" :ref="'client-' + client.id + '-link'" class="text-gray-400 text-xs">
+                        <a :href="'./cnf/' + client.oneTimeLink + ''">{{document.location.protocol}}//{{document.location.host}}/cnf/{{client.oneTimeLink}}</a>
                       </div>
                       <!-- Expire Date -->
                       <div v-show="enableExpireTime" class=" block md:inline-block pb-1 md:pb-0 text-gray-500 dark:text-neutral-400 text-xs">
@@ -383,6 +383,22 @@
                           d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                       </svg>
                     </a>
+
+                    <!-- Short OneTime Link -->
+                    <button v-if="uiShowLinks" :disabled="!client.downloadableConfig"
+                      class="align-middle inline-block bg-gray-100 dark:bg-neutral-600 dark:text-neutral-300 p-2 rounded transition"
+                      :class="{
+                        'hover:bg-red-800 dark:hover:bg-red-800 hover:text-white dark:hover:text-white': client.downloadableConfig,
+                        'is-disabled': !client.downloadableConfig
+                      }"
+                      :title="!client.downloadableConfig ? $t('noPrivKey') : $t('OneTimeLink')"
+                      @click="if(client.downloadableConfig) { showOneTimeLink(client); }">
+                      <svg class="w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M13.213 9.787a3.391 3.391 0 0 0-4.795 0l-3.425 3.426a3.39 3.39 0 0 0 4.795 4.794l.321-.304m-.321-4.49a3.39 3.39 0 0 0 4.795 0l3.424-3.426a3.39 3.39 0 0 0-4.794-4.795l-1.028.961"/>
+                      </svg>
+                    </button>
 
                     <!-- Delete -->
 
