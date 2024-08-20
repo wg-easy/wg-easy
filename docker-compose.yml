@@ -30,7 +30,6 @@ services:
       # - UI_SHOW_LINKS=true
       # - UI_ENABLE_SORT_CLIENTS=true
       # - WG_ENABLE_EXPIRES_TIME=true
-      # - ENABLE_PROMETHEUS_METRICS=false
 
     image: ghcr.io/wg-easy/wg-easy
     container_name: wg-easy

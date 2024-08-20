@@ -41,4 +41,3 @@ module.exports.UI_CHART_TYPE = process.env.UI_CHART_TYPE || 0;
 module.exports.UI_SHOW_LINKS = process.env.UI_SHOW_LINKS || 'false';
 module.exports.UI_ENABLE_SORT_CLIENTS = process.env.UI_ENABLE_SORT_CLIENTS || 'false';
 module.exports.WG_ENABLE_EXPIRES_TIME = process.env.WG_ENABLE_EXPIRES_TIME || 'false';
-module.exports.ENABLE_PROMETHEUS_METRICS = process.env.ENABLE_PROMETHEUS_METRICS || 'true';
