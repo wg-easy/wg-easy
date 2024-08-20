@@ -26,6 +26,7 @@ You have found the easiest way to install & manage WireGuard on any Linux host!
 * UI_TRAFFIC_STATS (default off)
 * UI_SHOW_LINKS (default off)
 * WG_ENABLE_EXPIRES_TIME (default off)
+* Prometheus metrics support
 
 ## Requirements
 
@@ -87,6 +88,8 @@ To automatically install & run wg-easy, simply run:
 
 The Web UI will now be available on `http://0.0.0.0:51821`.
 
+The Prometheus metrics will now be available on `http://0.0.0.0:51821/metrics`. Grafana dashboard [21733](https://grafana.com/grafana/dashboards/21733-wireguard/)
+
 > 💡 Your configuration files will be saved in `~/.wg-easy`
 
 WireGuard Easy can be launched with Docker Compose as well - just download
@@ -126,6 +129,7 @@ These options can be configured by setting environment variables using `-e KEY="
 | `UI_SHOW_LINKS` | `false` | `true` | Enable display of a short download link in Web UI |
 | `MAX_AGE` | `0` | `1440` | The maximum age of Web UI sessions in minutes. `0` means that the session will exist until the browser is closed. |
 | `UI_ENABLE_SORT_CLIENTS` | `false` | `true`                         | Enable UI sort clients by name   |
+| `ENABLE_PROMETHEUS_METRICS` | `true` | `true`                       | Enable Prometheus metrics `http://0.0.0.0:51821/metrics` and `http://0.0.0.0:51821/metrics/json`|
 
 
 > If you change `WG_PORT`, make sure to also change the exposed port.
