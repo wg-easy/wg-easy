@@ -152,7 +152,7 @@ ${client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
         ? new Date(client.expiredAt)
         : null,
       allowedIPs: client.allowedIPs,
-      hash: Math.abs(CRC32.str(clientId)).toString(16),
+      oneTimeLink: client.oneTimeLink ? client.oneTimeLink : null,
       downloadableConfig: 'privateKey' in client,
       persistentKeepalive: null,
       latestHandshakeAt: null,
@@ -305,6 +305,21 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
     client.enabled = true;
     client.updatedAt = new Date();
 
+    await this.saveConfig();
+  }
+
+  async generateOneTimeLink({ clientId }) {
+    const client = await this.getClient({ clientId });
+    const key = `${clientId}-${Math.floor(Math.random() * 1000)}`;
+    client.oneTimeLink = Math.abs(CRC32.str(key)).toString(16);
+    client.updatedAt = new Date();
+    await this.saveConfig();
+  }
+
+  async eraseOneTimeLink({ clientId }) {
+    const client = await this.getClient({ clientId });
+    client.oneTimeLink = null;
+    client.updatedAt = new Date();
     await this.saveConfig();
   }
 
