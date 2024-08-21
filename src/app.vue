@@ -7,6 +7,10 @@
 </template>
 
 <script setup lang="ts">
+const globalStore = useGlobalStore();
+globalStore.fetchTrafficStats();
+globalStore.fetchChartType();
+globalStore.fetchRelease();
 useHead({
   bodyAttrs: {
     class: 'bg-gray-50 dark:bg-neutral-800',

@@ -50,10 +50,6 @@ const clientsStore = useClientsStore();
 
 const intervalId = ref<NodeJS.Timeout | null>(null);
 
-globalStore.fetchTrafficStats();
-globalStore.fetchChartType();
-globalStore.fetchRelease();
-
 onMounted(() => {
   // TODO?: replace with websocket or similar
   intervalId.value = setInterval(() => {
