@@ -24,7 +24,7 @@ You have found the easiest way to install & manage WireGuard on any Linux host!
 * Automatic Light / Dark Mode
 * Multilanguage Support
 * UI_TRAFFIC_STATS (default off)
-* UI_SHOW_LINKS (default off)
+* WG_ENABLE_ONE_TIME_LINKS (default off)
 * WG_ENABLE_EXPIRES_TIME (default off)
 * Prometheus metrics support
 
@@ -126,7 +126,7 @@ These options can be configured by setting environment variables using `-e KEY="
 | `LANG` | `en` | `de` | Web UI language (Supports: en, ua, ru, tr, no, pl, fr, de, ca, es, ko, vi, nl, is, pt, chs, cht, it, th, hi).                                        |
 | `UI_TRAFFIC_STATS` | `false` | `true` | Enable detailed RX / TX client stats in Web UI |
 | `UI_CHART_TYPE` | `0` | `1` | UI_CHART_TYPE=0 # Charts disabled, UI_CHART_TYPE=1 # Line chart, UI_CHART_TYPE=2 # Area chart, UI_CHART_TYPE=3 # Bar chart |
-| `UI_SHOW_LINKS` | `false` | `true` | Enable display of a short download link in Web UI |
+| `WG_ENABLE_ONE_TIME_LINKS` | `false` | `true` | Enable display and generation of short one time download links (expire after 5 minutes) |
 | `MAX_AGE` | `0` | `1440` | The maximum age of Web UI sessions in minutes. `0` means that the session will exist until the browser is closed. |
 | `UI_ENABLE_SORT_CLIENTS` | `false` | `true`                         | Enable UI sort clients by name   |
 | `ENABLE_PROMETHEUS_METRICS` | `true` | `true`                       | Enable Prometheus metrics `http://0.0.0.0:51821/metrics` and `http://0.0.0.0:51821/metrics/json`|

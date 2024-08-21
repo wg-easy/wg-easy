@@ -3,7 +3,7 @@ name: 🛠️ Feature Request
 description: Suggest an idea to help us improve
 title: "[Feat]: "
 labels:
-  - "enhancement"
+  - "type: feature request"
 
 body:
   - type: markdown

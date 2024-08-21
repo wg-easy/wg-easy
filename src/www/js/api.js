@@ -64,10 +64,10 @@ class API {
     });
   }
 
-  async getUIShowLinks() {
+  async getWGEnableOneTimeLinks() {
     return this.call({
       method: 'get',
-      path: '/ui-show-links',
+      path: '/wg-enable-one-time-links',
     });
   }
 
@@ -129,6 +129,13 @@ class API {
     return this.call({
       method: 'delete',
       path: `/wireguard/client/${clientId}`,
+    });
+  }
+
+  async showOneTimeLink({ clientId }) {
+    return this.call({
+      method: 'post',
+      path: `/wireguard/client/${clientId}/generateOneTimeLink`,
     });
   }
 
