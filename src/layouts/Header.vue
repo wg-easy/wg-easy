@@ -36,7 +36,7 @@
         </button>
         <!-- Show / hide charts -->
         <label
-          v-if="uiChartType > 0"
+          v-if="globalStore.uiChartType > 0"
           class="inline-flex items-center justify-center cursor-pointer w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 dark:bg-neutral-700 dark:hover:bg-neutral-600 whitespace-nowrap transition group"
           :title="$t('toggleCharts')"
         >
@@ -52,7 +52,7 @@
           />
         </label>
         <span
-          v-if="authStore.requiresPassword && authStore.authenticated"
+          v-if="authStore.requiresPassword && !isLoginPage"
           class="text-sm text-gray-400 dark:text-neutral-400 cursor-pointer hover:underline"
           @click="logout"
         >
@@ -87,6 +87,7 @@
 
 <script setup lang="ts">
 const authStore = useAuthStore();
+const globalStore = useGlobalStore();
 const route = useRoute();
 
 const isLoginPage = computed(() => route.path == '/login');
@@ -96,7 +97,7 @@ const latestRelease = ref<null | { version: number; changelog: string }>(null);
 
 const theme = useTheme();
 
-const uiChartType = ref(0);
+globalStore.fetchChartType();
 const uiShowCharts = ref(getItem('uiShowCharts') === '1');
 
 function toggleTheme() {

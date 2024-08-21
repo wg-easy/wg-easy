@@ -50,7 +50,7 @@ const clientsStore = useClientsStore();
 
 const intervalId = ref<NodeJS.Timeout | null>(null);
 
-globalStore.fetchUITrafficStats();
+globalStore.fetchTrafficStats();
 globalStore.fetchChartType();
 globalStore.fetchRelease();
 

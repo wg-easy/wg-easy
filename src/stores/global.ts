@@ -37,7 +37,7 @@ export const useGlobalStore = defineStore('Global', () => {
     uiChartType.value = chartType.value ?? 0;
   }
 
-  async function fetchUITrafficStats() {
+  async function fetchTrafficStats() {
     const { data: trafficStats } = await api.getTrafficStats();
     uiTrafficStats.value = trafficStats.value ?? false;
   }
@@ -53,6 +53,6 @@ export const useGlobalStore = defineStore('Global', () => {
     updateCharts,
     fetchRelease,
     fetchChartType,
-    fetchUITrafficStats,
+    fetchTrafficStats,
   };
 });
