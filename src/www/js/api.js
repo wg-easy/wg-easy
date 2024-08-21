@@ -64,10 +64,10 @@ class API {
     });
   }
 
-  async getUIShowLinks() {
+  async getWGEnableOneTimeLinks() {
     return this.call({
       method: 'get',
-      path: '/ui-show-links',
+      path: '/wg-enable-one-time-links',
     });
   }
 

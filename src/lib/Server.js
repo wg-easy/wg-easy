@@ -33,7 +33,7 @@ const {
   LANG,
   UI_TRAFFIC_STATS,
   UI_CHART_TYPE,
-  UI_SHOW_LINKS,
+  WG_ENABLE_ONE_TIME_LINKS,
   UI_ENABLE_SORT_CLIENTS,
   WG_ENABLE_EXPIRES_TIME,
 } = require('../config');
@@ -106,9 +106,9 @@ module.exports = class Server {
         return `"${UI_CHART_TYPE}"`;
       }))
 
-      .get('/api/ui-show-links', defineEventHandler((event) => {
+      .get('/api/wg-enable-one-time-links', defineEventHandler((event) => {
         setHeader(event, 'Content-Type', 'application/json');
-        return `${UI_SHOW_LINKS}`;
+        return `${WG_ENABLE_ONE_TIME_LINKS}`;
       }))
 
       .get('/api/ui-sort-clients', defineEventHandler((event) => {
@@ -133,6 +133,12 @@ module.exports = class Server {
         };
       }))
       .get('/cnf/:clientOneTimeLink', defineEventHandler(async (event) => {
+        if (WG_ENABLE_ONE_TIME_LINKS === 'false') {
+          throw createError({
+            status: 404,
+            message: 'Invalid state',
+          });
+        }
         const clientOneTimeLink = getRouterParam(event, 'clientOneTimeLink');
         const clients = await WireGuard.getClients();
         const client = clients.find((client) => client.oneTimeLink === clientOneTimeLink);
@@ -254,6 +260,12 @@ module.exports = class Server {
         return { success: true };
       }))
       .post('/api/wireguard/client/:clientId/generateOneTimeLink', defineEventHandler(async (event) => {
+        if (WG_ENABLE_ONE_TIME_LINKS === 'false') {
+          throw createError({
+            status: 404,
+            message: 'Invalid state',
+          });
+        }
         const clientId = getRouterParam(event, 'clientId');
         if (clientId === '__proto__' || clientId === 'constructor' || clientId === 'prototype') {
           throw createError({ status: 403 });

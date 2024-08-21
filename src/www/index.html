@@ -256,7 +256,7 @@
                           {{!uiTrafficStats ? " · " : ""}}{{new Date(client.latestHandshakeAt) | timeago}}
                         </span>
                       </div>
-                      <div v-if="uiShowLinks && client.oneTimeLink !== null && client.oneTimeLink !== ''" :ref="'client-' + client.id + '-link'" class="text-gray-400 text-xs">
+                      <div v-if="enableOneTimeLinks && client.oneTimeLink !== null && client.oneTimeLink !== ''" :ref="'client-' + client.id + '-link'" class="text-gray-400 text-xs">
                         <a :href="'./cnf/' + client.oneTimeLink + ''">{{document.location.protocol}}//{{document.location.host}}/cnf/{{client.oneTimeLink}}</a>
                       </div>
                       <!-- Expire Date -->
@@ -385,7 +385,7 @@
                     </a>
 
                     <!-- Short OneTime Link -->
-                    <button v-if="uiShowLinks" :disabled="!client.downloadableConfig"
+                    <button v-if="enableOneTimeLinks" :disabled="!client.downloadableConfig"
                       class="align-middle inline-block bg-gray-100 dark:bg-neutral-600 dark:text-neutral-300 p-2 rounded transition"
                       :class="{
                         'hover:bg-red-800 dark:hover:bg-red-800 hover:text-white dark:hover:text-white': client.downloadableConfig,
