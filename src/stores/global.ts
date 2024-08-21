@@ -12,40 +12,34 @@ export const useGlobalStore = defineStore('Global', () => {
   const { availableLocales, locale } = useI18n();
 
   async function fetchRelease() {
-    const lang = await api.getLang();
-    if (lang !== getItem('lang') && availableLocales.includes(lang)) {
-      setItem('lang', lang);
-      locale.value = lang;
+    const { data: lang } = await api.getLang();
+    if (
+      lang.value !== getItem('lang') &&
+      availableLocales.includes(lang.value!)
+    ) {
+      setItem('lang', lang.value!);
+      locale.value = lang.value!;
     }
 
-    const release = await api.getRelease();
+    // this is still called on client. why?
+    const { data: release } = await api.getRelease();
 
-    if (release.currentRelease >= release.latestRelease.version) return;
+    if (release.value!.currentRelease >= release.value!.latestRelease.version) {
+      return;
+    }
 
-    currentRelease.value = release.currentRelease;
-    latestRelease.value = release.latestRelease;
+    currentRelease.value = release.value!.currentRelease;
+    latestRelease.value = release.value!.latestRelease;
   }
 
   async function fetchChartType() {
-    api
-      .getChartType()
-      .then((res) => {
-        uiChartType.value = res;
-      })
-      .catch(() => {
-        uiChartType.value = 0;
-      });
+    const { data: chartType } = await api.getChartType();
+    uiChartType.value = chartType.value ?? 0;
   }
 
   async function fetchUITrafficStats() {
-    api
-      .getUITrafficStats()
-      .then((res) => {
-        uiTrafficStats.value = res;
-      })
-      .catch(() => {
-        uiTrafficStats.value = false;
-      });
+    const { data: trafficStats } = await api.getTrafficStats();
+    uiTrafficStats.value = trafficStats.value ?? false;
   }
 
   const updateCharts = computed(() => {

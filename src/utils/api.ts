@@ -1,24 +1,24 @@
 class API {
   async getRelease() {
-    return $fetch('/api/release', {
+    return useFetch('/api/release', {
       method: 'get',
     });
   }
 
   async getLang() {
-    return $fetch('/api/lang', {
+    return useFetch('/api/lang', {
       method: 'get',
     });
   }
 
-  async getUITrafficStats() {
-    return $fetch('/api/ui-traffic-stats', {
+  async getTrafficStats() {
+    return useFetch('/api/ui-traffic-stats', {
       method: 'get',
     });
   }
 
   async getChartType() {
-    return $fetch('/api/ui-chart-type', {
+    return useFetch('/api/ui-chart-type', {
       method: 'get',
     });
   }
