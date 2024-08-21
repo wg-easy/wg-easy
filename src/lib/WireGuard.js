@@ -25,6 +25,7 @@ const {
   WG_PRE_DOWN,
   WG_POST_DOWN,
   WG_ENABLE_EXPIRES_TIME,
+  WG_ENABLE_ONE_TIME_LINKS,
 } = require('../config');
 
 module.exports = class WireGuard {
@@ -152,7 +153,8 @@ ${client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
         ? new Date(client.expiredAt)
         : null,
       allowedIPs: client.allowedIPs,
-      oneTimeLink: client.oneTimeLink ? client.oneTimeLink : null,
+      oneTimeLink: client.oneTimeLink ?? null,
+      oneTimeLinkExpiresAt: client.oneTimeLinkExpiresAt ?? null,
       downloadableConfig: 'privateKey' in client,
       persistentKeepalive: null,
       latestHandshakeAt: null,
@@ -312,6 +314,7 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
     const client = await this.getClient({ clientId });
     const key = `${clientId}-${Math.floor(Math.random() * 1000)}`;
     client.oneTimeLink = Math.abs(CRC32.str(key)).toString(16);
+    client.oneTimeLinkExpiresAt = new Date(Date.now() + 5 * 60 * 1000);
     client.updatedAt = new Date();
     await this.saveConfig();
   }
@@ -319,6 +322,7 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
   async eraseOneTimeLink({ clientId }) {
     const client = await this.getClient({ clientId });
     client.oneTimeLink = null;
+    client.oneTimeLinkExpiresAt = null;
     client.updatedAt = new Date();
     await this.saveConfig();
   }
@@ -398,8 +402,9 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
 
   async cronJobEveryMinute() {
     const config = await this.getConfig();
+    let needSaveConfig = false;
+    // Expires Feature
     if (WG_ENABLE_EXPIRES_TIME === 'true') {
-      let needSaveConfig = false;
       for (const client of Object.values(config.clients)) {
         if (client.enabled !== true) continue;
         if (client.expiredAt !== null && new Date() > new Date(client.expiredAt)) {
@@ -409,9 +414,21 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
           client.updatedAt = new Date();
         }
       }
-      if (needSaveConfig) {
-        await this.saveConfig();
+    }
+    // One Time Link Feature
+    if (WG_ENABLE_ONE_TIME_LINKS === 'true') {
+      for (const client of Object.values(config.clients)) {
+        if (client.oneTimeLink !== null && new Date() > new Date(client.oneTimeLinkExpiresAt)) {
+          debug(`Client ${client.id} One Time Link expired.`);
+          needSaveConfig = true;
+          client.oneTimeLink = null;
+          client.oneTimeLinkExpiresAt = null;
+          client.updatedAt = new Date();
+        }
       }
+    }
+    if (needSaveConfig) {
+      await this.saveConfig();
     }
   }
 

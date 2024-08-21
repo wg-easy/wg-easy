@@ -92,7 +92,7 @@ new Vue({
     uiTrafficStats: false,
 
     uiChartType: 0,
-    uiShowLinks: false,
+    enableOneTimeLinks: false,
     enableSortClient: false,
     sortClient: true, // Sort clients by name, true = asc, false = desc
     enableExpireTime: false,
@@ -441,12 +441,12 @@ new Vue({
         this.uiChartType = 0;
       });
 
-    this.api.getUIShowLinks()
+    this.api.getWGEnableOneTimeLinks()
       .then((res) => {
-        this.uiShowLinks = res;
+        this.enableOneTimeLinks = res;
       })
       .catch(() => {
-        this.uiShowLinks = false;
+        this.enableOneTimeLinks = false;
       });
 
     this.api.getUiSortClients()
