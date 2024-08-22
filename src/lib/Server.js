@@ -37,7 +37,6 @@ const {
   UI_ENABLE_SORT_CLIENTS,
   WG_ENABLE_EXPIRES_TIME,
   ENABLE_PROMETHEUS_METRICS,
-  PROMETHEUS_METRICS_PORT,
 } = require('../config');
 
 const requiresPassword = !!PASSWORD_HASH;
@@ -309,6 +308,20 @@ module.exports = class Server {
         const { expireDate } = await readBody(event);
         await WireGuard.updateClientExpireDate({ clientId, expireDate });
         return { success: true };
+      }))
+      .get('/metrics', defineEventHandler(async (event) => {
+        setHeader(event, 'Content-Type', 'text/plain');
+        if (ENABLE_PROMETHEUS_METRICS === 'true') {
+          return WireGuard.getMetrics();
+        }
+        return '';
+      }))
+      .get('/metrics/json', defineEventHandler(async (event) => {
+        setHeader(event, 'Content-Type', 'application/json');
+        if (ENABLE_PROMETHEUS_METRICS === 'true') {
+          return WireGuard.getMetricsJSON();
+        }
+        return '';
       }));
 
     const safePathJoin = (base, target) => {
@@ -384,35 +397,6 @@ module.exports = class Server {
 
     createServer(toNodeListener(app)).listen(PORT, WEBUI_HOST);
     debug(`Listening on http://${WEBUI_HOST}:${PORT}`);
-
-    if (ENABLE_PROMETHEUS_METRICS === 'true') {
-      const appMetrics = createApp();
-      this.app_metrics = appMetrics;
-      appMetrics.use(fromNodeMiddleware(expressSession({
-        secret: crypto.randomBytes(256).toString('hex'),
-        resave: true,
-        saveUninitialized: true,
-      })));
-      const metricsRouter = createRouter();
-      appMetrics.use(metricsRouter);
-      metricsRouter
-        .get('/metrics', defineEventHandler(async (event) => {
-          setHeader(event, 'Content-Type', 'text/plain');
-          if (ENABLE_PROMETHEUS_METRICS === 'true') {
-            return WireGuard.getMetrics();
-          }
-          return '';
-        }))
-        .get('/metrics/json', defineEventHandler(async (event) => {
-          setHeader(event, 'Content-Type', 'application/json');
-          if (ENABLE_PROMETHEUS_METRICS === 'true') {
-            return WireGuard.getMetricsJSON();
-          }
-          return '';
-        }));
-      createServer(toNodeListener(appMetrics)).listen(PROMETHEUS_METRICS_PORT, WEBUI_HOST);
-      debug(`Prometheus metrics on http://${WEBUI_HOST}:${PROMETHEUS_METRICS_PORT}/metrics`);
-    }
 
     cronJobEveryMinute();
   }
