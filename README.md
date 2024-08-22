@@ -88,7 +88,7 @@ To automatically install & run wg-easy, simply run:
 
 The Web UI will now be available on `http://0.0.0.0:51821`.
 
-The Prometheus metrics will now be available on `http://0.0.0.0:9586/metrics`. Grafana dashboard [21733](https://grafana.com/grafana/dashboards/21733-wireguard/)
+The Prometheus metrics will now be available on `http://0.0.0.0:51821/metrics`. Grafana dashboard [21733](https://grafana.com/grafana/dashboards/21733-wireguard/)
 
 > 💡 Your configuration files will be saved in `~/.wg-easy`
 
@@ -129,7 +129,7 @@ These options can be configured by setting environment variables using `-e KEY="
 | `WG_ENABLE_ONE_TIME_LINKS` | `false` | `true` | Enable display and generation of short one time download links (expire after 5 minutes) |
 | `MAX_AGE` | `0` | `1440` | The maximum age of Web UI sessions in minutes. `0` means that the session will exist until the browser is closed. |
 | `UI_ENABLE_SORT_CLIENTS` | `false` | `true`                         | Enable UI sort clients by name   |
-| `ENABLE_PROMETHEUS_METRICS` | `true` | `true`                       | Enable Prometheus metrics `http://0.0.0.0:9586/metrics` and `http://0.0.0.0:9586/metrics/json`|
+| `ENABLE_PROMETHEUS_METRICS` | `true` | `true`                       | Enable Prometheus metrics `http://0.0.0.0:51821/metrics` and `http://0.0.0.0:51821/metrics/json`|
 | `PROMETHEUS_METRICS_PORT` | `9586` | `9100` | TCP port for Prometheus metrics |
 
 > If you change `WG_PORT`, make sure to also change the exposed port.
