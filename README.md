@@ -130,7 +130,7 @@ These options can be configured by setting environment variables using `-e KEY="
 | `MAX_AGE` | `0` | `1440` | The maximum age of Web UI sessions in minutes. `0` means that the session will exist until the browser is closed. |
 | `UI_ENABLE_SORT_CLIENTS` | `false` | `true`                         | Enable UI sort clients by name   |
 | `ENABLE_PROMETHEUS_METRICS` | `true` | `true`                       | Enable Prometheus metrics `http://0.0.0.0:51821/metrics` and `http://0.0.0.0:51821/metrics/json`|
-
+| `PROMETHEUS_METRICS_PORT` | `9586` | `9100` | TCP port for Prometheus metrics |
 
 > If you change `WG_PORT`, make sure to also change the exposed port.
 
