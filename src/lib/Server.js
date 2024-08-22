@@ -351,7 +351,7 @@ module.exports = class Server {
           return { error: 'Not Logged In' };
         }
 
-        if (req.url.startsWith('/metrics') && user.pass) {
+        if (user.pass) {
           if (isPasswordValid(user.pass, PROMETHEUS_METRICS_PASSWORD)) {
             return next();
           }
