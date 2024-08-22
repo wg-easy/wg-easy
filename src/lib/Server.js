@@ -388,11 +388,6 @@ module.exports = class Server {
     if (ENABLE_PROMETHEUS_METRICS === 'true') {
       const appMetrics = createApp();
       this.app_metrics = appMetrics;
-      appMetrics.use(fromNodeMiddleware(expressSession({
-        secret: crypto.randomBytes(256).toString('hex'),
-        resave: true,
-        saveUninitialized: true,
-      })));
       const metricsRouter = createRouter();
       appMetrics.use(metricsRouter);
       metricsRouter
