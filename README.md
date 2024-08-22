@@ -129,7 +129,7 @@ These options can be configured by setting environment variables using `-e KEY="
 | `WG_ENABLE_ONE_TIME_LINKS` | `false` | `true` | Enable display and generation of short one time download links (expire after 5 minutes) |
 | `MAX_AGE` | `0` | `1440` | The maximum age of Web UI sessions in minutes. `0` means that the session will exist until the browser is closed. |
 | `UI_ENABLE_SORT_CLIENTS` | `false` | `true`                         | Enable UI sort clients by name   |
-| `ENABLE_PROMETHEUS_METRICS` | `true` | `true`                       | Enable Prometheus metrics `http://0.0.0.0:51821/metrics` and `http://0.0.0.0:51821/metrics/json`|
+| `ENABLE_PROMETHEUS_METRICS` | `false` | `true`                       | Enable Prometheus metrics `http://0.0.0.0:51821/metrics` and `http://0.0.0.0:51821/metrics/json`|
 | `PROMETHEUS_METRICS_PASSWORD` | - | `$2y$05$Ci...` | If set, Basic Auth is required when requesting metrics. See [How to generate an bcrypt hash.md]("https://github.com/wg-easy/wg-easy/blob/master/How_to_generate_an_bcrypt_hash.md") for know how generate the hash. |
 
 > If you change `WG_PORT`, make sure to also change the exposed port.
