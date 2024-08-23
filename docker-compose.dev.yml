@@ -1,10 +1,12 @@
 services:
   wg-easy:
     build:
-      dockerfile: ./Dockerfile
-    command: npm run serve
+      dockerfile: ./Dockerfile.dev
+    command: pnpm run dev
     volumes:
       - ./src/:/app/
+      - temp:/app/.nuxt/
+      - temp1:/app/node_modules/
       # - ./data/:/etc/wireguard
     ports:
       - "51820:51820/udp"
@@ -13,5 +15,12 @@ services:
       - NET_ADMIN
       - SYS_MODULE
     environment:
-      # - PASSWORD=p
+      - PASSWORD_HASH=$$2y$$10$$Vhi2tF1i2c/ReW3LdLOru.z7LDITqBgb2wrSVw6sa.KEtbpYgSAf2 # foobar123
       - WG_HOST=192.168.1.233
+
+# folders should be generated inside container
+volumes:
+  temp:
+    driver: local
+  temp1:
+    driver: local
