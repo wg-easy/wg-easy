@@ -1,0 +1,13 @@
+{
+  "recommendations": [
+    "aaron-bond.better-comments",
+    "dbaeumer.vscode-eslint",
+    "antfu.goto-alias",
+    "visualstudioexptteam.vscodeintellicode",
+    "Nuxtr.nuxtr-vscode",
+    "esbenp.prettier-vscode",
+    "yoavbls.pretty-ts-errors",
+    "bradlc.vscode-tailwindcss",
+    "vue.volar"
+  ]
+}
