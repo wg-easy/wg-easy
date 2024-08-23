@@ -1,5 +1,6 @@
-# nodejs 20 hangs on build with armv6/armv7 (https://github.com/nodejs/docker-node/issues/2077)
-FROM docker.io/library/node:18-alpine AS build
+# As a workaround we have to build on nodejs 18
+# nodejs 20 hangs on build with armv6/armv7
+FROM docker.io/library/node:20-alpine
 WORKDIR /app
 
 # Install pnpm
@@ -9,22 +10,7 @@ RUN corepack enable pnpm
 COPY src ./
 RUN pnpm install
 
-# Build UI
-RUN pnpm build
-
-# Copy build result to a new image.
-# This saves a lot of disk space.
-FROM docker.io/library/node:lts-alpine
-WORKDIR /app
-
 HEALTHCHECK CMD /usr/bin/timeout 5s /bin/sh -c "/usr/bin/wg show | /bin/grep -q interface || exit 1" --interval=1m --timeout=5s --retries=3
-
-# Copy build
-COPY --from=build /app/.output /app
-
-# Copy the needed wg-password scripts
-COPY --from=build /app/wgpw.sh /bin/wgpw
-RUN chmod +x /bin/wgpw
 
 # Install Linux packages
 RUN apk add --no-cache \
@@ -40,6 +26,3 @@ RUN update-alternatives --install /sbin/iptables iptables /sbin/iptables-legacy 
 # Set Environment
 ENV DEBUG=Server,WireGuard
 ENV PORT=51821
-
-# Run Web UI
-CMD ["/usr/bin/dumb-init", "node", "server/index.mjs"]
