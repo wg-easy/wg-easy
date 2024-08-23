@@ -9,7 +9,8 @@ export const useGlobalStore = defineStore('Global', () => {
   );
   const uiTrafficStats = ref(false);
   const rememberMeEnabled = ref(false);
-
+  const enableExpireTime = ref(false);
+  const enableOneTimeLinks = ref(false);
   const enableSortClient = ref(false);
   const sortClient = ref(true); // Sort clients by name, true = asc, false = desc
 
@@ -46,6 +47,26 @@ export const useGlobalStore = defineStore('Global', () => {
     uiTrafficStats.value = trafficStats.value ?? false;
   }
 
+  async function fetchOneTimeLinks() {
+    const { data: oneTimeLinks } = await api.getEnableOneTimeLinks();
+    enableOneTimeLinks.value = oneTimeLinks.value ?? false;
+  }
+
+  async function fetchSortClients() {
+    const { data: sortClients } = await api.getSortClients();
+    enableSortClient.value = sortClients.value ?? false;
+  }
+
+  async function fetchExpireTime() {
+    const { data: expireTime } = await api.getEnableExpireTime();
+    enableExpireTime.value = expireTime.value ?? false;
+  }
+
+  async function fetchRememberMe() {
+    const { data: rememberMe } = await api.getRememberMeEnabled();
+    rememberMeEnabled.value = rememberMe.value ?? false;
+  }
+
   const updateCharts = computed(() => {
     return uiChartType.value > 0 && uiShowCharts.value;
   });
@@ -58,8 +79,14 @@ export const useGlobalStore = defineStore('Global', () => {
     rememberMeEnabled,
     enableSortClient,
     sortClient,
+    enableExpireTime,
+    enableOneTimeLinks,
     fetchRelease,
     fetchChartType,
     fetchTrafficStats,
+    fetchOneTimeLinks,
+    fetchSortClients,
+    fetchExpireTime,
+    fetchRememberMe,
   };
 });

@@ -1,11 +1,11 @@
 <template>
   <button
-    v-if="enableSortClient"
-    @click="sortClient = !sortClient"
+    v-if="globalStore.enableSortClient"
     class="hover:bg-red-800 hover:border-red-800 hover:text-white text-gray-700 dark:text-neutral-200 max-md:border-x-0 border-2 border-gray-100 dark:border-neutral-600 py-2 px-4 md:rounded inline-flex items-center transition"
+    @click="globalStore.sortClient = !globalStore.sortClient"
   >
     <svg
-      v-if="sortClient === true"
+      v-if="globalStore.sortClient === true"
       inline
       class="w-4 md:mr-2"
       xmlns="http://www.w3.org/2000/svg"
@@ -24,7 +24,7 @@
       />
     </svg>
     <svg
-      v-if="sortClient === false"
+      v-if="globalStore.sortClient === false"
       inline
       class="w-4 md:mr-2"
       xmlns="http://www.w3.org/2000/svg"
@@ -46,4 +46,6 @@
   </button>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+const globalStore = useGlobalStore();
+</script>

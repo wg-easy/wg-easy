@@ -108,7 +108,7 @@ export const useClientsStore = defineStore('Clients', () => {
       };
     });
 
-    if (globalStore.enableSortClient) {
+    if (globalStore.enableSortClient && transformedClients !== undefined) {
       transformedClients = sortByProperty(
         transformedClients,
         'name',

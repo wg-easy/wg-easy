@@ -7,40 +7,37 @@
       <!-- Show -->
       <input
         v-show="clientEditExpireDateId === client.id"
+        ref="clientExpireDateInput"
         v-model="clientEditExpireDate"
-        v-on:keyup.enter="
+        type="text"
+        class="rounded border-2 dark:bg-neutral-700 border-gray-100 dark:border-neutral-600 focus:border-gray-200 dark:focus:border-neutral-500 outline-none w-70 text-black dark:text-neutral-300 dark:placeholder:text-neutral-500 text-xs p-0"
+        @keyup.enter="
           updateClientExpireDate(client, clientEditExpireDate);
           clientEditExpireDate = null;
           clientEditExpireDateId = null;
         "
-        v-on:keyup.escape="
+        @keyup.escape="
           clientEditExpireDate = null;
           clientEditExpireDateId = null;
         "
-        :ref="'client-' + client.id + '-expire'"
-        type="text"
-        class="rounded border-2 dark:bg-neutral-700 border-gray-100 dark:border-neutral-600 focus:border-gray-200 dark:focus:border-neutral-500 outline-none w-70 text-black dark:text-neutral-300 dark:placeholder:text-neutral-500 text-xs p-0"
       />
       <span
         v-show="clientEditExpireDateId !== client.id"
         class="inline-block"
-        >{{ client.expiredAt | expiredDateFormat }}</span
+        >{{ expiredDateFormat(client.expireAt) }}</span
       >
 
       <!-- Edit -->
       <span
         v-show="clientEditExpireDateId !== client.id"
+        class="cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity"
         @click="
-          clientEditExpireDate = client.expiredAt
-            ? client.expiredAt.toISOString().slice(0, 10)
+          clientEditExpireDate = client.expireAt
+            ? client.expireAt.slice(0, 10)
             : 'yyyy-mm-dd';
           clientEditExpireDateId = client.id;
-          setTimeout(
-            () => $refs['client-' + client.id + '-expire'][0].select(),
-            1
-          );
+          nextTick(() => clientExpireDateInput?.select());
         "
-        class="cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -66,6 +63,11 @@ defineProps<{ client: LocalClient }>();
 
 const globalStore = useGlobalStore();
 const clientsStore = useClientsStore();
+const clientEditExpireDate = ref<string | null>(null);
+const clientEditExpireDateId = ref<string | null>(null);
+const { t, locale } = useI18n();
+
+const clientExpireDateInput = ref<HTMLInputElement | null>(null);
 
 function updateClientExpireDate(
   client: LocalClient,
@@ -75,5 +77,15 @@ function updateClientExpireDate(
     .updateClientExpireDate({ clientId: client.id, expireDate })
     .catch((err) => alert(err.message || err.toString()))
     .finally(() => clientsStore.refresh().catch(console.error));
+}
+
+function expiredDateFormat(value: string | null) {
+  if (value === null) return t('Permanent');
+  const dateTime = new Date(value);
+  return dateTime.toLocaleDateString(locale.value, {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
 }
 </script>

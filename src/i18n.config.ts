@@ -40,6 +40,12 @@ export default defineI18nConfig(() => ({
       backup: 'Backup',
       titleRestoreConfig: 'Restore your configuration',
       titleBackupConfig: 'Backup your configuration',
+      rememberMe: 'Remember me',
+      titleRememberMe: 'Stay logged after closing the browser',
+      sort: 'Sort',
+      ExpireDate: 'Expire Date',
+      Permanent: 'Permanent',
+      OneTimeLink: 'Generate short one time link',
     },
     ua: {
       name: 'Ім`я',
@@ -118,6 +124,12 @@ export default defineI18nConfig(() => ({
       backup: 'Резервная копия',
       titleRestoreConfig: 'Восстановить конфигурацию',
       titleBackupConfig: 'Создать резервную копию конфигурации',
+      rememberMe: 'Запомнить меня',
+      titleRememberMe: 'Оставаться в системе после закрытия браузера',
+      sort: 'Сортировка',
+      ExpireDate: 'Дата истечения срока',
+      Permanent: 'Бессрочно',
+      OneTimeLink: 'Создать короткую одноразовую ссылку',
     },
     tr: {
       // Müslüm Barış Korkmazer @babico

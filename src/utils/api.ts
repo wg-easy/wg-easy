@@ -78,7 +78,7 @@ class API {
     expireDate,
   }: {
     name: string;
-    expireDate: string;
+    expireDate: string | null;
   }) {
     return $fetch('/api/wireguard/client', {
       method: 'post',

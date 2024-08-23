@@ -11,6 +11,10 @@ const globalStore = useGlobalStore();
 globalStore.fetchTrafficStats();
 globalStore.fetchChartType();
 globalStore.fetchRelease();
+globalStore.fetchOneTimeLinks();
+globalStore.fetchSortClients();
+globalStore.fetchExpireTime();
+globalStore.fetchRememberMe();
 useHead({
   bodyAttrs: {
     class: 'bg-gray-50 dark:bg-neutral-800',

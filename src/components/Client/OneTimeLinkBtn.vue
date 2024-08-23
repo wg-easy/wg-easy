@@ -1,6 +1,6 @@
 <template>
   <button
-    v-if="enableOneTimeLinks"
+    v-if="globalStore.enableOneTimeLinks"
     :disabled="!client.downloadableConfig"
     class="align-middle inline-block bg-gray-100 dark:bg-neutral-600 dark:text-neutral-300 p-2 rounded transition"
     :class="{
@@ -36,6 +36,7 @@
 defineProps<{ client: LocalClient }>();
 
 const clientsStore = useClientsStore();
+const globalStore = useGlobalStore();
 
 function showOneTimeLink(client: LocalClient) {
   api

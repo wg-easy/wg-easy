@@ -166,7 +166,7 @@ ${
         publicKey: client.publicKey,
         createdAt: new Date(client.createdAt),
         updatedAt: new Date(client.updatedAt),
-        expiredAt: client.expireAt !== null ? new Date(client.expireAt) : null,
+        expireAt: client.expireAt !== null ? new Date(client.expireAt) : null,
         allowedIPs: client.allowedIPs,
         oneTimeLink: client.oneTimeLink ?? null,
         oneTimeLinkExpiresAt: client.oneTimeLinkExpiresAt ?? null,

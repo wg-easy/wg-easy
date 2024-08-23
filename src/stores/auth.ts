@@ -4,8 +4,8 @@ export const useAuthStore = defineStore('Auth', () => {
   /**
    * @throws if unsuccessful
    */
-  async function login(password: string) {
-    const response = await api.createSession({ password });
+  async function login(password: string, remember: boolean) {
+    const response = await api.createSession({ password, remember });
     requiresPassword.value = response.requiresPassword;
     return true as const;
   }

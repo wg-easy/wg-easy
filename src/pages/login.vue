@@ -28,11 +28,11 @@
       />
 
       <label
-        v-if="rememberMeEnabled"
+        v-if="globalStore.rememberMeEnabled"
         class="inline-block mb-5 cursor-pointer whitespace-nowrap"
         :title="$t('titleRememberMe')"
       >
-        <input type="checkbox" class="sr-only" v-model="remember" />
+        <input v-model="remember" type="checkbox" class="sr-only" />
 
         <div
           v-if="remember"
@@ -76,8 +76,10 @@
 
 <script setup lang="ts">
 const authenticating = ref(false);
+const remember = ref(false);
 const password = ref<null | string>(null);
 const authStore = useAuthStore();
+const globalStore = useGlobalStore();
 
 async function login(e: Event) {
   e.preventDefault();
@@ -87,7 +89,7 @@ async function login(e: Event) {
 
   authenticating.value = true;
   try {
-    const res = await authStore.login(password.value);
+    const res = await authStore.login(password.value, remember.value);
     if (res) {
       await navigateTo('/');
     }
