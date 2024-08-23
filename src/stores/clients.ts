@@ -20,12 +20,13 @@ export type ClientPersist = {
 };
 
 export const useClientsStore = defineStore('Clients', () => {
+  const globalStore = useGlobalStore();
   const clients = ref<null | LocalClient[]>(null);
   const clientsPersist = ref<Record<string, ClientPersist>>({});
 
   async function refresh({ updateCharts = false } = {}) {
     const { data: _clients } = await api.getClients();
-    const transformedClients = _clients.value?.map((client) => {
+    let transformedClients = _clients.value?.map((client) => {
       let avatar = undefined;
       if (client.name.includes('@') && client.name.includes('.')) {
         avatar = `https://gravatar.com/avatar/${sha256(client.name.toLowerCase().trim())}.jpg`;
@@ -106,6 +107,15 @@ export const useClientsStore = defineStore('Clients', () => {
         hoverRx: clientPersist.hoverRx,
       };
     });
+
+    if (globalStore.enableSortClient) {
+      transformedClients = sortByProperty(
+        transformedClients,
+        'name',
+        globalStore.sortClient
+      );
+    }
+
     clients.value = transformedClients ?? null;
   }
   return { clients, clientsPersist, refresh };

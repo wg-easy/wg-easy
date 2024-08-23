@@ -27,6 +27,30 @@
         class="px-3 py-2 text-sm dark:bg-neutral-700 text-gray-500 dark:text-gray-500 mb-5 border-2 border-gray-100 dark:border-neutral-800 rounded-lg w-full focus:border-red-800 dark:focus:border-red-800 dark:placeholder:text-neutral-400 outline-none"
       />
 
+      <label
+        v-if="rememberMeEnabled"
+        class="inline-block mb-5 cursor-pointer whitespace-nowrap"
+        :title="$t('titleRememberMe')"
+      >
+        <input type="checkbox" class="sr-only" v-model="remember" />
+
+        <div
+          v-if="remember"
+          class="inline-block align-middle rounded-full w-10 h-6 mr-1 bg-red-800 cursor-pointer hover:bg-red-700 transition-all"
+        >
+          <div class="rounded-full w-4 h-4 m-1 ml-5 bg-white"></div>
+        </div>
+
+        <div
+          v-if="!remember"
+          class="inline-block align-middle rounded-full w-10 h-6 mr-1 bg-gray-200 dark:bg-neutral-400 cursor-pointer hover:bg-gray-300 dark:hover:bg-neutral-500 transition-all"
+        >
+          <div class="rounded-full w-4 h-4 m-1 bg-white"></div>
+        </div>
+
+        <span class="text-sm">{{ $t('rememberMe') }}</span>
+      </label>
+
       <button
         v-if="authenticating"
         class="bg-red-800 dark:bg-red-800 w-full rounded shadow py-2 text-sm text-white dark:text-white cursor-not-allowed"

@@ -53,7 +53,7 @@ const clientNameInput = ref<HTMLInputElement | null>(null);
 const clientEditName = ref<null | string>(null);
 const clientEditNameId = ref<null | string>(null);
 
-function updateClientName(client: WGClient, name: string | null) {
+function updateClientName(client: LocalClient, name: string | null) {
   if (name === null) {
     return;
   }

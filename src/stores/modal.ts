@@ -5,14 +5,16 @@ export const useModalStore = defineStore('Modal', () => {
   const clientDelete = ref<null | WGClient>(null);
   const clientCreate = ref<null | boolean>(null);
   const clientCreateName = ref<string>('');
+  const clientExpireDate = ref(null);
   const qrcode = ref<null | string>(null);
 
   function createClient() {
     const name = clientCreateName.value;
+    const expireDate = clientExpireDate.value;
     if (!name) return;
 
     api
-      .createClient({ name })
+      .createClient({ name, expireDate })
       .catch((err) => alert(err.message || err.toString()))
       .finally(() => clientsStore.refresh().catch(console.error));
   }
@@ -31,6 +33,7 @@ export const useModalStore = defineStore('Modal', () => {
     clientDelete,
     clientCreate,
     clientCreateName,
+    clientExpireDate,
     qrcode,
     createClient,
     deleteClient,

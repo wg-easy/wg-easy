@@ -6,6 +6,7 @@
       @click="
         modalStore.clientCreate = true;
         modalStore.clientCreateName = '';
+        modalStore.clientExpireDate = '';
       "
     >
       <IconsPlus class="w-4 mr-2" />

@@ -29,3 +29,30 @@ export function dateTime(value: Date) {
     minute: 'numeric',
   }).format(value);
 }
+
+/**
+ * Sorts an array of objects by a specified property in ascending or descending order.
+ *
+ * @param array The array of objects to be sorted.
+ * @param property The property to sort the array by.
+ * @param sort Whether to sort the array in ascending (default, true) or descending order (false).
+ */
+export function sortByProperty<T>(
+  array: T[],
+  property: keyof T,
+  sort: boolean = true
+): T[] {
+  if (sort) {
+    return array.sort((a, b) =>
+      typeof a[property] === 'string'
+        ? (a[property] as string).localeCompare(b[property] as string)
+        : (a[property] as number) - (b[property] as number)
+    );
+  }
+
+  return array.sort((a, b) =>
+    typeof a[property] === 'string'
+      ? (b[property] as string).localeCompare(a[property] as string)
+      : (b[property] as number) - (a[property] as number)
+  );
+}

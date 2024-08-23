@@ -19,6 +19,8 @@
             />
             <ClientLastSeen :client="client" />
           </div>
+          <ClientOneTimeLink :client="client" />
+          <ClientExpireDate :client="client" />
         </div>
 
         <!-- Info -->
@@ -40,6 +42,7 @@
         <ClientSwitch :client="client" />
         <ClientQRCode :client="client" />
         <ClientConfig :client="client" />
+        <ClientOneTimeLinkBtn :client="client" />
         <ClientDelete :client="client" />
       </div>
     </div>

@@ -8,6 +8,10 @@ export const useGlobalStore = defineStore('Global', () => {
     null
   );
   const uiTrafficStats = ref(false);
+  const rememberMeEnabled = ref(false);
+
+  const enableSortClient = ref(false);
+  const sortClient = ref(true); // Sort clients by name, true = asc, false = desc
 
   const { availableLocales, locale } = useI18n();
 
@@ -51,6 +55,9 @@ export const useGlobalStore = defineStore('Global', () => {
     uiShowCharts,
     uiTrafficStats,
     updateCharts,
+    rememberMeEnabled,
+    enableSortClient,
+    sortClient,
     fetchRelease,
     fetchChartType,
     fetchTrafficStats,
