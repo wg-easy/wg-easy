@@ -2,6 +2,7 @@
 
 const bcrypt = require('bcryptjs');
 const crypto = require('node:crypto');
+const basicAuth = require('basic-auth');
 const { createServer } = require('node:http');
 const { stat, readFile } = require('node:fs/promises');
 const { resolve, sep } = require('node:path');
@@ -36,9 +37,12 @@ const {
   WG_ENABLE_ONE_TIME_LINKS,
   UI_ENABLE_SORT_CLIENTS,
   WG_ENABLE_EXPIRES_TIME,
+  ENABLE_PROMETHEUS_METRICS,
+  PROMETHEUS_METRICS_PASSWORD,
 } = require('../config');
 
 const requiresPassword = !!PASSWORD_HASH;
+const requiresPrometheusPassword = !!PROMETHEUS_METRICS_PASSWORD;
 
 /**
  * Checks if `password` matches the PASSWORD_HASH.
@@ -48,13 +52,12 @@ const requiresPassword = !!PASSWORD_HASH;
  * @param {string} password String to test
  * @returns {boolean} true if matching environment, otherwise false
  */
-const isPasswordValid = (password) => {
+const isPasswordValid = (password, hash) => {
   if (typeof password !== 'string') {
     return false;
   }
-
-  if (PASSWORD_HASH) {
-    return bcrypt.compareSync(password, PASSWORD_HASH);
+  if (hash) {
+    return bcrypt.compareSync(password, hash);
   }
 
   return false;
@@ -162,7 +165,7 @@ module.exports = class Server {
           });
         }
 
-        if (!isPasswordValid(password)) {
+        if (!isPasswordValid(password, PASSWORD_HASH)) {
           throw createError({
             status: 401,
             message: 'Incorrect Password',
@@ -192,7 +195,7 @@ module.exports = class Server {
         }
 
         if (req.url.startsWith('/api/') && req.headers['authorization']) {
-          if (isPasswordValid(req.headers['authorization'])) {
+          if (isPasswordValid(req.headers['authorization'], PASSWORD_HASH)) {
             return next();
           }
           return res.status(401).json({
@@ -331,6 +334,51 @@ module.exports = class Server {
         message: 'Bad Request',
       });
     };
+
+    // Prometheus Metrics API
+    const routerPrometheusMetrics = createRouter();
+    app.use(routerPrometheusMetrics);
+
+    // Check Prometheus credentials
+    app.use(
+      fromNodeMiddleware((req, res, next) => {
+        if (!requiresPrometheusPassword || !req.url.startsWith('/metrics')) {
+          return next();
+        }
+        const user = basicAuth(req);
+        if (requiresPrometheusPassword && !user) {
+          res.statusCode = 401;
+          return { error: 'Not Logged In' };
+        }
+
+        if (user.pass) {
+          if (isPasswordValid(user.pass, PROMETHEUS_METRICS_PASSWORD)) {
+            return next();
+          }
+          res.statusCode = 401;
+          return { error: 'Incorrect Password' };
+        }
+        res.statusCode = 401;
+        return { error: 'Not Logged In' };
+      }),
+    );
+
+    // Prometheus Routes
+    routerPrometheusMetrics
+      .get('/metrics', defineEventHandler(async (event) => {
+        setHeader(event, 'Content-Type', 'text/plain');
+        if (ENABLE_PROMETHEUS_METRICS === 'true') {
+          return WireGuard.getMetrics();
+        }
+        return '';
+      }))
+      .get('/metrics/json', defineEventHandler(async (event) => {
+        setHeader(event, 'Content-Type', 'application/json');
+        if (ENABLE_PROMETHEUS_METRICS === 'true') {
+          return WireGuard.getMetricsJSON();
+        }
+        return '';
+      }));
 
     // backup_restore
     const router3 = createRouter();
