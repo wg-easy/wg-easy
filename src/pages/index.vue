@@ -50,6 +50,8 @@ const clientsStore = useClientsStore();
 
 const intervalId = ref<NodeJS.Timeout | null>(null);
 
+clientsStore.refresh();
+
 onMounted(() => {
   // TODO?: replace with websocket or similar
   intervalId.value = setInterval(() => {

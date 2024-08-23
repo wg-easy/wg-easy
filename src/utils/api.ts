@@ -24,6 +24,7 @@ class API {
   }
 
   async getSession() {
+    // TODO?: use useFetch
     return $fetch('/api/session', {
       method: 'get',
     });
@@ -43,19 +44,9 @@ class API {
   }
 
   async getClients() {
-    return $fetch('/api/wireguard/client', {
+    return useFetch('/api/wireguard/client', {
       method: 'get',
-    }).then((clients) =>
-      clients.map((client) => ({
-        ...client,
-        createdAt: new Date(client.createdAt),
-        updatedAt: new Date(client.updatedAt),
-        latestHandshakeAt:
-          client.latestHandshakeAt !== null
-            ? new Date(client.latestHandshakeAt)
-            : null,
-      }))
-    );
+    });
   }
 
   async createClient({ name }: { name: string }) {
@@ -117,8 +108,12 @@ class API {
   }
 }
 
-export type WGClient = Awaited<
+type WGClientReturn = Awaited<
   ReturnType<typeof API.prototype.getClients>
->[number];
+>['data']['value'];
+
+export type WGClient = WGClientReturn extends (infer U)[] | undefined
+  ? U
+  : never;
 
 export default new API();

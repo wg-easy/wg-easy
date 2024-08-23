@@ -24,8 +24,8 @@ export const useClientsStore = defineStore('Clients', () => {
   const clientsPersist = ref<Record<string, ClientPersist>>({});
 
   async function refresh({ updateCharts = false } = {}) {
-    const _clients = await api.getClients();
-    clients.value = _clients.map((client) => {
+    const { data: _clients } = await api.getClients();
+    const transformedClients = _clients.value?.map((client) => {
       let avatar = undefined;
       if (client.name.includes('@') && client.name.includes('.')) {
         avatar = `https://gravatar.com/avatar/${sha256(client.name.toLowerCase().trim())}.jpg`;
@@ -106,6 +106,7 @@ export const useClientsStore = defineStore('Clients', () => {
         hoverRx: clientPersist.hoverRx,
       };
     });
+    clients.value = transformedClients ?? null;
   }
   return { clients, clientsPersist, refresh };
 });
