@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
 
   const authorization = getHeader(event, 'Authorization');
   if (url.pathname.startsWith('/api/') && authorization) {
-    if (isPasswordValid(authorization)) {
+    if (isPasswordValid(authorization, PASSWORD_HASH)) {
       return;
     }
     throw createError({

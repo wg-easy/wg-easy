@@ -3,6 +3,7 @@ import path from 'path';
 import debug_logger from 'debug';
 import crypto from 'node:crypto';
 import QRCode from 'qrcode';
+import CRC32 from 'crc-32';
 
 const debug = debug_logger('WireGuard');
 
@@ -13,6 +14,7 @@ type Server = {
 };
 
 type Client = {
+  id: string;
   name: string;
   address: string;
   privateKey: string;
@@ -20,8 +22,12 @@ type Client = {
   preSharedKey: string;
   createdAt: string;
   updatedAt: string;
+  expireAt: string | null;
+  endpoint: string | null;
   enabled: boolean;
   allowedIPs?: never;
+  oneTimeLink: string | null;
+  oneTimeLinkExpiresAt: string | null;
 };
 
 type Config = {
@@ -160,10 +166,14 @@ ${
         publicKey: client.publicKey,
         createdAt: new Date(client.createdAt),
         updatedAt: new Date(client.updatedAt),
+        expiredAt: client.expireAt !== null ? new Date(client.expireAt) : null,
         allowedIPs: client.allowedIPs,
+        oneTimeLink: client.oneTimeLink ?? null,
+        oneTimeLinkExpiresAt: client.oneTimeLinkExpiresAt ?? null,
         downloadableConfig: 'privateKey' in client,
         persistentKeepalive: null as string | null,
         latestHandshakeAt: null as Date | null,
+        endpoint: null as string | null,
         transferRx: null as number | null,
         transferTx: null as number | null,
       })
@@ -181,7 +191,7 @@ ${
         const [
           publicKey,
           _preSharedKey,
-          _endpoint,
+          endpoint,
           _allowedIps,
           latestHandshakeAt,
           transferRx,
@@ -196,6 +206,7 @@ ${
           latestHandshakeAt === '0'
             ? null
             : new Date(Number(`${latestHandshakeAt}000`));
+        client.endpoint = endpoint === '(none)' ? null : (endpoint ?? null);
         client.transferRx = Number(transferRx);
         client.transferTx = Number(transferTx);
         client.persistentKeepalive = persistentKeepalive ?? null;
@@ -245,7 +256,13 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
     });
   }
 
-  async createClient({ name }: { name: string }) {
+  async createClient({
+    name,
+    expireDate,
+  }: {
+    name: string;
+    expireDate: string;
+  }) {
     if (!name) {
       throw new Error('Missing: Name');
     }
@@ -277,7 +294,7 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
 
     // Create Client
     const id = crypto.randomUUID();
-    const client = {
+    const client: Client = {
       id,
       name,
       address,
@@ -288,8 +305,20 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
 
+      endpoint: null,
+      oneTimeLink: null,
+      oneTimeLinkExpiresAt: null,
+      expireAt: null,
       enabled: true,
     };
+
+    if (expireDate) {
+      const date = new Date(expireDate);
+      date.setHours(23);
+      date.setMinutes(59);
+      date.setSeconds(59);
+      client.expireAt = date.toISOString();
+    }
 
     config.clients[id] = client;
 
@@ -314,6 +343,25 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
     client.enabled = true;
     client.updatedAt = new Date().toISOString();
 
+    await this.saveConfig();
+  }
+
+  async generateOneTimeLink({ clientId }: { clientId: string }) {
+    const client = await this.getClient({ clientId });
+    const key = `${clientId}-${Math.floor(Math.random() * 1000)}`;
+    client.oneTimeLink = Math.abs(CRC32.str(key)).toString(16);
+    client.oneTimeLinkExpiresAt = new Date(
+      Date.now() + 5 * 60 * 1000
+    ).toISOString();
+    client.updatedAt = new Date().toISOString();
+    await this.saveConfig();
+  }
+
+  async eraseOneTimeLink({ clientId }: { clientId: string }) {
+    const client = await this.getClient({ clientId });
+    client.oneTimeLink = null;
+    client.oneTimeLinkExpiresAt = null;
+    client.updatedAt = new Date().toISOString();
     await this.saveConfig();
   }
 
@@ -363,6 +411,29 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
     await this.saveConfig();
   }
 
+  async updateClientExpireDate({
+    clientId,
+    expireDate,
+  }: {
+    clientId: string;
+    expireDate: string;
+  }) {
+    const client = await this.getClient({ clientId });
+
+    if (expireDate) {
+      const date = new Date(expireDate);
+      date.setHours(23);
+      date.setMinutes(59);
+      date.setSeconds(59);
+      client.expireAt = date.toISOString();
+    } else {
+      client.expireAt = null;
+    }
+    client.updatedAt = new Date().toISOString();
+
+    await this.saveConfig();
+  }
+
   async __reloadConfig() {
     await this.__buildConfig();
     await this.__syncConfig();
@@ -389,6 +460,118 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
   async Shutdown() {
     await exec('wg-quick down wg0').catch(() => {});
   }
+
+  async cronJobEveryMinute() {
+    const config = await this.getConfig();
+    let needSaveConfig = false;
+    // Expires Feature
+    if (WG_ENABLE_EXPIRES_TIME === 'true') {
+      for (const client of Object.values(config.clients)) {
+        if (client.enabled !== true) continue;
+        if (
+          client.expireAt !== null &&
+          new Date() > new Date(client.expireAt)
+        ) {
+          debug(`Client ${client.id} expired.`);
+          needSaveConfig = true;
+          client.enabled = false;
+          client.updatedAt = new Date().toISOString();
+        }
+      }
+    }
+    // One Time Link Feature
+    if (WG_ENABLE_ONE_TIME_LINKS === 'true') {
+      for (const client of Object.values(config.clients)) {
+        if (
+          client.oneTimeLink !== null &&
+          client.oneTimeLinkExpiresAt !== null &&
+          new Date() > new Date(client.oneTimeLinkExpiresAt)
+        ) {
+          debug(`Client ${client.id} One Time Link expired.`);
+          needSaveConfig = true;
+          client.oneTimeLink = null;
+          client.oneTimeLinkExpiresAt = null;
+          client.updatedAt = new Date().toISOString();
+        }
+      }
+    }
+    if (needSaveConfig) {
+      await this.saveConfig();
+    }
+  }
+
+  async getMetrics() {
+    const clients = await this.getClients();
+    let wireguardPeerCount = 0;
+    let wireguardEnabledPeersCount = 0;
+    let wireguardConnectedPeersCount = 0;
+    let wireguardSentBytes = '';
+    let wireguardReceivedBytes = '';
+    let wireguardLatestHandshakeSeconds = '';
+    for (const client of Object.values(clients)) {
+      wireguardPeerCount++;
+      if (client.enabled === true) {
+        wireguardEnabledPeersCount++;
+      }
+      if (client.endpoint !== null) {
+        wireguardConnectedPeersCount++;
+      }
+      wireguardSentBytes += `wireguard_sent_bytes{interface="wg0",enabled="${client.enabled}",address="${client.address}",name="${client.name}"} ${Number(client.transferTx)}\n`;
+      wireguardReceivedBytes += `wireguard_received_bytes{interface="wg0",enabled="${client.enabled}",address="${client.address}",name="${client.name}"} ${Number(client.transferRx)}\n`;
+      wireguardLatestHandshakeSeconds += `wireguard_latest_handshake_seconds{interface="wg0",enabled="${client.enabled}",address="${client.address}",name="${client.name}"} ${client.latestHandshakeAt ? (new Date().getTime() - new Date(client.latestHandshakeAt).getTime()) / 1000 : 0}\n`;
+    }
+
+    let returnText = '# HELP wg-easy and wireguard metrics\n';
+
+    returnText += '\n# HELP wireguard_configured_peers\n';
+    returnText += '# TYPE wireguard_configured_peers gauge\n';
+    returnText += `wireguard_configured_peers{interface="wg0"} ${Number(wireguardPeerCount)}\n`;
+
+    returnText += '\n# HELP wireguard_enabled_peers\n';
+    returnText += '# TYPE wireguard_enabled_peers gauge\n';
+    returnText += `wireguard_enabled_peers{interface="wg0"} ${Number(wireguardEnabledPeersCount)}\n`;
+
+    returnText += '\n# HELP wireguard_connected_peers\n';
+    returnText += '# TYPE wireguard_connected_peers gauge\n';
+    returnText += `wireguard_connected_peers{interface="wg0"} ${Number(wireguardConnectedPeersCount)}\n`;
+
+    returnText += '\n# HELP wireguard_sent_bytes Bytes sent to the peer\n';
+    returnText += '# TYPE wireguard_sent_bytes counter\n';
+    returnText += `${wireguardSentBytes}`;
+
+    returnText +=
+      '\n# HELP wireguard_received_bytes Bytes received from the peer\n';
+    returnText += '# TYPE wireguard_received_bytes counter\n';
+    returnText += `${wireguardReceivedBytes}`;
+
+    returnText +=
+      '\n# HELP wireguard_latest_handshake_seconds UNIX timestamp seconds of the last handshake\n';
+    returnText += '# TYPE wireguard_latest_handshake_seconds gauge\n';
+    returnText += `${wireguardLatestHandshakeSeconds}`;
+
+    return returnText;
+  }
+
+  async getMetricsJSON() {
+    const clients = await this.getClients();
+    let wireguardPeerCount = 0;
+    let wireguardEnabledPeersCount = 0;
+    let wireguardConnectedPeersCount = 0;
+    for (const client of Object.values(clients)) {
+      wireguardPeerCount++;
+      if (client.enabled === true) {
+        wireguardEnabledPeersCount++;
+      }
+      if (client.endpoint !== null) {
+        wireguardConnectedPeersCount++;
+      }
+    }
+    return {
+      wireguard_configured_peers: Number(wireguardPeerCount),
+      wireguard_enabled_peers: Number(wireguardEnabledPeersCount),
+      wireguard_connected_peers: Number(wireguardConnectedPeersCount),
+    };
+  }
 }
 
 const inst = new WireGuard();
@@ -396,5 +579,11 @@ inst.getConfig().catch((err) => {
   console.error(err);
   process.exit(1);
 });
+
+async function cronJobEveryMinute() {
+  await inst.cronJobEveryMinute();
+  setTimeout(cronJobEveryMinute, 60 * 1000);
+}
+cronJobEveryMinute();
 
 export default inst;

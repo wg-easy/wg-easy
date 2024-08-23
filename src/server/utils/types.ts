@@ -30,6 +30,15 @@ const password = z
   .string({ message: 'Password must be a valid string' })
   .pipe(safeStringRefine);
 
+const remember = z
+  .boolean({ message: 'Remember must be a valid boolean' })
+  .optional();
+
+const expireDate = z
+  .string({ message: 'expiredDate must be a valid string' })
+  .min(1, 'expiredDate must be at least 1 Character')
+  .pipe(safeStringRefine);
+
 export const clientIdType = z.object(
   {
     clientId: id,
@@ -51,6 +60,21 @@ export const nameType = z.object(
   { message: 'Body must be a valid object' }
 );
 
+export const expireDateType = z.object(
+  {
+    expireDate: expireDate,
+  },
+  { message: 'Body must be a valid object' }
+);
+
+export const createType = z.object(
+  {
+    name: name,
+    expireDate: expireDate,
+  },
+  { message: 'Body must be a valid object' }
+);
+
 export const fileType = z.object(
   {
     file: file,
@@ -61,6 +85,7 @@ export const fileType = z.object(
 export const passwordType = z.object(
   {
     password: password,
+    remember: remember,
   },
   { message: 'Body must be a valid object' }
 );

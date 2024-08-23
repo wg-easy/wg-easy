@@ -8,13 +8,9 @@ import bcrypt from 'bcryptjs';
  * @param {string} password String to test
  * @returns {boolean} true if matching environment, otherwise false
  */
-export function isPasswordValid(password: string): boolean {
-  if (typeof password !== 'string') {
-    return false;
-  }
-
-  if (PASSWORD_HASH) {
-    return bcrypt.compareSync(password, PASSWORD_HASH);
+export function isPasswordValid(password: string, hash?: string): boolean {
+  if (hash) {
+    return bcrypt.compareSync(password, hash);
   }
 
   return false;
