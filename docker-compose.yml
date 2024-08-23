@@ -27,9 +27,11 @@ services:
       # - WG_POST_DOWN=echo "Post Down" > /etc/wireguard/post-down.txt
       # - UI_TRAFFIC_STATS=true
       # - UI_CHART_TYPE=0 # (0 Charts disabled, 1 # Line chart, 2 # Area chart, 3 # Bar chart)
-      # - UI_SHOW_LINKS=true
+      # - WG_ENABLE_ONE_TIME_LINKS=true
       # - UI_ENABLE_SORT_CLIENTS=true
       # - WG_ENABLE_EXPIRES_TIME=true
+      # - ENABLE_PROMETHEUS_METRICS=false
+      # - PROMETHEUS_METRICS_PASSWORD=$$2a$$12$$vkvKpeEAHD78gasyawIod.1leBMKg8sBwKW.pQyNsq78bXV3INf2G # (needs double $$, hash of 'prometheus_password'; see "How_to_generate_an_bcrypt_hash.md" for generate the hash)
 
     image: ghcr.io/wg-easy/wg-easy
     container_name: wg-easy

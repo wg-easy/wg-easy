@@ -2,6 +2,7 @@
 
 const bcrypt = require('bcryptjs');
 const crypto = require('node:crypto');
+const basicAuth = require('basic-auth');
 const { createServer } = require('node:http');
 const { stat, readFile } = require('node:fs/promises');
 const { resolve, sep } = require('node:path');
@@ -33,12 +34,15 @@ const {
   LANG,
   UI_TRAFFIC_STATS,
   UI_CHART_TYPE,
-  UI_SHOW_LINKS,
+  WG_ENABLE_ONE_TIME_LINKS,
   UI_ENABLE_SORT_CLIENTS,
   WG_ENABLE_EXPIRES_TIME,
+  ENABLE_PROMETHEUS_METRICS,
+  PROMETHEUS_METRICS_PASSWORD,
 } = require('../config');
 
 const requiresPassword = !!PASSWORD_HASH;
+const requiresPrometheusPassword = !!PROMETHEUS_METRICS_PASSWORD;
 
 /**
  * Checks if `password` matches the PASSWORD_HASH.
@@ -48,13 +52,12 @@ const requiresPassword = !!PASSWORD_HASH;
  * @param {string} password String to test
  * @returns {boolean} true if matching environment, otherwise false
  */
-const isPasswordValid = (password) => {
+const isPasswordValid = (password, hash) => {
   if (typeof password !== 'string') {
     return false;
   }
-
-  if (PASSWORD_HASH) {
-    return bcrypt.compareSync(password, PASSWORD_HASH);
+  if (hash) {
+    return bcrypt.compareSync(password, hash);
   }
 
   return false;
@@ -106,9 +109,9 @@ module.exports = class Server {
         return `"${UI_CHART_TYPE}"`;
       }))
 
-      .get('/api/ui-show-links', defineEventHandler((event) => {
+      .get('/api/wg-enable-one-time-links', defineEventHandler((event) => {
         setHeader(event, 'Content-Type', 'application/json');
-        return `${UI_SHOW_LINKS}`;
+        return `${WG_ENABLE_ONE_TIME_LINKS}`;
       }))
 
       .get('/api/ui-sort-clients', defineEventHandler((event) => {
@@ -132,14 +135,21 @@ module.exports = class Server {
           authenticated,
         };
       }))
-      .get('/:clientHash', defineEventHandler(async (event) => {
-        const clientHash = getRouterParam(event, 'clientHash');
+      .get('/cnf/:clientOneTimeLink', defineEventHandler(async (event) => {
+        if (WG_ENABLE_ONE_TIME_LINKS === 'false') {
+          throw createError({
+            status: 404,
+            message: 'Invalid state',
+          });
+        }
+        const clientOneTimeLink = getRouterParam(event, 'clientOneTimeLink');
         const clients = await WireGuard.getClients();
-        const client = clients.find((client) => client.hash === clientHash);
+        const client = clients.find((client) => client.oneTimeLink === clientOneTimeLink);
         if (!client) return;
         const clientId = client.id;
         const config = await WireGuard.getClientConfiguration({ clientId });
-        setHeader(event, 'Content-Disposition', `attachment; filename="${clientHash}.conf"`);
+        await WireGuard.eraseOneTimeLink({ clientId });
+        setHeader(event, 'Content-Disposition', `attachment; filename="${clientOneTimeLink}.conf"`);
         setHeader(event, 'Content-Type', 'text/plain');
         return config;
       }))
@@ -155,7 +165,7 @@ module.exports = class Server {
           });
         }
 
-        if (!isPasswordValid(password)) {
+        if (!isPasswordValid(password, PASSWORD_HASH)) {
           throw createError({
             status: 401,
             message: 'Incorrect Password',
@@ -185,7 +195,7 @@ module.exports = class Server {
         }
 
         if (req.url.startsWith('/api/') && req.headers['authorization']) {
-          if (isPasswordValid(req.headers['authorization'])) {
+          if (isPasswordValid(req.headers['authorization'], PASSWORD_HASH)) {
             return next();
           }
           return res.status(401).json({
@@ -252,6 +262,20 @@ module.exports = class Server {
         await WireGuard.enableClient({ clientId });
         return { success: true };
       }))
+      .post('/api/wireguard/client/:clientId/generateOneTimeLink', defineEventHandler(async (event) => {
+        if (WG_ENABLE_ONE_TIME_LINKS === 'false') {
+          throw createError({
+            status: 404,
+            message: 'Invalid state',
+          });
+        }
+        const clientId = getRouterParam(event, 'clientId');
+        if (clientId === '__proto__' || clientId === 'constructor' || clientId === 'prototype') {
+          throw createError({ status: 403 });
+        }
+        await WireGuard.generateOneTimeLink({ clientId });
+        return { success: true };
+      }))
       .post('/api/wireguard/client/:clientId/disable', defineEventHandler(async (event) => {
         const clientId = getRouterParam(event, 'clientId');
         if (clientId === '__proto__' || clientId === 'constructor' || clientId === 'prototype') {
@@ -310,6 +334,51 @@ module.exports = class Server {
         message: 'Bad Request',
       });
     };
+
+    // Prometheus Metrics API
+    const routerPrometheusMetrics = createRouter();
+    app.use(routerPrometheusMetrics);
+
+    // Check Prometheus credentials
+    app.use(
+      fromNodeMiddleware((req, res, next) => {
+        if (!requiresPrometheusPassword || !req.url.startsWith('/metrics')) {
+          return next();
+        }
+        const user = basicAuth(req);
+        if (requiresPrometheusPassword && !user) {
+          res.statusCode = 401;
+          return { error: 'Not Logged In' };
+        }
+
+        if (user.pass) {
+          if (isPasswordValid(user.pass, PROMETHEUS_METRICS_PASSWORD)) {
+            return next();
+          }
+          res.statusCode = 401;
+          return { error: 'Incorrect Password' };
+        }
+        res.statusCode = 401;
+        return { error: 'Not Logged In' };
+      }),
+    );
+
+    // Prometheus Routes
+    routerPrometheusMetrics
+      .get('/metrics', defineEventHandler(async (event) => {
+        setHeader(event, 'Content-Type', 'text/plain');
+        if (ENABLE_PROMETHEUS_METRICS === 'true') {
+          return WireGuard.getMetrics();
+        }
+        return '';
+      }))
+      .get('/metrics/json', defineEventHandler(async (event) => {
+        setHeader(event, 'Content-Type', 'application/json');
+        if (ENABLE_PROMETHEUS_METRICS === 'true') {
+          return WireGuard.getMetricsJSON();
+        }
+        return '';
+      }));
 
     // backup_restore
     const router3 = createRouter();

@@ -39,6 +39,7 @@ const messages = { // eslint-disable-line no-unused-vars
     sort: 'Sort',
     ExpireDate: 'Expire Date',
     Permanent: 'Permanent',
+    OneTimeLink: 'Generate short one time link',
   },
   ua: {
     name: 'Ім`я',
@@ -112,6 +113,7 @@ const messages = { // eslint-disable-line no-unused-vars
     sort: 'Сортировка',
     ExpireDate: 'Дата истечения срока',
     Permanent: 'Бессрочно',
+    OneTimeLink: 'Создать короткую одноразовую ссылку',
   },
   tr: { // Müslüm Barış Korkmazer @babico
     name: 'İsim',
