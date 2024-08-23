@@ -13,6 +13,7 @@ You have found the easiest way to install & manage WireGuard on any Linux host!
 </p>
 
 ## Features
+
 * All-in-one: WireGuard + Web UI.
 * Easy installation, simple to use.
 * List, create, edit, delete, enable & disable clients.
@@ -23,10 +24,10 @@ You have found the easiest way to install & manage WireGuard on any Linux host!
 * Gravatar support.
 * Automatic Light / Dark Mode
 * Multilanguage Support
-* UI_TRAFFIC_STATS (default off)
-* WG_ENABLE_ONE_TIME_LINKS (default off)
-* WG_ENABLE_EXPIRES_TIME (default off)
-* Prometheus metrics support
+* Traffic Stats (default off)
+* One Time Links (default off)
+* Client Expiry (default off)
+* * Prometheus metrics support
 
 ## Requirements
 
@@ -112,7 +113,7 @@ These options can be configured by setting environment variables using `-e KEY="
 | `WG_HOST` | - | `vpn.myserver.com` | The public hostname of your VPN server.                                                                                                              |
 | `WG_DEVICE` | `eth0` | `ens6f0` | Ethernet device the wireguard traffic should be forwarded through.                                                                                   |
 | `WG_PORT` | `51820` | `12345` | The public UDP port of your VPN server. WireGuard will listen on that (othwise default) inside the Docker container.                                 |
-| `WG_CONFIG_PORT`| `51820` | `12345` | The UDP port used on [Home Assistant Plugin](https://github.com/adriy-be/homeassistant-addons-jdeath/tree/main/wgeasy)                               
+| `WG_CONFIG_PORT`| `51820` | `12345` | The UDP port used on [Home Assistant Plugin](https://github.com/adriy-be/homeassistant-addons-jdeath/tree/main/wgeasy)
 | `WG_MTU` | `null` | `1420` | The MTU the clients will use. Server uses default WG MTU.                                                                                            |
 | `WG_PERSISTENT_KEEPALIVE` | `0` | `25` | Value in seconds to keep the "connection" open. If this value is 0, then connections won't be kept alive.                                            |
 | `WG_DEFAULT_ADDRESS` | `10.8.0.x` | `10.6.0.x` | Clients IP address range. |
