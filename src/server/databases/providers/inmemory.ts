@@ -1,11 +1,11 @@
 import type { SessionConfig } from 'h3';
 import type { Identity } from '../database';
-import type UserRepository from '../repositories/user';
-import type SystemRepository from '../repositories/system';
 import type System from '../entities/system';
 import type User from '../entities/user';
+import type { UserProvider } from '../entities/user';
+import type { SystemProvider } from '../entities/system';
+import type DatabaseProvider from '../database';
 
-import DatabaseProvider from '../database';
 import { ChartType } from '../entities/system';
 import debug from 'debug';
 
@@ -21,8 +21,7 @@ type InMemoryData = {
 
 // In-Memory Database Provider
 export default class InMemoryDP
-  extends DatabaseProvider
-  implements UserRepository, SystemRepository
+  implements DatabaseProvider, UserProvider, SystemProvider
 {
   private data: InMemoryData = { users: [] };
 
@@ -78,7 +77,7 @@ export default class InMemoryDP
   }
 
   async disconnect() {
-    // TODO
+    this.data = { users: [] };
   }
 
   async getSystem() {
@@ -89,6 +88,10 @@ export default class InMemoryDP
   async saveSystem(system: System) {
     INMDP_DEBUG('Save System');
     this.data.system = system;
+  }
+
+  async getUsers() {
+    return this.data.users;
   }
 
   async getUser(id: Identity<User>) {

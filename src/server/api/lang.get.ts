@@ -1,10 +1,7 @@
 export default defineEventHandler(async (event) => {
   setHeader(event, 'Content-Type', 'application/json');
 
-  const system = await InMemory.getSystem();
-  if (system) {
-    const { lang } = system;
-    return lang;
-  }
-  return 'en';
+  const provider = InMemory; // TODO multiple provider
+  const lang = await SystemRepository.getLang(provider);
+  return lang;
 });
