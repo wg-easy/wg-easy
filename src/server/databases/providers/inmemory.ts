@@ -1,7 +1,15 @@
-import DatabaseProvider, { type Identity } from '../database';
+import type { SessionConfig } from 'h3';
+import type { Identity } from '../database';
+import type UserRepository from '../repositories/user';
+import type SystemRepository from '../repositories/system';
 import type System from '../entities/system';
 import type User from '../entities/user';
+
+import DatabaseProvider from '../database';
+import { ChartType } from '../entities/system';
 import debug from 'debug';
+
+import packageJson from '@/package.json';
 
 const INMDP_DEBUG = debug('InMemoryDP');
 
@@ -12,15 +20,65 @@ type InMemoryData = {
 };
 
 // In-Memory Database Provider
-export class InMemoryDP extends DatabaseProvider {
+export default class InMemoryDP
+  extends DatabaseProvider
+  implements UserRepository, SystemRepository
+{
   private data: InMemoryData = { users: [] };
 
   async connect() {
-    // No connection needed for in-memory
+    INMDP_DEBUG('Connection...');
+    const system: System = {
+      release: packageJson.release.version,
+      interface: {
+        privateKey: '',
+        publicKey: '',
+        address: '10.8.0.1',
+      },
+      port: 51821,
+      webuiHost: '0.0.0.0',
+      sessionTimeout: 3600, // 1 hour
+      lang: 'en',
+      userConfig: {
+        mtu: 1420,
+        persistentKeepalive: 0,
+        rangeAddress: '10.8.0.x',
+        defaultDns: ['1.1.1.1'],
+        allowedIps: ['0.0.0.0/0', '::/0'],
+      },
+      wgPath: '/etc/wireguard/',
+      wgDevice: 'wg0',
+      wgHost: '',
+      wgPort: 51820,
+      wgConfigPort: 51820,
+      iptables: {
+        wgPreUp: '',
+        wgPostUp: '',
+        wgPreDown: '',
+        wgPostDown: '',
+      },
+      trafficStats: {
+        enabled: false,
+        type: ChartType.None,
+      },
+      wgEnableExpiresTime: false,
+      prometheus: {
+        enabled: false,
+        password: null,
+      },
+      sessionConfig: {
+        password: '',
+        name: 'wg-easy',
+        cookie: undefined,
+      } satisfies SessionConfig,
+    };
+
+    this.data.system = system;
+    INMDP_DEBUG('Connection done');
   }
 
   async disconnect() {
-    // No disconnection needed for in-memory
+    // TODO
   }
 
   async getSystem() {

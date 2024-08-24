@@ -1,3 +1,5 @@
+import type { Address, Key, PassordHash } from './system';
+
 export type ROLE = 'ADMIN';
 
 /**
@@ -6,13 +8,15 @@ export type ROLE = 'ADMIN';
 type User = {
   id: string;
   roles: Array<ROLE>;
+  username: string;
+  password: PassordHash;
   name: string;
-  address: string;
-  privateKey: string;
-  publicKey: string;
+  address: Address;
+  privateKey: Key;
+  publicKey: Key;
   preSharedKey: string;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
   enabled: boolean;
 };
 

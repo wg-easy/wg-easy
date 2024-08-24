@@ -1,4 +1,10 @@
-export default defineEventHandler((event) => {
+export default defineEventHandler(async (event) => {
   setHeader(event, 'Content-Type', 'application/json');
-  return LANG;
+
+  const system = await InMemory.getSystem();
+  if (system) {
+    const { lang } = system;
+    return lang;
+  }
+  return 'en';
 });
