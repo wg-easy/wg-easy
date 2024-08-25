@@ -93,7 +93,7 @@ class API {
   }
 
   async showOneTimeLink({ clientId }: { clientId: string }) {
-    return $fetch(`/api/wireguard/${clientId}/:clientId/generateOneTimeLink`, {
+    return $fetch(`/api/wireguard/client/${clientId}/generateOneTimeLink`, {
       method: 'post',
     });
   }
