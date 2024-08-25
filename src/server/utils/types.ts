@@ -30,14 +30,13 @@ const password = z
   .string({ message: 'Password must be a valid string' })
   .pipe(safeStringRefine);
 
-const remember = z
-  .boolean({ message: 'Remember must be a valid boolean' })
-  .optional();
+const remember = z.boolean({ message: 'Remember must be a valid boolean' });
 
 const expireDate = z
   .string({ message: 'expiredDate must be a valid string' })
   .min(1, 'expiredDate must be at least 1 Character')
-  .pipe(safeStringRefine);
+  .pipe(safeStringRefine)
+  .nullable();
 
 export const clientIdType = z.object(
   {
