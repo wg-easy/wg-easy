@@ -5,12 +5,12 @@ export const useModalStore = defineStore('Modal', () => {
   const clientDelete = ref<null | WGClient>(null);
   const clientCreate = ref<null | boolean>(null);
   const clientCreateName = ref<string>('');
-  const clientExpireDate = ref<string | null>(null);
+  const clientExpireDate = ref<string>('');
   const qrcode = ref<null | string>(null);
 
   function createClient() {
     const name = clientCreateName.value;
-    const expireDate = clientExpireDate.value;
+    const expireDate = clientExpireDate.value || null;
     if (!name) return;
 
     api
