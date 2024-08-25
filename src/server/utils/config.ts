@@ -9,7 +9,7 @@ export const PORT = process.env.PORT || '51821';
 export const WEBUI_HOST = process.env.WEBUI_HOST || '0.0.0.0';
 export const PASSWORD_HASH = process.env.PASSWORD_HASH;
 export const MAX_AGE = process.env.MAX_AGE
-  ? parseInt(process.env.MAX_AGE, 10) * 1000 * 60
+  ? parseInt(process.env.MAX_AGE, 10) * 60
   : 0;
 export const WG_PATH = process.env.WG_PATH || '/etc/wireguard/';
 export const WG_DEVICE = process.env.WG_DEVICE || 'eth0';
