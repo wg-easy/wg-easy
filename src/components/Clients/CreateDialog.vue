@@ -71,6 +71,23 @@
                   />
                 </p>
               </div>
+              <div v-show="globalStore.enableExpireTime" class="mt-2">
+                <p class="text-sm text-gray-500">
+                  <label
+                    class="block text-gray-900 dark:text-neutral-200 text-sm font-bold mb-2"
+                    for="expireDate"
+                  >
+                    {{ $t('ExpireDate') }}
+                  </label>
+                  <input
+                    v-model.trim="modalStore.clientExpireDate"
+                    class="rounded p-2 border-2 dark:bg-neutral-700 dark:text-neutral-200 border-gray-100 dark:border-neutral-600 focus:border-gray-200 focus:dark:border-neutral-500 dark:placeholder:text-neutral-400 outline-none w-full"
+                    type="date"
+                    :placeholder="$t('ExpireDate')"
+                    name="expireDate"
+                  />
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -110,4 +127,5 @@
 
 <script setup lang="ts">
 const modalStore = useModalStore();
+const globalStore = useGlobalStore();
 </script>
