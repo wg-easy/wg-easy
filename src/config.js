@@ -43,3 +43,14 @@ module.exports.UI_ENABLE_SORT_CLIENTS = process.env.UI_ENABLE_SORT_CLIENTS || 'f
 module.exports.WG_ENABLE_EXPIRES_TIME = process.env.WG_ENABLE_EXPIRES_TIME || 'false';
 module.exports.ENABLE_PROMETHEUS_METRICS = process.env.ENABLE_PROMETHEUS_METRICS || 'false';
 module.exports.PROMETHEUS_METRICS_PASSWORD = process.env.PROMETHEUS_METRICS_PASSWORD;
+
+module.exports.WG_AMNEZIA_ENABLE = process.env.WG_AMNEZIA_ENABLE || 'false';
+module.exports.WG_AMNEZIA_JC = process.env.WG_AMNEZIA_JC || 0;
+module.exports.WG_AMNEZIA_JMIN = process.env.WG_AMNEZIA_JMIN || 0;
+module.exports.WG_AMNEZIA_JMAX = process.env.WG_AMNEZIA_JMAX || 0;
+module.exports.WG_AMNEZIA_S1 = process.env.WG_AMNEZIA_S1 || 0;
+module.exports.WG_AMNEZIA_S2 = process.env.WG_AMNEZIA_S2 || 0;
+module.exports.WG_AMNEZIA_H1 = process.env.WG_AMNEZIA_H1 || 1;
+module.exports.WG_AMNEZIA_H2 = process.env.WG_AMNEZIA_H2 || 2;
+module.exports.WG_AMNEZIA_H3 = process.env.WG_AMNEZIA_H3 || 3;
+module.exports.WG_AMNEZIA_H4 = process.env.WG_AMNEZIA_H4 || 4;

@@ -26,6 +26,16 @@ const {
   WG_POST_DOWN,
   WG_ENABLE_EXPIRES_TIME,
   WG_ENABLE_ONE_TIME_LINKS,
+  WG_AMNEZIA_ENABLE,
+  WG_AMNEZIA_JC,
+  WG_AMNEZIA_JMIN,
+  WG_AMNEZIA_JMAX,
+  WG_AMNEZIA_S1,
+  WG_AMNEZIA_S2,
+  WG_AMNEZIA_H1,
+  WG_AMNEZIA_H2,
+  WG_AMNEZIA_H3,
+  WG_AMNEZIA_H4,
 } = require('../config');
 
 module.exports = class WireGuard {
@@ -218,6 +228,15 @@ PrivateKey = ${client.privateKey ? `${client.privateKey}` : 'REPLACE_ME'}
 Address = ${client.address}/24
 ${WG_DEFAULT_DNS ? `DNS = ${WG_DEFAULT_DNS}\n` : ''}\
 ${WG_MTU ? `MTU = ${WG_MTU}\n` : ''}\
+${WG_AMNEZIA_ENABLE === 'true' ? `Jc = ${WG_AMNEZIA_JC}
+Jmin = ${WG_AMNEZIA_JMIN}
+Jmax = ${WG_AMNEZIA_JMAX}
+S1 = ${WG_AMNEZIA_S1}
+S2 = ${WG_AMNEZIA_S2}
+H1 = ${WG_AMNEZIA_H1}
+H2 = ${WG_AMNEZIA_H2}
+H3 = ${WG_AMNEZIA_H3}
+H4 = ${WG_AMNEZIA_H4}` : ""}
 
 [Peer]
 PublicKey = ${config.server.publicKey}
