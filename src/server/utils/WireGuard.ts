@@ -43,7 +43,6 @@ class WireGuard {
     }
 
     debug('Loading configuration...');
-    // TODO: Better way to invalidate cache
     this.#configCache = null;
     try {
       const config = await fs.readFile(path.join(WG_PATH, 'wg0.json'), 'utf8');
@@ -575,13 +574,13 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
 }
 
 const inst = new WireGuard();
-inst.getConfig().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
 
+// This also has to also start the WireGuard Server
 async function cronJobEveryMinute() {
-  await inst.cronJobEveryMinute();
+  await inst.cronJobEveryMinute().catch((err) => {
+    debug('Running Cron Job failed.');
+    console.error(err);
+  });
   setTimeout(cronJobEveryMinute, 60 * 1000);
 }
 cronJobEveryMinute();
