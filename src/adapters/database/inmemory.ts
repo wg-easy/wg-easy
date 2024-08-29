@@ -1,15 +1,14 @@
-import type { SessionConfig } from 'h3';
-import type { Identity } from '../database';
-import type System from '../entities/system';
-import type User from '../entities/user';
-import type { UserProvider } from '../entities/user';
-import type { SystemProvider } from '../entities/system';
-import type DatabaseProvider from '../database';
-
-import { ChartType } from '../entities/system';
 import debug from 'debug';
-
 import packageJson from '@/package.json';
+
+import DatabaseProvider from '~/ports/database';
+import { ChartType, Lang } from '~/ports/types';
+import { ROLE } from '~/ports/user/model';
+
+import type { SessionConfig } from 'h3';
+import type { System } from '~/ports/system/model';
+import type { User } from '~/ports/user/model';
+import type { Identity } from '~/ports/types';
 
 const INMDP_DEBUG = debug('InMemoryDP');
 
@@ -20,12 +19,10 @@ type InMemoryData = {
 };
 
 // In-Memory Database Provider
-export default class InMemoryDP
-  implements DatabaseProvider, UserProvider, SystemProvider
-{
-  private data: InMemoryData = { users: [] };
+export class InMemory extends DatabaseProvider {
+  protected data: InMemoryData = { users: [] };
 
-  async connect() {
+  override async connect() {
     INMDP_DEBUG('Connection...');
     const system: System = {
       release: packageJson.release.version,
@@ -37,7 +34,7 @@ export default class InMemoryDP
       port: 51821,
       webuiHost: '0.0.0.0',
       sessionTimeout: 3600, // 1 hour
-      lang: 'en',
+      lang: Lang.EN,
       userConfig: {
         mtu: 1420,
         persistentKeepalive: 0,
@@ -76,13 +73,13 @@ export default class InMemoryDP
     INMDP_DEBUG('Connection done');
   }
 
-  async disconnect() {
+  override async disconnect() {
     this.data = { users: [] };
   }
 
-  async getSystem() {
+  override async getSystem() {
     INMDP_DEBUG('Get System');
-    return this.data.system || null;
+    return this.data.system;
   }
 
   async saveSystem(system: System) {
@@ -90,11 +87,15 @@ export default class InMemoryDP
     this.data.system = system;
   }
 
-  async getUsers() {
+  override async getLang() {
+    return this.data.system?.lang || Lang.EN;
+  }
+
+  override async getUsers() {
     return this.data.users;
   }
 
-  async getUser(id: Identity<User>) {
+  override async getUser(id: Identity<User>) {
     INMDP_DEBUG('Get User');
     if (typeof id === 'string') {
       return this.data.users.find((user) => user.id === id);
@@ -102,14 +103,37 @@ export default class InMemoryDP
     return this.data.users.find((user) => user.id === id.id);
   }
 
-  async saveUser(user: User) {
+  override async saveUser(user: User) {
     let _user = await this.getUser(user);
     if (_user) {
       INMDP_DEBUG('Update User');
       _user = user;
     } else {
       INMDP_DEBUG('New User');
+      if (this.data.users.length == 0) {
+        // first user is admin
+        user.role = ROLE.ADMIN;
+      }
       this.data.users.push(user);
     }
   }
+
+  override async deleteUser(id: Identity<User>) {
+    const _id = typeof id === 'string' ? id : id.id;
+    const idx = this.data.users.findIndex((user) => user.id == _id);
+    if (idx !== -1) {
+      this.data.users.splice(idx, 1);
+    }
+  }
+}
+
+export default function initInMemoryProvider() {
+  const provider = new InMemory();
+
+  provider.connect().catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
+
+  return provider;
 }
