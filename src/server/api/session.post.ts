@@ -1,7 +1,7 @@
 import type { SessionConfig } from 'h3';
 
 export default defineEventHandler(async (event) => {
-  const { password, remember } = await readValidatedBody(
+  const { username, password, remember } = await readValidatedBody(
     event,
     validateZod(passwordType)
   );
@@ -14,7 +14,17 @@ export default defineEventHandler(async (event) => {
       statusMessage: 'Invalid state',
     });
   }
-  if (!isPasswordValid(password, PASSWORD_HASH)) {
+
+  const users = await Database.getUsers();
+  const user = users.find((user) => user.username == username);
+  if (!user)
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'User with username does not exist',
+    });
+
+  const userHashPassword = user.password;
+  if (!isPasswordValid(password, userHashPassword)) {
     throw createError({
       statusCode: 401,
       statusMessage: 'Incorrect Password',
@@ -35,6 +45,7 @@ export default defineEventHandler(async (event) => {
 
   const data = await session.update({
     authenticated: true,
+    userId: user.id,
   });
 
   SERVER_DEBUG(`New Session: ${data.id}`);

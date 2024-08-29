@@ -6,11 +6,12 @@ export enum Lang {
   FR = 'fr',
 }
 export type String = string;
-export type ID = String;
+export type Number = number;
+export type ID = String | Number;
 export type Boolean = boolean;
 export type Version = String;
-export type SessionTimeOut = number;
-export type Port = number;
+export type SessionTimeOut = Number;
+export type Port = Number;
 export type Address = String;
 export type HashPassword = String;
 export type Command = String;
@@ -27,8 +28,8 @@ export type WGInterface = {
   address: Address;
 };
 export type WGConfig = {
-  mtu: number;
-  persistentKeepalive: number;
+  mtu: Number;
+  persistentKeepalive: Number;
   rangeAddress: Address;
   defaultDns: Array<Address>;
   allowedIps: Array<Address>;
@@ -40,11 +41,11 @@ export enum ChartType {
   Bar = 3,
 }
 export type TrafficStats = {
-  enabled: boolean;
+  enabled: Boolean;
   type: ChartType;
 };
 export type Prometheus = {
-  enabled: boolean;
+  enabled: Boolean;
   password?: HashPassword | Undefined;
 };
 /**

@@ -1,4 +1,4 @@
-import type { Identity, Undefined } from '../types';
+import type { Identity, String, Undefined } from '../types';
 import type { User } from './model';
 
 /**
@@ -19,6 +19,8 @@ export default interface UserRepository {
    * if found, or `undefined` if the user is not available.
    */
   getUser(id: Identity<User>): Promise<User | Undefined>;
+
+  newUserWithPassword(username: String, password: String): Promise<void>;
 
   /**
    * Creates or updates a user in the database.

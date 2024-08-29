@@ -3,6 +3,7 @@ export default defineEventHandler(async (event) => {
   if (
     !REQUIRES_PASSWORD ||
     !url.pathname.startsWith('/api/') ||
+    url.pathname === '/api/account/new' ||
     url.pathname === '/api/session' ||
     url.pathname === '/api/lang' ||
     url.pathname === '/api/release' ||
@@ -18,7 +19,16 @@ export default defineEventHandler(async (event) => {
 
   const authorization = getHeader(event, 'Authorization');
   if (url.pathname.startsWith('/api/') && authorization) {
-    if (isPasswordValid(authorization, PASSWORD_HASH)) {
+    const users = await Database.getUsers();
+    const user = users.find((user) => user.id == session.data.userId);
+    if (!user)
+      throw createError({
+        statusCode: 401,
+        statusMessage: 'Session failed',
+      });
+
+    const userHashPassword = user.password;
+    if (isPasswordValid(authorization, userHashPassword)) {
       return;
     }
     throw createError({

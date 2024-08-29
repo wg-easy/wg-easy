@@ -1,4 +1,4 @@
-import type { Address, ID, Key, HashPassword, String } from '../types';
+import type { Address, ID, Key, HashPassword, String, Boolean } from '../types';
 
 export enum ROLE {
   /* Full permissions to any resources (app, database...) */
@@ -17,12 +17,12 @@ export type User = {
   role: ROLE;
   username: String;
   password: HashPassword;
-  name: String;
-  address: Address;
-  privateKey: Key;
-  publicKey: Key;
-  preSharedKey: String;
+  name?: String;
+  address?: Address;
+  privateKey?: Key;
+  publicKey?: Key;
+  preSharedKey?: String;
   createdAt: Date;
   updatedAt: Date;
-  enabled: boolean;
+  enabled: Boolean;
 };
