@@ -7,6 +7,9 @@ export default defineEventHandler(async (event) => {
     event,
     validateZod(expireDateType)
   );
-  await WireGuard.updateClientExpireDate({ clientId, expireDate });
+  await WireGuard.updateClientExpireDate({
+    clientId,
+    expireDate: expireDate || '',
+  });
   return { success: true };
 });

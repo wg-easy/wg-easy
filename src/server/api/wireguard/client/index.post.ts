@@ -3,6 +3,6 @@ export default defineEventHandler(async (event) => {
     event,
     validateZod(createType)
   );
-  await WireGuard.createClient({ name, expireDate });
+  await WireGuard.createClient({ name, expireDate: expireDate || '' });
   return { success: true };
 });
