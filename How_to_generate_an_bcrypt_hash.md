@@ -33,4 +33,4 @@ $2b$12$coPqCsPtcF
 - PASSWORD_HASH=$$2y$$10$$hBCoykrB95WSzuV4fafBzOHWKu9sbyVa34GJr8VV5R/pIelfEMYyG
 ```
 
-This hash is for the password 'foobar123', obtained using the command `docker run ghcr.io/wg-easy/wg-easy wgpw foobar123` and then inserted an additional `$` before each existing `$` symbal.
+This hash is for the password 'foobar123', obtained using the command `docker run ghcr.io/wg-easy/wg-easy wgpw foobar123` and then inserted an additional `$` before each existing `$` symbol.
