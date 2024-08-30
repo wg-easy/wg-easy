@@ -37,6 +37,9 @@ export type System = {
   trafficStats: TrafficStats;
 
   wgEnableExpiresTime: boolean;
+  wgEnableOneTimeLinks: boolean;
+  wgEnableSortClients: boolean;
+
   prometheus: Prometheus;
   sessionConfig: SessionConfig;
 };

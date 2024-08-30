@@ -1,3 +1,5 @@
+import type * as crypto from 'node:crypto';
+
 export type Undefined = null | undefined | 0 | '';
 export enum Lang {
   /* english */
@@ -5,7 +7,8 @@ export enum Lang {
   /* french */
   FR = 'fr',
 }
-export type ID = string;
+
+export type ID = crypto.UUID;
 export type Version = string;
 export type SessionTimeOut = number;
 export type Port = number;

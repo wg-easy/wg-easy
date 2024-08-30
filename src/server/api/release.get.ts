@@ -2,7 +2,7 @@ export default defineEventHandler(async () => {
   const system = await Database.getSystem();
   if (!system)
     throw createError({
-      statusCode: 400,
+      statusCode: 500,
       statusMessage: 'Invalid',
     });
 

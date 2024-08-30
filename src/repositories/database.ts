@@ -1,5 +1,5 @@
-import type SystemRepository from './system/interface';
-import type UserRepository from './user/interface';
+import type SystemRepository from './system/repository';
+import type UserRepository from './user/repository.ts';
 import type { Undefined, Lang, ID } from './types';
 import type { User } from './user/model';
 import type { System } from './system/model';

@@ -1,5 +1,6 @@
 import debug from 'debug';
 import packageJson from '@/package.json';
+import crypto from 'node:crypto';
 
 import DatabaseProvider, { DatabaseError } from '~/repositories/database';
 import { ChartType, Lang } from '~/repositories/types';
@@ -58,6 +59,8 @@ export default class InMemory extends DatabaseProvider {
         type: ChartType.None,
       },
       wgEnableExpiresTime: false,
+      wgEnableOneTimeLinks: false,
+      wgEnableSortClients: false,
       prometheus: {
         enabled: false,
         password: null,
@@ -117,7 +120,7 @@ export default class InMemory extends DatabaseProvider {
     const isUserEmpty = this.data.users.length === 0;
 
     const newUser: User = {
-      id: `${this.data.users.length + 1}`,
+      id: crypto.randomUUID(),
       password: hashPassword(password),
       username,
       role: isUserEmpty ? 'ADMIN' : 'CLIENT',
