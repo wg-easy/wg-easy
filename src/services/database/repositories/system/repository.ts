@@ -1,4 +1,4 @@
-import type { Lang, Undefined } from '../types';
+import type { Lang } from '../types';
 import type { System } from './model';
 
 /**
@@ -9,10 +9,10 @@ import type { System } from './model';
 export default interface SystemRepository {
   /**
    * Retrieves the system configuration data from the database.
-   * @returns {Promise<System | Undefined>} A promise that resolves to the system data
+   * @returns {Promise<System | null>} A promise that resolves to the system data
    * if found, or `undefined` if the system data is not available.
    */
-  getSystem(): Promise<System | Undefined>;
+  getSystem(): Promise<System | null>;
 
   /**
    * Retrieves the system's language setting.

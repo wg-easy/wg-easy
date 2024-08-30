@@ -1,6 +1,6 @@
 import type SystemRepository from './system/repository';
 import type UserRepository from './user/repository.ts';
-import type { Undefined, Lang, ID } from './types';
+import type { Lang, ID } from './types';
 import type { User } from './user/model';
 import type { System } from './system/model';
 
@@ -24,11 +24,11 @@ export default abstract class DatabaseProvider
    */
   abstract disconnect(): Promise<void>;
 
-  abstract getSystem(): Promise<System | Undefined>;
+  abstract getSystem(): Promise<System | null>;
   abstract getLang(): Promise<Lang>;
 
   abstract getUsers(): Promise<Array<User>>;
-  abstract getUser(id: ID): Promise<User | Undefined>;
+  abstract getUser(id: ID): Promise<User | undefined>;
   abstract newUserWithPassword(
     username: string,
     password: string

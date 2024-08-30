@@ -2,26 +2,25 @@ import debug from 'debug';
 import packageJson from '@/package.json';
 import crypto from 'node:crypto';
 
-import DatabaseProvider, { DatabaseError } from '~/repositories/database';
-import { ChartType, Lang } from '~/repositories/types';
+import DatabaseProvider, { DatabaseError } from './repositories/database';
+import { ChartType, Lang } from './repositories/types';
 
-import type { SessionConfig } from 'h3';
-import type { ID } from '~/repositories/types';
-import type { System } from '~/repositories/system/model';
-import type { User } from '~/repositories/user/model';
+import type { ID } from './repositories/types';
+import type { System } from './repositories/system/model';
+import type { User } from './repositories/user/model';
 import { hashPassword, isPasswordStrong } from '~/server/utils/password';
 
 const DEBUG = debug('InMemoryDB');
 
 // Represent in-memory data structure
 type InMemoryData = {
-  system?: System;
-  users: Array<User>;
+  system: System | null;
+  users: User[];
 };
 
 // In-Memory Database Provider
 export default class InMemory extends DatabaseProvider {
-  protected data: InMemoryData = { users: [] };
+  protected data: InMemoryData = { system: null, users: [] };
 
   async connect() {
     DEBUG('Connection...');
@@ -69,7 +68,7 @@ export default class InMemory extends DatabaseProvider {
         password: '',
         name: 'wg-easy',
         cookie: undefined,
-      } satisfies SessionConfig,
+      },
     };
 
     this.data.system = system;
@@ -77,7 +76,7 @@ export default class InMemory extends DatabaseProvider {
   }
 
   async disconnect() {
-    this.data = { users: [] };
+    this.data = { system: null, users: [] };
   }
 
   async getSystem() {

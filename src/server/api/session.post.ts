@@ -24,16 +24,23 @@ export default defineEventHandler(async (event) => {
 
   // TODO: timing againts timing attack
 
-  const conf: SessionConfig = SESSION_CONFIG;
+  const system = await Database.getSystem();
+  if (!system)
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Invalid',
+    });
+
+  const conf: SessionConfig = system.sessionConfig;
   if (MAX_AGE && remember) {
     conf.cookie = {
-      ...(SESSION_CONFIG.cookie ?? {}),
+      ...(system.sessionConfig.cookie ?? {}),
       maxAge: MAX_AGE,
     };
   }
 
   const session = await useSession(event, {
-    ...SESSION_CONFIG,
+    ...system.sessionConfig,
   });
 
   const data = await session.update({

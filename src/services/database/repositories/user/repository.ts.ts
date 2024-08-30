@@ -1,4 +1,4 @@
-import type { ID, Undefined } from '../types';
+import type { ID } from '../types';
 import type { User } from './model';
 
 /**
@@ -15,10 +15,10 @@ export default interface UserRepository {
   /**
    * Retrieves a user by their ID or User object from the database.
    * @param {ID} id - The ID of the user or a User object.
-   * @returns {Promise<User | Undefined>} A promise that resolves to the user data
+   * @returns {Promise<User | undefined>} A promise that resolves to the user data
    * if found, or `undefined` if the user is not available.
    */
-  getUser(id: ID): Promise<User | Undefined>;
+  getUser(id: ID): Promise<User | undefined>;
 
   newUserWithPassword(username: string, password: string): Promise<void>;
 

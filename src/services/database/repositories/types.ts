@@ -1,6 +1,5 @@
 import type * as crypto from 'node:crypto';
 
-export type Undefined = null | undefined | 0 | '';
 export enum Lang {
   /* english */
   EN = 'en',
@@ -46,5 +45,5 @@ export type TrafficStats = {
 };
 export type Prometheus = {
   enabled: boolean;
-  password?: HashPassword | Undefined;
+  password: HashPassword | null;
 };
