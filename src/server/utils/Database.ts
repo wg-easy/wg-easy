@@ -4,7 +4,7 @@
  *
  */
 
-import InMemory from '~/adapters/database/inmemory';
+import InMemory from '~/services/database/inmemory';
 
 const provider = new InMemory();
 

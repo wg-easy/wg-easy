@@ -1,13 +1,13 @@
 import debug from 'debug';
 import packageJson from '@/package.json';
 
-import DatabaseProvider, { DatabaseError } from '~/ports/database';
-import { ChartType, Lang } from '~/ports/types';
+import DatabaseProvider, { DatabaseError } from '~/repositories/database';
+import { ChartType, Lang } from '~/repositories/types';
 
 import type { SessionConfig } from 'h3';
-import type { ID } from '~/ports/types';
-import type { System } from '~/ports/system/model';
-import type { User } from '~/ports/user/model';
+import type { ID } from '~/repositories/types';
+import type { System } from '~/repositories/system/model';
+import type { User } from '~/repositories/user/model';
 import { hashPassword, isPasswordStrong } from '~/server/utils/password';
 
 const DEBUG = debug('InMemoryDB');
@@ -97,6 +97,7 @@ export default class InMemory extends DatabaseProvider {
 
   async newUserWithPassword(username: string, password: string) {
     DEBUG('New User');
+
     if (username.length < 8) {
       throw new DatabaseError(DatabaseError.ERROR_USERNAME_REQ);
     }

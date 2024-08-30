@@ -1,4 +1,4 @@
-import { DatabaseError } from '~/ports/database';
+import { DatabaseError } from '~/repositories/database';
 
 export default defineEventHandler(async (event) => {
   setHeader(event, 'Content-Type', 'application/json');
@@ -11,9 +11,11 @@ export default defineEventHandler(async (event) => {
     return { success: true };
   } catch (error) {
     if (error instanceof DatabaseError) {
+      const t = await useTranslation(event);
       throw createError({
         statusCode: 400,
-        statusMessage: error.message,
+        statusMessage: t(error.message),
+        message: error.message,
       });
     } else {
       throw createError('Something happened !');
