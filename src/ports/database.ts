@@ -1,6 +1,6 @@
 import type SystemRepository from './system/interface';
 import type UserRepository from './user/interface';
-import type { Identity, Undefined, Lang, String } from './types';
+import type { Undefined, Lang, ID } from './types';
 import type { User } from './user/model';
 import type { System } from './system/model';
 
@@ -28,25 +28,24 @@ export default abstract class DatabaseProvider
   abstract getLang(): Promise<Lang>;
 
   abstract getUsers(): Promise<Array<User>>;
-  abstract getUser(_id: Identity<User>): Promise<User | Undefined>;
+  abstract getUser(id: ID): Promise<User | Undefined>;
   abstract newUserWithPassword(
-    _username: String,
-    _password: String
+    username: string,
+    password: string
   ): Promise<void>;
-  abstract saveUser(_user: User): Promise<void>;
-  abstract deleteUser(_id: Identity<User>): Promise<void>;
+  abstract updateUser(_user: User): Promise<void>;
+  abstract deleteUser(id: ID): Promise<void>;
 }
 
 export class DatabaseError extends Error {
-  static readonly ERROR_PASSWORD_REQ =
-    'Password does not meet the strength requirements. It must be at least 12 characters long, with at least one uppercase letter, one lowercase letter, one number, and one special character.';
-  static readonly ERROR_USER_EXIST = 'User already exists.';
-  static readonly ERROR_DATABASE_CONNECTION =
-    'Failed to connect to the database.';
-  static readonly ERROR_USERNAME_LEN =
-    'Username must be longer than 8 characters.';
+  static readonly ERROR_PASSWORD_REQ = 'errorPasswordReq';
+  static readonly ERROR_USER_EXIST = 'errorUserExist';
+  static readonly ERROR_DATABASE_CONNECTION = 'errorDatabaseConn';
+  static readonly ERROR_USERNAME_REQ = 'errorUsernameReq';
 
-  constructor(message: string) {
+  constructor(messageKey: string) {
+    const { t } = useI18n();
+    const message = t(messageKey);
     super(message);
     this.name = 'DatabaseError';
   }

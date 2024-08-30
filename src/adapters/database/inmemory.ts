@@ -3,18 +3,14 @@ import packageJson from '@/package.json';
 
 import DatabaseProvider, { DatabaseError } from '~/ports/database';
 import { ChartType, Lang } from '~/ports/types';
-import { ROLE } from '~/ports/user/model';
 
 import type { SessionConfig } from 'h3';
+import type { ID } from '~/ports/types';
 import type { System } from '~/ports/system/model';
 import type { User } from '~/ports/user/model';
-import type { Identity, String } from '~/ports/types';
-import {
-  hashPasswordWithBcrypt,
-  isPasswordStrong,
-} from '~/server/utils/password';
+import { hashPassword, isPasswordStrong } from '~/server/utils/password';
 
-const INMDP_DEBUG = debug('InMemoryDP');
+const DEBUG = debug('InMemoryDB');
 
 // Represent in-memory data structure
 type InMemoryData = {
@@ -27,7 +23,7 @@ export default class InMemory extends DatabaseProvider {
   protected data: InMemoryData = { users: [] };
 
   async connect() {
-    INMDP_DEBUG('Connection...');
+    DEBUG('Connection...');
     const system: System = {
       release: packageJson.release.version,
       interface: {
@@ -74,7 +70,7 @@ export default class InMemory extends DatabaseProvider {
     };
 
     this.data.system = system;
-    INMDP_DEBUG('Connection done');
+    DEBUG('Connection done');
   }
 
   async disconnect() {
@@ -82,13 +78,8 @@ export default class InMemory extends DatabaseProvider {
   }
 
   async getSystem() {
-    INMDP_DEBUG('Get System');
+    DEBUG('Get System');
     return this.data.system;
-  }
-
-  async saveSystem(system: System) {
-    INMDP_DEBUG('Save System');
-    this.data.system = system;
   }
 
   async getLang() {
@@ -99,18 +90,15 @@ export default class InMemory extends DatabaseProvider {
     return this.data.users;
   }
 
-  async getUser(id: Identity<User>) {
-    INMDP_DEBUG('Get User');
-    if (typeof id === 'string' || typeof id === 'number') {
-      return this.data.users.find((user) => user.id === id);
-    }
-    return this.data.users.find((user) => user.id === id.id);
+  async getUser(id: ID) {
+    DEBUG('Get User');
+    return this.data.users.find((user) => user.id === id);
   }
 
-  async newUserWithPassword(username: String, password: String) {
-    INMDP_DEBUG('New User');
+  async newUserWithPassword(username: string, password: string) {
+    DEBUG('New User');
     if (username.length < 8) {
-      throw new DatabaseError(DatabaseError.ERROR_USERNAME_LEN);
+      throw new DatabaseError(DatabaseError.ERROR_USERNAME_REQ);
     }
 
     if (!isPasswordStrong(password)) {
@@ -125,13 +113,13 @@ export default class InMemory extends DatabaseProvider {
     }
 
     const now = new Date();
-    const isUserEmpty = this.data.users.length == 0;
+    const isUserEmpty = this.data.users.length === 0;
 
     const newUser: User = {
       id: `${this.data.users.length + 1}`,
-      password: hashPasswordWithBcrypt(password),
+      password: hashPassword(password),
       username,
-      role: isUserEmpty ? ROLE.ADMIN : ROLE.CLIENT,
+      role: isUserEmpty ? 'ADMIN' : 'CLIENT',
       enabled: true,
       createdAt: now,
       updatedAt: now,
@@ -140,18 +128,17 @@ export default class InMemory extends DatabaseProvider {
     this.data.users.push(newUser);
   }
 
-  async saveUser(user: User) {
-    let _user = await this.getUser(user);
+  async updateUser(user: User) {
+    let _user = await this.getUser(user.id);
     if (_user) {
-      INMDP_DEBUG('Update User');
+      DEBUG('Update User');
       _user = user;
     }
   }
 
-  async deleteUser(id: Identity<User>) {
-    INMDP_DEBUG('Delete User');
-    const _id = typeof id === 'string' || typeof id === 'number' ? id : id.id;
-    const idx = this.data.users.findIndex((user) => user.id == _id);
+  async deleteUser(id: ID) {
+    DEBUG('Delete User');
+    const idx = this.data.users.findIndex((user) => user.id === id);
     if (idx !== -1) {
       this.data.users.splice(idx, 1);
     }

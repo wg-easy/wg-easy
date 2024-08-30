@@ -5,17 +5,14 @@ export enum Lang {
   /* french */
   FR = 'fr',
 }
-export type String = string;
-export type Number = number;
-export type ID = String | Number;
-export type Boolean = boolean;
-export type Version = String;
-export type SessionTimeOut = Number;
-export type Port = Number;
-export type Address = String;
-export type HashPassword = String;
-export type Command = String;
-export type Key = String;
+export type ID = string;
+export type Version = string;
+export type SessionTimeOut = number;
+export type Port = number;
+export type Address = string;
+export type HashPassword = string;
+export type Command = string;
+export type Key = string;
 export type IpTables = {
   wgPreUp: Command;
   wgPostUp: Command;
@@ -28,8 +25,8 @@ export type WGInterface = {
   address: Address;
 };
 export type WGConfig = {
-  mtu: Number;
-  persistentKeepalive: Number;
+  mtu: number;
+  persistentKeepalive: number;
   rangeAddress: Address;
   defaultDns: Array<Address>;
   allowedIps: Array<Address>;
@@ -41,16 +38,10 @@ export enum ChartType {
   Bar = 3,
 }
 export type TrafficStats = {
-  enabled: Boolean;
+  enabled: boolean;
   type: ChartType;
 };
 export type Prometheus = {
-  enabled: Boolean;
+  enabled: boolean;
   password?: HashPassword | Undefined;
 };
-/**
- * `id` of T or T.
- *
- * @template T - The specific type that can be used in place of id String.
- */
-export type Identity<T> = ID | T;

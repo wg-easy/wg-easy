@@ -35,6 +35,7 @@
     "qrcode": "^1.5.4",
     "tailwindcss": "^3.4.10",
     "timeago.js": "^4.0.2",
+    "uuid": "^10.0.0",
     "vue": "latest",
     "vue3-apexcharts": "^1.5.3",
     "zod": "^3.23.8"
@@ -44,6 +45,7 @@
     "@types/bcryptjs": "^2.4.6",
     "@types/debug": "^4.1.12",
     "@types/qrcode": "^1.5.5",
+    "@types/uuid": "^10.0.0",
     "eslint": "^9.8.0",
     "eslint-config-prettier": "^9.1.0",
     "prettier": "^3.3.3",

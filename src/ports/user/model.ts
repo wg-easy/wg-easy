@@ -1,13 +1,14 @@
-import type { Address, ID, Key, HashPassword, String, Boolean } from '../types';
+import type { Address, ID, Key, HashPassword } from '../types';
 
-export enum ROLE {
-  /* Full permissions to any resources (app, database...) */
-  ADMIN = 'ADMIN',
-  /* Grants write and read permissions on their own resources and `CLIENT` resources without `ADMIN` permissions */
-  EDITOR = 'EDITOR',
-  /* Grants write and read permissions on their own resources  */
-  CLIENT = 'CLIENT',
-}
+/**
+ * Represents user roles within the application, each with specific permissions :
+ *
+ * - `ADMIN`: Full permissions to all resources, including the app, database, etc
+ * - `EDITOR`: Granted write and read permissions on their own resources as well as
+ *   `CLIENT` resources, but without `ADMIN` privileges
+ * - `CLIENT`: Granted write and read permissions only on their own resources.
+ */
+export type ROLE = 'ADMIN' | 'EDITOR' | 'CLIENT';
 
 /**
  * Representing a user data structure.
@@ -15,14 +16,14 @@ export enum ROLE {
 export type User = {
   id: ID;
   role: ROLE;
-  username: String;
+  username: string;
   password: HashPassword;
-  name?: String;
+  name?: string;
   address?: Address;
   privateKey?: Key;
   publicKey?: Key;
-  preSharedKey?: String;
+  preSharedKey?: string;
   createdAt: Date;
   updatedAt: Date;
-  enabled: Boolean;
+  enabled: boolean;
 };

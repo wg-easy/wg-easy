@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 /**
  * Checks if `password` matches the user password.
  *
- * @param {string} password String to test
+ * @param {string} password string to test
  * @returns {boolean} `true` if matching user password, otherwise `false`
  */
 export function isPasswordValid(password: string, hash: string): boolean {
@@ -37,11 +37,11 @@ export function isPasswordStrong(password: string): boolean {
 }
 
 /**
- * Hashes a password using the bcrypt algorithm.
+ * Hashes a password.
  *
  * @param {string} password - The plaintext password to hash
- * @returns {string} The bcrypt hash of the password
+ * @returns {string} The hash of the password
  */
-export function hashPasswordWithBcrypt(password: string): string {
+export function hashPassword(password: string): string {
   return bcrypt.hashSync(password, 12);
 }

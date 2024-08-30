@@ -6,8 +6,6 @@ import type {
   Port,
   Prometheus,
   SessionTimeOut,
-  String,
-  Boolean,
   TrafficStats,
   Version,
   WGConfig,
@@ -22,15 +20,15 @@ export type System = {
 
   release: Version;
   port: number;
-  webuiHost: String;
+  webuiHost: string;
   // maxAge
   sessionTimeout: SessionTimeOut;
   lang: Lang;
 
   userConfig: WGConfig;
 
-  wgPath: String;
-  wgDevice: String;
+  wgPath: string;
+  wgDevice: string;
   wgHost: Address;
   wgPort: Port;
   wgConfigPort: Port;
@@ -38,7 +36,7 @@ export type System = {
   iptables: IpTables;
   trafficStats: TrafficStats;
 
-  wgEnableExpiresTime: Boolean;
+  wgEnableExpiresTime: boolean;
   prometheus: Prometheus;
   sessionConfig: SessionConfig;
 };

@@ -1,7 +1,6 @@
 export default defineEventHandler(async (event) => {
   const url = getRequestURL(event);
   if (
-    !REQUIRES_PASSWORD ||
     !url.pathname.startsWith('/api/') ||
     url.pathname === '/api/account/new' ||
     url.pathname === '/api/session' ||

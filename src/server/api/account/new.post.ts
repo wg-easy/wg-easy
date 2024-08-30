@@ -1,12 +1,12 @@
 import { DatabaseError } from '~/ports/database';
 
-type Request = { username: string; password: string };
-
 export default defineEventHandler(async (event) => {
   setHeader(event, 'Content-Type', 'application/json');
   try {
-    // TODO use zod
-    const { username, password } = await readBody<Request>(event);
+    const { username, password } = await readValidatedBody(
+      event,
+      validateZod(passwordType)
+    );
     await Database.newUserWithPassword(username, password);
     return { success: true };
   } catch (error) {

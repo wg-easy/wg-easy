@@ -35,15 +35,14 @@
 </template>
 
 <script setup lang="ts">
-const username = ref<string>();
-const password = ref<string>();
+const username = ref<null | string>(null);
+const password = ref<null | string>(null);
 const authStore = useAuthStore();
 
 async function newAccount(e: Event) {
   e.preventDefault();
 
-  if (!username.value) return;
-  if (!password.value) return;
+  if (!username.value || !password.value) return;
 
   try {
     const res = await authStore.signup(username.value, password.value);

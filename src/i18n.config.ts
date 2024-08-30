@@ -46,6 +46,11 @@ export default defineI18nConfig(() => ({
       ExpireDate: 'Expire Date',
       Permanent: 'Permanent',
       OneTimeLink: 'Generate short one time link',
+      errorDatabaseConn: 'Failed to connect to the database.',
+      errorPasswordReq:
+        'Password does not meet the strength requirements. It must be at least 12 characters long, with at least one uppercase letter, one lowercase letter, one number, and one special character.',
+      errorUsernameReq: 'Username must be longer than 8 characters.',
+      errorUserExist: 'User already exists.',
     },
     ua: {
       name: 'Ім`я',

@@ -86,7 +86,7 @@
 <script setup lang="ts">
 const authenticating = ref(false);
 const remember = ref(false);
-const username = ref<string>();
+const username = ref<null | string>(null);
 const password = ref<null | string>(null);
 const authStore = useAuthStore();
 const globalStore = useGlobalStore();
@@ -94,9 +94,7 @@ const globalStore = useGlobalStore();
 async function login(e: Event) {
   e.preventDefault();
 
-  if (!username.value) return;
-  if (!password.value) return;
-  if (authenticating.value) return;
+  if (!username.value || !password.value || authenticating.value) return;
 
   authenticating.value = true;
   try {
