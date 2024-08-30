@@ -260,7 +260,7 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
     expireDate,
   }: {
     name: string;
-    expireDate: string;
+    expireDate: string | null;
   }) {
     if (!name) {
       throw new Error('Missing: Name');
@@ -415,7 +415,7 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
     expireDate,
   }: {
     clientId: string;
-    expireDate: string;
+    expireDate: string | null;
   }) {
     const client = await this.getClient({ clientId });
 
