@@ -4,9 +4,10 @@
  *
  */
 
-import InMemory from '~/services/database/inmemory';
+// import InMemory from '~/services/database/inmemory';
+import LowDb from '~/services/database/lowdb';
 
-const provider = new InMemory();
+const provider = new LowDb();
 
 provider.connect().catch((err) => {
   console.error(err);

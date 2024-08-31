@@ -1,6 +1,6 @@
 import type { SessionConfig } from 'h3';
 import type {
-  Address,
+  Url,
   IpTables,
   Lang,
   Port,
@@ -29,7 +29,7 @@ export type System = {
 
   wgPath: string;
   wgDevice: string;
-  wgHost: Address;
+  wgHost: Url;
   wgPort: Port;
   wgConfigPort: Port;
 

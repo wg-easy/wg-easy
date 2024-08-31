@@ -7,11 +7,23 @@ export enum Lang {
   FR = 'fr',
 }
 
+export type Ipv4 = `${number}.${number}.${number}.${number}`;
+export type Ipv4CIDR = `${number}.${number}.${number}.${number}/${number}`;
+export type Ipv6 =
+  `${string}:${string}:${string}:${string}:${string}:${string}:${string}:${string}`;
+export type Ipv6CIDR =
+  `${string}:${string}:${string}:${string}:${string}:${string}:${string}:${string}/${number}`;
+
+export type Address = Ipv4 | Ipv4CIDR | Ipv6 | Ipv6CIDR | '::/0';
+
+export type UrlHttp = `http://${string}`;
+export type UrlHttps = `https://${string}`;
+export type Url = string | UrlHttp | UrlHttps | Address;
+
 export type ID = crypto.UUID;
 export type Version = string;
 export type SessionTimeOut = number;
 export type Port = number;
-export type Address = string;
 export type HashPassword = string;
 export type Command = string;
 export type Key = string;

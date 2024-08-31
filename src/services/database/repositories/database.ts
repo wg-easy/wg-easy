@@ -4,6 +4,14 @@ import type { Lang, ID } from './types';
 import type { User } from './user/model';
 import type { System } from './system/model';
 
+// TODO: re-export type from /user & /system
+
+// Represent data structure
+export type DBData = {
+  system: System | null;
+  users: User[];
+};
+
 /**
  * Abstract class for database operations.
  * Provides methods to connect, disconnect, and interact with system and user data.
@@ -14,6 +22,8 @@ import type { System } from './system/model';
 export default abstract class DatabaseProvider
   implements SystemRepository, UserRepository
 {
+  protected data: DBData = { system: null, users: [] };
+
   /**
    * Connects to the database.
    */
@@ -68,6 +78,7 @@ export default abstract class DatabaseProvider
  * @extends {Error}
  */
 export class DatabaseError extends Error {
+  static readonly ERROR_INIT = 'errorInit';
   static readonly ERROR_PASSWORD_REQ = 'errorPasswordReq';
   static readonly ERROR_USER_EXIST = 'errorUserExist';
   static readonly ERROR_DATABASE_CONNECTION = 'errorDatabaseConn';

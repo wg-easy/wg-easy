@@ -1,44 +1,71 @@
 import crypto from 'node:crypto';
 import debug from 'debug';
+import { join } from 'path';
 
 import DatabaseProvider, { DatabaseError } from './repositories/database';
 import { hashPassword, isPasswordStrong } from '~/server/utils/password';
+import { JSONFilePreset } from 'lowdb/node';
 import { Lang } from './repositories/types';
 import SYSTEM from './repositories/system';
 
 import type { User } from './repositories/user/model';
+import type { DBData } from './repositories/database';
 import type { ID } from './repositories/types';
+import type { Low } from 'lowdb';
 
-const DEBUG = debug('InMemoryDB');
+const DEBUG = debug('LowDB');
 
-// In-Memory Database Provider
-export default class InMemory extends DatabaseProvider {
+export default class LowDB extends DatabaseProvider {
+  private _db!: Low<DBData>;
+
+  private async __init() {
+    // TODO: assume path to db file
+    const dbFilePath = join(WG_PATH, 'db.json');
+    this._db = await JSONFilePreset(dbFilePath, this.data);
+  }
+
   async connect() {
-    this.data.system = SYSTEM;
+    try {
+      // load file db
+      await this._db.read();
+      DEBUG('Connection done');
+      return;
+    } catch (error) {
+      DEBUG('Database does not exist : ', error);
+    }
+
+    try {
+      await this.__init();
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+      throw new DatabaseError(DatabaseError.ERROR_INIT);
+    }
+
+    this._db.update((data) => (data.system = SYSTEM));
+
     DEBUG('Connection done');
   }
 
   async disconnect() {
-    this.data = { system: null, users: [] };
     DEBUG('Diconnect done');
   }
 
   async getSystem() {
     DEBUG('Get System');
-    return this.data.system;
+    return this._db.data.system;
   }
 
   async getLang() {
-    return this.data.system?.lang || Lang.EN;
+    return this._db.data.system?.lang || Lang.EN;
   }
 
   async getUsers() {
-    return this.data.users;
+    return this._db.data.users;
   }
 
   async getUser(id: ID) {
     DEBUG('Get User');
-    return this.data.users.find((user) => user.id === id);
+    return this._db.data.users.find((user) => user.id === id);
   }
 
   async newUserWithPassword(username: string, password: string) {
@@ -52,7 +79,7 @@ export default class InMemory extends DatabaseProvider {
       throw new DatabaseError(DatabaseError.ERROR_PASSWORD_REQ);
     }
 
-    const isUserExist = this.data.users.find(
+    const isUserExist = this._db.data.users.find(
       (user) => user.username === username
     );
     if (isUserExist) {
@@ -60,7 +87,7 @@ export default class InMemory extends DatabaseProvider {
     }
 
     const now = new Date();
-    const isUserEmpty = this.data.users.length === 0;
+    const isUserEmpty = this._db.data.users.length === 0;
 
     const newUser: User = {
       id: crypto.randomUUID(),
@@ -72,7 +99,7 @@ export default class InMemory extends DatabaseProvider {
       updatedAt: now,
     };
 
-    this.data.users.push(newUser);
+    this._db.update((data) => data.users.push(newUser));
   }
 
   async updateUser(user: User) {
@@ -80,14 +107,15 @@ export default class InMemory extends DatabaseProvider {
     if (_user) {
       DEBUG('Update User');
       _user = user;
+      this._db.write();
     }
   }
 
   async deleteUser(id: ID) {
     DEBUG('Delete User');
-    const idx = this.data.users.findIndex((user) => user.id === id);
+    const idx = this._db.data.users.findIndex((user) => user.id === id);
     if (idx !== -1) {
-      this.data.users.splice(idx, 1);
+      this._db.update((data) => data.users.splice(idx, 1));
     }
   }
 }
