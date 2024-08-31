@@ -60,6 +60,7 @@ export default abstract class DatabaseProvider
  * ```typescript
  * throw new DatabaseError(DatabaseError.ERROR_PASSWORD_REQ);
  * ...
+ * // event handler routes
  * if (error instanceof DatabaseError) {
  *   const t = await useTranslation(event);
  *   throw createError({
@@ -71,9 +72,6 @@ export default abstract class DatabaseProvider
  *   throw createError('Something happened !');
  * }
  * ```
- *
- * ### Constructor:
- * - `constructor(message: string)`: Creates a new `DatabaseError` with the provided i18n message key.
  *
  * @extends {Error}
  */
