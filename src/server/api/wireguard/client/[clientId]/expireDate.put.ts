@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
   );
   await WireGuard.updateClientExpireDate({
     clientId,
-    expireDate: expireDate || '',
+    expireDate,
   });
   return { success: true };
 });
