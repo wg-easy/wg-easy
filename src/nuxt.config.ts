@@ -17,4 +17,10 @@ export default defineNuxtConfig({
     classSuffix: '',
     cookieName: 'theme',
   },
+  i18n: {
+    // https://i18n.nuxtjs.org/docs/guide/server-side-translations
+    experimental: {
+      localeDetector: './localeDetector.ts',
+    },
+  },
 });

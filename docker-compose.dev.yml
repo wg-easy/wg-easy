@@ -15,7 +15,6 @@ services:
       - NET_ADMIN
       - SYS_MODULE
     environment:
-      - PASSWORD_HASH=$$2y$$10$$Vhi2tF1i2c/ReW3LdLOru.z7LDITqBgb2wrSVw6sa.KEtbpYgSAf2 # foobar123
       - WG_HOST=192.168.1.233
 
 # folders should be generated inside container

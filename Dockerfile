@@ -22,10 +22,6 @@ HEALTHCHECK CMD /usr/bin/timeout 5s /bin/sh -c "/usr/bin/wg show | /bin/grep -q 
 # Copy build
 COPY --from=build /app/.output /app
 
-# Copy the needed wg-password scripts
-COPY --from=build /app/wgpw.sh /bin/wgpw
-RUN chmod +x /bin/wgpw
-
 # Install Linux packages
 RUN apk add --no-cache \
     dpkg \
