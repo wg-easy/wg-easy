@@ -49,15 +49,17 @@ class API {
   }
 
   async createSession({
+    username,
     password,
     remember,
   }: {
+    username: string;
     password: string | null;
     remember: boolean;
   }) {
     return $fetch('/api/session', {
       method: 'post',
-      body: { password, remember },
+      body: { username, password, remember },
     });
   }
 
@@ -159,6 +161,19 @@ class API {
   async getSortClients() {
     return useFetch('/api/ui-sort-clients', {
       method: 'get',
+    });
+  }
+
+  async newAccount({
+    username,
+    password,
+  }: {
+    username: string;
+    password: string;
+  }) {
+    return $fetch('/api/account/new', {
+      method: 'post',
+      body: { username, password },
     });
   }
 }

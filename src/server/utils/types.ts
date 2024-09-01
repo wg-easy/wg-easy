@@ -26,6 +26,10 @@ const file = z
   .string({ message: 'File must be a valid string' })
   .pipe(safeStringRefine);
 
+const username = z
+  .string({ message: 'Username must be a valid string' })
+  .pipe(safeStringRefine);
+
 const password = z
   .string({ message: 'Password must be a valid string' })
   .pipe(safeStringRefine);
@@ -81,10 +85,19 @@ export const fileType = z.object(
   { message: 'Body must be a valid object' }
 );
 
-export const passwordType = z.object(
+export const credentialsType = z.object(
   {
+    username: username,
     password: password,
     remember: remember,
+  },
+  { message: 'Body must be a valid object' }
+);
+
+export const passwordType = z.object(
+  {
+    username: username,
+    password: password,
   },
   { message: 'Body must be a valid object' }
 );
