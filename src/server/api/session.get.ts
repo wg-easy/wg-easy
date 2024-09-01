@@ -1,11 +1,9 @@
 export default defineEventHandler(async (event) => {
   const session = await useWGSession(event);
-  const authenticated = REQUIRES_PASSWORD
-    ? session.data.authenticated === true
-    : true;
+  const authenticated = session.data.authenticated;
 
   return {
-    requiresPassword: REQUIRES_PASSWORD,
+    requiresPassword: true,
     authenticated,
   };
 });
