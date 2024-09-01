@@ -1,13 +1,9 @@
 import type { SessionConfig } from 'h3';
 
-import packageJSON from '../../package.json';
 import debug from 'debug';
-const version = packageJSON.release.version;
 
-export const RELEASE = version;
 export const PORT = process.env.PORT || '51821';
 export const WEBUI_HOST = process.env.WEBUI_HOST || '0.0.0.0';
-export const PASSWORD_HASH = process.env.PASSWORD_HASH;
 export const MAX_AGE = process.env.MAX_AGE
   ? parseInt(process.env.MAX_AGE, 10) * 60
   : 0;
@@ -64,7 +60,6 @@ export const ENABLE_PROMETHEUS_METRICS =
 export const PROMETHEUS_METRICS_PASSWORD =
   process.env.PROMETHEUS_METRICS_PASSWORD;
 
-export const REQUIRES_PASSWORD = !!PASSWORD_HASH;
 export const REQUIRES_PROMETHEUS_PASSWORD = !!PROMETHEUS_METRICS_PASSWORD;
 
 export const SESSION_CONFIG = {

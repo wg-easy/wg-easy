@@ -1,6 +1,11 @@
-export default defineEventHandler((event) => {
+export default defineEventHandler(async (event) => {
   setHeader(event, 'Content-Type', 'application/json');
-  // Weird issue with auto import not working. This alias is needed
-  const stats = UI_TRAFFIC_STATS;
-  return stats === 'true' ? true : false;
+  const system = await Database.getSystem();
+  if (!system)
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Invalid',
+    });
+
+  return system.trafficStats.enabled;
 });

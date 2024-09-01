@@ -29,11 +29,14 @@ export const useGlobalStore = defineStore('Global', () => {
     // this is still called on client. why?
     const { data: release } = await api.getRelease();
 
-    if (release.value!.currentRelease >= release.value!.latestRelease.version) {
+    if (
+      Number(release.value!.currentRelease) >=
+      release.value!.latestRelease.version
+    ) {
       return;
     }
 
-    currentRelease.value = release.value!.currentRelease;
+    currentRelease.value = Number(release.value!.currentRelease);
     latestRelease.value = release.value!.latestRelease;
   }
 
