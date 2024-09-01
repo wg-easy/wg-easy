@@ -4,6 +4,8 @@ export type WGSession = {
   authenticated: boolean;
 };
 
-export function useWGSession(event: H3Event) {
-  return useSession<Partial<WGSession>>(event, SESSION_CONFIG);
+export async function useWGSession(event: H3Event) {
+  const system = await Database.getSystem();
+  if (!system) throw new Error('Invalid');
+  return useSession<Partial<WGSession>>(event, system.sessionConfig);
 }
