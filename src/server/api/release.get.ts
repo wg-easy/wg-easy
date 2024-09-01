@@ -1,8 +1,14 @@
 export default defineEventHandler(async () => {
-  const release = Number.parseInt(RELEASE, 10);
+  const system = await Database.getSystem();
+  if (!system)
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Invalid',
+    });
+
   const latestRelease = await fetchLatestRelease();
   return {
-    currentRelease: release,
+    currentRelease: system.release,
     latestRelease: latestRelease,
   };
 });
