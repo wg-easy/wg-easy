@@ -4,3 +4,5 @@
 /src/node_modules
 .DS_Store
 *.swp
+# lowdb data file
+db.json

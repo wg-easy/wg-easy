@@ -1,5 +1,11 @@
-export default defineEventHandler((event) => {
+export default defineEventHandler(async (event) => {
   setHeader(event, 'Content-Type', 'application/json');
-  const expires = WG_ENABLE_EXPIRES_TIME;
-  return expires === 'true' ? true : false;
+  const system = await Database.getSystem();
+  if (!system)
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Invalid',
+    });
+
+  return system.wgEnableExpiresTime;
 });
