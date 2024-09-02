@@ -35,6 +35,7 @@ export abstract class DatabaseProvider
   abstract disconnect(): Promise<void>;
 
   abstract getSystem(): Promise<System | null>;
+  // TODO: remove
   abstract getLang(): Promise<Lang>;
 
   abstract getUsers(): Promise<User[]>;
