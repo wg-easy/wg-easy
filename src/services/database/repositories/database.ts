@@ -1,15 +1,17 @@
-import type SystemRepository from './system/repository';
-import type UserRepository from './user/repository.ts';
-import type { Lang, ID } from './types';
-import type { User } from './user/model';
-import type { System } from './system/model';
-
-// TODO: re-export type from /user & /system
+import type { System, SystemRepository } from './system';
+import type { User, UserRepository } from './user';
+import type { Lang } from './types';
 
 // Represent data structure
-export type DBData = {
+export type Database = {
+  // TODO: always return correct value, greatly improves code
   system: System | null;
   users: User[];
+};
+
+export const DEFAULT_DATABASE: Database = {
+  system: null,
+  users: [],
 };
 
 /**
@@ -19,11 +21,9 @@ export type DBData = {
  * **Note :** Always throw `DatabaseError` to ensure proper API error handling.
  *
  */
-export default abstract class DatabaseProvider
+export abstract class DatabaseProvider
   implements SystemRepository, UserRepository
 {
-  protected data: DBData = { system: null, users: [] };
-
   /**
    * Connects to the database.
    */
@@ -37,14 +37,14 @@ export default abstract class DatabaseProvider
   abstract getSystem(): Promise<System | null>;
   abstract getLang(): Promise<Lang>;
 
-  abstract getUsers(): Promise<Array<User>>;
-  abstract getUser(id: ID): Promise<User | undefined>;
+  abstract getUsers(): Promise<User[]>;
+  abstract getUser(id: string): Promise<User | undefined>;
   abstract newUserWithPassword(
     username: string,
     password: string
   ): Promise<void>;
-  abstract updateUser(_user: User): Promise<void>;
-  abstract deleteUser(id: ID): Promise<void>;
+  abstract updateUser(user: User): Promise<void>;
+  abstract deleteUser(id: string): Promise<void>;
 }
 
 /**

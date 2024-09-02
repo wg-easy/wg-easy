@@ -2,33 +2,36 @@ import crypto from 'node:crypto';
 import debug from 'debug';
 import { join } from 'path';
 
-import DatabaseProvider, { DatabaseError } from './repositories/database';
+import {
+  DatabaseProvider,
+  DatabaseError,
+  DEFAULT_DATABASE,
+} from './repositories/database';
 import { hashPassword, isPasswordStrong } from '~/server/utils/password';
 import { JSONFilePreset } from 'lowdb/node';
-import { Lang } from './repositories/types';
-import SYSTEM from './repositories/system';
+import { DEFAULT_SYSTEM } from './repositories/system';
 
-import type { User } from './repositories/user/model';
-import type { DBData } from './repositories/database';
-import type { ID } from './repositories/types';
 import type { Low } from 'lowdb';
+import type { User } from './repositories/user';
+import type { Database } from './repositories/database';
 
 const DEBUG = debug('LowDB');
 
 export default class LowDB extends DatabaseProvider {
-  private _db!: Low<DBData>;
+  #db!: Low<Database>;
 
+  // is this really needed?
   private async __init() {
     // TODO: assume path to db file
     const dbFilePath = join(WG_PATH, 'db.json');
-    this._db = await JSONFilePreset(dbFilePath, this.data);
+    this.#db = await JSONFilePreset(dbFilePath, DEFAULT_DATABASE);
   }
 
   async connect() {
     try {
       // load file db
-      await this._db.read();
-      DEBUG('Connection done');
+      await this.#db.read();
+      DEBUG('Connected successfully');
       return;
     } catch (error) {
       DEBUG('Database does not exist : ', error);
@@ -41,31 +44,32 @@ export default class LowDB extends DatabaseProvider {
       throw new DatabaseError(DatabaseError.ERROR_INIT);
     }
 
-    this._db.update((data) => (data.system = SYSTEM));
+    // TODO: move to DEFAULT_DATABASE
+    this.#db.update((data) => (data.system = DEFAULT_SYSTEM));
 
-    DEBUG('Connection done');
+    DEBUG('Connected successfully');
   }
 
   async disconnect() {
-    DEBUG('Diconnect done');
+    DEBUG('Disconnected successfully');
   }
 
   async getSystem() {
     DEBUG('Get System');
-    return this._db.data.system;
+    return this.#db.data.system;
   }
 
   async getLang() {
-    return this._db.data.system?.lang || Lang.EN;
+    return this.#db.data.system?.lang || 'en';
   }
 
   async getUsers() {
-    return this._db.data.users;
+    return this.#db.data.users;
   }
 
-  async getUser(id: ID) {
+  async getUser(id: string) {
     DEBUG('Get User');
-    return this._db.data.users.find((user) => user.id === id);
+    return this.#db.data.users.find((user) => user.id === id);
   }
 
   async newUserWithPassword(username: string, password: string) {
@@ -79,7 +83,7 @@ export default class LowDB extends DatabaseProvider {
       throw new DatabaseError(DatabaseError.ERROR_PASSWORD_REQ);
     }
 
-    const isUserExist = this._db.data.users.find(
+    const isUserExist = this.#db.data.users.find(
       (user) => user.username === username
     );
     if (isUserExist) {
@@ -87,7 +91,7 @@ export default class LowDB extends DatabaseProvider {
     }
 
     const now = new Date();
-    const isUserEmpty = this._db.data.users.length === 0;
+    const isUserEmpty = this.#db.data.users.length === 0;
 
     const newUser: User = {
       id: crypto.randomUUID(),
@@ -99,23 +103,23 @@ export default class LowDB extends DatabaseProvider {
       updatedAt: now,
     };
 
-    this._db.update((data) => data.users.push(newUser));
+    this.#db.update((data) => data.users.push(newUser));
   }
 
   async updateUser(user: User) {
-    let _user = await this.getUser(user.id);
-    if (_user) {
+    let oldUser = await this.getUser(user.id);
+    if (oldUser) {
       DEBUG('Update User');
-      _user = user;
-      this._db.write();
+      oldUser = user;
+      this.#db.write();
     }
   }
 
-  async deleteUser(id: ID) {
+  async deleteUser(id: string) {
     DEBUG('Delete User');
-    const idx = this._db.data.users.findIndex((user) => user.id === id);
+    const idx = this.#db.data.users.findIndex((user) => user.id === id);
     if (idx !== -1) {
-      this._db.update((data) => data.users.splice(idx, 1));
+      this.#db.update((data) => data.users.splice(idx, 1));
     }
   }
 }

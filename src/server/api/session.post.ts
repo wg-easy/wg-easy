@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  // TODO: timing againts timing attack
+  // TODO: timing against timing attack
 
   const system = await Database.getSystem();
   if (!system)
