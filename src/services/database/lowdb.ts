@@ -75,6 +75,7 @@ export default class LowDB extends DatabaseProvider {
   async newUserWithPassword(username: string, password: string) {
     DEBUG('New User');
 
+    // TODO: should be handled by zod. completely remove database error
     if (username.length < 8) {
       throw new DatabaseError(DatabaseError.ERROR_USERNAME_REQ);
     }

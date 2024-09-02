@@ -11,6 +11,7 @@ export default defineEventHandler(async (event) => {
       message: 'Invalid state',
     });
   }
+  // TODO: validate with zod
   const clientOneTimeLink = getRouterParam(event, 'clientOneTimeLink');
   const clients = await WireGuard.getClients();
   const client = clients.find(

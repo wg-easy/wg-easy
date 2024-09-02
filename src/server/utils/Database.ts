@@ -13,4 +13,6 @@ provider.connect().catch((err) => {
   process.exit(1);
 });
 
+// TODO: check if old config exists and tell user about migration path
+
 export default provider;
