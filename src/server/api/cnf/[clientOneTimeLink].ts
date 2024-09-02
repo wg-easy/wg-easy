@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
       statusCode: 500,
       statusMessage: 'Invalid',
     });
-  if (!system.wgEnableOneTimeLinks) {
+  if (!system.oneTimeLinks.enabled) {
     throw createError({
       status: 404,
       message: 'Invalid state',
