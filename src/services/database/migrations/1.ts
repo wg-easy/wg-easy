@@ -23,7 +23,7 @@ export async function run1(db: Low<Database>) {
       userConfig: {
         mtu: 1420,
         persistentKeepalive: 0,
-        // TODO: assume handle CIDR to compute next ip in WireGuard
+        // TODO: handle CIDR to compute next ip in WireGuard
         //addressRange: '10.8.0.0/24',
         addressRange: addressRange,
         defaultDns: ['1.1.1.1'],

@@ -6,7 +6,6 @@ export default defineEventHandler(async (event) => {
       statusMessage: 'Invalid state',
     });
   }
-  // TODO: validate with zod
   const { oneTimeLink } = await getValidatedRouterParams(
     event,
     validateZod(oneTimeLinkType)

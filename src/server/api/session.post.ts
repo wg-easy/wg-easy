@@ -23,11 +23,6 @@ export default defineEventHandler(async (event) => {
   }
 
   const system = await Database.getSystem();
-  if (!system)
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Invalid',
-    });
 
   const conf: SessionConfig = system.sessionConfig;
 
