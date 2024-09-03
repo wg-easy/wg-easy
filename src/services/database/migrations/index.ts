@@ -5,6 +5,7 @@ import { run1 } from './1';
 export type MIGRATION_FN = (db: Low<Database>) => Promise<void>;
 
 const MIGRATION_LIST = {
+  // Adds Initial Database Structure
   '1': run1,
 } satisfies Record<string, MIGRATION_FN>;
 
