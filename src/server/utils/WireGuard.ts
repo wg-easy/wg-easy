@@ -6,6 +6,7 @@ import QRCode from 'qrcode';
 import CRC32 from 'crc-32';
 
 import type { NewClient } from '~~/services/database/repositories/client';
+import ip from 'ip';
 
 const DEBUG = debug('WireGuard');
 
@@ -25,7 +26,7 @@ class WireGuard {
 # Server
 [Interface]
 PrivateKey = ${system.interface.privateKey}
-Address = ${system.interface.address}/24
+Address = ${system.interface.address}
 ListenPort = ${system.wgPort}
 PreUp = ${system.iptables.PreUp}
 PostUp = ${system.iptables.PostUp}
@@ -41,9 +42,8 @@ PostDown = ${system.iptables.PostDown}
 # Client: ${client.name} (${clientId})
 [Peer]
 PublicKey = ${client.publicKey}
-${
-  client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
-}AllowedIPs = ${client.address}/32`;
+PresharedKey = ${client.preSharedKey}
+AllowedIPs = ${client.address}/32`;
     }
 
     DEBUG('Config saving...');
@@ -134,8 +134,8 @@ ${
 
     return `
 [Interface]
-PrivateKey = ${client.privateKey ? `${client.privateKey}` : 'REPLACE_ME'}
-Address = ${client.address}/24
+PrivateKey = ${client.privateKey}
+Address = ${client.address}
 DNS = ${system.userConfig.defaultDns.join(',')}
 MTU = ${system.userConfig.mtu}
 
@@ -175,19 +175,21 @@ Endpoint = ${system.wgHost}:${system.wgConfigPort}`;
     });
     const preSharedKey = await exec('wg genpsk');
 
-    // TODO: cidr
     // Calculate next IP
+    const cidr = ip.cidrSubnet(system.userConfig.addressRange);
     let address;
-    for (let i = 2; i < 255; i++) {
+    for (
+      let i = ip.toLong(cidr.firstAddress) + 1;
+      i <= ip.toLong(cidr.lastAddress) - 1;
+      i++
+    ) {
+      const currentIp = ip.fromLong(i);
       const client = Object.values(clients).find((client) => {
-        return (
-          client.address ===
-          system.userConfig.addressRange.replace('x', i.toString())
-        );
+        return client.address === currentIp;
       });
 
       if (!client) {
-        address = system.userConfig.addressRange.replace('x', i.toString());
+        address = currentIp;
         break;
       }
     }
@@ -281,7 +283,7 @@ Endpoint = ${system.wgHost}:${system.wgConfigPort}`;
     clientId: string;
     address: string;
   }) {
-    if (!isValidIPv4(address)) {
+    if (!ip.isV4Format(address)) {
       throw createError({
         statusCode: 400,
         statusMessage: `Invalid Address: ${address}`,
