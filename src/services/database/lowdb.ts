@@ -31,16 +31,14 @@ export default class LowDB extends DatabaseProvider {
    */
   async connect() {
     try {
-      // load file db
-      await this.#db.read();
-      DEBUG('Connected successfully');
-      return;
-    } catch (error) {
-      DEBUG('Database does not exist : ', error);
+      await this.__init();
+      DEBUG('Running Migrations');
+      await migrationRunner(this.#db);
+      DEBUG('Migrations ran successfully');
+    } catch (e) {
+      DEBUG(e);
+      throw new DatabaseError(DatabaseError.ERROR_INIT);
     }
-
-    await this.__init();
-    await migrationRunner(this.#db);
 
     DEBUG('Connected successfully');
   }

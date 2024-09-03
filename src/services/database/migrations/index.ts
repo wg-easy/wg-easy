@@ -24,8 +24,8 @@ export async function migrationRunner(db: Low<Database>) {
     try {
       await MIGRATION_LIST[migrationId](db);
       db.data.migrations.push(migrationId);
-    } catch {
-      throw new Error(`Failed to run Migration $`);
+    } catch (e) {
+      throw new Error(`Failed to run Migration ${migrationId}: ${e}`);
     }
   }
   await db.write();
