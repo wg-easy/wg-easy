@@ -22,8 +22,6 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  // TODO: timing againts timing attack
-
   const system = await Database.getSystem();
   if (!system)
     throw createError({
