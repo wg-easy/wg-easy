@@ -1,4 +1,5 @@
-export default defineEventHandler((event) => {
+export default defineEventHandler(async (event) => {
   setHeader(event, 'Content-Type', 'application/json');
-  return Database.getLang();
+  const system = await Database.getSystem();
+  return system.lang;
 });

@@ -34,7 +34,7 @@ RUN apk add --no-cache \
 RUN update-alternatives --install /usr/sbin/iptables iptables /usr/sbin/iptables-legacy 10 --slave /usr/sbin/iptables-restore iptables-restore /usr/sbin/iptables-legacy-restore --slave /usr/sbin/iptables-save iptables-save /usr/sbin/iptables-legacy-save
 
 # Set Environment
-ENV DEBUG=Server,WireGuard
+ENV DEBUG=Server,WireGuard,LowDB
 ENV PORT=51821
 
 # Run Web UI
