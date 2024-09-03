@@ -1,6 +1,6 @@
 <template>
   <div
-    v-show="globalStore.enableExpireTime"
+    v-show="globalStore.features.clientExpiration.enabled"
     class="block md:inline-block pb-1 md:pb-0 text-gray-500 dark:text-neutral-400 text-xs"
   >
     <span class="group">

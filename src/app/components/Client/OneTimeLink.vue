@@ -1,6 +1,8 @@
 <template>
   <div
-    v-if="globalStore.enableOneTimeLinks && client.oneTimeLink !== null"
+    v-if="
+      globalStore.features.oneTimeLinks.enabled && client.oneTimeLink !== null
+    "
     :ref="'client-' + client.id + '-link'"
     class="text-gray-400 text-xs"
   >

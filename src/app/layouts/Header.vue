@@ -36,7 +36,7 @@
         </button>
         <!-- Show / hide charts -->
         <label
-          v-if="globalStore.uiChartType > 0"
+          v-if="globalStore.features.trafficStats.type > 0"
           class="inline-flex items-center justify-center cursor-pointer w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 dark:bg-neutral-700 dark:hover:bg-neutral-600 whitespace-nowrap transition group"
           :title="$t('toggleCharts')"
         >
@@ -96,8 +96,6 @@ const currentRelease = ref<null | number>(null);
 const latestRelease = ref<null | { version: number; changelog: string }>(null);
 
 const theme = useTheme();
-
-globalStore.fetchChartType();
 const uiShowCharts = ref(getItem('uiShowCharts') === '1');
 
 function toggleTheme() {

@@ -11,30 +11,6 @@ class API {
     });
   }
 
-  async getTrafficStats() {
-    return useFetch('/api/ui-traffic-stats', {
-      method: 'get',
-    });
-  }
-
-  async getChartType() {
-    return useFetch('/api/ui-chart-type', {
-      method: 'get',
-    });
-  }
-
-  async getEnableOneTimeLinks() {
-    return useFetch('/api/wg-enable-one-time-links', {
-      method: 'get',
-    });
-  }
-
-  async getEnableExpireTime() {
-    return useFetch('/api/wg-enable-expire-time', {
-      method: 'get',
-    });
-  }
-
   async getSession() {
     // TODO?: use useFetch
     return $fetch('/api/session', {
@@ -152,13 +128,7 @@ class API {
     });
   }
 
-  async getSortClients() {
-    return useFetch('/api/ui-sort-clients', {
-      method: 'get',
-    });
-  }
-
-  async newAccount({
+  async createAccount({
     username,
     password,
   }: {
@@ -168,6 +138,12 @@ class API {
     return $fetch('/api/account/new', {
       method: 'post',
       body: { username, password },
+    });
+  }
+
+  async getFeatures() {
+    return useFetch('/api/features', {
+      method: 'get',
     });
   }
 }
