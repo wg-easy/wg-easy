@@ -2,13 +2,15 @@ import type { Low } from 'lowdb';
 import type { Database } from '../repositories/database';
 import packageJson from '@@/package.json';
 import { ChartType } from '../repositories/system';
+import ip from 'ip';
 
 export async function run1(db: Low<Database>) {
   const privateKey = await exec('wg genkey');
   const publicKey = await exec(`echo ${privateKey} | wg pubkey`, {
     log: 'echo ***hidden*** | wg pubkey',
   });
-  const addressRange = '10.8.0.x';
+  const addressRange = '10.8.0.0/24';
+  const cidr = ip.cidrSubnet(addressRange);
   const database: Database = {
     migrations: [],
     system: {
@@ -17,20 +19,18 @@ export async function run1(db: Low<Database>) {
       interface: {
         privateKey: privateKey,
         publicKey: publicKey,
-        address: addressRange.replace('x', '1'),
+        address: cidr.firstAddress,
       },
       sessionTimeout: 3600, // 1 hour
       lang: 'en',
       userConfig: {
         mtu: 1420,
         persistentKeepalive: 0,
-        // TODO: handle CIDR to compute next ip in WireGuard
-        //addressRange: '10.8.0.0/24',
         addressRange: addressRange,
         defaultDns: ['1.1.1.1'],
         allowedIps: ['0.0.0.0/0', '::/0'],
       },
-      wgDevice: 'wg0',
+      wgDevice: 'eth0',
       // TODO: wgHost has to be configured when onboarding
       wgHost: '',
       wgPort: 51820,
@@ -71,7 +71,7 @@ export async function run1(db: Low<Database>) {
 
   // TODO: use variables inside up/down script
   database.system.iptables.PostUp = `
-iptables -t nat -A POSTROUTING -s ${database.system.userConfig.addressRange.replace('x', '0')}/24 -o ${database.system.wgDevice} -j MASQUERADE;
+iptables -t nat -A POSTROUTING -s ${database.system.userConfig.addressRange} -o ${database.system.wgDevice} -j MASQUERADE;
 iptables -A INPUT -p udp -m udp --dport ${database.system.wgPort} -j ACCEPT;
 iptables -A FORWARD -i wg0 -j ACCEPT;
 iptables -A FORWARD -o wg0 -j ACCEPT;
@@ -79,7 +79,7 @@ iptables -A FORWARD -o wg0 -j ACCEPT;
     .split('\n')
     .join(' ');
   database.system.iptables.PostDown = `
-iptables -t nat -D POSTROUTING -s ${database.system.userConfig.addressRange.replace('x', '0')}/24 -o ${database.system.wgDevice} -j MASQUERADE;
+iptables -t nat -D POSTROUTING -s ${database.system.userConfig.addressRange} -o ${database.system.wgDevice} -j MASQUERADE;
 iptables -D INPUT -p udp -m udp --dport ${database.system.wgPort} -j ACCEPT;
 iptables -D FORWARD -i wg0 -j ACCEPT;
 iptables -D FORWARD -o wg0 -j ACCEPT;
