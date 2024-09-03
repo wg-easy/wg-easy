@@ -1,30 +1,32 @@
 export default defineEventHandler(async (event) => {
   const system = await Database.getSystem();
-  if (!system)
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Invalid',
-    });
   if (!system.oneTimeLinks.enabled) {
     throw createError({
-      status: 404,
-      message: 'Invalid state',
+      statusCode: 404,
+      statusMessage: 'Invalid state',
     });
   }
-  // TODO: validate with zod
-  const clientOneTimeLink = getRouterParam(event, 'clientOneTimeLink');
+  const { oneTimeLink } = await getValidatedRouterParams(
+    event,
+    validateZod(oneTimeLinkType)
+  );
   const clients = await WireGuard.getClients();
   const client = clients.find(
-    (client) => client.oneTimeLink === clientOneTimeLink
+    (client) => client.oneTimeLink?.oneTimeLink === oneTimeLink
   );
-  if (!client) return;
+  if (!client) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: 'Invalid One Time Link',
+    });
+  }
   const clientId = client.id;
   const config = await WireGuard.getClientConfiguration({ clientId });
   await WireGuard.eraseOneTimeLink({ clientId });
   setHeader(
     event,
     'Content-Disposition',
-    `attachment; filename="${clientOneTimeLink}.conf"`
+    `attachment; filename="${client.name}.conf"`
   );
   setHeader(event, 'Content-Type', 'text/plain');
   return config;

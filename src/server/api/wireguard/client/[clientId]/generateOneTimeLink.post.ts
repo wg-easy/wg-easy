@@ -1,5 +1,6 @@
 export default defineEventHandler(async (event) => {
-  if (WG_ENABLE_ONE_TIME_LINKS === 'false') {
+  const system = await Database.getSystem();
+  if (!system.oneTimeLinks.enabled) {
     throw createError({
       status: 404,
       message: 'Invalid state',

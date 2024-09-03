@@ -23,17 +23,13 @@ export default defineEventHandler(async (event) => {
   }
 
   const system = await Database.getSystem();
-  if (!system)
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Invalid',
-    });
 
   const conf: SessionConfig = system.sessionConfig;
-  if (MAX_AGE && remember) {
+
+  if (remember) {
     conf.cookie = {
       ...(system.sessionConfig.cookie ?? {}),
-      maxAge: MAX_AGE,
+      maxAge: system.cookieMaxAge * 60,
     };
   }
 

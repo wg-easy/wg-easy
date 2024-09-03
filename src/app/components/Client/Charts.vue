@@ -1,13 +1,13 @@
 <template>
   <div
-    v-if="globalStore.uiChartType"
-    :class="`absolute z-0 bottom-0 left-0 right-0 h-6 ${globalStore.uiChartType === 1 && 'line-chart'}`"
+    v-if="globalStore.features.trafficStats.type"
+    :class="`absolute z-0 bottom-0 left-0 right-0 h-6 ${globalStore.features.trafficStats.type === 1 && 'line-chart'}`"
   >
     <UiChart :options="chartOptionsTX" :series="client.transferTxSeries" />
   </div>
   <div
-    v-if="globalStore.uiChartType"
-    :class="`absolute z-0 top-0 left-0 right-0 h-6 ${globalStore.uiChartType === 1 && 'line-chart'}`"
+    v-if="globalStore.features.trafficStats.type"
+    :class="`absolute z-0 top-0 left-0 right-0 h-6 ${globalStore.features.trafficStats.type === 1 && 'line-chart'}`"
   >
     <UiChart
       :options="chartOptionsRX"
@@ -32,8 +32,10 @@ const chartOptionsTX = computed(() => {
     ...chartOptions,
     colors: [CHART_COLORS.tx[theme.value]],
   };
-  opts.chart.type = UI_CHART_TYPES[globalStore.uiChartType]?.type || undefined;
-  opts.stroke.width = UI_CHART_TYPES[globalStore.uiChartType]?.strokeWidth ?? 0;
+  opts.chart.type =
+    UI_CHART_TYPES[globalStore.features.trafficStats.type]?.type || undefined;
+  opts.stroke.width =
+    UI_CHART_TYPES[globalStore.features.trafficStats.type]?.strokeWidth ?? 0;
   return opts;
 });
 
@@ -42,8 +44,10 @@ const chartOptionsRX = computed(() => {
     ...chartOptions,
     colors: [CHART_COLORS.rx[theme.value]],
   };
-  opts.chart.type = UI_CHART_TYPES[globalStore.uiChartType]?.type || undefined;
-  opts.stroke.width = UI_CHART_TYPES[globalStore.uiChartType]?.strokeWidth ?? 0;
+  opts.chart.type =
+    UI_CHART_TYPES[globalStore.features.trafficStats.type]?.type || undefined;
+  opts.stroke.width =
+    UI_CHART_TYPES[globalStore.features.trafficStats.type]?.strokeWidth ?? 0;
   return opts;
 });
 

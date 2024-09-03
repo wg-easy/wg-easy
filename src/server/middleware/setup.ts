@@ -4,7 +4,8 @@ export default defineEventHandler(async (event) => {
 
   if (
     url.pathname.startsWith('/setup') ||
-    url.pathname === '/api/account/new'
+    url.pathname === '/api/account/new' ||
+    url.pathname === '/api/features'
   ) {
     return;
   }
