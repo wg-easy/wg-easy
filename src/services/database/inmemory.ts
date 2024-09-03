@@ -1,44 +1,47 @@
 import crypto from 'node:crypto';
 import debug from 'debug';
 
-import DatabaseProvider, { DatabaseError } from './repositories/database';
+import {
+  DatabaseProvider,
+  DatabaseError,
+  DEFAULT_DATABASE,
+} from './repositories/database';
 import { hashPassword, isPasswordStrong } from '~/server/utils/password';
-import { Lang } from './repositories/types';
-import SYSTEM from './repositories/system';
+import { DEFAULT_SYSTEM } from './repositories/system';
 
-import type { User } from './repositories/user/model';
-import type { ID } from './repositories/types';
+import type { User } from './repositories/user';
 
 const DEBUG = debug('InMemoryDB');
 
-// In-Memory Database Provider
 export default class InMemory extends DatabaseProvider {
+  #data = DEFAULT_DATABASE;
+
   async connect() {
-    this.data.system = SYSTEM;
-    DEBUG('Connection done');
+    this.#data.system = DEFAULT_SYSTEM;
+    DEBUG('Connected  successfully');
   }
 
   async disconnect() {
-    this.data = { system: null, users: [] };
-    DEBUG('Diconnect done');
+    this.#data = { system: null, users: [] };
+    DEBUG('Disconnected successfully');
   }
 
   async getSystem() {
     DEBUG('Get System');
-    return this.data.system;
+    return this.#data.system;
   }
 
   async getLang() {
-    return this.data.system?.lang || Lang.EN;
+    return this.#data.system?.lang || 'en';
   }
 
   async getUsers() {
-    return this.data.users;
+    return this.#data.users;
   }
 
-  async getUser(id: ID) {
+  async getUser(id: string) {
     DEBUG('Get User');
-    return this.data.users.find((user) => user.id === id);
+    return this.#data.users.find((user) => user.id === id);
   }
 
   async newUserWithPassword(username: string, password: string) {
@@ -52,7 +55,7 @@ export default class InMemory extends DatabaseProvider {
       throw new DatabaseError(DatabaseError.ERROR_PASSWORD_REQ);
     }
 
-    const isUserExist = this.data.users.find(
+    const isUserExist = this.#data.users.find(
       (user) => user.username === username
     );
     if (isUserExist) {
@@ -60,7 +63,7 @@ export default class InMemory extends DatabaseProvider {
     }
 
     const now = new Date();
-    const isUserEmpty = this.data.users.length === 0;
+    const isUserEmpty = this.#data.users.length === 0;
 
     const newUser: User = {
       id: crypto.randomUUID(),
@@ -72,22 +75,22 @@ export default class InMemory extends DatabaseProvider {
       updatedAt: now,
     };
 
-    this.data.users.push(newUser);
+    this.#data.users.push(newUser);
   }
 
   async updateUser(user: User) {
-    let _user = await this.getUser(user.id);
-    if (_user) {
+    let oldUser = await this.getUser(user.id);
+    if (oldUser) {
       DEBUG('Update User');
-      _user = user;
+      oldUser = user;
     }
   }
 
-  async deleteUser(id: ID) {
+  async deleteUser(id: string) {
     DEBUG('Delete User');
-    const idx = this.data.users.findIndex((user) => user.id === id);
+    const idx = this.#data.users.findIndex((user) => user.id === id);
     if (idx !== -1) {
-      this.data.users.splice(idx, 1);
+      this.#data.users.splice(idx, 1);
     }
   }
 }
