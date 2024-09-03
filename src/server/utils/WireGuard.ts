@@ -464,9 +464,13 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
 
   async cronJobEveryMinute() {
     const config = await this.getConfig();
+    const system = await Database.getSystem();
+    if (!system) {
+      throw new Error('Invalid Database');
+    }
     let needSaveConfig = false;
     // Expires Feature
-    if (WG_ENABLE_EXPIRES_TIME === 'true') {
+    if (system.clientExpiration.enabled) {
       for (const client of Object.values(config.clients)) {
         if (client.enabled !== true) continue;
         if (
@@ -481,7 +485,7 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
       }
     }
     // One Time Link Feature
-    if (WG_ENABLE_ONE_TIME_LINKS === 'true') {
+    if (system.oneTimeLinks.enabled) {
       for (const client of Object.values(config.clients)) {
         if (
           client.oneTimeLink !== null &&

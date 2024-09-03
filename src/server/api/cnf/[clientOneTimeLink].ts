@@ -5,12 +5,13 @@ export default defineEventHandler(async (event) => {
       statusCode: 500,
       statusMessage: 'Invalid',
     });
-  if (!system.wgEnableOneTimeLinks) {
+  if (!system.oneTimeLinks.enabled) {
     throw createError({
       status: 404,
       message: 'Invalid state',
     });
   }
+  // TODO: validate with zod
   const clientOneTimeLink = getRouterParam(event, 'clientOneTimeLink');
   const clients = await WireGuard.getClients();
   const client = clients.find(
