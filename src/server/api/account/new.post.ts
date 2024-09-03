@@ -1,4 +1,4 @@
-import { DatabaseError } from '~/services/database/repositories/database';
+import { DatabaseError } from '~~/services/database/repositories/database';
 
 export default defineEventHandler(async (event) => {
   setHeader(event, 'Content-Type', 'application/json');
