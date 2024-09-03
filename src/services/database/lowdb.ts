@@ -26,6 +26,9 @@ export default class LowDB extends DatabaseProvider {
     this.#db = await JSONFilePreset(dbFilePath, DEFAULT_DATABASE);
   }
 
+  /**
+   * @throws
+   */
   async connect() {
     try {
       // load file db
@@ -36,12 +39,8 @@ export default class LowDB extends DatabaseProvider {
       DEBUG('Database does not exist : ', error);
     }
 
-    try {
-      await this.__init();
-      await migrationRunner(this.#db);
-    } catch {
-      throw new DatabaseError(DatabaseError.ERROR_INIT);
-    }
+    await this.__init();
+    await migrationRunner(this.#db);
 
     DEBUG('Connected successfully');
   }

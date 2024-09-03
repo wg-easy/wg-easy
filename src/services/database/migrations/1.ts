@@ -30,7 +30,7 @@ export async function run1(db: Low<Database>) {
     log: 'echo ***hidden*** | wg pubkey',
   });
   const database: Database = {
-    migrations: ['1'],
+    migrations: [],
     system: {
       release: packageJson.release.version,
       interface: {
