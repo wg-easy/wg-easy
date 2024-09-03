@@ -26,7 +26,7 @@ You have found the easiest way to install & manage WireGuard on any Linux host!
 - Multilanguage Support
 - Traffic Stats (default off)
 - One Time Links (default off)
-- Client Expiry (default off)
+- Client Expiration (default off)
 - Prometheus metrics support
 
 ## Requirements

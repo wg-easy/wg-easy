@@ -1,5 +1,11 @@
-export default defineEventHandler((event) => {
+export default defineEventHandler(async (event) => {
   setHeader(event, 'Content-Type', 'application/json');
-  const sort = UI_ENABLE_SORT_CLIENTS;
-  return sort === 'true' ? true : false;
+  const system = await Database.getSystem();
+  if (!system)
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Invalid',
+    });
+
+  return system.sortClients.enabled;
 });
