@@ -2,8 +2,6 @@ import type { SessionConfig } from 'h3';
 
 import debug from 'debug';
 
-export const PORT = process.env.PORT || '51821';
-export const WEBUI_HOST = process.env.WEBUI_HOST || '0.0.0.0';
 export const MAX_AGE = process.env.MAX_AGE
   ? parseInt(process.env.MAX_AGE, 10) * 60
   : 0;

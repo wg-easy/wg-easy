@@ -7,5 +7,5 @@ export default defineEventHandler(async (event) => {
       statusMessage: 'Invalid',
     });
 
-  return system.wgEnableExpiresTime;
+  return system.clientExpiration.enabled;
 });
