@@ -8,11 +8,11 @@ import {
   DEFAULT_DATABASE,
 } from './repositories/database';
 import { JSONFilePreset } from 'lowdb/node';
-import { DEFAULT_SYSTEM } from './repositories/system';
 
 import type { Low } from 'lowdb';
 import type { User } from './repositories/user';
 import type { Database } from './repositories/database';
+import { migrationRunner } from './migrations';
 
 const DEBUG = debug('LowDB');
 
@@ -38,13 +38,10 @@ export default class LowDB extends DatabaseProvider {
 
     try {
       await this.__init();
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
+      await migrationRunner(this.#db);
+    } catch {
       throw new DatabaseError(DatabaseError.ERROR_INIT);
     }
-
-    // TODO: move to DEFAULT_DATABASE
-    this.#db.update((data) => (data.system = DEFAULT_SYSTEM));
 
     DEBUG('Connected successfully');
   }
@@ -55,11 +52,12 @@ export default class LowDB extends DatabaseProvider {
 
   async getSystem() {
     DEBUG('Get System');
-    return this.#db.data.system;
-  }
-
-  async getLang() {
-    return this.#db.data.system?.lang || 'en';
+    const system = this.#db.data.system;
+    // system is only null if migration failed
+    if (system === null) {
+      throw new DatabaseError(DatabaseError.ERROR_INIT);
+    }
+    return system;
   }
 
   async getUsers() {
