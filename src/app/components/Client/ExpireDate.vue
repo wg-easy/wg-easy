@@ -1,6 +1,6 @@
 <template>
   <div
-    v-show="globalStore.enableExpireTime"
+    v-show="globalStore.features.clientExpiration.enabled"
     class="block md:inline-block pb-1 md:pb-0 text-gray-500 dark:text-neutral-400 text-xs"
   >
     <span class="group">
@@ -24,7 +24,7 @@
       <span
         v-show="clientEditExpireDateId !== client.id"
         class="inline-block"
-        >{{ expiredDateFormat(client.expireAt) }}</span
+        >{{ expiredDateFormat(client.expiresAt) }}</span
       >
 
       <!-- Edit -->
@@ -32,8 +32,8 @@
         v-show="clientEditExpireDateId !== client.id"
         class="cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity"
         @click="
-          clientEditExpireDate = client.expireAt
-            ? client.expireAt.slice(0, 10)
+          clientEditExpireDate = client.expiresAt
+            ? client.expiresAt.slice(0, 10)
             : 'yyyy-mm-dd';
           clientEditExpireDateId = client.id;
           nextTick(() => clientExpireDateInput?.select());

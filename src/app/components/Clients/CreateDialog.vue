@@ -71,7 +71,10 @@
                   />
                 </p>
               </div>
-              <div v-show="globalStore.enableExpireTime" class="mt-2">
+              <div
+                v-show="globalStore.features.clientExpiration.enabled"
+                class="mt-2"
+              >
                 <p class="text-sm text-gray-500">
                   <label
                     class="block text-gray-900 dark:text-neutral-200 text-sm font-bold mb-2"
