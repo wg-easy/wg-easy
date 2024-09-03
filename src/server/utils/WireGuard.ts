@@ -6,7 +6,7 @@ import QRCode from 'qrcode';
 import CRC32 from 'crc-32';
 
 import type { NewClient } from '~~/services/database/repositories/client';
-import { cidrSubnet, fromLong, isV4Format, toLong } from 'ip';
+import ip from 'ip';
 
 const DEBUG = debug('WireGuard');
 
@@ -42,9 +42,8 @@ PostDown = ${system.iptables.PostDown}
 # Client: ${client.name} (${clientId})
 [Peer]
 PublicKey = ${client.publicKey}
-${
-  client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
-}AllowedIPs = ${client.address}/32`;
+PresharedKey = ${client.preSharedKey}
+AllowedIPs = ${client.address}/32`;
     }
 
     DEBUG('Config saving...');
@@ -178,14 +177,14 @@ Endpoint = ${system.wgHost}:${system.wgConfigPort}`;
 
     // TODO: cidr
     // Calculate next IP
-    const cidr = cidrSubnet(system.userConfig.addressRange);
+    const cidr = ip.cidrSubnet(system.userConfig.addressRange);
     let address;
     for (
-      let i = toLong(cidr.firstAddress);
-      i <= toLong(cidr.lastAddress);
+      let i = ip.toLong(cidr.firstAddress);
+      i <= ip.toLong(cidr.lastAddress);
       i++
     ) {
-      const currentIp = fromLong(i);
+      const currentIp = ip.fromLong(i);
       const client = Object.values(clients).find((client) => {
         return client.address === currentIp;
       });
@@ -285,7 +284,7 @@ Endpoint = ${system.wgHost}:${system.wgConfigPort}`;
     clientId: string;
     address: string;
   }) {
-    if (!isV4Format(address)) {
+    if (!ip.isV4Format(address)) {
       throw createError({
         statusCode: 400,
         statusMessage: `Invalid Address: ${address}`,
