@@ -42,6 +42,11 @@ const expireDate = z
   .pipe(safeStringRefine)
   .nullable();
 
+const oneTimeLink = z
+  .string({ message: 'oneTimeLink must be a valid string' })
+  .min(1, 'oneTimeLink must be at least 1 Character')
+  .pipe(safeStringRefine);
+
 export const clientIdType = z.object(
   {
     clientId: id,
@@ -66,6 +71,13 @@ export const nameType = z.object(
 export const expireDateType = z.object(
   {
     expireDate: expireDate,
+  },
+  { message: 'Body must be a valid object' }
+);
+
+export const oneTimeLinkType = z.object(
+  {
+    oneTimeLink: oneTimeLink,
   },
   { message: 'Body must be a valid object' }
 );

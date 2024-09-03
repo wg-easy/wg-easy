@@ -13,6 +13,7 @@ import type { Low } from 'lowdb';
 import type { User } from './repositories/user';
 import type { Database } from './repositories/database';
 import { migrationRunner } from './migrations';
+import type { Client, NewClient, OneTimeLink } from './repositories/client';
 
 const DEBUG = debug('LowDB');
 
@@ -99,15 +100,16 @@ export default class LowDB extends DatabaseProvider {
       updatedAt: now,
     };
 
-    this.#db.update((data) => data.users.push(newUser));
+    await this.#db.update((data) => data.users.push(newUser));
   }
 
   async updateUser(user: User) {
+    // TODO: avoid mutation, prefer .update
     let oldUser = await this.getUser(user.id);
     if (oldUser) {
       DEBUG('Update User');
       oldUser = user;
-      this.#db.write();
+      await this.#db.write();
     }
   }
 
@@ -115,7 +117,89 @@ export default class LowDB extends DatabaseProvider {
     DEBUG('Delete User');
     const idx = this.#db.data.users.findIndex((user) => user.id === id);
     if (idx !== -1) {
-      this.#db.update((data) => data.users.splice(idx, 1));
+      await this.#db.update((data) => data.users.splice(idx, 1));
     }
+  }
+
+  async getClients() {
+    DEBUG('GET Clients');
+    return this.#db.data.clients;
+  }
+
+  async getClient(id: string) {
+    DEBUG('Get Client');
+    return this.#db.data.clients[id];
+  }
+
+  async createClient(client: NewClient) {
+    DEBUG('Create Client');
+    const now = new Date();
+    const newClient: Client = { ...client, createdAt: now, updatedAt: now };
+    await this.#db.update((data) => {
+      data.clients[client.id] = newClient;
+    });
+  }
+
+  async deleteClient(id: string) {
+    DEBUG('Delete Client');
+    await this.#db.update((data) => {
+      // TODO: find something better than delete
+      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+      delete data.clients[id];
+    });
+  }
+
+  async toggleClient(id: string, enable: boolean) {
+    DEBUG('Toggle Client');
+    await this.#db.update((data) => {
+      if (data.clients[id]) {
+        data.clients[id].enabled = enable;
+      }
+    });
+  }
+
+  async updateClientName(id: string, name: string) {
+    DEBUG('Update Client Name');
+    await this.#db.update((data) => {
+      if (data.clients[id]) {
+        data.clients[id].name = name;
+      }
+    });
+  }
+
+  async updateClientAddress(id: string, address: string) {
+    DEBUG('Update Client Address');
+    await this.#db.update((data) => {
+      if (data.clients[id]) {
+        data.clients[id].address = address;
+      }
+    });
+  }
+
+  async updateClientExpirationDate(id: string, expirationDate: Date | null) {
+    DEBUG('Update Client Address');
+    await this.#db.update((data) => {
+      if (data.clients[id]) {
+        data.clients[id].expiresAt = expirationDate;
+      }
+    });
+  }
+
+  async deleteOneTimeLink(id: string) {
+    DEBUG('Update Client Address');
+    await this.#db.update((data) => {
+      if (data.clients[id]) {
+        data.clients[id].oneTimeLink = null;
+      }
+    });
+  }
+
+  async createOneTimeLink(id: string, oneTimeLink: OneTimeLink) {
+    DEBUG('Update Client Address');
+    await this.#db.update((data) => {
+      if (data.clients[id]) {
+        data.clients[id].oneTimeLink = oneTimeLink;
+      }
+    });
   }
 }
