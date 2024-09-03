@@ -2,8 +2,8 @@
 
 // Import needed libraries
 import bcrypt from 'bcryptjs';
-import { Writable } from 'stream'
-import readline from 'readline'
+import { Writable } from 'stream';
+import readline from 'readline';
 
 // Function to generate hash
 const generateHash = async (password) => {
@@ -34,30 +34,27 @@ const comparePassword = async (password, hash) => {
 };
 
 const readStdinPassword = () => {
-
   return new Promise((resolve) => {
-    process.stdout.write("Enter your password: ");
+    process.stdout.write('Enter your password: ');
 
     const rl = readline.createInterface({
       input: process.stdin,
       output: new Writable({
         write(_chunk, _encoding, callback) {
-          callback()
-        }
+          callback();
+        },
       }),
       terminal: true,
     });
 
-    rl.question('', answer => {
+    rl.question('', (answer) => {
       rl.close();
       // Print a new line after password prompt
       process.stdout.write('\n');
       resolve(answer);
-    })
-
-  })
-
-}
+    });
+  });
+};
 
 (async () => {
   try {
@@ -74,7 +71,7 @@ const readStdinPassword = () => {
       await generateHash(password);
     } else {
       const password = await readStdinPassword();
-      await generateHash(password)
+      await generateHash(password);
     }
   } catch (error) {
     // eslint-disable-next-line no-console
