@@ -334,12 +334,55 @@ Endpoint = ${system.wgHost}:${system.wgConfigPort}`;
     return backup; */
   }
 
+  async Startup() {
+    // TODO: improve this
+    await new Promise((res) => {
+      function wait() {
+        if (Database.connected) {
+          return res(true);
+        }
+      }
+      setTimeout(wait, 1000);
+    });
+    DEBUG('Starting Wireguard');
+    await this.#saveWireguardConfig();
+    await exec('wg-quick down wg0').catch(() => {});
+    await exec('wg-quick up wg0').catch((err) => {
+      if (
+        err &&
+        err.message &&
+        err.message.includes('Cannot find device "wg0"')
+      ) {
+        throw new Error(
+          'WireGuard exited with the error: Cannot find device "wg0"\nThis usually means that your host\'s kernel does not support WireGuard!'
+        );
+      }
+
+      throw err;
+    });
+    await this.#syncWireguardConfig();
+    DEBUG('Wireguard started successfully');
+
+    DEBUG('Starting Cron Job');
+    await this.startCronJob();
+  }
+
+  async startCronJob() {
+    await this.cronJob().catch((err) => {
+      DEBUG('Running Cron Job failed.');
+      console.error(err);
+    });
+    setTimeout(() => {
+      this.startCronJob();
+    }, 60 * 1000);
+  }
+
   // Shutdown wireguard
   async Shutdown() {
     await exec('wg-quick down wg0').catch(() => {});
   }
 
-  async cronJobEveryMinute() {
+  async cronJob() {
     const clients = await Database.getClients();
     const system = await Database.getSystem();
     // Expires Feature
@@ -441,15 +484,9 @@ Endpoint = ${system.wgHost}:${system.wgConfigPort}`;
 }
 
 const inst = new WireGuard();
-
-// This also has to also start the WireGuard Server
-async function cronJobEveryMinute() {
-  await inst.cronJobEveryMinute().catch((err) => {
-    DEBUG('Running Cron Job failed.');
-    console.error(err);
-  });
-  setTimeout(cronJobEveryMinute, 60 * 1000);
-}
-cronJobEveryMinute();
+inst.Startup().catch((v) => {
+  console.error(v);
+  process.exit(1);
+});
 
 export default inst;

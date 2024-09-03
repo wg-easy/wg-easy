@@ -19,6 +19,7 @@ const DEBUG = debug('LowDB');
 
 export default class LowDB extends DatabaseProvider {
   #db!: Low<Database>;
+  #connected = false;
 
   // is this really needed?
   private async __init() {
@@ -30,6 +31,9 @@ export default class LowDB extends DatabaseProvider {
    * @throws
    */
   async connect() {
+    if (this.#connected) {
+      return;
+    }
     try {
       await this.__init();
       DEBUG('Running Migrations');
@@ -39,11 +43,16 @@ export default class LowDB extends DatabaseProvider {
       DEBUG(e);
       throw new DatabaseError(DatabaseError.ERROR_INIT);
     }
-
+    this.#connected = true;
     DEBUG('Connected successfully');
   }
 
+  get connected() {
+    return this.#connected;
+  }
+
   async disconnect() {
+    this.#connected = false;
     DEBUG('Disconnected successfully');
   }
 
@@ -104,7 +113,7 @@ export default class LowDB extends DatabaseProvider {
   }
 
   async updateUser(user: User) {
-    // TODO: avoid mutation, prefer .update
+    // TODO: avoid mutation, prefer .update, updatedAt
     let oldUser = await this.getUser(user.id);
     if (oldUser) {
       DEBUG('Update User');

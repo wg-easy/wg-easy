@@ -12,6 +12,7 @@ export async function run1(db: Low<Database>) {
   const database: Database = {
     migrations: [],
     system: {
+      // TODO: move to var, no need for database
       release: packageJson.release.version,
       interface: {
         privateKey: privateKey,
