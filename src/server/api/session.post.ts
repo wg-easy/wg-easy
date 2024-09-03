@@ -30,10 +30,11 @@ export default defineEventHandler(async (event) => {
     });
 
   const conf: SessionConfig = system.sessionConfig;
-  if (MAX_AGE && remember) {
+
+  if (remember) {
     conf.cookie = {
       ...(system.sessionConfig.cookie ?? {}),
-      maxAge: MAX_AGE,
+      maxAge: system.cookieMaxAge * 60,
     };
   }
 

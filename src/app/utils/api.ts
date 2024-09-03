@@ -11,12 +11,6 @@ class API {
     });
   }
 
-  async getRememberMeEnabled() {
-    return useFetch('/api/remember-me', {
-      method: 'get',
-    });
-  }
-
   async getTrafficStats() {
     return useFetch('/api/ui-traffic-stats', {
       method: 'get',

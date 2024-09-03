@@ -3,32 +3,12 @@ import type { Database } from '../repositories/database';
 import packageJson from '@@/package.json';
 import { ChartType } from '../repositories/system';
 
-// TODO: use variables inside up/down script
-const DEFAULT_ADDRESS = '10.8.0.x';
-const DEFAULT_DEVICE = 'eth0';
-const DEFAULT_WG_PORT = 51820;
-const DEFAULT_POST_UP = `
-iptables -t nat -A POSTROUTING -s ${DEFAULT_ADDRESS.replace('x', '0')}/24 -o ${DEFAULT_DEVICE} -j MASQUERADE;
-iptables -A INPUT -p udp -m udp --dport ${DEFAULT_WG_PORT} -j ACCEPT;
-iptables -A FORWARD -i wg0 -j ACCEPT;
-iptables -A FORWARD -o wg0 -j ACCEPT;
-`
-  .split('\n')
-  .join(' ');
-const DEFAULT_POST_DOWN = `
-iptables -t nat -D POSTROUTING -s ${DEFAULT_ADDRESS.replace('x', '0')}/24 -o ${DEFAULT_DEVICE} -j MASQUERADE;
-iptables -D INPUT -p udp -m udp --dport ${DEFAULT_WG_PORT} -j ACCEPT;
-iptables -D FORWARD -i wg0 -j ACCEPT;
-iptables -D FORWARD -o wg0 -j ACCEPT;
-`
-  .split('\n')
-  .join(' ');
-
 export async function run1(db: Low<Database>) {
   const privateKey = await exec('wg genkey');
   const publicKey = await exec(`echo ${privateKey} | wg pubkey`, {
     log: 'echo ***hidden*** | wg pubkey',
   });
+  const addressRange = '10.8.0.x';
   const database: Database = {
     migrations: [],
     system: {
@@ -36,7 +16,7 @@ export async function run1(db: Low<Database>) {
       interface: {
         privateKey: privateKey,
         publicKey: publicKey,
-        address: DEFAULT_ADDRESS.replace('x', '1'),
+        address: addressRange.replace('x', '1'),
       },
       sessionTimeout: 3600, // 1 hour
       lang: 'en',
@@ -44,20 +24,21 @@ export async function run1(db: Low<Database>) {
         mtu: 1420,
         persistentKeepalive: 0,
         // TODO: assume handle CIDR to compute next ip in WireGuard
-        rangeAddress: '10.8.0.0/24',
+        //addressRange: '10.8.0.0/24',
+        addressRange: addressRange,
         defaultDns: ['1.1.1.1'],
         allowedIps: ['0.0.0.0/0', '::/0'],
       },
-      wgPath: WG_PATH,
-      wgDevice: DEFAULT_DEVICE,
-      wgHost: WG_HOST || '',
-      wgPort: DEFAULT_WG_PORT,
+      wgDevice: 'wg0',
+      // TODO: wgHost has to be configured when onboarding
+      wgHost: '',
+      wgPort: 51820,
       wgConfigPort: 51820,
       iptables: {
         PreUp: '',
-        PostUp: DEFAULT_POST_UP,
+        PostUp: '',
         PreDown: '',
-        PostDown: DEFAULT_POST_DOWN,
+        PostDown: '',
       },
       trafficStats: {
         enabled: false,
@@ -79,12 +60,31 @@ export async function run1(db: Low<Database>) {
       sessionConfig: {
         password: getRandomHex(256),
         name: 'wg-easy',
-        cookie: undefined,
+        cookie: {},
       },
+      cookieMaxAge: 24 * 60,
     },
     users: [],
     clients: {},
   };
+
+  // TODO: use variables inside up/down script
+  database.system.iptables.PostUp = `
+iptables -t nat -A POSTROUTING -s ${database.system.userConfig.addressRange.replace('x', '0')}/24 -o ${database.system.wgDevice} -j MASQUERADE;
+iptables -A INPUT -p udp -m udp --dport ${database.system.wgPort} -j ACCEPT;
+iptables -A FORWARD -i wg0 -j ACCEPT;
+iptables -A FORWARD -o wg0 -j ACCEPT;
+`
+    .split('\n')
+    .join(' ');
+  database.system.iptables.PostDown = `
+iptables -t nat -D POSTROUTING -s ${database.system.userConfig.addressRange.replace('x', '0')}/24 -o ${database.system.wgDevice} -j MASQUERADE;
+iptables -D INPUT -p udp -m udp --dport ${database.system.wgPort} -j ACCEPT;
+iptables -D FORWARD -i wg0 -j ACCEPT;
+iptables -D FORWARD -o wg0 -j ACCEPT;
+`
+    .split('\n')
+    .join(' ');
 
   db.data = database;
   db.write();

@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises';
 import path from 'path';
-import debug from 'DEBUG';
+import debug from 'debug';
 import crypto from 'node:crypto';
 import QRCode from 'qrcode';
 import CRC32 from 'crc-32';
@@ -47,7 +47,7 @@ ${
     }
 
     DEBUG('Config saving...');
-    await fs.writeFile(path.join(WG_PATH, 'wg0.conf'), result, {
+    await fs.writeFile(path.join('/etc/wireguard', 'wg0.conf'), result, {
       mode: 0o600,
     });
     DEBUG('Config saved.');
@@ -136,16 +136,15 @@ ${
 [Interface]
 PrivateKey = ${client.privateKey ? `${client.privateKey}` : 'REPLACE_ME'}
 Address = ${client.address}/24
-${WG_DEFAULT_DNS ? `DNS = ${WG_DEFAULT_DNS}\n` : ''}\
-${WG_MTU ? `MTU = ${WG_MTU}\n` : ''}\
+DNS = ${system.userConfig.defaultDns.join(',')}
+MTU = ${system.userConfig.mtu}
 
 [Peer]
 PublicKey = ${system.interface.publicKey}
-${
-  client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
-}AllowedIPs = ${client.allowedIPs}
+PresharedKey = ${client.preSharedKey}
+AllowedIPs = ${client.allowedIPs}
 PersistentKeepalive = ${client.persistentKeepalive}
-Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
+Endpoint = ${system.wgHost}:${system.wgConfigPort}`;
   }
 
   async getClientQRCodeSVG({ clientId }: { clientId: string }) {
@@ -167,6 +166,7 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
       throw new Error('Missing: Name');
     }
 
+    const system = await Database.getSystem();
     const clients = await Database.getClients();
 
     const privateKey = await exec('wg genkey');
@@ -180,11 +180,14 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
     let address;
     for (let i = 2; i < 255; i++) {
       const client = Object.values(clients).find((client) => {
-        return client.address === WG_DEFAULT_ADDRESS.replace('x', i.toString());
+        return (
+          client.address ===
+          system.userConfig.addressRange.replace('x', i.toString())
+        );
       });
 
       if (!client) {
-        address = WG_DEFAULT_ADDRESS.replace('x', i.toString());
+        address = system.userConfig.addressRange.replace('x', i.toString());
         break;
       }
     }
@@ -207,8 +210,8 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
       oneTimeLink: null,
       expiresAt: null,
       enabled: true,
-      allowedIPs: WG_ALLOWED_IPS.split(', '),
-      persistentKeepalive: Number(WG_PERSISTENT_KEEPALIVE),
+      allowedIPs: system.userConfig.allowedIps,
+      persistentKeepalive: system.userConfig.persistentKeepalive,
     };
 
     if (expireDate) {

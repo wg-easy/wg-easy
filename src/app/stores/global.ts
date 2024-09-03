@@ -8,7 +8,6 @@ export const useGlobalStore = defineStore('Global', () => {
     null
   );
   const uiTrafficStats = ref(false);
-  const rememberMeEnabled = ref(false);
   const enableExpireTime = ref(false);
   const enableOneTimeLinks = ref(false);
   const enableSortClient = ref(false);
@@ -65,11 +64,6 @@ export const useGlobalStore = defineStore('Global', () => {
     enableExpireTime.value = expireTime.value ?? false;
   }
 
-  async function fetchRememberMe() {
-    const { data: rememberMe } = await api.getRememberMeEnabled();
-    rememberMeEnabled.value = rememberMe.value ?? false;
-  }
-
   const updateCharts = computed(() => {
     return uiChartType.value > 0 && uiShowCharts.value;
   });
@@ -79,7 +73,6 @@ export const useGlobalStore = defineStore('Global', () => {
     uiShowCharts,
     uiTrafficStats,
     updateCharts,
-    rememberMeEnabled,
     enableSortClient,
     sortClient,
     enableExpireTime,
@@ -90,6 +83,5 @@ export const useGlobalStore = defineStore('Global', () => {
     fetchOneTimeLinks,
     fetchSortClients,
     fetchExpireTime,
-    fetchRememberMe,
   };
 });
