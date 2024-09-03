@@ -175,13 +175,12 @@ Endpoint = ${system.wgHost}:${system.wgConfigPort}`;
     });
     const preSharedKey = await exec('wg genpsk');
 
-    // TODO: cidr
     // Calculate next IP
     const cidr = ip.cidrSubnet(system.userConfig.addressRange);
     let address;
     for (
-      let i = ip.toLong(cidr.firstAddress);
-      i <= ip.toLong(cidr.lastAddress);
+      let i = ip.toLong(cidr.firstAddress) + 1;
+      i <= ip.toLong(cidr.lastAddress) - 1;
       i++
     ) {
       const currentIp = ip.fromLong(i);

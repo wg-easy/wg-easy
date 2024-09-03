@@ -2,7 +2,7 @@ import type { Low } from 'lowdb';
 import type { Database } from '../repositories/database';
 import packageJson from '@@/package.json';
 import { ChartType } from '../repositories/system';
-import { cidrSubnet } from 'ip';
+import ip from 'ip';
 
 export async function run1(db: Low<Database>) {
   const privateKey = await exec('wg genkey');
@@ -10,7 +10,7 @@ export async function run1(db: Low<Database>) {
     log: 'echo ***hidden*** | wg pubkey',
   });
   const addressRange = '10.8.0.0/24';
-  const cidr = cidrSubnet(addressRange);
+  const cidr = ip.cidrSubnet(addressRange);
   const database: Database = {
     migrations: [],
     system: {
@@ -30,7 +30,7 @@ export async function run1(db: Low<Database>) {
         defaultDns: ['1.1.1.1'],
         allowedIps: ['0.0.0.0/0', '::/0'],
       },
-      wgDevice: 'wg0',
+      wgDevice: 'eth0',
       // TODO: wgHost has to be configured when onboarding
       wgHost: '',
       wgPort: 51820,
