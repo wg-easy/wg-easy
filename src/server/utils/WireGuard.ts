@@ -6,6 +6,7 @@ import QRCode from 'qrcode';
 import CRC32 from 'crc-32';
 
 import type { NewClient } from '~~/services/database/repositories/client';
+import { cidrSubnet, fromLong, isV4Format, toLong } from 'ip';
 
 const DEBUG = debug('WireGuard');
 
@@ -25,7 +26,7 @@ class WireGuard {
 # Server
 [Interface]
 PrivateKey = ${system.interface.privateKey}
-Address = ${system.interface.address}/24
+Address = ${system.interface.address}
 ListenPort = ${system.wgPort}
 PreUp = ${system.iptables.PreUp}
 PostUp = ${system.iptables.PostUp}
@@ -134,8 +135,8 @@ ${
 
     return `
 [Interface]
-PrivateKey = ${client.privateKey ? `${client.privateKey}` : 'REPLACE_ME'}
-Address = ${client.address}/24
+PrivateKey = ${client.privateKey}
+Address = ${client.address}
 DNS = ${system.userConfig.defaultDns.join(',')}
 MTU = ${system.userConfig.mtu}
 
@@ -177,17 +178,20 @@ Endpoint = ${system.wgHost}:${system.wgConfigPort}`;
 
     // TODO: cidr
     // Calculate next IP
+    const cidr = cidrSubnet(system.userConfig.addressRange);
     let address;
-    for (let i = 2; i < 255; i++) {
+    for (
+      let i = toLong(cidr.firstAddress);
+      i <= toLong(cidr.lastAddress);
+      i++
+    ) {
+      const currentIp = fromLong(i);
       const client = Object.values(clients).find((client) => {
-        return (
-          client.address ===
-          system.userConfig.addressRange.replace('x', i.toString())
-        );
+        return client.address === currentIp;
       });
 
       if (!client) {
-        address = system.userConfig.addressRange.replace('x', i.toString());
+        address = currentIp;
         break;
       }
     }
@@ -281,7 +285,7 @@ Endpoint = ${system.wgHost}:${system.wgConfigPort}`;
     clientId: string;
     address: string;
   }) {
-    if (!isValidIPv4(address)) {
+    if (!isV4Format(address)) {
       throw createError({
         statusCode: 400,
         statusMessage: `Invalid Address: ${address}`,
