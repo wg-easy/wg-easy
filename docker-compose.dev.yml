@@ -14,8 +14,6 @@ services:
     cap_add:
       - NET_ADMIN
       - SYS_MODULE
-    environment:
-      - WG_HOST=192.168.1.233
 
 # folders should be generated inside container
 volumes:

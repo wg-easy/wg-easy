@@ -2,12 +2,12 @@ export default defineEventHandler(async (event) => {
   const url = getRequestURL(event);
   if (
     !url.pathname.startsWith('/api/') ||
+    // TODO: only allowed on onboarding!
     url.pathname === '/api/account/new' ||
     url.pathname === '/api/session' ||
     url.pathname === '/api/lang' ||
     url.pathname === '/api/release' ||
-    url.pathname === '/api/ui-chart-type' ||
-    url.pathname === '/api/ui-traffic-stats'
+    url.pathname === '/api/features'
   ) {
     return;
   }
