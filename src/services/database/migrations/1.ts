@@ -83,6 +83,7 @@ export async function run1(db: Low<Database>) {
       },
     },
     users: [],
+    clients: [],
   };
 
   db.data = database;

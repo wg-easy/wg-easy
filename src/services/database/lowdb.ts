@@ -57,6 +57,7 @@ export default class LowDB extends DatabaseProvider {
     return system;
   }
 
+  // TODO: return copy to avoid mutation (everywhere)
   async getUsers() {
     return this.#db.data.users;
   }
