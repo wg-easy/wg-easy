@@ -6,7 +6,6 @@ import {
   DatabaseError,
   DEFAULT_DATABASE,
 } from './repositories/database';
-import { hashPassword, isPasswordStrong } from '~/server/utils/password';
 import { DEFAULT_SYSTEM } from './repositories/system';
 
 import type { User } from './repositories/user';

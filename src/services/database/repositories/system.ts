@@ -1,4 +1,4 @@
-import packageJson from '@/package.json';
+import packageJson from '@@/package.json';
 
 import type { SessionConfig } from 'h3';
 import type { Lang } from './types';

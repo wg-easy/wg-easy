@@ -7,7 +7,6 @@ import {
   DatabaseError,
   DEFAULT_DATABASE,
 } from './repositories/database';
-import { hashPassword, isPasswordStrong } from '~/server/utils/password';
 import { JSONFilePreset } from 'lowdb/node';
 import { DEFAULT_SYSTEM } from './repositories/system';
 
