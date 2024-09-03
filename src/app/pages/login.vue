@@ -37,7 +37,6 @@
       />
 
       <label
-        v-if="globalStore.rememberMeEnabled"
         class="inline-block mb-5 cursor-pointer whitespace-nowrap"
         :title="$t('titleRememberMe')"
       >
@@ -89,7 +88,6 @@ const remember = ref(false);
 const username = ref<null | string>(null);
 const password = ref<null | string>(null);
 const authStore = useAuthStore();
-const globalStore = useGlobalStore();
 
 async function login(e: Event) {
   e.preventDefault();

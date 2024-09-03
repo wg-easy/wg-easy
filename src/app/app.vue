@@ -8,13 +8,8 @@
 
 <script setup lang="ts">
 const globalStore = useGlobalStore();
-globalStore.fetchTrafficStats();
-globalStore.fetchChartType();
+globalStore.fetchFeatures();
 globalStore.fetchRelease();
-globalStore.fetchOneTimeLinks();
-globalStore.fetchSortClients();
-globalStore.fetchExpireTime();
-globalStore.fetchRememberMe();
 useHead({
   bodyAttrs: {
     class: 'bg-gray-50 dark:bg-neutral-800',

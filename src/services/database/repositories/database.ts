@@ -1,3 +1,9 @@
+import type {
+  ClientRepository,
+  Client,
+  NewClient,
+  OneTimeLink,
+} from './client';
 import type { System, SystemRepository } from './system';
 import type { User, UserRepository } from './user';
 
@@ -6,12 +12,14 @@ export type Database = {
   migrations: string[];
   system: System;
   users: User[];
+  clients: Record<string, Client>;
 };
 
 export const DEFAULT_DATABASE: Database = {
   migrations: [],
   system: null as never,
   users: [],
+  clients: {},
 };
 
 /**
@@ -22,7 +30,7 @@ export const DEFAULT_DATABASE: Database = {
  *
  */
 export abstract class DatabaseProvider
-  implements SystemRepository, UserRepository
+  implements SystemRepository, UserRepository, ClientRepository
 {
   /**
    * Connects to the database.
@@ -44,6 +52,23 @@ export abstract class DatabaseProvider
   ): Promise<void>;
   abstract updateUser(user: User): Promise<void>;
   abstract deleteUser(id: string): Promise<void>;
+
+  abstract getClients(): Promise<Record<string, Client>>;
+  abstract getClient(id: string): Promise<Client | undefined>;
+  abstract createClient(client: NewClient): Promise<void>;
+  abstract deleteClient(id: string): Promise<void>;
+  abstract toggleClient(id: string, enable: boolean): Promise<void>;
+  abstract updateClientName(id: string, name: string): Promise<void>;
+  abstract updateClientAddress(id: string, address: string): Promise<void>;
+  abstract updateClientExpirationDate(
+    id: string,
+    expirationDate: Date | null
+  ): Promise<void>;
+  abstract deleteOneTimeLink(id: string): Promise<void>;
+  abstract createOneTimeLink(
+    id: string,
+    oneTimeLink: OneTimeLink
+  ): Promise<void>;
 }
 
 /**
