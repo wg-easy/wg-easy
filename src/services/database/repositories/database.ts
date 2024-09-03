@@ -1,16 +1,16 @@
 import type { System, SystemRepository } from './system';
 import type { User, UserRepository } from './user';
-import type { Lang } from './types';
 
 // Represent data structure
 export type Database = {
-  // TODO: always return correct value, greatly improves code
-  system: System | null;
+  migrations: string[];
+  system: System;
   users: User[];
 };
 
 export const DEFAULT_DATABASE: Database = {
-  system: null,
+  migrations: [],
+  system: null as never,
   users: [],
 };
 
@@ -34,9 +34,7 @@ export abstract class DatabaseProvider
    */
   abstract disconnect(): Promise<void>;
 
-  abstract getSystem(): Promise<System | null>;
-  // TODO: remove
-  abstract getLang(): Promise<Lang>;
+  abstract getSystem(): Promise<System>;
 
   abstract getUsers(): Promise<User[]>;
   abstract getUser(id: string): Promise<User | undefined>;
