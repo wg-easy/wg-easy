@@ -18,7 +18,7 @@ export type WGInterface = {
 export type WGConfig = {
   mtu: number;
   persistentKeepalive: number;
-  rangeAddress: string;
+  addressRange: string;
   defaultDns: string[];
   allowedIps: string[];
 };
@@ -57,7 +57,6 @@ export type System = {
 
   userConfig: WGConfig;
 
-  wgPath: string;
   wgDevice: string;
   wgHost: string;
   wgPort: number;
@@ -72,6 +71,7 @@ export type System = {
 
   prometheus: Prometheus;
   sessionConfig: SessionConfig;
+  cookieMaxAge: number;
 };
 
 /**

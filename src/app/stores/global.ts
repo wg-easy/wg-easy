@@ -1,17 +1,26 @@
 import { defineStore } from 'pinia';
 
 export const useGlobalStore = defineStore('Global', () => {
-  const uiChartType = ref(0);
   const uiShowCharts = ref(getItem('uiShowCharts') === '1');
   const currentRelease = ref<null | number>(null);
   const latestRelease = ref<null | { version: number; changelog: string }>(
     null
   );
-  const uiTrafficStats = ref(false);
-  const rememberMeEnabled = ref(false);
-  const enableExpireTime = ref(false);
-  const enableOneTimeLinks = ref(false);
-  const enableSortClient = ref(false);
+  const features = ref({
+    trafficStats: {
+      enabled: false,
+      type: 0,
+    },
+    sortClients: {
+      enabled: false,
+    },
+    clientExpiration: {
+      enabled: false,
+    },
+    oneTimeLinks: {
+      enabled: false,
+    },
+  });
   const sortClient = ref(true); // Sort clients by name, true = asc, false = desc
 
   const { availableLocales, locale } = useI18n();
@@ -40,56 +49,23 @@ export const useGlobalStore = defineStore('Global', () => {
     latestRelease.value = release.value!.latestRelease;
   }
 
-  async function fetchChartType() {
-    const { data: chartType } = await api.getChartType();
-    uiChartType.value = chartType.value ?? 0;
-  }
-
-  async function fetchTrafficStats() {
-    const { data: trafficStats } = await api.getTrafficStats();
-    uiTrafficStats.value = trafficStats.value ?? false;
-  }
-
-  async function fetchOneTimeLinks() {
-    const { data: oneTimeLinks } = await api.getEnableOneTimeLinks();
-    enableOneTimeLinks.value = oneTimeLinks.value ?? false;
-  }
-
-  async function fetchSortClients() {
-    const { data: sortClients } = await api.getSortClients();
-    enableSortClient.value = sortClients.value ?? false;
-  }
-
-  async function fetchExpireTime() {
-    const { data: expireTime } = await api.getEnableExpireTime();
-    enableExpireTime.value = expireTime.value ?? false;
-  }
-
-  async function fetchRememberMe() {
-    const { data: rememberMe } = await api.getRememberMeEnabled();
-    rememberMeEnabled.value = rememberMe.value ?? false;
+  async function fetchFeatures() {
+    const { data: apiFeatures } = await api.getFeatures();
+    if (apiFeatures.value) {
+      features.value = apiFeatures.value;
+    }
   }
 
   const updateCharts = computed(() => {
-    return uiChartType.value > 0 && uiShowCharts.value;
+    return features.value.trafficStats.type > 0 && uiShowCharts.value;
   });
 
   return {
-    uiChartType,
     uiShowCharts,
-    uiTrafficStats,
     updateCharts,
-    rememberMeEnabled,
-    enableSortClient,
     sortClient,
-    enableExpireTime,
-    enableOneTimeLinks,
+    features,
     fetchRelease,
-    fetchChartType,
-    fetchTrafficStats,
-    fetchOneTimeLinks,
-    fetchSortClients,
-    fetchExpireTime,
-    fetchRememberMe,
+    fetchFeatures,
   };
 });
