@@ -10,6 +10,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const users = await Database.getUsers();
+  // TODO: better error messages for api requests
   if (users.length === 0) {
     return sendRedirect(event, '/setup', 302);
   }
