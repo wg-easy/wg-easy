@@ -1,6 +1,7 @@
 export type OneTimeLink = {
   oneTimeLink: string;
-  expiresAt: Date;
+  /** ISO String */
+  expiresAt: string;
 };
 
 export type Client = {
@@ -10,12 +11,15 @@ export type Client = {
   privateKey: string;
   publicKey: string;
   preSharedKey: string;
-  expiresAt: Date | null;
+  /** ISO String */
+  expiresAt: string | null;
   endpoint: string | null;
   allowedIPs: string[];
   oneTimeLink: OneTimeLink | null;
-  createdAt: Date;
-  updatedAt: Date;
+  /** ISO String */
+  createdAt: string;
+  /** ISO String */
+  updatedAt: string;
   enabled: boolean;
   persistentKeepalive: number;
 };
@@ -36,7 +40,7 @@ export interface ClientRepository {
   updateClientAddress(id: string, address: string): Promise<void>;
   updateClientExpirationDate(
     id: string,
-    expirationDate: Date | null
+    expirationDate: string | null
   ): Promise<void>;
   deleteOneTimeLink(id: string): Promise<void>;
   createOneTimeLink(id: string, oneTimeLink: OneTimeLink): Promise<void>;
