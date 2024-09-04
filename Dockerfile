@@ -36,6 +36,7 @@ RUN update-alternatives --install /sbin/iptables iptables /sbin/iptables-legacy 
 # Set Environment
 ENV DEBUG=Server,WireGuard,LowDB
 ENV PORT=51821
+ENV HOST=0.0.0.0
 
 # Run Web UI
 CMD ["/usr/bin/dumb-init", "node", "server/index.mjs"]
