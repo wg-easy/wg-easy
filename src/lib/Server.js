@@ -28,6 +28,7 @@ const {
   PORT,
   WEBUI_HOST,
   RELEASE,
+  PASSWORD,
   PASSWORD_HASH,
   LANG,
   UI_TRAFFIC_STATS,
@@ -305,6 +306,10 @@ module.exports = class Server {
         });
       }),
     );
+
+    if (PASSWORD) {
+      throw new Error('DO NOT USE PASSWORD ENVIRONMENT VARIABLE. USE PASSWORD_HASH INSTEAD.\nSee https://github.com/wg-easy/wg-easy/blob/master/How_to_generate_an_bcrypt_hash.md');
+    }
 
     createServer(toNodeListener(app)).listen(PORT, WEBUI_HOST);
     debug(`Listening on http://${WEBUI_HOST}:${PORT}`);
