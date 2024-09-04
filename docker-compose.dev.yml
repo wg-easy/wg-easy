@@ -13,5 +13,5 @@ services:
       - NET_ADMIN
       - SYS_MODULE
     environment:
-      # - PASSWORD=p
+      # - PASSWORD_HASH=p
       - WG_HOST=192.168.1.233
