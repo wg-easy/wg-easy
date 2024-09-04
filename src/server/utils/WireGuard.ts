@@ -47,7 +47,7 @@ AllowedIPs = ${client.address}/32`;
     }
 
     DEBUG('Config saving...');
-    await fs.writeFile(path.join('/etc/wireguard', 'wg0.conf'), result, {
+    await fs.writeFile(path.join(WG_PATH, 'wg0.conf'), result, {
       mode: 0o600,
     });
     DEBUG('Config saved.');
