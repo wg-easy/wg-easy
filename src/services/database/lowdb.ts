@@ -21,9 +21,8 @@ export default class LowDB extends DatabaseProvider {
   #db!: Low<Database>;
   #connected = false;
 
-  // is this really needed?
   private async __init() {
-    const dbFilePath = join('/etc/wireguard', 'db.json');
+    const dbFilePath = join(WG_PATH, 'db.json');
     this.#db = await JSONFilePreset(dbFilePath, DEFAULT_DATABASE);
   }
 
