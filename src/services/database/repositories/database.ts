@@ -62,7 +62,7 @@ export abstract class DatabaseProvider
   abstract updateClientAddress(id: string, address: string): Promise<void>;
   abstract updateClientExpirationDate(
     id: string,
-    expirationDate: Date | null
+    expirationDate: string | null
   ): Promise<void>;
   abstract deleteOneTimeLink(id: string): Promise<void>;
   abstract createOneTimeLink(

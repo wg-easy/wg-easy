@@ -21,8 +21,10 @@ export type User = {
   privateKey?: string;
   publicKey?: string;
   preSharedKey?: string;
-  createdAt: Date;
-  updatedAt: Date;
+  /** ISO String */
+  createdAt: string;
+  /** ISO String */
+  updatedAt: string;
   enabled: boolean;
 };
 
