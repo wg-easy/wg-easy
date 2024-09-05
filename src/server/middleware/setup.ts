@@ -3,16 +3,21 @@ export default defineEventHandler(async (event) => {
   const url = getRequestURL(event);
 
   if (
-    url.pathname.startsWith('/setup') ||
-    url.pathname === '/api/account/new' ||
+    url.pathname === '/setup' ||
+    url.pathname === '/api/account/setup' ||
     url.pathname === '/api/features'
   ) {
     return;
   }
 
   const users = await Database.getUsers();
-  // TODO: better error messages for api requests
   if (users.length === 0) {
+    if (url.pathname.startsWith('/api/')) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'Invalid State',
+      });
+    }
     return sendRedirect(event, '/setup', 302);
   }
 });

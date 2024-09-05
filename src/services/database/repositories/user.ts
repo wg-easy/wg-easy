@@ -39,7 +39,7 @@ export interface UserRepository {
    */
   getUser(id: string): Promise<User | undefined>;
 
-  newUserWithPassword(username: string, password: string): Promise<void>;
+  createUser(username: string, password: string): Promise<void>;
 
   /**
    * Updates a user in the database.
