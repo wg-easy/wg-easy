@@ -128,14 +128,14 @@ class API {
     });
   }
 
-  async createAccount({
+  async setupAccount({
     username,
     password,
   }: {
     username: string;
     password: string;
   }) {
-    return $fetch('/api/account/new', {
+    return $fetch('/api/account/setup', {
       method: 'post',
       body: { username, password },
     });
