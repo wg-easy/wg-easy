@@ -13,12 +13,14 @@ export type WGInterface = {
   privateKey: string;
   publicKey: string;
   address: string;
+  address6: string;
 };
 
 export type WGConfig = {
   mtu: number;
   persistentKeepalive: number;
   addressRange: string;
+  addressRange6: string;
   defaultDns: string[];
   allowedIps: string[];
 };
@@ -50,7 +52,6 @@ export type Feature = {
 export type System = {
   interface: WGInterface;
 
-  release: string;
   // maxAge
   sessionTimeout: number;
   lang: Lang;
@@ -71,7 +72,6 @@ export type System = {
 
   prometheus: Prometheus;
   sessionConfig: SessionConfig;
-  cookieMaxAge: number;
 };
 
 /**

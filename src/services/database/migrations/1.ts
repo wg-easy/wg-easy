@@ -1,8 +1,8 @@
 import type { Low } from 'lowdb';
 import type { Database } from '../repositories/database';
-import packageJson from '@@/package.json';
 import { ChartType } from '../repositories/system';
-import ip from 'ip';
+import { parseCidr } from 'cidr-tools';
+import { stringifyIp } from 'ip-bigint';
 
 export async function run1(db: Low<Database>) {
   const privateKey = await exec('wg genkey');
@@ -10,16 +10,17 @@ export async function run1(db: Low<Database>) {
     log: 'echo ***hidden*** | wg pubkey',
   });
   const addressRange = '10.8.0.0/24';
-  const cidr = ip.cidrSubnet(addressRange);
+  const addressRange6 = 'fdcc:ad94:bacf:61a4::cafe:0/112';
+  const cidr = parseCidr(addressRange);
+  const cidr6 = parseCidr(addressRange6);
   const database: Database = {
     migrations: [],
     system: {
-      // TODO: move to var, no need for database
-      release: packageJson.release.version,
       interface: {
         privateKey: privateKey,
         publicKey: publicKey,
-        address: cidr.firstAddress,
+        address: stringifyIp({ number: cidr.start, version: 4 }),
+        address6: stringifyIp({ number: cidr6.start, version: 6 }),
       },
       sessionTimeout: 3600, // 1 hour
       lang: 'en',
@@ -27,7 +28,8 @@ export async function run1(db: Low<Database>) {
         mtu: 1420,
         persistentKeepalive: 0,
         addressRange: addressRange,
-        defaultDns: ['1.1.1.1'],
+        addressRange6: addressRange6,
+        defaultDns: ['1.1.1.1', '2606:4700:4700::1111'],
         allowedIps: ['0.0.0.0/0', '::/0'],
       },
       wgDevice: 'eth0',
@@ -63,7 +65,6 @@ export async function run1(db: Low<Database>) {
         name: 'wg-easy',
         cookie: {},
       },
-      cookieMaxAge: 24 * 60,
     },
     users: [],
     clients: {},
