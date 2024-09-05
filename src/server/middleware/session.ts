@@ -2,8 +2,7 @@ export default defineEventHandler(async (event) => {
   const url = getRequestURL(event);
   if (
     !url.pathname.startsWith('/api/') ||
-    // TODO: only allowed on onboarding!
-    url.pathname === '/api/account/new' ||
+    url.pathname === '/api/account/setup' ||
     url.pathname === '/api/session' ||
     url.pathname === '/api/lang' ||
     url.pathname === '/api/release' ||

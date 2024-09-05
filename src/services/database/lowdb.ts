@@ -75,8 +75,8 @@ export default class LowDB extends DatabaseProvider {
     return this.#db.data.users.find((user) => user.id === id);
   }
 
-  async newUserWithPassword(username: string, password: string) {
-    DEBUG('New User');
+  async createUser(username: string, password: string) {
+    DEBUG('Create User');
 
     // TODO: should be handled by zod. completely remove database error
     if (username.length < 8) {

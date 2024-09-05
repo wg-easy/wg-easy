@@ -46,10 +46,7 @@ export abstract class DatabaseProvider
 
   abstract getUsers(): Promise<User[]>;
   abstract getUser(id: string): Promise<User | undefined>;
-  abstract newUserWithPassword(
-    username: string,
-    password: string
-  ): Promise<void>;
+  abstract createUser(username: string, password: string): Promise<void>;
   abstract updateUser(user: User): Promise<void>;
   abstract deleteUser(id: string): Promise<void>;
 
