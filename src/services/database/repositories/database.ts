@@ -59,7 +59,7 @@ export abstract class DatabaseProvider
   abstract deleteClient(id: string): Promise<void>;
   abstract toggleClient(id: string, enable: boolean): Promise<void>;
   abstract updateClientName(id: string, name: string): Promise<void>;
-  abstract updateClientAddress(id: string, address: string): Promise<void>;
+  abstract updateClientAddress4(id: string, address4: string): Promise<void>;
   abstract updateClientExpirationDate(
     id: string,
     expirationDate: string | null

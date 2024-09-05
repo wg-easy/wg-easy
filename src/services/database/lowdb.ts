@@ -102,6 +102,7 @@ export default class LowDB extends DatabaseProvider {
       id: crypto.randomUUID(),
       password: hashPassword(password),
       username,
+      name: 'Administrator',
       role: isUserEmpty ? 'ADMIN' : 'CLIENT',
       enabled: true,
       createdAt: now,
@@ -175,17 +176,17 @@ export default class LowDB extends DatabaseProvider {
     });
   }
 
-  async updateClientAddress(id: string, address: string) {
-    DEBUG('Update Client Address');
+  async updateClientAddress4(id: string, address4: string) {
+    DEBUG('Update Client Address4');
     await this.#db.update((data) => {
       if (data.clients[id]) {
-        data.clients[id].address = address;
+        data.clients[id].address4 = address4;
       }
     });
   }
 
   async updateClientExpirationDate(id: string, expirationDate: string | null) {
-    DEBUG('Update Client Address');
+    DEBUG('Update Client Expiration Date');
     await this.#db.update((data) => {
       if (data.clients[id]) {
         data.clients[id].expiresAt = expirationDate;
@@ -194,7 +195,7 @@ export default class LowDB extends DatabaseProvider {
   }
 
   async deleteOneTimeLink(id: string) {
-    DEBUG('Update Client Address');
+    DEBUG('Delete Client One Time Link');
     await this.#db.update((data) => {
       if (data.clients[id]) {
         if (data.clients[id].oneTimeLink) {
@@ -208,7 +209,7 @@ export default class LowDB extends DatabaseProvider {
   }
 
   async createOneTimeLink(id: string, oneTimeLink: OneTimeLink) {
-    DEBUG('Update Client Address');
+    DEBUG('Create Client One Time Link');
     await this.#db.update((data) => {
       if (data.clients[id]) {
         data.clients[id].oneTimeLink = oneTimeLink;
