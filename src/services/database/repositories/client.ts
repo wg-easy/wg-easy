@@ -16,6 +16,7 @@ export type Client = {
   expiresAt: string | null;
   endpoint: string | null;
   allowedIPs: string[];
+  serverAllowedIPs: string[] | null;
   oneTimeLink: OneTimeLink | null;
   /** ISO String */
   createdAt: string;

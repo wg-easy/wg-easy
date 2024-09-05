@@ -5,14 +5,14 @@ import { parseCidr } from 'cidr-tools';
 import { stringifyIp } from 'ip-bigint';
 
 export async function run1(db: Low<Database>) {
-  const privateKey = await exec('wg genkey');
-  const publicKey = await exec(`echo ${privateKey} | wg pubkey`, {
-    log: 'echo ***hidden*** | wg pubkey',
-  });
+  const privateKey = await wg.generatePrivateKey();
+  const publicKey = await wg.getPublicKey(privateKey);
+
   const address4Range = '10.8.0.0/24';
   const address6Range = 'fdcc:ad94:bacf:61a4::cafe:0/112';
   const cidr4 = parseCidr(address4Range);
   const cidr6 = parseCidr(address6Range);
+
   const database: Database = {
     migrations: [],
     system: {
