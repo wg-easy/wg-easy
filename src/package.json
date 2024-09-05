@@ -25,8 +25,8 @@
     "@pinia/nuxt": "^0.5.4",
     "@tailwindcss/forms": "^0.5.8",
     "apexcharts": "^3.53.0",
+    "argon2": "^0.41.1",
     "basic-auth": "^2.0.1",
-    "bcryptjs": "^2.4.3",
     "cidr-tools": "^11.0.2",
     "crc-32": "^1.2.2",
     "debug": "^4.3.7",
@@ -45,7 +45,6 @@
   },
   "devDependencies": {
     "@nuxt/eslint-config": "^0.5.5",
-    "@types/bcryptjs": "^2.4.6",
     "@types/debug": "^4.1.12",
     "@types/qrcode": "^1.5.5",
     "eslint": "^9.9.1",
