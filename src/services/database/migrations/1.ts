@@ -19,8 +19,8 @@ export async function run1(db: Low<Database>) {
       interface: {
         privateKey: privateKey,
         publicKey: publicKey,
-        address: stringifyIp({ number: cidr.start, version: 4 }),
-        address6: stringifyIp({ number: cidr6.start, version: 6 }),
+        address: stringifyIp({ number: cidr.start + 1n, version: 4 }),
+        address6: stringifyIp({ number: cidr6.start + 1n, version: 6 }),
       },
       sessionTimeout: 3600, // 1 hour
       lang: 'en',
@@ -71,19 +71,29 @@ export async function run1(db: Low<Database>) {
   };
 
   // TODO: use variables inside up/down script
+  // TODO: properly check if ipv6 support
   database.system.iptables.PostUp = `
 iptables -t nat -A POSTROUTING -s ${database.system.userConfig.addressRange} -o ${database.system.wgDevice} -j MASQUERADE;
 iptables -A INPUT -p udp -m udp --dport ${database.system.wgPort} -j ACCEPT;
 iptables -A FORWARD -i wg0 -j ACCEPT;
 iptables -A FORWARD -o wg0 -j ACCEPT;
+ip6tables -t nat -A POSTROUTING -s ${database.system.userConfig.addressRange6} -o ${database.system.wgDevice} -j MASQUERADE;
+ip6tables -A INPUT -p udp -m udp --dport ${database.system.wgPort} -j ACCEPT;
+ip6tables -A FORWARD -i wg0 -j ACCEPT;
+ip6tables -A FORWARD -o wg0 -j ACCEPT;
 `
     .split('\n')
     .join(' ');
+
   database.system.iptables.PostDown = `
 iptables -t nat -D POSTROUTING -s ${database.system.userConfig.addressRange} -o ${database.system.wgDevice} -j MASQUERADE;
 iptables -D INPUT -p udp -m udp --dport ${database.system.wgPort} -j ACCEPT;
 iptables -D FORWARD -i wg0 -j ACCEPT;
 iptables -D FORWARD -o wg0 -j ACCEPT;
+ip6tables -t nat -D POSTROUTING -s ${database.system.userConfig.addressRange6} -o ${database.system.wgDevice} -j MASQUERADE;
+ip6tables -D INPUT -p udp -m udp --dport ${database.system.wgPort} -j ACCEPT;
+ip6tables -D FORWARD -i wg0 -j ACCEPT;
+ip6tables -D FORWARD -o wg0 -j ACCEPT;
 `
     .split('\n')
     .join(' ');

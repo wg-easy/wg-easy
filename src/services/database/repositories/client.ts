@@ -8,6 +8,7 @@ export type Client = {
   id: string;
   name: string;
   address: string;
+  address6: string;
   privateKey: string;
   publicKey: string;
   preSharedKey: string;
