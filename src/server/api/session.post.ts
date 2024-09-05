@@ -15,7 +15,8 @@ export default defineEventHandler(async (event) => {
     });
 
   const userHashPassword = user.password;
-  if (!isPasswordValid(password, userHashPassword)) {
+  const passwordValid = await isPasswordValid(password, userHashPassword);
+  if (!passwordValid) {
     throw createError({
       statusCode: 401,
       statusMessage: 'Incorrect credentials',
