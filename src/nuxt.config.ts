@@ -23,4 +23,11 @@ export default defineNuxtConfig({
       localeDetector: './localeDetector.ts',
     },
   },
+  nitro: {
+    esbuild: {
+      options: {
+        target: 'es2020',
+      },
+    },
+  },
 });

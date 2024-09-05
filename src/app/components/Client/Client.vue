@@ -12,7 +12,7 @@
           <div
             class="block md:inline-block pb-1 md:pb-0 text-gray-500 dark:text-neutral-400 text-xs"
           >
-            <ClientAddress :client="client" />
+            <ClientAddress4 :client="client" />
             <ClientInlineTransfer
               v-if="!globalStore.features.trafficStats.enabled"
               :client="client"
