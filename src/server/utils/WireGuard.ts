@@ -32,7 +32,7 @@ class WireGuard {
     }
 
     DEBUG('Config saving...');
-    await fs.writeFile(path.join(WG_PATH, 'wg0.conf'), result.join('\n'), {
+    await fs.writeFile(path.join(WG_PATH, 'wg0.conf'), result.join('\n\n'), {
       mode: 0o600,
     });
     DEBUG('Config saved.');
