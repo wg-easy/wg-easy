@@ -16,11 +16,7 @@ export type User = {
   role: ROLE;
   username: string;
   password: string;
-  name?: string;
-  address?: string;
-  privateKey?: string;
-  publicKey?: string;
-  preSharedKey?: string;
+  name: string;
   /** ISO String */
   createdAt: string;
   /** ISO String */

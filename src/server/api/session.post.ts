@@ -29,7 +29,7 @@ export default defineEventHandler(async (event) => {
   if (remember) {
     conf.cookie = {
       ...(system.sessionConfig.cookie ?? {}),
-      maxAge: system.cookieMaxAge * 60,
+      maxAge: system.sessionTimeout,
     };
   }
 
