@@ -78,16 +78,15 @@ class WireGuard {
         persistentKeepalive,
       }) => {
         const client = clients.find((client) => client.publicKey === publicKey);
-        if (!client) return;
+        if (!client) {
+          return;
+        }
 
-        client.latestHandshakeAt =
-          latestHandshakeAt === '0'
-            ? null
-            : new Date(Number(`${latestHandshakeAt}000`));
-        client.endpoint = endpoint === '(none)' ? null : (endpoint ?? null);
-        client.transferRx = Number(transferRx);
-        client.transferTx = Number(transferTx);
-        client.persistentKeepalive = persistentKeepalive ?? null;
+        client.latestHandshakeAt = latestHandshakeAt;
+        client.endpoint = endpoint;
+        client.transferRx = transferRx;
+        client.transferTx = transferTx;
+        client.persistentKeepalive = persistentKeepalive;
       }
     );
 
@@ -423,15 +422,15 @@ class WireGuard {
 
     returnText += '\n# HELP wireguard_configured_peers\n';
     returnText += '# TYPE wireguard_configured_peers gauge\n';
-    returnText += `wireguard_configured_peers{interface="wg0"} ${Number(wireguardPeerCount)}\n`;
+    returnText += `wireguard_configured_peers{interface="wg0"} ${wireguardPeerCount}\n`;
 
     returnText += '\n# HELP wireguard_enabled_peers\n';
     returnText += '# TYPE wireguard_enabled_peers gauge\n';
-    returnText += `wireguard_enabled_peers{interface="wg0"} ${Number(wireguardEnabledPeersCount)}\n`;
+    returnText += `wireguard_enabled_peers{interface="wg0"} ${wireguardEnabledPeersCount}\n`;
 
     returnText += '\n# HELP wireguard_connected_peers\n';
     returnText += '# TYPE wireguard_connected_peers gauge\n';
-    returnText += `wireguard_connected_peers{interface="wg0"} ${Number(wireguardConnectedPeersCount)}\n`;
+    returnText += `wireguard_connected_peers{interface="wg0"} ${wireguardConnectedPeersCount}\n`;
 
     returnText += '\n# HELP wireguard_sent_bytes Bytes sent to the peer\n';
     returnText += '# TYPE wireguard_sent_bytes counter\n';
@@ -465,9 +464,9 @@ class WireGuard {
       }
     }
     return {
-      wireguard_configured_peers: Number(wireguardPeerCount),
-      wireguard_enabled_peers: Number(wireguardEnabledPeersCount),
-      wireguard_connected_peers: Number(wireguardConnectedPeersCount),
+      wireguard_configured_peers: wireguardPeerCount,
+      wireguard_enabled_peers: wireguardEnabledPeersCount,
+      wireguard_connected_peers: wireguardConnectedPeersCount,
     };
   }
 }

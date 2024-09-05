@@ -4,11 +4,17 @@ import type { System } from '~~/services/database/repositories/system';
 
 export const wg = {
   generateServerPeer: (client: Client) => {
+    const allowedIps = [
+      `${client.address4}/32`,
+      `${client.address6}/128`,
+      ...(client.serverAllowedIPs ?? []),
+    ];
+
     return `# Client: ${client.name} (${client.id})
 [Peer]
 PublicKey = ${client.publicKey}
 PresharedKey = ${client.preSharedKey}
-AllowedIPs = ${client.address4}/32, ${client.address6}/128${client.serverAllowedIPs ? ` ${client.serverAllowedIPs.join(', ')}` : ''}`;
+AllowedIPs = ${allowedIps.join(', ')}`;
   },
 
   generateServerInterface: (system: System) => {
@@ -47,8 +53,6 @@ PersistentKeepalive = ${client.persistentKeepalive}
 Endpoint = ${system.wgHost}:${system.wgConfigPort}`;
   },
 
-  // TODO?: generate keys using plain javascript
-
   generatePrivateKey: () => {
     return exec('wg genkey');
   },
@@ -75,16 +79,28 @@ Endpoint = ${system.wgHost}:${system.wgConfigPort}`;
     return exec('wg syncconf wg0 <(wg-quick strip wg0)');
   },
 
-  // TODO: properly convert
   dump: async () => {
     const rawDump = await exec('wg show wg0 dump', {
       log: false,
     });
+
+    type wgDumpLine = [
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+    ];
+
     return rawDump
       .trim()
       .split('\n')
       .slice(1)
       .map((line) => {
+        const splitLines = line.split('\t');
         const [
           publicKey,
           preSharedKey,
@@ -94,17 +110,20 @@ Endpoint = ${system.wgHost}:${system.wgConfigPort}`;
           transferRx,
           transferTx,
           persistentKeepalive,
-        ] = line.split('\t');
+        ] = splitLines as wgDumpLine;
 
         return {
           publicKey,
           preSharedKey,
-          endpoint,
+          endpoint: endpoint === '(none)' ? null : endpoint,
           allowedIPs,
-          latestHandshakeAt,
-          transferRx,
-          transferTx,
-          persistentKeepalive,
+          latestHandshakeAt:
+            latestHandshakeAt === '0'
+              ? null
+              : new Date(Number.parseInt(`${latestHandshakeAt}000`)),
+          transferRx: Number.parseInt(transferRx),
+          transferTx: Number.parseInt(transferTx),
+          persistentKeepalive: persistentKeepalive,
         };
       });
   },
