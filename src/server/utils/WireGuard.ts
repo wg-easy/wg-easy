@@ -224,7 +224,7 @@ Endpoint = ${system.wgHost}:${system.wgConfigPort}`;
       date.setHours(23);
       date.setMinutes(59);
       date.setSeconds(59);
-      client.expiresAt = date;
+      client.expiresAt = date.toISOString();
     }
 
     await Database.createClient(client);
@@ -248,7 +248,7 @@ Endpoint = ${system.wgHost}:${system.wgConfigPort}`;
   async generateOneTimeLink({ clientId }: { clientId: string }) {
     const key = `${clientId}-${Math.floor(Math.random() * 1000)}`;
     const oneTimeLink = Math.abs(CRC32.str(key)).toString(16);
-    const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString();
     await Database.createOneTimeLink(clientId, {
       oneTimeLink,
       expiresAt,
@@ -305,14 +305,14 @@ Endpoint = ${system.wgHost}:${system.wgConfigPort}`;
     clientId: string;
     expireDate: string | null;
   }) {
-    let updatedDate: Date | null = null;
+    let updatedDate: string | null = null;
 
     if (expireDate) {
       const date = new Date(expireDate);
       date.setHours(23);
       date.setMinutes(59);
       date.setSeconds(59);
-      updatedDate = date;
+      updatedDate = date.toISOString();
     }
 
     await Database.updateClientExpirationDate(clientId, updatedDate);
@@ -394,7 +394,10 @@ Endpoint = ${system.wgHost}:${system.wgConfigPort}`;
     if (system.clientExpiration.enabled) {
       for (const client of Object.values(clients)) {
         if (client.enabled !== true) continue;
-        if (client.expiresAt !== null && new Date() > client.expiresAt) {
+        if (
+          client.expiresAt !== null &&
+          new Date() > new Date(client.expiresAt)
+        ) {
           DEBUG(`Client ${client.id} expired.`);
           await Database.toggleClient(client.id, false);
         }
@@ -405,7 +408,7 @@ Endpoint = ${system.wgHost}:${system.wgConfigPort}`;
       for (const client of Object.values(clients)) {
         if (
           client.oneTimeLink !== null &&
-          new Date() > client.oneTimeLink.expiresAt
+          new Date() > new Date(client.oneTimeLink.expiresAt)
         ) {
           DEBUG(`Client ${client.id} One Time Link expired.`);
           await Database.deleteOneTimeLink(client.id);
