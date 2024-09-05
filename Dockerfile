@@ -5,6 +5,9 @@ WORKDIR /app
 # Install pnpm
 RUN corepack enable pnpm
 
+# add build tools for argon2
+RUN apk add --no-cache make gcc g++ python3
+
 # Copy Web UI
 COPY src ./
 RUN pnpm install
