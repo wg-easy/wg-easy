@@ -7,7 +7,7 @@ export type OneTimeLink = {
 export type Client = {
   id: string;
   name: string;
-  address: string;
+  address4: string;
   address6: string;
   privateKey: string;
   publicKey: string;
@@ -38,7 +38,7 @@ export interface ClientRepository {
   deleteClient(id: string): Promise<void>;
   toggleClient(id: string, enable: boolean): Promise<void>;
   updateClientName(id: string, name: string): Promise<void>;
-  updateClientAddress(id: string, address: string): Promise<void>;
+  updateClientAddress4(id: string, address4: string): Promise<void>;
   updateClientExpirationDate(
     id: string,
     expirationDate: string | null

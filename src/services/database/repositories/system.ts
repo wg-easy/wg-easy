@@ -12,15 +12,15 @@ export type IpTables = {
 export type WGInterface = {
   privateKey: string;
   publicKey: string;
-  address: string;
+  address4: string;
   address6: string;
 };
 
 export type WGConfig = {
   mtu: number;
   persistentKeepalive: number;
-  addressRange: string;
-  addressRange6: string;
+  address4Range: string;
+  address6Range: string;
   defaultDns: string[];
   allowedIps: string[];
 };

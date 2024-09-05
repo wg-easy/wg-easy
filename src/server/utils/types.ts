@@ -13,8 +13,8 @@ const id = z
   .uuid('Client ID must be a valid UUID')
   .pipe(safeStringRefine);
 
-const address = z
-  .string({ message: 'Address must be a valid string' })
+const address4 = z
+  .string({ message: 'IPv4 Address must be a valid string' })
   .pipe(safeStringRefine);
 
 const name = z
@@ -54,9 +54,9 @@ export const clientIdType = z.object(
   { message: "This shouldn't happen" }
 );
 
-export const addressType = z.object(
+export const address4Type = z.object(
   {
-    address: address,
+    address4: address4,
   },
   { message: 'Body must be a valid object' }
 );
