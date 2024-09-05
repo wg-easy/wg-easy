@@ -1,6 +1,8 @@
 import type { ZodSchema } from 'zod';
 import { z, ZodError } from 'zod';
 
+// TODO: use i18n for messages
+
 const safeStringRefine = z
   .string()
   .refine(
@@ -28,10 +30,19 @@ const file = z
 
 const username = z
   .string({ message: 'Username must be a valid string' })
+  .min(8, 'Username must be at least 8 Characters')
   .pipe(safeStringRefine);
 
 const password = z
   .string({ message: 'Password must be a valid string' })
+  .min(12, 'Password must be at least 12 Characters')
+  .regex(/[A-Z]/, 'Password must have at least 1 uppercase letter')
+  .regex(/[a-z]/, 'Password must have at least 1 lowercase letter')
+  .regex(/\d/, 'Password must have at least 1 number')
+  .regex(
+    /[!@#$%^&*(),.?":{}|<>]/,
+    'Password must have at least 1 special character'
+  )
   .pipe(safeStringRefine);
 
 const remember = z.boolean({ message: 'Remember must be a valid boolean' });

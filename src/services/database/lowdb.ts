@@ -40,7 +40,7 @@ export default class LowDB extends DatabaseProvider {
       DEBUG('Migrations ran successfully');
     } catch (e) {
       DEBUG(e);
-      throw new DatabaseError(DatabaseError.ERROR_INIT);
+      throw new Error('Failed to initialize Database');
     }
     this.#connected = true;
     DEBUG('Connected successfully');
@@ -78,21 +78,14 @@ export default class LowDB extends DatabaseProvider {
   async createUser(username: string, password: string) {
     DEBUG('Create User');
 
-    // TODO: should be handled by zod. completely remove database error
-    if (username.length < 8) {
-      throw new DatabaseError(DatabaseError.ERROR_USERNAME_REQ);
-    }
-
-    if (!isPasswordStrong(password)) {
-      throw new DatabaseError(DatabaseError.ERROR_PASSWORD_REQ);
-    }
-
-    // TODO: multiple names are no problem
     const isUserExist = this.#db.data.users.find(
       (user) => user.username === username
     );
     if (isUserExist) {
-      throw new DatabaseError(DatabaseError.ERROR_USER_EXIST);
+      throw createError({
+        statusCode: 409,
+        statusMessage: 'Username already taken',
+      });
     }
 
     const now = new Date().toISOString();
