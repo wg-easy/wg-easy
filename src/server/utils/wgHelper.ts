@@ -29,6 +29,7 @@ AllowedIPs = ${allowedIps.join(', ')}`;
 PrivateKey = ${system.interface.privateKey}
 Address = ${system.interface.address4}/${cidr4Block}, ${system.interface.address6}/${cidr6Block}
 ListenPort = ${system.wgPort}
+MTU = ${system.userConfig.serverMtu}
 PreUp = ${system.iptables.PreUp}
 PostUp = ${system.iptables.PostUp}
 PreDown = ${system.iptables.PreDown}

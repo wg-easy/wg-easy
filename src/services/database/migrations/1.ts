@@ -26,6 +26,7 @@ export async function run1(db: Low<Database>) {
       lang: 'en',
       userConfig: {
         mtu: 1420,
+        serverMtu: 1420,
         persistentKeepalive: 0,
         address4Range: address4Range,
         address6Range: address6Range,
@@ -70,7 +71,6 @@ export async function run1(db: Low<Database>) {
     clients: {},
   };
 
-  // TODO: use variables inside up/down script
   // TODO: properly check if ipv6 support
   database.system.iptables.PostUp = `
 iptables -t nat -A POSTROUTING -s ${database.system.userConfig.address4Range} -o ${database.system.wgDevice} -j MASQUERADE;
