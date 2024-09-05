@@ -65,24 +65,38 @@ And log in again.
 
 ### 2. Run WireGuard Easy
 
+To setup the IPv6 Network, simply run once:
+
+```bash
+  docker network create \
+  -d bridge --ipv6 \
+  -d default \
+  --subnet 10.42.42.0/24 \
+  --subnet fdcc:ad94:bacf:61a3::/64 wg \
+```
+
 To automatically install & run wg-easy, simply run:
 
 ```bash
   docker run -d \
-  --name=wg-easy \
+  --net wg \
   -e PORT=51821 \
+  --name wg-easy \
+  --ip6 fdcc:ad94:bacf:61a3::2a \
+  --ip 10.42.42.42 \
   -v ~/.wg-easy:/etc/wireguard \
   -p 51820:51820/udp \
   -p 51821:51821/tcp \
-  --cap-add=NET_ADMIN \
-  --cap-add=SYS_MODULE \
-  --sysctl="net.ipv4.conf.all.src_valid_mark=1" \
-  --sysctl="net.ipv4.ip_forward=1" \
+  --cap-add NET_ADMIN \
+  --cap-add SYS_MODULE \
+  --sysctl net.ipv4.ip_forward=1 \
+  --sysctl net.ipv4.conf.all.src_valid_mark=1 \
+  --sysctl net.ipv6.conf.all.disable_ipv6=0 \
+  --sysctl net.ipv6.conf.all.forwarding=1 \
+  --sysctl net.ipv6.conf.default.forwarding=1 \
   --restart unless-stopped \
   ghcr.io/wg-easy/wg-easy
 ```
-
-> 💡 Replace `<🚨YOUR_SERVER_IP>` with your WAN IP, or a Dynamic DNS hostname.
 
 The Web UI will now be available on `http://0.0.0.0:51821`.
 
@@ -92,7 +106,7 @@ The Prometheus metrics will now be available on `http://0.0.0.0:51821/metrics`. 
 
 WireGuard Easy can be launched with Docker Compose as well - just download
 [`docker-compose.yml`](docker-compose.yml), make necessary adjustments and
-execute `docker compose up --detach`.
+execute `docker compose up -d`.
 
 ### 3. Sponsor
 
