@@ -46,10 +46,7 @@ export abstract class DatabaseProvider
 
   abstract getUsers(): Promise<User[]>;
   abstract getUser(id: string): Promise<User | undefined>;
-  abstract newUserWithPassword(
-    username: string,
-    password: string
-  ): Promise<void>;
+  abstract createUser(username: string, password: string): Promise<void>;
   abstract updateUser(user: User): Promise<void>;
   abstract deleteUser(id: string): Promise<void>;
 
@@ -82,7 +79,7 @@ export abstract class DatabaseProvider
  *
  * Example:
  * ```typescript
- * throw new DatabaseError(DatabaseError.ERROR_PASSWORD_REQ);
+ * throw new DatabaseError(DatabaseError.ERROR_INIT);
  * ...
  * // event handler routes
  * if (error instanceof DatabaseError) {
@@ -101,10 +98,6 @@ export abstract class DatabaseProvider
  */
 export class DatabaseError extends Error {
   static readonly ERROR_INIT = 'errorInit';
-  static readonly ERROR_PASSWORD_REQ = 'errorPasswordReq';
-  static readonly ERROR_USER_EXIST = 'errorUserExist';
-  static readonly ERROR_DATABASE_CONNECTION = 'errorDatabaseConn';
-  static readonly ERROR_USERNAME_REQ = 'errorUsernameReq';
 
   constructor(message: string) {
     super(message);
