@@ -95,16 +95,16 @@ class API {
     });
   }
 
-  async updateClientAddress({
+  async updateClientAddress4({
     clientId,
-    address,
+    address4,
   }: {
     clientId: string;
-    address: string;
+    address4: string;
   }) {
-    return $fetch(`/api/wireguard/client/${clientId}/address`, {
+    return $fetch(`/api/wireguard/client/${clientId}/address4`, {
       method: 'put',
-      body: { address },
+      body: { address4 },
     });
   }
 
