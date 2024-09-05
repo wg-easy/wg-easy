@@ -18,6 +18,7 @@ export type WGInterface = {
 
 export type WGConfig = {
   mtu: number;
+  serverMtu: number;
   persistentKeepalive: number;
   address4Range: string;
   address6Range: string;
