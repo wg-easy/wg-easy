@@ -95,7 +95,7 @@ export default class LowDB extends DatabaseProvider {
       throw new DatabaseError(DatabaseError.ERROR_USER_EXIST);
     }
 
-    const now = new Date();
+    const now = new Date().toISOString();
     const isUserEmpty = this.#db.data.users.length === 0;
 
     const newUser: User = {
@@ -141,7 +141,7 @@ export default class LowDB extends DatabaseProvider {
 
   async createClient(client: NewClient) {
     DEBUG('Create Client');
-    const now = new Date();
+    const now = new Date().toISOString();
     const newClient: Client = { ...client, createdAt: now, updatedAt: now };
     await this.#db.update((data) => {
       data.clients[client.id] = newClient;
@@ -184,7 +184,7 @@ export default class LowDB extends DatabaseProvider {
     });
   }
 
-  async updateClientExpirationDate(id: string, expirationDate: Date | null) {
+  async updateClientExpirationDate(id: string, expirationDate: string | null) {
     DEBUG('Update Client Address');
     await this.#db.update((data) => {
       if (data.clients[id]) {
