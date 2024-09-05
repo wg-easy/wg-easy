@@ -33,7 +33,11 @@ export default defineEventHandler(async (event) => {
       });
 
     const userHashPassword = user.password;
-    if (isPasswordValid(authorization, userHashPassword)) {
+    const passwordValid = await isPasswordValid(
+      authorization,
+      userHashPassword
+    );
+    if (passwordValid) {
       return;
     }
     throw createError({

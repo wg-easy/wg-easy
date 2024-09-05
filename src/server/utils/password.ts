@@ -1,21 +1,18 @@
-import bcrypt from 'bcryptjs';
+import argon2 from 'argon2';
 
 /**
- * Checks if `password` matches the user password.
- *
- * @param {string} password string to test
- * @returns {boolean} `true` if matching user password, otherwise `false`
+ * Checks if `password` matches the hash.
  */
-export function isPasswordValid(password: string, hash: string): boolean {
-  return bcrypt.compareSync(password, hash);
+export function isPasswordValid(
+  password: string,
+  hash: string
+): Promise<boolean> {
+  return argon2.verify(hash, password);
 }
 
 /**
  * Hashes a password.
- *
- * @param {string} password - The plaintext password to hash
- * @returns {string} The hash of the password
  */
-export function hashPassword(password: string): string {
-  return bcrypt.hashSync(password, 12);
+export async function hashPassword(password: string): Promise<string> {
+  return argon2.hash(password);
 }

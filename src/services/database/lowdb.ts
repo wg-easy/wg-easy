@@ -91,9 +91,11 @@ export default class LowDB extends DatabaseProvider {
     const now = new Date().toISOString();
     const isUserEmpty = this.#db.data.users.length === 0;
 
+    const hash = await hashPassword(password);
+
     const newUser: User = {
       id: crypto.randomUUID(),
-      password: hashPassword(password),
+      password: hash,
       username,
       name: 'Administrator',
       role: isUserEmpty ? 'ADMIN' : 'CLIENT',
