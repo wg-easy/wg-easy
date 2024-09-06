@@ -321,8 +321,8 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
 
   async eraseOneTimeLink({ clientId }) {
     const client = await this.getClient({ clientId });
-    client.oneTimeLink = null;
-    client.oneTimeLinkExpiresAt = null;
+    // client.oneTimeLink = null;
+    client.oneTimeLinkExpiresAt = new Date(Date.now() + 10 * 1000);
     client.updatedAt = new Date();
     await this.saveConfig();
   }
