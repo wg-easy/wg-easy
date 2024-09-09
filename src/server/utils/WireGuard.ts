@@ -147,7 +147,6 @@ class WireGuard {
       privateKey,
       publicKey,
       preSharedKey,
-      endpoint: null,
       oneTimeLink: null,
       expiresAt: null,
       enabled: true,
