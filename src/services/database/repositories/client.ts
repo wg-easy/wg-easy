@@ -14,7 +14,6 @@ export type Client = {
   preSharedKey: string;
   /** ISO String */
   expiresAt: string | null;
-  endpoint: string | null;
   allowedIPs: string[];
   serverAllowedIPs: string[] | null;
   oneTimeLink: OneTimeLink | null;

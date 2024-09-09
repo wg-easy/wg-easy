@@ -68,7 +68,6 @@ export async function migrateConfig(input: unknown) {
       privateKey: oldClient.privateKey,
       publicKey: oldClient.publicKey,
       updatedAt: oldClient.updatedAt,
-      endpoint: null,
       expiresAt: null,
       oneTimeLink: null,
       allowedIPs: db.system.userConfig.allowedIps,
