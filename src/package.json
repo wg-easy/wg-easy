@@ -14,7 +14,7 @@
   "license": "CC BY-NC-SA 4.0",
   "dependencies": {
     "bcryptjs": "^2.4.3",
-    "debug": "^4.3.6",
+    "debug": "^4.3.7",
     "express-session": "^1.18.0",
     "h3": "^1.12.0",
     "qrcode": "^1.5.4"
