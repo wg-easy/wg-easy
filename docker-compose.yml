@@ -7,7 +7,6 @@ services:
       - PORT=51821
       # Optional:
       # - HOST=0.0.0.0
-      # - WG_PATH=/etc/wireguard/
 
     image: ghcr.io/wg-easy/wg-easy
     container_name: wg-easy
