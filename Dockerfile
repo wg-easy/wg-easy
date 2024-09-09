@@ -43,5 +43,7 @@ ENV DEBUG=Server,WireGuard,LowDB
 ENV PORT=51821
 ENV HOST=0.0.0.0
 
+LABEL org.opencontainers.image.source=https://github.com/wg-easy/wg-easy
+
 # Run Web UI
 CMD ["/usr/bin/dumb-init", "node", "server/index.mjs"]
