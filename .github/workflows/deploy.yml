@@ -33,7 +33,7 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Set environment variables
-      run: RELEASE=echo $(cat ./src/package.json | jq -r .release | jq -r .version) >> $GITHUB_ENV
+      run: echo RELEASE=$(cat ./src/package.json | jq -r .release | jq -r .version) >> $GITHUB_ENV
 
     - name: Build & Publish Docker Image
       uses: docker/build-push-action@v6
