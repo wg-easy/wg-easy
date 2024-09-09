@@ -1,0 +1,75 @@
+site_name: "wg-easy"
+site_description: "The easiest way to run WireGuard VPN + Web-based Admin UI."
+site_author: "wg-easy (Github Organization)"
+copyright: '<p>&copy <a href="https://github.com/wg-easy"><em>Wireguard Easy Organization</em></a><br/><span>This project is licensed under the CC BY-NC-SA 4.0 license.</span></p>'
+
+repo_url: https://github.com/wg-easy/wg-easy
+repo_name: wg-easy
+
+edit_uri: "edit/master/docs/content"
+
+docs_dir: "content/"
+
+site_url: https://wg-easy.github.io/wg-easy
+
+theme:
+  name: material
+  favicon: assets/logo/favicon.png
+  logo: assets/logo/logo.png
+  icon:
+    repo: fontawesome/brands/github
+  features:
+    - navigation.tabs
+    - navigation.top
+    - navigation.expand
+    - navigation.instant
+    - content.action.edit
+    - content.action.view
+    - content.code.annotate
+  palette:
+    # Light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: grey
+      accent: red
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    # Dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: grey
+      accent: red
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+
+extra:
+  version:
+    provider: mike
+
+markdown_extensions:
+  - toc:
+      anchorlink: true
+  - abbr
+  - attr_list
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.magiclink
+  - pymdownx.inlinehilite
+  - pymdownx.tilde
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
