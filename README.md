@@ -121,7 +121,6 @@ These options can be configured by setting environment variables using `-e KEY="
 | --------- | ----------------- | ------------- | -------------------------------------------- |
 | `PORT`    | `51821`           | `6789`        | TCP port for Web UI.                         |
 | `HOST`    | `0.0.0.0`         | `localhost`   | IP address web UI binds to.                  |
-| `WG_PATH` | `/etc/wireguard/` | `/home/user/` | The Path your `wg0.conf` and `db.json` lives |
 
 ## Updating
 
