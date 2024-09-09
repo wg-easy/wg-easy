@@ -1,6 +1,5 @@
 import crypto from 'node:crypto';
 import debug from 'debug';
-import { join } from 'path';
 
 import {
   DatabaseProvider,
@@ -22,7 +21,7 @@ export default class LowDB extends DatabaseProvider {
   #connected = false;
 
   private async __init() {
-    const dbFilePath = join(WG_PATH, 'db.json');
+    const dbFilePath = '/etc/wireguard/db.json';
     this.#db = await JSONFilePreset(dbFilePath, DEFAULT_DATABASE);
   }
 

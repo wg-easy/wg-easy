@@ -1,5 +1,4 @@
 import fs from 'node:fs/promises';
-import path from 'path';
 import debug from 'debug';
 import crypto from 'node:crypto';
 import QRCode from 'qrcode';
@@ -30,7 +29,7 @@ class WireGuard {
     }
 
     DEBUG('Config saving...');
-    await fs.writeFile(path.join(WG_PATH, 'wg0.conf'), result.join('\n\n'), {
+    await fs.writeFile('/etc/wireguard/wg0.conf', result.join('\n\n'), {
       mode: 0o600,
     });
     DEBUG('Config saved.');
