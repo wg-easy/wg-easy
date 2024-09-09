@@ -6,8 +6,6 @@ import QRCode from 'qrcode';
 import CRC32 from 'crc-32';
 
 import type { NewClient } from '~~/services/database/repositories/client';
-import { parseCidr } from 'cidr-tools';
-import { stringifyIp } from 'ip-bigint';
 import { isIPv4 } from 'is-ip';
 
 const DEBUG = debug('WireGuard');
@@ -134,50 +132,9 @@ class WireGuard {
     const publicKey = await wg.getPublicKey(privateKey);
     const preSharedKey = await wg.generatePresharedKey();
 
-    // Calculate next IP
-    const cidr4 = parseCidr(system.userConfig.address4Range);
-    let address4;
-    for (let i = cidr4.start + 2n; i <= cidr4.end - 1n; i++) {
-      const currentIp4 = stringifyIp({ number: i, version: 4 });
-      const client = Object.values(clients).find((client) => {
-        return client.address4 === currentIp4;
-      });
+    const address4 = nextIPv4(system, clients);
 
-      if (!client) {
-        address4 = currentIp4;
-        break;
-      }
-    }
-
-    if (!address4) {
-      throw createError({
-        statusCode: 409,
-        statusMessage: 'Maximum number of clients reached.',
-        data: { cause: 'IPv4 Address Pool exhausted' },
-      });
-    }
-
-    const cidr6 = parseCidr(system.userConfig.address6Range);
-    let address6;
-    for (let i = cidr6.start + 2n; i <= cidr6.end - 1n; i++) {
-      const currentIp6 = stringifyIp({ number: i, version: 6 });
-      const client = Object.values(clients).find((client) => {
-        return client.address6 === currentIp6;
-      });
-
-      if (!client) {
-        address6 = currentIp6;
-        break;
-      }
-    }
-
-    if (!address6) {
-      throw createError({
-        statusCode: 409,
-        statusMessage: 'Maximum number of clients reached.',
-        data: { cause: 'IPv6 Address Pool exhausted' },
-      });
-    }
+    const address6 = nextIPv6(system, clients);
 
     // Create Client
     const id = crypto.randomUUID();

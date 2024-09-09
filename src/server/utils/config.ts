@@ -2,6 +2,8 @@ import debug from 'debug';
 import packageJson from '@@/package.json';
 import { z } from 'zod';
 import type { Database } from '~~/services/database/repositories/database';
+import { parseCidr } from 'cidr-tools';
+import { stringifyIp } from 'ip-bigint';
 
 export const WG_PATH = process.env.WG_PATH || '/etc/wireguard/';
 
@@ -36,6 +38,7 @@ export async function migrateConfig(input: unknown) {
   }
   const system = await Database.getSystem();
   const oldConfig = res.data;
+  const oldCidr = parseCidr(oldConfig.server.address + '/24');
   const db = {
     system: {
       ...system,
@@ -47,12 +50,14 @@ export async function migrateConfig(input: unknown) {
       },
       userConfig: {
         ...system.userConfig,
-        address4Range: 'TODO',
+        address4Range:
+          stringifyIp({ number: oldCidr.start, version: 4 }) + '/24',
       },
     } satisfies Partial<Database['system']>,
     clients: {} as Database['clients'],
   };
   for (const [oldId, oldClient] of Object.entries(oldConfig.clients)) {
+    const address6 = nextIPv6(db.system, db.clients);
     db.clients[oldId] = {
       id: oldId,
       address4: oldClient.address,
@@ -66,10 +71,10 @@ export async function migrateConfig(input: unknown) {
       endpoint: null,
       expiresAt: null,
       oneTimeLink: null,
-      allowedIPs: ['0.0.0.0/0', '::/0'],
+      allowedIPs: db.system.userConfig.allowedIps,
       serverAllowedIPs: [],
       persistentKeepalive: 0,
-      address6: 'TODO',
+      address6: address6,
     };
   }
 }
