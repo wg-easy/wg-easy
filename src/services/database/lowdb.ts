@@ -22,7 +22,7 @@ export default class LowDB extends DatabaseProvider {
   #connected = false;
 
   private async __init() {
-    const dbFilePath = join(WG_PATH, 'db.json');
+    const dbFilePath = join('/etc/wireguard/db.json');
     this.#db = await JSONFilePreset(dbFilePath, DEFAULT_DATABASE);
   }
 

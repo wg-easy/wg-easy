@@ -5,8 +5,6 @@ import type { Database } from '~~/services/database/repositories/database';
 import { parseCidr } from 'cidr-tools';
 import { stringifyIp } from 'ip-bigint';
 
-export const WG_PATH = process.env.WG_PATH || '/etc/wireguard/';
-
 export const RELEASE = packageJson.release.version;
 
 export const SERVER_DEBUG = debug('Server');
