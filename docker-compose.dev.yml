@@ -7,6 +7,7 @@ services:
       - ./src/:/app/
       - temp:/app/.nuxt/
       - temp1:/app/node_modules/
+      - /lib/modules:/lib/modules:ro
       # - ./data/:/etc/wireguard
     ports:
       - "51820:51820/udp"
