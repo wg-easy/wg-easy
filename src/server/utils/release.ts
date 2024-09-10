@@ -1,5 +1,6 @@
 type GithubRelease = {
   tag_name: string;
+  body: string;
 };
 
 export async function fetchLatestRelease() {
@@ -11,10 +12,16 @@ export async function fetchLatestRelease() {
     if (!response) {
       throw new Error('Empty Response');
     }
-    // TODO: changelog
-    return { version: response.tag_name, changelog: '' };
+    const changelog = response.body.split('\r\n\r\n')[0] ?? '';
+    return {
+      version: response.tag_name,
+      changelog,
+    };
   } catch (e) {
     SERVER_DEBUG('Failed to fetch latest releases: ', e);
-    return { version: 'v0.0.0', changelog: '' };
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Failed to fetch latest release',
+    });
   }
 }
