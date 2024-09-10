@@ -28,7 +28,9 @@ export abstract class DatabaseProvider {
   /**
    * Connects to the database.
    */
-  abstract connect(): Promise<void>;
+  static connect(): Promise<DatabaseProvider> {
+    throw new Error('Not implemented');
+  }
 
   /**
    * Disconnects from the database.
