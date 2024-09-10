@@ -3,13 +3,13 @@ export default defineEventHandler(async (event) => {
     event,
     validateZod(passwordType)
   );
-  const users = await Database.getUsers();
+  const users = await Database.user.findAll();
   if (users.length !== 0) {
     throw createError({
       statusCode: 400,
       statusMessage: 'Invalid state',
     });
   }
-  await Database.createUser(username, password);
+  await Database.user.create(username, password);
   return { success: true };
 });

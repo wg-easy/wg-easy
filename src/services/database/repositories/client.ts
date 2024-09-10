@@ -31,18 +31,21 @@ export type NewClient = Omit<Client, 'createdAt' | 'updatedAt'>;
  * Interface for client-related database operations.
  * This interface provides methods for managing client data.
  */
-export interface ClientRepository {
-  getClients(): Promise<Record<string, Client>>;
-  getClient(id: string): Promise<Client | undefined>;
-  createClient(client: NewClient): Promise<void>;
-  deleteClient(id: string): Promise<void>;
-  toggleClient(id: string, enable: boolean): Promise<void>;
-  updateClientName(id: string, name: string): Promise<void>;
-  updateClientAddress4(id: string, address4: string): Promise<void>;
-  updateClientExpirationDate(
+export abstract class ClientRepository {
+  abstract findAll(): Promise<Record<string, Client>>;
+  abstract findById(id: string): Promise<Client | undefined>;
+  abstract create(client: NewClient): Promise<void>;
+  abstract delete(id: string): Promise<void>;
+  abstract toggle(id: string, enable: boolean): Promise<void>;
+  abstract updateName(id: string, name: string): Promise<void>;
+  abstract updateAddress4(id: string, address4: string): Promise<void>;
+  abstract updateExpirationDate(
     id: string,
     expirationDate: string | null
   ): Promise<void>;
-  deleteOneTimeLink(id: string): Promise<void>;
-  createOneTimeLink(id: string, oneTimeLink: OneTimeLink): Promise<void>;
+  abstract deleteOneTimeLink(id: string): Promise<void>;
+  abstract createOneTimeLink(
+    id: string,
+    oneTimeLink: OneTimeLink
+  ): Promise<void>;
 }
