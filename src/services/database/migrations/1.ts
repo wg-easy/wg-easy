@@ -72,31 +72,29 @@ export async function run1(db: Low<Database>) {
   };
 
   // TODO: properly check if ipv6 support
-  database.system.iptables.PostUp = `
-iptables -t nat -A POSTROUTING -s ${database.system.userConfig.address4Range} -o ${database.system.wgDevice} -j MASQUERADE;
+  database.system.iptables.PostUp =
+    `iptables -t nat -A POSTROUTING -s ${database.system.userConfig.address4Range} -o ${database.system.wgDevice} -j MASQUERADE;
 iptables -A INPUT -p udp -m udp --dport ${database.system.wgPort} -j ACCEPT;
 iptables -A FORWARD -i wg0 -j ACCEPT;
 iptables -A FORWARD -o wg0 -j ACCEPT;
 ip6tables -t nat -A POSTROUTING -s ${database.system.userConfig.address6Range} -o ${database.system.wgDevice} -j MASQUERADE;
 ip6tables -A INPUT -p udp -m udp --dport ${database.system.wgPort} -j ACCEPT;
 ip6tables -A FORWARD -i wg0 -j ACCEPT;
-ip6tables -A FORWARD -o wg0 -j ACCEPT;
-`
-    .split('\n')
-    .join(' ');
+ip6tables -A FORWARD -o wg0 -j ACCEPT;`
+      .split('\n')
+      .join(' ');
 
-  database.system.iptables.PostDown = `
-iptables -t nat -D POSTROUTING -s ${database.system.userConfig.address4Range} -o ${database.system.wgDevice} -j MASQUERADE;
+  database.system.iptables.PostDown =
+    `iptables -t nat -D POSTROUTING -s ${database.system.userConfig.address4Range} -o ${database.system.wgDevice} -j MASQUERADE;
 iptables -D INPUT -p udp -m udp --dport ${database.system.wgPort} -j ACCEPT;
 iptables -D FORWARD -i wg0 -j ACCEPT;
 iptables -D FORWARD -o wg0 -j ACCEPT;
 ip6tables -t nat -D POSTROUTING -s ${database.system.userConfig.address6Range} -o ${database.system.wgDevice} -j MASQUERADE;
 ip6tables -D INPUT -p udp -m udp --dport ${database.system.wgPort} -j ACCEPT;
 ip6tables -D FORWARD -i wg0 -j ACCEPT;
-ip6tables -D FORWARD -o wg0 -j ACCEPT;
-`
-    .split('\n')
-    .join(' ');
+ip6tables -D FORWARD -o wg0 -j ACCEPT;`
+      .split('\n')
+      .join(' ');
 
   db.data = database;
   db.write();

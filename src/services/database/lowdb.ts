@@ -204,14 +204,9 @@ export default class LowDB extends DatabaseProvider {
   #db!: Low<Database>;
   #connected = false;
 
-  system = new LowDBSystem(this.#db);
-  user = new LowDBUser(this.#db);
-  client = new LowDBClient(this.#db);
-
-  private async __init() {
-    const dbFilePath = '/etc/wireguard/db.json';
-    this.#db = await JSONFilePreset(dbFilePath, DEFAULT_DATABASE);
-  }
+  system!: LowDBSystem;
+  user!: LowDBUser;
+  client!: LowDBClient;
 
   /**
    * @throws
@@ -221,7 +216,12 @@ export default class LowDB extends DatabaseProvider {
       return;
     }
     try {
-      await this.__init();
+      DEBUG('Connecting');
+      this.#db = await JSONFilePreset(
+        '/etc/wireguard/db.json',
+        DEFAULT_DATABASE
+      );
+
       DEBUG('Running Migrations');
       await migrationRunner(this.#db);
       DEBUG('Migrations ran successfully');
@@ -229,6 +229,9 @@ export default class LowDB extends DatabaseProvider {
       DEBUG(e);
       throw new Error('Failed to initialize Database');
     }
+    this.system = new LowDBSystem(this.#db);
+    this.user = new LowDBUser(this.#db);
+    this.client = new LowDBClient(this.#db);
     this.#connected = true;
     DEBUG('Connected successfully');
   }
