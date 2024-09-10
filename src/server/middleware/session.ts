@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
   ) {
     return;
   }
-  const system = await Database.getSystem();
+  const system = await Database.system.get();
   if (!system)
     throw createError({
       statusCode: 500,
@@ -24,7 +24,7 @@ export default defineEventHandler(async (event) => {
 
   const authorization = getHeader(event, 'Authorization');
   if (url.pathname.startsWith('/api/') && authorization) {
-    const users = await Database.getUsers();
+    const users = await Database.user.findAll();
     const user = users.find((user) => user.id == session.data.userId);
     if (!user)
       throw createError({

@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
     return;
   }
 
-  const users = await Database.getUsers();
+  const users = await Database.user.findAll();
   if (users.length === 0) {
     if (url.pathname.startsWith('/api/')) {
       throw createError({
