@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
     validateZod(credentialsType)
   );
 
-  const users = await Database.getUsers();
+  const users = await Database.user.findAll();
   const user = users.find((user) => user.username == username);
   if (!user)
     throw createError({
@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const system = await Database.getSystem();
+  const system = await Database.system.get();
 
   const conf: SessionConfig = system.sessionConfig;
 

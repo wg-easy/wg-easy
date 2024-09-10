@@ -1,9 +1,4 @@
-import type {
-  ClientRepository,
-  Client,
-  NewClient,
-  OneTimeLink,
-} from './client';
+import type { ClientRepository, Client } from './client';
 import type { System, SystemRepository } from './system';
 import type { User, UserRepository } from './user';
 
@@ -29,9 +24,7 @@ export const DEFAULT_DATABASE: Database = {
  * **Note :** Always throw `DatabaseError` to ensure proper API error handling.
  *
  */
-export abstract class DatabaseProvider
-  implements SystemRepository, UserRepository, ClientRepository
-{
+export abstract class DatabaseProvider {
   /**
    * Connects to the database.
    */
@@ -42,30 +35,9 @@ export abstract class DatabaseProvider
    */
   abstract disconnect(): Promise<void>;
 
-  abstract getSystem(): Promise<System>;
-
-  abstract getUsers(): Promise<User[]>;
-  abstract getUser(id: string): Promise<User | undefined>;
-  abstract createUser(username: string, password: string): Promise<void>;
-  abstract updateUser(user: User): Promise<void>;
-  abstract deleteUser(id: string): Promise<void>;
-
-  abstract getClients(): Promise<Record<string, Client>>;
-  abstract getClient(id: string): Promise<Client | undefined>;
-  abstract createClient(client: NewClient): Promise<void>;
-  abstract deleteClient(id: string): Promise<void>;
-  abstract toggleClient(id: string, enable: boolean): Promise<void>;
-  abstract updateClientName(id: string, name: string): Promise<void>;
-  abstract updateClientAddress4(id: string, address4: string): Promise<void>;
-  abstract updateClientExpirationDate(
-    id: string,
-    expirationDate: string | null
-  ): Promise<void>;
-  abstract deleteOneTimeLink(id: string): Promise<void>;
-  abstract createOneTimeLink(
-    id: string,
-    oneTimeLink: OneTimeLink
-  ): Promise<void>;
+  abstract system: SystemRepository;
+  abstract user: UserRepository;
+  abstract client: ClientRepository;
 }
 
 /**
