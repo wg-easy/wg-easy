@@ -6,6 +6,7 @@ export const useGlobalStore = defineStore('Global', () => {
   const latestRelease = ref<null | { version: string; changelog: string }>(
     null
   );
+  const updateAvailable = ref(false);
   const features = ref({
     trafficStats: {
       enabled: false,
@@ -25,7 +26,7 @@ export const useGlobalStore = defineStore('Global', () => {
 
   const { availableLocales, locale } = useI18n();
 
-  async function fetchRelease() {
+  async function setLanguage() {
     const { data: lang } = await api.getLang();
     if (
       lang.value !== getItem('lang') &&
@@ -34,19 +35,18 @@ export const useGlobalStore = defineStore('Global', () => {
       setItem('lang', lang.value!);
       locale.value = lang.value!;
     }
+  }
 
+  async function fetchRelease() {
     const { data: release } = await api.getRelease();
 
     if (!release.value) {
       return;
     }
 
-    if (!release.value.updateAvailable) {
-      return;
-    }
-
     currentRelease.value = release.value.currentRelease;
     latestRelease.value = release.value.latestRelease;
+    updateAvailable.value = release.value.updateAvailable;
   }
 
   async function fetchFeatures() {
@@ -67,7 +67,9 @@ export const useGlobalStore = defineStore('Global', () => {
     features,
     currentRelease,
     latestRelease,
+    updateAvailable,
     fetchRelease,
     fetchFeatures,
+    setLanguage,
   };
 });

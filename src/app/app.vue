@@ -10,6 +10,7 @@
 const globalStore = useGlobalStore();
 globalStore.fetchFeatures();
 globalStore.fetchRelease();
+globalStore.setLanguage();
 useHead({
   bodyAttrs: {
     class: 'bg-gray-50 dark:bg-neutral-800',

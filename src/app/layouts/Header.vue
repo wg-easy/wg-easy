@@ -63,7 +63,7 @@
     </div>
     <div class="text-sm text-gray-400 dark:text-neutral-400 mb-5" />
     <div
-      v-if="globalStore.latestRelease"
+      v-if="globalStore.updateAvailable && globalStore.latestRelease"
       class="bg-red-800 dark:bg-red-100 p-4 text-white dark:text-red-600 text-sm font-small mb-10 rounded-md shadow-lg"
       :title="`v${globalStore.currentRelease} → v${globalStore.latestRelease.version}`"
     >

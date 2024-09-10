@@ -3,7 +3,30 @@ type GithubRelease = {
   body: string;
 };
 
-export async function fetchLatestRelease() {
+/**
+ * Cache function for 1 hour
+ */
+function cacheFunction<T>(fn: () => T): () => T {
+  let cache: { value: T; expiry: number } | null = null;
+
+  return (): T => {
+    const now = Date.now();
+
+    if (cache && cache.expiry > now) {
+      return cache.value;
+    }
+
+    const result = fn();
+    cache = {
+      value: result,
+      expiry: now + 3600000,
+    };
+
+    return result;
+  };
+}
+
+async function fetchLatestRelease() {
   try {
     const response = await $fetch<GithubRelease>(
       'https://api.github.com/repos/wg-easy/wg-easy/releases/latest',
@@ -25,3 +48,5 @@ export async function fetchLatestRelease() {
     });
   }
 }
+
+export const cachedFetchLatestRelease = cacheFunction(fetchLatestRelease);
