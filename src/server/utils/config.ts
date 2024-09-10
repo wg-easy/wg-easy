@@ -34,7 +34,7 @@ export async function migrateConfig(input: unknown) {
   if (!res.success) {
     throw new Error('Invalid Config');
   }
-  const system = await Database.getSystem();
+  const system = await Database.system.get();
   const oldConfig = res.data;
   const oldCidr = parseCidr(oldConfig.server.address + '/24');
   const db = {

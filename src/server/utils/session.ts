@@ -5,7 +5,7 @@ export type WGSession = {
 };
 
 export async function useWGSession(event: H3Event) {
-  const system = await Database.getSystem();
+  const system = await Database.system.get();
   if (!system) throw new Error('Invalid');
   return useSession<Partial<WGSession>>(event, system.sessionConfig);
 }

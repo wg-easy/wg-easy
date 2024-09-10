@@ -16,8 +16,8 @@ class WireGuard {
   }
 
   async #saveWireguardConfig() {
-    const system = await Database.getSystem();
-    const clients = await Database.getClients();
+    const system = await Database.system.get();
+    const clients = await Database.client.findAll();
     const result = [];
     result.push(wg.generateServerInterface(system));
 
@@ -42,7 +42,7 @@ class WireGuard {
   }
 
   async getClients() {
-    const dbClients = await Database.getClients();
+    const dbClients = await Database.client.findAll();
     const clients = Object.entries(dbClients).map(([clientId, client]) => ({
       id: clientId,
       name: client.name,
@@ -91,7 +91,7 @@ class WireGuard {
   }
 
   async getClient({ clientId }: { clientId: string }) {
-    const client = await Database.getClient(clientId);
+    const client = await Database.client.findById(clientId);
     if (!client) {
       throw createError({
         statusCode: 404,
@@ -103,7 +103,7 @@ class WireGuard {
   }
 
   async getClientConfiguration({ clientId }: { clientId: string }) {
-    const system = await Database.getSystem();
+    const system = await Database.system.get();
     const client = await this.getClient({ clientId });
 
     return wg.generateClientConfig(system, client);
@@ -124,8 +124,8 @@ class WireGuard {
     name: string;
     expireDate: string | null;
   }) {
-    const system = await Database.getSystem();
-    const clients = await Database.getClients();
+    const system = await Database.system.get();
+    const clients = await Database.client.findAll();
 
     const privateKey = await wg.generatePrivateKey();
     const publicKey = await wg.getPublicKey(privateKey);
@@ -162,7 +162,7 @@ class WireGuard {
       client.expiresAt = date.toISOString();
     }
 
-    await Database.createClient(client);
+    await Database.client.create(client);
 
     await this.saveConfig();
 
@@ -170,12 +170,12 @@ class WireGuard {
   }
 
   async deleteClient({ clientId }: { clientId: string }) {
-    await Database.deleteClient(clientId);
+    await Database.client.delete(clientId);
     await this.saveConfig();
   }
 
   async enableClient({ clientId }: { clientId: string }) {
-    await Database.toggleClient(clientId, true);
+    await Database.client.toggle(clientId, true);
 
     await this.saveConfig();
   }
@@ -184,7 +184,7 @@ class WireGuard {
     const key = `${clientId}-${Math.floor(Math.random() * 1000)}`;
     const oneTimeLink = Math.abs(CRC32.str(key)).toString(16);
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString();
-    await Database.createOneTimeLink(clientId, {
+    await Database.client.createOneTimeLink(clientId, {
       oneTimeLink,
       expiresAt,
     });
@@ -192,12 +192,12 @@ class WireGuard {
   }
 
   async eraseOneTimeLink({ clientId }: { clientId: string }) {
-    await Database.deleteOneTimeLink(clientId);
+    await Database.client.deleteOneTimeLink(clientId);
     await this.saveConfig();
   }
 
   async disableClient({ clientId }: { clientId: string }) {
-    await Database.toggleClient(clientId, false);
+    await Database.client.toggle(clientId, false);
 
     await this.saveConfig();
   }
@@ -209,7 +209,7 @@ class WireGuard {
     clientId: string;
     name: string;
   }) {
-    await Database.updateClientName(clientId, name);
+    await Database.client.updateName(clientId, name);
 
     await this.saveConfig();
   }
@@ -228,7 +228,7 @@ class WireGuard {
       });
     }
 
-    await Database.updateClientAddress4(clientId, address4);
+    await Database.client.updateAddress4(clientId, address4);
 
     await this.saveConfig();
   }
@@ -250,7 +250,7 @@ class WireGuard {
       updatedDate = date.toISOString();
     }
 
-    await Database.updateClientExpirationDate(clientId, updatedDate);
+    await Database.client.updateExpirationDate(clientId, updatedDate);
 
     await this.saveConfig();
   }
@@ -323,8 +323,8 @@ class WireGuard {
   }
 
   async cronJob() {
-    const clients = await Database.getClients();
-    const system = await Database.getSystem();
+    const clients = await Database.client.findAll();
+    const system = await Database.system.get();
     // Expires Feature
     if (system.clientExpiration.enabled) {
       for (const client of Object.values(clients)) {
@@ -334,7 +334,7 @@ class WireGuard {
           new Date() > new Date(client.expiresAt)
         ) {
           DEBUG(`Client ${client.id} expired.`);
-          await Database.toggleClient(client.id, false);
+          await Database.client.toggle(client.id, false);
         }
       }
     }
@@ -346,7 +346,7 @@ class WireGuard {
           new Date() > new Date(client.oneTimeLink.expiresAt)
         ) {
           DEBUG(`Client ${client.id} One Time Link expired.`);
-          await Database.deleteOneTimeLink(client.id);
+          await Database.client.deleteOneTimeLink(client.id);
         }
       }
     }

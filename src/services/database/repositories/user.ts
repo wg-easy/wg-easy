@@ -28,26 +28,26 @@ export type User = {
  * Interface for user-related database operations.
  * This interface provides methods for managing user data.
  */
-export interface UserRepository {
+export abstract class UserRepository {
   /**
    * Retrieves all users from the database.
    */
-  getUsers(): Promise<User[]>;
+  abstract findAll(): Promise<User[]>;
 
   /**
    * Retrieves a user by their ID or User object from the database.
    */
-  getUser(id: string): Promise<User | undefined>;
+  abstract findById(id: string): Promise<User | undefined>;
 
-  createUser(username: string, password: string): Promise<void>;
+  abstract create(username: string, password: string): Promise<void>;
 
   /**
    * Updates a user in the database.
    */
-  updateUser(user: User): Promise<void>;
+  abstract update(user: User): Promise<void>;
 
   /**
    * Deletes a user from the database.
    */
-  deleteUser(id: string): Promise<void>;
+  abstract delete(id: string): Promise<void>;
 }
