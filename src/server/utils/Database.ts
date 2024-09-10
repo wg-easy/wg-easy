@@ -5,11 +5,21 @@
 
 import LowDb from '~~/services/database/lowdb';
 
-const provider = new LowDb();
+const nullObject = new Proxy(
+  {},
+  {
+    get() {
+      throw new Error('Database not yet initialized');
+    },
+  }
+);
 
-provider.connect().catch((err) => {
-  console.error(err);
-  process.exit(1);
+// eslint-disable-next-line import/no-mutable-exports
+let provider = nullObject as never as LowDb;
+
+LowDb.connect().then((v) => {
+  provider = v;
+  WireGuard.Startup();
 });
 
 // TODO: check if old config exists and tell user about migration path
