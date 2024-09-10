@@ -336,10 +336,6 @@ module.exports = class Server {
       });
     };
 
-    // Prometheus Metrics API
-    const routerPrometheusMetrics = createRouter();
-    app.use(routerPrometheusMetrics);
-
     // Check Prometheus credentials
     app.use(
       fromNodeMiddleware((req, res, next) => {
@@ -347,11 +343,10 @@ module.exports = class Server {
           return next();
         }
         const user = basicAuth(req);
-        if (requiresPrometheusPassword && !user) {
+        if (!user) {
           res.statusCode = 401;
           return { error: 'Not Logged In' };
         }
-
         if (user.pass) {
           if (isPasswordValid(user.pass, PROMETHEUS_METRICS_PASSWORD)) {
             return next();
@@ -363,6 +358,10 @@ module.exports = class Server {
         return { error: 'Not Logged In' };
       }),
     );
+
+    // Prometheus Metrics API
+    const routerPrometheusMetrics = createRouter();
+    app.use(routerPrometheusMetrics);
 
     // Prometheus Routes
     routerPrometheusMetrics
