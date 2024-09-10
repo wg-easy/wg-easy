@@ -3,6 +3,6 @@ export default defineEventHandler(async (event) => {
     event,
     validateZod(passwordType)
   );
-  await Database.createUser(username, password);
+  await Database.user.create(username, password);
   return { success: true };
 });

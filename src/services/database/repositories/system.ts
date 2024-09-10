@@ -80,9 +80,9 @@ export type System = {
  * This interface provides methods for retrieving system configuration data
  * and specific system properties, such as the language setting, from the database.
  */
-export interface SystemRepository {
+export abstract class SystemRepository {
   /**
    * Retrieves the system configuration data from the database.
    */
-  getSystem(): Promise<System>;
+  abstract get(): Promise<System>;
 }
