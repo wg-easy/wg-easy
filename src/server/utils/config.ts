@@ -5,7 +5,7 @@ import type { Database } from '~~/services/database/repositories/database';
 import { parseCidr } from 'cidr-tools';
 import { stringifyIp } from 'ip-bigint';
 
-export const RELEASE = packageJson.version;
+export const RELEASE = 'v' + packageJson.version;
 
 export const SERVER_DEBUG = debug('Server');
 
