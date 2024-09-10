@@ -7,7 +7,7 @@
         href="https://github.com/wg-easy/wg-easy"
         >WireGuard Easy</a
       >
-      © 2021-2024 by
+      ({{ globalStore.currentRelease }}) © 2021-2024 by
       <a
         class="hover:underline"
         target="_blank"
@@ -32,4 +32,6 @@
   </footer>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+const globalStore = useGlobalStore();
+</script>

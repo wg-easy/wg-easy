@@ -1,8 +1,7 @@
 import { gt } from 'semver';
 
 export default defineEventHandler(async () => {
-  // TODO: cache this
-  const latestRelease = await fetchLatestRelease();
+  const latestRelease = await cachedFetchLatestRelease();
   const updateAvailable = gt(latestRelease.version, RELEASE);
   return {
     currentRelease: RELEASE,
