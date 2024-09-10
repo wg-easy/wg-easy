@@ -1,8 +1,9 @@
 {
-  "version": "1.0.1",
+  "version": "1.0.0",
+  "private": true,
   "scripts": {
     "dev": "docker compose -f docker-compose.dev.yml up",
     "build": "docker build -t wg-easy ."
   },
-  "packageManager": "pnpm@9.9.0"
+  "packageManager": "pnpm@9.10.0"
 }

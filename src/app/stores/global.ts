@@ -2,8 +2,8 @@ import { defineStore } from 'pinia';
 
 export const useGlobalStore = defineStore('Global', () => {
   const uiShowCharts = ref(getItem('uiShowCharts') === '1');
-  const currentRelease = ref<null | number>(null);
-  const latestRelease = ref<null | { version: number; changelog: string }>(
+  const currentRelease = ref<null | string>(null);
+  const latestRelease = ref<null | { version: string; changelog: string }>(
     null
   );
   const features = ref({
@@ -35,18 +35,18 @@ export const useGlobalStore = defineStore('Global', () => {
       locale.value = lang.value!;
     }
 
-    // this is still called on client. why?
     const { data: release } = await api.getRelease();
 
-    if (
-      Number(release.value!.currentRelease) >=
-      release.value!.latestRelease.version
-    ) {
+    if (!release.value) {
       return;
     }
 
-    currentRelease.value = Number(release.value!.currentRelease);
-    latestRelease.value = release.value!.latestRelease;
+    if (!release.value.updateAvailable) {
+      return;
+    }
+
+    currentRelease.value = release.value.currentRelease;
+    latestRelease.value = release.value.latestRelease;
   }
 
   async function fetchFeatures() {
@@ -65,6 +65,8 @@ export const useGlobalStore = defineStore('Global', () => {
     updateCharts,
     sortClient,
     features,
+    currentRelease,
+    latestRelease,
     fetchRelease,
     fetchFeatures,
   };

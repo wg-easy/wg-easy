@@ -1,26 +1,20 @@
+type GithubRelease = {
+  tag_name: string;
+};
+
 export async function fetchLatestRelease() {
   try {
-    const response = await $fetch<Record<string, string>>(
-      'https://wg-easy.github.io/wg-easy/changelog.json',
+    const response = await $fetch<GithubRelease>(
+      'https://api.github.com/repos/wg-easy/wg-easy/releases/latest',
       { method: 'get' }
     );
-    const releasesArray = Object.entries(response).map(
-      ([version, changelog]) => ({
-        version: parseInt(version, 10),
-        changelog: changelog,
-      })
-    );
-    releasesArray.sort((a, b) => {
-      return b.version - a.version;
-    });
-
-    if (releasesArray.length === 0) {
-      throw new Error('Changelog is empty');
+    if (!response) {
+      throw new Error('Empty Response');
     }
-
-    return releasesArray[0]!;
+    // TODO: changelog
+    return { version: response.tag_name, changelog: '' };
   } catch (e) {
     SERVER_DEBUG('Failed to fetch latest releases: ', e);
-    return { version: 0, changelog: '' };
+    return { version: 'v0.0.0', changelog: '' };
   }
 }

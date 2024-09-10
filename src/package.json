@@ -1,9 +1,6 @@
 {
-  "release": {
-    "version": "14"
-  },
   "name": "wg-easy",
-  "version": "1.0.1",
+  "version": "14.0.0",
   "description": "The easiest way to run WireGuard VPN + Web-based Admin UI.",
   "private": true,
   "type": "module",
@@ -37,6 +34,7 @@
     "nuxt": "^3.13.0",
     "pinia": "^2.2.2",
     "qrcode": "^1.5.4",
+    "semver": "^7.6.3",
     "tailwindcss": "^3.4.10",
     "timeago.js": "^4.0.2",
     "vue": "latest",
@@ -47,11 +45,12 @@
     "@nuxt/eslint-config": "^0.5.5",
     "@types/debug": "^4.1.12",
     "@types/qrcode": "^1.5.5",
+    "@types/semver": "^7.5.8",
     "eslint": "^9.9.1",
     "eslint-config-prettier": "^9.1.0",
     "prettier": "^3.3.3",
     "typescript": "^5.5.4",
     "vue-tsc": "^2.1.4"
   },
-  "packageManager": "pnpm@9.9.0"
+  "packageManager": "pnpm@9.10.0"
 }
