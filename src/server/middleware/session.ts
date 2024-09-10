@@ -11,11 +11,6 @@ export default defineEventHandler(async (event) => {
     return;
   }
   const system = await Database.system.get();
-  if (!system)
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Invalid',
-    });
 
   const session = await getSession(event, system.sessionConfig);
   if (session.id && session.data.authenticated) {
