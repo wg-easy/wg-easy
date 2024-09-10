@@ -15,11 +15,9 @@ jobs:
       startsWith(github.ref, 'refs/tags/v')
     permissions:
       packages: write
-      contents: read
+      contents: write
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: production
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -55,3 +53,18 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=min
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11.9
+      - name: Install Dependencies
+        run: |
+          pip install mkdocs-material
+          pip install pillow cairosvg mike
+      - name: Setup Docs Deploy
+        run: |
+          git config --global user.name 'Docs Deploy Bot'
+          git config --global user.email 'docs.deploy@users.noreply.github.com'
+      - name: Build Docs Website
+        run: mike deploy --push --update-aliases ${{ github.ref_name }} latest
