@@ -201,47 +201,47 @@ export class LowDBClient extends ClientRepository {
 }
 
 export default class LowDB extends DatabaseProvider {
-  #db!: Low<Database>;
-  #connected = false;
+  #db: Low<Database>;
 
-  system!: LowDBSystem;
-  user!: LowDBUser;
-  client!: LowDBClient;
+  system: LowDBSystem;
+  user: LowDBUser;
+  client: LowDBClient;
+
+  private constructor(db: Low<Database>) {
+    super();
+    this.#db = db;
+    this.system = new LowDBSystem(this.#db);
+    this.user = new LowDBUser(this.#db);
+    this.client = new LowDBClient(this.#db);
+  }
+
+  async runMigrations() {
+    await migrationRunner(this.#db);
+  }
 
   /**
    * @throws
    */
-  async connect() {
-    if (this.#connected) {
-      return;
-    }
+  static override async connect() {
     try {
-      DEBUG('Connecting');
-      this.#db = await JSONFilePreset(
+      DEBUG('Connecting...');
+      const db = await JSONFilePreset(
         '/etc/wireguard/db.json',
         DEFAULT_DATABASE
       );
-
-      DEBUG('Running Migrations');
-      await migrationRunner(this.#db);
-      DEBUG('Migrations ran successfully');
+      const inst = new LowDB(db);
+      DEBUG('Running Migrations...');
+      await inst.runMigrations();
+      DEBUG('Migrations ran successfully.');
+      DEBUG('Connected successfully.');
+      return inst;
     } catch (e) {
       DEBUG(e);
       throw new Error('Failed to initialize Database');
     }
-    this.system = new LowDBSystem(this.#db);
-    this.user = new LowDBUser(this.#db);
-    this.client = new LowDBClient(this.#db);
-    this.#connected = true;
-    DEBUG('Connected successfully');
-  }
-
-  get connected() {
-    return this.#connected;
   }
 
   async disconnect() {
-    this.#connected = false;
     DEBUG('Disconnected successfully');
   }
 }

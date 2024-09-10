@@ -28,17 +28,17 @@ class WireGuard {
       result.push(wg.generateServerPeer(client));
     }
 
-    DEBUG('Config saving...');
+    DEBUG('Saving Config...');
     await fs.writeFile('/etc/wireguard/wg0.conf', result.join('\n\n'), {
       mode: 0o600,
     });
-    DEBUG('Config saved.');
+    DEBUG('Config saved successfully.');
   }
 
   async #syncWireguardConfig() {
-    DEBUG('Config syncing...');
+    DEBUG('Syncing Config...');
     await wg.sync();
-    DEBUG('Config synced.');
+    DEBUG('Config synced successfully.');
   }
 
   async getClients() {
@@ -275,16 +275,7 @@ class WireGuard {
   }
 
   async Startup() {
-    // TODO: improve this
-    await new Promise((res) => {
-      function wait() {
-        if (Database.connected) {
-          return res(true);
-        }
-      }
-      setTimeout(wait, 1000);
-    });
-    DEBUG('Starting Wireguard');
+    DEBUG('Starting Wireguard...');
     await this.#saveWireguardConfig();
     await wg.down().catch(() => {});
     await wg.up().catch((err) => {
@@ -301,10 +292,11 @@ class WireGuard {
       throw err;
     });
     await this.#syncWireguardConfig();
-    DEBUG('Wireguard started successfully');
+    DEBUG('Wireguard started successfully.');
 
-    DEBUG('Starting Cron Job');
+    DEBUG('Starting Cron Job.');
     await this.startCronJob();
+    DEBUG('Cron Job started successfully.');
   }
 
   async startCronJob() {
@@ -426,10 +418,4 @@ class WireGuard {
   }
 }
 
-const inst = new WireGuard();
-inst.Startup().catch((v) => {
-  console.error(v);
-  process.exit(1);
-});
-
-export default inst;
+export default new WireGuard();
