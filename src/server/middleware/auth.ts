@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  if (url.pathname === '/admin') {
+  if (url.pathname.startsWith('/admin')) {
     if (!session.data.userId) {
       return sendRedirect(event, '/login', 302);
     }
