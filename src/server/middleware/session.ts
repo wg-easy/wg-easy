@@ -12,8 +12,8 @@ export default defineEventHandler(async (event) => {
   }
   const system = await Database.system.get();
 
-  const session = await getSession(event, system.sessionConfig);
-  if (session.id && session.data.authenticated) {
+  const session = await getSession<WGSession>(event, system.sessionConfig);
+  if (session.id && session.data.userId) {
     return;
   }
 

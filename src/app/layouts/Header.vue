@@ -51,14 +51,7 @@
             class="w-5 h-5 peer fill-gray-400 peer-checked:fill-gray-600 dark:fill-neutral-600 peer-checked:dark:fill-neutral-400 group-hover:dark:fill-neutral-500 transition"
           />
         </label>
-        <span
-          v-if="!isLoginPage"
-          class="text-sm text-gray-400 dark:text-neutral-400 cursor-pointer hover:underline"
-          @click="logout"
-        >
-          {{ $t('logout') }}
-          <IconsLogout class="h-3 inline" />
-        </span>
+        <UiUserMenu v-if="!isLoginPage" />
       </div>
     </div>
     <div class="text-sm text-gray-400 dark:text-neutral-400 mb-5" />
@@ -86,7 +79,6 @@
 </template>
 
 <script setup lang="ts">
-const authStore = useAuthStore();
 const globalStore = useGlobalStore();
 const route = useRoute();
 
@@ -107,18 +99,5 @@ function toggleTheme() {
 
 function toggleCharts() {
   setItem('uiShowCharts', uiShowCharts.value ? '1' : '0');
-}
-
-async function logout(e: Event) {
-  e.preventDefault();
-  try {
-    await authStore.logout();
-    navigateTo('/login');
-  } catch (err) {
-    if (err instanceof Error) {
-      // TODO: better ui
-      alert(err.message || err.toString());
-    }
-  }
 }
 </script>
