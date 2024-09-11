@@ -54,4 +54,7 @@ jobs:
           git config --global user.name 'Docs Deploy Bot'
           git config --global user.email 'docs.deploy@users.noreply.github.com'
       - name: Build Docs Website
-        run: mike deploy --push nightly
+        run: |
+          cd docs
+          git fetch origin gh-pages --depth=1
+          mike deploy --push --update-aliases nightly
