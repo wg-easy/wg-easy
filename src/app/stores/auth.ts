@@ -1,4 +1,10 @@
 export const useAuthStore = defineStore('Auth', () => {
+  const userData = ref<null | {
+    name: string;
+    username: string;
+    role: string;
+  }>();
+
   /**
    * @throws if unsuccessful
    */
@@ -25,8 +31,9 @@ export const useAuthStore = defineStore('Auth', () => {
 
   async function update() {
     // store role etc
-    await api.getSession();
+    const { data: response } = await api.getSession();
+    userData.value = response.value;
   }
 
-  return { login, logout, update, signup };
+  return { userData, login, logout, update, signup };
 });
