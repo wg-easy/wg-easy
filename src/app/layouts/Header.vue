@@ -52,7 +52,7 @@
           />
         </label>
         <span
-          v-if="authStore.requiresPassword && !isLoginPage"
+          v-if="!isLoginPage"
           class="text-sm text-gray-400 dark:text-neutral-400 cursor-pointer hover:underline"
           @click="logout"
         >

@@ -12,8 +12,7 @@ class API {
   }
 
   async getSession() {
-    // TODO?: use useFetch
-    return $fetch('/api/session', {
+    return useFetch('/api/session', {
       method: 'get',
     });
   }

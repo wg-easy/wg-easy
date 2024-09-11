@@ -34,12 +34,11 @@ export default defineEventHandler(async (event) => {
     };
   }
 
-  const session = await useSession(event, {
+  const session = await useSession<WGSession>(event, {
     ...system.sessionConfig,
   });
 
   const data = await session.update({
-    authenticated: true,
     userId: user.id,
   });
 
