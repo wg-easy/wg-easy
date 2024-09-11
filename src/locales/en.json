@@ -1,4 +1,15 @@
 {
+  "setup": {
+    "welcome": "Welcome to your first setup of wg-easy !",
+    "msg": "Please first enter an admin username and a strong secure password. This information will be used to log in to your administration panel.",
+    "newPassword": "New Password",
+    "accept": "I accept the condition",
+    "submitBtn": "Create admin account",
+    "usernameCondition": "The username must contain at least 8 characters.",
+    "passwordCondition": "The password must contain at least 12 characters, including 1 uppercase letter, 1 lowercase letter, 1 digit, and 1 special character.",
+    "usernamePlaceholder": "Administrator",
+    "passwordPlaceholder": "Strong password"
+  },
   "name": "Name",
   "username": "Username",
   "password": "Password",
