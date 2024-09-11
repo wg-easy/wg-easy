@@ -7,16 +7,18 @@
           : 'flex flex-col-reverse xxs:flex-row flex-auto items-center gap-3'
       "
     >
-      <h1
-        v-if="isLoginPage"
-        class="text-4xl dark:text-neutral-200 font-medium flex-grow self-start mb-4"
-      >
-        <img
-          src="/logo.png"
-          width="32"
-          class="inline align-middle dark:bg mr-2"
-        /><span class="align-middle">WireGuard</span>
-      </h1>
+      <NuxtLink to="/" class="flex-grow self-start mb-4">
+        <h1
+          v-if="isLoginPage"
+          class="text-4xl dark:text-neutral-200 font-medium"
+        >
+          <img
+            src="/logo.png"
+            width="32"
+            class="inline align-middle dark:bg mr-2"
+          /><span class="align-middle">WireGuard</span>
+        </h1>
+      </NuxtLink>
       <div class="flex items-center grow-0 gap-3 self-end xxs:self-center">
         <!-- Dark / light theme -->
         <button

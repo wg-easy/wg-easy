@@ -34,6 +34,7 @@
     "nuxt": "^3.13.0",
     "pinia": "^2.2.2",
     "qrcode": "^1.5.4",
+    "radix-vue": "^1.9.5",
     "semver": "^7.6.3",
     "tailwindcss": "^3.4.10",
     "timeago.js": "^4.0.2",
