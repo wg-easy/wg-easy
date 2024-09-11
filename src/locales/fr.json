@@ -1,4 +1,15 @@
 {
+  "setup": {
+    "welcome": "Bienvenue à la page de configuration de votre wg-easy !",
+    "msg": "Veuillez renseigner votre nom d'utilisateur et votre mot de passe. Ces informations seront utilisées pour vous connecter à votre page d'administration.",
+    "newPassword": "Nouveau mot de passe",
+    "accept": "J'accepte les conditions d'utilisation",
+    "submitBtn": "Créer un nouveau compte",
+    "usernameCondition": "Le nom d'utilisateur doit contenir au moins 8 caractères.",
+    "passwordCondition": "Le mot de passe doit contenir au moins 12 caractères dont 1 majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial.",
+    "usernamePlaceholder": "Administrateur",
+    "passwordPlaceholder": "Mot de passe sapau"
+  },
   "name": "Nom",
   "password": "Mot de passe",
   "signIn": "Se Connecter",
