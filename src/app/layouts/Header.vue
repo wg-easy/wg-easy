@@ -8,7 +8,7 @@
       "
     >
       <h1
-        v-if="!isLoginPage"
+        v-if="isLoginPage"
         class="text-4xl dark:text-neutral-200 font-medium flex-grow self-start mb-4"
       >
         <img
