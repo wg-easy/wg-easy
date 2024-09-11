@@ -1,7 +1,7 @@
 import type { H3Event } from 'h3';
 
 export type WGSession = {
-  authenticated: boolean;
+  userId: string;
 };
 
 export async function useWGSession(event: H3Event) {
