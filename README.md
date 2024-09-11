@@ -42,7 +42,7 @@ For **stable** versions instead of nightly or development please read **README**
 | tag | Branch | Example | Description |
 | - | - | - | - |
 | `latest` | production | `ghcr.io/wg-easy/wg-easy:latest` or `ghcr.io/wg-easy/wg-easy` | stable as possbile get bug fixes quickly when needed, deployed against `production`. |
-| `13` | production | `ghcr.io/wg-easy/wg-easy:13` | same as latest, stick to a version tag. |
+| `14` | production | `ghcr.io/wg-easy/wg-easy:14` | same as latest, stick to a version tag. |
 | `nightly` | master | `ghcr.io/wg-easy/wg-easy:nightly` | mostly unstable gets frequent package and code updates, deployed against `master`. |
 | `development` | pull requests | `ghcr.io/wg-easy/wg-easy:development` | used for development, testing code from PRs before landing into `master`. |
 
