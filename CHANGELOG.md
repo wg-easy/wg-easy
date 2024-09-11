@@ -15,6 +15,10 @@ This update is an entire rewrite to make it even easier to set up your own VPN.
 - Almost all Environment variables removed
 - New and Improved UI
 
+## Minor Changes
+
+- Renamed Chinese Locales (cht -> zh-cht, chs -> zh-chs)
+
 ## [14.0.0] - 2024-09-04
 
 ### Major changes
