@@ -2,6 +2,8 @@
 export default defineEventHandler(async (event) => {
   const url = getRequestURL(event);
 
+  // TODO: redirect to login page if already set up
+
   if (
     url.pathname === '/setup' ||
     url.pathname === '/api/account/setup' ||

@@ -2,14 +2,14 @@
   <header class="container mx-auto max-w-3xl px-3 md:px-0 mt-4 xs:mt-6">
     <div
       :class="
-        isLoginPage
+        hasOwnLogo
           ? 'flex justify-end'
           : 'flex flex-col-reverse xxs:flex-row flex-auto items-center gap-3'
       "
     >
       <NuxtLink to="/" class="flex-grow self-start mb-4">
         <h1
-          v-if="isLoginPage"
+          v-if="!hasOwnLogo"
           class="text-4xl dark:text-neutral-200 font-medium"
         >
           <img
@@ -53,7 +53,7 @@
             class="w-5 h-5 peer fill-gray-400 peer-checked:fill-gray-600 dark:fill-neutral-600 peer-checked:dark:fill-neutral-400 group-hover:dark:fill-neutral-500 transition"
           />
         </label>
-        <UiUserMenu v-if="!isLoginPage" />
+        <UiUserMenu v-if="loggedIn" />
       </div>
     </div>
     <div class="text-sm text-gray-400 dark:text-neutral-400 mb-5" />
@@ -84,7 +84,13 @@
 const globalStore = useGlobalStore();
 const route = useRoute();
 
-const isLoginPage = computed(() => route.path == '/login');
+const hasOwnLogo = computed(
+  () => route.path === '/login' || route.path === '/setup'
+);
+
+const loggedIn = computed(
+  () => route.path !== '/login' && route.path !== '/setup'
+);
 
 const theme = useTheme();
 const uiShowCharts = ref(getItem('uiShowCharts') === '1');
