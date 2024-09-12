@@ -145,6 +145,13 @@ class API {
       method: 'get',
     });
   }
+
+  async updateFeatures(features: Record<string, { enabled: boolean }>) {
+    return $fetch('/api/features', {
+      method: 'post',
+      body: { features },
+    });
+  }
 }
 
 type WGClientReturn = Awaited<

@@ -65,15 +65,24 @@ export type System = {
   wgConfigPort: number;
 
   iptables: IpTables;
+
   trafficStats: TrafficStats;
+  prometheus: Prometheus;
 
   clientExpiration: Feature;
   oneTimeLinks: Feature;
   sortClients: Feature;
 
-  prometheus: Prometheus;
   sessionConfig: SessionConfig;
 };
+
+export const Features = [
+  'clientExpiration',
+  'oneTimeLinks',
+  'sortClients',
+] as const;
+
+export type Features = (typeof Features)[number];
 
 /**
  * Interface for system-related database operations.
@@ -85,4 +94,6 @@ export abstract class SystemRepository {
    * Retrieves the system configuration data from the database.
    */
   abstract get(): Promise<System>;
+
+  abstract updateFeatures(features: Record<string, Feature>): Promise<void>;
 }

@@ -58,6 +58,19 @@ const oneTimeLink = z
   .min(1, 'oneTimeLink must be at least 1 Character')
   .pipe(safeStringRefine);
 
+const features = z.record(
+  z.string({ message: 'key must be a valid object' }),
+  z.object(
+    {
+      enabled: z.boolean({ message: 'enabled must be a valid boolean' }),
+    },
+    { message: 'value must be a valid object' }
+  ),
+  { message: 'features must be a valid record' }
+);
+
+const objectMessage = 'Body must be a valid object';
+
 export const clientIdType = z.object(
   {
     clientId: id,
@@ -69,28 +82,28 @@ export const address4Type = z.object(
   {
     address4: address4,
   },
-  { message: 'Body must be a valid object' }
+  { message: objectMessage }
 );
 
 export const nameType = z.object(
   {
     name: name,
   },
-  { message: 'Body must be a valid object' }
+  { message: objectMessage }
 );
 
 export const expireDateType = z.object(
   {
     expireDate: expireDate,
   },
-  { message: 'Body must be a valid object' }
+  { message: objectMessage }
 );
 
 export const oneTimeLinkType = z.object(
   {
     oneTimeLink: oneTimeLink,
   },
-  { message: 'Body must be a valid object' }
+  { message: objectMessage }
 );
 
 export const createType = z.object(
@@ -98,14 +111,14 @@ export const createType = z.object(
     name: name,
     expireDate: expireDate,
   },
-  { message: 'Body must be a valid object' }
+  { message: objectMessage }
 );
 
 export const fileType = z.object(
   {
     file: file,
   },
-  { message: 'Body must be a valid object' }
+  { message: objectMessage }
 );
 
 export const credentialsType = z.object(
@@ -114,7 +127,7 @@ export const credentialsType = z.object(
     password: password,
     remember: remember,
   },
-  { message: 'Body must be a valid object' }
+  { message: objectMessage }
 );
 
 export const passwordType = z.object(
@@ -122,7 +135,14 @@ export const passwordType = z.object(
     username: username,
     password: password,
   },
-  { message: 'Body must be a valid object' }
+  { message: objectMessage }
+);
+
+export const featuresType = z.object(
+  {
+    features: features,
+  },
+  { message: objectMessage }
 );
 
 export function validateZod<T>(schema: ZodSchema<T>) {

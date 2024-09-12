@@ -18,7 +18,11 @@ import {
   type NewClient,
   type OneTimeLink,
 } from './repositories/client';
-import { SystemRepository } from './repositories/system';
+import {
+  Features,
+  SystemRepository,
+  type Feature,
+} from './repositories/system';
 
 const DEBUG = debug('LowDB');
 
@@ -36,6 +40,17 @@ export class LowDBSystem extends SystemRepository {
       throw new DatabaseError(DatabaseError.ERROR_INIT);
     }
     return system;
+  }
+
+  async updateFeatures(features: Record<string, Feature>) {
+    DEBUG('Update Features');
+    this.#db.update((v) => {
+      for (const key in features) {
+        if (Features.includes(key as Features)) {
+          v.system[key as Features].enabled = features[key]!.enabled;
+        }
+      }
+    });
   }
 }
 
