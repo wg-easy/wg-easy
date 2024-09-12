@@ -17,7 +17,6 @@ export default defineEventHandler(async (event) => {
   // Require auth for every page other than Login
   // TODO: investigate /__nuxt_error (error page when unauthenticated)
   if (!session.data.userId) {
-    console.log(url.pathname);
     return sendRedirect(event, '/login', 302);
   }
 
