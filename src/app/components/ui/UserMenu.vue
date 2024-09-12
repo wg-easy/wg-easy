@@ -70,10 +70,6 @@
 const authStore = useAuthStore();
 const toggleState = ref(false);
 
-watchEffect(() => {
-  console.log(toggleState);
-});
-
 async function logout() {
   try {
     await authStore.logout();

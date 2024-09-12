@@ -19,7 +19,6 @@ export default defineEventHandler(async (event) => {
         statusMessage: 'Invalid State',
       });
     }
-    console.log(url.pathname);
     return sendRedirect(event, '/setup', 302);
   } else {
     // If already set up
