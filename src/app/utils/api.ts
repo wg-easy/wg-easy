@@ -147,7 +147,7 @@ class API {
   }
 
   async updateFeatures(features: Record<string, { enabled: boolean }>) {
-    return $fetch('/api/features', {
+    return $fetch('/api/admin/features', {
       method: 'post',
       body: { features },
     });

@@ -42,8 +42,8 @@ const route = useRoute();
 
 const menuItems = [
   { id: 'features', name: 'Features' },
-  { id: 'user', name: 'User' },
-  { id: 'server', name: 'Server' },
+  { id: 'statistics', name: 'Statistics' },
+  { id: 'metrics', name: 'Metrics' },
 ];
 
 const activeMenuItem = computed(() => {

@@ -36,6 +36,14 @@
             Clients
           </NuxtLink>
         </DropdownMenuItem>
+        <DropdownMenuItem>
+          <NuxtLink
+            to="/me"
+            class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+          >
+            Account
+          </NuxtLink>
+        </DropdownMenuItem>
         <DropdownMenuItem v-if="authStore.userData?.role === 'ADMIN'">
           <NuxtLink
             to="/admin"
