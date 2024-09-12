@@ -62,6 +62,7 @@ export async function run1(db: Low<Database>) {
         password: null,
       },
       sessionConfig: {
+        // TODO: be able to invalidate all sessions
         password: getRandomHex(256),
         name: 'wg-easy',
         cookie: {},
@@ -71,7 +72,6 @@ export async function run1(db: Low<Database>) {
     clients: {},
   };
 
-  // TODO: properly check if ipv6 support
   database.system.iptables.PostUp =
     `iptables -t nat -A POSTROUTING -s ${database.system.userConfig.address4Range} -o ${database.system.wgDevice} -j MASQUERADE;
 iptables -A INPUT -p udp -m udp --dport ${database.system.wgPort} -j ACCEPT;

@@ -33,8 +33,6 @@
 </template>
 
 <script setup lang="ts">
-import type { UiToast } from '#build/components';
-
 const globalStore = useGlobalStore();
 const open = ref(false);
 
