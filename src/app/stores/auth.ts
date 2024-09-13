@@ -3,6 +3,7 @@ export const useAuthStore = defineStore('Auth', () => {
     name: string;
     username: string;
     role: string;
+    email: string | null;
   }>();
 
   /**
