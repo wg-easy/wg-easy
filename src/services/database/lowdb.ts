@@ -92,6 +92,7 @@ export class LowDBUser extends UserRepository {
       id: crypto.randomUUID(),
       password: hash,
       username,
+      email: null,
       name: 'Administrator',
       role: isUserEmpty ? 'ADMIN' : 'CLIENT',
       enabled: true,
