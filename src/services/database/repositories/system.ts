@@ -14,16 +14,20 @@ export type WGInterface = {
   publicKey: string;
   address4: string;
   address6: string;
+  mtu: number;
+  port: number;
+  device: string;
 };
 
 export type WGConfig = {
   mtu: number;
-  serverMtu: number;
   persistentKeepalive: number;
   address4Range: string;
   address6Range: string;
   defaultDns: string[];
   allowedIps: string[];
+  host: string;
+  port: number;
 };
 
 export enum ChartType {
@@ -47,27 +51,27 @@ export type Feature = {
   enabled: boolean;
 };
 
+export type Metrics = {
+  prometheus: Prometheus;
+};
+
+export type General = {
+  sessionTimeout: number;
+  lang: Lang;
+};
+
 /**
  * Representing the WireGuard network configuration data structure of a computer interface system.
  */
 export type System = {
   interface: WGInterface;
-
-  // maxAge
-  sessionTimeout: number;
-  lang: Lang;
-
+  general: General;
   userConfig: WGConfig;
-
-  wgDevice: string;
-  wgHost: string;
-  wgPort: number;
-  wgConfigPort: number;
 
   iptables: IpTables;
 
   trafficStats: TrafficStats;
-  prometheus: Prometheus;
+  metrics: Metrics;
 
   clientExpiration: Feature;
   oneTimeLinks: Feature;
