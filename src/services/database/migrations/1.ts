@@ -16,28 +16,33 @@ export async function run1(db: Low<Database>) {
   const database: Database = {
     migrations: [],
     system: {
+      // Config to configure Server
       interface: {
         privateKey: privateKey,
         publicKey: publicKey,
         address4: stringifyIp({ number: cidr4.start + 1n, version: 4 }),
         address6: stringifyIp({ number: cidr6.start + 1n, version: 6 }),
+        mtu: 1420,
+        port: 51820,
+        device: 'eth0',
       },
-      sessionTimeout: 3600, // 1 hour
-      lang: 'en',
+      general: {
+        sessionTimeout: 3600, // 1 hour
+        lang: 'en',
+      },
+      // Config to configure Peer & Client Config
       userConfig: {
         mtu: 1420,
-        serverMtu: 1420,
         persistentKeepalive: 0,
         address4Range: address4Range,
         address6Range: address6Range,
         defaultDns: ['1.1.1.1', '2606:4700:4700::1111'],
         allowedIps: ['0.0.0.0/0', '::/0'],
+        // TODO: host has to be configured when onboarding
+        host: '',
+        port: 51820,
       },
-      wgDevice: 'eth0',
-      // TODO: wgHost has to be configured when onboarding
-      wgHost: '',
-      wgPort: 51820,
-      wgConfigPort: 51820,
+      // Config to configure Firewall
       iptables: {
         PreUp: '',
         PostUp: '',
@@ -57,9 +62,11 @@ export async function run1(db: Low<Database>) {
       sortClients: {
         enabled: false,
       },
-      prometheus: {
-        enabled: false,
-        password: null,
+      metrics: {
+        prometheus: {
+          enabled: false,
+          password: null,
+        },
       },
       sessionConfig: {
         // TODO: be able to invalidate all sessions
@@ -73,24 +80,24 @@ export async function run1(db: Low<Database>) {
   };
 
   database.system.iptables.PostUp =
-    `iptables -t nat -A POSTROUTING -s ${database.system.userConfig.address4Range} -o ${database.system.wgDevice} -j MASQUERADE;
-iptables -A INPUT -p udp -m udp --dport ${database.system.wgPort} -j ACCEPT;
+    `iptables -t nat -A POSTROUTING -s ${database.system.userConfig.address4Range} -o ${database.system.interface.device} -j MASQUERADE;
+iptables -A INPUT -p udp -m udp --dport ${database.system.interface.port} -j ACCEPT;
 iptables -A FORWARD -i wg0 -j ACCEPT;
 iptables -A FORWARD -o wg0 -j ACCEPT;
-ip6tables -t nat -A POSTROUTING -s ${database.system.userConfig.address6Range} -o ${database.system.wgDevice} -j MASQUERADE;
-ip6tables -A INPUT -p udp -m udp --dport ${database.system.wgPort} -j ACCEPT;
+ip6tables -t nat -A POSTROUTING -s ${database.system.userConfig.address6Range} -o ${database.system.interface.device} -j MASQUERADE;
+ip6tables -A INPUT -p udp -m udp --dport ${database.system.interface.port} -j ACCEPT;
 ip6tables -A FORWARD -i wg0 -j ACCEPT;
 ip6tables -A FORWARD -o wg0 -j ACCEPT;`
       .split('\n')
       .join(' ');
 
   database.system.iptables.PostDown =
-    `iptables -t nat -D POSTROUTING -s ${database.system.userConfig.address4Range} -o ${database.system.wgDevice} -j MASQUERADE;
-iptables -D INPUT -p udp -m udp --dport ${database.system.wgPort} -j ACCEPT;
+    `iptables -t nat -D POSTROUTING -s ${database.system.userConfig.address4Range} -o ${database.system.interface.device} -j MASQUERADE;
+iptables -D INPUT -p udp -m udp --dport ${database.system.interface.port} -j ACCEPT;
 iptables -D FORWARD -i wg0 -j ACCEPT;
 iptables -D FORWARD -o wg0 -j ACCEPT;
-ip6tables -t nat -D POSTROUTING -s ${database.system.userConfig.address6Range} -o ${database.system.wgDevice} -j MASQUERADE;
-ip6tables -D INPUT -p udp -m udp --dport ${database.system.wgPort} -j ACCEPT;
+ip6tables -t nat -D POSTROUTING -s ${database.system.userConfig.address6Range} -o ${database.system.interface.device} -j MASQUERADE;
+ip6tables -D INPUT -p udp -m udp --dport ${database.system.interface.port} -j ACCEPT;
 ip6tables -D FORWARD -i wg0 -j ACCEPT;
 ip6tables -D FORWARD -o wg0 -j ACCEPT;`
       .split('\n')
