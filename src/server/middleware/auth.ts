@@ -25,7 +25,7 @@ export default defineEventHandler(async (event) => {
     if (!user) {
       return sendRedirect(event, '/login', 302);
     }
-    if (!user.enabled || user.role !== 'ADMIN') {
+    if (user.role !== 'ADMIN') {
       throw createError({
         statusCode: 403,
         statusMessage: 'Not allowed to access Admin Panel',
