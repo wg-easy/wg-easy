@@ -78,6 +78,13 @@ export default defineEventHandler(async (event) => {
     });
   }
 
+  if (!user.enabled) {
+    throw createError({
+      statusCode: 403,
+      statusMessage: 'Account is disabled',
+    });
+  }
+
   if (url.pathname.startsWith('/api/admin')) {
     if (user.role !== 'ADMIN') {
       throw createError({
