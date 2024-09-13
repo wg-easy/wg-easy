@@ -127,13 +127,6 @@ class API {
       body: { username, password },
     });
   }
-
-  async updateFeatures(features: Record<string, { enabled: boolean }>) {
-    return $fetch('/api/admin/features', {
-      method: 'post',
-      body: { features },
-    });
-  }
 }
 
 type WGClientReturn = Awaited<

@@ -105,4 +105,5 @@ export abstract class SystemRepository {
   abstract get(): Promise<System>;
 
   abstract updateFeatures(features: Record<string, Feature>): Promise<void>;
+  abstract updateStatistics(statistics: Statistics): Promise<void>;
 }
