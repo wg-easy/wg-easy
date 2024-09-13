@@ -16,6 +16,10 @@ export async function run1(db: Low<Database>) {
   const database: Database = {
     migrations: [],
     system: {
+      general: {
+        sessionTimeout: 3600, // 1 hour
+        lang: 'en',
+      },
       // Config to configure Server
       interface: {
         privateKey: privateKey,
@@ -25,10 +29,6 @@ export async function run1(db: Low<Database>) {
         mtu: 1420,
         port: 51820,
         device: 'eth0',
-      },
-      general: {
-        sessionTimeout: 3600, // 1 hour
-        lang: 'en',
       },
       // Config to configure Peer & Client Config
       userConfig: {
@@ -49,18 +49,20 @@ export async function run1(db: Low<Database>) {
         PreDown: '',
         PostDown: '',
       },
-      trafficStats: {
-        enabled: false,
-        type: ChartType.None,
+      features: {
+        clientExpiration: {
+          enabled: false,
+        },
+        oneTimeLinks: {
+          enabled: false,
+        },
+        sortClients: {
+          enabled: false,
+        },
       },
-      clientExpiration: {
+      statistics: {
         enabled: false,
-      },
-      oneTimeLinks: {
-        enabled: false,
-      },
-      sortClients: {
-        enabled: false,
+        chartType: ChartType.None,
       },
       metrics: {
         prometheus: {

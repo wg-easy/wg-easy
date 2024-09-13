@@ -14,7 +14,7 @@
           >
             <ClientAddress4 :client="client" />
             <ClientInlineTransfer
-              v-if="!globalStore.features.trafficStats.enabled"
+              v-if="!globalStore.statistics.enabled"
               :client="client"
             />
             <ClientLastSeen :client="client" />
@@ -25,7 +25,7 @@
 
         <!-- Info -->
         <div
-          v-if="globalStore.features.trafficStats.enabled"
+          v-if="globalStore.statistics.enabled"
           class="flex gap-2 items-center shrink-0 text-gray-400 dark:text-neutral-400 text-xs mt-px justify-end"
         >
           <ClientTransfer :client="client" />

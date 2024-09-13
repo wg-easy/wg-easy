@@ -19,9 +19,10 @@ import {
   type OneTimeLink,
 } from './repositories/client';
 import {
-  Features,
+  AvailableFeatures,
   SystemRepository,
   type Feature,
+  type Features,
 } from './repositories/system';
 
 const DEBUG = debug('LowDB');
@@ -46,8 +47,9 @@ export class LowDBSystem extends SystemRepository {
     DEBUG('Update Features');
     this.#db.update((v) => {
       for (const key in features) {
-        if (Features.includes(key as Features)) {
-          v.system[key as Features].enabled = features[key]!.enabled;
+        if (AvailableFeatures.includes(key as keyof Features)) {
+          v.system.features[key as keyof Features].enabled =
+            features[key]!.enabled;
         }
       }
     });
