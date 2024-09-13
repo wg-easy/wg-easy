@@ -20,9 +20,11 @@ import {
 } from './repositories/client';
 import {
   AvailableFeatures,
+  ChartType,
   SystemRepository,
   type Feature,
   type Features,
+  type Statistics,
 } from './repositories/system';
 
 const DEBUG = debug('LowDB');
@@ -51,6 +53,19 @@ export class LowDBSystem extends SystemRepository {
           v.system.features[key as keyof Features].enabled =
             features[key]!.enabled;
         }
+      }
+    });
+  }
+
+  async updateStatistics(statistics: Statistics) {
+    DEBUG('Update Statistics');
+    this.#db.update((v) => {
+      v.system.statistics.enabled = statistics.enabled;
+      if (
+        statistics.chartType >= ChartType.None &&
+        statistics.chartType <= ChartType.Bar
+      ) {
+        v.system.statistics.chartType = statistics.chartType;
       }
     });
   }

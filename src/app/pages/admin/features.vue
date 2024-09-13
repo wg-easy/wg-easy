@@ -37,7 +37,7 @@ const globalStore = useGlobalStore();
 const open = ref(false);
 
 type ExtendedFeatures = {
-  [K in keyof Omit<(typeof globalStore)['features'], 'trafficStats'>]: {
+  [K in keyof (typeof globalStore)['features']]: {
     name: string;
     description: string;
     enabled: boolean;
@@ -71,7 +71,10 @@ function toggleFeature(key: keyof ExtendedFeatures) {
 }
 
 async function submit() {
-  const response = await api.updateFeatures(featuresData.value);
+  const response = await $fetch('/api/admin/features', {
+    method: 'post',
+    body: { features: featuresData.value },
+  });
   if (response.success) {
     open.value = true;
   }

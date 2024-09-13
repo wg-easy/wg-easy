@@ -59,7 +59,7 @@ const oneTimeLink = z
   .pipe(safeStringRefine);
 
 const features = z.record(
-  z.string({ message: 'key must be a valid object' }),
+  z.string({ message: 'key must be a valid string' }),
   z.object(
     {
       enabled: z.boolean({ message: 'enabled must be a valid boolean' }),
@@ -67,6 +67,14 @@ const features = z.record(
     { message: 'value must be a valid object' }
   ),
   { message: 'features must be a valid record' }
+);
+
+const statistics = z.object(
+  {
+    enabled: z.boolean({ message: 'enabled must be a valid boolean' }),
+    chartType: z.number({ message: 'chartType must be a valid number' }),
+  },
+  { message: 'statistics must be a valid object' }
 );
 
 const objectMessage = 'Body must be a valid object';
@@ -141,6 +149,13 @@ export const passwordType = z.object(
 export const featuresType = z.object(
   {
     features: features,
+  },
+  { message: objectMessage }
+);
+
+export const statisticsType = z.object(
+  {
+    statistics: statistics,
   },
   { message: objectMessage }
 );
