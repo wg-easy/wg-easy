@@ -1,16 +1,4 @@
 class API {
-  async getRelease() {
-    return useFetch('/api/release', {
-      method: 'get',
-    });
-  }
-
-  async getLang() {
-    return useFetch('/api/lang', {
-      method: 'get',
-    });
-  }
-
   async getSession() {
     return useFetch('/api/session', {
       method: 'get',
@@ -137,12 +125,6 @@ class API {
     return $fetch('/api/account/setup', {
       method: 'post',
       body: { username, password },
-    });
-  }
-
-  async getFeatures() {
-    return useFetch('/api/features', {
-      method: 'get',
     });
   }
 

@@ -38,7 +38,7 @@
         </button>
         <!-- Show / hide charts -->
         <label
-          v-if="globalStore.features.trafficStats.type > 0"
+          v-if="globalStore.statistics.chartType > 0"
           class="inline-flex items-center justify-center cursor-pointer w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 dark:bg-neutral-700 dark:hover:bg-neutral-600 whitespace-nowrap transition group"
           :title="$t('toggleCharts')"
         >

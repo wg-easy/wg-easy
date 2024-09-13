@@ -37,9 +37,9 @@ export enum ChartType {
   Bar = 3,
 }
 
-export type TrafficStats = {
+export type Statistics = {
   enabled: boolean;
-  type: ChartType;
+  chartType: ChartType;
 };
 
 export type Prometheus = {
@@ -60,33 +60,38 @@ export type General = {
   lang: Lang;
 };
 
-/**
- * Representing the WireGuard network configuration data structure of a computer interface system.
- */
-export type System = {
-  interface: WGInterface;
-  general: General;
-  userConfig: WGConfig;
-
-  iptables: IpTables;
-
-  trafficStats: TrafficStats;
-  metrics: Metrics;
-
+export type Features = {
   clientExpiration: Feature;
   oneTimeLinks: Feature;
   sortClients: Feature;
-
-  sessionConfig: SessionConfig;
 };
 
-export const Features = [
+export const AvailableFeatures: (keyof Features)[] = [
   'clientExpiration',
   'oneTimeLinks',
   'sortClients',
 ] as const;
 
-export type Features = (typeof Features)[number];
+/**
+ * Representing the WireGuard network configuration data structure of a computer interface system.
+ */
+export type System = {
+  general: General;
+
+  interface: WGInterface;
+
+  userConfig: WGConfig;
+
+  iptables: IpTables;
+
+  features: Features;
+
+  statistics: Statistics;
+
+  metrics: Metrics;
+
+  sessionConfig: SessionConfig;
+};
 
 /**
  * Interface for system-related database operations.
