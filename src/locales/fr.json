@@ -1,4 +1,13 @@
 {
+  "pages": {
+    "me": "Compte",
+    "clients": "Clients"
+  },
+  "email": "E-Mail",
+  "save": "Enregistrer",
+  "updatePassword": "Changer le mot de passe",
+  "currentPassword": "Mot de passe actuel",
+  "confirmPassword": "Confirmer le mot de passse",
   "setup": {
     "welcome": "Bienvenue à la page de configuration de votre wg-easy !",
     "msg": "Veuillez renseigner votre nom d'utilisateur et votre mot de passe. Ces informations seront utilisées pour vous connecter à votre page d'administration.",
