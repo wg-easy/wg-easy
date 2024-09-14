@@ -15,7 +15,7 @@
         {{ $t('setup.welcome') }}
       </h2>
       <p class="text-lg p-8">{{ $t('setup.msg') }}</p>
-      <form class="mb-8" @submit="newAccount">
+      <form class="mb-8" @submit.prevent="newAccount">
         <div>
           <label for="username" class="inline-block py-2">{{
             $t('username')
@@ -85,9 +85,7 @@ const authStore = useAuthStore();
 const errorCU = ref(false);
 const errorPWD = ref(false);
 
-async function newAccount(e: Event) {
-  e.preventDefault();
-
+async function newAccount() {
   if (!username.value || !password.value) return;
 
   try {

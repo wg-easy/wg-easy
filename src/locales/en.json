@@ -1,4 +1,13 @@
 {
+  "pages": {
+    "me": "Account",
+    "clients": "Clients"
+  },
+  "email": "E-Mail",
+  "save": "Save",
+  "updatePassword": "Update Password",
+  "currentPassword": "Current Password",
+  "confirmPassword": "Confirm Password",
   "setup": {
     "welcome": "Welcome to your first setup of wg-easy !",
     "msg": "Please first enter an admin username and a strong secure password. This information will be used to log in to your administration panel.",
@@ -17,7 +26,6 @@
   "logout": "Logout",
   "updateAvailable": "There is an update available!",
   "update": "Update",
-  "clients": "Clients",
   "new": "New",
   "deleteClient": "Delete Client",
   "deleteDialog1": "Are you sure you want to delete",

@@ -1,42 +1,118 @@
 <template>
   <main>
-    <div class="container mx-auto max-w-3xl px-3 md:px-0">
-      <div
-        class="shadow-md rounded-lg bg-white dark:bg-neutral-700 overflow-hidden"
-      >
-        <div
-          class="flex flex-row flex-auto items-center p-3 px-5 border-b-2 border-gray-100 dark:border-neutral-600"
-        >
-          <div class="flex-grow">
-            <p class="text-2xl font-medium dark:text-neutral-200">Account</p>
-          </div>
-        </div>
-        <div class="space-y-2">
-          <div class="flex flex-wrap items-center gap-[15px] px-5">
-            <Label class="font-semibold dark:text-neutral-200" for="username">
-              Username
-            </Label>
-            <input id="username" v-model.trim="username" type="text" />
-          </div>
-          <div class="flex flex-wrap items-center gap-[15px] px-5">
-            <Label class="font-semibold dark:text-neutral-200" for="name">
-              Name
-            </Label>
-            <input id="name" v-model.trim="name" type="text" />
-          </div>
-          <div class="flex flex-wrap items-center gap-[15px] px-5">
-            <Label class="font-semibold dark:text-neutral-200" for="name">
-              E-Mail
-            </Label>
-            <input id="name" v-model.trim="email" type="text" />
-          </div>
-          <BaseButton class="self-end" @click="openPasswordModal">
-            Change Password
-          </BaseButton>
-          <BaseButton class="self-end" @click="submit">Save</BaseButton>
-        </div>
-      </div>
-    </div>
+    <Panel>
+      <PanelHead>
+        <PanelHeadTitle>
+          {{ $t('pages.me') }}
+        </PanelHeadTitle>
+      </PanelHead>
+      <PanelBody>
+        <table>
+          <tbody>
+            <tr>
+              <td>
+                <Label
+                  class="font-semibold dark:text-neutral-200"
+                  for="username"
+                >
+                  {{ $t('username') }}
+                </Label>
+              </td>
+              <td>
+                <input id="username" v-model.trim="username" type="text" />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <Label class="font-semibold dark:text-neutral-200" for="name">
+                  {{ $t('name') }}
+                </Label>
+              </td>
+              <td>
+                <input id="name" v-model.trim="name" type="text" />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <Label class="font-semibold dark:text-neutral-200" for="name">
+                  {{ $t('email') }}
+                </Label>
+              </td>
+              <td>
+                <input id="name" v-model.trim="email" type="text" />
+              </td>
+            </tr>
+            <tr colspan="2">
+              <td>
+                <BaseButton @click="submit">{{ $t('save') }}</BaseButton>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <Label
+                  class="font-semibold dark:text-neutral-200"
+                  for="current-password"
+                >
+                  {{ $t('currentPassword') }}
+                </Label>
+              </td>
+              <td>
+                <input
+                  id="current-password"
+                  v-model.trim="currentPassword"
+                  type="password"
+                  autocomplete="current-password"
+                />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <Label
+                  class="font-semibold dark:text-neutral-200"
+                  for="new-password"
+                >
+                  {{ $t('setup.newPassword') }}
+                </Label>
+              </td>
+              <td>
+                <input
+                  id="new-password"
+                  v-model.trim="newPassword"
+                  type="password"
+                  autocomplete="new-password"
+                />
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <Label
+                  class="font-semibold dark:text-neutral-200"
+                  for="confirm-password"
+                >
+                  {{ $t('confirmPassword') }}
+                </Label>
+              </td>
+              <td>
+                <input
+                  id="confirm-password"
+                  v-model.trim="confirmPassword"
+                  type="password"
+                  autocomplete="new-password"
+                />
+              </td>
+            </tr>
+            <tr colspan="2">
+              <td>
+                <BaseButton @click="updatePassword">{{
+                  $t('updatePassword')
+                }}</BaseButton>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </PanelBody>
+    </Panel>
   </main>
 </template>
 
@@ -48,7 +124,11 @@ const username = ref(authStore.userData?.username);
 const name = ref(authStore.userData?.name);
 const email = ref(authStore.userData?.email);
 
+const currentPassword = ref(authStore.userData?.email);
+const newPassword = ref(authStore.userData?.email);
+const confirmPassword = ref(authStore.userData?.email);
+
 function submit() {}
 
-function openPasswordModal() {}
+function updatePassword() {}
 </script>
