@@ -62,6 +62,8 @@ And log in again.
 
 ### 2. Run WireGuard Easy
 
+<!-- TODO: prioritize docker compose over docker run -->
+
 To setup the IPv6 Network, simply run once:
 
 ```bash
@@ -82,6 +84,7 @@ To automatically install & run wg-easy, simply run:
   --ip6 fdcc:ad94:bacf:61a3::2a \
   --ip 10.42.42.42 \
   -v ~/.wg-easy:/etc/wireguard \
+  -v /lib/modules:/lib/modules:ro \
   -p 51820:51820/udp \
   -p 51821:51821/tcp \
   --cap-add NET_ADMIN \
@@ -97,7 +100,7 @@ To automatically install & run wg-easy, simply run:
 
 The Web UI will now be available on `http://0.0.0.0:51821`.
 
-The Prometheus metrics will now be available on `http://0.0.0.0:51821/metrics`. Grafana dashboard [21733](https://grafana.com/grafana/dashboards/21733-wireguard/)
+The Prometheus metrics will now be available on `http://0.0.0.0:51821/api/metrics`. Grafana dashboard [21733](https://grafana.com/grafana/dashboards/21733-wireguard/)
 
 > 💡 Your configuration files will be saved in `~/.wg-easy`
 

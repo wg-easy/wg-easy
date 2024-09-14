@@ -18,7 +18,14 @@ import {
   type NewClient,
   type OneTimeLink,
 } from './repositories/client';
-import { SystemRepository } from './repositories/system';
+import {
+  AvailableFeatures,
+  ChartType,
+  SystemRepository,
+  type Feature,
+  type Features,
+  type Statistics,
+} from './repositories/system';
 
 const DEBUG = debug('LowDB');
 
@@ -36,6 +43,31 @@ export class LowDBSystem extends SystemRepository {
       throw new DatabaseError(DatabaseError.ERROR_INIT);
     }
     return system;
+  }
+
+  async updateFeatures(features: Record<string, Feature>) {
+    DEBUG('Update Features');
+    this.#db.update((v) => {
+      for (const key in features) {
+        if (AvailableFeatures.includes(key as keyof Features)) {
+          v.system.features[key as keyof Features].enabled =
+            features[key]!.enabled;
+        }
+      }
+    });
+  }
+
+  async updateStatistics(statistics: Statistics) {
+    DEBUG('Update Statistics');
+    this.#db.update((v) => {
+      v.system.statistics.enabled = statistics.enabled;
+      if (
+        statistics.chartType >= ChartType.None &&
+        statistics.chartType <= ChartType.Bar
+      ) {
+        v.system.statistics.chartType = statistics.chartType;
+      }
+    });
   }
 }
 
@@ -77,6 +109,7 @@ export class LowDBUser extends UserRepository {
       id: crypto.randomUUID(),
       password: hash,
       username,
+      email: null,
       name: 'Administrator',
       role: isUserEmpty ? 'ADMIN' : 'CLIENT',
       enabled: true,

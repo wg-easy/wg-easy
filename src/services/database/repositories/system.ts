@@ -14,16 +14,20 @@ export type WGInterface = {
   publicKey: string;
   address4: string;
   address6: string;
+  mtu: number;
+  port: number;
+  device: string;
 };
 
 export type WGConfig = {
   mtu: number;
-  serverMtu: number;
   persistentKeepalive: number;
   address4Range: string;
   address6Range: string;
   defaultDns: string[];
   allowedIps: string[];
+  host: string;
+  port: number;
 };
 
 export enum ChartType {
@@ -33,9 +37,9 @@ export enum ChartType {
   Bar = 3,
 }
 
-export type TrafficStats = {
+export type Statistics = {
   enabled: boolean;
-  type: ChartType;
+  chartType: ChartType;
 };
 
 export type Prometheus = {
@@ -47,31 +51,45 @@ export type Feature = {
   enabled: boolean;
 };
 
+export type Metrics = {
+  prometheus: Prometheus;
+};
+
+export type General = {
+  sessionTimeout: number;
+  lang: Lang;
+};
+
+export type Features = {
+  clientExpiration: Feature;
+  oneTimeLinks: Feature;
+  sortClients: Feature;
+};
+
+export const AvailableFeatures: (keyof Features)[] = [
+  'clientExpiration',
+  'oneTimeLinks',
+  'sortClients',
+] as const;
+
 /**
  * Representing the WireGuard network configuration data structure of a computer interface system.
  */
 export type System = {
-  interface: WGInterface;
+  general: General;
 
-  // maxAge
-  sessionTimeout: number;
-  lang: Lang;
+  interface: WGInterface;
 
   userConfig: WGConfig;
 
-  wgDevice: string;
-  wgHost: string;
-  wgPort: number;
-  wgConfigPort: number;
-
   iptables: IpTables;
-  trafficStats: TrafficStats;
 
-  clientExpiration: Feature;
-  oneTimeLinks: Feature;
-  sortClients: Feature;
+  features: Features;
 
-  prometheus: Prometheus;
+  statistics: Statistics;
+
+  metrics: Metrics;
+
   sessionConfig: SessionConfig;
 };
 
@@ -85,4 +103,7 @@ export abstract class SystemRepository {
    * Retrieves the system configuration data from the database.
    */
   abstract get(): Promise<System>;
+
+  abstract updateFeatures(features: Record<string, Feature>): Promise<void>;
+  abstract updateStatistics(statistics: Statistics): Promise<void>;
 }
