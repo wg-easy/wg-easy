@@ -7,7 +7,7 @@
   "save": "Enregistrer",
   "updatePassword": "Changer le mot de passe",
   "currentPassword": "Mot de passe actuel",
-  "confirmPassword": "Confirmer le mot de passse",
+  "confirmPassword": "Confirmer le mot de passe",
   "setup": {
     "welcome": "Bienvenue à la page de configuration de votre wg-easy !",
     "msg": "Veuillez renseigner votre nom d'utilisateur et votre mot de passe. Ces informations seront utilisées pour vous connecter à votre page d'administration.",
@@ -17,15 +17,44 @@
     "usernameCondition": "Le nom d'utilisateur doit contenir au moins 8 caractères.",
     "passwordCondition": "Le mot de passe doit contenir au moins 12 caractères dont 1 majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial.",
     "usernamePlaceholder": "Administrateur",
-    "passwordPlaceholder": "Mot de passe sapau"
+    "passwordPlaceholder": "Mot de passe sapau",
+    "requirements": "Conditions de configuration"
+  },
+  "zod": {
+    "id": "L'ID du client doit être un UUID valide",
+    "address4": "L'adresse IPv4 doit être une chaîne valide",
+    "name": "Le nom doit être une chaîne valide",
+    "nameMin": "Le nom doit contenir au moins 1 caractère",
+    "file": "Le fichier doit être une chaîne valide",
+    "username": "Le nom d'utilisateur doit être une chaîne valide",
+    "usernameMin": "Le nom d'utilisateur doit contenir au moins 8 caractères",
+    "password": "Le mot de passe doit être une chaîne valide",
+    "passwordMin": "Le mot de passe doit contenir au moins 12 caractères",
+    "passwordUppercase": "Le mot de passe doit contenir au moins 1 lettre majuscule",
+    "passwordLowercase": "Le mot de passe doit contenir au moins 1 lettre minuscule",
+    "passwordNumber": "Le mot de passe doit contenir au moins 1 chiffre",
+    "passwordSpecial": "Le mot de passe doit contenir au moins 1 caractère spécial",
+    "remember": "La case « se souvenir de moi » doit être un booléen valide",
+    "expireDate": "La date d'expiration doit être une chaîne valide",
+    "expireDateMin": "La date d'expiration doit contenir au moins 1 caractère",
+    "otl": "Le lien à usage unique doit être une chaîne valide",
+    "otlMin": "Le lien à usage unique doit contenir au moins 1 caractère",
+    "features": "La clé doit être une chaîne valide",
+    "ftBool": "Le paramètre « activé » doit être un booléen valide",
+    "ftObj": "La valeur doit être un objet valide",
+    "ftObj2": "Les fonctionnalités doivent être un enregistrement valide",
+    "stat": "Les statistiques doivent être un objet valide",
+    "statBool": "Le paramètre « activé » doit être un booléen valide",
+    "statNumber": "Le type de graphique doit être un nombre valide",
+    "body": "Le corps doit être un objet valide"
   },
   "name": "Nom",
+  "username": "Nom d'utilisateur",
   "password": "Mot de passe",
   "signIn": "Se Connecter",
   "logout": "Se déconnecter",
   "updateAvailable": "Une mise à jour est disponible !",
   "update": "Mise à jour",
-  "clients": "Clients",
   "new": "Nouveau",
   "deleteClient": "Supprimer ce client",
   "deleteDialog1": "Êtes-vous sûr de vouloir supprimer",
@@ -61,5 +90,8 @@
   "ExpireDate": "Date d'expiration",
   "Permanent": "Permanent",
   "OneTimeLink": "Générer un lien court à usage unique",
-  "errorInit": "Échec de l'initialisation."
+  "errorInit": "Échec de l'initialisation.",
+  "error": {
+    "clear": "Effacer"
+  }
 }
