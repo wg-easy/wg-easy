@@ -1,5 +1,6 @@
 import type { ZodSchema } from 'zod';
 import { z, ZodError } from 'zod';
+import type { H3Event, EventHandlerRequest } from 'h3';
 
 // TODO: use i18n for messages
 
@@ -10,74 +11,64 @@ const safeStringRefine = z
     { message: 'String is malformed' }
   );
 
-const id = z
-  .string()
-  .uuid('Client ID must be a valid UUID')
-  .pipe(safeStringRefine);
+const id = z.string().uuid('zod.id').pipe(safeStringRefine);
 
-const address4 = z
-  .string({ message: 'IPv4 Address must be a valid string' })
-  .pipe(safeStringRefine);
+const address4 = z.string({ message: 'zod.address4' }).pipe(safeStringRefine);
 
 const name = z
-  .string({ message: 'Name must be a valid string' })
-  .min(1, 'Name must be at least 1 Character')
+  .string({ message: 'zod.name' })
+  .min(1, 'zod.nameMin')
   .pipe(safeStringRefine);
 
-const file = z
-  .string({ message: 'File must be a valid string' })
-  .pipe(safeStringRefine);
+const file = z.string({ message: 'zod.file' }).pipe(safeStringRefine);
 
 const username = z
-  .string({ message: 'Username must be a valid string' })
-  .min(8, 'Username must be at least 8 Characters')
+  .string({ message: 'zod.username' })
+  .min(8, 'zod.usernameMin') // i18n key
   .pipe(safeStringRefine);
 
 const password = z
-  .string({ message: 'Password must be a valid string' })
-  .min(12, 'Password must be at least 12 Characters')
-  .regex(/[A-Z]/, 'Password must have at least 1 uppercase letter')
-  .regex(/[a-z]/, 'Password must have at least 1 lowercase letter')
-  .regex(/\d/, 'Password must have at least 1 number')
-  .regex(
-    /[!@#$%^&*(),.?":{}|<>]/,
-    'Password must have at least 1 special character'
-  )
+  .string({ message: 'zod.password' })
+  .min(12, 'zod.passwordMin') // i18n key
+  .regex(/[A-Z]/, 'zod.passwordUppercase') // i18n key
+  .regex(/[a-z]/, 'zod.passwordLowercase') // i18n key
+  .regex(/\d/, 'zod.passwordNumber') // i18n key
+  .regex(/[!@#$%^&*(),.?":{}|<>]/, 'zod.passwordSpecial') // i18n key
   .pipe(safeStringRefine);
 
-const remember = z.boolean({ message: 'Remember must be a valid boolean' });
+const remember = z.boolean({ message: 'zod.remember' }); // i18n key
 
 const expireDate = z
-  .string({ message: 'expiredDate must be a valid string' })
-  .min(1, 'expiredDate must be at least 1 Character')
+  .string({ message: 'zod.expireDate' }) // i18n key
+  .min(1, 'zod.expireDateMin') // i18n key
   .pipe(safeStringRefine)
   .nullable();
 
 const oneTimeLink = z
-  .string({ message: 'oneTimeLink must be a valid string' })
-  .min(1, 'oneTimeLink must be at least 1 Character')
+  .string({ message: 'zod.otl' }) // i18n key
+  .min(1, 'zod.otlMin') // i18n key
   .pipe(safeStringRefine);
 
 const features = z.record(
-  z.string({ message: 'key must be a valid string' }),
+  z.string({ message: 'zod.features' }), // i18n key
   z.object(
     {
-      enabled: z.boolean({ message: 'enabled must be a valid boolean' }),
+      enabled: z.boolean({ message: 'zod.ftBool' }), // i18n key
     },
-    { message: 'value must be a valid object' }
+    { message: 'zod.ftObj' } // i18n key
   ),
-  { message: 'features must be a valid record' }
+  { message: 'zod.ftObj2' } // i18n key
 );
 
 const statistics = z.object(
   {
-    enabled: z.boolean({ message: 'enabled must be a valid boolean' }),
-    chartType: z.number({ message: 'chartType must be a valid number' }),
+    enabled: z.boolean({ message: 'zod.statBool' }), // i18n key
+    chartType: z.number({ message: 'zod.statNumber' }), // i18n key
   },
-  { message: 'statistics must be a valid object' }
+  { message: 'zod.stat' } // i18n key
 );
 
-const objectMessage = 'Body must be a valid object';
+const objectMessage = 'zod.body'; // i18n key
 
 export const clientIdType = z.object(
   {
@@ -160,14 +151,33 @@ export const statisticsType = z.object(
   { message: objectMessage }
 );
 
-export function validateZod<T>(schema: ZodSchema<T>) {
+export function validateZod<T>(
+  schema: ZodSchema<T>,
+  event?: H3Event<EventHandlerRequest>
+) {
   return async (data: unknown) => {
+    let t: null | ((key: string) => string) = null;
+
+    if (event) {
+      t = await useTranslation(event);
+    }
+
     try {
       return await schema.parseAsync(data);
     } catch (error) {
       let message = 'Unexpected Error';
       if (error instanceof ZodError) {
-        message = error.issues.map((v) => v.message).join('; ');
+        message = error.issues
+          .map((v) => {
+            let m = v.message;
+
+            if (t) {
+              m = t(m); // m key else v.message
+            }
+
+            return m;
+          })
+          .join('; ');
       }
       throw new Error(message);
     }

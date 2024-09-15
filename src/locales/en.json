@@ -14,10 +14,37 @@
     "newPassword": "New Password",
     "accept": "I accept the condition",
     "submitBtn": "Create admin account",
-    "usernameCondition": "The username must contain at least 8 characters.",
-    "passwordCondition": "The password must contain at least 12 characters, including 1 uppercase letter, 1 lowercase letter, 1 digit, and 1 special character.",
     "usernamePlaceholder": "Administrator",
-    "passwordPlaceholder": "Strong password"
+    "passwordPlaceholder": "Strong password",
+    "requirements": "Setup requirements"
+  },
+  "zod": {
+    "id": "Client ID must be a valid UUID",
+    "address4": "IPv4 Address must be a valid string",
+    "name": "Name must be a valid string",
+    "nameMin": "Name must be at least 1 Character",
+    "file": "File must be a valid string",
+    "username": "Username must be a valid string",
+    "usernameMin": "Username must be at least 8 Characters",
+    "password": "Password must be a valid string",
+    "passwordMin": "Password must be at least 12 Characters",
+    "passwordUppercase": "Password must have at least 1 uppercase letter",
+    "passwordLowercase": "Password must have at least 1 lowercase letter",
+    "passwordNumber": "Password must have at least 1 number",
+    "passwordSpecial": "Password must have at least 1 special character",
+    "remember": "Remember must be a valid boolean",
+    "expireDate": "expiredDate must be a valid string",
+    "expireDateMin": "expiredDate must be at least 1 Character",
+    "otl": "oneTimeLink must be a valid string",
+    "otlMin": "oneTimeLink must be at least 1 Character",
+    "features": "key must be a valid string",
+    "ftBool": "enabled must be a valid boolean",
+    "ftObj": "value must be a valid object",
+    "ftObj2": "features must be a valid record",
+    "stat": "statistics must be a valid object",
+    "statBool": "enabled must be a valid boolean",
+    "statNumber": "chartType must be a valid number",
+    "body": "Body must be a valid object"
   },
   "name": "Name",
   "username": "Username",
@@ -61,5 +88,8 @@
   "ExpireDate": "Expire Date",
   "Permanent": "Permanent",
   "OneTimeLink": "Generate short one time link",
-  "errorInit": "Initialization failed."
+  "errorInit": "Initialization failed.",
+  "error": {
+    "clear": "Clear"
+  }
 }
