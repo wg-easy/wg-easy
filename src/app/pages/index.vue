@@ -2,9 +2,7 @@
   <main>
     <Panel>
       <PanelHead>
-        <PanelHeadTitle>
-          {{ $t('pages.clients') }}
-        </PanelHeadTitle>
+        <PanelHeadTitle :text="$t('pages.clients')" />
         <PanelHeadBoat>
           <ClientsRestoreConfig />
           <ClientsBackupConfig />
