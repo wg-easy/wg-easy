@@ -3,7 +3,7 @@ import type { SessionConfig } from 'h3';
 export default defineEventHandler(async (event) => {
   const { username, password, remember } = await readValidatedBody(
     event,
-    validateZod(credentialsType)
+    validateZod(credentialsType, event)
   );
 
   const users = await Database.user.findAll();

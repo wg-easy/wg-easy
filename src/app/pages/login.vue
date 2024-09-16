@@ -1,8 +1,6 @@
 <template>
-  <section>
-    <h1
-      class="text-4xl font-medium my-16 text-gray-700 dark:text-neutral-200 text-center"
-    >
+  <section class="text-gray-700 dark:text-neutral-200">
+    <h1 class="text-4xl font-medium my-16 text-center">
       <img src="/logo.png" width="32" class="inline align-middle dark:bg" />
       <span class="align-middle">WireGuard</span>
     </h1>
@@ -79,15 +77,40 @@
         :value="$t('signIn')"
       />
     </form>
+
+    <ErrorToast
+      v-if="setupError"
+      :title="setupError.title"
+      :message="setupError.message"
+    />
   </section>
 </template>
 
 <script setup lang="ts">
+import { FetchError } from 'ofetch';
+
+const { t } = useI18n();
+
 const authenticating = ref(false);
 const remember = ref(false);
 const username = ref<null | string>(null);
 const password = ref<null | string>(null);
 const authStore = useAuthStore();
+
+type SetupError = {
+  title: string;
+  message: string;
+};
+
+const setupError = ref<null | SetupError>(null);
+
+watch(setupError, (value) => {
+  if (value) {
+    setTimeout(() => {
+      setupError.value = null;
+    }, 13000);
+  }
+});
 
 async function login(e: Event) {
   e.preventDefault();
@@ -104,10 +127,12 @@ async function login(e: Event) {
     if (res) {
       await navigateTo('/');
     }
-  } catch (err) {
-    if (err instanceof Error) {
-      // TODO: replace alert with actual ui error message
-      alert(err.message || err.toString());
+  } catch (error) {
+    if (error instanceof FetchError) {
+      setupError.value = {
+        title: t('error.login'),
+        message: error.data.message,
+      };
     }
   }
   authenticating.value = false;

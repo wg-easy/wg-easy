@@ -36,6 +36,10 @@ const password = z
   .regex(/[!@#$%^&*(),.?":{}|<>]/, 'zod.passwordSpecial') // i18n key
   .pipe(safeStringRefine);
 
+const accept = z.boolean().refine((val) => val === true, {
+  message: 'zod.accept',
+}); // i18n key
+
 const remember = z.boolean({ message: 'zod.remember' }); // i18n key
 
 const expireDate = z
@@ -133,6 +137,15 @@ export const passwordType = z.object(
   {
     username: username,
     password: password,
+  },
+  { message: objectMessage }
+);
+
+export const passwordSetupType = z.object(
+  {
+    username: username,
+    password: password,
+    accept: accept,
   },
   { message: objectMessage }
 );

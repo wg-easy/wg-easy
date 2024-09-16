@@ -118,13 +118,15 @@ class API {
   async setupAccount({
     username,
     password,
+    accept,
   }: {
     username: string;
     password: string;
+    accept: boolean;
   }) {
     return $fetch('/api/account/setup', {
       method: 'post',
-      body: { username, password },
+      body: { username, password, accept },
     });
   }
 }

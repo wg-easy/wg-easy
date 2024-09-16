@@ -108,6 +108,8 @@ const username = ref(authStore.userData?.username);
 const name = ref(authStore.userData?.name);
 const email = ref(authStore.userData?.email);
 
+// TODO: handle update password
+
 const currentPassword = ref(authStore.userData?.email);
 const newPassword = ref(authStore.userData?.email);
 const confirmPassword = ref(authStore.userData?.email);
