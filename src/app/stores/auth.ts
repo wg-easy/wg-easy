@@ -9,8 +9,8 @@ export const useAuthStore = defineStore('Auth', () => {
   /**
    * @throws if unsuccessful
    */
-  async function signup(username: string, password: string) {
-    const response = await api.setupAccount({ username, password });
+  async function signup(username: string, password: string, accept: boolean) {
+    const response = await api.setupAccount({ username, password, accept });
     return response.success;
   }
 

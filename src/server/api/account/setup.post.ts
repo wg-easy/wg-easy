@@ -1,7 +1,7 @@
 export default defineEventHandler(async (event) => {
   const { username, password } = await readValidatedBody(
     event,
-    validateZod(passwordType, event)
+    validateZod(passwordSetupType, event)
   );
   const users = await Database.user.findAll();
   if (users.length !== 0) {

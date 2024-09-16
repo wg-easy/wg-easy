@@ -36,6 +36,7 @@
     "passwordLowercase": "Password must have at least 1 lowercase letter",
     "passwordNumber": "Password must have at least 1 number",
     "passwordSpecial": "Password must have at least 1 special character",
+    "accept": "Please accept the condition",
     "remember": "Remember must be a valid boolean",
     "expireDate": "expiredDate must be a valid string",
     "expireDateMin": "expiredDate must be at least 1 Character",
@@ -94,6 +95,7 @@
   "OneTimeLink": "Generate short one time link",
   "errorInit": "Initialization failed.",
   "error": {
-    "clear": "Clear"
+    "clear": "Clear",
+    "login": "Log in error"
   }
 }

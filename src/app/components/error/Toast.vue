@@ -7,7 +7,7 @@ const props = defineProps<{
 
 const open = ref(true);
 
-const autoCloseToast = props.duration ? Number(props.duration) : 5000; // 5 seconds
+const autoCloseToast = props.duration ? Number(props.duration) : 12000; // 12 seconds
 
 onMounted(() => {
   setTimeout(() => {
