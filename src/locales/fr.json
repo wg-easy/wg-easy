@@ -3,19 +3,21 @@
     "me": "Compte",
     "clients": "Clients"
   },
+  "me": {
+    "sectionGeneral": "Général",
+    "sectionPassword": "Mot de passe"
+  },
   "email": "E-Mail",
   "save": "Enregistrer",
   "updatePassword": "Changer le mot de passe",
   "currentPassword": "Mot de passe actuel",
   "confirmPassword": "Confirmer le mot de passe",
   "setup": {
-    "welcome": "Bienvenue à la page de configuration de votre wg-easy !",
+    "welcome": "Bienvenue dans votre première configuration de wg-easy !",
     "msg": "Veuillez renseigner votre nom d'utilisateur et votre mot de passe. Ces informations seront utilisées pour vous connecter à votre page d'administration.",
     "newPassword": "Nouveau mot de passe",
     "accept": "J'accepte les conditions d'utilisation",
-    "submitBtn": "Créer un nouveau compte",
-    "usernameCondition": "Le nom d'utilisateur doit contenir au moins 8 caractères.",
-    "passwordCondition": "Le mot de passe doit contenir au moins 12 caractères dont 1 majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial.",
+    "submitBtn": "Créer un compte administrateur",
     "usernamePlaceholder": "Administrateur",
     "passwordPlaceholder": "Mot de passe sapau",
     "requirements": "Conditions de configuration"
@@ -34,6 +36,7 @@
     "passwordLowercase": "Le mot de passe doit contenir au moins 1 lettre minuscule",
     "passwordNumber": "Le mot de passe doit contenir au moins 1 chiffre",
     "passwordSpecial": "Le mot de passe doit contenir au moins 1 caractère spécial",
+    "accept": "Veuillez accpter les conditions d'utilisation",
     "remember": "La case « se souvenir de moi » doit être un booléen valide",
     "expireDate": "La date d'expiration doit être une chaîne valide",
     "expireDateMin": "La date d'expiration doit contenir au moins 1 caractère",
@@ -92,6 +95,7 @@
   "OneTimeLink": "Générer un lien court à usage unique",
   "errorInit": "Échec de l'initialisation.",
   "error": {
-    "clear": "Effacer"
+    "clear": "Effacer",
+    "login": "Erreur de connexion"
   }
 }
