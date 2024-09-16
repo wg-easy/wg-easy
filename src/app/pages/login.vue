@@ -82,6 +82,7 @@
       v-if="setupError"
       :title="setupError.title"
       :message="setupError.message"
+      :duration="12000"
     />
   </section>
 </template>
