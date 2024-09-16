@@ -3,6 +3,10 @@
     "me": "Account",
     "clients": "Clients"
   },
+  "me": {
+    "sectionGeneral": "General",
+    "sectionPassword": "Password"
+  },
   "email": "E-Mail",
   "save": "Save",
   "updatePassword": "Update Password",
