@@ -1,18 +1,14 @@
 <template>
   <main class="container mx-auto px-4">
-    <h1
-      class="text-4xl font-medium my-16 text-center text-gray-700 dark:text-neutral-200"
-    >
-      <img src="/logo.png" width="32" class="inline align-middle dark:bg" />
-      <span class="align-middle">WireGuard</span>
-    </h1>
+    <UiBanner />
     <Panel>
       <PanelBody class="lg:w-[60%] mx-auto mt-10 p-4">
         <h2 class="mt-8 mb-16 text-3xl font-medium">
           {{ $t('setup.welcome') }}
         </h2>
-        <p class="text-lg p-8">{{ $t('setup.msg') }}</p>
-        <form class="mb-8" @submit.prevent="newAccount">
+
+        <div id="step1" class="tab">
+          <p class="text-lg p-8">{{ $t('setup.msg') }}</p>
           <div>
             <label for="username" class="inline-block py-2">{{
               $t('username')
@@ -48,21 +44,20 @@
             }}</Label>
             <input id="accept" v-model="accept" type="checkbox" name="accept" />
           </div>
-          <button
-            type="submit"
-            :class="[
-              {
-                'bg-red-800 dark:bg-red-800 hover:bg-red-700 dark:hover:bg-red-700 transition cursor-pointer':
-                  password && username,
-                'bg-gray-200 dark:bg-neutral-800 cursor-not-allowed':
-                  !password && !username,
-              },
-              'w-max px-4 rounded shadow py-2 text-sm text-white dark:text-white',
-            ]"
-          >
-            {{ $t('setup.submitBtn') }}
-          </button>
-        </form>
+        </div>
+
+        <div id="step2" class="tab">
+          <p class="text-lg p-8">Host/Port section</p>
+        </div>
+
+        <div id="step3" class="tab">
+          <p class="text-lg p-8">Migration section</p>
+        </div>
+
+        <div>
+          <div>Previous</div>
+          <div>Next</div>
+        </div>
       </PanelBody>
     </Panel>
 
@@ -100,7 +95,7 @@ watch(setupError, (value) => {
   }
 });
 
-async function newAccount() {
+async function _newAccount() {
   if (!username.value || !password.value) return;
 
   try {

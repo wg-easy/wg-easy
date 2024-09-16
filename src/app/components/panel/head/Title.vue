@@ -5,7 +5,7 @@ const { text } = defineProps<{
 </script>
 
 <template>
-  <h3 class="flex-1 text-2xl font-medium dark:text-neutral-200">
+  <h2 class="flex-1 text-2xl font-medium">
     {{ text }}
-  </h3>
+  </h2>
 </template>
