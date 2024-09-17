@@ -7,71 +7,70 @@
           {{ $t('setup.welcome') }}
         </h2>
 
-        <div class="tab">
+        <div v-if="step === 1">
           <p class="text-lg p-8">{{ $t('setup.msg') }}</p>
-          <form>
-            <div>
-              <label for="username" class="inline-block py-2">{{
-                $t('username')
-              }}</label>
-              <input
-                id="username"
-                v-model="username"
-                type="text"
-                name="username"
-                autocomplete="username"
-                autofocus
-                :placeholder="$t('setup.usernamePlaceholder')"
-                class="px-3 py-2 text-sm dark:bg-neutral-700 text-gray-500 dark:text-gray-500 mb-5 border-2 border-gray-100 dark:border-neutral-800 rounded-lg w-full focus:border-red-800 dark:focus:border-red-800 dark:placeholder:text-neutral-400 focus:outline-0 focus:ring-0"
-              />
-            </div>
-            <div>
-              <Label for="password" class="inline-block py-2">{{
-                $t('setup.newPassword')
-              }}</Label>
-              <input
-                id="password"
-                v-model="password"
-                type="password"
-                name="password"
-                autocomplete="new-password"
-                :placeholder="$t('setup.passwordPlaceholder')"
-                class="px-3 py-2 text-sm dark:bg-neutral-700 text-gray-500 dark:text-gray-500 mb-5 border-2 border-gray-100 dark:border-neutral-800 rounded-lg w-full focus:border-red-800 dark:focus:border-red-800 dark:placeholder:text-neutral-400 focus:outline-0 focus:ring-0"
-              />
-            </div>
-            <div>
-              <Label for="accept" class="inline-block my-4 mr-4">{{
-                $t('setup.accept')
-              }}</Label>
-              <input
-                id="accept"
-                v-model="accept"
-                type="checkbox"
-                name="accept"
-              />
-            </div>
-          </form>
+          <div>
+            <label for="username" class="inline-block py-2">{{
+              $t('username')
+            }}</label>
+            <input
+              id="username"
+              v-model="username"
+              form="formulaire"
+              type="text"
+              name="username"
+              autocomplete="username"
+              autofocus
+              :placeholder="$t('setup.usernamePlaceholder')"
+              class="px-3 py-2 text-sm dark:bg-neutral-700 text-gray-500 dark:text-gray-500 mb-5 border-2 border-gray-100 dark:border-neutral-800 rounded-lg w-full focus:border-red-800 dark:focus:border-red-800 dark:placeholder:text-neutral-400 focus:outline-0 focus:ring-0"
+            />
+          </div>
+          <div>
+            <Label for="password" class="inline-block py-2">{{
+              $t('setup.newPassword')
+            }}</Label>
+            <input
+              id="password"
+              v-model="password"
+              form="formulaire"
+              type="password"
+              name="password"
+              autocomplete="new-password"
+              :placeholder="$t('setup.passwordPlaceholder')"
+              class="px-3 py-2 text-sm dark:bg-neutral-700 text-gray-500 dark:text-gray-500 mb-5 border-2 border-gray-100 dark:border-neutral-800 rounded-lg w-full focus:border-red-800 dark:focus:border-red-800 dark:placeholder:text-neutral-400 focus:outline-0 focus:ring-0"
+            />
+          </div>
+          <div>
+            <Label for="accept" class="inline-block my-4 mr-4">{{
+              $t('setup.accept')
+            }}</Label>
+            <input id="accept" v-model="accept" type="checkbox" name="accept" />
+          </div>
+          <form id="formulaire"></form>
         </div>
 
-        <div class="tab hidden">
+        <div v-if="step === 2">
           <p class="text-lg p-8">Host/Port section</p>
         </div>
 
-        <div class="tab hidden">
+        <div v-if="step === 3">
           <p class="text-lg p-8">Migration section</p>
         </div>
 
-        <div class="tab hidden">
+        <div v-if="step === 4">
           <p class="text-lg p-8">Validation section</p>
         </div>
 
         <div class="flex justify-between items-center">
-          <IconsArrowLeftCircle class="size-12" />
-          <div class="step grow h-[3px] mx-4 bg-white"></div>
-          <div class="step grow h-[3px] mx-4 bg-gray-500"></div>
-          <div class="step grow h-[3px] mx-4 bg-gray-500"></div>
-          <div class="step grow h-[3px] mx-4 bg-gray-500"></div>
-          <IconsArrowRightCircle class="size-12" />
+          <IconsArrowLeftCircle
+            :class="['size-12', { 'text-gray-500': step === 1 }]"
+            @click="decreaseStep"
+          />
+          <StepProgress :step="step" />
+          <IconsArrowRightCircle
+            :class="['size-12', { 'text-gray-500': step === 4 }]"
+            @click="increaseStep"
+          />
         </div>
       </PanelBody>
     </Panel>
@@ -94,6 +93,16 @@ const username = ref<null | string>(null);
 const password = ref<null | string>(null);
 const accept = ref<boolean>(true);
 const authStore = useAuthStore();
+
+const step = ref(1);
+
+function increaseStep() {
+  if (step.value < 4) step.value += 1;
+}
+
+function decreaseStep() {
+  if (step.value > 1) step.value -= 1;
+}
 
 type SetupError = {
   title: string;
