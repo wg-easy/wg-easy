@@ -9,17 +9,9 @@
 
         <div v-if="step === 1">
           <p class="text-lg p-8">{{ $t('setup.msgStepOne') }}</p>
-          <select id="lang" form="form-step-one" name="lang">
-            <option
-              v-for="lang in langs"
-              :key="lang.value"
-              :value="lang.value"
-              :selected="lang.value == 'en'"
-            >
-              {{ lang.name }}
-            </option>
-          </select>
-          <form id="form-step-one"></form>
+          <div class="flex justify-center mb-8">
+            <UiChooseLang :lang="lang" @update:lang="updateLang" />
+          </div>
         </div>
 
         <div v-if="step === 2">
@@ -86,7 +78,7 @@
             ]"
             @click="decreaseStep"
           />
-          <StepProgress :step="step" />
+          <UiStepProgress :step="step" />
           <IconsArrowRightCircle
             :class="[
               'size-12',
@@ -111,35 +103,22 @@
 import { FetchError } from 'ofetch';
 
 const { t } = useI18n();
+const authStore = useAuthStore();
 
 type SetupError = {
   title: string;
   message: string;
 };
 
+const lang = ref('');
+
 const username = ref<null | string>(null);
 const password = ref<null | string>(null);
 const accept = ref<boolean>(true);
-const authStore = useAuthStore();
 
 const step = ref(1);
 const stepInvalide = ref<number[]>([]);
 const setupError = ref<null | SetupError>(null);
-
-const langs = [
-  {
-    value: 'de',
-    name: 'Deutsch',
-  },
-  {
-    value: 'en',
-    name: 'English',
-  },
-  {
-    value: 'de',
-    name: 'Français',
-  },
-];
 
 // TODO: improve error handling
 watch(setupError, (value) => {
@@ -149,6 +128,10 @@ watch(setupError, (value) => {
     }, 13000);
   }
 });
+
+function updateLang(value: string) {
+  lang.value = value;
+}
 
 async function increaseStep() {
   try {
