@@ -14,7 +14,8 @@
   "confirmPassword": "Confirmer le mot de passe",
   "setup": {
     "welcome": "Bienvenue dans votre première configuration de wg-easy !",
-    "msg": "Veuillez renseigner votre nom d'utilisateur et votre mot de passe. Ces informations seront utilisées pour vous connecter à votre page d'administration.",
+    "msgStepOne": "Sélectionner votre langue.",
+    "msgStepTwo": "Veuillez renseigner votre nom d'utilisateur et votre mot de passe. Ces informations seront utilisées pour vous connecter à votre page d'administration.",
     "newPassword": "Nouveau mot de passe",
     "accept": "J'accepte les conditions d'utilisation",
     "submitBtn": "Créer un compte administrateur",

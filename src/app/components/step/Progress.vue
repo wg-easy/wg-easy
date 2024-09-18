@@ -3,8 +3,8 @@
     v-for="n in totalSteps"
     :key="n"
     :class="[
-      'step grow h-[3px] mx-4',
-      step >= n ? 'dark:bg-white' : 'dark:bg-gray-500',
+      'step grow h-[3px] mx-3',
+      step >= n ? 'bg-red-800 dark:bg-white' : 'bg-gray-500',
     ]"
   ></div>
 </template>
@@ -17,7 +17,7 @@ defineProps({
   },
   totalSteps: {
     type: Number,
-    default: 4,
+    default: 5,
   },
 });
 </script>

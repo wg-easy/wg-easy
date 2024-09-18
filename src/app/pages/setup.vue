@@ -8,7 +8,22 @@
         </h2>
 
         <div v-if="step === 1">
-          <p class="text-lg p-8">{{ $t('setup.msg') }}</p>
+          <p class="text-lg p-8">{{ $t('setup.msgStepOne') }}</p>
+          <select id="lang" form="form-step-one" name="lang">
+            <option
+              v-for="lang in langs"
+              :key="lang.value"
+              :value="lang.value"
+              :selected="lang.value == 'en'"
+            >
+              {{ lang.name }}
+            </option>
+          </select>
+          <form id="form-step-one"></form>
+        </div>
+
+        <div v-if="step === 2">
+          <p class="text-lg p-8">{{ $t('setup.msgStepTwo') }}</p>
           <div>
             <label for="username" class="inline-block py-2">{{
               $t('username')
@@ -16,7 +31,7 @@
             <input
               id="username"
               v-model="username"
-              form="formulaire"
+              form="form-step-two"
               type="text"
               name="username"
               autocomplete="username"
@@ -32,7 +47,7 @@
             <input
               id="password"
               v-model="password"
-              form="formulaire"
+              form="form-step-two"
               type="password"
               name="password"
               autocomplete="new-password"
@@ -46,29 +61,37 @@
             }}</Label>
             <input id="accept" v-model="accept" type="checkbox" name="accept" />
           </div>
-          <form id="formulaire"></form>
-        </div>
-
-        <div v-if="step === 2">
-          <p class="text-lg p-8">Host/Port section</p>
+          <form id="form-step-two"></form>
         </div>
 
         <div v-if="step === 3">
-          <p class="text-lg p-8">Migration section</p>
+          <p class="text-lg p-8">Host/Port section</p>
         </div>
 
         <div v-if="step === 4">
+          <p class="text-lg p-8">Migration section</p>
+        </div>
+
+        <div v-if="step === 5">
           <p class="text-lg p-8">Validation section</p>
         </div>
 
         <div class="flex justify-between items-center">
           <IconsArrowLeftCircle
-            :class="['size-12', { 'text-gray-500': step === 1 }]"
+            :class="[
+              'size-12',
+              step === 1 || towardStepValide()
+                ? 'text-gray-500'
+                : 'text-red-800 dark:text-white',
+            ]"
             @click="decreaseStep"
           />
           <StepProgress :step="step" />
           <IconsArrowRightCircle
-            :class="['size-12', { 'text-gray-500': step === 4 }]"
+            :class="[
+              'size-12',
+              step === 4 ? 'text-gray-500' : 'text-red-800 dark:text-white',
+            ]"
             @click="increaseStep"
           />
         </div>
@@ -89,28 +112,36 @@ import { FetchError } from 'ofetch';
 
 const { t } = useI18n();
 
+type SetupError = {
+  title: string;
+  message: string;
+};
+
 const username = ref<null | string>(null);
 const password = ref<null | string>(null);
 const accept = ref<boolean>(true);
 const authStore = useAuthStore();
 
 const step = ref(1);
-
-function increaseStep() {
-  if (step.value < 4) step.value += 1;
-}
-
-function decreaseStep() {
-  if (step.value > 1) step.value -= 1;
-}
-
-type SetupError = {
-  title: string;
-  message: string;
-};
-
+const stepInvalide = ref<number[]>([]);
 const setupError = ref<null | SetupError>(null);
 
+const langs = [
+  {
+    value: 'de',
+    name: 'Deutsch',
+  },
+  {
+    value: 'en',
+    name: 'English',
+  },
+  {
+    value: 'de',
+    name: 'Français',
+  },
+];
+
+// TODO: improve error handling
 watch(setupError, (value) => {
   if (value) {
     setTimeout(() => {
@@ -119,7 +150,49 @@ watch(setupError, (value) => {
   }
 });
 
-async function _newAccount() {
+async function increaseStep() {
+  try {
+    if (step.value === 1) {
+      /* lang */
+    }
+
+    if (step.value === 2) {
+      await newAccount();
+      stepInvalide.value.push(1);
+    }
+
+    if (step.value === 3) {
+      /* host/port */
+    }
+
+    if (step.value === 4) {
+      /* migration */
+    }
+
+    if (step.value === 5) {
+      /* validation/welcome */
+    }
+
+    if (step.value < 5) step.value += 1;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (error) {
+    /* throw in functions */
+  }
+}
+
+// TODO: improve while user reload the page, might use server check
+/* Check if previous steps are invalide (mean successful executed). */
+function towardStepValide() {
+  return stepInvalide.value.includes(step.value - 1);
+}
+
+function decreaseStep() {
+  if (towardStepValide()) return;
+
+  if (step.value > 1) step.value -= 1;
+}
+
+async function newAccount() {
   if (!username.value || !password.value) return;
 
   try {
@@ -138,6 +211,8 @@ async function _newAccount() {
         message: error.data.message,
       };
     }
+    // increaseStep fn
+    throw error;
   }
 }
 </script>
