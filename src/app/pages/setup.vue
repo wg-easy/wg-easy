@@ -8,14 +8,14 @@
         </h2>
 
         <div v-if="step === 1">
-          <p class="text-lg p-8">{{ $t('setup.msgStepOne') }}</p>
+          <p class="text-lg p-8 text-center">{{ $t('setup.msgStepOne') }}</p>
           <div class="flex justify-center mb-8">
-            <UiChooseLang :lang="lang" @update:lang="updateLang" />
+            <UiChooseLang :lang="lang" @update:lang="handleEventUpdateLang" />
           </div>
         </div>
 
         <div v-if="step === 2">
-          <p class="text-lg p-8">{{ $t('setup.msgStepTwo') }}</p>
+          <p class="text-lg p-8 text-center">{{ $t('setup.msgStepTwo') }}</p>
           <div>
             <label for="username" class="inline-block py-2">{{
               $t('username')
@@ -57,15 +57,15 @@
         </div>
 
         <div v-if="step === 3">
-          <p class="text-lg p-8">Host/Port section</p>
+          <p class="text-lg p-8 text-center">Host/Port section</p>
         </div>
 
         <div v-if="step === 4">
-          <p class="text-lg p-8">Migration section</p>
+          <p class="text-lg p-8 text-center">Migration section</p>
         </div>
 
         <div v-if="step === 5">
-          <p class="text-lg p-8">Validation section</p>
+          <p class="text-lg p-8 text-center">Validation section</p>
         </div>
 
         <div class="flex justify-between items-center">
@@ -130,7 +130,7 @@ watch(setupError, (value) => {
   }
 });
 
-function updateLang(value: string) {
+function handleEventUpdateLang(value: string) {
   lang.value = value;
   // TODO: if the translation does not exist, it shows the key instead of default (en)
   setLocale(lang.value);
@@ -139,8 +139,7 @@ function updateLang(value: string) {
 async function increaseStep() {
   try {
     if (step.value === 1) {
-      // TODO: handle error
-      await globalStore.updateLang(lang.value);
+      await updateLang();
       stepInvalide.value.push(1);
     }
 
@@ -178,6 +177,21 @@ function decreaseStep() {
   if (towardStepValide()) return;
 
   if (step.value > 1) step.value -= 1;
+}
+
+async function updateLang() {
+  try {
+    await globalStore.updateLang(lang.value);
+  } catch (error) {
+    if (error instanceof FetchError) {
+      setupError.value = {
+        title: t('setup.requirements'),
+        message: error.data.message,
+      };
+    }
+    // increaseStep fn
+    throw error;
+  }
 }
 
 async function newAccount() {

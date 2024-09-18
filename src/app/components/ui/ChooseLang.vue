@@ -1,5 +1,5 @@
 <template>
-  <SelectRoot v-model="langProxy">
+  <SelectRoot v-model="langProxy" :default-value="lang">
     <SelectTrigger
       class="inline-flex min-w-[160px] items-center justify-between rounded px-[15px] text-[13px] dark:text-white leading-none h-[35px] gap-[5px] dark:bg-neutral-500"
       aria-label="Customise language"
