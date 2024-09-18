@@ -14,6 +14,15 @@ This update is an entire rewrite to make it even easier to set up your own VPN.
 
 - Almost all Environment variables removed
 - New and Improved UI
+- API Basic Authentication
+- Added Docs
+- Incrementing Version -> Semantic Versioning
+- CIDR Support
+- IPv6 Support
+- Changed API Structure
+- Changed Database Structure
+- Deprecated Dockerless Installations
+- Added Docker Volume Mount
 
 ## Minor Changes
 

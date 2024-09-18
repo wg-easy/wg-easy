@@ -1,6 +1,6 @@
 export default defineEventHandler(async (event) => {
   const system = await Database.system.get();
-  if (!system.oneTimeLinks.enabled) {
+  if (!system.features.oneTimeLinks.enabled) {
     throw createError({
       status: 404,
       message: 'Invalid state',

@@ -8,10 +8,6 @@ export const useGlobalStore = defineStore('Global', () => {
   );
   const updateAvailable = ref(false);
   const features = ref({
-    trafficStats: {
-      enabled: false,
-      type: 0,
-    },
     sortClients: {
       enabled: false,
     },
@@ -22,12 +18,18 @@ export const useGlobalStore = defineStore('Global', () => {
       enabled: false,
     },
   });
+  const statistics = ref({
+    enabled: false,
+    chartType: 0,
+  });
   const sortClient = ref(true); // Sort clients by name, true = asc, false = desc
 
   const { availableLocales, locale } = useI18n();
 
   async function setLanguage() {
-    const { data: lang } = await api.getLang();
+    const { data: lang } = await useFetch('/api/lang', {
+      method: 'get',
+    });
     if (
       lang.value !== getItem('lang') &&
       availableLocales.includes(lang.value!)
@@ -38,7 +40,9 @@ export const useGlobalStore = defineStore('Global', () => {
   }
 
   async function fetchRelease() {
-    const { data: release } = await api.getRelease();
+    const { data: release } = await useFetch('/api/release', {
+      method: 'get',
+    });
 
     if (!release.value) {
       return;
@@ -50,14 +54,25 @@ export const useGlobalStore = defineStore('Global', () => {
   }
 
   async function fetchFeatures() {
-    const { data: apiFeatures } = await api.getFeatures();
+    const { data: apiFeatures } = await useFetch('/api/features', {
+      method: 'get',
+    });
     if (apiFeatures.value) {
       features.value = apiFeatures.value;
     }
   }
 
+  async function fetchStatistics() {
+    const { data: apiStatistics } = await useFetch('/api/statistics', {
+      method: 'get',
+    });
+    if (apiStatistics.value) {
+      statistics.value = apiStatistics.value;
+    }
+  }
+
   const updateCharts = computed(() => {
-    return features.value.trafficStats.type > 0 && uiShowCharts.value;
+    return statistics.value.chartType > 0 && uiShowCharts.value;
   });
 
   return {
@@ -68,8 +83,10 @@ export const useGlobalStore = defineStore('Global', () => {
     currentRelease,
     latestRelease,
     updateAvailable,
+    statistics,
     fetchRelease,
     fetchFeatures,
     setLanguage,
+    fetchStatistics,
   };
 });

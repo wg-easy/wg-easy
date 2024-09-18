@@ -10,6 +10,7 @@ export default defineNuxtConfig({
     '@nuxtjs/tailwindcss',
     '@pinia/nuxt',
     '@eschricht/nuxt-color-mode',
+    'radix-vue/nuxt',
   ],
   colorMode: {
     preference: 'system',

@@ -4,7 +4,7 @@
     class="text-gray-400 dark:text-neutral-500 whitespace-nowrap"
     :title="$t('lastSeen') + dateTime(new Date(client.latestHandshakeAt))"
   >
-    {{ !globalStore.features.trafficStats.enabled ? ' · ' : ''
+    {{ !globalStore.statistics.enabled ? ' · ' : ''
     }}{{ timeago(new Date(client.latestHandshakeAt)) }}
   </span>
 </template>
