@@ -102,7 +102,7 @@
 <script setup lang="ts">
 import { FetchError } from 'ofetch';
 
-const { t, setLocale } = useI18n();
+const { t, locale, setLocale } = useI18n();
 const authStore = useAuthStore();
 const globalStore = useGlobalStore();
 
@@ -111,7 +111,7 @@ type SetupError = {
   message: string;
 };
 
-const lang = ref('en'); // default
+const lang = ref(locale.value);
 
 const username = ref<null | string>(null);
 const password = ref<null | string>(null);
@@ -132,7 +132,7 @@ watch(setupError, (value) => {
 
 function updateLang(value: string) {
   lang.value = value;
-  // TODO: if the translation does not exist, it shows the key
+  // TODO: if the translation does not exist, it shows the key instead of default (en)
   setLocale(lang.value);
 }
 

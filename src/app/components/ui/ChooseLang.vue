@@ -44,5 +44,5 @@ watch(langProxy, (newVal) => {
   updateLang('update:lang', newVal);
 });
 
-const langs = LOCALES;
+const langs = LOCALES.sort((a, b) => a.value.localeCompare(b.value));
 </script>
