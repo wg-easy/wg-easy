@@ -16,6 +16,7 @@
     "welcome": "Welcome to your first setup of wg-easy !",
     "msgStepOne": "Please choose a default language.",
     "msgStepTwo": "Please first enter an admin username and a strong secure password. This information will be used to log in to your administration panel.",
+    "chooseLang": "Select a language...",
     "newPassword": "New Password",
     "accept": "I accept the condition",
     "submitBtn": "Create admin account",

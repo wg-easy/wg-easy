@@ -102,7 +102,7 @@
 <script setup lang="ts">
 import { FetchError } from 'ofetch';
 
-const { t } = useI18n();
+const { t, setLocale } = useI18n();
 const authStore = useAuthStore();
 const generalStore = useGeneralStore();
 
@@ -132,6 +132,7 @@ watch(setupError, (value) => {
 
 function updateLang(value: string) {
   lang.value = value;
+  setLocale(lang.value);
 }
 
 async function increaseStep() {

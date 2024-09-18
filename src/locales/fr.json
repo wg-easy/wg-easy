@@ -16,6 +16,7 @@
     "welcome": "Bienvenue dans votre première configuration de wg-easy !",
     "msgStepOne": "Sélectionner votre langue.",
     "msgStepTwo": "Veuillez renseigner votre nom d'utilisateur et votre mot de passe. Ces informations seront utilisées pour vous connecter à votre page d'administration.",
+    "chooseLang": "Choisir une langue...",
     "newPassword": "Nouveau mot de passe",
     "accept": "J'accepte les conditions d'utilisation",
     "submitBtn": "Créer un compte administrateur",
