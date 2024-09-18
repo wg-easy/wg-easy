@@ -43,6 +43,8 @@
 </template>
 
 <script setup lang="ts">
+import { LOCALES } from '~/../i18n.config.js';
+
 const { lang } = defineProps<{
   lang: string;
 }>();
@@ -54,18 +56,5 @@ watch(langProxy, (newVal) => {
   updateLang('update:lang', newVal);
 });
 
-const langs = [
-  {
-    value: 'de',
-    name: 'Deutsch',
-  },
-  {
-    value: 'en',
-    name: 'English',
-  },
-  {
-    value: 'fr',
-    name: 'Français',
-  },
-];
+const langs = LOCALES;
 </script>

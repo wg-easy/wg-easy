@@ -1,6 +1,7 @@
 import type { ZodSchema } from 'zod';
 import { z, ZodError } from 'zod';
 import type { H3Event, EventHandlerRequest } from 'h3';
+import { LOCALES } from '~~/i18n.config';
 
 // TODO: use i18n for messages
 
@@ -73,6 +74,12 @@ const statistics = z.object(
 );
 
 const objectMessage = 'zod.body'; // i18n key
+
+const langs = LOCALES.map((lang) => lang.value);
+const lang = z.enum(['', ...langs]);
+export const langType = z.object({
+  lang: lang,
+});
 
 export const clientIdType = z.object(
   {

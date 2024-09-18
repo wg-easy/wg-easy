@@ -19,6 +19,31 @@ import it from './locales/it.json';
 import th from './locales/th.json';
 import hi from './locales/hi.json';
 
+const LOCALES = [
+  { value: 'en', name: 'English' },
+  { value: 'ua', name: 'Українська' },
+  { value: 'ru', name: 'Русский' },
+  { value: 'tr', name: 'Türkçe' },
+  { value: 'no', name: 'Norsk' },
+  { value: 'pl', name: 'Polski' },
+  { value: 'fr', name: 'Français' },
+  { value: 'de', name: 'Deutsch' },
+  { value: 'ca', name: 'Català' },
+  { value: 'es', name: 'Español' },
+  { value: 'ko', name: '한국어' },
+  { value: 'vi', name: 'Tiếng Việt' },
+  { value: 'nl', name: 'Nederlands' },
+  { value: 'is', name: 'Íslenska' },
+  { value: 'pt', name: 'Português' },
+  { value: 'zh-chs', name: '简体中文' },
+  { value: 'zh-cht', name: '繁體中文' },
+  { value: 'it', name: 'Italiano' },
+  { value: 'th', name: 'ไทย' },
+  { value: 'hi', name: 'हिन्दी' },
+];
+
+export { LOCALES };
+
 export default defineI18nConfig(() => ({
   legacy: false,
   locale: 'en',

@@ -104,6 +104,7 @@ import { FetchError } from 'ofetch';
 
 const { t } = useI18n();
 const authStore = useAuthStore();
+const generalStore = useGeneralStore();
 
 type SetupError = {
   title: string;
@@ -136,12 +137,14 @@ function updateLang(value: string) {
 async function increaseStep() {
   try {
     if (step.value === 1) {
-      /* lang */
+      // TODO: handle error
+      await generalStore.updateLanguage(lang.value);
+      stepInvalide.value.push(1);
     }
 
     if (step.value === 2) {
       await newAccount();
-      stepInvalide.value.push(1);
+      stepInvalide.value.push(2);
     }
 
     if (step.value === 3) {

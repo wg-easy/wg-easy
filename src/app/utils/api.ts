@@ -129,6 +129,13 @@ class API {
       body: { username, password, accept },
     });
   }
+
+  async updateLanguage({ lang }: { lang: string }) {
+    return $fetch('/api/lang', {
+      method: 'post',
+      body: { lang },
+    });
+  }
 }
 
 type WGClientReturn = Awaited<

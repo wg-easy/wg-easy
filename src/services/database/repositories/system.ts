@@ -1,6 +1,7 @@
 import type { SessionConfig } from 'h3';
+import type { LOCALES } from '~~/i18n.config';
 
-export type Lang = 'en' | 'fr';
+export type Lang = (typeof LOCALES)[number]['value'];
 
 export type IpTables = {
   PreUp: string;
@@ -106,4 +107,5 @@ export abstract class SystemRepository {
 
   abstract updateFeatures(features: Record<string, Feature>): Promise<void>;
   abstract updateStatistics(statistics: Statistics): Promise<void>;
+  abstract updateLanguage(language: Lang): Promise<void>;
 }
