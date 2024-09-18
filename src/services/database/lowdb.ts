@@ -71,10 +71,10 @@ export class LowDBSystem extends SystemRepository {
     });
   }
 
-  async updateLanguage(language: Lang): Promise<void> {
+  async updateLang(lang: Lang): Promise<void> {
     DEBUG('Update Language');
     this.#db.update((v) => {
-      v.system.general.lang = language;
+      v.system.general.lang = lang;
     });
   }
 }

@@ -130,7 +130,7 @@ class API {
     });
   }
 
-  async updateLanguage({ lang }: { lang: string }) {
+  async updateLang({ lang }: { lang: string }) {
     return $fetch('/api/lang', {
       method: 'post',
       body: { lang },

@@ -107,5 +107,5 @@ export abstract class SystemRepository {
 
   abstract updateFeatures(features: Record<string, Feature>): Promise<void>;
   abstract updateStatistics(statistics: Statistics): Promise<void>;
-  abstract updateLanguage(language: Lang): Promise<void>;
+  abstract updateLang(lang: Lang): Promise<void>;
 }

@@ -104,14 +104,14 @@ import { FetchError } from 'ofetch';
 
 const { t, setLocale } = useI18n();
 const authStore = useAuthStore();
-const generalStore = useGeneralStore();
+const globalStore = useGlobalStore();
 
 type SetupError = {
   title: string;
   message: string;
 };
 
-const lang = ref('');
+const lang = ref('en'); // default
 
 const username = ref<null | string>(null);
 const password = ref<null | string>(null);
@@ -132,6 +132,7 @@ watch(setupError, (value) => {
 
 function updateLang(value: string) {
   lang.value = value;
+  // TODO: if the translation does not exist, it shows the key
   setLocale(lang.value);
 }
 
@@ -139,7 +140,7 @@ async function increaseStep() {
   try {
     if (step.value === 1) {
       // TODO: handle error
-      await generalStore.updateLanguage(lang.value);
+      await globalStore.updateLang(lang.value);
       stepInvalide.value.push(1);
     }
 
