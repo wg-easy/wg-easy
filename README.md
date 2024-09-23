@@ -36,15 +36,18 @@ You have found the easiest way to install & manage WireGuard on any Linux host!
 
 ## Versions
 
-We provide more then 1 docker image to get, this will help you decide which one is best for you. <br>
-For **stable** versions instead of nightly or development please read **README** from the **production** branch!
+> 💡 For the **stable** version please read instructions on the
+> [**production** branch](/wg-easy/wg-easy/tree/production)!
+
+We provide more than 1 docker image tag, the following will help you decide
+which one suites the best for you.
 
 | tag | Branch | Example | Description |
 | - | - | - | - |
-| `latest` | production | `ghcr.io/wg-easy/wg-easy:latest` or `ghcr.io/wg-easy/wg-easy` | stable as possbile get bug fixes quickly when needed, deployed against `production`. |
-| `14` | production | `ghcr.io/wg-easy/wg-easy:14` | same as latest, stick to a version tag. |
-| `nightly` | master | `ghcr.io/wg-easy/wg-easy:nightly` | mostly unstable gets frequent package and code updates, deployed against `master`. |
-| `development` | pull requests | `ghcr.io/wg-easy/wg-easy:development` | used for development, testing code from PRs before landing into `master`. |
+| `latest` | [`production`](/wg-easy/wg-easy/tree/production) | `ghcr.io/wg-easy/wg-easy:latest` or `ghcr.io/wg-easy/wg-easy` | stable as possbile get bug fixes quickly when needed, deployed against [`production`](/wg-easy/wg-easy/tree/production). |
+| `14` | [`production`](/wg-easy/wg-easy/tree/production) | `ghcr.io/wg-easy/wg-easy:14` | same as latest, stick to a version tag. |
+| `nightly` | [`master`](/wg-easy/wg-easy/tree/master) | `ghcr.io/wg-easy/wg-easy:nightly` | mostly unstable gets frequent package and code updates, deployed against [`master`](/wg-easy/wg-easy/tree/master). |
+| `development` | pull requests | `ghcr.io/wg-easy/wg-easy:development` | used for development, testing code from PRs before landing into [`master`](/wg-easy/wg-easy/tree/master). |
 
 ## Installation
 
@@ -52,7 +55,7 @@ For **stable** versions instead of nightly or development please read **README**
 
 If you haven't installed Docker yet, install it by running:
 
-```bash
+```shell
 curl -sSL https://get.docker.com | sh
 sudo usermod -aG docker $(whoami)
 exit
@@ -64,28 +67,28 @@ And log in again.
 
 To automatically install & run wg-easy, simply run:
 
-```
-  docker run -d \
-  --name=wg-easy \
-  -e LANG=de \
-  -e WG_HOST=<🚨YOUR_SERVER_IP> \
-  -e PASSWORD_HASH=<🚨YOUR_ADMIN_PASSWORD_HASH> \
-  -e PORT=51821 \
-  -e WG_PORT=51820 \
-  -v ~/.wg-easy:/etc/wireguard \
-  -p 51820:51820/udp \
-  -p 51821:51821/tcp \
-  --cap-add=NET_ADMIN \
-  --cap-add=SYS_MODULE \
-  --sysctl="net.ipv4.conf.all.src_valid_mark=1" \
-  --sysctl="net.ipv4.ip_forward=1" \
+```shell
+docker run --detach \
+  --name wg-easy \
+  --env LANG=de \
+  --env WG_HOST=<🚨YOUR_SERVER_IP> \
+  --env PASSWORD_HASH='<🚨YOUR_ADMIN_PASSWORD_HASH>' \
+  --env PORT=51821 \
+  --env WG_PORT=51820 \
+  --volume ~/.wg-easy:/etc/wireguard \
+  --publish 51820:51820/udp \
+  --publish 51821:51821/tcp \
+  --cap-add NET_ADMIN \
+  --cap-add SYS_MODULE \
+  --sysctl 'net.ipv4.conf.all.src_valid_mark=1' \
+  --sysctl 'net.ipv4.ip_forward=1' \
   --restart unless-stopped \
   ghcr.io/wg-easy/wg-easy
 ```
 
-> 💡 Replace `YOUR_SERVER_IP` with your WAN IP, or a Dynamic DNS hostname.
+> 💡 Replace `<🚨YOUR_SERVER_IP>` with your WAN IP, or a Dynamic DNS hostname.
 >
-> 💡 Replace `YOUR_ADMIN_PASSWORD_HASH` with a bcrypt password hash to log in on the Web UI. See [How_to_generate_an_bcrypt_hash.md](./How_to_generate_an_bcrypt_hash.md) for know how generate the hash.
+> 💡 Replace `<🚨YOUR_ADMIN_PASSWORD_HASH>` with a bcrypt password hash to log in on the Web UI. See [How_to_generate_an_bcrypt_hash.md](./How_to_generate_an_bcrypt_hash.md) for instructions on how to generate a hashed password.
 
 The Web UI will now be available on `http://0.0.0.0:51821`.
 
@@ -139,7 +142,7 @@ These options can be configured by setting environment variables using `-e KEY="
 
 To update to the latest version, simply run:
 
-```bash
+```shell
 docker stop wg-easy
 docker rm wg-easy
 docker pull ghcr.io/wg-easy/wg-easy
