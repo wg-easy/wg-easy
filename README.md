@@ -37,17 +37,17 @@ You have found the easiest way to install & manage WireGuard on any Linux host!
 ## Versions
 
 > 💡 For the **stable** version please read instructions on the
-> [**production** branch](/wg-easy/wg-easy/tree/production)!
+> [**production** branch](https://github.com/wg-easy/wg-easy/tree/production)!
 
 We provide more than 1 docker image tag, the following will help you decide
 which one suites the best for you.
 
 | tag | Branch | Example | Description |
 | - | - | - | - |
-| `latest` | [`production`](/wg-easy/wg-easy/tree/production) | `ghcr.io/wg-easy/wg-easy:latest` or `ghcr.io/wg-easy/wg-easy` | stable as possbile get bug fixes quickly when needed, deployed against [`production`](/wg-easy/wg-easy/tree/production). |
-| `14` | [`production`](/wg-easy/wg-easy/tree/production) | `ghcr.io/wg-easy/wg-easy:14` | same as latest, stick to a version tag. |
-| `nightly` | [`master`](/wg-easy/wg-easy/tree/master) | `ghcr.io/wg-easy/wg-easy:nightly` | mostly unstable gets frequent package and code updates, deployed against [`master`](/wg-easy/wg-easy/tree/master). |
-| `development` | pull requests | `ghcr.io/wg-easy/wg-easy:development` | used for development, testing code from PRs before landing into [`master`](/wg-easy/wg-easy/tree/master). |
+| `latest` | [`production`](https://github.com/wg-easy/wg-easy/tree/production) | `ghcr.io/wg-easy/wg-easy:latest` or `ghcr.io/wg-easy/wg-easy` | stable as possbile get bug fixes quickly when needed, deployed against [`production`](https://github.com/wg-easy/wg-easy/tree/production). |
+| `14` | [`production`](https://github.com/wg-easy/wg-easy/tree/production) | `ghcr.io/wg-easy/wg-easy:14` | same as latest, stick to a version tag. |
+| `nightly` | [`master`](https://github.com/wg-easy/wg-easy/tree/master) | `ghcr.io/wg-easy/wg-easy:nightly` | mostly unstable gets frequent package and code updates, deployed against [`master`](https://github.com/wg-easy/wg-easy/tree/master). |
+| `development` | pull requests | `ghcr.io/wg-easy/wg-easy:development` | used for development, testing code from PRs before landing into [`master`](https://github.com/wg-easy/wg-easy/tree/master). |
 
 ## Installation
 
