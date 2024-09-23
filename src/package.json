@@ -13,7 +13,8 @@
     "lint": "eslint .",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
-    "typecheck": "nuxt typecheck"
+    "typecheck": "nuxt typecheck",
+    "check:runall": "nuxt build && nuxt typecheck && eslint . && prettier . --check"
   },
   "dependencies": {
     "@eschricht/nuxt-color-mode": "^1.1.5",

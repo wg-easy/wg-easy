@@ -31,7 +31,7 @@
 </template>
 
 <script setup lang="ts">
-import { LOCALES } from '~/../i18n.config.js';
+import { LOCALES } from '~/../i18n.config';
 
 const { lang } = defineProps<{
   lang: string;
