@@ -14,15 +14,20 @@
   "confirmPassword": "Confirm Password",
   "setup": {
     "welcome": "Welcome to your first setup of wg-easy !",
-    "msgStepOne": "Please choose a default language.",
-    "msgStepTwo": "Please first enter an admin username and a strong secure password. This information will be used to log in to your administration panel.",
+    "messageSetupLanguage": "Please choose a default language.",
+    "messageSetupCreateAdminUser": "Please first enter an admin username and a strong secure password. This information will be used to log in to your administration panel.",
+    "messageSetupHostPort": "Please enter the host and port information. This will be used for the client configuration when setting up WireGuard on their devices.",
     "chooseLang": "Select a language...",
     "newPassword": "New Password",
     "accept": "I accept the condition",
     "submitBtn": "Create admin account",
     "usernamePlaceholder": "Administrator",
     "passwordPlaceholder": "Strong password",
-    "requirements": "Setup requirements"
+    "requirements": "Setup requirements",
+    "host": "Host",
+    "hostPlaceholder": "wg-easy.example.com",
+    "port": "Port",
+    "portPlaceholder": "443"
   },
   "zod": {
     "id": "Client ID must be a valid UUID",
@@ -51,7 +56,12 @@
     "stat": "statistics must be a valid object",
     "statBool": "enabled must be a valid boolean",
     "statNumber": "chartType must be a valid number",
-    "body": "Body must be a valid object"
+    "body": "Body must be a valid object",
+    "host": "Host must be a valid string",
+    "hostMin": "Host must contain at least 1 character",
+    "port": "Port must be a valid number",
+    "portMin": "Port must be at least 1",
+    "portMax": "Port must be at most 65535"
   },
   "name": "Name",
   "username": "Username",

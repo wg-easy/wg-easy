@@ -45,6 +45,7 @@ const LOCALES = [
 export { LOCALES };
 
 export default defineI18nConfig(() => ({
+  fallbackLocale: 'en',
   legacy: false,
   locale: 'en',
   messages: {

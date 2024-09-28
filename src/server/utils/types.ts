@@ -73,12 +73,28 @@ const statistics = z.object(
   { message: 'zod.stat' } // i18n key
 );
 
+const host = z
+  .string({ message: 'zod.host' })
+  .min(1, 'zod.hostMin')
+  .pipe(safeStringRefine);
+
+const port = z
+  .number({ message: 'zod.port' })
+  .min(1, 'zod.portMin')
+  .max(65535, 'zod.portMax');
+
 const objectMessage = 'zod.body'; // i18n key
 
 const langs = LOCALES.map((lang) => lang.value);
 const lang = z.enum(['', ...langs]);
+
 export const langType = z.object({
   lang: lang,
+});
+
+export const hostPortType = z.object({
+  host: host,
+  port: port,
 });
 
 export const clientIdType = z.object(

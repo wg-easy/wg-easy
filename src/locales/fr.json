@@ -14,15 +14,20 @@
   "confirmPassword": "Confirmer le mot de passe",
   "setup": {
     "welcome": "Bienvenue dans votre première configuration de wg-easy !",
-    "msgStepOne": "Sélectionner votre langue.",
-    "msgStepTwo": "Veuillez renseigner votre nom d'utilisateur et votre mot de passe. Ces informations seront utilisées pour vous connecter à votre page d'administration.",
+    "messageSetupLanguage": "Sélectionner votre langue.",
+    "messageSetupCreateAdminUser": "Veuillez renseigner votre nom d'utilisateur et votre mot de passe. Ces informations seront utilisées pour vous connecter à votre page d'administration.",
+    "messageSetupHostPort": "Veuillez entrer les informations de l'hôte et du port. Cela sera utilisé pour la configuration du client lors de la configuration de WireGuard sur leurs appareils.",
     "chooseLang": "Choisir une langue...",
     "newPassword": "Nouveau mot de passe",
     "accept": "J'accepte les conditions d'utilisation",
     "submitBtn": "Créer un compte administrateur",
     "usernamePlaceholder": "Administrateur",
     "passwordPlaceholder": "Mot de passe sapau",
-    "requirements": "Conditions de configuration"
+    "requirements": "Conditions de configuration",
+    "host": "Hôte",
+    "hostPlaceholder": "wg-easy.example.com",
+    "port": "Port",
+    "portPlaceholder": "443"
   },
   "zod": {
     "id": "L'ID du client doit être un UUID valide",
@@ -51,7 +56,12 @@
     "stat": "Les statistiques doivent être un objet valide",
     "statBool": "Le paramètre « activé » doit être un booléen valide",
     "statNumber": "Le type de graphique doit être un nombre valide",
-    "body": "Le corps doit être un objet valide"
+    "body": "Le corps doit être un objet valide",
+    "host": "L'hôte doit être une chaîne valide",
+    "hostMin": "L'hôte doit contenir au moins 1 caractère",
+    "port": "Le port doit être un nombre valide",
+    "portMin": "Le port doit être au moins 1",
+    "portMax": "Le port doit être au maximum 65535"
   },
   "name": "Nom",
   "username": "Nom d'utilisateur",

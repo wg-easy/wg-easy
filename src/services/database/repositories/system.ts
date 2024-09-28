@@ -108,4 +108,5 @@ export abstract class SystemRepository {
   abstract updateFeatures(features: Record<string, Feature>): Promise<void>;
   abstract updateStatistics(statistics: Statistics): Promise<void>;
   abstract updateLang(lang: Lang): Promise<void>;
+  abstract updateClientsHostPort(host: string, port: number): Promise<void>;
 }

@@ -9,14 +9,6 @@ export const useAuthStore = defineStore('Auth', () => {
   /**
    * @throws if unsuccessful
    */
-  async function signup(username: string, password: string, accept: boolean) {
-    const response = await api.setupAccount({ username, password, accept });
-    return response.success;
-  }
-
-  /**
-   * @throws if unsuccessful
-   */
   async function login(username: string, password: string, remember: boolean) {
     await api.createSession({ username, password, remember });
     return true as const;
@@ -36,5 +28,5 @@ export const useAuthStore = defineStore('Auth', () => {
     userData.value = response.value;
   }
 
-  return { userData, login, logout, update, signup };
+  return { userData, login, logout, update };
 });

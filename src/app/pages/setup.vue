@@ -8,28 +8,32 @@
         </h2>
 
         <div v-if="step === 1">
-          <p class="text-lg p-8 text-center">{{ $t('setup.msgStepOne') }}</p>
+          <p class="text-lg p-8 text-center">
+            {{ $t('setup.messageSetupLanguage') }}
+          </p>
           <div class="flex justify-center mb-8">
             <UiChooseLang :lang="lang" @update:lang="handleEventUpdateLang" />
           </div>
         </div>
 
         <div v-if="step === 2">
-          <p class="text-lg p-8 text-center">{{ $t('setup.msgStepTwo') }}</p>
+          <p class="text-lg p-8 text-center">
+            {{ $t('setup.messageSetupCreateAdminUser') }}
+          </p>
           <div>
-            <label for="username" class="inline-block py-2">{{
+            <Label for="username" class="inline-block py-2">{{
               $t('username')
-            }}</label>
+            }}</Label>
             <input
               id="username"
               v-model="username"
-              form="form-step-two"
+              form="form-create-admin-user"
               type="text"
               name="username"
               autocomplete="username"
               autofocus
               :placeholder="$t('setup.usernamePlaceholder')"
-              class="px-3 py-2 text-sm dark:bg-neutral-700 text-gray-500 dark:text-gray-500 mb-5 border-2 border-gray-100 dark:border-neutral-800 rounded-lg w-full focus:border-red-800 dark:focus:border-red-800 dark:placeholder:text-neutral-400 focus:outline-0 focus:ring-0"
+              :class="inputClass"
             />
           </div>
           <div>
@@ -39,12 +43,12 @@
             <input
               id="password"
               v-model="password"
-              form="form-step-two"
+              form="form-create-admin-user"
               type="password"
               name="password"
               autocomplete="new-password"
               :placeholder="$t('setup.passwordPlaceholder')"
-              class="px-3 py-2 text-sm dark:bg-neutral-700 text-gray-500 dark:text-gray-500 mb-5 border-2 border-gray-100 dark:border-neutral-800 rounded-lg w-full focus:border-red-800 dark:focus:border-red-800 dark:placeholder:text-neutral-400 focus:outline-0 focus:ring-0"
+              :class="inputClass"
             />
           </div>
           <div>
@@ -53,11 +57,41 @@
             }}</Label>
             <input id="accept" v-model="accept" type="checkbox" name="accept" />
           </div>
-          <form id="form-step-two"></form>
+          <form id="form-create-admin-user"></form>
         </div>
 
         <div v-if="step === 3">
-          <p class="text-lg p-8 text-center">Host/Port section</p>
+          <p class="text-lg p-8 text-center">
+            {{ $t('setup.messageSetupHostPort') }}
+          </p>
+          <div>
+            <Label for="host">{{ $t('setup.host') }}</Label>
+            <input
+              id="host"
+              v-model="host"
+              form="form-set-host-port"
+              type="text"
+              name="host"
+              autofocus
+              :placeholder="t('setup.hostPlaceholder')"
+              :class="inputClass"
+            />
+          </div>
+          <div>
+            <Label for="port">{{ $t('setup.port') }}</Label>
+            <input
+              id="port"
+              v-model="port"
+              form="form-set-host-port"
+              type="number"
+              name="port"
+              min="1"
+              max="65535"
+              :placeholder="t('setup.portPlaceholder')"
+              :class="inputClass"
+            />
+          </div>
+          <form id="form-set-host-port"></form>
         </div>
 
         <div v-if="step === 4">
@@ -104,7 +138,11 @@ import { FetchError } from 'ofetch';
 
 const { t, locale, setLocale } = useI18n();
 const authStore = useAuthStore();
+const setupStore = useSetupStore();
 const globalStore = useGlobalStore();
+
+const inputClass =
+  'px-3 py-2 text-sm dark:bg-neutral-700 text-gray-500 dark:text-gray-500 mb-5 border-2 border-gray-100 dark:border-neutral-800 rounded-lg w-full focus:border-red-800 dark:focus:border-red-800 dark:placeholder:text-neutral-400 focus:outline-0 focus:ring-0';
 
 type SetupError = {
   title: string;
@@ -113,9 +151,14 @@ type SetupError = {
 
 const lang = ref(locale.value);
 
+/* STEP CREATE ADMIN USER MODELS */
 const username = ref<null | string>(null);
 const password = ref<null | string>(null);
 const accept = ref<boolean>(true);
+
+/* STEP SET HOST & PORT MODELS */
+const host = ref<null | string>(null);
+const port = ref<null | number>(null);
 
 const step = ref(1);
 const stepInvalide = ref<number[]>([]);
@@ -132,7 +175,6 @@ watch(setupError, (value) => {
 
 function handleEventUpdateLang(value: string) {
   lang.value = value;
-  // TODO: if the translation does not exist, it shows the key instead of default (en)
   setLocale(lang.value);
 }
 
@@ -149,15 +191,19 @@ async function increaseStep() {
     }
 
     if (step.value === 3) {
-      /* host/port */
+      await updateHostPort();
+      stepInvalide.value.push(3);
     }
 
     if (step.value === 4) {
       /* migration */
+      stepInvalide.value.push(4);
     }
 
     if (step.value === 5) {
       /* validation/welcome */
+      navigateTo('/login');
+      stepInvalide.value.push(5);
     }
 
     if (step.value < 5) step.value += 1;
@@ -198,14 +244,25 @@ async function newAccount() {
   if (!username.value || !password.value) return;
 
   try {
-    const res = await authStore.signup(
-      username.value,
-      password.value,
-      accept.value
-    );
-    if (res) {
-      navigateTo('/login');
+    await setupStore.signup(username.value, password.value, accept.value);
+    // the next step need authentication
+    await authStore.login(username.value, password.value, false);
+  } catch (error) {
+    if (error instanceof FetchError) {
+      setupError.value = {
+        title: t('setup.requirements'),
+        message: error.data.message,
+      };
     }
+    // increaseStep fn
+    throw error;
+  }
+}
+
+async function updateHostPort() {
+  if (!host.value || !port.value) return;
+  try {
+    await setupStore.updateHostPort(host.value, port.value);
   } catch (error) {
     if (error instanceof FetchError) {
       setupError.value = {

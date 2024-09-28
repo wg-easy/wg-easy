@@ -115,7 +115,14 @@ class API {
     });
   }
 
-  async setupAccount({
+  async updateLang({ lang }: { lang: string }) {
+    return $fetch('/api/lang', {
+      method: 'post',
+      body: { lang },
+    });
+  }
+
+  async setupAdminUser({
     username,
     password,
     accept,
@@ -130,10 +137,10 @@ class API {
     });
   }
 
-  async updateLang({ lang }: { lang: string }) {
-    return $fetch('/api/lang', {
+  async setupHostPort({ host, port }: { host: string; port: number }) {
+    return $fetch('/api/wireguard/clients/hostport', {
       method: 'post',
-      body: { lang },
+      body: { host, port },
     });
   }
 }
