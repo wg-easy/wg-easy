@@ -1,5 +1,5 @@
 <template>
-  <SelectRoot v-model="langProxy" :default-value="lang">
+  <SelectRoot v-model="langProxy" :default-value="locale">
     <SelectTrigger
       class="inline-flex min-w-[160px] items-center justify-between rounded px-[15px] text-[13px] dark:text-white leading-none h-[35px] gap-[5px] dark:bg-neutral-500"
       aria-label="Customise language"
@@ -32,16 +32,13 @@
 
 <script setup lang="ts">
 import { LOCALES } from '~/../i18n.config';
+const { locale } = useI18n();
+const emit = defineEmits(['update:lang']);
 
-const { lang } = defineProps<{
-  lang: string;
-}>();
+const langProxy = ref(locale);
 
-const langProxy = ref(lang);
-
-const updateLang = defineEmits(['update:lang']);
 watch(langProxy, (newVal) => {
-  updateLang('update:lang', newVal);
+  emit('update:lang', newVal);
 });
 
 const langs = LOCALES.sort((a, b) => a.value.localeCompare(b.value));
