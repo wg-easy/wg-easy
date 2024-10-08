@@ -25,30 +25,31 @@
           @validated="handleValidatedStep"
         />
 
-        <div v-if="step === 4">
-          <p class="text-lg p-8 text-center">Migration section</p>
-        </div>
+        <SetupValidation
+          v-if="step === 4"
+          :next="nextStep"
+          @validated="handleValidatedStep"
+        />
 
-        <div v-if="step === 5">
-          <p class="text-lg p-8 text-center">Validation section</p>
-        </div>
-
-        <div class="flex justify-between items-center">
+        <div class="flex justify-between items-center mt-12">
           <IconsArrowLeftCircle
             :class="[
               'size-12',
-              step === 1 || towardStepValide()
+              step === 1
                 ? 'text-gray-500'
-                : 'text-red-800 dark:text-white',
+                : 'text-red-800 hover:text-red-600 dark:text-white dark:hover:text-red-800',
             ]"
             @click="decreaseStep"
           />
-          <UiStepProgress :step="step" />
+          <UiStepProgress :step="step" :total-steps="totalSteps" />
           <IconsArrowRightCircle
-            :class="[
-              'size-12',
-              step === 4 ? 'text-gray-500' : 'text-red-800 dark:text-white',
-            ]"
+            v-if="step < totalSteps"
+            class="size-12 text-red-800 hover:text-red-600 dark:text-white dark:hover:text-red-800"
+            @click="increaseStep"
+          />
+          <IconsCheckCircle
+            v-if="step == totalSteps"
+            class="size-12 text-red-800 hover:text-red-600 dark:text-white dark:hover:text-red-800"
             @click="increaseStep"
           />
         </div>
@@ -71,32 +72,57 @@ type SetupError = {
 
 /* STEP MANAGEMENT */
 const step = ref(1);
-const stepInvalide = ref<number[]>([]);
+const totalSteps = ref(4);
+const stepValide = ref<number[]>([]);
 const setupError = ref<null | SetupError>(null);
 const nextStep = ref(false);
 
+watch(setupError, (newVal) => {
+  if (newVal) {
+    const id = setTimeout(() => {
+      setupError.value = null;
+      clearTimeout(id);
+    }, 8000);
+  }
+});
+
 async function increaseStep() {
+  if (step.value === totalSteps.value) {
+    navigateTo('/login');
+  }
+
+  if (stepValide.value.includes(step.value)) {
+    nextStep.value = false;
+    step.value += 1;
+    return;
+  }
+
+  // handleValidatedStep()
   nextStep.value = true;
 }
 
 function decreaseStep() {
-  if (stepInvalide.value.includes(step.value - 1)) return;
-  if (step.value > 1) step.value -= 1;
-}
-
-function towardStepValide() {
-  return stepInvalide.value.includes(step.value - 1);
+  if (step.value > 1) {
+    nextStep.value = false;
+    step.value -= 1;
+  }
 }
 
 function handleValidatedStep(error: null | SetupError) {
+  nextStep.value = false;
+
   if (error) {
     setupError.value = error;
+    return;
   }
 
   if (!error) {
-    nextStep.value = false;
-    if (step.value < 5) {
-      stepInvalide.value.push(step.value);
+    if (step.value === 2 || step.value === 3) {
+      // if new admin user has been created, allow to skip this step if user returns to the previous steps
+      stepValide.value.push(step.value);
+    }
+
+    if (step.value < totalSteps.value) {
       step.value += 1;
     }
   }

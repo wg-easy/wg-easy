@@ -17,6 +17,8 @@
     "messageSetupLanguage": "Sélectionner votre langue.",
     "messageSetupCreateAdminUser": "Veuillez renseigner votre nom d'utilisateur et votre mot de passe. Ces informations seront utilisées pour vous connecter à votre page d'administration.",
     "messageSetupHostPort": "Veuillez entrer les informations de l'hôte et du port. Cela sera utilisé pour la configuration du client lors de la configuration de WireGuard sur leurs appareils.",
+    "messageSetupValidation": "Bienvenue sur wg-easy ! La meilleur application pour administrer son serveur VPN WireGuard.",
+    "emptyFields": "Des champs sont requis",
     "chooseLang": "Choisir une langue...",
     "newPassword": "Nouveau mot de passe",
     "accept": "J'accepte les conditions d'utilisation",
