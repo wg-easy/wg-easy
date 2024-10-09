@@ -22,6 +22,7 @@ const name = z
   .pipe(safeStringRefine);
 
 const file = z.string({ message: 'zod.file' }).pipe(safeStringRefine);
+const file_ = z.instanceof(File, { message: 'zod.file' });
 
 const username = z
   .string({ message: 'zod.username' })
@@ -143,6 +144,12 @@ export const createType = z.object(
 export const fileType = z.object(
   {
     file: file,
+  },
+  { message: objectMessage }
+);
+export const fileType_ = z.object(
+  {
+    file: file_,
   },
   { message: objectMessage }
 );

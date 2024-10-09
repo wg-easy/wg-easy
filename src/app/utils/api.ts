@@ -138,9 +138,16 @@ class API {
   }
 
   async setupHostPort({ host, port }: { host: string; port: number }) {
-    return $fetch('/api/wireguard/clients/hostport', {
+    return $fetch('/api/admin/hostport', {
       method: 'post',
       body: { host, port },
+    });
+  }
+
+  async setupMigration({ file }: { file: File }) {
+    return $fetch('/api/admin/migration', {
+      method: 'post',
+      body: { file },
     });
   }
 }

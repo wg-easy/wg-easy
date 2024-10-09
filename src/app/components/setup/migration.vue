@@ -13,7 +13,7 @@
 <script setup lang="ts">
 import { FetchError } from 'ofetch';
 
-// const setupStore = useSetupStore();
+const setupStore = useSetupStore();
 const { t } = useI18n();
 
 const emit = defineEmits(['validated']);
@@ -35,8 +35,11 @@ function onChangeFile(evt: Event) {
   const target = evt.target as HTMLInputElement;
   const file = target.files?.[0];
 
+  console.log('file', file);
+
   if (file) {
     backupFile.value = file;
+    console.log('backupFile.value', backupFile.value);
   }
 }
 
@@ -50,7 +53,7 @@ async function sendFile() {
   }
 
   try {
-    // TODO: handle migration
+    await setupStore.runMigration(backupFile.value);
     emit('validated', null);
   } catch (error) {
     if (error instanceof FetchError) {

@@ -17,5 +17,13 @@ export const useSetupStore = defineStore('Setup', () => {
     return response.success;
   }
 
-  return { signup, updateHostPort };
+  /**
+   * @throws if unsuccessful
+   */
+  async function runMigration(file: File) {
+    const response = await api.setupMigration({ file });
+    return response.success;
+  }
+
+  return { signup, updateHostPort, runMigration };
 });
