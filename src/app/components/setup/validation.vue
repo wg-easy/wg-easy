@@ -7,10 +7,6 @@
 </template>
 
 <script setup lang="ts">
-import { FetchError } from 'ofetch';
-
-const { t } = useI18n();
-
 const emit = defineEmits(['validated']);
 
 const props = defineProps<{
@@ -19,22 +15,9 @@ const props = defineProps<{
 
 const next = toRef(props, 'next');
 
-watch(next, async (newVal) => {
+watch(next, (newVal) => {
   if (newVal) {
-    await runNext();
+    emit('validated', null);
   }
 });
-
-async function runNext() {
-  try {
-    emit('validated', null);
-  } catch (error) {
-    if (error instanceof FetchError) {
-      emit('validated', {
-        title: t('setup.requirements'),
-        message: error.data.message,
-      });
-    }
-  }
-}
 </script>

@@ -6,6 +6,7 @@
     <div>
       <Label for="host">{{ $t('setup.host') }}</Label>
       <input
+        id="host"
         v-model="host"
         type="text"
         :class="inputClass"
@@ -15,6 +16,7 @@
     <div>
       <Label for="port">{{ $t('setup.port') }}</Label>
       <input
+        id="port"
         v-model="port"
         type="number"
         :min="1"

@@ -7,26 +7,38 @@
           {{ $t('setup.welcome') }}
         </h2>
 
-        <SetupChooseLang
+        <SetupLang
           v-if="step === 1"
           :next="nextStep"
           @validated="handleValidatedStep"
         />
 
-        <SetupCreateAdminUser
+        <SetupWelcome
           v-if="step === 2"
           :next="nextStep"
           @validated="handleValidatedStep"
         />
 
-        <SetupUpdateHostPort
+        <SetupAdminUser
           v-if="step === 3"
           :next="nextStep"
           @validated="handleValidatedStep"
         />
 
-        <SetupValidation
+        <SetupHostPort
           v-if="step === 4"
+          :next="nextStep"
+          @validated="handleValidatedStep"
+        />
+
+        <SetupMigration
+          v-if="step === 5"
+          :next="nextStep"
+          @validated="handleValidatedStep"
+        />
+
+        <SetupValidation
+          v-if="step === 6"
           :next="nextStep"
           @validated="handleValidatedStep"
         />
@@ -72,7 +84,7 @@ type SetupError = {
 
 /* STEP MANAGEMENT */
 const step = ref(1);
-const totalSteps = ref(4);
+const totalSteps = ref(6);
 const stepValide = ref<number[]>([]);
 const setupError = ref<null | SetupError>(null);
 const nextStep = ref(false);
@@ -117,7 +129,7 @@ function handleValidatedStep(error: null | SetupError) {
   }
 
   if (!error) {
-    if (step.value === 2 || step.value === 3) {
+    if (step.value === 3 || step.value === 4) {
       // if new admin user has been created, allow to skip this step if user returns to the previous steps
       stepValide.value.push(step.value);
     }

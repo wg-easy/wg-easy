@@ -13,10 +13,16 @@
   "currentPassword": "Mot de passe actuel",
   "confirmPassword": "Confirmer le mot de passe",
   "setup": {
-    "welcome": "Bienvenue dans votre première configuration de wg-easy !",
+    "welcome": "Bienvenue à votre première installation de wg-easy !",
+    "messageWelcome": {
+      "whatIs": "Vous avez trouvé le moyen le plus simple d'installer et de gérer WireGuard sur n'importe quel hôte Linux !",
+      "warning": "Tout d'abord, assurez-vous d'avoir une sauvegarde de vos données si vous voulez migrer vos utilisateurs vers votre nouveau wg-easy.",
+      "next": "Cliquez sur la flèche pour passer à l'étape suivante."
+    },
     "messageSetupLanguage": "Sélectionner votre langue.",
     "messageSetupCreateAdminUser": "Veuillez renseigner votre nom d'utilisateur et votre mot de passe. Ces informations seront utilisées pour vous connecter à votre page d'administration.",
     "messageSetupHostPort": "Veuillez entrer les informations de l'hôte et du port. Cela sera utilisé pour la configuration du client lors de la configuration de WireGuard sur leurs appareils.",
+    "messageSetupMigration": " Veuillez fournir le fichier de sauvegarde si vous souhaitez migrer vos données de la version précédente de wg-easy vers votre nouvelle installation.",
     "messageSetupValidation": "Bienvenue sur wg-easy ! La meilleur application pour administrer son serveur VPN WireGuard.",
     "emptyFields": "Des champs sont requis",
     "chooseLang": "Choisir une langue...",
@@ -29,7 +35,8 @@
     "host": "Hôte",
     "hostPlaceholder": "wg-easy.example.com",
     "port": "Port",
-    "portPlaceholder": "443"
+    "portPlaceholder": "443",
+    "migration": "Restaurer la sauvegarde"
   },
   "zod": {
     "id": "L'ID du client doit être un UUID valide",

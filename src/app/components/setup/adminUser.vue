@@ -7,6 +7,7 @@
     <div>
       <Label for="username">{{ $t('username') }}</Label>
       <input
+        id="username"
         v-model="username"
         form="newAccount"
         type="text"
@@ -17,6 +18,7 @@
     <div>
       <Label for="password">{{ $t('setup.newPassword') }}</Label>
       <input
+        id="password"
         v-model="password"
         form="newAccount"
         type="password"
@@ -26,7 +28,13 @@
     </div>
     <div>
       <Label for="accept">{{ $t('setup.accept') }}</Label>
-      <input v-model="accept" form="newAccount" type="checkbox" />
+      <input
+        id="accept"
+        v-model="accept"
+        form="newAccount"
+        type="checkbox"
+        class="ml-2"
+      />
     </div>
   </div>
 </template>
