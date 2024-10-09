@@ -20,7 +20,7 @@ export const useSetupStore = defineStore('Setup', () => {
   /**
    * @throws if unsuccessful
    */
-  async function runMigration(file: File) {
+  async function runMigration(file: string) {
     const response = await api.setupMigration({ file });
     return response.success;
   }

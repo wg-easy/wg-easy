@@ -144,7 +144,7 @@ class API {
     });
   }
 
-  async setupMigration({ file }: { file: File }) {
+  async setupMigration({ file }: { file: string }) {
     return $fetch('/api/admin/migration', {
       method: 'post',
       body: { file },
