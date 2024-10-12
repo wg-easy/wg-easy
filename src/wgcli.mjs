@@ -61,7 +61,7 @@ const readStdinPassword = () => {
     // Retrieve command line arguments
     const args = process.argv.slice(2); // Ignore the first two arguments
     if (args.length > 2) {
-      throw new Error('Usage : wgpw [YOUR_PASSWORD] [HASH]');
+      throw new Error('Usage : wgcli [YOUR_PASSWORD] [HASH]');
     }
 
     const [password, hash] = args;

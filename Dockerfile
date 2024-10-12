@@ -27,8 +27,8 @@ COPY --from=build_node_modules /app /app
 COPY --from=build_node_modules /node_modules /node_modules
 
 # Copy the needed wg-password scripts
-COPY --from=build_node_modules /app/wgpw.sh /bin/wgpw
-RUN chmod +x /bin/wgpw
+COPY --from=build_node_modules /app/wgcli.sh /bin/wgcli
+RUN chmod +x /bin/wgcli
 
 # Install Linux packages
 RUN apk add --no-cache \
