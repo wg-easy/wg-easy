@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
   // Handle api routes
   if (
     !url.pathname.startsWith('/api/') ||
-    url.pathname === '/api/account/setup' ||
+    url.pathname.startsWith('/api/setup/') ||
     url.pathname === '/api/session' ||
     url.pathname === '/api/lang' ||
     url.pathname === '/api/release' ||

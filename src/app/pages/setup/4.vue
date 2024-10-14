@@ -12,7 +12,7 @@
         form="newAccount"
         type="text"
         autocomplete="username"
-        :class="inputClass"
+        class="px-3 py-2 text-sm dark:bg-neutral-700 text-gray-500 dark:text-gray-200 mb-5 border-2 border-gray-100 dark:border-neutral-800 rounded-lg w-full focus:border-red-800 dark:focus:border-red-800 dark:placeholder:text-neutral-400 focus:outline-0 focus:ring-0"
       />
     </div>
     <div>
@@ -23,7 +23,7 @@
         form="newAccount"
         type="password"
         autocomplete="new-password"
-        :class="inputClass"
+        class="px-3 py-2 text-sm dark:bg-neutral-700 text-gray-500 dark:text-gray-200 mb-5 border-2 border-gray-100 dark:border-neutral-800 rounded-lg w-full focus:border-red-800 dark:focus:border-red-800 dark:placeholder:text-neutral-400 focus:outline-0 focus:ring-0"
       />
     </div>
     <div>
@@ -36,33 +36,21 @@
         class="ml-2"
       />
     </div>
+    <BaseButton @click="newAccount">Create Account</BaseButton>
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import { FetchError } from 'ofetch';
-
-const setupStore = useSetupStore();
-const authStore = useAuthStore();
 const { t } = useI18n();
 
-const inputClass =
-  'px-3 py-2 text-sm dark:bg-neutral-700 text-gray-500 dark:text-gray-200 mb-5 border-2 border-gray-100 dark:border-neutral-800 rounded-lg w-full focus:border-red-800 dark:focus:border-red-800 dark:placeholder:text-neutral-400 focus:outline-0 focus:ring-0';
-
-const emit = defineEmits(['validated']);
-
-const props = defineProps<{
-  next: boolean;
-}>();
-
-const next = toRef(props, 'next');
-
-watch(next, async (newVal) => {
-  if (newVal) {
-    await newAccount();
-  }
+definePageMeta({
+  layout: 'setup',
 });
 
+const setupStore = useSetupStore();
+setupStore.setStep(4);
+const router = useRouter();
 const username = ref<null | string>(null);
 const password = ref<null | string>(null);
 const accept = ref<boolean>(true);
@@ -70,7 +58,7 @@ const accept = ref<boolean>(true);
 async function newAccount() {
   try {
     if (!username.value || !password.value) {
-      emit('validated', {
+      setupStore.handleError({
         title: t('setup.requirements'),
         message: t('setup.emptyFields'),
       });
@@ -78,12 +66,10 @@ async function newAccount() {
     }
 
     await setupStore.signup(username.value, password.value, accept.value);
-    // the next step need authentication
-    await authStore.login(username.value, password.value, false);
-    emit('validated', null);
+    await router.push('/setup/5');
   } catch (error) {
     if (error instanceof FetchError) {
-      emit('validated', {
+      setupStore.handleError({
         title: t('setup.requirements'),
         message: error.data.message,
       });

@@ -7,22 +7,21 @@ export default defineEventHandler(async (event) => {
     return;
   }
 
-  const users = await Database.user.findAll();
-  if (users.length === 0) {
-    // If not setup
-    if (url.pathname.startsWith('/setup')) {
+  const setupDone = await Database.setup.done();
+  if (!setupDone) {
+    const parsedSetup = url.pathname.match(/\/setup\/(\d)/);
+    if (!parsedSetup) {
+      return sendRedirect(event, `/setup/1`, 302);
+    }
+    const [_, currentSetup] = parsedSetup;
+    const step = await Database.setup.get();
+    if (step.toString() === currentSetup) {
       return;
     }
-    if (url.pathname.startsWith('/api/')) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'Invalid State',
-      });
-    }
-    return sendRedirect(event, '/setup', 302);
+    return sendRedirect(event, `/setup/${step}`, 302);
   } else {
     // If already set up
-    if (!url.pathname.startsWith('/setup')) {
+    if (!url.pathname.startsWith('/setup/')) {
       return;
     }
     return sendRedirect(event, '/login', 302);
