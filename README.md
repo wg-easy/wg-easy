@@ -102,7 +102,8 @@ execute `docker compose up --detach`.
 
 ### 3. Sponsor
 
-Are you enjoying this project? [Buy Emile a beer!](https://github.com/sponsors/WeeJeWel) 🍻
+Are you enjoying this project? [Buy Emile a beer!](https://github.com/sponsors/WeeJeWel) 🍻 <br>
+Donation to core component: [WireGuard](https://www.wireguard.com/donations/)
 
 ## Options
 
