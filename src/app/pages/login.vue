@@ -1,14 +1,8 @@
 <template>
-  <section>
-    <h1
-      class="text-4xl font-medium my-16 text-gray-700 dark:text-neutral-200 text-center"
-    >
-      <img src="/logo.png" width="32" class="inline align-middle dark:bg" />
-      <span class="align-middle">WireGuard</span>
-    </h1>
-
+  <main>
+    <UiBanner />
     <form
-      class="shadow rounded-md bg-white dark:bg-neutral-700 mx-auto w-64 p-5 overflow-hidden mt-10"
+      class="shadow rounded-md bg-white dark:bg-neutral-700 text-gray-700 dark:text-neutral-200 mx-auto w-64 p-5 overflow-hidden mt-10"
       @submit="login"
     >
       <!-- Avatar -->
@@ -24,7 +18,8 @@
         name="username"
         :placeholder="$t('username')"
         autocomplete="username"
-        class="px-3 py-2 text-sm dark:bg-neutral-700 text-gray-500 dark:text-gray-500 mb-5 border-2 border-gray-100 dark:border-neutral-800 rounded-lg w-full focus:border-red-800 dark:focus:border-red-800 dark:placeholder:text-neutral-400 outline-none"
+        autofocus
+        class="px-3 py-2 text-sm dark:bg-neutral-700 text-gray-500 dark:text-gray-500 mb-5 border-2 border-gray-100 dark:border-neutral-800 rounded-lg w-full focus:border-red-800 dark:focus:border-red-800 dark:placeholder:text-neutral-400 focus:outline-0 focus:ring-0"
       />
 
       <input
@@ -33,7 +28,7 @@
         name="password"
         :placeholder="$t('password')"
         autocomplete="current-password"
-        class="px-3 py-2 text-sm dark:bg-neutral-700 text-gray-500 dark:text-gray-500 mb-5 border-2 border-gray-100 dark:border-neutral-800 rounded-lg w-full focus:border-red-800 dark:focus:border-red-800 dark:placeholder:text-neutral-400 outline-none"
+        class="px-3 py-2 text-sm dark:bg-neutral-700 text-gray-500 dark:text-gray-500 mb-5 border-2 border-gray-100 dark:border-neutral-800 rounded-lg w-full focus:border-red-800 dark:focus:border-red-800 dark:placeholder:text-neutral-400 focus:outline-0 focus:ring-0"
       />
 
       <label
@@ -79,15 +74,41 @@
         :value="$t('signIn')"
       />
     </form>
-  </section>
+
+    <ErrorToast
+      v-if="setupError"
+      :title="setupError.title"
+      :message="setupError.message"
+      :duration="12000"
+    />
+  </main>
 </template>
 
 <script setup lang="ts">
+import { FetchError } from 'ofetch';
+
+const { t } = useI18n();
+
 const authenticating = ref(false);
 const remember = ref(false);
 const username = ref<null | string>(null);
 const password = ref<null | string>(null);
 const authStore = useAuthStore();
+
+type SetupError = {
+  title: string;
+  message: string;
+};
+
+const setupError = ref<null | SetupError>(null);
+
+watch(setupError, (value) => {
+  if (value) {
+    setTimeout(() => {
+      setupError.value = null;
+    }, 13000);
+  }
+});
 
 async function login(e: Event) {
   e.preventDefault();
@@ -104,10 +125,12 @@ async function login(e: Event) {
     if (res) {
       await navigateTo('/');
     }
-  } catch (err) {
-    if (err instanceof Error) {
-      // TODO: replace alert with actual ui error message
-      alert(err.message || err.toString());
+  } catch (error) {
+    if (error instanceof FetchError) {
+      setupError.value = {
+        title: t('error.login'),
+        message: error.data.message,
+      };
     }
   }
   authenticating.value = false;

@@ -75,6 +75,14 @@ export const useGlobalStore = defineStore('Global', () => {
     return statistics.value.chartType > 0 && uiShowCharts.value;
   });
 
+  /**
+   * @throws if unsuccessful
+   */
+  async function updateLang(language: string) {
+    const response = await api.updateLang({ lang: language });
+    return response.success;
+  }
+
   return {
     uiShowCharts,
     updateCharts,
@@ -88,5 +96,6 @@ export const useGlobalStore = defineStore('Global', () => {
     fetchFeatures,
     setLanguage,
     fetchStatistics,
+    updateLang,
   };
 });

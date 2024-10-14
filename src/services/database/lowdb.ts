@@ -24,6 +24,7 @@ import {
   SystemRepository,
   type Feature,
   type Features,
+  type Lang,
   type Statistics,
 } from './repositories/system';
 
@@ -67,6 +68,21 @@ export class LowDBSystem extends SystemRepository {
       ) {
         v.system.statistics.chartType = statistics.chartType;
       }
+    });
+  }
+
+  async updateLang(lang: Lang): Promise<void> {
+    DEBUG('Update Language');
+    this.#db.update((v) => {
+      v.system.general.lang = lang;
+    });
+  }
+
+  async updateClientsHostPort(host: string, port: number): Promise<void> {
+    DEBUG('Update Clients Host and Port endpoint');
+    this.#db.update((v) => {
+      v.system.userConfig.host = host;
+      v.system.userConfig.port = port;
     });
   }
 }

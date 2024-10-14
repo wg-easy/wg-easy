@@ -115,16 +115,39 @@ class API {
     });
   }
 
-  async setupAccount({
+  async updateLang({ lang }: { lang: string }) {
+    return $fetch('/api/lang', {
+      method: 'post',
+      body: { lang },
+    });
+  }
+
+  async setupAdminUser({
     username,
     password,
+    accept,
   }: {
     username: string;
     password: string;
+    accept: boolean;
   }) {
     return $fetch('/api/account/setup', {
       method: 'post',
-      body: { username, password },
+      body: { username, password, accept },
+    });
+  }
+
+  async setupHostPort({ host, port }: { host: string; port: number }) {
+    return $fetch('/api/admin/hostport', {
+      method: 'post',
+      body: { host, port },
+    });
+  }
+
+  async setupMigration({ file }: { file: string }) {
+    return $fetch('/api/admin/migration', {
+      method: 'post',
+      body: { file },
     });
   }
 }
