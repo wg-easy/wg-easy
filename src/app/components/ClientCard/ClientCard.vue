@@ -1,26 +1,26 @@
 <template>
-  <ClientCharts :client="client" />
+  <ClientCardCharts :client="client" />
   <div
     class="relative py-3 md:py-5 px-3 z-10 flex flex-col sm:flex-row justify-between gap-3"
   >
     <div class="flex gap-3 md:gap-4 w-full items-center">
-      <ClientAvatar :client="client" />
+      <ClientCardAvatar :client="client" />
       <!-- Name & Info -->
       <div class="flex flex-col xxs:flex-row w-full gap-2">
         <div class="flex flex-col flex-grow gap-1">
-          <ClientName :client="client" />
+          <ClientCardName :client="client" />
           <div
             class="block md:inline-block pb-1 md:pb-0 text-gray-500 dark:text-neutral-400 text-xs"
           >
-            <ClientAddress4 :client="client" />
-            <ClientInlineTransfer
+            <ClientCardAddress4 :client="client" />
+            <ClientCardInlineTransfer
               v-if="!globalStore.statistics.enabled"
               :client="client"
             />
-            <ClientLastSeen :client="client" />
+            <ClientCardLastSeen :client="client" />
           </div>
-          <ClientOneTimeLink :client="client" />
-          <ClientExpireDate :client="client" />
+          <ClientCardOneTimeLink :client="client" />
+          <ClientCardExpireDate :client="client" />
         </div>
 
         <!-- Info -->
@@ -28,7 +28,7 @@
           v-if="globalStore.statistics.enabled"
           class="flex gap-2 items-center shrink-0 text-gray-400 dark:text-neutral-400 text-xs mt-px justify-end"
         >
-          <ClientTransfer :client="client" />
+          <ClientCardTransfer :client="client" />
         </div>
       </div>
       <!-- </div> -->
@@ -39,11 +39,11 @@
       <div
         class="text-gray-400 dark:text-neutral-400 flex gap-1 items-center justify-between"
       >
-        <ClientSwitch :client="client" />
-        <ClientQRCode :client="client" />
-        <ClientConfig :client="client" />
-        <ClientOneTimeLinkBtn :client="client" />
-        <ClientDelete :client="client" />
+        <ClientCardSwitch :client="client" />
+        <ClientCardEdit :client="client" />
+        <ClientCardQRCode :client="client" />
+        <ClientCardConfig :client="client" />
+        <ClientCardOneTimeLinkBtn :client="client" />
       </div>
     </div>
   </div>

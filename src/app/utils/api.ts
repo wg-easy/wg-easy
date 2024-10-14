@@ -27,7 +27,7 @@ class API {
   }
 
   async getClients() {
-    return useFetch('/api/wireguard/client', {
+    return useFetch('/api/client', {
       method: 'get',
     });
   }
@@ -39,32 +39,32 @@ class API {
     name: string;
     expireDate: string | null;
   }) {
-    return $fetch('/api/wireguard/client', {
+    return $fetch('/api/client', {
       method: 'post',
       body: { name, expireDate },
     });
   }
 
   async deleteClient({ clientId }: { clientId: string }) {
-    return $fetch(`/api/wireguard/client/${clientId}`, {
+    return $fetch(`/api/client/${clientId}`, {
       method: 'delete',
     });
   }
 
   async showOneTimeLink({ clientId }: { clientId: string }) {
-    return $fetch(`/api/wireguard/client/${clientId}/generateOneTimeLink`, {
+    return $fetch(`/api/client/${clientId}/generateOneTimeLink`, {
       method: 'post',
     });
   }
 
   async enableClient({ clientId }: { clientId: string }) {
-    return $fetch(`/api/wireguard/client/${clientId}/enable`, {
+    return $fetch(`/api/client/${clientId}/enable`, {
       method: 'post',
     });
   }
 
   async disableClient({ clientId }: { clientId: string }) {
-    return $fetch(`/api/wireguard/client/${clientId}/disable`, {
+    return $fetch(`/api/client/${clientId}/disable`, {
       method: 'post',
     });
   }
@@ -76,7 +76,7 @@ class API {
     clientId: string;
     name: string;
   }) {
-    return $fetch(`/api/wireguard/client/${clientId}/name`, {
+    return $fetch(`/api/client/${clientId}/name`, {
       method: 'put',
       body: { name },
     });
@@ -89,7 +89,7 @@ class API {
     clientId: string;
     address4: string;
   }) {
-    return $fetch(`/api/wireguard/client/${clientId}/address4`, {
+    return $fetch(`/api/client/${clientId}/address4`, {
       method: 'put',
       body: { address4 },
     });
@@ -102,7 +102,7 @@ class API {
     clientId: string;
     expireDate: string | null;
   }) {
-    return $fetch(`/api/wireguard/client/${clientId}/expireDate`, {
+    return $fetch(`/api/client/${clientId}/expireDate`, {
       method: 'put',
       body: { expireDate },
     });
@@ -145,7 +145,7 @@ class API {
   }
 
   async setupMigration({ file }: { file: string }) {
-    return $fetch('/api/admin/migration', {
+    return $fetch('/api/setup/migration', {
       method: 'post',
       body: { file },
     });

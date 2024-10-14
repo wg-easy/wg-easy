@@ -8,9 +8,7 @@
       'is-disabled': !client.downloadableConfig,
     }"
     :title="!client.downloadableConfig ? $t('noPrivKey') : $t('showQR')"
-    @click="
-      modalStore.qrcode = `./api/wireguard/client/${client.id}/qrcode.svg`
-    "
+    @click="modalStore.qrcode = `./api/client/${client.id}/qrcode.svg`"
   >
     <IconsQRCode class="w-5" />
   </button>
