@@ -15,7 +15,7 @@
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "debug": "^4.3.7",
-    "express-session": "^1.18.0",
+    "express-session": "^1.18.1",
     "h3": "^1.13.0",
     "qrcode": "^1.5.4"
   },
