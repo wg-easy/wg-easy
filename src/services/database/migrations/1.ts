@@ -15,6 +15,7 @@ export async function run1(db: Low<Database>) {
 
   const database: Database = {
     migrations: [],
+    setup: 1,
     system: {
       general: {
         sessionTimeout: 3600, // 1 hour

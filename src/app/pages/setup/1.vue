@@ -6,40 +6,34 @@
     <div class="flex justify-center mb-8">
       <UiChooseLang @update:lang="handleEventUpdateLang" />
     </div>
+    <div><BaseButton @click="updateLang">Continue</BaseButton></div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { FetchError } from 'ofetch';
 
-const globalStore = useGlobalStore();
-const { t, locale, setLocale } = useI18n();
-
-const emit = defineEmits(['validated']);
-
-const props = defineProps<{
-  next: boolean;
-}>();
-
-const next = toRef(props, 'next');
-
-watch(next, async (newVal) => {
-  if (newVal) {
-    await updateLang();
-  }
+definePageMeta({
+  layout: 'setup',
 });
+
+const { t, locale, setLocale } = useI18n();
 
 function handleEventUpdateLang(value: string) {
   setLocale(value);
 }
 
+const setupStore = useSetupStore();
+setupStore.setStep(1);
+const globalStore = useGlobalStore();
+const router = useRouter();
 async function updateLang() {
   try {
     await globalStore.updateLang(locale.value);
-    emit('validated', null);
+    router.push('/setup/2');
   } catch (error) {
     if (error instanceof FetchError) {
-      emit('validated', {
+      setupStore.handleError({
         title: t('setup.requirements'),
         message: error.data.message,
       });

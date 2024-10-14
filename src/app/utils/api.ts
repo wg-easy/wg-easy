@@ -131,14 +131,14 @@ class API {
     password: string;
     accept: boolean;
   }) {
-    return $fetch('/api/account/setup', {
+    return $fetch('/api/setup/account', {
       method: 'post',
       body: { username, password, accept },
     });
   }
 
   async setupHostPort({ host, port }: { host: string; port: number }) {
-    return $fetch('/api/admin/hostport', {
+    return $fetch('/api/setup/hostport', {
       method: 'post',
       body: { host, port },
     });

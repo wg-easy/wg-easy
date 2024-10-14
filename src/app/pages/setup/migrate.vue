@@ -7,29 +7,22 @@
       <Label for="migration">{{ $t('setup.migration') }}</Label>
       <input id="migration" type="file" @change="onChangeFile" />
     </div>
+    <BaseButton @click="sendFile">Upload</BaseButton>
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import { FetchError } from 'ofetch';
 
-const setupStore = useSetupStore();
+definePageMeta({
+  layout: 'setup',
+});
+
 const { t } = useI18n();
 
-const emit = defineEmits(['validated']);
-
-const props = defineProps<{
-  next: boolean;
-}>();
-
-const next = toRef(props, 'next');
+const setupStore = useSetupStore();
+setupStore.setStep(5);
 const backupFile = ref<null | File>(null);
-
-watch(next, async (newVal) => {
-  if (newVal) {
-    await sendFile();
-  }
-});
 
 function onChangeFile(evt: Event) {
   const target = evt.target as HTMLInputElement;
@@ -43,9 +36,11 @@ function onChangeFile(evt: Event) {
   }
 }
 
+const router = useRouter();
+
 async function sendFile() {
   if (!backupFile.value) {
-    emit('validated', {
+    setupStore.handleError({
       title: t('setup.requirements'),
       message: t('setup.emptyFields'),
     });
@@ -56,10 +51,10 @@ async function sendFile() {
     const content = await readFileContent(backupFile.value);
 
     await setupStore.runMigration(content);
-    emit('validated', null);
+    await router.push('/setup/success');
   } catch (error) {
     if (error instanceof FetchError) {
-      emit('validated', {
+      setupStore.handleError({
         title: t('setup.requirements'),
         message: error.data.message,
       });

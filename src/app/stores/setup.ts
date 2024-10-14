@@ -25,5 +25,31 @@ export const useSetupStore = defineStore('Setup', () => {
     return response.success;
   }
 
-  return { signup, updateHostPort, runMigration };
+  type SetupError = {
+    title: string;
+    message: string;
+  };
+
+  const error = ref<null | SetupError>(null);
+
+  function handleError(e: SetupError) {
+    error.value = e;
+  }
+
+  const step = ref(1);
+  const totalSteps = ref(6);
+  function setStep(i: number) {
+    step.value = i;
+  }
+
+  return {
+    signup,
+    updateHostPort,
+    runMigration,
+    error,
+    handleError,
+    step,
+    totalSteps,
+    setStep,
+  };
 });
