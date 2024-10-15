@@ -35,6 +35,8 @@ const {
   LANG,
   UI_TRAFFIC_STATS,
   UI_CHART_TYPE,
+  DICEBEAR_TYPE,
+  USE_GRAVATAR,
   WG_ENABLE_ONE_TIME_LINKS,
   UI_ENABLE_SORT_CLIENTS,
   WG_ENABLE_EXPIRES_TIME,
@@ -123,6 +125,14 @@ module.exports = class Server {
       .get('/api/wg-enable-expire-time', defineEventHandler((event) => {
         setHeader(event, 'Content-Type', 'application/json');
         return `${WG_ENABLE_EXPIRES_TIME}`;
+      }))
+
+      .get('/api/ui-avatar-settings', defineEventHandler((event) => {
+        setHeader(event, 'Content-Type', 'application/json');
+        return {
+          dicebear: DICEBEAR_TYPE,
+          gravatar: USE_GRAVATAR,
+        }
       }))
 
       // Authentication
@@ -418,6 +428,7 @@ module.exports = class Server {
             if (id.endsWith('.json')) setHeader(event, 'Content-Type', 'application/json');
             if (id.endsWith('.css')) setHeader(event, 'Content-Type', 'text/css');
             if (id.endsWith('.png')) setHeader(event, 'Content-Type', 'image/png');
+            if (id.endsWith('.svg')) setHeader(event, 'Content-Type', 'image/svg+xml');
 
             return {
               size: stats.size,

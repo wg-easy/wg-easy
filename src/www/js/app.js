@@ -92,6 +92,10 @@ new Vue({
     uiTrafficStats: false,
 
     uiChartType: 0,
+    avatarSettings: {
+      'dicebear': null,
+      'gravatar': false,
+    },
     enableOneTimeLinks: false,
     enableSortClient: false,
     sortClient: true, // Sort clients by name, true = asc, false = desc
@@ -200,8 +204,10 @@ new Vue({
 
       const clients = await this.api.getClients();
       this.clients = clients.map((client) => {
-        if (client.name.includes('@') && client.name.includes('.')) {
+        if (client.name.includes('@') && client.name.includes('.')) && this.avatarSettings.gravatar) {
           client.avatar = `https://gravatar.com/avatar/${sha256(client.name.toLowerCase().trim())}.jpg`;
+        } else if (this.avatarSettings.dicebear) {
+          client.avatar = `https://api.dicebear.com/9.x/${this.avatarSettings.dicebear}/svg?seed=${sha256(client.name.toLowerCase().trim())}`
         }
 
         if (!this.clientsPersist[client.id]) {
@@ -463,6 +469,17 @@ new Vue({
       })
       .catch(() => {
         this.enableExpireTime = false;
+      });
+
+    this.api.getAvatarSettings()
+      .then((res) => {
+        this.avatarSettings = res;
+      })
+      .catch(() => {
+          this.avatarSettings = {
+            'dicebear': null,
+            'gravatar': false,
+          };
       });
 
     Promise.resolve().then(async () => {
