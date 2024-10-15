@@ -18,11 +18,44 @@ import {
   type NewClient,
   type OneTimeLink,
 } from './repositories/client';
-import { SystemRepository } from './repositories/system';
+import {
+  AvailableFeatures,
+  ChartType,
+  SystemRepository,
+  type Feature,
+  type Features,
+  type Lang,
+  type Statistics,
+} from './repositories/system';
+import { SetupRepository, type Steps } from './repositories/setup';
 
 const DEBUG = debug('LowDB');
 
-export class LowDBSystem extends SystemRepository {
+export class LowDBSetup extends SetupRepository {
+  #db: Low<Database>;
+  constructor(db: Low<Database>) {
+    super();
+    this.#db = db;
+  }
+  async done() {
+    if (this.#db.data.setup === 'success') {
+      return true;
+    }
+    return false;
+  }
+
+  async get() {
+    return this.#db.data.setup;
+  }
+
+  async set(step: Steps) {
+    this.#db.update((v) => {
+      v.setup = step;
+    });
+  }
+}
+
+class LowDBSystem extends SystemRepository {
   #db: Low<Database>;
   constructor(db: Low<Database>) {
     super();
@@ -37,9 +70,49 @@ export class LowDBSystem extends SystemRepository {
     }
     return system;
   }
+
+  async updateFeatures(features: Record<string, Feature>) {
+    DEBUG('Update Features');
+    this.#db.update((v) => {
+      for (const key in features) {
+        if (AvailableFeatures.includes(key as keyof Features)) {
+          v.system.features[key as keyof Features].enabled =
+            features[key]!.enabled;
+        }
+      }
+    });
+  }
+
+  async updateStatistics(statistics: Statistics) {
+    DEBUG('Update Statistics');
+    this.#db.update((v) => {
+      v.system.statistics.enabled = statistics.enabled;
+      if (
+        statistics.chartType >= ChartType.None &&
+        statistics.chartType <= ChartType.Bar
+      ) {
+        v.system.statistics.chartType = statistics.chartType;
+      }
+    });
+  }
+
+  async updateLang(lang: Lang): Promise<void> {
+    DEBUG('Update Language');
+    this.#db.update((v) => {
+      v.system.general.lang = lang;
+    });
+  }
+
+  async updateClientsHostPort(host: string, port: number): Promise<void> {
+    DEBUG('Update Clients Host and Port endpoint');
+    this.#db.update((v) => {
+      v.system.userConfig.host = host;
+      v.system.userConfig.port = port;
+    });
+  }
 }
 
-export class LowDBUser extends UserRepository {
+class LowDBUser extends UserRepository {
   #db: Low<Database>;
   constructor(db: Low<Database>) {
     super();
@@ -77,6 +150,7 @@ export class LowDBUser extends UserRepository {
       id: crypto.randomUUID(),
       password: hash,
       username,
+      email: null,
       name: 'Administrator',
       role: isUserEmpty ? 'ADMIN' : 'CLIENT',
       enabled: true,
@@ -106,7 +180,7 @@ export class LowDBUser extends UserRepository {
   }
 }
 
-export class LowDBClient extends ClientRepository {
+class LowDBClient extends ClientRepository {
   #db: Low<Database>;
   constructor(db: Low<Database>) {
     super();
@@ -203,6 +277,7 @@ export class LowDBClient extends ClientRepository {
 export default class LowDB extends DatabaseProvider {
   #db: Low<Database>;
 
+  setup: LowDBSetup;
   system: LowDBSystem;
   user: LowDBUser;
   client: LowDBClient;
@@ -210,6 +285,7 @@ export default class LowDB extends DatabaseProvider {
   private constructor(db: Low<Database>) {
     super();
     this.#db = db;
+    this.setup = new LowDBSetup(this.#db);
     this.system = new LowDBSystem(this.#db);
     this.user = new LowDBUser(this.#db);
     this.client = new LowDBClient(this.#db);

@@ -2,22 +2,28 @@
 export default defineEventHandler(async (event) => {
   const url = getRequestURL(event);
 
-  if (
-    url.pathname === '/setup' ||
-    url.pathname === '/api/account/setup' ||
-    url.pathname === '/api/features'
-  ) {
+  // User can't be logged in, and public routes can be accessed whenever
+  if (url.pathname.startsWith('/api/')) {
     return;
   }
 
-  const users = await Database.user.findAll();
-  if (users.length === 0) {
-    if (url.pathname.startsWith('/api/')) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'Invalid State',
-      });
+  const setupDone = await Database.setup.done();
+  if (!setupDone) {
+    const parsedSetup = url.pathname.match(/\/setup\/(\d)/);
+    if (!parsedSetup) {
+      return sendRedirect(event, `/setup/1`, 302);
     }
-    return sendRedirect(event, '/setup', 302);
+    const [_, currentSetup] = parsedSetup;
+    const step = await Database.setup.get();
+    if (step.toString() === currentSetup) {
+      return;
+    }
+    return sendRedirect(event, `/setup/${step}`, 302);
+  } else {
+    // If already set up
+    if (!url.pathname.startsWith('/setup/')) {
+      return;
+    }
+    return sendRedirect(event, '/login', 302);
   }
 });

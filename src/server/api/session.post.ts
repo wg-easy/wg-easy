@@ -3,7 +3,7 @@ import type { SessionConfig } from 'h3';
 export default defineEventHandler(async (event) => {
   const { username, password, remember } = await readValidatedBody(
     event,
-    validateZod(credentialsType)
+    validateZod(credentialsType, event)
   );
 
   const users = await Database.user.findAll();
@@ -30,16 +30,15 @@ export default defineEventHandler(async (event) => {
   if (remember) {
     conf.cookie = {
       ...(system.sessionConfig.cookie ?? {}),
-      maxAge: system.sessionTimeout,
+      maxAge: system.general.sessionTimeout,
     };
   }
 
-  const session = await useSession(event, {
+  const session = await useSession<WGSession>(event, {
     ...system.sessionConfig,
   });
 
   const data = await session.update({
-    authenticated: true,
     userId: user.id,
   });
 

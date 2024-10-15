@@ -318,7 +318,7 @@ class WireGuard {
     const clients = await Database.client.findAll();
     const system = await Database.system.get();
     // Expires Feature
-    if (system.clientExpiration.enabled) {
+    if (system.features.clientExpiration.enabled) {
       for (const client of Object.values(clients)) {
         if (client.enabled !== true) continue;
         if (
@@ -331,7 +331,7 @@ class WireGuard {
       }
     }
     // One Time Link Feature
-    if (system.oneTimeLinks.enabled) {
+    if (system.features.oneTimeLinks.enabled) {
       for (const client of Object.values(clients)) {
         if (
           client.oneTimeLink !== null &&

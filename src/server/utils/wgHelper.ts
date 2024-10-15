@@ -28,8 +28,8 @@ AllowedIPs = ${allowedIps.join(', ')}`;
 [Interface]
 PrivateKey = ${system.interface.privateKey}
 Address = ${system.interface.address4}/${cidr4Block}, ${system.interface.address6}/${cidr6Block}
-ListenPort = ${system.wgPort}
-MTU = ${system.userConfig.serverMtu}
+ListenPort = ${system.interface.port}
+MTU = ${system.interface.mtu}
 PreUp = ${system.iptables.PreUp}
 PostUp = ${system.iptables.PostUp}
 PreDown = ${system.iptables.PreDown}
@@ -51,7 +51,7 @@ PublicKey = ${system.interface.publicKey}
 PresharedKey = ${client.preSharedKey}
 AllowedIPs = ${client.allowedIPs.join(', ')}
 PersistentKeepalive = ${client.persistentKeepalive}
-Endpoint = ${system.wgHost}:${system.wgConfigPort}`;
+Endpoint = ${system.userConfig.host}:${system.userConfig.port}`;
   },
 
   generatePrivateKey: () => {
