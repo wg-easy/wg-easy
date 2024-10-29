@@ -303,6 +303,15 @@ module.exports = class Server {
         await WireGuard.updateClientAddress({ clientId, address });
         return { success: true };
       }))
+      .put('/api/wireguard/client/:clientId/allowedIPs', defineEventHandler(async (event) => {
+        const clientId = getRouterParam(event, 'clientId');
+        if (clientId === '__proto__' || clientId === 'constructor' || clientId === 'prototype') {
+          throw createError({ status: 403 });
+        }
+        const { address } = await readBody(event);
+        await WireGuard.updateClientAllowedIPs({ clientId, allowedIPs });
+        return { success: true };
+      }))
       .put('/api/wireguard/client/:clientId/expireDate', defineEventHandler(async (event) => {
         const clientId = getRouterParam(event, 'clientId');
         if (clientId === '__proto__' || clientId === 'constructor' || clientId === 'prototype') {

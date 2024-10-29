@@ -120,7 +120,7 @@ PostDown = ${WG_POST_DOWN}
 [Peer]
 PublicKey = ${client.publicKey}
 ${client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
-}AllowedIPs = ${client.address}/32`;
+}AllowedIPs = ${client.address}/32, ${client.allowedIPs}`;
     }
 
     debug('Config saving...');
@@ -340,6 +340,15 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
     const client = await this.getClient({ clientId });
 
     client.name = name;
+    client.updatedAt = new Date();
+
+    await this.saveConfig();
+  }
+// ip is an array
+  async updateClientAllowedIPs({ clientId, allowedIPs }) {
+    const client = await this.getClient({ clientId });
+
+    client.allowedIPs = allowedIPs.toString();
     client.updatedAt = new Date();
 
     await this.saveConfig();
