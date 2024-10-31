@@ -26,6 +26,9 @@ const {
   WG_POST_DOWN,
   WG_ENABLE_EXPIRES_TIME,
   WG_ENABLE_ONE_TIME_LINKS,
+  WG_ASC_JC, WG_ASC_JMIN, WG_ASC_JMAX,
+  WG_ASC_S1, WG_ASC_S2,
+  WG_ASC_H1, WG_ASC_H2, WG_ASC_H3, WG_ASC_H4,
 } = require('../config');
 
 module.exports = class WireGuard {
@@ -110,6 +113,21 @@ PostUp = ${WG_POST_UP}
 PreDown = ${WG_PRE_DOWN}
 PostDown = ${WG_POST_DOWN}
 `;
+    // Has advanced security config
+    if (WG_ASC_JC) {
+      result += `
+# Advance security
+Jc = ${WG_ASC_JC}
+Jmin = ${WG_ASC_JMIN}
+Jmax = ${WG_ASC_JMAX}
+S1 = ${WG_ASC_S1}
+S2 = ${WG_ASC_S2}
+H1 = ${WG_ASC_H1}
+H2 = ${WG_ASC_H2}
+H3 = ${WG_ASC_H3}
+H4 = ${WG_ASC_H4}
+`;
+    }
 
     for (const [clientId, client] of Object.entries(config.clients)) {
       if (!client.enabled) continue;
@@ -211,13 +229,23 @@ ${client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
   async getClientConfiguration({ clientId }) {
     const config = await this.getConfig();
     const client = await this.getClient({ clientId });
-
+    const asc = WG_ASC_JC ? `
+Jc = ${WG_ASC_JC}
+Jmin = ${WG_ASC_JMIN}
+Jmax = ${WG_ASC_JMAX}
+S1 = ${WG_ASC_S1}
+S2 = ${WG_ASC_S2}
+H1 = ${WG_ASC_H1}
+H2 = ${WG_ASC_H2}
+H3 = ${WG_ASC_H3}
+H4 = ${WG_ASC_H4}` : '';
     return `
 [Interface]
 PrivateKey = ${client.privateKey ? `${client.privateKey}` : 'REPLACE_ME'}
 Address = ${client.address}/24
 ${WG_DEFAULT_DNS ? `DNS = ${WG_DEFAULT_DNS}\n` : ''}\
 ${WG_MTU ? `MTU = ${WG_MTU}\n` : ''}\
+${asc}
 
 [Peer]
 PublicKey = ${config.server.publicKey}

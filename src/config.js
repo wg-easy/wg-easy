@@ -37,6 +37,17 @@ iptables -D INPUT -p udp -m udp --dport ${module.exports.WG_PORT} -j ACCEPT;
 iptables -D FORWARD -i wg0 -j ACCEPT;
 iptables -D FORWARD -o wg0 -j ACCEPT;
 `.split('\n').join(' ');
+// Advanced security settings
+module.exports.WG_ASC_JC = process.env.WG_ASC_JC;
+module.exports.WG_ASC_JMIN = process.env.WG_ASC_JMIN
+module.exports.WG_ASC_JMAX = process.env.WG_ASC_JMAX
+module.exports.WG_ASC_S1 = process.env.WG_ASC_S1;
+module.exports.WG_ASC_S2 = process.env.WG_ASC_S2;
+module.exports.WG_ASC_H1 = process.env.WG_ASC_H1;
+module.exports.WG_ASC_H2 = process.env.WG_ASC_H2;
+module.exports.WG_ASC_H3 = process.env.WG_ASC_H3;
+module.exports.WG_ASC_H4 = process.env.WG_ASC_H4;
+
 module.exports.LANG = process.env.LANG || 'en';
 module.exports.UI_TRAFFIC_STATS = process.env.UI_TRAFFIC_STATS || 'false';
 module.exports.UI_CHART_TYPE = process.env.UI_CHART_TYPE || 0;
