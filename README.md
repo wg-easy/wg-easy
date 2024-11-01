@@ -139,6 +139,25 @@ These options can be configured by setting environment variables using `-e KEY="
 
 > If you change `WG_PORT`, make sure to also change the exposed port.
 
+### Advanced security settings ([AmneziaWG](https://docs.amnezia.org/documentation/amnezia-wg/) only)
+If defined `WG_ASC_JC` then advanced security settings will be enabled.
+All options are required.
+
+| Env           | Default | Example | Description                                                                                                            |
+|---------------|---------|---------|------------------------------------------------------------------------------------------------------------------------|
+| `WG_ASC_JC`   | -       | `4`     | If defined, ASC will be enabled. Recommended range is from 3 to 10 inclusive                                           |
+| `WG_ASC_JMIN` | -       | `50`    | Jmin < Jmax; recommended value is 50                                                                                   |
+| `WG_ASC_JMAX` | -       | `1000`  | Jmin < Jmax ≤ 1280; recommended value is 1000                                                                          |
+| `WG_ASC_S1`   | -       | `20`    | < 1280; recommended range is from 15 to 150 inclusive                                                                  |
+| `WG_ASC_S2`   | -       | `80`    | < 1280; recommended range is from 15 to 150 inclusive                                                                  |
+| `WG_ASC_H1`   | -       | `465374418` | Must be unique among each other H*; recommended range is from 5 to 2147483647 inclusive                                |
+| `WG_ASC_H2`   | -       | `87847148` | Must be unique among each other H*; recommended range is from 5 to 2147483647 inclusive
+| `WG_ASC_H3`   | -       | `1143494632`  | Must be unique among each other H*; recommended range is from 5 to 2147483647 inclusive                                                             |
+| `WG_ASC_H4`   | -       | `411102977`    | Must be unique among each other H*; recommended range is from 5 to 2147483647 inclusive              |
+
+> Works only with [AmneziaWG](https://github.com/amnezia-vpn/amneziawg-linux-kernel-module) and currently not compatible with Docker version.
+
+
 ## Updating
 
 To update to the latest version, simply run:
