@@ -113,7 +113,7 @@ These options can be configured by setting environment variables using `-e KEY="
 | - | - | - |------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `PORT` | `51821` | `6789` | TCP port for Web UI.                                                                                                                                 |
 | `WEBUI_HOST` | `0.0.0.0` | `localhost` | IP address web UI binds to.                                                                                                                          |
-| `PASSWORD_HASH` | - | `$2y$05$Ci...` | When set, requires a password when logging in to the Web UI. See [How to generate an bcrypt hash.md]("https://github.com/wg-easy/wg-easy/blob/master/How_to_generate_an_bcrypt_hash.md") for know how generate the hash. |
+| `PASSWORD_HASH` | - | `$2y$05$Ci...` | When set, requires a password when logging in to the Web UI. See [How to generate a bcrypt hash.md]("https://github.com/wg-easy/wg-easy/blob/master/How_to_generate_an_bcrypt_hash.md") for know how generate the hash. |
 | `WG_HOST` | - | `vpn.myserver.com` | The public hostname of your VPN server.                                                                                                              |
 | `WG_DEVICE` | `eth0` | `ens6f0` | Ethernet device the wireguard traffic should be forwarded through.                                                                                   |
 | `WG_PORT` | `51820` | `12345` | The public UDP port of your VPN server. WireGuard will listen on that (othwise default) inside the Docker container.                                 |
@@ -135,7 +135,7 @@ These options can be configured by setting environment variables using `-e KEY="
 | `MAX_AGE` | `0` | `1440` | The maximum age of Web UI sessions in minutes. `0` means that the session will exist until the browser is closed. |
 | `UI_ENABLE_SORT_CLIENTS` | `false` | `true`                         | Enable UI sort clients by name   |
 | `ENABLE_PROMETHEUS_METRICS` | `false` | `true`                       | Enable Prometheus metrics `http://0.0.0.0:51821/metrics` and `http://0.0.0.0:51821/metrics/json`|
-| `PROMETHEUS_METRICS_PASSWORD` | - | `$2y$05$Ci...` | If set, Basic Auth is required when requesting metrics. See [How to generate an bcrypt hash.md]("https://github.com/wg-easy/wg-easy/blob/master/How_to_generate_an_bcrypt_hash.md") for know how generate the hash. |
+| `PROMETHEUS_METRICS_PASSWORD` | - | `$2y$05$Ci...` | If set, Basic Auth is required when requesting metrics. See [How to generate a bcrypt hash.md]("https://github.com/wg-easy/wg-easy/blob/master/How_to_generate_an_bcrypt_hash.md") for know how generate the hash. |
 
 > If you change `WG_PORT`, make sure to also change the exposed port.
 
