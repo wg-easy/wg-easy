@@ -78,6 +78,7 @@ export default defineEventHandler(async (event) => {
       serverAllowedIPs: [],
       persistentKeepalive: 0,
       address6: address6,
+      mtu: 1420,
     });
   }
 

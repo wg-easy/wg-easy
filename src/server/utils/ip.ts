@@ -17,6 +17,9 @@ export function nextIPv6(
   return nextIP(6, system, clients);
 }
 
+// TODO: above functions should probably have a lock
+// TODO(general): what happens if multiple users create client at the same time?
+
 function nextIP(
   version: 4 | 6,
   system: DeepReadonly<Database['system']>,

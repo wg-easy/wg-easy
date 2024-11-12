@@ -9,7 +9,7 @@
           class="inline-flex h-8 w-8 select-none items-center justify-center overflow-hidden rounded-full align-middle mr-2"
         >
           <AvatarFallback
-            class="text-grass11 leading-1 flex h-full w-full items-center justify-center bg-white text-[15px] font-medium"
+            class="leading-1 flex h-full w-full items-center justify-center bg-white text-[15px] font-medium"
             :delay-ms="600"
           >
             {{ fallbackName }}

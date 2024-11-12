@@ -25,6 +25,7 @@ export type Client = {
   updatedAt: string;
   enabled: boolean;
   persistentKeepalive: number;
+  mtu: number;
 };
 
 export type NewClient = Omit<Client, 'createdAt' | 'updatedAt'>;

@@ -48,7 +48,7 @@ PostDown = ${system.iptables.PostDown}`;
 PrivateKey = ${client.privateKey}
 Address = ${client.address4}/${cidr4Block}, ${client.address6}/${cidr6Block}
 DNS = ${system.userConfig.defaultDns.join(', ')}
-MTU = ${system.userConfig.mtu}
+MTU = ${client.mtu}
 
 [Peer]
 PublicKey = ${system.interface.publicKey}

@@ -5,108 +5,57 @@
         <PanelHeadTitle :text="data.name" />
       </PanelHead>
       <PanelBody>
-        <section class="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <h4 class="text-2xl col-span-full py-6">
+        <FormGroup>
+          <FormHeading>
             {{ $t('me.sectionGeneral') }}
-          </h4>
-          <Label for="name" class="font-semibold md:align-middle md:leading-10">
-            {{ 'Name' }}
-          </Label>
-          <input
-            id="name"
-            v-model.trim="data.name"
-            type="text"
-            class="dark:bg-neutral-700 text-gray-500 dark:text-neutral-200 border-2 border-gray-100 dark:border-neutral-800 rounded-lg focus:border-red-800 dark:placeholder:text-neutral-400 focus:outline-0 focus:ring-0"
-          />
-          <Label
-            for="enabled"
-            class="font-semibold md:align-middle md:leading-10"
-          >
-            {{ 'Enabled' }}
-          </Label>
-          <input
+          </FormHeading>
+          <FormTextField id="name" v-model.trim="data.name" label="Name" />
+          <FormSwitchField
             id="enabled"
-            v-model.trim="data.enabled"
-            type="checkbox"
-            class="dark:bg-neutral-700 text-gray-500 dark:text-neutral-200 border-2 border-gray-100 dark:border-neutral-800 rounded-lg focus:border-red-800 dark:placeholder:text-neutral-400 focus:outline-0 focus:ring-0"
+            v-model="data.enabled"
+            label="Enabled"
           />
-        </section>
-        <section class="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <h4 class="text-2xl col-span-full py-6">
-            {{ 'Address' }}
-          </h4>
-          <Label for="ipv4" class="font-semibold md:align-middle md:leading-10">
-            {{ 'IPv4' }}
-          </Label>
-          <input
-            id="ipv4"
-            v-model.trim="data.address4"
-            type="text"
-            class="dark:bg-neutral-700 text-gray-500 dark:text-neutral-200 border-2 border-gray-100 dark:border-neutral-800 rounded-lg focus:border-red-800 dark:placeholder:text-neutral-400 focus:outline-0 focus:ring-0"
-          />
-          <Label for="ipv6" class="font-semibold md:align-middle md:leading-10">
-            {{ 'IPv6' }}
-          </Label>
-          <input
-            id="ipv6"
-            v-model.trim="data.address6"
-            type="text"
-            class="dark:bg-neutral-700 text-gray-500 dark:text-neutral-200 border-2 border-gray-100 dark:border-neutral-800 rounded-lg focus:border-red-800 dark:placeholder:text-neutral-400 focus:outline-0 focus:ring-0"
-          />
-        </section>
-        <section class="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <h4 class="text-2xl col-span-full py-6">
-            {{ 'Advanced' }}
-          </h4>
-          <Label
-            for="keepalive"
-            class="font-semibold md:align-middle md:leading-10"
-          >
-            {{ 'Persistent Keepalive' }}
-          </Label>
-          <input
+        </FormGroup>
+        <FormGroup>
+          <FormHeading>Address</FormHeading>
+          <FormTextField id="ipv4" v-model.trim="data.address4" label="IPv4" />
+          <FormTextField id="ipv6" v-model.trim="data.address6" label="IPv6" />
+        </FormGroup>
+        <FormGroup>
+          <FormHeading>Allowed IPs</FormHeading>
+          <FormArrayField v-model="data.allowedIPs" />
+        </FormGroup>
+        <FormGroup>
+          <FormHeading>Advanced</FormHeading>
+          <FormNumberField id="mtu" v-model="data.mtu" label="MTU" />
+          <FormNumberField
             id="keepalive"
-            v-model.number="data.persistentKeepalive"
-            type="number"
-            class="dark:bg-neutral-700 text-gray-500 dark:text-neutral-200 border-2 border-gray-100 dark:border-neutral-800 rounded-lg focus:border-red-800 dark:placeholder:text-neutral-400 focus:outline-0 focus:ring-0"
+            v-model="data.persistentKeepalive"
+            label="Persistent Keepalive"
           />
-        </section>
-        <section class="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <h4 class="text-2xl col-span-full py-6">
-            {{ 'Action' }}
-          </h4>
-          <Label
-            for="rotateprivkey"
-            class="font-semibold md:align-middle md:leading-10"
-          >
-            {{ 'Rotate Private Key' }}
-          </Label>
-          <input
-            id="rotateprivkey"
-            value="Do !"
-            type="button"
-            class="dark:bg-neutral-700 text-gray-500 dark:text-neutral-200 border-2 border-gray-100 dark:border-neutral-800 rounded-lg focus:border-red-800 dark:placeholder:text-neutral-400 focus:outline-0 focus:ring-0"
-          />
-          <Label
-            for="delete"
-            class="font-semibold md:align-middle md:leading-10"
-          >
-            {{ 'Delete' }}
-          </Label>
-          <input
-            id="delete"
-            value="Do !"
-            type="button"
-            class="dark:bg-neutral-700 text-gray-500 dark:text-neutral-200 border-2 border-gray-100 dark:border-neutral-800 rounded-lg focus:border-red-800 dark:placeholder:text-neutral-400 focus:outline-0 focus:ring-0"
-          />
-        </section>
+        </FormGroup>
+        <FormGroup>
+          <FormHeading>Actions</FormHeading>
+          <FormActionField label="Delete!" />
+          <FormActionField label="Revert!" @click="revert" />
+        </FormGroup>
       </PanelBody>
     </Panel>
   </main>
 </template>
 
 <script lang="ts" setup>
+const authStore = useAuthStore();
+authStore.update();
 const route = useRoute();
 const id = route.params.id as string;
-const { data } = await useFetch(`/api/client/${id}`, { method: 'get' });
+const { data: _data, refresh } = await useFetch(`/api/client/${id}`, {
+  method: 'get',
+});
+const data = toRef(_data.value);
+
+async function revert() {
+  await refresh();
+  data.value = toRef(_data.value).value;
+}
 </script>
