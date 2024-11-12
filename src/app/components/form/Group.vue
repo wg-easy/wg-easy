@@ -3,7 +3,7 @@
     <slot />
     <Separator
       decorative
-      class="w-full h-px bg-gray-100 dark:bg-neutral-600 col-span-2"
+      class="col-span-2 h-px w-full bg-gray-100 dark:bg-neutral-600"
     />
   </section>
 </template>

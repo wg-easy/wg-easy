@@ -12,7 +12,7 @@
         </div>
         <SwitchRoot
           :checked="feature.enabled"
-          class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-800"
+          class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-red-800 focus:ring-offset-2"
           :class="feature.enabled ? 'bg-red-800' : 'bg-gray-200'"
           @update:checked="toggleFeature(key)"
         >

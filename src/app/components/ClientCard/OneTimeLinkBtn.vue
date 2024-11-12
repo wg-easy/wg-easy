@@ -2,9 +2,9 @@
   <button
     v-if="globalStore.features.oneTimeLinks.enabled"
     :disabled="!client.downloadableConfig"
-    class="align-middle inline-block bg-gray-100 dark:bg-neutral-600 dark:text-neutral-300 p-2 rounded transition"
+    class="inline-block rounded bg-gray-100 p-2 align-middle transition dark:bg-neutral-600 dark:text-neutral-300"
     :class="{
-      'hover:bg-red-800 dark:hover:bg-red-800 hover:text-white dark:hover:text-white':
+      'hover:bg-red-800 hover:text-white dark:hover:bg-red-800 dark:hover:text-white':
         client.downloadableConfig,
       'is-disabled': !client.downloadableConfig,
     }"

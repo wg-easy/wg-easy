@@ -3,7 +3,7 @@
     v-for="n in totalSteps"
     :key="n"
     :class="[
-      'step grow h-[3px] mx-3',
+      'step mx-3 h-[3px] grow',
       step >= n ? 'bg-red-800 dark:bg-white' : 'bg-gray-500',
     ]"
   ></div>

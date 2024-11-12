@@ -1,7 +1,7 @@
 <template>
   <SelectRoot v-model="langProxy" :default-value="locale">
     <SelectTrigger
-      class="inline-flex min-w-[160px] items-center justify-between rounded px-[15px] text-[13px] dark:text-white leading-none h-[35px] gap-[5px] dark:bg-neutral-500"
+      class="inline-flex h-[35px] min-w-[160px] items-center justify-between gap-[5px] rounded px-[15px] text-[13px] leading-none dark:bg-neutral-500 dark:text-white"
       aria-label="Customise language"
     >
       <SelectValue :placeholder="$t('setup.chooseLang')" />
@@ -10,7 +10,7 @@
 
     <SelectPortal>
       <SelectContent
-        class="min-w-[160px] bg-white dark:bg-neutral-500 rounded"
+        class="min-w-[160px] rounded bg-white dark:bg-neutral-500"
         :side-offset="5"
       >
         <SelectViewport class="p-[5px]">
@@ -18,7 +18,7 @@
             v-for="(option, index) in langs"
             :key="index"
             :value="option.value"
-            class="text-[13px] leading-none text-grass11 hover:bg-red-800 dark:text-white hover:text-white rounded-[3px] flex items-center h-[25px] pr-[35px] pl-[25px] relative"
+            class="text-grass11 relative flex h-[25px] items-center rounded-[3px] pl-[25px] pr-[35px] text-[13px] leading-none hover:bg-red-800 hover:text-white dark:text-white"
           >
             <SelectItemText>
               {{ option.name }}

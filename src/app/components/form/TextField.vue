@@ -6,7 +6,7 @@
     :id="id"
     v-model="data"
     type="text"
-    class="dark:bg-neutral-700 text-gray-500 dark:text-neutral-200 border-2 border-gray-100 dark:border-neutral-800 rounded-lg focus:border-red-800 dark:placeholder:text-neutral-400 focus:outline-0 focus:ring-0"
+    class="rounded-lg border-2 border-gray-100 text-gray-500 focus:border-red-800 focus:outline-0 focus:ring-0 dark:border-neutral-800 dark:bg-neutral-700 dark:text-neutral-200 dark:placeholder:text-neutral-400"
   />
 </template>
 

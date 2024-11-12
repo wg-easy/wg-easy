@@ -1,9 +1,9 @@
 <template>
   <div>
-    <p class="text-lg p-8 text-center">
+    <p class="p-8 text-center text-lg">
       {{ $t('setup.messageSetupLanguage') }}
     </p>
-    <div class="flex justify-center mb-8">
+    <div class="mb-8 flex justify-center">
       <UiChooseLang @update:lang="handleEventUpdateLang" />
     </div>
     <div><BaseButton @click="updateLang">Continue</BaseButton></div>

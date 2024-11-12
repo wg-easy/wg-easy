@@ -1,9 +1,9 @@
 <template>
   <div
-    class="text-gray-700 dark:text-neutral-200 group text-sm md:text-base"
+    class="group text-sm text-gray-700 md:text-base dark:text-neutral-200"
     :title="$t('createdOn') + dateTime(new Date(client.createdAt))"
   >
-    <span class="border-t-2 border-b-2 border-transparent">
+    <span class="border-b-2 border-t-2 border-transparent">
       {{ client.name }}
     </span>
   </div>

@@ -1,13 +1,13 @@
 <template>
   <div
     v-if="globalStore.statistics.chartType"
-    :class="`absolute z-0 bottom-0 left-0 right-0 h-6 ${globalStore.statistics.chartType === 1 && 'line-chart'}`"
+    :class="`absolute bottom-0 left-0 right-0 z-0 h-6 ${globalStore.statistics.chartType === 1 && 'line-chart'}`"
   >
     <UiChart :options="chartOptionsTX" :series="client.transferTxSeries" />
   </div>
   <div
     v-if="globalStore.statistics.chartType"
-    :class="`absolute z-0 top-0 left-0 right-0 h-6 ${globalStore.statistics.chartType === 1 && 'line-chart'}`"
+    :class="`absolute left-0 right-0 top-0 z-0 h-6 ${globalStore.statistics.chartType === 1 && 'line-chart'}`"
   >
     <UiChart
       :options="chartOptionsRX"

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <p class="text-lg p-8 text-center">
+    <p class="p-8 text-center text-lg">
       {{ $t('setup.messageSetupHostPort') }}
     </p>
     <div>
@@ -9,7 +9,7 @@
         id="host"
         v-model="host"
         type="text"
-        class="px-3 py-2 text-sm dark:bg-neutral-700 text-gray-500 dark:text-gray-200 mb-5 border-2 border-gray-100 dark:border-neutral-800 rounded-lg w-full focus:border-red-800 dark:focus:border-red-800 dark:placeholder:text-neutral-400 focus:outline-0 focus:ring-0"
+        class="mb-5 w-full rounded-lg border-2 border-gray-100 px-3 py-2 text-sm text-gray-500 focus:border-red-800 focus:outline-0 focus:ring-0 dark:border-neutral-800 dark:bg-neutral-700 dark:text-gray-200 dark:placeholder:text-neutral-400 dark:focus:border-red-800"
         placeholder="vpn.example.com"
       />
     </div>
@@ -21,7 +21,7 @@
         type="number"
         :min="1"
         :max="65535"
-        class="px-3 py-2 text-sm dark:bg-neutral-700 text-gray-500 dark:text-gray-200 mb-5 border-2 border-gray-100 dark:border-neutral-800 rounded-lg w-full focus:border-red-800 dark:focus:border-red-800 dark:placeholder:text-neutral-400 focus:outline-0 focus:ring-0"
+        class="mb-5 w-full rounded-lg border-2 border-gray-100 px-3 py-2 text-sm text-gray-500 focus:border-red-800 focus:outline-0 focus:ring-0 dark:border-neutral-800 dark:bg-neutral-700 dark:text-gray-200 dark:placeholder:text-neutral-400 dark:focus:border-red-800"
       />
     </div>
     <BaseButton @click="updateHostPort">Continue</BaseButton>

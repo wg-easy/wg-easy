@@ -2,11 +2,11 @@
   <DropdownMenuRoot v-model:open="toggleState">
     <DropdownMenuTrigger>
       <button
-        class="flex items-center pe-1 font-medium text-sm text-gray-400 rounded-full hover:text-red-800 dark:hover:text-red-800 md:me-0 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:text-neutral-400"
+        class="flex items-center rounded-full pe-1 text-sm font-medium text-gray-400 hover:text-red-800 focus:ring-4 focus:ring-gray-100 md:me-0 dark:text-neutral-400 dark:hover:text-red-800 dark:focus:ring-gray-700"
         type="button"
       >
         <AvatarRoot
-          class="inline-flex h-8 w-8 select-none items-center justify-center overflow-hidden rounded-full align-middle mr-2"
+          class="mr-2 inline-flex h-8 w-8 select-none items-center justify-center overflow-hidden rounded-full align-middle"
         >
           <AvatarFallback
             class="leading-1 flex h-full w-full items-center justify-center bg-white text-[15px] font-medium"
@@ -22,7 +22,7 @@
     <DropdownMenuPortal>
       <DropdownMenuContent
         :side-offset="5"
-        class="z-10 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-neutral-700 dark:divide-neutral-800 text-gray-700 dark:text-gray-200"
+        class="z-10 w-44 divide-y divide-gray-100 rounded-lg bg-white text-gray-700 shadow dark:divide-neutral-800 dark:bg-neutral-700 dark:text-gray-200"
       >
         <DropdownMenuItem>
           <div class="truncate">{{ authStore.userData?.name }}</div>
@@ -54,7 +54,7 @@
         </DropdownMenuItem>
         <DropdownMenuItem>
           <button
-            class="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+            class="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600 dark:hover:text-white"
             @click.prevent="logout"
           >
             <IconsLogout class="h-5" />

@@ -5,7 +5,7 @@
       class="flex gap-1"
       :title="$t('totalDownload') + bytes(client.transferTx)"
     >
-      <IconsArrowDown class="align-middle h-3 inline mt-0.5" />
+      <IconsArrowDown class="mt-0.5 inline h-3 align-middle" />
       <div>
         <span class="text-gray-700 dark:text-neutral-200"
           >{{ bytes(client.transferTxCurrent) }}/s</span
@@ -24,7 +24,7 @@
       class="flex gap-1"
       :title="$t('totalUpload') + bytes(client.transferRx)"
     >
-      <IconsArrowUp class="align-middle h-3 inline mt-0.5" />
+      <IconsArrowUp class="mt-0.5 inline h-3 align-middle" />
       <div>
         <span class="text-gray-700 dark:text-neutral-200"
           >{{ bytes(client.transferRxCurrent) }}/s</span

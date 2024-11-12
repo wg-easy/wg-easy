@@ -7,7 +7,7 @@
     "
   >
     <IconsPlus class="w-4 md:mr-2" />
-    <span class="max-md:hidden text-sm">{{ $t('new') }}</span>
+    <span class="text-sm max-md:hidden">{{ $t('new') }}</span>
   </BaseButton>
 </template>
 

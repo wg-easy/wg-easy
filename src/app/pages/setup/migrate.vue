@@ -1,6 +1,6 @@
 <template>
   <div>
-    <p class="text-lg p-8 text-center">
+    <p class="p-8 text-center text-lg">
       {{ $t('setup.messageSetupMigration') }}
     </p>
     <div>

@@ -9,9 +9,9 @@ const { title, message, duration } = defineProps<{
 <template>
   <ToastRoot
     :duration="duration"
-    class="bg-red-800 rounded-md p-2 text-neutral-200"
+    class="rounded-md bg-red-800 p-2 text-neutral-200"
   >
-    <ToastTitle class="mb-4 font-medium text-lg">{{ title }} </ToastTitle>
+    <ToastTitle class="mb-4 text-lg font-medium">{{ title }} </ToastTitle>
     <ToastDescription as-child>{{ message }}</ToastDescription>
   </ToastRoot>
 </template>

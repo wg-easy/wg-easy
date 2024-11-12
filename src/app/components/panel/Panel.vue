@@ -1,6 +1,6 @@
 <template>
   <div
-    class="container mx-auto max-w-3xl px-3 md:px-0 shadow-md rounded-lg bg-white dark:bg-neutral-700 text-gray-700 dark:text-neutral-200 overflow-hidden"
+    class="container mx-auto max-w-3xl overflow-hidden rounded-lg bg-white px-3 text-gray-700 shadow-md md:px-0 dark:bg-neutral-700 dark:text-neutral-200"
   >
     <slot />
   </div>

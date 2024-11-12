@@ -1,10 +1,10 @@
 <template>
-  <div class="h-10 w-10 mt-2 self-start rounded-full bg-gray-50 relative">
-    <IconsAvatar class="w-6 m-2 text-gray-300" />
+  <div class="relative mt-2 h-10 w-10 self-start rounded-full bg-gray-50">
+    <IconsAvatar class="m-2 w-6 text-gray-300" />
     <img
       v-if="client.avatar"
       :src="client.avatar"
-      class="w-10 rounded-full absolute top-0 left-0"
+      class="absolute left-0 top-0 w-10 rounded-full"
     />
 
     <div
@@ -15,10 +15,10 @@
       "
     >
       <div
-        class="animate-ping w-4 h-4 p-1 bg-red-100 dark:bg-red-100 rounded-full absolute -bottom-1 -right-1"
+        class="absolute -bottom-1 -right-1 h-4 w-4 animate-ping rounded-full bg-red-100 p-1 dark:bg-red-100"
       />
       <div
-        class="w-2 h-2 bg-red-800 dark:bg-red-600 rounded-full absolute bottom-0 right-0"
+        class="absolute bottom-0 right-0 h-2 w-2 rounded-full bg-red-800 dark:bg-red-600"
       />
     </div>
   </div>

@@ -21,9 +21,9 @@
       />
       <div
         v-if="clientsStore.clients === null"
-        class="text-gray-200 dark:text-red-300 p-5"
+        class="p-5 text-gray-200 dark:text-red-300"
       >
-        <IconsLoading class="w-5 animate-spin mx-auto" />
+        <IconsLoading class="mx-auto w-5 animate-spin" />
       </div>
     </Panel>
 

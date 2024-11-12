@@ -1,7 +1,7 @@
 <template>
   <span
     v-if="client.latestHandshakeAt"
-    class="text-gray-400 dark:text-neutral-500 whitespace-nowrap"
+    class="whitespace-nowrap text-gray-400 dark:text-neutral-500"
     :title="$t('lastSeen') + dateTime(new Date(client.latestHandshakeAt))"
   >
     {{ !globalStore.statistics.enabled ? ' · ' : ''

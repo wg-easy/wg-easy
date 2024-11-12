@@ -1,16 +1,16 @@
 <template>
   <ClientCardCharts :client="client" />
   <div
-    class="relative py-3 md:py-5 px-3 z-10 flex flex-col sm:flex-row justify-between gap-3"
+    class="relative z-10 flex flex-col justify-between gap-3 px-3 py-3 sm:flex-row md:py-5"
   >
-    <div class="flex gap-3 md:gap-4 w-full items-center">
+    <div class="flex w-full items-center gap-3 md:gap-4">
       <ClientCardAvatar :client="client" />
       <!-- Name & Info -->
-      <div class="flex flex-col xxs:flex-row w-full gap-2">
-        <div class="flex flex-col flex-grow gap-1">
+      <div class="flex w-full flex-col gap-2 xxs:flex-row">
+        <div class="flex flex-grow flex-col gap-1">
           <ClientCardName :client="client" />
           <div
-            class="block md:inline-block pb-1 md:pb-0 text-gray-500 dark:text-neutral-400 text-xs"
+            class="block pb-1 text-xs text-gray-500 md:inline-block md:pb-0 dark:text-neutral-400"
           >
             <ClientCardAddress4 :client="client" />
             <ClientCardInlineTransfer
@@ -26,7 +26,7 @@
         <!-- Info -->
         <div
           v-if="globalStore.statistics.enabled"
-          class="flex gap-2 items-center shrink-0 text-gray-400 dark:text-neutral-400 text-xs mt-px justify-end"
+          class="mt-px flex shrink-0 items-center justify-end gap-2 text-xs text-gray-400 dark:text-neutral-400"
         >
           <ClientCardTransfer :client="client" />
         </div>
@@ -37,7 +37,7 @@
 
     <div class="flex items-center justify-end">
       <div
-        class="text-gray-400 dark:text-neutral-400 flex gap-1 items-center justify-between"
+        class="flex items-center justify-between gap-1 text-gray-400 dark:text-neutral-400"
       >
         <ClientCardSwitch :client="client" />
         <ClientCardEdit :client="client" />

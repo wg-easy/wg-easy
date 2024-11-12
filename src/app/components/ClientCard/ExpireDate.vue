@@ -1,7 +1,7 @@
 <template>
   <div
     v-show="globalStore.features.clientExpiration.enabled"
-    class="block md:inline-block pb-1 md:pb-0 text-gray-500 dark:text-neutral-400 text-xs"
+    class="block pb-1 text-xs text-gray-500 md:inline-block md:pb-0 dark:text-neutral-400"
   >
     <span class="inline-block">{{ expiredDateFormat(client.expiresAt) }}</span>
   </div>

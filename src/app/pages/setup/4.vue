@@ -1,6 +1,6 @@
 <template>
   <div>
-    <p class="text-lg p-8 text-center">
+    <p class="p-8 text-center text-lg">
       {{ $t('setup.messageSetupCreateAdminUser') }}
     </p>
     <form id="newAccount"></form>
@@ -12,7 +12,7 @@
         form="newAccount"
         type="text"
         autocomplete="username"
-        class="px-3 py-2 text-sm dark:bg-neutral-700 text-gray-500 dark:text-gray-200 mb-5 border-2 border-gray-100 dark:border-neutral-800 rounded-lg w-full focus:border-red-800 dark:focus:border-red-800 dark:placeholder:text-neutral-400 focus:outline-0 focus:ring-0"
+        class="mb-5 w-full rounded-lg border-2 border-gray-100 px-3 py-2 text-sm text-gray-500 focus:border-red-800 focus:outline-0 focus:ring-0 dark:border-neutral-800 dark:bg-neutral-700 dark:text-gray-200 dark:placeholder:text-neutral-400 dark:focus:border-red-800"
       />
     </div>
     <div>
@@ -23,7 +23,7 @@
         form="newAccount"
         type="password"
         autocomplete="new-password"
-        class="px-3 py-2 text-sm dark:bg-neutral-700 text-gray-500 dark:text-gray-200 mb-5 border-2 border-gray-100 dark:border-neutral-800 rounded-lg w-full focus:border-red-800 dark:focus:border-red-800 dark:placeholder:text-neutral-400 focus:outline-0 focus:ring-0"
+        class="mb-5 w-full rounded-lg border-2 border-gray-100 px-3 py-2 text-sm text-gray-500 focus:border-red-800 focus:outline-0 focus:ring-0 dark:border-neutral-800 dark:bg-neutral-700 dark:text-gray-200 dark:placeholder:text-neutral-400 dark:focus:border-red-800"
       />
     </div>
     <div>

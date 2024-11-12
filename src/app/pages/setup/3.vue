@@ -1,6 +1,6 @@
 <template>
   <div>
-    <p class="text-2xl pt-8 px-8 text-center">
+    <p class="px-8 pt-8 text-center text-2xl">
       {{ $t('setup.messageWelcome.whatIs') }}
     </p>
     <NuxtLink to="/setup/4"><BaseButton>Continue</BaseButton></NuxtLink>

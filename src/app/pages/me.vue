@@ -6,7 +6,7 @@
       </PanelHead>
       <PanelBody class="dark:text-neutral-200">
         <section class="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <h4 class="text-2xl col-span-full py-6">
+          <h4 class="col-span-full py-6 text-2xl">
             {{ $t('me.sectionGeneral') }}
           </h4>
           <Label
@@ -19,7 +19,7 @@
             id="username"
             v-model.trim="username"
             type="text"
-            class="dark:bg-neutral-700 text-gray-500 dark:text-neutral-200 border-2 border-gray-100 dark:border-neutral-800 rounded-lg focus:border-red-800 dark:placeholder:text-neutral-400 focus:outline-0 focus:ring-0"
+            class="rounded-lg border-2 border-gray-100 text-gray-500 focus:border-red-800 focus:outline-0 focus:ring-0 dark:border-neutral-800 dark:bg-neutral-700 dark:text-neutral-200 dark:placeholder:text-neutral-400"
           />
           <Label for="name" class="font-semibold md:align-middle md:leading-10">
             {{ $t('name') }}
@@ -28,7 +28,7 @@
             id="name"
             v-model.trim="name"
             type="text"
-            class="dark:bg-neutral-700 text-gray-500 dark:text-neutral-200 border-2 border-gray-100 dark:border-neutral-800 rounded-lg focus:border-red-800 dark:placeholder:text-neutral-400 focus:outline-0 focus:ring-0"
+            class="rounded-lg border-2 border-gray-100 text-gray-500 focus:border-red-800 focus:outline-0 focus:ring-0 dark:border-neutral-800 dark:bg-neutral-700 dark:text-neutral-200 dark:placeholder:text-neutral-400"
           />
           <Label
             for="email"
@@ -40,14 +40,14 @@
             id="email"
             v-model.trim="email"
             type="email"
-            class="dark:bg-neutral-700 text-gray-500 dark:text-neutral-200 border-2 border-gray-100 dark:border-neutral-800 rounded-lg focus:border-red-800 dark:placeholder:text-neutral-400 focus:outline-0 focus:ring-0"
+            class="rounded-lg border-2 border-gray-100 text-gray-500 focus:border-red-800 focus:outline-0 focus:ring-0 dark:border-neutral-800 dark:bg-neutral-700 dark:text-neutral-200 dark:placeholder:text-neutral-400"
           />
           <div class="col-span-full">
             <BaseButton @click="submit">{{ $t('save') }}</BaseButton>
           </div>
         </section>
         <section class="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <h4 class="text-2xl col-span-full py-6">
+          <h4 class="col-span-full py-6 text-2xl">
             {{ $t('me.sectionPassword') }}
           </h4>
           <Label
@@ -61,7 +61,7 @@
             v-model.trim="currentPassword"
             type="password"
             autocomplete="current-password"
-            class="dark:bg-neutral-700 text-gray-500 dark:text-neutral-200 border-2 border-gray-100 dark:border-neutral-800 rounded-lg focus:border-red-800 dark:placeholder:text-neutral-400 focus:outline-0 focus:ring-0"
+            class="rounded-lg border-2 border-gray-100 text-gray-500 focus:border-red-800 focus:outline-0 focus:ring-0 dark:border-neutral-800 dark:bg-neutral-700 dark:text-neutral-200 dark:placeholder:text-neutral-400"
           />
           <Label
             for="new-password"
@@ -74,7 +74,7 @@
             v-model.trim="newPassword"
             type="password"
             autocomplete="new-password"
-            class="dark:bg-neutral-700 text-gray-500 dark:text-neutral-200 border-2 border-gray-100 dark:border-neutral-800 rounded-lg focus:border-red-800 dark:placeholder:text-neutral-400 focus:outline-0 focus:ring-0"
+            class="rounded-lg border-2 border-gray-100 text-gray-500 focus:border-red-800 focus:outline-0 focus:ring-0 dark:border-neutral-800 dark:bg-neutral-700 dark:text-neutral-200 dark:placeholder:text-neutral-400"
           />
           <Label
             for="confirm-password"
@@ -87,7 +87,7 @@
             v-model.trim="confirmPassword"
             type="password"
             autocomplete="new-password"
-            class="dark:bg-neutral-700 text-gray-500 dark:text-neutral-200 border-2 border-gray-100 dark:border-neutral-800 rounded-lg focus:border-red-800 dark:placeholder:text-neutral-400 focus:outline-0 focus:ring-0"
+            class="rounded-lg border-2 border-gray-100 text-gray-500 focus:border-red-800 focus:outline-0 focus:ring-0 dark:border-neutral-800 dark:bg-neutral-700 dark:text-neutral-200 dark:placeholder:text-neutral-400"
           />
           <div class="col-span-full">
             <BaseButton @click="updatePassword">{{

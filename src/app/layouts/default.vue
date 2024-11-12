@@ -1,69 +1,69 @@
 <template>
   <div>
-    <header class="container mx-auto max-w-3xl px-3 md:px-0 mt-4 xs:mt-6">
+    <header class="container mx-auto mt-4 max-w-3xl px-3 xs:mt-6 md:px-0">
       <div
         :class="
           hasOwnLogo
             ? 'flex justify-end'
-            : 'flex flex-col-reverse xxs:flex-row flex-auto items-center gap-3'
+            : 'flex flex-auto flex-col-reverse items-center gap-3 xxs:flex-row'
         "
       >
-        <NuxtLink to="/" class="flex-grow self-start mb-4">
+        <NuxtLink to="/" class="mb-4 flex-grow self-start">
           <h1
             v-if="!hasOwnLogo"
-            class="text-4xl dark:text-neutral-200 font-medium"
+            class="text-4xl font-medium dark:text-neutral-200"
           >
             <img
               src="/logo.png"
               width="32"
-              class="inline align-middle dark:bg mr-2"
+              class="dark:bg mr-2 inline align-middle"
             /><span class="align-middle">WireGuard</span>
           </h1>
         </NuxtLink>
-        <div class="flex items-center grow-0 gap-3 self-end xxs:self-center">
+        <div class="flex grow-0 items-center gap-3 self-end xxs:self-center">
           <!-- Dark / light theme -->
           <button
-            class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 dark:bg-neutral-700 dark:hover:bg-neutral-600 transition"
+            class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 transition hover:bg-gray-300 dark:bg-neutral-700 dark:hover:bg-neutral-600"
             :title="$t(`theme.${theme.preference}`)"
             @click="toggleTheme"
           >
-            <IconsSun v-if="theme.preference === 'light'" class="w-5 h-5" />
+            <IconsSun v-if="theme.preference === 'light'" class="h-5 w-5" />
             <IconsMoon
               v-else-if="theme.preference === 'dark'"
-              class="w-5 h-5 text-neutral-400"
+              class="h-5 w-5 text-neutral-400"
             />
             <IconsHalfMoon
               v-else
-              class="w-5 h-5 fill-gray-600 dark:fill-neutral-400"
+              class="h-5 w-5 fill-gray-600 dark:fill-neutral-400"
             />
           </button>
           <!-- Show / hide charts -->
           <label
             v-if="globalStore.statistics.chartType > 0"
-            class="inline-flex items-center justify-center cursor-pointer w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 dark:bg-neutral-700 dark:hover:bg-neutral-600 whitespace-nowrap transition group"
+            class="group inline-flex h-8 w-8 cursor-pointer items-center justify-center whitespace-nowrap rounded-full bg-gray-200 transition hover:bg-gray-300 dark:bg-neutral-700 dark:hover:bg-neutral-600"
             :title="$t('toggleCharts')"
           >
             <input
               v-model="uiShowCharts"
               type="checkbox"
               value=""
-              class="sr-only peer"
+              class="peer sr-only"
               @change="toggleCharts"
             />
             <IconsChart
-              class="w-5 h-5 peer fill-gray-400 peer-checked:fill-gray-600 dark:fill-neutral-600 peer-checked:dark:fill-neutral-400 group-hover:dark:fill-neutral-500 transition"
+              class="peer h-5 w-5 fill-gray-400 transition peer-checked:fill-gray-600 dark:fill-neutral-600 group-hover:dark:fill-neutral-500 peer-checked:dark:fill-neutral-400"
             />
           </label>
           <UiUserMenu v-if="loggedIn" />
         </div>
       </div>
-      <div class="text-sm text-gray-400 dark:text-neutral-400 mb-5" />
+      <div class="mb-5 text-sm text-gray-400 dark:text-neutral-400" />
       <div
         v-if="globalStore.updateAvailable && globalStore.latestRelease"
-        class="bg-red-800 dark:bg-red-100 p-4 text-white dark:text-red-600 text-sm font-small mb-10 rounded-md shadow-lg"
+        class="font-small mb-10 rounded-md bg-red-800 p-4 text-sm text-white shadow-lg dark:bg-red-100 dark:text-red-600"
         :title="`v${globalStore.currentRelease} → v${globalStore.latestRelease.version}`"
       >
-        <div class="container mx-auto flex flex-row flex-auto items-center">
+        <div class="container mx-auto flex flex-auto flex-row items-center">
           <div class="flex-grow">
             <p class="font-bold">{{ $t('updateAvailable') }}</p>
             <p>{{ globalStore.latestRelease.changelog }}</p>
@@ -72,7 +72,7 @@
           <a
             :href="`https://github.com/wg-easy/wg-easy/releases/tag/${globalStore.latestRelease.version}`"
             target="_blank"
-            class="p-3 rounded-md bg-white dark:bg-red-100 float-right font-sm font-semibold text-red-800 dark:text-red-600 flex-shrink-0 border-2 border-red-800 dark:border-red-600 hover:border-white dark:hover:border-red-600 hover:text-white dark:hover:text-red-100 hover:bg-red-800 dark:hover:bg-red-600 transition-all"
+            class="font-sm float-right flex-shrink-0 rounded-md border-2 border-red-800 bg-white p-3 font-semibold text-red-800 transition-all hover:border-white hover:bg-red-800 hover:text-white dark:border-red-600 dark:bg-red-100 dark:text-red-600 dark:hover:border-red-600 dark:hover:bg-red-600 dark:hover:text-red-100"
           >
             {{ $t('update') }} →
           </a>
@@ -81,7 +81,7 @@
     </header>
     <slot />
     <footer>
-      <p class="text-center m-10 text-gray-300 dark:text-neutral-600 text-xs">
+      <p class="m-10 text-center text-xs text-gray-300 dark:text-neutral-600">
         <a
           class="hover:underline"
           target="_blank"

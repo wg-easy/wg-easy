@@ -6,7 +6,7 @@
     :title="$t('totalDownload') + bytes(client.transferTx)"
   >
     ·
-    <IconsArrowDown class="align-middle h-3 inline" />
+    <IconsArrowDown class="inline h-3 align-middle" />
     {{ bytes(client.transferTxCurrent) }}/s
   </span>
 
@@ -17,7 +17,7 @@
     :title="$t('totalUpload') + bytes(client.transferRx)"
   >
     ·
-    <IconsArrowUp class="align-middle h-3 inline" />
+    <IconsArrowUp class="inline h-3 align-middle" />
     {{ bytes(client.transferRxCurrent) }}/s
   </span>
 </template>

@@ -1,5 +1,5 @@
 <template>
-  <div class="flex md:block flex-shrink-0 space-x-1">
+  <div class="flex flex-shrink-0 space-x-1 md:block">
     <slot />
   </div>
 </template>

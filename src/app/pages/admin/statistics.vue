@@ -11,7 +11,7 @@
       </div>
       <SwitchRoot
         v-model:checked="enabled"
-        class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-800"
+        class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-red-800 focus:ring-offset-2"
         :class="enabled ? 'bg-red-800' : 'bg-gray-200'"
       >
         <SwitchThumb
@@ -31,7 +31,7 @@
       </div>
       <SelectRoot v-model="chartType">
         <SelectTrigger
-          class="inline-flex min-w-[160px] items-center justify-between rounded px-[15px] text-[13px] leading-none h-[35px] gap-[5px] bg-white text-grass11 shadow-[0_2px_10px] shadow-black/10 hover:bg-mauve3 focus:shadow-[0_0_0_2px] focus:shadow-black data-[placeholder]:text-green9 outline-none"
+          class="text-grass11 hover:bg-mauve3 data-[placeholder]:text-green9 inline-flex h-[35px] min-w-[160px] items-center justify-between gap-[5px] rounded bg-white px-[15px] text-[13px] leading-none shadow-[0_2px_10px] shadow-black/10 outline-none focus:shadow-[0_0_0_2px] focus:shadow-black"
           aria-label="Customize options"
         >
           <SelectValue placeholder="Select a fruit..." />
@@ -40,11 +40,11 @@
 
         <SelectPortal>
           <SelectContent
-            class="min-w-[160px] bg-white rounded shadow-[0px_10px_38px_-10px_rgba(22,_23,_24,_0.35),_0px_10px_20px_-15px_rgba(22,_23,_24,_0.2)] will-change-[opacity,transform] data-[side=top]:animate-slideDownAndFade data-[side=right]:animate-slideLeftAndFade data-[side=bottom]:animate-slideUpAndFade data-[side=left]:animate-slideRightAndFade z-[100]"
+            class="data-[side=top]:animate-slideDownAndFade data-[side=right]:animate-slideLeftAndFade data-[side=bottom]:animate-slideUpAndFade data-[side=left]:animate-slideRightAndFade z-[100] min-w-[160px] rounded bg-white shadow-[0px_10px_38px_-10px_rgba(22,_23,_24,_0.35),_0px_10px_20px_-15px_rgba(22,_23,_24,_0.2)] will-change-[opacity,transform]"
             :side-offset="5"
           >
             <SelectScrollUpButton
-              class="flex items-center justify-center h-[25px] bg-white text-violet11 cursor-default"
+              class="text-violet11 flex h-[25px] cursor-default items-center justify-center bg-white"
             >
               <IconsArrowUp />
             </SelectScrollUpButton>
@@ -52,7 +52,7 @@
               <SelectItem
                 v-for="(option, index) in options"
                 :key="index"
-                class="text-[13px] leading-none text-grass11 rounded-[3px] flex items-center h-[25px] pr-[35px] pl-[25px] relative select-none data-[disabled]:text-mauve8 data-[disabled]:pointer-events-none data-[highlighted]:outline-none data-[highlighted]:bg-green9 data-[highlighted]:text-green1"
+                class="text-grass11 data-[disabled]:text-mauve8 data-[highlighted]:bg-green9 data-[highlighted]:text-green1 relative flex h-[25px] select-none items-center rounded-[3px] pl-[25px] pr-[35px] text-[13px] leading-none data-[disabled]:pointer-events-none data-[highlighted]:outline-none"
                 :value="option"
               >
                 <SelectItemText>
@@ -61,7 +61,7 @@
               </SelectItem>
             </SelectViewport>
             <SelectScrollDownButton
-              class="flex items-center justify-center h-[25px] bg-white text-violet11 cursor-default"
+              class="text-violet11 flex h-[25px] cursor-default items-center justify-center bg-white"
             >
               <IconsArrowDown />
             </SelectScrollDownButton>

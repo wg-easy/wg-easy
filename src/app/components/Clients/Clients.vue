@@ -2,7 +2,7 @@
   <div
     v-for="client in clientsStore.clients"
     :key="client.id"
-    class="relative overflow-hidden border-b last:border-b-0 border-gray-100 dark:border-neutral-600 border-solid"
+    class="relative overflow-hidden border-b border-solid border-gray-100 last:border-b-0 dark:border-neutral-600"
   >
     <ClientCard :client="client" />
   </div>

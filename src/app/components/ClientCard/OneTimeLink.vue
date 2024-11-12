@@ -4,7 +4,7 @@
       globalStore.features.oneTimeLinks.enabled && client.oneTimeLink !== null
     "
     :ref="'client-' + client.id + '-link'"
-    class="text-gray-400 text-xs"
+    class="text-xs text-gray-400"
   >
     <a :href="'./cnf/' + client.oneTimeLink + ''">{{ path }}</a>
   </div>
