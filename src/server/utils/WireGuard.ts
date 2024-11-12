@@ -149,7 +149,7 @@ class WireGuard {
       oneTimeLink: null,
       expiresAt: null,
       enabled: true,
-      allowedIPs: system.userConfig.allowedIps,
+      allowedIPs: [...system.userConfig.allowedIps],
       serverAllowedIPs: null,
       persistentKeepalive: system.userConfig.persistentKeepalive,
     };

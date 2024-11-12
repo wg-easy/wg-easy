@@ -28,6 +28,7 @@ import {
   type Statistics,
 } from './repositories/system';
 import { SetupRepository, type Steps } from './repositories/setup';
+import type { DeepReadonly } from 'vue';
 
 const DEBUG = debug('LowDB');
 
@@ -55,12 +56,21 @@ export class LowDBSetup extends SetupRepository {
   }
 }
 
+/**
+ * deep copies object and
+ * makes readonly on type level
+ */
+function makeReadonly<T>(a: T): DeepReadonly<T> {
+  return structuredClone(a) as DeepReadonly<T>;
+}
+
 class LowDBSystem extends SystemRepository {
   #db: Low<Database>;
   constructor(db: Low<Database>) {
     super();
     this.#db = db;
   }
+
   async get() {
     DEBUG('Get System');
     const system = this.#db.data.system;
@@ -68,7 +78,7 @@ class LowDBSystem extends SystemRepository {
     if (system === null) {
       throw new DatabaseError(DatabaseError.ERROR_INIT);
     }
-    return system;
+    return makeReadonly(system);
   }
 
   async updateFeatures(features: Record<string, Feature>) {
@@ -118,14 +128,14 @@ class LowDBUser extends UserRepository {
     super();
     this.#db = db;
   }
-  // TODO: return copy to avoid mutation (everywhere)
+
   async findAll() {
-    return this.#db.data.users;
+    return makeReadonly(this.#db.data.users);
   }
 
   async findById(id: string) {
     DEBUG('Get User');
-    return this.#db.data.users.find((user) => user.id === id);
+    return makeReadonly(this.#db.data.users.find((user) => user.id === id));
   }
 
   async create(username: string, password: string) {
@@ -188,12 +198,12 @@ class LowDBClient extends ClientRepository {
   }
   async findAll() {
     DEBUG('GET Clients');
-    return this.#db.data.clients;
+    return makeReadonly(this.#db.data.clients);
   }
 
   async findById(id: string) {
     DEBUG('Get Client');
-    return this.#db.data.clients[id];
+    return makeReadonly(this.#db.data.clients[id]);
   }
 
   async create(client: NewClient) {

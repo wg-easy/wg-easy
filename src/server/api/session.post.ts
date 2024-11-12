@@ -1,5 +1,3 @@
-import type { SessionConfig } from 'h3';
-
 export default defineEventHandler(async (event) => {
   const { username, password, remember } = await readValidatedBody(
     event,
@@ -25,7 +23,7 @@ export default defineEventHandler(async (event) => {
 
   const system = await Database.system.get();
 
-  const conf: SessionConfig = system.sessionConfig;
+  const conf = { ...system.sessionConfig };
 
   if (remember) {
     conf.cookie = {
@@ -34,9 +32,7 @@ export default defineEventHandler(async (event) => {
     };
   }
 
-  const session = await useSession<WGSession>(event, {
-    ...system.sessionConfig,
-  });
+  const session = await useSession<WGSession>(event, conf);
 
   const data = await session.update({
     userId: user.id,

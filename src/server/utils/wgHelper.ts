@@ -1,9 +1,10 @@
 import { parseCidr } from 'cidr-tools';
+import type { DeepReadonly } from 'vue';
 import type { Client } from '~~/services/database/repositories/client';
 import type { System } from '~~/services/database/repositories/system';
 
 export const wg = {
-  generateServerPeer: (client: Client) => {
+  generateServerPeer: (client: DeepReadonly<Client>) => {
     const allowedIps = [
       `${client.address4}/32`,
       `${client.address6}/128`,
@@ -17,7 +18,7 @@ PresharedKey = ${client.preSharedKey}
 AllowedIPs = ${allowedIps.join(', ')}`;
   },
 
-  generateServerInterface: (system: System) => {
+  generateServerInterface: (system: DeepReadonly<System>) => {
     const cidr4Block = parseCidr(system.userConfig.address4Range).prefix;
     const cidr6Block = parseCidr(system.userConfig.address6Range).prefix;
 
@@ -36,7 +37,10 @@ PreDown = ${system.iptables.PreDown}
 PostDown = ${system.iptables.PostDown}`;
   },
 
-  generateClientConfig: (system: System, client: Client) => {
+  generateClientConfig: (
+    system: DeepReadonly<System>,
+    client: DeepReadonly<Client>
+  ) => {
     const cidr4Block = parseCidr(system.userConfig.address4Range).prefix;
     const cidr6Block = parseCidr(system.userConfig.address6Range).prefix;
 

@@ -52,6 +52,8 @@ export default defineEventHandler(async (event) => {
       },
       userConfig: {
         ...system.userConfig,
+        defaultDns: [...system.userConfig.defaultDns],
+        allowedIps: [...system.userConfig.allowedIps],
         address4Range:
           stringifyIp({ number: oldCidr.start, version: 4 }) + '/24',
       },
@@ -72,7 +74,7 @@ export default defineEventHandler(async (event) => {
       publicKey: oldClient.publicKey,
       expiresAt: null,
       oneTimeLink: null,
-      allowedIPs: db.system.userConfig.allowedIps,
+      allowedIPs: [...db.system.userConfig.allowedIps],
       serverAllowedIPs: [],
       persistentKeepalive: 0,
       address6: address6,

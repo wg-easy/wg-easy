@@ -23,9 +23,6 @@ export const DEFAULT_DATABASE: Database = {
 /**
  * Abstract class for database operations.
  * Provides methods to connect, disconnect, and interact with system and user data.
- *
- * **Note :** Always throw `DatabaseError` to ensure proper API error handling.
- *
  */
 export abstract class DatabaseProvider {
   /**

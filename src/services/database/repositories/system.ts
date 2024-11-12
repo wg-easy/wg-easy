@@ -1,4 +1,5 @@
 import type { SessionConfig } from 'h3';
+import type { DeepReadonly } from 'vue';
 import type { LOCALES } from '~~/i18n.config';
 
 export type Lang = (typeof LOCALES)[number]['value'];
@@ -73,9 +74,6 @@ export const AvailableFeatures: (keyof Features)[] = [
   'sortClients',
 ] as const;
 
-/**
- * Representing the WireGuard network configuration data structure of a computer interface system.
- */
 export type System = {
   general: General;
 
@@ -100,10 +98,7 @@ export type System = {
  * and specific system properties, such as the language setting, from the database.
  */
 export abstract class SystemRepository {
-  /**
-   * Retrieves the system configuration data from the database.
-   */
-  abstract get(): Promise<System>;
+  abstract get(): Promise<DeepReadonly<System>>;
 
   abstract updateFeatures(features: Record<string, Feature>): Promise<void>;
   abstract updateStatistics(statistics: Statistics): Promise<void>;

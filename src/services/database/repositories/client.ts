@@ -1,3 +1,5 @@
+import type { DeepReadonly } from 'vue';
+
 export type OneTimeLink = {
   oneTimeLink: string;
   /** ISO String */
@@ -32,8 +34,9 @@ export type NewClient = Omit<Client, 'createdAt' | 'updatedAt'>;
  * This interface provides methods for managing client data.
  */
 export abstract class ClientRepository {
-  abstract findAll(): Promise<Record<string, Client>>;
-  abstract findById(id: string): Promise<Client | undefined>;
+  abstract findAll(): Promise<DeepReadonly<Record<string, Client>>>;
+  abstract findById(id: string): Promise<DeepReadonly<Client | undefined>>;
+
   abstract create(client: NewClient): Promise<void>;
   abstract delete(id: string): Promise<void>;
   abstract toggle(id: string, enable: boolean): Promise<void>;
