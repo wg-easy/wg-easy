@@ -69,6 +69,7 @@ export const useSetupStore = defineStore('Setup', () => {
     runMigration,
     error,
     handleError,
+    step,
     totalSteps,
     setStep,
   };
