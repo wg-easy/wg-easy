@@ -92,14 +92,14 @@
         <a
           class="hover:underline"
           target="_blank"
-          href="https://emilenijssen.nl/?ref=wg-easy"
+          href="https://emile.nl/?ref=wg-easy"
           >Emile Nijssen</a
         >
         is licensed under
         <a
           class="hover:underline"
           target="_blank"
-          href="http://creativecommons.org/licenses/by-nc-sa/4.0/"
+          href="https://spdx.org/licenses/AGPL-3.0-or-later.html"
           >AGPL-3.0-or-later</a
         >
         ·
