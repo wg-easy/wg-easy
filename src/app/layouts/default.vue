@@ -100,7 +100,7 @@
           class="hover:underline"
           target="_blank"
           href="http://creativecommons.org/licenses/by-nc-sa/4.0/"
-          >CC BY-NC-SA 4.0</a
+          >AGPL-3.0-or-later</a
         >
         ·
         <a
