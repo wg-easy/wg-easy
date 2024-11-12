@@ -114,42 +114,6 @@ class API {
       body: { file },
     });
   }
-
-  async updateLang({ lang }: { lang: string }) {
-    return $fetch('/api/lang', {
-      method: 'post',
-      body: { lang },
-    });
-  }
-
-  async setupAdminUser({
-    username,
-    password,
-    accept,
-  }: {
-    username: string;
-    password: string;
-    accept: boolean;
-  }) {
-    return $fetch('/api/setup/account', {
-      method: 'post',
-      body: { username, password, accept },
-    });
-  }
-
-  async setupHostPort({ host, port }: { host: string; port: number }) {
-    return $fetch('/api/setup/hostport', {
-      method: 'post',
-      body: { host, port },
-    });
-  }
-
-  async setupMigration({ file }: { file: string }) {
-    return $fetch('/api/setup/migration', {
-      method: 'post',
-      body: { file },
-    });
-  }
 }
 
 type WGClientReturn = Awaited<

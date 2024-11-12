@@ -4,7 +4,6 @@ import { z } from 'zod';
 import type { Database } from '~~/services/database/repositories/database';
 
 export default defineEventHandler(async (event) => {
-  const { file } = await readValidatedBody(event, validateZod(fileType, event));
   const setupDone = await Database.setup.done();
   if (setupDone) {
     throw createError({
@@ -13,6 +12,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
+  const { file } = await readValidatedBody(event, validateZod(fileType, event));
   const schema = z.object({
     server: z.object({
       privateKey: z.string(),

@@ -1,27 +1,6 @@
 import { defineStore } from 'pinia';
 
 export const useGlobalStore = defineStore('Global', () => {
-  const uiShowCharts = ref(getItem('uiShowCharts') === '1');
-  const currentRelease = ref<null | string>(null);
-  const latestRelease = ref<null | { version: string; changelog: string }>(
-    null
-  );
-  const updateAvailable = ref(false);
-  const features = ref({
-    sortClients: {
-      enabled: false,
-    },
-    clientExpiration: {
-      enabled: false,
-    },
-    oneTimeLinks: {
-      enabled: false,
-    },
-  });
-  const statistics = ref({
-    enabled: false,
-    chartType: 0,
-  });
   const sortClient = ref(true); // Sort clients by name, true = asc, false = desc
 
   const { availableLocales, locale } = useI18n();
@@ -39,6 +18,12 @@ export const useGlobalStore = defineStore('Global', () => {
     }
   }
 
+  const currentRelease = ref<null | string>(null);
+  const latestRelease = ref<null | { version: string; changelog: string }>(
+    null
+  );
+  const updateAvailable = ref(false);
+
   async function fetchRelease() {
     const { data: release } = await useFetch('/api/release', {
       method: 'get',
@@ -53,6 +38,18 @@ export const useGlobalStore = defineStore('Global', () => {
     updateAvailable.value = release.value.updateAvailable;
   }
 
+  const features = ref({
+    sortClients: {
+      enabled: false,
+    },
+    clientExpiration: {
+      enabled: false,
+    },
+    oneTimeLinks: {
+      enabled: false,
+    },
+  });
+
   async function fetchFeatures() {
     const { data: apiFeatures } = await useFetch('/api/features', {
       method: 'get',
@@ -61,6 +58,11 @@ export const useGlobalStore = defineStore('Global', () => {
       features.value = apiFeatures.value;
     }
   }
+
+  const statistics = ref({
+    enabled: false,
+    chartType: 0,
+  });
 
   async function fetchStatistics() {
     const { data: apiStatistics } = await useFetch('/api/statistics', {
@@ -71,6 +73,8 @@ export const useGlobalStore = defineStore('Global', () => {
     }
   }
 
+  const uiShowCharts = ref(getItem('uiShowCharts') === '1');
+
   const updateCharts = computed(() => {
     return statistics.value.chartType > 0 && uiShowCharts.value;
   });
@@ -78,24 +82,27 @@ export const useGlobalStore = defineStore('Global', () => {
   /**
    * @throws if unsuccessful
    */
-  async function updateLang(language: string) {
-    const response = await api.updateLang({ lang: language });
+  async function updateLang(lang: string) {
+    const response = await $fetch('/api/admin/lang', {
+      method: 'post',
+      body: { lang },
+    });
     return response.success;
   }
 
   return {
-    uiShowCharts,
-    updateCharts,
     sortClient,
-    features,
+    setLanguage,
     currentRelease,
     latestRelease,
     updateAvailable,
-    statistics,
     fetchRelease,
+    features,
     fetchFeatures,
-    setLanguage,
+    statistics,
     fetchStatistics,
+    uiShowCharts,
+    updateCharts,
     updateLang,
   };
 });

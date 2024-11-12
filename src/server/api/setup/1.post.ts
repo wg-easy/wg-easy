@@ -1,8 +1,4 @@
 export default defineEventHandler(async (event) => {
-  const { host, port } = await readValidatedBody(
-    event,
-    validateZod(hostPortType, event)
-  );
   const setupDone = await Database.setup.done();
   if (setupDone) {
     throw createError({
@@ -10,7 +6,9 @@ export default defineEventHandler(async (event) => {
       statusMessage: 'Invalid state',
     });
   }
-  await Database.system.updateClientsHostPort(host, port);
-  await Database.setup.set('success');
+
+  const { lang } = await readValidatedBody(event, validateZod(langType));
+  await Database.system.updateLang(lang);
+  await Database.setup.set(2);
   return { success: true };
 });

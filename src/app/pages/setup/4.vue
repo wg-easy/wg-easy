@@ -65,7 +65,7 @@ async function newAccount() {
       return;
     }
 
-    await setupStore.signup(username.value, password.value, accept.value);
+    await setupStore.step4(username.value, password.value, accept.value);
     await router.push('/setup/5');
   } catch (error) {
     if (error instanceof FetchError) {

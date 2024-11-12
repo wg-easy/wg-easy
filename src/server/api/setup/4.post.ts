@@ -1,8 +1,4 @@
 export default defineEventHandler(async (event) => {
-  const { username, password } = await readValidatedBody(
-    event,
-    validateZod(passwordSetupType, event)
-  );
   const setupDone = await Database.setup.done();
   if (setupDone) {
     throw createError({
@@ -10,6 +6,11 @@ export default defineEventHandler(async (event) => {
       statusMessage: 'Invalid state',
     });
   }
+
+  const { username, password } = await readValidatedBody(
+    event,
+    validateZod(passwordSetupType, event)
+  );
   await Database.user.create(username, password);
   await Database.setup.set(5);
   return { success: true };

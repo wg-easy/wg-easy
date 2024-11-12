@@ -53,7 +53,7 @@ async function updateHostPort() {
   }
 
   try {
-    await setupStore.updateHostPort(host.value, port.value);
+    await setupStore.step5(host.value, port.value);
     await router.push('/setup/success');
   } catch (error) {
     if (error instanceof FetchError) {

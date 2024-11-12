@@ -25,11 +25,10 @@ function handleEventUpdateLang(value: string) {
 
 const setupStore = useSetupStore();
 setupStore.setStep(1);
-const globalStore = useGlobalStore();
 const router = useRouter();
 async function updateLang() {
   try {
-    await globalStore.updateLang(locale.value);
+    await setupStore.step1(locale.value);
     router.push('/setup/2');
   } catch (error) {
     if (error instanceof FetchError) {
