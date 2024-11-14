@@ -31,8 +31,7 @@
 </template>
 
 <script setup lang="ts">
-import { LOCALES } from '~/../i18n.config';
-const { locale } = useI18n();
+const { locale, locales } = useI18n();
 const emit = defineEmits(['update:lang']);
 
 const langProxy = ref(locale);
@@ -41,5 +40,5 @@ watch(langProxy, (newVal) => {
   emit('update:lang', newVal);
 });
 
-const langs = LOCALES.sort((a, b) => a.value.localeCompare(b.value));
+const langs = locales.value.sort((a, b) => a.value.localeCompare(b.value));
 </script>

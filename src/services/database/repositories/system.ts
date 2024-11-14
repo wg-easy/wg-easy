@@ -1,8 +1,8 @@
 import type { SessionConfig } from 'h3';
 import type { DeepReadonly } from 'vue';
-import type { LOCALES } from '~~/i18n.config';
+import type { LOCALES } from '#shared/locales';
 
-export type Lang = (typeof LOCALES)[number]['value'];
+export type Lang = (typeof LOCALES)[number]['code'];
 
 export type IpTables = {
   PreUp: string;
