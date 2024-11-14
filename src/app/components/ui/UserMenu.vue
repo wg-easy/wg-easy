@@ -5,16 +5,9 @@
         class="flex items-center rounded-full pe-1 text-sm font-medium text-gray-400 hover:text-red-800 focus:ring-4 focus:ring-gray-100 md:me-0 dark:text-neutral-400 dark:hover:text-red-800 dark:focus:ring-gray-700"
         type="button"
       >
-        <AvatarRoot
-          class="mr-2 inline-flex h-8 w-8 select-none items-center justify-center overflow-hidden rounded-full align-middle"
-        >
-          <AvatarFallback
-            class="leading-1 flex h-full w-full items-center justify-center bg-white text-[15px] font-medium"
-            :delay-ms="600"
-          >
-            {{ fallbackName }}
-          </AvatarFallback>
-        </AvatarRoot>
+        <BaseAvatar class="h-8 w-8">
+          {{ fallbackName }}
+        </BaseAvatar>
         {{ authStore.userData?.name }}
       </button>
     </DropdownMenuTrigger>

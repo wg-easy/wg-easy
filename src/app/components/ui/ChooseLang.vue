@@ -17,7 +17,7 @@
           <SelectItem
             v-for="(option, index) in langs"
             :key="index"
-            :value="option.value"
+            :value="option.code"
             class="text-grass11 relative flex h-[25px] items-center rounded-[3px] pl-[25px] pr-[35px] text-[13px] leading-none hover:bg-red-800 hover:text-white dark:text-white"
           >
             <SelectItemText>
@@ -31,7 +31,9 @@
 </template>
 
 <script setup lang="ts">
-const { locale, locales } = useI18n();
+import { LOCALES } from '#shared/locales';
+
+const { locale } = useI18n();
 const emit = defineEmits(['update:lang']);
 
 const langProxy = ref(locale);
@@ -40,5 +42,5 @@ watch(langProxy, (newVal) => {
   emit('update:lang', newVal);
 });
 
-const langs = locales.value.sort((a, b) => a.value.localeCompare(b.value));
+const langs = LOCALES.sort((a, b) => a.code.localeCompare(b.code));
 </script>

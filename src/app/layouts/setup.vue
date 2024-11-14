@@ -18,14 +18,12 @@
       </PanelBody>
     </Panel>
 
-    <ErrorToast
-      v-if="setupStore.error"
-      :title="setupStore.error.title"
-      :message="setupStore.error.message"
-    />
+    <BaseToast ref="toast" />
   </main>
 </template>
 
 <script lang="ts" setup>
 const setupStore = useSetupStore();
+const savedRef = useTemplateRef('toast');
+setupStore.setErrorRef(savedRef);
 </script>

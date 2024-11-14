@@ -19,13 +19,10 @@ import it from './locales/it.json';
 import th from './locales/th.json';
 import hi from './locales/hi.json';
 
-import { LOCALES } from '~~/shared/locales';
-
 export default defineI18nConfig(() => ({
   fallbackLocale: 'en',
   legacy: false,
   locale: 'en',
-  locales: LOCALES,
   messages: {
     en,
     ua,

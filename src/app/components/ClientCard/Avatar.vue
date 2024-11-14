@@ -1,11 +1,8 @@
 <template>
   <div class="relative mt-2 h-10 w-10 self-start rounded-full bg-gray-50">
-    <IconsAvatar class="m-2 w-6 text-gray-300" />
-    <img
-      v-if="client.avatar"
-      :src="client.avatar"
-      class="absolute left-0 top-0 w-10 rounded-full"
-    />
+    <BaseAvatar :img="client.avatar" class="h-10 w-10">
+      <IconsAvatar class="h-6 w-6 text-gray-300" />
+    </BaseAvatar>
 
     <div
       v-if="
@@ -25,7 +22,9 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{
+const props = defineProps<{
   client: LocalClient;
 }>();
+
+console.log(props.client.avatar);
 </script>

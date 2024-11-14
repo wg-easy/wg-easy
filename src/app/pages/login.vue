@@ -75,12 +75,7 @@
       />
     </form>
 
-    <ErrorToast
-      v-if="setupError"
-      :title="setupError.title"
-      :message="setupError.message"
-      :duration="12000"
-    />
+    <BaseToast ref="toast" />
   </main>
 </template>
 
@@ -94,22 +89,7 @@ const remember = ref(false);
 const username = ref<null | string>(null);
 const password = ref<null | string>(null);
 const authStore = useAuthStore();
-
-type SetupError = {
-  title: string;
-  message: string;
-};
-
-const setupError = ref<null | SetupError>(null);
-
-// TODO: check if needed
-watch(setupError, (value) => {
-  if (value) {
-    setTimeout(() => {
-      setupError.value = null;
-    }, 13000);
-  }
-});
+const toast = useTemplateRef('toast');
 
 async function login(e: Event) {
   e.preventDefault();
@@ -128,10 +108,10 @@ async function login(e: Event) {
     }
   } catch (error) {
     if (error instanceof FetchError) {
-      setupError.value = {
+      toast.value?.publish({
         title: t('error.login'),
         message: error.data.message,
-      };
+      });
     }
   }
   authenticating.value = false;
