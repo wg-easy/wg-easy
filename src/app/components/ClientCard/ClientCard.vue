@@ -5,7 +5,6 @@
   >
     <div class="flex w-full items-center gap-3 md:gap-4">
       <ClientCardAvatar :client="client" />
-      <!-- Name & Info -->
       <div class="flex w-full flex-col gap-2 xxs:flex-row">
         <div class="flex flex-grow flex-col gap-1">
           <ClientCardName :client="client" />
@@ -19,15 +18,12 @@
           <ClientCardExpireDate :client="client" />
         </div>
 
-        <!-- Info -->
         <div
           class="mt-px flex shrink-0 items-center justify-end gap-2 text-xs text-gray-400 dark:text-neutral-400"
         >
           <ClientCardTransfer :client="client" />
         </div>
       </div>
-      <!-- </div> -->
-      <!-- <div class="flex flex-grow items-center"> -->
     </div>
 
     <div class="flex items-center justify-end">

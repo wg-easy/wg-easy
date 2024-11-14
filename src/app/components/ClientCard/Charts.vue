@@ -2,12 +2,12 @@
   <div
     :class="`absolute bottom-0 left-0 right-0 z-0 h-6 ${globalStore.uiChartType === 'line' && 'line-chart'}`"
   >
-    <UiChart :options="chartOptionsTX" :series="client.transferTxSeries" />
+    <BaseChart :options="chartOptionsTX" :series="client.transferTxSeries" />
   </div>
   <div
     :class="`absolute left-0 right-0 top-0 z-0 h-6 ${globalStore.uiChartType === 'line' && 'line-chart'}`"
   >
-    <UiChart
+    <BaseChart
       :options="chartOptionsRX"
       :series="client.transferRxSeries"
       style="transform: scaleY(-1)"

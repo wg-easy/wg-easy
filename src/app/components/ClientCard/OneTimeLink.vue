@@ -1,9 +1,5 @@
 <template>
-  <div
-    v-if="client.oneTimeLink !== null"
-    :ref="'client-' + client.id + '-link'"
-    class="text-xs text-gray-400"
-  >
+  <div v-if="client.oneTimeLink !== null" class="text-xs text-gray-400">
     <a :href="'./cnf/' + client.oneTimeLink.oneTimeLink">{{ path }}</a>
   </div>
 </template>

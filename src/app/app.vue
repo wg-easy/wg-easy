@@ -11,7 +11,6 @@
 
 <script setup lang="ts">
 const globalStore = useGlobalStore();
-globalStore.fetchRelease();
 globalStore.setLanguage();
 useHead({
   bodyAttrs: {

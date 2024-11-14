@@ -39,6 +39,11 @@ export const useGlobalStore = defineStore('Global', () => {
   }
 
   const uiShowCharts = ref(getItem('uiShowCharts') === '1');
+
+  function toggleCharts() {
+    setItem('uiShowCharts', uiShowCharts.value ? '1' : '0');
+  }
+
   const uiChartType = ref(getItem('uiChartType') ?? 'area');
 
   /**
@@ -60,6 +65,7 @@ export const useGlobalStore = defineStore('Global', () => {
     updateAvailable,
     fetchRelease,
     uiShowCharts,
+    toggleCharts,
     uiChartType,
     updateLang,
   };
