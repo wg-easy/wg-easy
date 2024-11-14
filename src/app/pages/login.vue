@@ -102,6 +102,7 @@ type SetupError = {
 
 const setupError = ref<null | SetupError>(null);
 
+// TODO: check if needed
 watch(setupError, (value) => {
   if (value) {
     setTimeout(() => {

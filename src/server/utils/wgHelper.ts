@@ -3,6 +3,8 @@ import type { DeepReadonly } from 'vue';
 import type { Client } from '~~/services/database/repositories/client';
 import type { System } from '~~/services/database/repositories/system';
 
+// TODO: replace wg0 with parameter (to allow multi interface design)
+
 export const wg = {
   generateServerPeer: (client: DeepReadonly<Client>) => {
     const allowedIps = [

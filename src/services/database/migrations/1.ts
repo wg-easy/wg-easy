@@ -39,7 +39,6 @@ export async function run1(db: Low<Database>) {
         address6Range: address6Range,
         defaultDns: ['1.1.1.1', '2606:4700:4700::1111'],
         allowedIps: ['0.0.0.0/0', '::/0'],
-        // TODO: host has to be configured when onboarding
         host: '',
         port: 51820,
       },

@@ -10,11 +10,17 @@ import { isIPv4 } from 'is-ip';
 const DEBUG = debug('WireGuard');
 
 class WireGuard {
+  /**
+   * Save and sync config
+   */
   async saveConfig() {
     await this.#saveWireguardConfig();
     await this.#syncWireguardConfig();
   }
 
+  /**
+   * Generates and saves WireGuard config from database as wg0
+   */
   async #saveWireguardConfig() {
     const system = await Database.system.get();
     const clients = await Database.client.findAll();
@@ -300,6 +306,8 @@ class WireGuard {
     DEBUG('Cron Job started successfully.');
   }
 
+  // TODO: handle as worker_thread
+  // would need a better database aswell
   async startCronJob() {
     await this.cronJob().catch((err) => {
       DEBUG('Running Cron Job failed.');
@@ -343,6 +351,7 @@ class WireGuard {
         }
       }
     }
+    await this.saveConfig();
   }
 
   async getMetrics() {
