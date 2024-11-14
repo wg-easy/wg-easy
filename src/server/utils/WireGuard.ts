@@ -325,32 +325,29 @@ class WireGuard {
 
   async cronJob() {
     const clients = await Database.client.findAll();
-    const system = await Database.system.get();
     // Expires Feature
-    if (system.features.clientExpiration.enabled) {
-      for (const client of Object.values(clients)) {
-        if (client.enabled !== true) continue;
-        if (
-          client.expiresAt !== null &&
-          new Date() > new Date(client.expiresAt)
-        ) {
-          DEBUG(`Client ${client.id} expired.`);
-          await Database.client.toggle(client.id, false);
-        }
+    for (const client of Object.values(clients)) {
+      if (client.enabled !== true) continue;
+      if (
+        client.expiresAt !== null &&
+        new Date() > new Date(client.expiresAt)
+      ) {
+        DEBUG(`Client ${client.id} expired.`);
+        await Database.client.toggle(client.id, false);
       }
     }
+
     // One Time Link Feature
-    if (system.features.oneTimeLinks.enabled) {
-      for (const client of Object.values(clients)) {
-        if (
-          client.oneTimeLink !== null &&
-          new Date() > new Date(client.oneTimeLink.expiresAt)
-        ) {
-          DEBUG(`Client ${client.id} One Time Link expired.`);
-          await Database.client.deleteOneTimeLink(client.id);
-        }
+    for (const client of Object.values(clients)) {
+      if (
+        client.oneTimeLink !== null &&
+        new Date() > new Date(client.oneTimeLink.expiresAt)
+      ) {
+        DEBUG(`Client ${client.id} One Time Link expired.`);
+        await Database.client.deleteOneTimeLink(client.id);
       }
     }
+
     await this.saveConfig();
   }
 

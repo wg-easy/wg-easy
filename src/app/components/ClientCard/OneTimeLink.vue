@@ -1,8 +1,6 @@
 <template>
   <div
-    v-if="
-      globalStore.features.oneTimeLinks.enabled && client.oneTimeLink !== null
-    "
+    v-if="client.oneTimeLink !== null"
     :ref="'client-' + client.id + '-link'"
     class="text-xs text-gray-400"
   >
@@ -12,8 +10,6 @@
 
 <script setup lang="ts">
 const props = defineProps<{ client: LocalClient }>();
-
-const globalStore = useGlobalStore();
 
 const path = computed(() => {
   if (import.meta.client) {

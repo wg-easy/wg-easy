@@ -9,8 +9,7 @@ export default defineEventHandler(async (event) => {
     url.pathname.startsWith('/api/setup/') ||
     url.pathname === '/api/session' ||
     url.pathname === '/api/lang' ||
-    url.pathname === '/api/release' ||
-    url.pathname === '/api/features'
+    url.pathname === '/api/release'
   ) {
     return;
   }

@@ -41,7 +41,9 @@ authStore.update();
 const route = useRoute();
 
 const menuItems = [
-  { id: 'features', name: 'Features' },
+  { id: '', name: 'General' },
+  { id: 'defaults', name: 'Defaults' },
+  { id: 'interface', name: 'Interface' },
   { id: 'statistics', name: 'Statistics' },
   { id: 'metrics', name: 'Metrics' },
 ];

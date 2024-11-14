@@ -11,7 +11,6 @@
 
 <script setup lang="ts">
 const globalStore = useGlobalStore();
-globalStore.fetchFeatures();
 globalStore.fetchRelease();
 globalStore.setLanguage();
 globalStore.fetchStatistics();

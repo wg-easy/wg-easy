@@ -1,6 +1,5 @@
 <template>
   <button
-    v-if="globalStore.features.oneTimeLinks.enabled"
     :disabled="!client.downloadableConfig"
     class="inline-block rounded bg-gray-100 p-2 align-middle transition dark:bg-neutral-600 dark:text-neutral-300"
     :class="{

@@ -1,10 +1,9 @@
 <template>
   <div>
-    This is the Admin Panel. Your are running wg-easy
-    {{ globalStore.currentRelease }}
+    <FormGroup>
+      <FormNumberField id="session" label="Session Timeout" />
+    </FormGroup>
   </div>
 </template>
 
-<script setup lang="ts">
-const globalStore = useGlobalStore();
-</script>
+<script setup lang="ts"></script>

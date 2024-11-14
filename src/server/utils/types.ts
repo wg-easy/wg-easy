@@ -55,17 +55,6 @@ const oneTimeLink = z
   .min(1, 'zod.otlMin') // i18n key
   .pipe(safeStringRefine);
 
-const features = z.record(
-  z.string({ message: 'zod.features' }), // i18n key
-  z.object(
-    {
-      enabled: z.boolean({ message: 'zod.ftBool' }), // i18n key
-    },
-    { message: 'zod.ftObj' } // i18n key
-  ),
-  { message: 'zod.ftObj2' } // i18n key
-);
-
 const statistics = z.object(
   {
     enabled: z.boolean({ message: 'zod.statBool' }), // i18n key
@@ -176,13 +165,6 @@ export const passwordSetupType = z.object(
     username: username,
     password: password,
     accept: accept,
-  },
-  { message: objectMessage }
-);
-
-export const featuresType = z.object(
-  {
-    features: features,
   },
   { message: objectMessage }
 );

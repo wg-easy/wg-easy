@@ -26,6 +26,11 @@
           <FormArrayField v-model="data.allowedIPs" />
         </FormGroup>
         <FormGroup>
+          <FormHeading>Server Allowed IPs</FormHeading>
+          <FormArrayField v-model="data.serverAllowedIPs" />
+        </FormGroup>
+        <FormGroup></FormGroup>
+        <FormGroup>
           <FormHeading>Advanced</FormHeading>
           <FormNumberField id="mtu" v-model="data.mtu" label="MTU" />
           <FormNumberField

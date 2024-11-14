@@ -1,6 +1,5 @@
 <template>
   <button
-    v-if="globalStore.features.sortClients.enabled"
     class="inline-flex items-center border-2 border-gray-100 px-4 py-2 text-gray-700 transition hover:border-red-800 hover:bg-red-800 hover:text-white max-md:border-x-0 md:rounded dark:border-neutral-600 dark:text-neutral-200"
     @click="globalStore.sortClient = !globalStore.sortClient"
   >

@@ -38,27 +38,6 @@ export const useGlobalStore = defineStore('Global', () => {
     updateAvailable.value = release.value.updateAvailable;
   }
 
-  const features = ref({
-    sortClients: {
-      enabled: false,
-    },
-    clientExpiration: {
-      enabled: false,
-    },
-    oneTimeLinks: {
-      enabled: false,
-    },
-  });
-
-  async function fetchFeatures() {
-    const { data: apiFeatures } = await useFetch('/api/features', {
-      method: 'get',
-    });
-    if (apiFeatures.value) {
-      features.value = apiFeatures.value;
-    }
-  }
-
   const statistics = ref({
     enabled: false,
     chartType: 0,
@@ -97,8 +76,6 @@ export const useGlobalStore = defineStore('Global', () => {
     latestRelease,
     updateAvailable,
     fetchRelease,
-    features,
-    fetchFeatures,
     statistics,
     fetchStatistics,
     uiShowCharts,

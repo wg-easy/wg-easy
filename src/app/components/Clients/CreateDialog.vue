@@ -71,10 +71,7 @@
                   />
                 </p>
               </div>
-              <div
-                v-show="globalStore.features.clientExpiration.enabled"
-                class="mt-2"
-              >
+              <div class="mt-2">
                 <p class="text-sm text-gray-500">
                   <label
                     class="mb-2 block text-sm font-bold text-gray-900 dark:text-neutral-200"
@@ -130,5 +127,4 @@
 
 <script setup lang="ts">
 const modalStore = useModalStore();
-const globalStore = useGlobalStore();
 </script>

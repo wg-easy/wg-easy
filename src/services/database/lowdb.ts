@@ -19,11 +19,8 @@ import {
   type OneTimeLink,
 } from './repositories/client';
 import {
-  AvailableFeatures,
   ChartType,
   SystemRepository,
-  type Feature,
-  type Features,
   type Lang,
   type Statistics,
 } from './repositories/system';
@@ -79,18 +76,6 @@ class LowDBSystem extends SystemRepository {
       throw new DatabaseError(DatabaseError.ERROR_INIT);
     }
     return makeReadonly(system);
-  }
-
-  async updateFeatures(features: Record<string, Feature>) {
-    DEBUG('Update Features');
-    this.#db.update((v) => {
-      for (const key in features) {
-        if (AvailableFeatures.includes(key as keyof Features)) {
-          v.system.features[key as keyof Features].enabled =
-            features[key]!.enabled;
-        }
-      }
-    });
   }
 
   async updateStatistics(statistics: Statistics) {

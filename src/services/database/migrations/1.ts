@@ -49,21 +49,6 @@ export async function run1(db: Low<Database>) {
         PreDown: '',
         PostDown: '',
       },
-      features: {
-        clientExpiration: {
-          enabled: false,
-        },
-        oneTimeLinks: {
-          enabled: false,
-        },
-        sortClients: {
-          enabled: false,
-        },
-      },
-      statistics: {
-        enabled: false,
-        chartType: ChartType.None,
-      },
       metrics: {
         prometheus: {
           enabled: false,

@@ -49,10 +49,6 @@ export type Prometheus = {
   password: string | null;
 };
 
-export type Feature = {
-  enabled: boolean;
-};
-
 export type Metrics = {
   prometheus: Prometheus;
 };
@@ -62,18 +58,6 @@ export type General = {
   lang: Lang;
 };
 
-export type Features = {
-  clientExpiration: Feature;
-  oneTimeLinks: Feature;
-  sortClients: Feature;
-};
-
-export const AvailableFeatures: (keyof Features)[] = [
-  'clientExpiration',
-  'oneTimeLinks',
-  'sortClients',
-] as const;
-
 export type System = {
   general: General;
 
@@ -82,8 +66,6 @@ export type System = {
   userConfig: WGConfig;
 
   iptables: IpTables;
-
-  features: Features;
 
   statistics: Statistics;
 
@@ -100,7 +82,6 @@ export type System = {
 export abstract class SystemRepository {
   abstract get(): Promise<DeepReadonly<System>>;
 
-  abstract updateFeatures(features: Record<string, Feature>): Promise<void>;
   abstract updateStatistics(statistics: Statistics): Promise<void>;
   abstract updateLang(lang: Lang): Promise<void>;
   abstract updateClientsHostPort(host: string, port: number): Promise<void>;
