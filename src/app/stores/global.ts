@@ -38,25 +38,8 @@ export const useGlobalStore = defineStore('Global', () => {
     updateAvailable.value = release.value.updateAvailable;
   }
 
-  const statistics = ref({
-    enabled: false,
-    chartType: 0,
-  });
-
-  async function fetchStatistics() {
-    const { data: apiStatistics } = await useFetch('/api/statistics', {
-      method: 'get',
-    });
-    if (apiStatistics.value) {
-      statistics.value = apiStatistics.value;
-    }
-  }
-
   const uiShowCharts = ref(getItem('uiShowCharts') === '1');
-
-  const updateCharts = computed(() => {
-    return statistics.value.chartType > 0 && uiShowCharts.value;
-  });
+  const uiChartType = ref(getItem('uiChartType') ?? 'area');
 
   /**
    * @throws if unsuccessful
@@ -76,10 +59,8 @@ export const useGlobalStore = defineStore('Global', () => {
     latestRelease,
     updateAvailable,
     fetchRelease,
-    statistics,
-    fetchStatistics,
     uiShowCharts,
-    updateCharts,
+    uiChartType,
     updateLang,
   };
 });

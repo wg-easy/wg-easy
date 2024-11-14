@@ -4,7 +4,7 @@
     :ref="'client-' + client.id + '-link'"
     class="text-xs text-gray-400"
   >
-    <a :href="'./cnf/' + client.oneTimeLink + ''">{{ path }}</a>
+    <a :href="'./cnf/' + client.oneTimeLink.oneTimeLink">{{ path }}</a>
   </div>
 </template>
 
@@ -13,8 +13,9 @@ const props = defineProps<{ client: LocalClient }>();
 
 const path = computed(() => {
   if (import.meta.client) {
-    return `${document.location.protocol}//${document.location.host}/cnf/${props.client.oneTimeLink}`;
+    // TODO: show how long its still valid
+    return `${document.location.protocol}//${document.location.host}/cnf/${props.client.oneTimeLink?.oneTimeLink}`;
   }
-  return '';
+  return 'Loading...';
 });
 </script>

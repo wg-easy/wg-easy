@@ -44,7 +44,6 @@ const menuItems = [
   { id: '', name: 'General' },
   { id: 'defaults', name: 'Defaults' },
   { id: 'interface', name: 'Interface' },
-  { id: 'statistics', name: 'Statistics' },
   { id: 'metrics', name: 'Metrics' },
 ];
 

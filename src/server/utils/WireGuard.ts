@@ -61,7 +61,6 @@ class WireGuard {
       expiresAt: client.expiresAt,
       allowedIPs: client.allowedIPs,
       oneTimeLink: client.oneTimeLink,
-      downloadableConfig: 'privateKey' in client,
       persistentKeepalive: null as string | null,
       latestHandshakeAt: null as Date | null,
       endpoint: null as string | null,

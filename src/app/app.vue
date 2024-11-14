@@ -13,7 +13,6 @@
 const globalStore = useGlobalStore();
 globalStore.fetchRelease();
 globalStore.setLanguage();
-globalStore.fetchStatistics();
 useHead({
   bodyAttrs: {
     class: 'bg-gray-50 dark:bg-neutral-800',

@@ -18,12 +18,7 @@ import {
   type NewClient,
   type OneTimeLink,
 } from './repositories/client';
-import {
-  ChartType,
-  SystemRepository,
-  type Lang,
-  type Statistics,
-} from './repositories/system';
+import { SystemRepository, type Lang } from './repositories/system';
 import { SetupRepository, type Steps } from './repositories/setup';
 import type { DeepReadonly } from 'vue';
 
@@ -76,19 +71,6 @@ class LowDBSystem extends SystemRepository {
       throw new DatabaseError(DatabaseError.ERROR_INIT);
     }
     return makeReadonly(system);
-  }
-
-  async updateStatistics(statistics: Statistics) {
-    DEBUG('Update Statistics');
-    this.#db.update((v) => {
-      v.system.statistics.enabled = statistics.enabled;
-      if (
-        statistics.chartType >= ChartType.None &&
-        statistics.chartType <= ChartType.Bar
-      ) {
-        v.system.statistics.chartType = statistics.chartType;
-      }
-    });
   }
 
   async updateLang(lang: Lang): Promise<void> {

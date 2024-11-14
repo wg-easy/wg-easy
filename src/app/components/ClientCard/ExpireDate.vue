@@ -9,7 +9,6 @@
 <script setup lang="ts">
 defineProps<{ client: LocalClient }>();
 
-const globalStore = useGlobalStore();
 const { t, locale } = useI18n();
 
 function expiredDateFormat(value: string | null) {

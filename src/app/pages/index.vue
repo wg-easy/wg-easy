@@ -10,7 +10,7 @@
       </PanelHead>
 
       <div>
-        <Clients
+        <ClientsList
           v-if="clientsStore.clients && clientsStore.clients.length > 0"
         />
       </div>
@@ -48,7 +48,7 @@ onMounted(() => {
   intervalId.value = setInterval(() => {
     clientsStore
       .refresh({
-        updateCharts: globalStore.updateCharts,
+        updateCharts: globalStore.uiShowCharts,
       })
       .catch(console.error);
   }, 1000);

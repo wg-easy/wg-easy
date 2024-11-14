@@ -12,11 +12,7 @@
           <div
             class="block pb-1 text-xs text-gray-500 md:inline-block md:pb-0 dark:text-neutral-400"
           >
-            <ClientCardAddress4 :client="client" />
-            <ClientCardInlineTransfer
-              v-if="!globalStore.statistics.enabled"
-              :client="client"
-            />
+            <ClientCardAddress :client="client" />
             <ClientCardLastSeen :client="client" />
           </div>
           <ClientCardOneTimeLink :client="client" />
@@ -25,7 +21,6 @@
 
         <!-- Info -->
         <div
-          v-if="globalStore.statistics.enabled"
           class="mt-px flex shrink-0 items-center justify-end gap-2 text-xs text-gray-400 dark:text-neutral-400"
         >
           <ClientCardTransfer :client="client" />
@@ -53,6 +48,4 @@
 defineProps<{
   client: LocalClient;
 }>();
-
-const globalStore = useGlobalStore();
 </script>

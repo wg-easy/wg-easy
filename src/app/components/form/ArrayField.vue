@@ -14,7 +14,7 @@
 </template>
 
 <script lang="ts" setup>
-const data = defineModel<string[]>();
+const data = defineModel<string[] | null>();
 
 function update(i: number) {
   return (v: string) => {

@@ -1,5 +1,4 @@
 import type { Config } from 'tailwindcss';
-import type { PluginAPI } from 'tailwindcss/types/config';
 import tailwindForms from '@tailwindcss/forms';
 
 export default {
@@ -16,16 +15,5 @@ export default {
       '2xl': '1536px',
     },
   },
-  plugins: [
-    function addDisabledClass({ addUtilities }: PluginAPI) {
-      const newUtilities = {
-        '.is-disabled': {
-          opacity: '0.25',
-          cursor: 'default',
-        },
-      };
-      addUtilities(newUtilities);
-    },
-    tailwindForms,
-  ],
+  plugins: [tailwindForms],
 } satisfies Config;

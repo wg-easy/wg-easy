@@ -39,11 +39,6 @@ export enum ChartType {
   Bar = 3,
 }
 
-export type Statistics = {
-  enabled: boolean;
-  chartType: ChartType;
-};
-
 export type Prometheus = {
   enabled: boolean;
   password: string | null;
@@ -67,8 +62,6 @@ export type System = {
 
   iptables: IpTables;
 
-  statistics: Statistics;
-
   metrics: Metrics;
 
   sessionConfig: SessionConfig;
@@ -82,7 +75,6 @@ export type System = {
 export abstract class SystemRepository {
   abstract get(): Promise<DeepReadonly<System>>;
 
-  abstract updateStatistics(statistics: Statistics): Promise<void>;
   abstract updateLang(lang: Lang): Promise<void>;
   abstract updateClientsHostPort(host: string, port: number): Promise<void>;
 }

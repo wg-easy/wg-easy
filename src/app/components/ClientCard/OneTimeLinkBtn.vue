@@ -1,18 +1,8 @@
 <template>
   <button
-    :disabled="!client.downloadableConfig"
-    class="inline-block rounded bg-gray-100 p-2 align-middle transition dark:bg-neutral-600 dark:text-neutral-300"
-    :class="{
-      'hover:bg-red-800 hover:text-white dark:hover:bg-red-800 dark:hover:text-white':
-        client.downloadableConfig,
-      'is-disabled': !client.downloadableConfig,
-    }"
-    :title="!client.downloadableConfig ? $t('noPrivKey') : $t('OneTimeLink')"
-    @click="
-      if (client.downloadableConfig) {
-        showOneTimeLink(client);
-      }
-    "
+    class="inline-block rounded bg-gray-100 p-2 align-middle transition hover:bg-red-800 hover:text-white dark:bg-neutral-600 dark:text-neutral-300 dark:hover:bg-red-800 dark:hover:text-white"
+    :title="$t('OneTimeLink')"
+    @click="showOneTimeLink(client)"
   >
     <svg
       class="w-5"
@@ -35,7 +25,6 @@
 defineProps<{ client: LocalClient }>();
 
 const clientsStore = useClientsStore();
-const globalStore = useGlobalStore();
 
 function showOneTimeLink(client: LocalClient) {
   api

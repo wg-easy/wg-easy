@@ -1,6 +1,5 @@
 import type { Low } from 'lowdb';
 import type { Database } from '../repositories/database';
-import { ChartType } from '../repositories/system';
 import { parseCidr } from 'cidr-tools';
 import { stringifyIp } from 'ip-bigint';
 

@@ -1,7 +1,7 @@
 <template>
   <button
     class="inline-flex items-center border-2 border-gray-100 px-4 py-2 text-gray-700 transition hover:border-red-800 hover:bg-red-800 hover:text-white max-md:border-x-0 md:rounded dark:border-neutral-600 dark:text-neutral-200"
-    @click="globalStore.sortClient = !globalStore.sortClient"
+    @click="toggleSort"
   >
     <svg
       v-if="globalStore.sortClient === true"
@@ -47,4 +47,10 @@
 
 <script setup lang="ts">
 const globalStore = useGlobalStore();
+const clientsStore = useClientsStore();
+
+function toggleSort() {
+  globalStore.sortClient = !globalStore.sortClient;
+  clientsStore.refresh().catch(console.error);
+}
 </script>

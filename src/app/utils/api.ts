@@ -57,44 +57,6 @@ class API {
     });
   }
 
-  async enableClient({ clientId }: { clientId: string }) {
-    return $fetch(`/api/client/${clientId}/enable`, {
-      method: 'post',
-    });
-  }
-
-  async disableClient({ clientId }: { clientId: string }) {
-    return $fetch(`/api/client/${clientId}/disable`, {
-      method: 'post',
-    });
-  }
-
-  async updateClientName({
-    clientId,
-    name,
-  }: {
-    clientId: string;
-    name: string;
-  }) {
-    return $fetch(`/api/client/${clientId}/name`, {
-      method: 'put',
-      body: { name },
-    });
-  }
-
-  async updateClientAddress4({
-    clientId,
-    address4,
-  }: {
-    clientId: string;
-    address4: string;
-  }) {
-    return $fetch(`/api/client/${clientId}/address4`, {
-      method: 'put',
-      body: { address4 },
-    });
-  }
-
   async updateClientExpireDate({
     clientId,
     expireDate,
