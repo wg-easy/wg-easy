@@ -245,13 +245,22 @@ module.exports = class Server {
         return config;
       }))
       .post('/api/wireguard/client', defineEventHandler(async (event) => {
-        const { name } = await readBody(event);
+        const { name, id } = await readBody(event);
         const { expiredDate } = await readBody(event);
-        const client = await WireGuard.createClient({ name, expiredDate });
+        
+        let client;
+        try {
+          client = await WireGuard.createClient({ name, expiredDate, id });
+        }
+        catch (e) {
+          return e;
+        }
+        
         return { 
           client_id: client.id, 
           success: true 
         };
+        
       }))
       .delete('/api/wireguard/client/:clientId', defineEventHandler(async (event) => {
         const clientId = getRouterParam(event, 'clientId');

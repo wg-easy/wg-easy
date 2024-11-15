@@ -235,7 +235,7 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
     });
   }
 
-  async createClient({ name, expiredDate }) {
+  async createClient({ name, expiredDate, id }) {
     if (!name) {
       throw new Error('Missing: Name');
     }
@@ -265,9 +265,8 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
       throw new Error('Maximum number of clients reached.');
     }
     // Create Client
-    const id = crypto.randomUUID();
     const client = {
-      id,
+      id, //id from tg bot
       name,
       address,
       privateKey,
