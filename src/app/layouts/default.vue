@@ -38,8 +38,8 @@
         <a
           class="hover:underline"
           target="_blank"
-          href="https://spdx.org/licenses/AGPL-3.0-or-later.html"
-          >AGPL-3.0-or-later</a
+          href="https://spdx.org/licenses/AGPL-3.0-only.html"
+          >AGPL-3.0-only</a
         >
         ·
         <a
