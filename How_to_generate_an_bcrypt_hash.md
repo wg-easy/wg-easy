@@ -12,12 +12,12 @@
 To generate a bcrypt password hash using docker, run the following command :
 
 ```sh
-docker run -it ghcr.io/wg-easy/wg-easy wgpw YOUR_PASSWORD
+docker run --rm -it ghcr.io/wg-easy/wg-easy wgpw 'YOUR_PASSWORD'
 PASSWORD_HASH='$2b$12$coPqCsPtcFO.Ab99xylBNOW4.Iu7OOA2/ZIboHN6/oyxca3MWo7fW' // literally YOUR_PASSWORD
 ```
 If a password is not provided, the tool will prompt you for one :
 ```sh
-docker run -it ghcr.io/wg-easy/wg-easy wgpw
+docker run --rm -it ghcr.io/wg-easy/wg-easy wgpw
 Enter your password:      // hidden prompt, type in your password
 PASSWORD_HASH='$2b$12$coPqCsPtcFO.Ab99xylBNOW4.Iu7OOA2/ZIboHN6/oyxca3MWo7fW'
 ```
@@ -39,4 +39,4 @@ $2b$12$coPqCsPtcF
 - PASSWORD_HASH=$$2y$$10$$hBCoykrB95WSzuV4fafBzOHWKu9sbyVa34GJr8VV5R/pIelfEMYyG
 ```
 
-This hash is for the password 'foobar123', obtained using the command `docker run ghcr.io/wg-easy/wg-easy wgpw foobar123` and then inserted an additional `$` before each existing `$` symbol.
+This hash is for the password 'foobar123', obtained using the command `docker run ghcr.io/wg-easy/wg-easy wgpw 'foobar123'` and then inserted an additional `$` before each existing `$` symbol.
