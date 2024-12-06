@@ -70,8 +70,8 @@ To automatically install & run wg-easy, simply run:
 ```shell
 docker run --detach \
   --name wg-easy \
-  --env LANG=de \
-  --env WG_HOST=<🚨YOUR_SERVER_IP> \
+  --env LANG=en \
+  --env WG_HOST=47.39.229.116 \
   --env PASSWORD_HASH='<🚨YOUR_ADMIN_PASSWORD_HASH>' \
   --env PORT=51821 \
   --env WG_PORT=51820 \
