@@ -12,7 +12,7 @@ services:
       - WG_HOST=47.39.229.116
 
       # Optional:
-      # - PASSWORD_HASH=$$2y$$10$$hBCoykrB95WSzuV4fafBzOHWKu9sbyVa34GJr8VV5R/pIelfEMYyG # (needs double $$, hash of 'foobar123'; see "How_to_generate_an_bcrypt_hash.md" for generate the hash)
+      - PASSWORD_HASH=$$2a$$12$$nepGZB3heEDk5TYLNsIfwO8.O4AYyTAIuDhPIsqJnyHppBJ4Rz8Ge
       - PORT=51821
       - WG_PORT=51820
       - WG_CONFIG_PORT=92820
@@ -26,7 +26,7 @@ services:
       - WG_PRE_DOWN=echo "Pre Down" > /etc/wireguard/pre-down.txt
       - WG_POST_DOWN=echo "Post Down" > /etc/wireguard/post-down.txt
       - UI_TRAFFIC_STATS=true
-      - UI_CHART_TYPE=0 # (0 Charts disabled, 1 # Line chart, 2 # Area chart, 3 # Bar chart)
+      - UI_CHART_TYPE=1 # (0 Charts disabled, 1 # Line chart, 2 # Area chart, 3 # Bar chart)
       - WG_ENABLE_ONE_TIME_LINKS=true
       - UI_ENABLE_SORT_CLIENTS=true
       - WG_ENABLE_EXPIRES_TIME=true
