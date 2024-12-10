@@ -1,7 +1,7 @@
 <template>
   <BaseButton as="label" for="inputRC" :title="$t('titleRestoreConfig')">
     <IconsArrowInf class="w-4 md:mr-2" />
-    <span class="max-md:hidden text-sm">{{ $t('restore') }}</span>
+    <span class="text-sm max-md:hidden">{{ $t('restore') }}</span>
     <input
       id="inputRC"
       type="file"

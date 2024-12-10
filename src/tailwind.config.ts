@@ -1,6 +1,5 @@
 import type { Config } from 'tailwindcss';
-import type { PluginAPI } from 'tailwindcss/types/config';
-// import { red } from 'tailwindcss/colors.js';
+import tailwindForms from '@tailwindcss/forms';
 
 export default {
   darkMode: 'selector',
@@ -15,22 +14,6 @@ export default {
       xl: '1280px',
       '2xl': '1536px',
     },
-    extend: {
-      colors: {
-        // DEFAULT: red[800],
-        // primary: red[800],
-      },
-    },
   },
-  plugins: [
-    function addDisabledClass({ addUtilities }: PluginAPI) {
-      const newUtilities = {
-        '.is-disabled': {
-          opacity: '0.25',
-          cursor: 'default',
-        },
-      };
-      addUtilities(newUtilities);
-    },
-  ],
+  plugins: [tailwindForms],
 } satisfies Config;

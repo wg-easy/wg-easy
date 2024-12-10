@@ -1,20 +1,16 @@
 export const useAuthStore = defineStore('Auth', () => {
-  const requiresPassword = ref<boolean>(true);
-
-  /**
-   * @throws if unsuccessful
-   */
-  async function signup(username: string, password: string) {
-    const response = await api.setupAccount({ username, password });
-    return response.success;
-  }
+  const userData = ref<null | {
+    name: string;
+    username: string;
+    role: string;
+    email: string | null;
+  }>();
 
   /**
    * @throws if unsuccessful
    */
   async function login(username: string, password: string, remember: boolean) {
-    const response = await api.createSession({ username, password, remember });
-    requiresPassword.value = response.requiresPassword;
+    await api.createSession({ username, password, remember });
     return true as const;
   }
 
@@ -26,13 +22,11 @@ export const useAuthStore = defineStore('Auth', () => {
     return response.success;
   }
 
-  /**
-   * @throws if unsuccessful
-   */
   async function update() {
-    const session = await api.getSession();
-    requiresPassword.value = session.requiresPassword;
+    // store role etc
+    const { data: response } = await api.getSession();
+    userData.value = response.value;
   }
 
-  return { requiresPassword, login, logout, update, signup };
+  return { userData, login, logout, update };
 });

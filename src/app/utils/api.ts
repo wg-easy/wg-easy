@@ -1,19 +1,6 @@
 class API {
-  async getRelease() {
-    return useFetch('/api/release', {
-      method: 'get',
-    });
-  }
-
-  async getLang() {
-    return useFetch('/api/lang', {
-      method: 'get',
-    });
-  }
-
   async getSession() {
-    // TODO?: use useFetch
-    return $fetch('/api/session', {
+    return useFetch('/api/session', {
       method: 'get',
     });
   }
@@ -40,7 +27,7 @@ class API {
   }
 
   async getClients() {
-    return useFetch('/api/wireguard/client', {
+    return useFetch('/api/client', {
       method: 'get',
     });
   }
@@ -52,59 +39,21 @@ class API {
     name: string;
     expireDate: string | null;
   }) {
-    return $fetch('/api/wireguard/client', {
+    return $fetch('/api/client', {
       method: 'post',
       body: { name, expireDate },
     });
   }
 
   async deleteClient({ clientId }: { clientId: string }) {
-    return $fetch(`/api/wireguard/client/${clientId}`, {
+    return $fetch(`/api/client/${clientId}`, {
       method: 'delete',
     });
   }
 
   async showOneTimeLink({ clientId }: { clientId: string }) {
-    return $fetch(`/api/wireguard/client/${clientId}/generateOneTimeLink`, {
+    return $fetch(`/api/client/${clientId}/generateOneTimeLink`, {
       method: 'post',
-    });
-  }
-
-  async enableClient({ clientId }: { clientId: string }) {
-    return $fetch(`/api/wireguard/client/${clientId}/enable`, {
-      method: 'post',
-    });
-  }
-
-  async disableClient({ clientId }: { clientId: string }) {
-    return $fetch(`/api/wireguard/client/${clientId}/disable`, {
-      method: 'post',
-    });
-  }
-
-  async updateClientName({
-    clientId,
-    name,
-  }: {
-    clientId: string;
-    name: string;
-  }) {
-    return $fetch(`/api/wireguard/client/${clientId}/name`, {
-      method: 'put',
-      body: { name },
-    });
-  }
-
-  async updateClientAddress4({
-    clientId,
-    address4,
-  }: {
-    clientId: string;
-    address4: string;
-  }) {
-    return $fetch(`/api/wireguard/client/${clientId}/address4`, {
-      method: 'put',
-      body: { address4 },
     });
   }
 
@@ -115,7 +64,7 @@ class API {
     clientId: string;
     expireDate: string | null;
   }) {
-    return $fetch(`/api/wireguard/client/${clientId}/expireDate`, {
+    return $fetch(`/api/client/${clientId}/expireDate`, {
       method: 'put',
       body: { expireDate },
     });
@@ -125,25 +74,6 @@ class API {
     return $fetch('/api/wireguard/restore', {
       method: 'put',
       body: { file },
-    });
-  }
-
-  async setupAccount({
-    username,
-    password,
-  }: {
-    username: string;
-    password: string;
-  }) {
-    return $fetch('/api/account/setup', {
-      method: 'post',
-      body: { username, password },
-    });
-  }
-
-  async getFeatures() {
-    return useFetch('/api/features', {
-      method: 'get',
     });
   }
 }

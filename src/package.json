@@ -1,6 +1,6 @@
 {
   "name": "wg-easy",
-  "version": "14.0.0",
+  "version": "15.0.0-alpha.1",
   "description": "The easiest way to run WireGuard VPN + Web-based Admin UI.",
   "private": true,
   "type": "module",
@@ -13,15 +13,16 @@
     "lint": "eslint .",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
-    "typecheck": "nuxt typecheck"
+    "typecheck": "nuxt typecheck",
+    "check:runall": "nuxt build && nuxt typecheck && eslint . && prettier . --check"
   },
   "dependencies": {
     "@eschricht/nuxt-color-mode": "^1.1.5",
-    "@nuxtjs/i18n": "^8.5.1",
-    "@nuxtjs/tailwindcss": "^6.12.1",
-    "@pinia/nuxt": "^0.5.4",
-    "@tailwindcss/forms": "^0.5.8",
-    "apexcharts": "^3.53.0",
+    "@nuxtjs/i18n": "^9.0.0",
+    "@nuxtjs/tailwindcss": "^6.12.2",
+    "@pinia/nuxt": "^0.7.0",
+    "@tailwindcss/forms": "^0.5.9",
+    "apexcharts": "^4.0.0",
     "argon2": "^0.41.1",
     "basic-auth": "^2.0.1",
     "cidr-tools": "^11.0.2",
@@ -31,26 +32,28 @@
     "is-ip": "^5.0.1",
     "js-sha256": "^0.11.0",
     "lowdb": "^7.0.1",
-    "nuxt": "^3.13.0",
-    "pinia": "^2.2.2",
+    "nuxt": "^3.14.159",
+    "pinia": "^2.2.6",
     "qrcode": "^1.5.4",
+    "radix-vue": "^1.9.9",
     "semver": "^7.6.3",
-    "tailwindcss": "^3.4.10",
+    "tailwindcss": "^3.4.14",
     "timeago.js": "^4.0.2",
     "vue": "latest",
-    "vue3-apexcharts": "^1.6.0",
+    "vue3-apexcharts": "^1.7.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@nuxt/eslint-config": "^0.5.5",
+    "@nuxt/eslint-config": "^0.6.1",
     "@types/debug": "^4.1.12",
     "@types/qrcode": "^1.5.5",
     "@types/semver": "^7.5.8",
-    "eslint": "^9.9.1",
+    "eslint": "^9.14.0",
     "eslint-config-prettier": "^9.1.0",
     "prettier": "^3.3.3",
-    "typescript": "^5.5.4",
-    "vue-tsc": "^2.1.4"
+    "prettier-plugin-tailwindcss": "^0.6.8",
+    "typescript": "^5.6.3",
+    "vue-tsc": "^2.1.10"
   },
-  "packageManager": "pnpm@9.10.0"
+  "packageManager": "pnpm@9.13.0"
 }

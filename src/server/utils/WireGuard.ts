@@ -10,11 +10,17 @@ import { isIPv4 } from 'is-ip';
 const DEBUG = debug('WireGuard');
 
 class WireGuard {
+  /**
+   * Save and sync config
+   */
   async saveConfig() {
     await this.#saveWireguardConfig();
     await this.#syncWireguardConfig();
   }
 
+  /**
+   * Generates and saves WireGuard config from database as wg0
+   */
   async #saveWireguardConfig() {
     const system = await Database.system.get();
     const clients = await Database.client.findAll();
@@ -55,7 +61,6 @@ class WireGuard {
       expiresAt: client.expiresAt,
       allowedIPs: client.allowedIPs,
       oneTimeLink: client.oneTimeLink,
-      downloadableConfig: 'privateKey' in client,
       persistentKeepalive: null as string | null,
       latestHandshakeAt: null as Date | null,
       endpoint: null as string | null,
@@ -149,9 +154,10 @@ class WireGuard {
       oneTimeLink: null,
       expiresAt: null,
       enabled: true,
-      allowedIPs: system.userConfig.allowedIps,
+      allowedIPs: [...system.userConfig.allowedIps],
       serverAllowedIPs: null,
       persistentKeepalive: system.userConfig.persistentKeepalive,
+      mtu: system.userConfig.mtu,
     };
 
     if (expireDate) {
@@ -299,6 +305,8 @@ class WireGuard {
     DEBUG('Cron Job started successfully.');
   }
 
+  // TODO: handle as worker_thread
+  // would need a better database aswell
   async startCronJob() {
     await this.cronJob().catch((err) => {
       DEBUG('Running Cron Job failed.');
@@ -316,32 +324,30 @@ class WireGuard {
 
   async cronJob() {
     const clients = await Database.client.findAll();
-    const system = await Database.system.get();
     // Expires Feature
-    if (system.clientExpiration.enabled) {
-      for (const client of Object.values(clients)) {
-        if (client.enabled !== true) continue;
-        if (
-          client.expiresAt !== null &&
-          new Date() > new Date(client.expiresAt)
-        ) {
-          DEBUG(`Client ${client.id} expired.`);
-          await Database.client.toggle(client.id, false);
-        }
+    for (const client of Object.values(clients)) {
+      if (client.enabled !== true) continue;
+      if (
+        client.expiresAt !== null &&
+        new Date() > new Date(client.expiresAt)
+      ) {
+        DEBUG(`Client ${client.id} expired.`);
+        await Database.client.toggle(client.id, false);
       }
     }
+
     // One Time Link Feature
-    if (system.oneTimeLinks.enabled) {
-      for (const client of Object.values(clients)) {
-        if (
-          client.oneTimeLink !== null &&
-          new Date() > new Date(client.oneTimeLink.expiresAt)
-        ) {
-          DEBUG(`Client ${client.id} One Time Link expired.`);
-          await Database.client.deleteOneTimeLink(client.id);
-        }
+    for (const client of Object.values(clients)) {
+      if (
+        client.oneTimeLink !== null &&
+        new Date() > new Date(client.oneTimeLink.expiresAt)
+      ) {
+        DEBUG(`Client ${client.id} One Time Link expired.`);
+        await Database.client.deleteOneTimeLink(client.id);
       }
     }
+
+    await this.saveConfig();
   }
 
   async getMetrics() {

@@ -17,7 +17,7 @@
     "vue"
   ],
   "i18n-ally.localesPaths": [
-    "src/locales"
+    "src/i18n/locales"
   ],
   "i18n-ally.sortKeys": false,
   "i18n-ally.keepFulfilled": false,
