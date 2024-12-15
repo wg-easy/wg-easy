@@ -16,6 +16,7 @@ const {
   WG_PORT,
   WG_CONFIG_PORT,
   WG_MTU,
+  WG_SERVER_MTU,
   WG_DEFAULT_DNS,
   WG_DEFAULT_ADDRESS,
   WG_PERSISTENT_KEEPALIVE,
@@ -48,12 +49,14 @@ module.exports = class WireGuard {
           log: 'echo ***hidden*** | wg pubkey',
         });
         const address = WG_DEFAULT_ADDRESS.replace('x', '1');
+        const mtu = WG_SERVER_MTU;
 
         config = {
           server: {
             privateKey,
             publicKey,
             address,
+            mtu,
           },
           clients: {},
         };
@@ -105,6 +108,7 @@ module.exports = class WireGuard {
 PrivateKey = ${config.server.privateKey}
 Address = ${config.server.address}/24
 ListenPort = ${WG_PORT}
+MTU = ${WG_SERVER_MTU}
 PreUp = ${WG_PRE_UP}
 PostUp = ${WG_POST_UP}
 PreDown = ${WG_PRE_DOWN}
