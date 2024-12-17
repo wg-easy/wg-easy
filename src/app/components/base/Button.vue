@@ -2,7 +2,7 @@
   <component
     :is="elementType"
     role="button"
-    class="hover:bg-red-800 hover:border-red-800 hover:text-white text-gray-700 dark:text-neutral-200 max-md:border-x-0 border-2 border-gray-100 dark:border-neutral-600 py-2 md:px-4 rounded max-md:rounded-full inline-flex items-center transition"
+    class="inline-flex items-center rounded border-2 border-gray-100 py-2 text-gray-700 transition hover:border-red-800 hover:bg-red-800 hover:text-white max-md:rounded-full max-md:border-x-0 md:px-4 dark:border-neutral-600 dark:text-neutral-200"
     v-bind="attrs"
   >
     <slot />

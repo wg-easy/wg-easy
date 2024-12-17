@@ -1,10 +1,12 @@
 import type { ClientRepository, Client } from './client';
+import type { SetupRepository, Steps } from './setup';
 import type { System, SystemRepository } from './system';
 import type { User, UserRepository } from './user';
 
 // Represent data structure
 export type Database = {
   migrations: string[];
+  setup: Steps;
   system: System;
   users: User[];
   clients: Record<string, Client>;
@@ -12,6 +14,7 @@ export type Database = {
 
 export const DEFAULT_DATABASE: Database = {
   migrations: [],
+  setup: 1,
   system: null as never,
   users: [],
   clients: {},
@@ -20,9 +23,6 @@ export const DEFAULT_DATABASE: Database = {
 /**
  * Abstract class for database operations.
  * Provides methods to connect, disconnect, and interact with system and user data.
- *
- * **Note :** Always throw `DatabaseError` to ensure proper API error handling.
- *
  */
 export abstract class DatabaseProvider {
   /**
@@ -37,6 +37,7 @@ export abstract class DatabaseProvider {
    */
   abstract disconnect(): Promise<void>;
 
+  abstract setup: SetupRepository;
   abstract system: SystemRepository;
   abstract user: UserRepository;
   abstract client: ClientRepository;

@@ -1,7 +1,7 @@
 site_name: "wg-easy"
 site_description: "The easiest way to run WireGuard VPN + Web-based Admin UI."
 site_author: "wg-easy (Github Organization)"
-copyright: '<p>&copy <a href="https://github.com/wg-easy"><em>Wireguard Easy Organization</em></a><br/><span>This project is licensed under the CC BY-NC-SA 4.0 license.</span></p>'
+copyright: '<p>&copy <a href="https://github.com/wg-easy"><em>Wireguard Easy Organization</em></a><br/><span>This project is licensed under the GNU Affero General Public License v3.0 or later.</span></p>'
 
 repo_url: https://github.com/wg-easy/wg-easy
 repo_name: wg-easy

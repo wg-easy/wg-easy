@@ -1,9 +1,12 @@
 import { parseCidr } from 'cidr-tools';
+import type { DeepReadonly } from 'vue';
 import type { Client } from '~~/services/database/repositories/client';
 import type { System } from '~~/services/database/repositories/system';
 
+// TODO: replace wg0 with parameter (to allow multi interface design)
+
 export const wg = {
-  generateServerPeer: (client: Client) => {
+  generateServerPeer: (client: DeepReadonly<Client>) => {
     const allowedIps = [
       `${client.address4}/32`,
       `${client.address6}/128`,
@@ -17,7 +20,7 @@ PresharedKey = ${client.preSharedKey}
 AllowedIPs = ${allowedIps.join(', ')}`;
   },
 
-  generateServerInterface: (system: System) => {
+  generateServerInterface: (system: DeepReadonly<System>) => {
     const cidr4Block = parseCidr(system.userConfig.address4Range).prefix;
     const cidr6Block = parseCidr(system.userConfig.address6Range).prefix;
 
@@ -28,15 +31,18 @@ AllowedIPs = ${allowedIps.join(', ')}`;
 [Interface]
 PrivateKey = ${system.interface.privateKey}
 Address = ${system.interface.address4}/${cidr4Block}, ${system.interface.address6}/${cidr6Block}
-ListenPort = ${system.wgPort}
-MTU = ${system.userConfig.serverMtu}
+ListenPort = ${system.interface.port}
+MTU = ${system.interface.mtu}
 PreUp = ${system.iptables.PreUp}
 PostUp = ${system.iptables.PostUp}
 PreDown = ${system.iptables.PreDown}
 PostDown = ${system.iptables.PostDown}`;
   },
 
-  generateClientConfig: (system: System, client: Client) => {
+  generateClientConfig: (
+    system: DeepReadonly<System>,
+    client: DeepReadonly<Client>
+  ) => {
     const cidr4Block = parseCidr(system.userConfig.address4Range).prefix;
     const cidr6Block = parseCidr(system.userConfig.address6Range).prefix;
 
@@ -44,14 +50,14 @@ PostDown = ${system.iptables.PostDown}`;
 PrivateKey = ${client.privateKey}
 Address = ${client.address4}/${cidr4Block}, ${client.address6}/${cidr6Block}
 DNS = ${system.userConfig.defaultDns.join(', ')}
-MTU = ${system.userConfig.mtu}
+MTU = ${client.mtu}
 
 [Peer]
 PublicKey = ${system.interface.publicKey}
 PresharedKey = ${client.preSharedKey}
 AllowedIPs = ${client.allowedIPs.join(', ')}
 PersistentKeepalive = ${client.persistentKeepalive}
-Endpoint = ${system.wgHost}:${system.wgConfigPort}`;
+Endpoint = ${system.userConfig.host}:${system.userConfig.port}`;
   },
 
   generatePrivateKey: () => {

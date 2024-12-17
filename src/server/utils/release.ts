@@ -49,4 +49,8 @@ async function fetchLatestRelease() {
   }
 }
 
+/**
+ * Fetch latest release from GitHub
+ * @cache Response is cached for 1 hour
+ */
 export const cachedFetchLatestRelease = cacheFunction(fetchLatestRelease);

@@ -1,11 +1,4 @@
 export default defineEventHandler(async (event) => {
-  const system = await Database.system.get();
-  if (!system.oneTimeLinks.enabled) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: 'Invalid state',
-    });
-  }
   const { oneTimeLink } = await getValidatedRouterParams(
     event,
     validateZod(oneTimeLinkType)
