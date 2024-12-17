@@ -1,6 +1,7 @@
 export type LocalStorage = {
   uiShowCharts: '1' | '0';
   lang: string;
+  uiChartType: 'area' | 'bar' | 'line';
 };
 
 export function getItem<K extends keyof LocalStorage>(

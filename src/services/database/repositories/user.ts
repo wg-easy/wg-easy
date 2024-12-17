@@ -1,3 +1,5 @@
+import type { DeepReadonly } from 'vue';
+
 /**
  * Represents user roles within the application, each with specific permissions :
  *
@@ -17,6 +19,7 @@ export type User = {
   username: string;
   password: string;
   name: string;
+  email: string | null;
   /** ISO String */
   createdAt: string;
   /** ISO String */
@@ -29,25 +32,10 @@ export type User = {
  * This interface provides methods for managing user data.
  */
 export abstract class UserRepository {
-  /**
-   * Retrieves all users from the database.
-   */
-  abstract findAll(): Promise<User[]>;
-
-  /**
-   * Retrieves a user by their ID or User object from the database.
-   */
-  abstract findById(id: string): Promise<User | undefined>;
+  abstract findAll(): Promise<DeepReadonly<User[]>>;
+  abstract findById(id: string): Promise<DeepReadonly<User | undefined>>;
 
   abstract create(username: string, password: string): Promise<void>;
-
-  /**
-   * Updates a user in the database.
-   */
   abstract update(user: User): Promise<void>;
-
-  /**
-   * Deletes a user from the database.
-   */
   abstract delete(id: string): Promise<void>;
 }

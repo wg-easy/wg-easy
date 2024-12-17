@@ -18,16 +18,51 @@ import {
   type NewClient,
   type OneTimeLink,
 } from './repositories/client';
-import { SystemRepository } from './repositories/system';
+import { SystemRepository, type Lang } from './repositories/system';
+import { SetupRepository, type Steps } from './repositories/setup';
+import type { DeepReadonly } from 'vue';
 
 const DEBUG = debug('LowDB');
 
-export class LowDBSystem extends SystemRepository {
+export class LowDBSetup extends SetupRepository {
   #db: Low<Database>;
   constructor(db: Low<Database>) {
     super();
     this.#db = db;
   }
+  async done() {
+    if (this.#db.data.setup === 'success') {
+      return true;
+    }
+    return false;
+  }
+
+  async get() {
+    return this.#db.data.setup;
+  }
+
+  async set(step: Steps) {
+    this.#db.update((v) => {
+      v.setup = step;
+    });
+  }
+}
+
+/**
+ * deep copies object and
+ * makes readonly on type level
+ */
+function makeReadonly<T>(a: T): DeepReadonly<T> {
+  return structuredClone(a) as DeepReadonly<T>;
+}
+
+class LowDBSystem extends SystemRepository {
+  #db: Low<Database>;
+  constructor(db: Low<Database>) {
+    super();
+    this.#db = db;
+  }
+
   async get() {
     DEBUG('Get System');
     const system = this.#db.data.system;
@@ -35,24 +70,39 @@ export class LowDBSystem extends SystemRepository {
     if (system === null) {
       throw new DatabaseError(DatabaseError.ERROR_INIT);
     }
-    return system;
+    return makeReadonly(system);
+  }
+
+  async updateLang(lang: Lang): Promise<void> {
+    DEBUG('Update Language');
+    this.#db.update((v) => {
+      v.system.general.lang = lang;
+    });
+  }
+
+  async updateClientsHostPort(host: string, port: number): Promise<void> {
+    DEBUG('Update Clients Host and Port endpoint');
+    this.#db.update((v) => {
+      v.system.userConfig.host = host;
+      v.system.userConfig.port = port;
+    });
   }
 }
 
-export class LowDBUser extends UserRepository {
+class LowDBUser extends UserRepository {
   #db: Low<Database>;
   constructor(db: Low<Database>) {
     super();
     this.#db = db;
   }
-  // TODO: return copy to avoid mutation (everywhere)
+
   async findAll() {
-    return this.#db.data.users;
+    return makeReadonly(this.#db.data.users);
   }
 
   async findById(id: string) {
     DEBUG('Get User');
-    return this.#db.data.users.find((user) => user.id === id);
+    return makeReadonly(this.#db.data.users.find((user) => user.id === id));
   }
 
   async create(username: string, password: string) {
@@ -77,6 +127,7 @@ export class LowDBUser extends UserRepository {
       id: crypto.randomUUID(),
       password: hash,
       username,
+      email: null,
       name: 'Administrator',
       role: isUserEmpty ? 'ADMIN' : 'CLIENT',
       enabled: true,
@@ -106,7 +157,7 @@ export class LowDBUser extends UserRepository {
   }
 }
 
-export class LowDBClient extends ClientRepository {
+class LowDBClient extends ClientRepository {
   #db: Low<Database>;
   constructor(db: Low<Database>) {
     super();
@@ -114,12 +165,12 @@ export class LowDBClient extends ClientRepository {
   }
   async findAll() {
     DEBUG('GET Clients');
-    return this.#db.data.clients;
+    return makeReadonly(this.#db.data.clients);
   }
 
   async findById(id: string) {
     DEBUG('Get Client');
-    return this.#db.data.clients[id];
+    return makeReadonly(this.#db.data.clients[id]);
   }
 
   async create(client: NewClient) {
@@ -203,6 +254,7 @@ export class LowDBClient extends ClientRepository {
 export default class LowDB extends DatabaseProvider {
   #db: Low<Database>;
 
+  setup: LowDBSetup;
   system: LowDBSystem;
   user: LowDBUser;
   client: LowDBClient;
@@ -210,6 +262,7 @@ export default class LowDB extends DatabaseProvider {
   private constructor(db: Low<Database>) {
     super();
     this.#db = db;
+    this.setup = new LowDBSetup(this.#db);
     this.system = new LowDBSystem(this.#db);
     this.user = new LowDBUser(this.#db);
     this.client = new LowDBClient(this.#db);

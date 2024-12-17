@@ -1,6 +1,8 @@
 import type { SessionConfig } from 'h3';
+import type { DeepReadonly } from 'vue';
+import type { LOCALES } from '#shared/locales';
 
-export type Lang = 'en' | 'fr';
+export type Lang = (typeof LOCALES)[number]['code'];
 
 export type IpTables = {
   PreUp: string;
@@ -14,16 +16,20 @@ export type WGInterface = {
   publicKey: string;
   address4: string;
   address6: string;
+  mtu: number;
+  port: number;
+  device: string;
 };
 
 export type WGConfig = {
   mtu: number;
-  serverMtu: number;
   persistentKeepalive: number;
   address4Range: string;
   address6Range: string;
   defaultDns: string[];
   allowedIps: string[];
+  host: string;
+  port: number;
 };
 
 export enum ChartType {
@@ -33,45 +39,31 @@ export enum ChartType {
   Bar = 3,
 }
 
-export type TrafficStats = {
-  enabled: boolean;
-  type: ChartType;
-};
-
 export type Prometheus = {
   enabled: boolean;
   password: string | null;
 };
 
-export type Feature = {
-  enabled: boolean;
+export type Metrics = {
+  prometheus: Prometheus;
 };
 
-/**
- * Representing the WireGuard network configuration data structure of a computer interface system.
- */
-export type System = {
-  interface: WGInterface;
-
-  // maxAge
+export type General = {
   sessionTimeout: number;
   lang: Lang;
+};
+
+export type System = {
+  general: General;
+
+  interface: WGInterface;
 
   userConfig: WGConfig;
 
-  wgDevice: string;
-  wgHost: string;
-  wgPort: number;
-  wgConfigPort: number;
-
   iptables: IpTables;
-  trafficStats: TrafficStats;
 
-  clientExpiration: Feature;
-  oneTimeLinks: Feature;
-  sortClients: Feature;
+  metrics: Metrics;
 
-  prometheus: Prometheus;
   sessionConfig: SessionConfig;
 };
 
@@ -81,8 +73,8 @@ export type System = {
  * and specific system properties, such as the language setting, from the database.
  */
 export abstract class SystemRepository {
-  /**
-   * Retrieves the system configuration data from the database.
-   */
-  abstract get(): Promise<System>;
+  abstract get(): Promise<DeepReadonly<System>>;
+
+  abstract updateLang(lang: Lang): Promise<void>;
+  abstract updateClientsHostPort(host: string, port: number): Promise<void>;
 }

@@ -1,9 +1,7 @@
-import type { SessionConfig } from 'h3';
-
 export default defineEventHandler(async (event) => {
   const { username, password, remember } = await readValidatedBody(
     event,
-    validateZod(credentialsType)
+    validateZod(credentialsType, event)
   );
 
   const users = await Database.user.findAll();
@@ -25,21 +23,18 @@ export default defineEventHandler(async (event) => {
 
   const system = await Database.system.get();
 
-  const conf: SessionConfig = system.sessionConfig;
+  const conf = { ...system.sessionConfig };
 
   if (remember) {
     conf.cookie = {
       ...(system.sessionConfig.cookie ?? {}),
-      maxAge: system.sessionTimeout,
+      maxAge: system.general.sessionTimeout,
     };
   }
 
-  const session = await useSession(event, {
-    ...system.sessionConfig,
-  });
+  const session = await useSession<WGSession>(event, conf);
 
   const data = await session.update({
-    authenticated: true,
     userId: user.id,
   });
 

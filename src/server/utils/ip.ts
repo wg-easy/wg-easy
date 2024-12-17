@@ -1,25 +1,29 @@
 import { parseCidr } from 'cidr-tools';
 import { stringifyIp } from 'ip-bigint';
+import type { DeepReadonly } from 'vue';
 import type { Database } from '~~/services/database/repositories/database';
 
 export function nextIPv4(
-  system: Database['system'],
-  clients: Database['clients']
+  system: DeepReadonly<Database['system']>,
+  clients: DeepReadonly<Database['clients']>
 ) {
   return nextIP(4, system, clients);
 }
 
 export function nextIPv6(
-  system: Database['system'],
-  clients: Database['clients']
+  system: DeepReadonly<Database['system']>,
+  clients: DeepReadonly<Database['clients']>
 ) {
   return nextIP(6, system, clients);
 }
 
+// TODO: above functions should probably have a lock
+// TODO(general): what happens if multiple users create client at the same time?
+
 function nextIP(
   version: 4 | 6,
-  system: Database['system'],
-  clients: Database['clients']
+  system: DeepReadonly<Database['system']>,
+  clients: DeepReadonly<Database['clients']>
 ) {
   const cidr = parseCidr(system.userConfig[`address${version}Range`]);
   let address;

@@ -1,8 +1,7 @@
 <template>
   <button
-    v-if="globalStore.features.sortClients.enabled"
-    class="hover:bg-red-800 hover:border-red-800 hover:text-white text-gray-700 dark:text-neutral-200 max-md:border-x-0 border-2 border-gray-100 dark:border-neutral-600 py-2 px-4 md:rounded inline-flex items-center transition"
-    @click="globalStore.sortClient = !globalStore.sortClient"
+    class="inline-flex items-center border-2 border-gray-100 px-4 py-2 text-gray-700 transition hover:border-red-800 hover:bg-red-800 hover:text-white max-md:border-x-0 md:rounded dark:border-neutral-600 dark:text-neutral-200"
+    @click="toggleSort"
   >
     <svg
       v-if="globalStore.sortClient === true"
@@ -42,10 +41,16 @@
         fill="#000000"
       />
     </svg>
-    <span class="max-md:hidden text-sm">{{ $t('sort') }}</span>
+    <span class="text-sm max-md:hidden">{{ $t('sort') }}</span>
   </button>
 </template>
 
 <script setup lang="ts">
 const globalStore = useGlobalStore();
+const clientsStore = useClientsStore();
+
+function toggleSort() {
+  globalStore.sortClient = !globalStore.sortClient;
+  clientsStore.refresh().catch(console.error);
+}
 </script>

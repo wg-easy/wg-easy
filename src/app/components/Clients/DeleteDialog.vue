@@ -1,10 +1,10 @@
 <template>
   <div
     v-if="modalStore.clientDelete"
-    class="fixed z-10 inset-0 overflow-y-auto"
+    class="fixed inset-0 z-10 overflow-y-auto"
   >
     <div
-      class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0"
+      class="flex min-h-screen items-center justify-center px-4 pb-20 pt-4 text-center sm:block sm:p-0"
     >
       <!--
         Background overlay, show/hide based on modal state.
@@ -18,13 +18,13 @@
       -->
       <div class="fixed inset-0 transition-opacity" aria-hidden="true">
         <div
-          class="absolute inset-0 bg-gray-500 dark:bg-black opacity-75 dark:opacity-50"
+          class="absolute inset-0 bg-gray-500 opacity-75 dark:bg-black dark:opacity-50"
         />
       </div>
 
       <!-- This element is to trick the browser into centering the modal contents. -->
       <span
-        class="hidden sm:inline-block sm:align-middle sm:h-screen"
+        class="hidden sm:inline-block sm:h-screen sm:align-middle"
         aria-hidden="true"
         >&#8203;</span
       >
@@ -39,22 +39,22 @@
           To: "opacity-0 tranneutral-y-4 sm:tranneutral-y-0 sm:scale-95"
       -->
       <div
-        class="inline-block align-bottom bg-white dark:bg-neutral-700 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full"
+        class="inline-block w-full transform overflow-hidden rounded-lg bg-white text-left align-bottom shadow-xl transition-all sm:my-8 sm:max-w-lg sm:align-middle dark:bg-neutral-700"
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-headline"
       >
-        <div class="bg-white dark:bg-neutral-700 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+        <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4 dark:bg-neutral-700">
           <div class="sm:flex sm:items-start">
             <div
-              class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10"
+              class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10"
             >
               <IconsWarning class="h-6 w-6 text-red-600" />
             </div>
-            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+            <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
               <h3
                 id="modal-headline"
-                class="text-lg leading-6 font-medium text-gray-900 dark:text-neutral-200"
+                class="text-lg font-medium leading-6 text-gray-900 dark:text-neutral-200"
               >
                 {{ $t('deleteClient') }}
               </h3>
@@ -69,11 +69,11 @@
           </div>
         </div>
         <div
-          class="bg-gray-50 dark:bg-neutral-600 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse"
+          class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6 dark:bg-neutral-600"
         >
           <button
             type="button"
-            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 dark:bg-red-600 text-base font-medium text-white dark:text-white hover:bg-red-700 dark:hover:bg-red-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm"
+            class="inline-flex w-full justify-center rounded-md border border-transparent bg-red-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm dark:bg-red-600 dark:text-white dark:hover:bg-red-700"
             @click="
               modalStore.deleteClient(modalStore.clientDelete);
               modalStore.clientDelete = null;
@@ -83,7 +83,7 @@
           </button>
           <button
             type="button"
-            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-neutral-500 shadow-sm px-4 py-2 bg-white dark:bg-neutral-500 text-base font-medium text-gray-700 dark:text-neutral-50 hover:bg-gray-50 dark:hover:bg-neutral-600 dark:hover:border-neutral-600 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+            class="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none sm:ml-3 sm:mt-0 sm:w-auto sm:text-sm dark:border-neutral-500 dark:bg-neutral-500 dark:text-neutral-50 dark:hover:border-neutral-600 dark:hover:bg-neutral-600"
             @click="modalStore.clientDelete = null"
           >
             {{ $t('cancel') }}

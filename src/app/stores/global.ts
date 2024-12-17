@@ -1,33 +1,14 @@
 import { defineStore } from 'pinia';
 
 export const useGlobalStore = defineStore('Global', () => {
-  const uiShowCharts = ref(getItem('uiShowCharts') === '1');
-  const currentRelease = ref<null | string>(null);
-  const latestRelease = ref<null | { version: string; changelog: string }>(
-    null
-  );
-  const updateAvailable = ref(false);
-  const features = ref({
-    trafficStats: {
-      enabled: false,
-      type: 0,
-    },
-    sortClients: {
-      enabled: false,
-    },
-    clientExpiration: {
-      enabled: false,
-    },
-    oneTimeLinks: {
-      enabled: false,
-    },
-  });
   const sortClient = ref(true); // Sort clients by name, true = asc, false = desc
 
   const { availableLocales, locale } = useI18n();
 
   async function setLanguage() {
-    const { data: lang } = await api.getLang();
+    const { data: lang } = await useFetch('/api/lang', {
+      method: 'get',
+    });
     if (
       lang.value !== getItem('lang') &&
       availableLocales.includes(lang.value!)
@@ -37,8 +18,16 @@ export const useGlobalStore = defineStore('Global', () => {
     }
   }
 
+  const currentRelease = ref<null | string>(null);
+  const latestRelease = ref<null | { version: string; changelog: string }>(
+    null
+  );
+  const updateAvailable = ref(false);
+
   async function fetchRelease() {
-    const { data: release } = await api.getRelease();
+    const { data: release } = await useFetch('/api/release', {
+      method: 'get',
+    });
 
     if (!release.value) {
       return;
@@ -49,27 +38,35 @@ export const useGlobalStore = defineStore('Global', () => {
     updateAvailable.value = release.value.updateAvailable;
   }
 
-  async function fetchFeatures() {
-    const { data: apiFeatures } = await api.getFeatures();
-    if (apiFeatures.value) {
-      features.value = apiFeatures.value;
-    }
+  const uiShowCharts = ref(getItem('uiShowCharts') === '1');
+
+  function toggleCharts() {
+    setItem('uiShowCharts', uiShowCharts.value ? '1' : '0');
   }
 
-  const updateCharts = computed(() => {
-    return features.value.trafficStats.type > 0 && uiShowCharts.value;
-  });
+  const uiChartType = ref(getItem('uiChartType') ?? 'area');
+
+  /**
+   * @throws if unsuccessful
+   */
+  async function updateLang(lang: string) {
+    const response = await $fetch('/api/admin/lang', {
+      method: 'post',
+      body: { lang },
+    });
+    return response.success;
+  }
 
   return {
-    uiShowCharts,
-    updateCharts,
     sortClient,
-    features,
+    setLanguage,
     currentRelease,
     latestRelease,
     updateAvailable,
     fetchRelease,
-    fetchFeatures,
-    setLanguage,
+    uiShowCharts,
+    toggleCharts,
+    uiChartType,
+    updateLang,
   };
 });
