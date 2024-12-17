@@ -12,28 +12,49 @@ jobs:
     if: github.repository_owner == 'wg-easy'
     permissions:
       packages: write
-      contents: read
+      contents: write
     steps:
-    - uses: actions/checkout@v4
-      with:
-        ref: master
+      - uses: actions/checkout@v4
+        with:
+          ref: master
 
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v3
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-    - name: Login to GitHub Container Registry
-      uses: docker/login-action@v3
-      with:
-        registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Build & Publish Docker Image
-      uses: docker/build-push-action@v6
-      with:
-        push: true
-        platforms: linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8
-        tags: ghcr.io/wg-easy/wg-easy:nightly
+      - name: Build & Publish Docker Image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          platforms: linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8
+          tags: ghcr.io/wg-easy/wg-easy:nightly
+          cache-from: type=gha
+          cache-to: type=gha,mode=min
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11.9
+      - name: Install Dependencies
+        run: |
+          pip install mkdocs-material
+          pip install pillow cairosvg mike
+      - name: Setup Docs Deploy
+        run: |
+          git config --global user.name 'Docs Deploy Bot'
+          git config --global user.email 'docs.deploy@users.noreply.github.com'
+      - name: Build Docs Website
+        run: |
+          cd docs
+          git fetch origin gh-pages --depth=1
+          mike deploy --push --update-aliases nightly

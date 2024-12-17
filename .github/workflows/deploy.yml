@@ -3,41 +3,71 @@ name: Build & Publish Latest
 on:
   workflow_dispatch:
   push:
-    branches:
-      - production
+    tags:
+      - "v*"
 
 jobs:
   deploy:
     name: Build & Deploy
     runs-on: ubuntu-latest
-    if: github.repository_owner == 'wg-easy'
+    if: |
+      github.repository_owner == 'wg-easy' &&
+      startsWith(github.ref, 'refs/tags/v')
     permissions:
       packages: write
-      contents: read
+      contents: write
     steps:
-    - uses: actions/checkout@v4
-      with:
-        ref: production
+      - uses: actions/checkout@v4
 
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v3
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-    - name: Login to GitHub Container Registry
-      uses: docker/login-action@v3
-      with:
-        registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ghcr.io/wg-easy/wg-easy
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}
+            type=semver,pattern={{major}}.{{minor}}
 
-    - name: Set environment variables
-      run: echo RELEASE=$(cat ./src/package.json | jq -r .release | jq -r .version) >> $GITHUB_ENV
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Build & Publish Docker Image
-      uses: docker/build-push-action@v6
-      with:
-        push: true
-        platforms: linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8
-        tags: ghcr.io/wg-easy/wg-easy:latest, ghcr.io/wg-easy/wg-easy:${{ env.RELEASE }}
+      - name: Build & Publish Docker Image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          platforms: linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=min
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11.9
+      - name: Install Dependencies
+        run: |
+          pip install mkdocs-material
+          pip install pillow cairosvg mike
+      - name: Setup Docs Deploy
+        run: |
+          git config --global user.name 'Docs Deploy Bot'
+          git config --global user.email 'docs.deploy@users.noreply.github.com'
+      - name: Build Docs Website
+        run: |
+          cd docs
+          git fetch origin gh-pages --depth=1
+          mike deploy --push --update-aliases ${{ github.ref_name }} latest
