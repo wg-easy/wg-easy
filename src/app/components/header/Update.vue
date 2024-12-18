@@ -23,5 +23,4 @@
 
 <script lang="ts" setup>
 const globalStore = useGlobalStore();
-globalStore.fetchRelease();
 </script>

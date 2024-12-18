@@ -55,6 +55,7 @@
 
 <script setup lang="ts">
 const globalStore = useGlobalStore();
+globalStore.fetchRelease();
 
 const route = useRoute();
 
