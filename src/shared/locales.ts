@@ -1,3 +1,1 @@
-export const LOCALES = [
-  { code: 'en', name: 'English' },
-];
+export const LOCALES = [{ code: 'en', name: 'English' }];
