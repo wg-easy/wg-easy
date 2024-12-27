@@ -1,5 +1,8 @@
 <template>
-  <div class="flex flex-col">
+  <div v-if="data?.length === 0">
+    {{ emptyText || 'No items' }}
+  </div>
+  <div v-else class="flex flex-col">
     <div v-for="(item, i) in data" :key="item">
       <input
         :value="item"
@@ -14,7 +17,8 @@
 </template>
 
 <script lang="ts" setup>
-const data = defineModel<string[] | null>();
+const data = defineModel<string[]>();
+defineProps<{ emptyText?: string[] }>();
 
 function update(i: number) {
   return (v: string) => {
