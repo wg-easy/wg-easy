@@ -27,6 +27,7 @@ export default defineNuxtConfig({
   nitro: {
     esbuild: {
       options: {
+        // to support big int
         target: 'es2020',
       },
     },
