@@ -155,7 +155,7 @@ class WireGuard {
       expiresAt: null,
       enabled: true,
       allowedIPs: [...system.userConfig.allowedIps],
-      serverAllowedIPs: null,
+      serverAllowedIPs: [],
       persistentKeepalive: system.userConfig.persistentKeepalive,
       mtu: system.userConfig.mtu,
     };
