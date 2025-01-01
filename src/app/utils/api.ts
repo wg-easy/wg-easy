@@ -57,19 +57,6 @@ class API {
     });
   }
 
-  async updateClientExpireDate({
-    clientId,
-    expireDate,
-  }: {
-    clientId: string;
-    expireDate: string | null;
-  }) {
-    return $fetch(`/api/client/${clientId}/expireDate`, {
-      method: 'put',
-      body: { expireDate },
-    });
-  }
-
   async restoreConfiguration(file: string) {
     return $fetch('/api/wireguard/restore', {
       method: 'put',

@@ -28,7 +28,17 @@ export type Client = {
   mtu: number;
 };
 
-export type NewClient = Omit<Client, 'createdAt' | 'updatedAt'>;
+export type CreateClient = Omit<Client, 'createdAt' | 'updatedAt'>;
+export type UpdateClient = Omit<
+  Client,
+  | 'createdAt'
+  | 'updatedAt'
+  | 'id'
+  | 'oneTimeLink'
+  | 'privateKey'
+  | 'publicKey'
+  | 'preSharedKey'
+>;
 
 /**
  * Interface for client-related database operations.
@@ -38,18 +48,14 @@ export abstract class ClientRepository {
   abstract findAll(): Promise<DeepReadonly<Record<string, Client>>>;
   abstract findById(id: string): Promise<DeepReadonly<Client | undefined>>;
 
-  abstract create(client: NewClient): Promise<void>;
+  abstract create(client: CreateClient): Promise<void>;
   abstract delete(id: string): Promise<void>;
   abstract toggle(id: string, enable: boolean): Promise<void>;
-  abstract updateName(id: string, name: string): Promise<void>;
-  abstract updateAddress4(id: string, address4: string): Promise<void>;
-  abstract updateExpirationDate(
-    id: string,
-    expirationDate: string | null
-  ): Promise<void>;
   abstract deleteOneTimeLink(id: string): Promise<void>;
   abstract createOneTimeLink(
     id: string,
     oneTimeLink: OneTimeLink
   ): Promise<void>;
+
+  abstract update(id: string, client: UpdateClient): Promise<void>;
 }

@@ -7,11 +7,11 @@
     </FormGroup>
     <FormGroup>
       <FormHeading>Allowed IPs</FormHeading>
-      <FormArrayField v-model="data.allowedIps" />
+      <FormArrayField v-model="data.allowedIps" name="allowedIps" />
     </FormGroup>
     <FormGroup>
       <FormHeading>DNS</FormHeading>
-      <FormArrayField v-model="data.defaultDns" />
+      <FormArrayField v-model="data.defaultDns" name="defaultDns" />
     </FormGroup>
     <FormGroup>
       <FormHeading>Advanced</FormHeading>

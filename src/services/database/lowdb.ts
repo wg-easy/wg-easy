@@ -15,7 +15,8 @@ import { migrationRunner } from './migrations';
 import {
   ClientRepository,
   type Client,
-  type NewClient,
+  type UpdateClient,
+  type CreateClient,
   type OneTimeLink,
 } from './repositories/client';
 import { SystemRepository, type Lang } from './repositories/system';
@@ -173,7 +174,7 @@ class LowDBClient extends ClientRepository {
     return makeReadonly(this.#db.data.clients[id]);
   }
 
-  async create(client: NewClient) {
+  async create(client: CreateClient) {
     DEBUG('Create Client');
     const now = new Date().toISOString();
     const newClient: Client = { ...client, createdAt: now, updatedAt: now };
@@ -196,24 +197,6 @@ class LowDBClient extends ClientRepository {
     await this.#db.update((data) => {
       if (data.clients[id]) {
         data.clients[id].enabled = enable;
-      }
-    });
-  }
-
-  async updateName(id: string, name: string) {
-    DEBUG('Update Client Name');
-    await this.#db.update((data) => {
-      if (data.clients[id]) {
-        data.clients[id].name = name;
-      }
-    });
-  }
-
-  async updateAddress4(id: string, address4: string) {
-    DEBUG('Update Client Address4');
-    await this.#db.update((data) => {
-      if (data.clients[id]) {
-        data.clients[id].address4 = address4;
       }
     });
   }
@@ -247,6 +230,22 @@ class LowDBClient extends ClientRepository {
       if (data.clients[id]) {
         data.clients[id].oneTimeLink = oneTimeLink;
       }
+    });
+  }
+
+  async update(id: string, client: UpdateClient) {
+    DEBUG('Create Client');
+    const now = new Date().toISOString();
+    await this.#db.update((data) => {
+      const oldClient = data.clients[id];
+      if (!oldClient) {
+        return;
+      }
+      data.clients[id] = {
+        ...oldClient,
+        ...client,
+        updatedAt: now,
+      };
     });
   }
 }

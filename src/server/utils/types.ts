@@ -1,67 +1,26 @@
-import type { ZodSchema } from 'zod';
+import type { ZodSchema, ZodTypeDef } from 'zod';
 import { z, ZodError } from 'zod';
 import type { H3Event, EventHandlerRequest } from 'h3';
 import { LOCALES } from '#shared/locales';
+import { zfd } from 'zod-form-data';
 
-// TODO: use i18n for messages
+// TODO: make objects strict
+
+const objectMessage = 'zod.body';
 
 const safeStringRefine = z
   .string()
   .refine(
     (v) => v !== '__proto__' && v !== 'constructor' && v !== 'prototype',
-    { message: 'String is malformed' }
+    { message: 'zod.stringMalformed' }
   );
 
-const id = z.string().uuid('zod.id').pipe(safeStringRefine);
+const langs = LOCALES.map((lang) => lang.code);
+const lang = z.enum(['', ...langs]);
 
-const address4 = z.string({ message: 'zod.address4' }).pipe(safeStringRefine);
-
-const name = z
-  .string({ message: 'zod.name' })
-  .min(1, 'zod.nameMin')
-  .pipe(safeStringRefine);
-
-const file = z.string({ message: 'zod.file' }).pipe(safeStringRefine);
-const file_ = z.instanceof(File, { message: 'zod.file' });
-
-const username = z
-  .string({ message: 'zod.username' })
-  .min(8, 'zod.usernameMin') // i18n key
-  .pipe(safeStringRefine);
-
-const password = z
-  .string({ message: 'zod.password' })
-  .min(12, 'zod.passwordMin') // i18n key
-  .regex(/[A-Z]/, 'zod.passwordUppercase') // i18n key
-  .regex(/[a-z]/, 'zod.passwordLowercase') // i18n key
-  .regex(/\d/, 'zod.passwordNumber') // i18n key
-  .regex(/[!@#$%^&*(),.?":{}|<>]/, 'zod.passwordSpecial') // i18n key
-  .pipe(safeStringRefine);
-
-const accept = z.boolean().refine((val) => val === true, {
-  message: 'zod.accept',
-}); // i18n key
-
-const remember = z.boolean({ message: 'zod.remember' }); // i18n key
-
-const expireDate = z
-  .string({ message: 'zod.expireDate' }) // i18n key
-  .min(1, 'zod.expireDateMin') // i18n key
-  .pipe(safeStringRefine)
-  .nullable();
-
-const oneTimeLink = z
-  .string({ message: 'zod.otl' }) // i18n key
-  .min(1, 'zod.otlMin') // i18n key
-  .pipe(safeStringRefine);
-
-const statistics = z.object(
-  {
-    enabled: z.boolean({ message: 'zod.statBool' }), // i18n key
-    chartType: z.number({ message: 'zod.statNumber' }), // i18n key
-  },
-  { message: 'zod.stat' } // i18n key
-);
+export const langType = z.object({
+  lang: lang,
+});
 
 const host = z
   .string({ message: 'zod.host' })
@@ -73,47 +32,24 @@ const port = z
   .min(1, 'zod.portMin')
   .max(65535, 'zod.portMax');
 
-const objectMessage = 'zod.body'; // i18n key
-
-const langs = LOCALES.map((lang) => lang.code);
-const lang = z.enum(['', ...langs]);
-
-export const langType = z.object({
-  lang: lang,
-});
-
 export const hostPortType = z.object({
   host: host,
   port: port,
 });
 
+const id = z.string().uuid('zod.id').pipe(safeStringRefine);
+
 export const clientIdType = z.object(
   {
     clientId: id,
   },
-  { message: "This shouldn't happen" }
-);
-
-export const address4Type = z.object(
-  {
-    address4: address4,
-  },
   { message: objectMessage }
 );
 
-export const nameType = z.object(
-  {
-    name: name,
-  },
-  { message: objectMessage }
-);
-
-export const expireDateType = z.object(
-  {
-    expireDate: expireDate,
-  },
-  { message: objectMessage }
-);
+const oneTimeLink = z
+  .string({ message: 'zod.otl' })
+  .min(1, 'zod.otlMin')
+  .pipe(safeStringRefine);
 
 export const oneTimeLinkType = z.object(
   {
@@ -122,6 +58,17 @@ export const oneTimeLinkType = z.object(
   { message: objectMessage }
 );
 
+const name = z
+  .string({ message: 'zod.name' })
+  .min(1, 'zod.nameMin')
+  .pipe(safeStringRefine);
+
+const expireDate = z
+  .string({ message: 'zod.expireDate' })
+  .min(1, 'zod.expireDateMin')
+  .pipe(safeStringRefine)
+  .nullable();
+
 export const createType = z.object(
   {
     name: name,
@@ -129,6 +76,9 @@ export const createType = z.object(
   },
   { message: objectMessage }
 );
+
+const file = z.string({ message: 'zod.file' }).pipe(safeStringRefine);
+const file_ = z.instanceof(File, { message: 'zod.file' });
 
 export const fileType = z.object(
   {
@@ -142,6 +92,22 @@ export const fileType_ = z.object(
   },
   { message: objectMessage }
 );
+
+const username = z
+  .string({ message: 'zod.username' })
+  .min(8, 'zod.usernameMin')
+  .pipe(safeStringRefine);
+
+const password = z
+  .string({ message: 'zod.password' })
+  .min(12, 'zod.passwordMin')
+  .regex(/[A-Z]/, 'zod.passwordUppercase')
+  .regex(/[a-z]/, 'zod.passwordLowercase')
+  .regex(/\d/, 'zod.passwordNumber')
+  .regex(/[!@#$%^&*(),.?":{}|<>]/, 'zod.passwordSpecial')
+  .pipe(safeStringRefine);
+
+const remember = z.boolean({ message: 'zod.remember' });
 
 export const credentialsType = z.object(
   {
@@ -160,6 +126,10 @@ export const passwordType = z.object(
   { message: objectMessage }
 );
 
+const accept = z.boolean().refine((val) => val === true, {
+  message: 'zod.accept',
+});
+
 export const passwordSetupType = z.object(
   {
     username: username,
@@ -169,15 +139,48 @@ export const passwordSetupType = z.object(
   { message: objectMessage }
 );
 
-export const statisticsType = z.object(
-  {
-    statistics: statistics,
-  },
-  { message: objectMessage }
-);
+const address = z
+  .string({ message: 'zod.address' })
+  .min(1, { message: 'zod.addressMin' })
+  .pipe(safeStringRefine);
+
+const address4 = z
+  .string({ message: 'zod.address4' })
+  .min(1, { message: 'zod.address4Min' })
+  .pipe(safeStringRefine);
+
+const address6 = z
+  .string({ message: 'zod.address6' })
+  .min(1, { message: 'zod.address6Min' })
+  .pipe(safeStringRefine);
+
+/** expects formdata, strict */
+export const clientUpdateType = zfd.formData({
+  name: zfd.text(name),
+  enabled: zfd.checkbox(),
+  expiresAt: zfd.text(expireDate.optional()),
+  address4: zfd.text(address4),
+  address6: zfd.text(address6),
+  allowedIPs: zfd.repeatable(
+    z
+      .array(zfd.text(address), { message: 'zod.allowedIPs' })
+      .min(1, { message: 'zod.allowedIPsMin' })
+  ),
+  serverAllowedIPs: zfd.repeatable(
+    z.array(zfd.text(address), { message: 'zod.serverAllowedIPs' })
+  ),
+  mtu: zfd.numeric(),
+  persistentKeepalive: zfd.numeric(),
+});
+
+// from https://github.com/airjp73/rvf/blob/7e7c35d98015ea5ecff5affaf89f78296e84e8b9/packages/zod-form-data/src/helpers.ts#L117
+type FormDataLikeInput = {
+  [Symbol.iterator](): IterableIterator<[string, FormDataEntryValue]>;
+  entries(): IterableIterator<[string, FormDataEntryValue]>;
+};
 
 export function validateZod<T>(
-  schema: ZodSchema<T>,
+  schema: ZodSchema<T> | ZodSchema<T, ZodTypeDef, FormData | FormDataLikeInput>,
   event?: H3Event<EventHandlerRequest>
 ) {
   return async (data: unknown) => {
@@ -197,7 +200,7 @@ export function validateZod<T>(
             let m = v.message;
 
             if (t) {
-              m = t(m); // m key else v.message
+              m = t(m);
             }
 
             return m;

@@ -4,8 +4,10 @@ import crypto from 'node:crypto';
 import QRCode from 'qrcode';
 import CRC32 from 'crc-32';
 
-import type { NewClient } from '~~/services/database/repositories/client';
-import { isIPv4 } from 'is-ip';
+import type {
+  CreateClient,
+  UpdateClient,
+} from '~~/services/database/repositories/client';
 
 const DEBUG = debug('WireGuard');
 
@@ -143,7 +145,7 @@ class WireGuard {
     // Create Client
     const id = crypto.randomUUID();
 
-    const client: NewClient = {
+    const client: CreateClient = {
       id,
       name,
       address4,
@@ -208,56 +210,15 @@ class WireGuard {
     await this.saveConfig();
   }
 
-  async updateClientName({
+  async updateClient({
     clientId,
-    name,
+    client,
   }: {
     clientId: string;
-    name: string;
+    client: UpdateClient;
   }) {
-    await Database.client.updateName(clientId, name);
-
-    await this.saveConfig();
-  }
-
-  async updateClientAddress({
-    clientId,
-    address4,
-  }: {
-    clientId: string;
-    address4: string;
-  }) {
-    if (!isIPv4(address4)) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: `Invalid Address: ${address4}`,
-      });
-    }
-
-    await Database.client.updateAddress4(clientId, address4);
-
-    await this.saveConfig();
-  }
-
-  async updateClientExpireDate({
-    clientId,
-    expireDate,
-  }: {
-    clientId: string;
-    expireDate: string | null;
-  }) {
-    let updatedDate: string | null = null;
-
-    if (expireDate) {
-      const date = new Date(expireDate);
-      date.setHours(23);
-      date.setMinutes(59);
-      date.setSeconds(59);
-      updatedDate = date.toISOString();
-    }
-
-    await Database.client.updateExpirationDate(clientId, updatedDate);
-
+    // TODO: validate ipv4, v6, expire date etc
+    await Database.client.update(clientId, client);
     await this.saveConfig();
   }
 

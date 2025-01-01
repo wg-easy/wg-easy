@@ -4,9 +4,9 @@
   </Label>
   <input
     :id="id"
-    v-model.number="data"
+    v-model="data"
     :name="id"
-    type="number"
+    type="text"
     class="rounded-lg border-2 border-gray-100 text-gray-500 focus:border-red-800 focus:outline-0 focus:ring-0 dark:border-neutral-800 dark:bg-neutral-700 dark:text-neutral-200 dark:placeholder:text-neutral-400"
   />
 </template>
@@ -14,5 +14,7 @@
 <script lang="ts" setup>
 defineProps<{ id: string; label: string }>();
 
-const data = defineModel<number>();
+// TODO: proper datefield
+
+const data = defineModel<string | null>();
 </script>

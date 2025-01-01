@@ -39,8 +39,17 @@
     "migration": "Restore the backup"
   },
   "zod": {
+    "stringMalformed": "String is malformed",
     "id": "Client ID must be a valid UUID",
+    "address": "IP Address must be a valid string",
+    "addressMin": "IP Address must be a be at least 1 Character",
     "address4": "IPv4 Address must be a valid string",
+    "address4Min": "IPv4 Address must be a be at least 1 Character",
+    "address6": "IPv6 Address must be a valid string",
+    "address6Min": "IPv6 Address must be a be at least 1 Character",
+    "allowedIPs": "Allowed IPs must be a valid array of strings",
+    "allowedIPsMin": "Allowed IPs must have at least 1 item",
+    "serverAllowedIPs": "Allowed IPs must be a valid array of strings",
     "name": "Name must be a valid string",
     "nameMin": "Name must be at least 1 Character",
     "file": "File must be a valid string",
