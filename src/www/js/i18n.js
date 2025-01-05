@@ -74,6 +74,12 @@ const messages = { // eslint-disable-line no-unused-vars
     backup: 'Резервна копія',
     titleRestoreConfig: 'Відновити конфігурацію',
     titleBackupConfig: 'Створити резервну копію конфігурації',
+    rememberMe: 'Запам'ятати мене',
+    titleRememberMe: 'Залишатися в системі після закриття браузера',
+    sort: 'Сортувати',
+    ExpireDate: 'Дата закінчення',
+    Permanent: 'Постійний',
+    OneTimeLink: 'Створити коротке одноразове посилання',
   },
   ru: {
     name: 'Имя',
