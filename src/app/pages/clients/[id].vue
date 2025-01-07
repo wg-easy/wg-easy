@@ -5,7 +5,7 @@
         <PanelHeadTitle :text="data.name" />
       </PanelHead>
       <PanelBody>
-        <FormElement :action="submitAction" method="post">
+        <FormElement @submit.prevent="submit">
           <FormGroup>
             <FormHeading>
               {{ $t('me.sectionGeneral') }}
@@ -74,12 +74,14 @@ authStore.update();
 const route = useRoute();
 const id = route.params.id as string;
 
-const submitAction = computed(() => `/api/client/${id}`);
-
 const { data: _data, refresh } = await useFetch(`/api/client/${id}`, {
   method: 'get',
 });
 const data = toRef(_data.value);
+
+function submit() {
+  console.log(data.value);
+}
 
 async function revert() {
   await refresh();

@@ -2,7 +2,6 @@ import type { ZodSchema, ZodTypeDef } from 'zod';
 import { z, ZodError } from 'zod';
 import type { H3Event, EventHandlerRequest } from 'h3';
 import { LOCALES } from '#shared/locales';
-import { zfd } from 'zod-form-data';
 
 // TODO: make objects strict
 
@@ -155,22 +154,18 @@ const address6 = z
   .pipe(safeStringRefine);
 
 /** expects formdata, strict */
-export const clientUpdateType = zfd.formData({
-  name: zfd.text(name),
-  enabled: zfd.checkbox(),
-  expiresAt: zfd.text(expireDate.optional()),
-  address4: zfd.text(address4),
-  address6: zfd.text(address6),
-  allowedIPs: zfd.repeatable(
-    z
-      .array(zfd.text(address), { message: 'zod.allowedIPs' })
-      .min(1, { message: 'zod.allowedIPsMin' })
-  ),
-  serverAllowedIPs: zfd.repeatable(
-    z.array(zfd.text(address), { message: 'zod.serverAllowedIPs' })
-  ),
-  mtu: zfd.numeric(),
-  persistentKeepalive: zfd.numeric(),
+export const clientUpdateType = z.strictObject({
+  name: name,
+  enabled: z.boolean(),
+  expiresAt: expireDate,
+  address4: address4,
+  address6: address6,
+  allowedIPs: z
+    .array(address, { message: 'zod.allowedIPs' })
+    .min(1, { message: 'zod.allowedIPsMin' }),
+  serverAllowedIPs: z.array(address, { message: 'zod.serverAllowedIPs' }),
+  mtu: z.number({ message: 'zod.mtu' }),
+  persistentKeepalive: z.number({ message: 'zod.persistentKeepalive' }),
 });
 
 // from https://github.com/airjp73/rvf/blob/7e7c35d98015ea5ecff5affaf89f78296e84e8b9/packages/zod-form-data/src/helpers.ts#L117

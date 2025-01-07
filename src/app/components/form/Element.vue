@@ -1,9 +1,5 @@
 <template>
-  <form :action="action" :method="method">
+  <form>
     <slot />
   </form>
 </template>
-
-<script lang="ts" setup>
-defineProps<{ method: string; action: string }>();
-</script>

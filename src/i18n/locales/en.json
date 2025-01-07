@@ -52,6 +52,8 @@
     "serverAllowedIPs": "Allowed IPs must be a valid array of strings",
     "name": "Name must be a valid string",
     "nameMin": "Name must be at least 1 Character",
+    "mtu": "MTU must be a valid number",
+    "persistentKeepalive": "Persistent Keepalive must be a valid number",
     "file": "File must be a valid string",
     "username": "Username must be a valid string",
     "usernameMin": "Username must be at least 8 Characters",

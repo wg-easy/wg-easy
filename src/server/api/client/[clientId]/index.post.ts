@@ -3,7 +3,7 @@ export default defineEventHandler(async (event) => {
     event,
     validateZod(clientIdType)
   );
-  const data = await readValidatedFormData(
+  const data = await readValidatedBody(
     event,
     validateZod(clientUpdateType, event)
   );

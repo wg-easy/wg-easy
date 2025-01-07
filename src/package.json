@@ -41,8 +41,7 @@
     "timeago.js": "^4.0.2",
     "vue": "latest",
     "vue3-apexcharts": "^1.8.0",
-    "zod": "^3.24.1",
-    "zod-form-data": "^2.0.5"
+    "zod": "^3.24.1"
   },
   "devDependencies": {
     "@nuxt/eslint-config": "^0.7.3",
