@@ -74,8 +74,6 @@
         :value="$t('signIn')"
       />
     </form>
-
-    <BaseToast ref="toast" />
   </main>
 </template>
 
@@ -89,7 +87,7 @@ const remember = ref(false);
 const username = ref<null | string>(null);
 const password = ref<null | string>(null);
 const authStore = useAuthStore();
-const toast = useTemplateRef('toast');
+const toast = useToast();
 
 async function login(e: Event) {
   e.preventDefault();
@@ -108,7 +106,8 @@ async function login(e: Event) {
     }
   } catch (error) {
     if (error instanceof FetchError) {
-      toast.value?.publish({
+      toast.showToast({
+        type: 'error',
         title: t('error.login'),
         message: error.data.message,
       });

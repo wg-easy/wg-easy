@@ -71,7 +71,9 @@
 <script lang="ts" setup>
 const authStore = useAuthStore();
 authStore.update();
+const router = useRouter();
 const route = useRoute();
+const toast = useToast();
 const id = route.params.id as string;
 
 const { data: _data, refresh } = await useFetch(`/api/client/${id}`, {
@@ -79,8 +81,30 @@ const { data: _data, refresh } = await useFetch(`/api/client/${id}`, {
 });
 const data = toRef(_data.value);
 
-function submit() {
-  console.log(data.value);
+async function submit() {
+  try {
+    const res = await $fetch(`/api/client/${id}`, {
+      method: 'post',
+      body: data.value,
+    });
+    toast.showToast({
+      type: 'success',
+      title: 'Success',
+      message: 'Saved',
+    });
+    if (!res.success) {
+      throw new Error('Failed to save');
+    }
+    router.push('/');
+  } catch (e) {
+    if (e instanceof Error) {
+      toast.showToast({
+        type: 'error',
+        title: 'Error',
+        message: e.message,
+      });
+    }
+  }
 }
 
 async function revert() {

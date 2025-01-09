@@ -25,6 +25,6 @@
 const props = defineProps<{
   client: LocalClient;
 }>();
-
+// TODO: why is this undefined?
 console.log(props.client.avatar);
 </script>

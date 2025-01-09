@@ -22,17 +22,20 @@ const { t, locale, setLocale } = useI18n();
 function handleEventUpdateLang(value: string) {
   setLocale(value);
 }
-
 const setupStore = useSetupStore();
 setupStore.setStep(1);
+
 const router = useRouter();
+const toast = useToast();
+
 async function updateLang() {
   try {
     await setupStore.step1(locale.value);
     router.push('/setup/2');
   } catch (error) {
     if (error instanceof FetchError) {
-      setupStore.handleError({
+      toast.showToast({
+        type: 'error',
         title: t('setup.requirements'),
         message: error.data.message,
       });

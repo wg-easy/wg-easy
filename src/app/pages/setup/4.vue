@@ -55,10 +55,13 @@ const username = ref<null | string>(null);
 const password = ref<null | string>(null);
 const accept = ref<boolean>(true);
 
+const toast = useToast();
+
 async function newAccount() {
   try {
     if (!username.value || !password.value) {
-      setupStore.handleError({
+      toast.showToast({
+        type: 'error',
         title: t('setup.requirements'),
         message: t('setup.emptyFields'),
       });
@@ -69,7 +72,8 @@ async function newAccount() {
     await router.push('/setup/5');
   } catch (error) {
     if (error instanceof FetchError) {
-      setupStore.handleError({
+      toast.showToast({
+        type: 'error',
         title: t('setup.requirements'),
         message: error.data.message,
       });

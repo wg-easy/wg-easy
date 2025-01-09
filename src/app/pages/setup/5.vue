@@ -43,9 +43,12 @@ const router = useRouter();
 const host = ref<null | string>(null);
 const port = ref<number>(51820);
 
+const toast = useToast();
+
 async function updateHostPort() {
   if (!host.value || !port.value) {
-    setupStore.handleError({
+    toast.showToast({
+      type: 'error',
       title: t('setup.requirements'),
       message: t('setup.emptyFields'),
     });
@@ -57,7 +60,8 @@ async function updateHostPort() {
     await router.push('/setup/success');
   } catch (error) {
     if (error instanceof FetchError) {
-      setupStore.handleError({
+      toast.showToast({
+        type: 'error',
         title: t('setup.requirements'),
         message: error.data.message,
       });

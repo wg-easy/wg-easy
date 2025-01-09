@@ -11,11 +11,12 @@ defineExpose({
   publish,
 });
 
+// TODO: support multiple types (info, success, error, warning)
+
 const count = reactive<{ title: string; message: string }[]>([]);
 
 function publish(e: { title: string; message: string }) {
   count.push({ title: e.title, message: e.message });
-  console.log(count.length);
 }
 </script>
 

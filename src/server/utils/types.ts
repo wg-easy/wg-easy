@@ -3,8 +3,6 @@ import { z, ZodError } from 'zod';
 import type { H3Event, EventHandlerRequest } from 'h3';
 import { LOCALES } from '#shared/locales';
 
-// TODO: make objects strict
-
 const objectMessage = 'zod.body';
 
 const safeStringRefine = z
@@ -153,8 +151,7 @@ const address6 = z
   .min(1, { message: 'zod.address6Min' })
   .pipe(safeStringRefine);
 
-/** expects formdata, strict */
-export const clientUpdateType = z.strictObject({
+export const clientUpdateType = z.object({
   name: name,
   enabled: z.boolean(),
   expiresAt: expireDate,

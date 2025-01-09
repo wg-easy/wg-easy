@@ -45,25 +45,6 @@ export const useSetupStore = defineStore('Setup', () => {
     return response.success;
   }
 
-  type SetupError = {
-    title: string;
-    message: string;
-  };
-
-  type ErrorRef = {
-    value: { publish: (e: SetupError) => void } | null;
-  };
-
-  const errorRef = ref<null | ErrorRef>(null);
-
-  function setErrorRef(a: ErrorRef | null) {
-    errorRef.value = a;
-  }
-
-  function handleError(e: SetupError) {
-    errorRef.value?.value?.publish(e);
-  }
-
   const step = ref(1);
   const totalSteps = ref(6);
   function setStep(i: number) {
@@ -75,8 +56,6 @@ export const useSetupStore = defineStore('Setup', () => {
     step4,
     step5,
     runMigration,
-    setErrorRef,
-    handleError,
     step,
     totalSteps,
     setStep,
