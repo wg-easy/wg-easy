@@ -6,7 +6,7 @@
     :id="id"
     v-model="data"
     :name="id"
-    type="text"
+    type="date"
     class="rounded-lg border-2 border-gray-100 text-gray-500 focus:border-red-800 focus:outline-0 focus:ring-0 dark:border-neutral-800 dark:bg-neutral-700 dark:text-neutral-200 dark:placeholder:text-neutral-400"
   />
 </template>
@@ -14,7 +14,13 @@
 <script lang="ts" setup>
 defineProps<{ id: string; label: string }>();
 
-// TODO: proper datefield
-
-const data = defineModel<string | null>();
+const [data] = defineModel<string | null>({
+  set(value) {
+    const temp = value?.trim() ?? null;
+    if (temp === '') {
+      return null;
+    }
+    return temp;
+  },
+});
 </script>
