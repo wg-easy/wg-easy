@@ -18,7 +18,6 @@ export async function run1(db: Low<Database>) {
     system: {
       general: {
         sessionTimeout: 3600, // 1 hour
-        lang: 'en',
       },
       // Config to configure Server
       interface: {

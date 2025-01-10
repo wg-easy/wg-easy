@@ -1,7 +1,6 @@
 import type { ZodSchema, ZodTypeDef } from 'zod';
 import { z, ZodError } from 'zod';
 import type { H3Event, EventHandlerRequest } from 'h3';
-import { LOCALES } from '#shared/locales';
 
 const objectMessage = 'zod.body';
 
@@ -11,13 +10,6 @@ const safeStringRefine = z
     (v) => v !== '__proto__' && v !== 'constructor' && v !== 'prototype',
     { message: 'zod.stringMalformed' }
   );
-
-const langs = LOCALES.map((lang) => lang.code);
-const lang = z.enum(['', ...langs]);
-
-export const langType = z.object({
-  lang: lang,
-});
 
 const host = z
   .string({ message: 'zod.host' })

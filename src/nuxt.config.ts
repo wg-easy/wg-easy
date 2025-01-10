@@ -23,6 +23,24 @@ export default defineNuxtConfig({
     experimental: {
       localeDetector: './localeDetector.ts',
     },
+    locales: [
+      {
+        code: 'en',
+        language: 'en-US',
+        name: 'English',
+      },
+      {
+        code: 'de',
+        language: 'de-DE',
+        name: 'Deutsch',
+      },
+    ],
+    defaultLocale: 'en',
+    vueI18n: './i18n.config.ts',
+    strategy: 'no_prefix',
+    detectBrowserLanguage: {
+      useCookie: true,
+    },
   },
   nitro: {
     esbuild: {

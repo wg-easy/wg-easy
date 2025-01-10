@@ -19,7 +19,7 @@
       "warning": "First of all, make sure you have a backup of your data if you want to migrate your users to your new wg-easy.",
       "next": "Click on the arrow button to proceed to the next step."
     },
-    "messageSetupLanguage": "Please choose a default language.",
+    "messageSetupLanguage": "Please choose a language for the setup.",
     "messageSetupCreateAdminUser": "Please first enter an admin username and a strong secure password. This information will be used to log in to your administration panel.",
     "messageSetupHostPort": "Please enter the host and port information. This will be used for the client configuration when setting up WireGuard on their devices.",
     "messageSetupMigration": "Please provide the backup file if you want to migrate your data from your previous wg-easy version to your new setup.",

@@ -19,7 +19,7 @@ import {
   type CreateClient,
   type OneTimeLink,
 } from './repositories/client';
-import { SystemRepository, type Lang } from './repositories/system';
+import { SystemRepository } from './repositories/system';
 import { SetupRepository, type Steps } from './repositories/setup';
 import type { DeepReadonly } from 'vue';
 
@@ -72,13 +72,6 @@ class LowDBSystem extends SystemRepository {
       throw new DatabaseError(DatabaseError.ERROR_INIT);
     }
     return makeReadonly(system);
-  }
-
-  async updateLang(lang: Lang): Promise<void> {
-    DEBUG('Update Language');
-    this.#db.update((v) => {
-      v.system.general.lang = lang;
-    });
   }
 
   async updateClientsHostPort(host: string, port: number): Promise<void> {

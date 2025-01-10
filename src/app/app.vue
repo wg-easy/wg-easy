@@ -12,9 +12,6 @@
 </template>
 
 <script setup lang="ts">
-const globalStore = useGlobalStore();
-globalStore.setLanguage();
-
 const toast = useToast();
 const toastRef = useTemplateRef('toast');
 toast.setToast(toastRef);

@@ -2,7 +2,7 @@
   <SelectRoot v-model="langProxy" :default-value="locale">
     <SelectTrigger
       class="inline-flex h-[35px] min-w-[160px] items-center justify-between gap-[5px] rounded px-[15px] text-[13px] leading-none dark:bg-neutral-500 dark:text-white"
-      aria-label="Customise language"
+      aria-label="Customize language"
     >
       <SelectValue :placeholder="$t('setup.chooseLang')" />
       <IconsArrowDown class="size-4" />
@@ -31,9 +31,9 @@
 </template>
 
 <script setup lang="ts">
-import { LOCALES } from '#shared/locales';
+// TODO: improve
 
-const { locale } = useI18n();
+const { locale, locales } = useI18n();
 const emit = defineEmits(['update:lang']);
 
 const langProxy = ref(locale);
@@ -42,5 +42,5 @@ watch(langProxy, (newVal) => {
   emit('update:lang', newVal);
 });
 
-const langs = LOCALES.sort((a, b) => a.code.localeCompare(b.code));
+const langs = locales.value.sort((a, b) => a.code.localeCompare(b.code));
 </script>

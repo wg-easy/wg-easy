@@ -4,17 +4,6 @@ export const useSetupStore = defineStore('Setup', () => {
   /**
    * @throws if unsuccessful
    */
-  async function step1(lang: string) {
-    const response = await $fetch('/api/setup/1', {
-      method: 'post',
-      body: { lang },
-    });
-    return response.success;
-  }
-
-  /**
-   * @throws if unsuccessful
-   */
   async function step4(username: string, password: string, accept: boolean) {
     const response = await $fetch('/api/setup/4', {
       method: 'post',
@@ -52,7 +41,6 @@ export const useSetupStore = defineStore('Setup', () => {
   }
 
   return {
-    step1,
     step4,
     step5,
     runMigration,

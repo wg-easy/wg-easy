@@ -14,7 +14,7 @@
     "format": "prettier . --write",
     "format:check": "prettier . --check",
     "typecheck": "nuxt typecheck",
-    "check:runall": "nuxt build && nuxt typecheck && eslint . && prettier . --check"
+    "check:all": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm build"
   },
   "dependencies": {
     "@eschricht/nuxt-color-mode": "^1.1.5",

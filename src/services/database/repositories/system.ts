@@ -1,8 +1,5 @@
 import type { SessionConfig } from 'h3';
 import type { DeepReadonly } from 'vue';
-import type { LOCALES } from '#shared/locales';
-
-export type Lang = (typeof LOCALES)[number]['code'];
 
 export type IpTables = {
   PreUp: string;
@@ -50,7 +47,6 @@ export type Metrics = {
 
 export type General = {
   sessionTimeout: number;
-  lang: Lang;
 };
 
 export type System = {
@@ -75,6 +71,5 @@ export type System = {
 export abstract class SystemRepository {
   abstract get(): Promise<DeepReadonly<System>>;
 
-  abstract updateLang(lang: Lang): Promise<void>;
   abstract updateClientsHostPort(host: string, port: number): Promise<void>;
 }
