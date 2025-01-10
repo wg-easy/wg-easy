@@ -19,7 +19,11 @@ import {
   type CreateClient,
   type OneTimeLink,
 } from './repositories/client';
-import { SystemRepository } from './repositories/system';
+import {
+  SystemRepository,
+  type General,
+  type UpdateWGInterface,
+} from './repositories/system';
 import { SetupRepository, type Steps } from './repositories/setup';
 import type { DeepReadonly } from 'vue';
 
@@ -79,6 +83,24 @@ class LowDBSystem extends SystemRepository {
     this.#db.update((v) => {
       v.system.userConfig.host = host;
       v.system.userConfig.port = port;
+    });
+  }
+
+  async updateGeneral(general: General) {
+    DEBUG('Update General');
+    this.#db.update((v) => {
+      v.system.general = general;
+    });
+  }
+
+  async updateInterface(wgInterface: UpdateWGInterface) {
+    DEBUG('Update Interface');
+    this.#db.update((v) => {
+      const oldInterface = v.system.interface;
+      v.system.interface = {
+        ...oldInterface,
+        ...wgInterface,
+      };
     });
   }
 }

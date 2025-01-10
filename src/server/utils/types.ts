@@ -157,6 +157,16 @@ export const clientUpdateType = z.object({
   persistentKeepalive: z.number({ message: 'zod.persistentKeepalive' }),
 });
 
+export const generalUpdateType = z.object({
+  sessionTimeout: z.number({ message: 'zod.sessionTimeout' }),
+});
+
+export const interfaceUpdateType = z.object({
+  mtu: z.number({ message: 'zod.mtu' }),
+  port: port,
+  device: z.string({ message: 'zod.device' }),
+});
+
 // from https://github.com/airjp73/rvf/blob/7e7c35d98015ea5ecff5affaf89f78296e84e8b9/packages/zod-form-data/src/helpers.ts#L117
 type FormDataLikeInput = {
   [Symbol.iterator](): IterableIterator<[string, FormDataEntryValue]>;

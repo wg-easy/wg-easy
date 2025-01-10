@@ -64,6 +64,8 @@ export async function run1(db: Low<Database>) {
     clients: {},
   };
 
+  // TODO: be able to regenerate this on changes
+
   database.system.iptables.PostUp =
     `iptables -t nat -A POSTROUTING -s ${database.system.userConfig.address4Range} -o ${database.system.interface.device} -j MASQUERADE;
 iptables -A INPUT -p udp -m udp --dport ${database.system.interface.port} -j ACCEPT;

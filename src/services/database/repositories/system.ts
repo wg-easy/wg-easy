@@ -63,6 +63,11 @@ export type System = {
   sessionConfig: SessionConfig;
 };
 
+export type UpdateWGInterface = Omit<
+  WGInterface,
+  'privateKey' | 'publicKey' | 'address4' | 'address6'
+>;
+
 /**
  * Interface for system-related database operations.
  * This interface provides methods for retrieving system configuration data
@@ -72,4 +77,8 @@ export abstract class SystemRepository {
   abstract get(): Promise<DeepReadonly<System>>;
 
   abstract updateClientsHostPort(host: string, port: number): Promise<void>;
+
+  abstract updateGeneral(general: General): Promise<void>;
+
+  abstract updateInterface(wgInterface: UpdateWGInterface): Promise<void>;
 }

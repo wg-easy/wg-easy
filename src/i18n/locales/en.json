@@ -81,7 +81,8 @@
     "hostMin": "Host must contain at least 1 character",
     "port": "Port must be a valid number",
     "portMin": "Port must be at least 1",
-    "portMax": "Port must be at most 65535"
+    "portMax": "Port must be at most 65535",
+    "sessionTimeout": "Session Timeout must be a valid number"
   },
   "name": "Name",
   "username": "Username",
