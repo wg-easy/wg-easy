@@ -45,12 +45,6 @@ class API {
     });
   }
 
-  async deleteClient({ clientId }: { clientId: string }) {
-    return $fetch(`/api/client/${clientId}`, {
-      method: 'delete',
-    });
-  }
-
   async showOneTimeLink({ clientId }: { clientId: string }) {
     return $fetch(`/api/client/${clientId}/generateOneTimeLink`, {
       method: 'post',

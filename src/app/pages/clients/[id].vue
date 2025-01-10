@@ -60,7 +60,12 @@
             <FormHeading>Actions</FormHeading>
             <FormActionField type="submit" label="Save" />
             <FormActionField label="Revert" @click="revert" />
-            <FormActionField type="submit" formmethod="delete" label="Delete" />
+            <ClientsDeleteDialog
+              trigger-class="col-span-2"
+              @delete="deleteClient"
+            >
+              <FormActionField label="Delete" class="w-full" />
+            </ClientsDeleteDialog>
           </FormGroup>
         </FormElement>
       </PanelBody>
@@ -110,5 +115,30 @@ async function submit() {
 async function revert() {
   await refresh();
   data.value = toRef(_data.value).value;
+}
+
+async function deleteClient() {
+  try {
+    const res = await $fetch(`/api/client/${id}`, {
+      method: 'delete',
+    });
+    toast.showToast({
+      type: 'success',
+      title: 'Success',
+      message: 'Deleted',
+    });
+    if (!res.success) {
+      throw new Error('Failed to delete');
+    }
+    router.push('/');
+  } catch (e) {
+    if (e instanceof Error) {
+      toast.showToast({
+        type: 'error',
+        title: 'Error',
+        message: e.message,
+      });
+    }
+  }
 }
 </script>

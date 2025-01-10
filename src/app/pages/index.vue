@@ -27,7 +27,6 @@
 
     <ClientsQRCodeDialog />
     <ClientsCreateDialog />
-    <ClientsDeleteDialog />
   </main>
 </template>
 
@@ -36,6 +35,9 @@ const authStore = useAuthStore();
 authStore.update();
 const globalStore = useGlobalStore();
 const clientsStore = useClientsStore();
+
+// TODO?: use hover card to show more detailed info without leaving the page
+// or do something like a accordion
 
 const intervalId = ref<NodeJS.Timeout | null>(null);
 

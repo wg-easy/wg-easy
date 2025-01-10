@@ -7,8 +7,10 @@
 </template>
 
 <script lang="ts" setup>
+import type { InputTypeHTMLAttribute } from 'vue';
+
 defineProps<{
   label: string;
-  type?: string;
+  type?: InputTypeHTMLAttribute;
 }>();
 </script>
