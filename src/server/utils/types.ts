@@ -143,9 +143,9 @@ const address6 = z
   .min(1, { message: 'zod.address6Min' })
   .pipe(safeStringRefine);
 
-const allowedIPs = z
-  .array(address, { message: 'zod.allowedIPs' })
-  .min(1, { message: 'zod.allowedIPsMin' });
+const allowedIps = z
+  .array(address, { message: 'zod.allowedIps' })
+  .min(1, { message: 'zod.allowedIpsMin' });
 
 const mtu = z
   .number({ message: 'zod.mtu' })
@@ -163,7 +163,7 @@ export const clientUpdateType = z.object({
   expiresAt: expireDate,
   address4: address4,
   address6: address6,
-  allowedIPs: allowedIPs,
+  allowedIps: allowedIps,
   serverAllowedIPs: z.array(address, { message: 'zod.serverAllowedIPs' }),
   mtu: mtu,
   persistentKeepalive: persistentKeepalive,
@@ -182,7 +182,7 @@ export const interfaceUpdateType = z.object({
 export const userConfigUpdateType = z.object({
   host: host,
   port: port,
-  allowedIps: allowedIPs,
+  allowedIps: allowedIps,
   defaultDns: z.array(address, { message: 'zod.dns' }),
   mtu: mtu,
   persistentKeepalive: persistentKeepalive,

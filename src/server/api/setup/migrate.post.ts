@@ -74,7 +74,7 @@ export default defineEventHandler(async (event) => {
       publicKey: oldClient.publicKey,
       expiresAt: null,
       oneTimeLink: null,
-      allowedIPs: [...db.system.userConfig.allowedIps],
+      allowedIps: [...db.system.userConfig.allowedIps],
       serverAllowedIPs: [],
       persistentKeepalive: 0,
       address6: address6,

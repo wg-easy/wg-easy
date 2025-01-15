@@ -37,7 +37,7 @@
           </FormGroup>
           <FormGroup>
             <FormHeading>Allowed IPs</FormHeading>
-            <FormArrayField v-model="data.allowedIPs" name="allowedIPs" />
+            <FormArrayField v-model="data.allowedIps" name="allowedIps" />
           </FormGroup>
           <FormGroup>
             <FormHeading>Server Allowed IPs</FormHeading>

@@ -55,7 +55,7 @@ MTU = ${client.mtu}
 [Peer]
 PublicKey = ${system.interface.publicKey}
 PresharedKey = ${client.preSharedKey}
-AllowedIPs = ${client.allowedIPs.join(', ')}
+AllowedIPs = ${client.allowedIps.join(', ')}
 PersistentKeepalive = ${client.persistentKeepalive}
 Endpoint = ${system.userConfig.host}:${system.userConfig.port}`;
   },
@@ -112,7 +112,7 @@ Endpoint = ${system.userConfig.host}:${system.userConfig.port}`;
           publicKey,
           preSharedKey,
           endpoint,
-          allowedIPs,
+          allowedIps,
           latestHandshakeAt,
           transferRx,
           transferTx,
@@ -123,7 +123,7 @@ Endpoint = ${system.userConfig.host}:${system.userConfig.port}`;
           publicKey,
           preSharedKey,
           endpoint: endpoint === '(none)' ? null : endpoint,
-          allowedIPs,
+          allowedIps,
           latestHandshakeAt:
             latestHandshakeAt === '0'
               ? null
