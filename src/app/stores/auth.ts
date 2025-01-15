@@ -1,16 +1,16 @@
 export const useAuthStore = defineStore('Auth', () => {
-  const userData = ref<null | {
-    name: string;
-    username: string;
-    role: string;
-    email: string | null;
-  }>();
+  const { data: userData, refresh: update } = useFetch('/api/session', {
+    method: 'get',
+  });
 
   /**
    * @throws if unsuccessful
    */
   async function login(username: string, password: string, remember: boolean) {
-    await api.createSession({ username, password, remember });
+    await $fetch('/api/session', {
+      method: 'post',
+      body: { username, password, remember },
+    });
     return true as const;
   }
 
@@ -18,14 +18,10 @@ export const useAuthStore = defineStore('Auth', () => {
    * @throws if unsuccessful
    */
   async function logout() {
-    const response = await api.deleteSession();
+    const response = await $fetch('/api/session', {
+      method: 'delete',
+    });
     return response.success;
-  }
-
-  async function update() {
-    // store role etc
-    const { data: response } = await api.getSession();
-    userData.value = response.value;
   }
 
   return { userData, login, logout, update };

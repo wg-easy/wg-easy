@@ -3,7 +3,16 @@ export default defineEventHandler(async (event) => {
     event,
     validateZod(clientIdType)
   );
-  const { name } = await readValidatedBody(event, validateZod(nameType));
-  await WireGuard.updateClientName({ clientId, name });
+
+  const data = await readValidatedBody(
+    event,
+    validateZod(clientUpdateType, event)
+  );
+
+  await WireGuard.updateClient({
+    clientId,
+    client: data,
+  });
+
   return { success: true };
 });

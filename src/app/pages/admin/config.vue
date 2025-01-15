@@ -1,0 +1,108 @@
+<template>
+  <main v-if="data">
+    <FormElement @submit.prevent="submit">
+      <FormGroup>
+        <FormHeading>Connection</FormHeading>
+        <FormTextField id="host" v-model="data.host" label="Host" />
+        <FormNumberField id="port" v-model="data.port" label="Port" />
+      </FormGroup>
+      <FormGroup>
+        <FormHeading>Allowed IPs</FormHeading>
+        <FormArrayField v-model="data.allowedIps" name="allowedIps" />
+      </FormGroup>
+      <FormGroup>
+        <FormHeading>DNS</FormHeading>
+        <FormArrayField v-model="data.defaultDns" name="defaultDns" />
+      </FormGroup>
+      <FormGroup>
+        <FormHeading>Advanced</FormHeading>
+        <FormNumberField id="mtu" v-model="data.mtu" label="MTU" />
+        <FormNumberField
+          id="keepalive"
+          v-model="data.persistentKeepalive"
+          label="Persistent Keepalive"
+        />
+      </FormGroup>
+      <FormGroup>
+        <FormHeading>Actions</FormHeading>
+        <FormActionField type="submit" label="Save" />
+        <FormActionField label="Revert" @click="revert" />
+        <AdminCidrDialog
+          trigger-class="col-span-2"
+          :address6="data.address6Range"
+          :address4="data.address4Range"
+          @change="changeCidr"
+        >
+          <FormActionField label="Change CIDR" class="w-full" />
+        </AdminCidrDialog>
+      </FormGroup>
+    </FormElement>
+  </main>
+</template>
+
+<script lang="ts" setup>
+const toast = useToast();
+
+const { data: _data, refresh } = await useFetch(`/api/admin/userconfig`, {
+  method: 'get',
+});
+
+const data = toRef(_data.value);
+
+async function submit() {
+  try {
+    const res = await $fetch(`/api/admin/userconfig`, {
+      method: 'post',
+      body: data.value,
+    });
+    toast.showToast({
+      type: 'success',
+      title: 'Success',
+      message: 'Saved',
+    });
+    if (!res.success) {
+      throw new Error('Failed to save');
+    }
+    await refreshNuxtData();
+  } catch (e) {
+    if (e instanceof Error) {
+      toast.showToast({
+        type: 'error',
+        title: 'Error',
+        message: e.message,
+      });
+    }
+  }
+}
+
+async function revert() {
+  await refresh();
+  data.value = toRef(_data.value).value;
+}
+
+async function changeCidr(address4: string, address6: string) {
+  try {
+    const res = await $fetch(`/api/admin/userconfig/cidr`, {
+      method: 'post',
+      body: { address4, address6 },
+    });
+    toast.showToast({
+      type: 'success',
+      title: 'Success',
+      message: 'Changed CIDR',
+    });
+    if (!res.success) {
+      throw new Error('Failed to change CIDR');
+    }
+    await refreshNuxtData();
+  } catch (e) {
+    if (e instanceof Error) {
+      toast.showToast({
+        type: 'error',
+        title: 'Error',
+        message: e.message,
+      });
+    }
+  }
+}
+</script>

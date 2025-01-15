@@ -1,11 +1,13 @@
 import fs from 'node:fs/promises';
 import debug from 'debug';
-import crypto from 'node:crypto';
 import QRCode from 'qrcode';
 import CRC32 from 'crc-32';
+import isCidr from 'is-cidr';
 
-import type { NewClient } from '~~/services/database/repositories/client';
-import { isIPv4 } from 'is-ip';
+import type {
+  CreateClient,
+  UpdateClient,
+} from '~~/services/database/repositories/client';
 
 const DEBUG = debug('WireGuard');
 
@@ -59,7 +61,7 @@ class WireGuard {
       createdAt: new Date(client.createdAt),
       updatedAt: new Date(client.updatedAt),
       expiresAt: client.expiresAt,
-      allowedIPs: client.allowedIPs,
+      allowedIps: client.allowedIps,
       oneTimeLink: client.oneTimeLink,
       persistentKeepalive: null as string | null,
       latestHandshakeAt: null as Date | null,
@@ -140,11 +142,7 @@ class WireGuard {
 
     const address6 = nextIPv6(system, clients);
 
-    // Create Client
-    const id = crypto.randomUUID();
-
-    const client: NewClient = {
-      id,
+    const client: CreateClient = {
       name,
       address4,
       address6,
@@ -154,8 +152,8 @@ class WireGuard {
       oneTimeLink: null,
       expiresAt: null,
       enabled: true,
-      allowedIPs: [...system.userConfig.allowedIps],
-      serverAllowedIPs: null,
+      allowedIps: [...system.userConfig.allowedIps],
+      serverAllowedIPs: [],
       persistentKeepalive: system.userConfig.persistentKeepalive,
       mtu: system.userConfig.mtu,
     };
@@ -208,55 +206,48 @@ class WireGuard {
     await this.saveConfig();
   }
 
-  async updateClientName({
+  async updateClient({
     clientId,
-    name,
+    client,
   }: {
     clientId: string;
-    name: string;
+    client: UpdateClient;
   }) {
-    await Database.client.updateName(clientId, name);
-
+    // TODO: validate ipv4, v6, expire date etc
+    await Database.client.update(clientId, client);
     await this.saveConfig();
   }
 
-  async updateClientAddress({
-    clientId,
+  async updateAddressRange({
     address4,
+    address6,
   }: {
-    clientId: string;
     address4: string;
+    address6: string;
   }) {
-    if (!isIPv4(address4)) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: `Invalid Address: ${address4}`,
+    // TODO: be able to revert if error
+
+    if (!isCidr(address4) || !isCidr(address6)) {
+      throw new Error('Invalid CIDR');
+    }
+
+    await Database.system.updateAddressRange(address4, address6);
+
+    const systems = await Database.system.get();
+    const clients = await Database.client.findAll();
+
+    for (const _client of Object.values(clients)) {
+      const clients = await Database.client.findAll();
+
+      const client = structuredClone(_client) as DeepWriteable<typeof _client>;
+
+      client.address4 = nextIPv4(systems, clients);
+      client.address6 = nextIPv6(systems, clients);
+
+      await Database.client.update(client.id, {
+        ...client,
       });
     }
-
-    await Database.client.updateAddress4(clientId, address4);
-
-    await this.saveConfig();
-  }
-
-  async updateClientExpireDate({
-    clientId,
-    expireDate,
-  }: {
-    clientId: string;
-    expireDate: string | null;
-  }) {
-    let updatedDate: string | null = null;
-
-    if (expireDate) {
-      const date = new Date(expireDate);
-      date.setHours(23);
-      date.setMinutes(59);
-      date.setSeconds(59);
-      updatedDate = date.toISOString();
-    }
-
-    await Database.client.updateExpirationDate(clientId, updatedDate);
 
     await this.saveConfig();
   }

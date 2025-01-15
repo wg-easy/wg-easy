@@ -153,7 +153,7 @@ For less common or specific edge-case scenarios, please refer to the detailed in
 
 ## License
 
-This project is licensed under the GPL-3.0-only License - see the LICENSE file for details
+This project is licensed under the AGPL-3.0-only License - see the LICENSE file for details
 
 This project is not affiliated, associated, authorized, endorsed by, or in any way officially connected with Jason A. Donenfeld, ZX2C4 or Edge Security
 

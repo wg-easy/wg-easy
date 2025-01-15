@@ -1,10 +1,7 @@
 import type { SessionConfig } from 'h3';
 import type { DeepReadonly } from 'vue';
-import type { LOCALES } from '#shared/locales';
 
-export type Lang = (typeof LOCALES)[number]['code'];
-
-export type IpTables = {
+export type WGHooks = {
   PreUp: string;
   PostUp: string;
   PreDown: string;
@@ -50,7 +47,6 @@ export type Metrics = {
 
 export type General = {
   sessionTimeout: number;
-  lang: Lang;
 };
 
 export type System = {
@@ -60,12 +56,19 @@ export type System = {
 
   userConfig: WGConfig;
 
-  iptables: IpTables;
+  hooks: WGHooks;
 
   metrics: Metrics;
 
   sessionConfig: SessionConfig;
 };
+
+export type UpdateWGInterface = Omit<
+  WGInterface,
+  'privateKey' | 'publicKey' | 'address4' | 'address6'
+>;
+
+export type UpdateWGConfig = Omit<WGConfig, 'address4Range' | 'address6Range'>;
 
 /**
  * Interface for system-related database operations.
@@ -75,6 +78,13 @@ export type System = {
 export abstract class SystemRepository {
   abstract get(): Promise<DeepReadonly<System>>;
 
-  abstract updateLang(lang: Lang): Promise<void>;
   abstract updateClientsHostPort(host: string, port: number): Promise<void>;
+
+  abstract updateGeneral(general: General): Promise<void>;
+
+  abstract updateInterface(wgInterface: UpdateWGInterface): Promise<void>;
+
+  abstract updateUserConfig(userConfig: UpdateWGConfig): Promise<void>;
+
+  abstract updateHooks(hooks: WGHooks): Promise<void>;
 }

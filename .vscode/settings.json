@@ -21,5 +21,6 @@
   ],
   "i18n-ally.sortKeys": false,
   "i18n-ally.keepFulfilled": false,
-  "i18n-ally.keystyle": "nested"
+  "i18n-ally.keystyle": "nested",
+  "editor.gotoLocation.multipleDefinitions": "goto"
 }

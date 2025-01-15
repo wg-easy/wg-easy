@@ -30,7 +30,7 @@ async function fetchLatestRelease() {
   try {
     const response = await $fetch<GithubRelease>(
       'https://api.github.com/repos/wg-easy/wg-easy/releases/latest',
-      { method: 'get' }
+      { method: 'get', timeout: 5000 }
     );
     if (!response) {
       throw new Error('Empty Response');

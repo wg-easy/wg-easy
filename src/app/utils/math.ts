@@ -20,17 +20,6 @@ export function bytes(
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
 }
 
-export function dateTime(value: Date) {
-  // TODO: results in mismatch because of different locales
-  return new Intl.DateTimeFormat(undefined, {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: 'numeric',
-  }).format(value);
-}
-
 /**
  * Sorts an array of objects by a specified property in ascending or descending order.
  *
