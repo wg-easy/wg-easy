@@ -1,31 +1,4 @@
 class API {
-  async getSession() {
-    return useFetch('/api/session', {
-      method: 'get',
-    });
-  }
-
-  async createSession({
-    username,
-    password,
-    remember,
-  }: {
-    username: string;
-    password: string | null;
-    remember: boolean;
-  }) {
-    return $fetch('/api/session', {
-      method: 'post',
-      body: { username, password, remember },
-    });
-  }
-
-  async deleteSession() {
-    return $fetch('/api/session', {
-      method: 'delete',
-    });
-  }
-
   async getClients() {
     return useFetch('/api/client', {
       method: 'get',
