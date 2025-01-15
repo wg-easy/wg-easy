@@ -143,18 +143,30 @@ const address6 = z
   .min(1, { message: 'zod.address6Min' })
   .pipe(safeStringRefine);
 
+const allowedIPs = z
+  .array(address, { message: 'zod.allowedIPs' })
+  .min(1, { message: 'zod.allowedIPsMin' });
+
+const mtu = z
+  .number({ message: 'zod.mtu' })
+  .min(1280, { message: 'zod.mtuMin' })
+  .max(9000, { message: 'zod.mtuMax' });
+
+const persistentKeepalive = z
+  .number({ message: 'zod.persistentKeepalive' })
+  .min(0, 'zod.persistentKeepaliveMin')
+  .max(65535, 'zod.persistentKeepaliveMax');
+
 export const clientUpdateType = z.object({
   name: name,
   enabled: z.boolean(),
   expiresAt: expireDate,
   address4: address4,
   address6: address6,
-  allowedIPs: z
-    .array(address, { message: 'zod.allowedIPs' })
-    .min(1, { message: 'zod.allowedIPsMin' }),
+  allowedIPs: allowedIPs,
   serverAllowedIPs: z.array(address, { message: 'zod.serverAllowedIPs' }),
-  mtu: z.number({ message: 'zod.mtu' }),
-  persistentKeepalive: z.number({ message: 'zod.persistentKeepalive' }),
+  mtu: mtu,
+  persistentKeepalive: persistentKeepalive,
 });
 
 export const generalUpdateType = z.object({
@@ -165,6 +177,15 @@ export const interfaceUpdateType = z.object({
   mtu: z.number({ message: 'zod.mtu' }),
   port: port,
   device: z.string({ message: 'zod.device' }),
+});
+
+export const userConfigUpdateType = z.object({
+  host: host,
+  port: port,
+  allowedIps: allowedIPs,
+  defaultDns: z.array(address, { message: 'zod.dns' }),
+  mtu: mtu,
+  persistentKeepalive: persistentKeepalive,
 });
 
 // from https://github.com/airjp73/rvf/blob/7e7c35d98015ea5ecff5affaf89f78296e84e8b9/packages/zod-form-data/src/helpers.ts#L117

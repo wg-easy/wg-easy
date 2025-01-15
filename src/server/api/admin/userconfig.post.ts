@@ -1,9 +1,9 @@
 export default defineEventHandler(async (event) => {
   const data = await readValidatedBody(
     event,
-    validateZod(interfaceUpdateType, event)
+    validateZod(userConfigUpdateType, event)
   );
-  await Database.system.updateInterface(data);
+  await Database.system.updateUserConfig(data);
   await WireGuard.saveConfig();
   return { success: true };
 });

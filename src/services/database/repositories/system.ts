@@ -68,6 +68,8 @@ export type UpdateWGInterface = Omit<
   'privateKey' | 'publicKey' | 'address4' | 'address6'
 >;
 
+export type UpdateWGConfig = Omit<WGConfig, 'address4Range' | 'address6Range'>;
+
 /**
  * Interface for system-related database operations.
  * This interface provides methods for retrieving system configuration data
@@ -81,4 +83,6 @@ export abstract class SystemRepository {
   abstract updateGeneral(general: General): Promise<void>;
 
   abstract updateInterface(wgInterface: UpdateWGInterface): Promise<void>;
+
+  abstract updateUserConfig(userConfig: UpdateWGConfig): Promise<void>;
 }

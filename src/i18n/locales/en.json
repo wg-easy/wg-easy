@@ -53,7 +53,11 @@
     "name": "Name must be a valid string",
     "nameMin": "Name must be at least 1 Character",
     "mtu": "MTU must be a valid number",
+    "mtuMin": "MTU must be at least 1280",
+    "mtuMax": "MTU must be at most 9000",
     "persistentKeepalive": "Persistent Keepalive must be a valid number",
+    "persistentKeepaliveMin": "Persistent Keepalive must be at least 0",
+    "persistentKeepaliveMax": "Persistent Keepalive must be at most 65535",
     "file": "File must be a valid string",
     "username": "Username must be a valid string",
     "usernameMin": "Username must be at least 8 Characters",
@@ -82,7 +86,8 @@
     "port": "Port must be a valid number",
     "portMin": "Port must be at least 1",
     "portMax": "Port must be at most 65535",
-    "sessionTimeout": "Session Timeout must be a valid number"
+    "sessionTimeout": "Session Timeout must be a valid number",
+    "device": "Device has to be a valid string"
   },
   "name": "Name",
   "username": "Username",

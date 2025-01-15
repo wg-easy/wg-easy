@@ -22,6 +22,7 @@ import {
 import {
   SystemRepository,
   type General,
+  type UpdateWGConfig,
   type UpdateWGInterface,
 } from './repositories/system';
 import { SetupRepository, type Steps } from './repositories/setup';
@@ -100,6 +101,17 @@ class LowDBSystem extends SystemRepository {
       v.system.interface = {
         ...oldInterface,
         ...wgInterface,
+      };
+    });
+  }
+
+  async updateUserConfig(userConfig: UpdateWGConfig) {
+    DEBUG('Update User Config');
+    this.#db.update((v) => {
+      const oldUserConfig = v.system.userConfig;
+      v.system.userConfig = {
+        ...oldUserConfig,
+        ...userConfig,
       };
     });
   }
