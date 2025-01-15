@@ -44,6 +44,9 @@ importers:
       ip-bigint:
         specifier: ^8.2.0
         version: 8.2.0
+      is-cidr:
+        specifier: ^5.1.0
+        version: 5.1.0
       is-ip:
         specifier: ^5.0.1
         version: 5.0.1
@@ -1709,6 +1712,10 @@ packages:
     resolution: {integrity: sha512-HutrvTNsF48wnxkzERIXOe5/mlcfFcbfCmwcg6CJnizbSue78AbDt+1cgl26zwn61WFxhcPykPfZrbqjGmBb4A==}
     engines: {node: '>=8'}
 
+  cidr-regex@4.1.1:
+    resolution: {integrity: sha512-ekKcVp+iRB9zlKFXyx7io7nINgb0oRjgRdXNEodp1OuxRui8FXr/CA40Tz1voWUp9DPPrMyQKy01vJhDo4N1lw==}
+    engines: {node: '>=14'}
+
   cidr-tools@11.0.2:
     resolution: {integrity: sha512-OLeM9EOXybbhMsGGBNRLCMjn8e+wFOXARIShF/sZwmJLsxWywqfE0By4BMftT6BFWpbcETWpW7TfM2KGCtrZDg==}
     engines: {node: '>=18'}
@@ -2634,6 +2641,10 @@ packages:
   is-builtin-module@3.2.1:
     resolution: {integrity: sha512-BSLE3HnV2syZ0FK0iMA/yUGplUeMmNz4AW5fnTunbCIqZi4vG3WjJT9FHMy5D69xmAYBHXQhJdALdpwVxV501A==}
     engines: {node: '>=6'}
+
+  is-cidr@5.1.0:
+    resolution: {integrity: sha512-OkVS+Ht2ssF27d48gZdB+ho1yND1VbkJRKKS6Pc1/Cw7uqkd9IOJg8/bTwBDQL6tfBhSdguPRnlGiE8pU/X5NQ==}
+    engines: {node: '>=14'}
 
   is-core-module@2.16.1:
     resolution: {integrity: sha512-UfoeMA6fIJ8wTYFEUjelnaGI67v6+N7qXJEvQuIGa99l4xsCruSYOVSQ0uPANn4dAzm8lkYPaKLrrijLq7x23w==}
@@ -6487,6 +6498,10 @@ snapshots:
 
   ci-info@4.1.0: {}
 
+  cidr-regex@4.1.1:
+    dependencies:
+      ip-regex: 5.0.0
+
   cidr-tools@11.0.2:
     dependencies:
       ip-bigint: 8.2.0
@@ -7489,6 +7504,10 @@ snapshots:
   is-builtin-module@3.2.1:
     dependencies:
       builtin-modules: 3.3.0
+
+  is-cidr@5.1.0:
+    dependencies:
+      cidr-regex: 4.1.1
 
   is-core-module@2.16.1:
     dependencies:

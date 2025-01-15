@@ -28,7 +28,8 @@ export type Client = {
   mtu: number;
 };
 
-export type CreateClient = Omit<Client, 'createdAt' | 'updatedAt'>;
+export type CreateClient = Omit<Client, 'createdAt' | 'updatedAt' | 'id'>;
+
 export type UpdateClient = Omit<
   Client,
   | 'createdAt'

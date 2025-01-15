@@ -4,7 +4,7 @@
       {{ $t('setup.messageSetupLanguage') }}
     </p>
     <div class="mb-8 flex justify-center">
-      <UiChooseLang @update:lang="handleEventUpdateLang" />
+      <UiChooseLang />
     </div>
     <div><BaseButton @click="nextStep">Continue</BaseButton></div>
   </div>
@@ -15,11 +15,6 @@ definePageMeta({
   layout: 'setup',
 });
 
-const { setLocale } = useI18n();
-
-function handleEventUpdateLang(value: string) {
-  setLocale(value);
-}
 const setupStore = useSetupStore();
 setupStore.setStep(1);
 

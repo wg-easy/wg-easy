@@ -33,13 +33,12 @@
 <script setup lang="ts">
 // TODO: improve
 
-const { locale, locales } = useI18n();
-const emit = defineEmits(['update:lang']);
+const { locales, locale, setLocale } = useI18n();
 
 const langProxy = ref(locale);
 
-watch(langProxy, (newVal) => {
-  emit('update:lang', newVal);
+watchEffect(() => {
+  setLocale(langProxy.value);
 });
 
 const langs = locales.value.sort((a, b) => a.code.localeCompare(b.code));

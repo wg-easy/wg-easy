@@ -1,8 +1,8 @@
 import fs from 'node:fs/promises';
 import debug from 'debug';
-import crypto from 'node:crypto';
 import QRCode from 'qrcode';
 import CRC32 from 'crc-32';
+import isCidr from 'is-cidr';
 
 import type {
   CreateClient,
@@ -142,11 +142,7 @@ class WireGuard {
 
     const address6 = nextIPv6(system, clients);
 
-    // Create Client
-    const id = crypto.randomUUID();
-
     const client: CreateClient = {
-      id,
       name,
       address4,
       address6,
@@ -229,7 +225,31 @@ class WireGuard {
     address4: string;
     address6: string;
   }) {
-    // TOOD: validate, change
+    // TODO: be able to revert if error
+
+    if (!isCidr(address4) || !isCidr(address6)) {
+      throw new Error('Invalid CIDR');
+    }
+
+    await Database.system.updateAddressRange(address4, address6);
+
+    const systems = await Database.system.get();
+    const clients = await Database.client.findAll();
+
+    for (const _client of Object.values(clients)) {
+      const clients = await Database.client.findAll();
+
+      const client = structuredClone(_client) as DeepWriteable<typeof _client>;
+
+      client.address4 = nextIPv4(systems, clients);
+      client.address6 = nextIPv6(systems, clients);
+
+      await Database.client.update(client.id, {
+        ...client,
+      });
+    }
+
+    await this.saveConfig();
   }
 
   // TODO: reimplement database restore

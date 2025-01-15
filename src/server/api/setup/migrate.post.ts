@@ -61,11 +61,10 @@ export default defineEventHandler(async (event) => {
     clients: {} as Database['clients'],
   };
 
-  for (const [oldId, oldClient] of Object.entries(oldConfig.clients)) {
+  for (const oldClient of Object.values(oldConfig.clients)) {
     const address6 = nextIPv6(db.system, db.clients);
 
     await Database.client.create({
-      id: oldId,
       address4: oldClient.address,
       enabled: oldClient.enabled,
       name: oldClient.name,
