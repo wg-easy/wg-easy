@@ -202,6 +202,11 @@ export const hooksUpdateType = z.object({
   PostDown: hook,
 });
 
+export const cidrUpdateType = z.object({
+  address4: address,
+  address6: address,
+});
+
 // from https://github.com/airjp73/rvf/blob/7e7c35d98015ea5ecff5affaf89f78296e84e8b9/packages/zod-form-data/src/helpers.ts#L117
 type FormDataLikeInput = {
   [Symbol.iterator](): IterableIterator<[string, FormDataEntryValue]>;

@@ -26,7 +26,15 @@
       <FormGroup>
         <FormHeading>Actions</FormHeading>
         <FormActionField type="submit" label="Save" />
-        <FormActionField label="Revert!" @click="revert" />
+        <FormActionField label="Revert" @click="revert" />
+        <AdminCidrDialog
+          trigger-class="col-span-2"
+          :address6="data.address6Range"
+          :address4="data.address4Range"
+          @change="changeCidr"
+        >
+          <FormActionField label="Change CIDR" class="w-full" />
+        </AdminCidrDialog>
       </FormGroup>
     </FormElement>
   </main>
@@ -70,5 +78,31 @@ async function submit() {
 async function revert() {
   await refresh();
   data.value = toRef(_data.value).value;
+}
+
+async function changeCidr(address4: string, address6: string) {
+  try {
+    const res = await $fetch(`/api/admin/userconfig/cidr`, {
+      method: 'post',
+      body: { address4, address6 },
+    });
+    toast.showToast({
+      type: 'success',
+      title: 'Success',
+      message: 'Changed CIDR',
+    });
+    if (!res.success) {
+      throw new Error('Failed to change CIDR');
+    }
+    await refreshNuxtData();
+  } catch (e) {
+    if (e instanceof Error) {
+      toast.showToast({
+        type: 'error',
+        title: 'Error',
+        message: e.message,
+      });
+    }
+  }
 }
 </script>

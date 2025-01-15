@@ -222,6 +222,16 @@ class WireGuard {
     await this.saveConfig();
   }
 
+  async updateAddressRange({
+    address4,
+    address6,
+  }: {
+    address4: string;
+    address6: string;
+  }) {
+    // TOOD: validate, change
+  }
+
   // TODO: reimplement database restore
   async restoreConfiguration(_config: string) {
     /* DEBUG('Starting configuration restore process.');
