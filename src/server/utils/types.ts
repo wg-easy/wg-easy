@@ -173,10 +173,15 @@ export const generalUpdateType = z.object({
   sessionTimeout: z.number({ message: 'zod.sessionTimeout' }),
 });
 
+const device = z
+  .string({ message: 'zod.device' })
+  .min(1, 'zod.deviceMin')
+  .pipe(safeStringRefine);
+
 export const interfaceUpdateType = z.object({
-  mtu: z.number({ message: 'zod.mtu' }),
+  mtu: mtu,
   port: port,
-  device: z.string({ message: 'zod.device' }),
+  device: device,
 });
 
 export const userConfigUpdateType = z.object({
@@ -186,6 +191,15 @@ export const userConfigUpdateType = z.object({
   defaultDns: z.array(address, { message: 'zod.dns' }),
   mtu: mtu,
   persistentKeepalive: persistentKeepalive,
+});
+
+const hook = z.string({ message: 'zod.hook' }).pipe(safeStringRefine);
+
+export const hooksUpdateType = z.object({
+  PreUp: hook,
+  PostUp: hook,
+  PreDown: hook,
+  PostDown: hook,
 });
 
 // from https://github.com/airjp73/rvf/blob/7e7c35d98015ea5ecff5affaf89f78296e84e8b9/packages/zod-form-data/src/helpers.ts#L117

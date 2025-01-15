@@ -1,7 +1,7 @@
 import type { SessionConfig } from 'h3';
 import type { DeepReadonly } from 'vue';
 
-export type IpTables = {
+export type WGHooks = {
   PreUp: string;
   PostUp: string;
   PreDown: string;
@@ -56,7 +56,7 @@ export type System = {
 
   userConfig: WGConfig;
 
-  iptables: IpTables;
+  hooks: WGHooks;
 
   metrics: Metrics;
 
@@ -85,4 +85,6 @@ export abstract class SystemRepository {
   abstract updateInterface(wgInterface: UpdateWGInterface): Promise<void>;
 
   abstract updateUserConfig(userConfig: UpdateWGConfig): Promise<void>;
+
+  abstract updateHooks(hooks: WGHooks): Promise<void>;
 }

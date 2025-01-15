@@ -87,7 +87,10 @@
     "portMin": "Port must be at least 1",
     "portMax": "Port must be at most 65535",
     "sessionTimeout": "Session Timeout must be a valid number",
-    "device": "Device has to be a valid string"
+    "device": "Device must be a valid string",
+    "deviceMin": "Device must be at least 1 Character",
+    "hook": "Hook must be a valid string",
+    "dns": "DNS must be a valid array of strings"
   },
   "name": "Name",
   "username": "Username",

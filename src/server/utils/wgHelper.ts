@@ -33,10 +33,10 @@ PrivateKey = ${system.interface.privateKey}
 Address = ${system.interface.address4}/${cidr4Block}, ${system.interface.address6}/${cidr6Block}
 ListenPort = ${system.interface.port}
 MTU = ${system.interface.mtu}
-PreUp = ${system.iptables.PreUp}
-PostUp = ${system.iptables.PostUp}
-PreDown = ${system.iptables.PreDown}
-PostDown = ${system.iptables.PostDown}`;
+PreUp = ${iptablesTemplate(system.hooks.PreUp, system)}
+PostUp = ${iptablesTemplate(system.hooks.PostUp, system)}
+PreDown = ${iptablesTemplate(system.hooks.PreDown, system)}
+PostDown = ${iptablesTemplate(system.hooks.PostDown, system)}`;
   },
 
   generateClientConfig: (

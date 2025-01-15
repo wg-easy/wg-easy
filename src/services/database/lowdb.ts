@@ -24,6 +24,7 @@ import {
   type General,
   type UpdateWGConfig,
   type UpdateWGInterface,
+  type WGHooks,
 } from './repositories/system';
 import { SetupRepository, type Steps } from './repositories/setup';
 import type { DeepReadonly } from 'vue';
@@ -113,6 +114,13 @@ class LowDBSystem extends SystemRepository {
         ...oldUserConfig,
         ...userConfig,
       };
+    });
+  }
+
+  async updateHooks(hooks: WGHooks) {
+    DEBUG('Update Hooks');
+    this.#db.update((v) => {
+      v.system.hooks = hooks;
     });
   }
 }
