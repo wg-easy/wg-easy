@@ -42,8 +42,9 @@ const route = useRoute();
 
 const menuItems = [
   { id: '', name: 'General' },
-  { id: 'defaults', name: 'Defaults' },
+  { id: 'config', name: 'Config' },
   { id: 'interface', name: 'Interface' },
+  { id: 'hooks', name: 'Hooks' },
   { id: 'metrics', name: 'Metrics' },
 ];
 

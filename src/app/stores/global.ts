@@ -3,21 +3,6 @@ import { defineStore } from 'pinia';
 export const useGlobalStore = defineStore('Global', () => {
   const sortClient = ref(true); // Sort clients by name, true = asc, false = desc
 
-  const { availableLocales, locale } = useI18n();
-
-  async function setLanguage() {
-    const { data: lang } = await useFetch('/api/lang', {
-      method: 'get',
-    });
-    if (
-      lang.value !== getItem('lang') &&
-      availableLocales.includes(lang.value!)
-    ) {
-      setItem('lang', lang.value!);
-      locale.value = lang.value!;
-    }
-  }
-
   const currentRelease = ref<null | string>(null);
   const latestRelease = ref<null | { version: string; changelog: string }>(
     null
@@ -46,20 +31,8 @@ export const useGlobalStore = defineStore('Global', () => {
 
   const uiChartType = ref(getItem('uiChartType') ?? 'area');
 
-  /**
-   * @throws if unsuccessful
-   */
-  async function updateLang(lang: string) {
-    const response = await $fetch('/api/admin/lang', {
-      method: 'post',
-      body: { lang },
-    });
-    return response.success;
-  }
-
   return {
     sortClient,
-    setLanguage,
     currentRelease,
     latestRelease,
     updateAvailable,
@@ -67,6 +40,5 @@ export const useGlobalStore = defineStore('Global', () => {
     uiShowCharts,
     toggleCharts,
     uiChartType,
-    updateLang,
   };
 });

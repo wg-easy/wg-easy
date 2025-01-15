@@ -14,37 +14,38 @@
     "format": "prettier . --write",
     "format:check": "prettier . --check",
     "typecheck": "nuxt typecheck",
-    "check:runall": "nuxt build && nuxt typecheck && eslint . && prettier . --check"
+    "check:all": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm build"
   },
   "dependencies": {
     "@eschricht/nuxt-color-mode": "^1.1.5",
     "@nuxtjs/i18n": "^9.1.1",
     "@nuxtjs/tailwindcss": "^6.12.2",
     "@pinia/nuxt": "^0.9.0",
-    "@tailwindcss/forms": "^0.5.9",
-    "apexcharts": "^4.2.0",
+    "@tailwindcss/forms": "^0.5.10",
+    "apexcharts": "^4.3.0",
     "argon2": "^0.41.1",
     "basic-auth": "^2.0.1",
     "cidr-tools": "^11.0.2",
     "crc-32": "^1.2.2",
     "debug": "^4.4.0",
     "ip-bigint": "^8.2.0",
+    "is-cidr": "^5.1.0",
     "is-ip": "^5.0.1",
     "js-sha256": "^0.11.0",
     "lowdb": "^7.0.1",
-    "nuxt": "^3.14.1592",
+    "nuxt": "^3.15.1",
     "pinia": "^2.3.0",
     "qrcode": "^1.5.4",
-    "radix-vue": "^1.9.11",
+    "radix-vue": "^1.9.12",
     "semver": "^7.6.3",
-    "tailwindcss": "^3.4.16",
+    "tailwindcss": "^3.4.17",
     "timeago.js": "^4.0.2",
     "vue": "latest",
     "vue3-apexcharts": "^1.8.0",
     "zod": "^3.24.1"
   },
   "devDependencies": {
-    "@nuxt/eslint-config": "^0.7.3",
+    "@nuxt/eslint-config": "^0.7.5",
     "@types/debug": "^4.1.12",
     "@types/qrcode": "^1.5.5",
     "@types/semver": "^7.5.8",
@@ -52,8 +53,8 @@
     "eslint-config-prettier": "^9.1.0",
     "prettier": "^3.4.2",
     "prettier-plugin-tailwindcss": "^0.6.9",
-    "typescript": "^5.7.2",
-    "vue-tsc": "^2.1.10"
+    "typescript": "^5.7.3",
+    "vue-tsc": "^2.2.0"
   },
-  "packageManager": "pnpm@9.15.0"
+  "packageManager": "pnpm@9.15.3"
 }

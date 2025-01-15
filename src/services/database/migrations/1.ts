@@ -18,7 +18,6 @@ export async function run1(db: Low<Database>) {
     system: {
       general: {
         sessionTimeout: 3600, // 1 hour
-        lang: 'en',
       },
       // Config to configure Server
       interface: {
@@ -41,12 +40,30 @@ export async function run1(db: Low<Database>) {
         host: '',
         port: 51820,
       },
-      // Config to configure Firewall
-      iptables: {
+      // Config to configure Firewall or general hooks
+      hooks: {
         PreUp: '',
-        PostUp: '',
+        PostUp: [
+          'iptables -t nat -A POSTROUTING -s {{address4}} -o {{device}} -j MASQUERADE;',
+          'iptables -A INPUT -p udp -m udp --dport {{port}} -j ACCEPT;',
+          'iptables -A FORWARD -i wg0 -j ACCEPT;',
+          'iptables -A FORWARD -o wg0 -j ACCEPT;',
+          'ip6tables -t nat -A POSTROUTING -s {{address6}} -o {{device}} -j MASQUERADE;',
+          'ip6tables -A INPUT -p udp -m udp --dport {{port}} -j ACCEPT;',
+          'ip6tables -A FORWARD -i wg0 -j ACCEPT;',
+          'ip6tables -A FORWARD -o wg0 -j ACCEPT;',
+        ].join(' '),
         PreDown: '',
-        PostDown: '',
+        PostDown: [
+          'iptables -t nat -D POSTROUTING -s {{address4}} -o {{device}} -j MASQUERADE;',
+          'iptables -D INPUT -p udp -m udp --dport {{port}} -j ACCEPT;',
+          'iptables -D FORWARD -i wg0 -j ACCEPT;',
+          'iptables -D FORWARD -o wg0 -j ACCEPT;',
+          'ip6tables -t nat -D POSTROUTING -s {{address6}} -o {{device}} -j MASQUERADE;',
+          'ip6tables -D INPUT -p udp -m udp --dport {{port}} -j ACCEPT;',
+          'ip6tables -D FORWARD -i wg0 -j ACCEPT;',
+          'ip6tables -D FORWARD -o wg0 -j ACCEPT;',
+        ].join(' '),
       },
       metrics: {
         prometheus: {
@@ -64,30 +81,6 @@ export async function run1(db: Low<Database>) {
     users: [],
     clients: {},
   };
-
-  database.system.iptables.PostUp =
-    `iptables -t nat -A POSTROUTING -s ${database.system.userConfig.address4Range} -o ${database.system.interface.device} -j MASQUERADE;
-iptables -A INPUT -p udp -m udp --dport ${database.system.interface.port} -j ACCEPT;
-iptables -A FORWARD -i wg0 -j ACCEPT;
-iptables -A FORWARD -o wg0 -j ACCEPT;
-ip6tables -t nat -A POSTROUTING -s ${database.system.userConfig.address6Range} -o ${database.system.interface.device} -j MASQUERADE;
-ip6tables -A INPUT -p udp -m udp --dport ${database.system.interface.port} -j ACCEPT;
-ip6tables -A FORWARD -i wg0 -j ACCEPT;
-ip6tables -A FORWARD -o wg0 -j ACCEPT;`
-      .split('\n')
-      .join(' ');
-
-  database.system.iptables.PostDown =
-    `iptables -t nat -D POSTROUTING -s ${database.system.userConfig.address4Range} -o ${database.system.interface.device} -j MASQUERADE;
-iptables -D INPUT -p udp -m udp --dport ${database.system.interface.port} -j ACCEPT;
-iptables -D FORWARD -i wg0 -j ACCEPT;
-iptables -D FORWARD -o wg0 -j ACCEPT;
-ip6tables -t nat -D POSTROUTING -s ${database.system.userConfig.address6Range} -o ${database.system.interface.device} -j MASQUERADE;
-ip6tables -D INPUT -p udp -m udp --dport ${database.system.interface.port} -j ACCEPT;
-ip6tables -D FORWARD -i wg0 -j ACCEPT;
-ip6tables -D FORWARD -o wg0 -j ACCEPT;`
-      .split('\n')
-      .join(' ');
 
   db.data = database;
   db.write();

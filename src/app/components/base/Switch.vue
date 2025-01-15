@@ -2,6 +2,7 @@
   <SwitchRoot
     :id="id"
     v-model:checked="data"
+    :name="id"
     class="relative flex h-6 w-10 cursor-default rounded-full bg-gray-200 shadow-sm focus-within:outline focus-within:outline-red-700 data-[state=checked]:bg-red-800 dark:bg-neutral-400"
   >
     <SwitchThumb

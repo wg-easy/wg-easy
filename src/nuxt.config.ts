@@ -23,10 +23,24 @@ export default defineNuxtConfig({
     experimental: {
       localeDetector: './localeDetector.ts',
     },
+    locales: [
+      {
+        code: 'en',
+        language: 'en-US',
+        name: 'English',
+      },
+    ],
+    defaultLocale: 'en',
+    vueI18n: './i18n.config.ts',
+    strategy: 'no_prefix',
+    detectBrowserLanguage: {
+      useCookie: true,
+    },
   },
   nitro: {
     esbuild: {
       options: {
+        // to support big int
         target: 'es2020',
       },
     },

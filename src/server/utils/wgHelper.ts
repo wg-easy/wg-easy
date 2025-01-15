@@ -33,10 +33,10 @@ PrivateKey = ${system.interface.privateKey}
 Address = ${system.interface.address4}/${cidr4Block}, ${system.interface.address6}/${cidr6Block}
 ListenPort = ${system.interface.port}
 MTU = ${system.interface.mtu}
-PreUp = ${system.iptables.PreUp}
-PostUp = ${system.iptables.PostUp}
-PreDown = ${system.iptables.PreDown}
-PostDown = ${system.iptables.PostDown}`;
+PreUp = ${iptablesTemplate(system.hooks.PreUp, system)}
+PostUp = ${iptablesTemplate(system.hooks.PostUp, system)}
+PreDown = ${iptablesTemplate(system.hooks.PreDown, system)}
+PostDown = ${iptablesTemplate(system.hooks.PostDown, system)}`;
   },
 
   generateClientConfig: (
@@ -55,7 +55,7 @@ MTU = ${client.mtu}
 [Peer]
 PublicKey = ${system.interface.publicKey}
 PresharedKey = ${client.preSharedKey}
-AllowedIPs = ${client.allowedIPs.join(', ')}
+AllowedIPs = ${client.allowedIps.join(', ')}
 PersistentKeepalive = ${client.persistentKeepalive}
 Endpoint = ${system.userConfig.host}:${system.userConfig.port}`;
   },
@@ -112,7 +112,7 @@ Endpoint = ${system.userConfig.host}:${system.userConfig.port}`;
           publicKey,
           preSharedKey,
           endpoint,
-          allowedIPs,
+          allowedIps,
           latestHandshakeAt,
           transferRx,
           transferTx,
@@ -123,7 +123,7 @@ Endpoint = ${system.userConfig.host}:${system.userConfig.port}`;
           publicKey,
           preSharedKey,
           endpoint: endpoint === '(none)' ? null : endpoint,
-          allowedIPs,
+          allowedIps,
           latestHandshakeAt:
             latestHandshakeAt === '0'
               ? null

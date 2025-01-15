@@ -4,10 +4,10 @@ import { run1 } from './1';
 
 export type MIGRATION_FN = (db: Low<Database>) => Promise<void>;
 
-const MIGRATION_LIST = {
+const MIGRATION_LIST = [
   // Adds Initial Database Structure
-  '1': run1,
-} satisfies Record<string, MIGRATION_FN>;
+  { id: '1', fn: run1 },
+] satisfies { id: string; fn: MIGRATION_FN }[];
 
 /**
  * Runs all migrations
@@ -15,18 +15,15 @@ const MIGRATION_LIST = {
  */
 export async function migrationRunner(db: Low<Database>) {
   const ranMigrations = db.data.migrations;
-  const runMigrations = Object.keys(
-    MIGRATION_LIST
-  ) as (keyof typeof MIGRATION_LIST)[];
-  for (const migrationId of runMigrations) {
-    if (ranMigrations.includes(migrationId)) {
+  for (const migration of MIGRATION_LIST) {
+    if (ranMigrations.includes(migration.id)) {
       continue;
     }
     try {
-      await MIGRATION_LIST[migrationId](db);
-      db.data.migrations.push(migrationId);
+      await migration.fn(db);
+      db.data.migrations.push(migration.id);
     } catch (e) {
-      throw new Error(`Failed to run Migration ${migrationId}: ${e}`);
+      throw new Error(`Failed to run Migration ${migration.id}: ${e}`);
     }
   }
   await db.write();

@@ -37,10 +37,12 @@ function onChangeFile(evt: Event) {
 }
 
 const router = useRouter();
+const toast = useToast();
 
 async function sendFile() {
   if (!backupFile.value) {
-    setupStore.handleError({
+    toast.showToast({
+      type: 'error',
       title: t('setup.requirements'),
       message: t('setup.emptyFields'),
     });
@@ -54,7 +56,8 @@ async function sendFile() {
     await router.push('/setup/success');
   } catch (error) {
     if (error instanceof FetchError) {
-      setupStore.handleError({
+      toast.showToast({
+        type: 'error',
         title: t('setup.requirements'),
         message: error.data.message,
       });

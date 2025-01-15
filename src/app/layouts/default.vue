@@ -4,12 +4,12 @@
       <div
         class="mb-5"
         :class="
-          hasOwnLogo
-            ? 'flex justify-end'
-            : 'flex flex-auto flex-col-reverse items-center gap-3 xxs:flex-row'
+          loggedIn
+            ? 'flex flex-auto flex-col-reverse items-center gap-3 xxs:flex-row'
+            : 'flex justify-end'
         "
       >
-        <HeaderLogo v-if="!hasOwnLogo" />
+        <HeaderLogo v-if="loggedIn" />
         <div class="flex grow-0 items-center gap-3 self-end xxs:self-center">
           <HeaderThemeSwitch />
           <HeaderChartToggle />
@@ -55,12 +55,9 @@
 
 <script setup lang="ts">
 const globalStore = useGlobalStore();
+globalStore.fetchRelease();
 
 const route = useRoute();
-
-const hasOwnLogo = computed(
-  () => route.path === '/login' || route.path === '/setup'
-);
 
 const loggedIn = computed(
   () => route.path !== '/login' && route.path !== '/setup'

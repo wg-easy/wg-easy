@@ -1,26 +1,33 @@
 import crypto from 'node:crypto';
 import debug from 'debug';
+import { JSONFilePreset } from 'lowdb/node';
+import type { Low } from 'lowdb';
+import type { DeepReadonly } from 'vue';
+import { parseCidr } from 'cidr-tools';
+import { stringifyIp } from 'ip-bigint';
 
 import {
   DatabaseProvider,
   DatabaseError,
   DEFAULT_DATABASE,
 } from './repositories/database';
-import { JSONFilePreset } from 'lowdb/node';
-
-import type { Low } from 'lowdb';
 import { UserRepository, type User } from './repositories/user';
 import type { Database } from './repositories/database';
 import { migrationRunner } from './migrations';
 import {
   ClientRepository,
-  type Client,
-  type NewClient,
+  type UpdateClient,
+  type CreateClient,
   type OneTimeLink,
 } from './repositories/client';
-import { SystemRepository, type Lang } from './repositories/system';
+import {
+  SystemRepository,
+  type General,
+  type UpdateWGConfig,
+  type UpdateWGInterface,
+  type WGHooks,
+} from './repositories/system';
 import { SetupRepository, type Steps } from './repositories/setup';
-import type { DeepReadonly } from 'vue';
 
 const DEBUG = debug('LowDB');
 
@@ -73,18 +80,68 @@ class LowDBSystem extends SystemRepository {
     return makeReadonly(system);
   }
 
-  async updateLang(lang: Lang): Promise<void> {
-    DEBUG('Update Language');
-    this.#db.update((v) => {
-      v.system.general.lang = lang;
-    });
-  }
-
   async updateClientsHostPort(host: string, port: number): Promise<void> {
     DEBUG('Update Clients Host and Port endpoint');
     this.#db.update((v) => {
       v.system.userConfig.host = host;
       v.system.userConfig.port = port;
+    });
+  }
+
+  async updateGeneral(general: General) {
+    DEBUG('Update General');
+    this.#db.update((v) => {
+      v.system.general = general;
+    });
+  }
+
+  async updateInterface(wgInterface: UpdateWGInterface) {
+    DEBUG('Update Interface');
+    this.#db.update((v) => {
+      const oldInterface = v.system.interface;
+      v.system.interface = {
+        ...oldInterface,
+        ...wgInterface,
+      };
+    });
+  }
+
+  async updateUserConfig(userConfig: UpdateWGConfig) {
+    DEBUG('Update User Config');
+    this.#db.update((v) => {
+      const oldUserConfig = v.system.userConfig;
+      v.system.userConfig = {
+        ...oldUserConfig,
+        ...userConfig,
+      };
+    });
+  }
+
+  async updateHooks(hooks: WGHooks) {
+    DEBUG('Update Hooks');
+    this.#db.update((v) => {
+      v.system.hooks = hooks;
+    });
+  }
+
+  /**
+   * updates the address range and the interface address
+   */
+  async updateAddressRange(address4Range: string, address6Range: string) {
+    DEBUG('Update Address Range');
+    const cidr4 = parseCidr(address4Range);
+    const cidr6 = parseCidr(address6Range);
+    this.#db.update((v) => {
+      v.system.userConfig.address4Range = address4Range;
+      v.system.userConfig.address6Range = address6Range;
+      v.system.interface.address4 = stringifyIp({
+        number: cidr4.start + 1n,
+        version: 4,
+      });
+      v.system.interface.address6 = stringifyIp({
+        number: cidr6.start + 1n,
+        version: 6,
+      });
     });
   }
 }
@@ -173,12 +230,13 @@ class LowDBClient extends ClientRepository {
     return makeReadonly(this.#db.data.clients[id]);
   }
 
-  async create(client: NewClient) {
+  async create(client: CreateClient) {
     DEBUG('Create Client');
+    const id = crypto.randomUUID();
     const now = new Date().toISOString();
-    const newClient: Client = { ...client, createdAt: now, updatedAt: now };
+    const newClient = { ...client, createdAt: now, updatedAt: now, id };
     await this.#db.update((data) => {
-      data.clients[client.id] = newClient;
+      data.clients[id] = newClient;
     });
   }
 
@@ -196,24 +254,6 @@ class LowDBClient extends ClientRepository {
     await this.#db.update((data) => {
       if (data.clients[id]) {
         data.clients[id].enabled = enable;
-      }
-    });
-  }
-
-  async updateName(id: string, name: string) {
-    DEBUG('Update Client Name');
-    await this.#db.update((data) => {
-      if (data.clients[id]) {
-        data.clients[id].name = name;
-      }
-    });
-  }
-
-  async updateAddress4(id: string, address4: string) {
-    DEBUG('Update Client Address4');
-    await this.#db.update((data) => {
-      if (data.clients[id]) {
-        data.clients[id].address4 = address4;
       }
     });
   }
@@ -247,6 +287,22 @@ class LowDBClient extends ClientRepository {
       if (data.clients[id]) {
         data.clients[id].oneTimeLink = oneTimeLink;
       }
+    });
+  }
+
+  async update(id: string, client: UpdateClient) {
+    DEBUG('Create Client');
+    const now = new Date().toISOString();
+    await this.#db.update((data) => {
+      const oldClient = data.clients[id];
+      if (!oldClient) {
+        return;
+      }
+      data.clients[id] = {
+        ...oldClient,
+        ...client,
+        updatedAt: now,
+      };
     });
   }
 }

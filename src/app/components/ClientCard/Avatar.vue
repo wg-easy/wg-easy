@@ -22,9 +22,7 @@
 </template>
 
 <script setup lang="ts">
-const props = defineProps<{
+defineProps<{
   client: LocalClient;
 }>();
-
-console.log(props.client.avatar);
 </script>

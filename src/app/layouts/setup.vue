@@ -17,13 +17,9 @@
         </div>
       </PanelBody>
     </Panel>
-
-    <BaseToast ref="toast" />
   </main>
 </template>
 
 <script lang="ts" setup>
 const setupStore = useSetupStore();
-const savedRef = useTemplateRef('toast');
-setupStore.setErrorRef(savedRef);
 </script>

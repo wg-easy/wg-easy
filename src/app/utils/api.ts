@@ -1,31 +1,4 @@
 class API {
-  async getSession() {
-    return useFetch('/api/session', {
-      method: 'get',
-    });
-  }
-
-  async createSession({
-    username,
-    password,
-    remember,
-  }: {
-    username: string;
-    password: string | null;
-    remember: boolean;
-  }) {
-    return $fetch('/api/session', {
-      method: 'post',
-      body: { username, password, remember },
-    });
-  }
-
-  async deleteSession() {
-    return $fetch('/api/session', {
-      method: 'delete',
-    });
-  }
-
   async getClients() {
     return useFetch('/api/client', {
       method: 'get',
@@ -45,28 +18,9 @@ class API {
     });
   }
 
-  async deleteClient({ clientId }: { clientId: string }) {
-    return $fetch(`/api/client/${clientId}`, {
-      method: 'delete',
-    });
-  }
-
   async showOneTimeLink({ clientId }: { clientId: string }) {
     return $fetch(`/api/client/${clientId}/generateOneTimeLink`, {
       method: 'post',
-    });
-  }
-
-  async updateClientExpireDate({
-    clientId,
-    expireDate,
-  }: {
-    clientId: string;
-    expireDate: string | null;
-  }) {
-    return $fetch(`/api/client/${clientId}/expireDate`, {
-      method: 'put',
-      body: { expireDate },
     });
   }
 
