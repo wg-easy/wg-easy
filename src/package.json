@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@eschricht/nuxt-color-mode": "^1.1.5",
+    "@libsql/client": "^0.14.0",
     "@nuxtjs/i18n": "^9.1.1",
     "@nuxtjs/tailwindcss": "^6.12.2",
     "@pinia/nuxt": "^0.9.0",
@@ -28,6 +29,7 @@
     "cidr-tools": "^11.0.2",
     "crc-32": "^1.2.2",
     "debug": "^4.4.0",
+    "drizzle-orm": "^0.38.3",
     "ip-bigint": "^8.2.0",
     "is-cidr": "^5.1.0",
     "is-ip": "^5.0.1",
@@ -49,6 +51,7 @@
     "@types/debug": "^4.1.12",
     "@types/qrcode": "^1.5.5",
     "@types/semver": "^7.5.8",
+    "drizzle-kit": "^0.30.1",
     "eslint": "^9.17.0",
     "eslint-config-prettier": "^9.1.0",
     "prettier": "^3.4.2",
