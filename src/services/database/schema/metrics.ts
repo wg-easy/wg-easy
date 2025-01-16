@@ -6,7 +6,10 @@ import { wgInterface } from './interface';
 export const prometheus = sqliteTable('prometheus_table', {
   id: int()
     .primaryKey({ autoIncrement: true })
-    .references(() => wgInterface.id),
+    .references(() => wgInterface.id, {
+      onDelete: 'cascade',
+      onUpdate: 'cascade',
+    }),
   password: text().notNull(),
   createdAt: text('created_at')
     .notNull()

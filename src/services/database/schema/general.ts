@@ -2,7 +2,8 @@ import { sql } from 'drizzle-orm';
 import { int, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 export const general = sqliteTable('general_table', {
-  id: int().primaryKey({ autoIncrement: true }),
+  // limit to one entry
+  id: int().primaryKey({ autoIncrement: false }).default(1),
   sessionTimeout: int('session_timeout').notNull(),
   createdAt: text('created_at')
     .notNull()

@@ -9,7 +9,7 @@ export const oneTimeLinks = sqliteTable('one_time_links_table', {
   expiresAt: text('expires_at').notNull(),
   clientId: int()
     .notNull()
-    .references(() => clients.id),
+    .references(() => clients.id, { onDelete: 'cascade', onUpdate: 'cascade' }),
   createdAt: text('created_at')
     .notNull()
     .default(sql`(CURRENT_TIMESTAMP)`),

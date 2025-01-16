@@ -7,7 +7,10 @@ import { wgInterface } from './interface';
 export const userConfig = sqliteTable('user_config_table', {
   id: int()
     .primaryKey({ autoIncrement: true })
-    .references(() => wgInterface.id),
+    .references(() => wgInterface.id, {
+      onDelete: 'cascade',
+      onUpdate: 'cascade',
+    }),
   defaultMtu: int('default_mtu').notNull(),
   defaultPersistentKeepalive: int('default_persistent_keepalive').notNull(),
   defaultDns: text('default_dns', { mode: 'json' }).$type<string[]>().notNull(),

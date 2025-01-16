@@ -8,8 +8,8 @@ import { prometheus } from './metrics';
 // maybe support multiple interfaces in the future
 export const wgInterface = sqliteTable('interface_table', {
   id: int().primaryKey({ autoIncrement: true }),
-  device: text().notNull(),
-  port: int().notNull(),
+  device: text().notNull().unique(),
+  port: int().notNull().unique(),
   privateKey: text('private_key').notNull(),
   publicKey: text('public_key').notNull(),
   ipv4Cidr: text('ipv4_cidr').notNull(),

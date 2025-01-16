@@ -6,7 +6,10 @@ import { wgInterface } from './interface';
 export const hooks = sqliteTable('hooks_table', {
   id: int()
     .primaryKey({ autoIncrement: true })
-    .references(() => wgInterface.id),
+    .references(() => wgInterface.id, {
+      onDelete: 'cascade',
+      onUpdate: 'cascade',
+    }),
   preUp: text('pre_up').notNull(),
   postUp: text('post_up').notNull(),
   preDown: text('pre_down').notNull(),
