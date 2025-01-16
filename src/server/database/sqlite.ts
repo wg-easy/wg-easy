@@ -25,7 +25,7 @@ async function migrate() {
   try {
     console.log('Migrating database...');
     await drizzleMigrate(db, {
-      migrationsFolder: './services/database/migrations',
+      migrationsFolder: './server/database/migrations',
     });
     console.log('Migration complete');
   } catch (e) {

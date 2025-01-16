@@ -24,6 +24,8 @@ HEALTHCHECK CMD /usr/bin/timeout 5s /bin/sh -c "/usr/bin/wg show | /bin/grep -q 
 
 # Copy build
 COPY --from=build /app/.output /app
+# Copy migrations
+COPY --from=build /app/server/database/migrations /app/server/database/migrations
 
 # Install Linux packages
 RUN apk add --no-cache \
@@ -38,6 +40,9 @@ RUN apk add --no-cache \
 # Use iptables-legacy
 RUN update-alternatives --install /usr/sbin/iptables iptables /usr/sbin/iptables-legacy 10 --slave /usr/sbin/iptables-restore iptables-restore /usr/sbin/iptables-legacy-restore --slave /usr/sbin/iptables-save iptables-save /usr/sbin/iptables-legacy-save
 RUN update-alternatives --install /usr/sbin/ip6tables ip6tables /usr/sbin/ip6tables-legacy 10 --slave /usr/sbin/ip6tables-restore ip6tables-restore /usr/sbin/ip6tables-legacy-restore --slave /usr/sbin/ip6tables-save ip6tables-save /usr/sbin/ip6tables-legacy-save
+
+# libsql
+RUN npm install libsql
 
 # Set Environment
 ENV DEBUG=Server,WireGuard,LowDB

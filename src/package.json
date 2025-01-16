@@ -14,7 +14,8 @@
     "format": "prettier . --write",
     "format:check": "prettier . --check",
     "typecheck": "nuxt typecheck",
-    "check:all": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm build"
+    "check:all": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm build",
+    "db:generate": "drizzle-kit generate"
   },
   "dependencies": {
     "@eschricht/nuxt-color-mode": "^1.1.5",
