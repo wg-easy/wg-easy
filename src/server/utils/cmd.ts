@@ -1,5 +1,7 @@
 import childProcess from 'child_process';
 
+import {} from '~/';
+
 export function exec(
   cmd: string,
   { log }: { log: boolean | string } = { log: true }

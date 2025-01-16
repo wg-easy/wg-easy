@@ -1,3 +1,5 @@
+import { fileURLToPath } from 'node:url';
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   future: {
@@ -43,6 +45,9 @@ export default defineNuxtConfig({
         // to support big int
         target: 'es2020',
       },
+    },
+    alias: {
+      '#db': fileURLToPath(new URL('./server/database/', import.meta.url)),
     },
   },
 });

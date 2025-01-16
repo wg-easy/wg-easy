@@ -1,10 +1,12 @@
 import type { ZodSchema, ZodTypeDef } from 'zod';
-import { z, ZodError } from 'zod';
+import z from 'zod';
 import type { H3Event, EventHandlerRequest } from 'h3';
+
+export { default as zod } from 'zod';
 
 const objectMessage = 'zod.body';
 
-const safeStringRefine = z
+export const safeStringRefine = z
   .string()
   .refine(
     (v) => v !== '__proto__' && v !== 'constructor' && v !== 'prototype',
@@ -228,7 +230,7 @@ export function validateZod<T>(
       return await schema.parseAsync(data);
     } catch (error) {
       let message = 'Unexpected Error';
-      if (error instanceof ZodError) {
+      if (error instanceof zod.ZodError) {
         message = error.issues
           .map((v) => {
             let m = v.message;

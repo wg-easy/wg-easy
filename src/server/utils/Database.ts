@@ -2,8 +2,7 @@
  * Changing the Database Provider
  * This design allows for easy swapping of different database implementations.
  */
-
-import LowDb from '~~/services/database/lowdb';
+import { connect, type DBServiceType } from '#db/sqlite';
 
 const nullObject = new Proxy(
   {},
@@ -15,11 +14,10 @@ const nullObject = new Proxy(
 );
 
 // eslint-disable-next-line import/no-mutable-exports
-let provider = nullObject as never as LowDb;
+let provider = nullObject as never as DBServiceType;
 
-LowDb.connect().then((v) => {
-  provider = v;
-  WireGuard.Startup();
+connect().then((db) => {
+  provider = db;
 });
 
 // TODO: check if old config exists and tell user about migration path

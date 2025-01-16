@@ -50,20 +50,9 @@ class WireGuard {
   }
 
   async getClients() {
-    const dbClients = await Database.client.findAll();
-    const clients = Object.entries(dbClients).map(([clientId, client]) => ({
-      id: clientId,
-      name: client.name,
-      enabled: client.enabled,
-      address4: client.address4,
-      address6: client.address6,
-      publicKey: client.publicKey,
-      createdAt: new Date(client.createdAt),
-      updatedAt: new Date(client.updatedAt),
-      expiresAt: client.expiresAt,
-      allowedIps: client.allowedIps,
-      oneTimeLink: client.oneTimeLink,
-      persistentKeepalive: null as string | null,
+    const dbClients = await Database.clients.findAll();
+    const clients = dbClients.map((client) => ({
+      ...client,
       latestHandshakeAt: null as Date | null,
       endpoint: null as string | null,
       transferRx: null as number | null,
@@ -73,14 +62,7 @@ class WireGuard {
     // Loop WireGuard status
     const dump = await wg.dump();
     dump.forEach(
-      ({
-        publicKey,
-        latestHandshakeAt,
-        endpoint,
-        transferRx,
-        transferTx,
-        persistentKeepalive,
-      }) => {
+      ({ publicKey, latestHandshakeAt, endpoint, transferRx, transferTx }) => {
         const client = clients.find((client) => client.publicKey === publicKey);
         if (!client) {
           return;
@@ -90,23 +72,10 @@ class WireGuard {
         client.endpoint = endpoint;
         client.transferRx = transferRx;
         client.transferTx = transferTx;
-        client.persistentKeepalive = persistentKeepalive;
       }
     );
 
     return clients;
-  }
-
-  async getClient({ clientId }: { clientId: string }) {
-    const client = await Database.client.findById(clientId);
-    if (!client) {
-      throw createError({
-        statusCode: 404,
-        statusMessage: `Client Not Found: ${clientId}`,
-      });
-    }
-
-    return client;
   }
 
   async getClientConfiguration({ clientId }: { clientId: string }) {

@@ -1,19 +1,16 @@
 import { sql } from 'drizzle-orm';
 import { int, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
-import { wgInterface } from './interface';
+import { wgInterface } from '../../schema';
 
-export const hooks = sqliteTable('hooks_table', {
+export const prometheus = sqliteTable('prometheus_table', {
   id: int()
     .primaryKey({ autoIncrement: true })
     .references(() => wgInterface.id, {
       onDelete: 'cascade',
       onUpdate: 'cascade',
     }),
-  preUp: text('pre_up').notNull(),
-  postUp: text('post_up').notNull(),
-  preDown: text('pre_down').notNull(),
-  postDown: text('post_down').notNull(),
+  password: text().notNull(),
   createdAt: text('created_at')
     .notNull()
     .default(sql`(CURRENT_TIMESTAMP)`),

@@ -1,9 +1,7 @@
 import { sql, relations } from 'drizzle-orm';
 import { int, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
-import { userConfig } from './userConfig';
-import { hooks } from './hooks';
-import { prometheus } from './metrics';
+import { userConfig, hooks, prometheus } from '../../schema';
 
 // maybe support multiple interfaces in the future
 export const wgInterface = sqliteTable('interface_table', {
