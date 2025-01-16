@@ -18,6 +18,7 @@ let provider = nullObject as never as DBServiceType;
 
 connect().then((db) => {
   provider = db;
+  // TODO: start wireguard
 });
 
 // TODO: check if old config exists and tell user about migration path

@@ -4,10 +4,7 @@ import QRCode from 'qrcode';
 import CRC32 from 'crc-32';
 import isCidr from 'is-cidr';
 
-import type {
-  CreateClient,
-  UpdateClient,
-} from '~~/services/database/repositories/client';
+import type { UpdateClient } from '~~/services/database/repositories/client';
 
 const DEBUG = debug('WireGuard');
 
@@ -24,7 +21,7 @@ class WireGuard {
    * Generates and saves WireGuard config from database as wg0
    */
   async #saveWireguardConfig() {
-    const system = await Database.system.get();
+    const system = await Database.get();
     const clients = await Database.client.findAll();
     const result = [];
     result.push(wg.generateServerInterface(system));

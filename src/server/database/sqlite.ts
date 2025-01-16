@@ -4,6 +4,8 @@ import { createClient } from '@libsql/client';
 
 import * as schema from './schema';
 import { ClientService } from './repositories/client/service';
+import { SessionConfigService } from './repositories/sessionConfig/service';
+import { UserService } from './repositories/user/service';
 
 const client = createClient({ url: 'file:/etc/wireguard/wg0.db' });
 const db = drizzle({ client, schema });
@@ -14,8 +16,14 @@ export async function connect() {
 }
 
 class DBService {
-  clients = new ClientService(db);
-  constructor(private db: DBType) {}
+  clients: ClientService;
+  sessionConfig: SessionConfigService;
+  users: UserService;
+  constructor(db: DBType) {
+    this.clients = new ClientService(db);
+    this.sessionConfig = new SessionConfigService(db);
+    this.users = new UserService(db);
+  }
 }
 
 export type DBType = typeof db;
@@ -27,6 +35,7 @@ async function migrate() {
     await drizzleMigrate(db, {
       migrationsFolder: './server/database/migrations',
     });
+    // TODO: data migration
     console.log('Migration complete');
   } catch (e) {
     if (e instanceof Error) {
