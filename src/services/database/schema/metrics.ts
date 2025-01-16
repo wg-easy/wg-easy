@@ -1,5 +1,6 @@
 import { sql } from 'drizzle-orm';
 import { int, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+
 import { wgInterface } from './interface';
 
 export const prometheus = sqliteTable('prometheus_table', {

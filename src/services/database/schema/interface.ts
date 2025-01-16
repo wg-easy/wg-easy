@@ -1,5 +1,9 @@
-import { sql } from 'drizzle-orm';
+import { sql, relations } from 'drizzle-orm';
 import { int, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+
+import { userConfig } from './userConfig';
+import { hooks } from './hooks';
+import { prometheus } from './metrics';
 
 // maybe support multiple interfaces in the future
 export const wgInterface = sqliteTable('interface_table', {
@@ -20,3 +24,18 @@ export const wgInterface = sqliteTable('interface_table', {
     .default(sql`(CURRENT_TIMESTAMP)`)
     .$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
 });
+
+export const wgInterfaceRelations = relations(wgInterface, ({ one }) => ({
+  hooks: one(hooks, {
+    fields: [wgInterface.id],
+    references: [hooks.id],
+  }),
+  prometheus: one(prometheus, {
+    fields: [wgInterface.id],
+    references: [prometheus.id],
+  }),
+  userConfig: one(userConfig, {
+    fields: [wgInterface.id],
+    references: [userConfig.id],
+  }),
+}));
