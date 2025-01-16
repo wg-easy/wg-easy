@@ -1,7 +1,7 @@
 import type { InferSelectModel } from 'drizzle-orm';
 import { zod } from '#imports';
 
-import type { clients } from './schema';
+import type { client } from './schema';
 
 const schemaForType =
   <T>() =>
@@ -10,10 +10,12 @@ const schemaForType =
     return arg;
   };
 
-export type ClientsType = InferSelectModel<typeof clients>;
+export type ID = string;
+
+export type ClientType = InferSelectModel<typeof client>;
 
 export type CreateClientType = Omit<
-  ClientsType,
+  ClientType,
   'createdAt' | 'updatedAt' | 'id'
 >;
 
@@ -27,7 +29,7 @@ const name = zod
   .min(1, 'zod.nameMin')
   .pipe(safeStringRefine);
 
-const expireDate = zod
+const expiresAt = zod
   .string({ message: 'zod.expireDate' })
   .min(1, 'zod.expireDateMin')
   .pipe(safeStringRefine)
@@ -70,11 +72,18 @@ const enabled = zod.boolean({ message: 'zod.enabled' });
 
 const dns = zod.array(address, { message: 'zod.dns' }).min(1, 'zod.dnsMin');
 
+export const ClientCreateSchema = zod.object({
+  name: name,
+  expiresAt: expiresAt,
+});
+
+export type ClientCreateType = zod.infer<typeof ClientCreateSchema>;
+
 export const ClientUpdateSchema = schemaForType<UpdateClientType>()(
   zod.object({
     name: name,
     enabled: enabled,
-    expiresAt: expireDate,
+    expiresAt: expiresAt,
     ipv4Address: address4,
     ipv6Address: address6,
     allowedIps: allowedIps,

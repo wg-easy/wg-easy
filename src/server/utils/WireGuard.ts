@@ -50,7 +50,7 @@ class WireGuard {
   }
 
   async getClients() {
-    const dbClients = await Database.clients.findAll();
+    const dbClients = await Database.clients.getAll();
     const clients = dbClients.map((client) => ({
       ...client,
       latestHandshakeAt: null as Date | null,
@@ -78,9 +78,9 @@ class WireGuard {
     return clients;
   }
 
-  async getClientConfiguration({ clientId }: { clientId: string }) {
+  async getClientConfiguration({ clientId }: { clientId: number }) {
     const system = await Database.system.get();
-    const client = await this.getClient({ clientId });
+    const client = await Database.clients.get(clientId);
 
     return wg.generateClientConfig(system, client);
   }
@@ -91,55 +91,6 @@ class WireGuard {
       type: 'svg',
       width: 512,
     });
-  }
-
-  async createClient({
-    name,
-    expireDate,
-  }: {
-    name: string;
-    expireDate: string | null;
-  }) {
-    const system = await Database.system.get();
-    const clients = await Database.client.findAll();
-
-    const privateKey = await wg.generatePrivateKey();
-    const publicKey = await wg.getPublicKey(privateKey);
-    const preSharedKey = await wg.generatePresharedKey();
-
-    const address4 = nextIPv4(system, clients);
-
-    const address6 = nextIPv6(system, clients);
-
-    const client: CreateClient = {
-      name,
-      address4,
-      address6,
-      privateKey,
-      publicKey,
-      preSharedKey,
-      oneTimeLink: null,
-      expiresAt: null,
-      enabled: true,
-      allowedIps: [...system.userConfig.allowedIps],
-      serverAllowedIPs: [],
-      persistentKeepalive: system.userConfig.persistentKeepalive,
-      mtu: system.userConfig.mtu,
-    };
-
-    if (expireDate) {
-      const date = new Date(expireDate);
-      date.setHours(23);
-      date.setMinutes(59);
-      date.setSeconds(59);
-      client.expiresAt = date.toISOString();
-    }
-
-    await Database.client.create(client);
-
-    await this.saveConfig();
-
-    return client;
   }
 
   async deleteClient({ clientId }: { clientId: string }) {

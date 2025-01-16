@@ -3,7 +3,7 @@ import { migrate as drizzleMigrate } from 'drizzle-orm/libsql/migrator';
 import { createClient } from '@libsql/client';
 
 import * as schema from './schema';
-import { ClientsService } from './repositories/clients/service';
+import { ClientService } from './repositories/client/service';
 
 const client = createClient({ url: 'file:/etc/wireguard/wg0.db' });
 const db = drizzle({ client, schema });
@@ -14,7 +14,7 @@ export async function connect() {
 }
 
 class DBService {
-  clients = new ClientsService(db);
+  clients = new ClientService(db);
   constructor(private db: DBType) {}
 }
 

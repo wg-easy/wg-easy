@@ -1,8 +1,11 @@
+import { ClientCreateSchema } from '#db/repositories/client/types';
+
 export default defineEventHandler(async (event) => {
-  const { name, expireDate } = await readValidatedBody(
+  const { name, expiresAt } = await readValidatedBody(
     event,
-    validateZod(createType)
+    validateZod(ClientCreateSchema)
   );
-  await WireGuard.createClient({ name, expireDate });
+  await Database.clients.create({ name, expiresAt });
+  await WireGuard.saveConfig();
   return { success: true };
 });

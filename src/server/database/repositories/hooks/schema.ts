@@ -1,12 +1,12 @@
 import { sql } from 'drizzle-orm';
-import { int, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 import { wgInterface } from '../../schema';
 
 export const hooks = sqliteTable('hooks_table', {
-  id: int()
-    .primaryKey({ autoIncrement: true })
-    .references(() => wgInterface.id, {
+  id: text()
+    .primaryKey()
+    .references(() => wgInterface.name, {
       onDelete: 'cascade',
       onUpdate: 'cascade',
     }),

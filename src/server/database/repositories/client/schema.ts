@@ -1,9 +1,9 @@
 import { sql, relations } from 'drizzle-orm';
 import { int, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
-import { oneTimeLinks } from '../../schema';
+import { oneTimeLink } from '../../schema';
 
-export const clients = sqliteTable('clients_table', {
+export const client = sqliteTable('clients_table', {
   id: int().primaryKey({ autoIncrement: true }),
   name: text().notNull(),
   ipv4Address: text('ipv4_address').notNull().unique(),
@@ -29,9 +29,9 @@ export const clients = sqliteTable('clients_table', {
     .$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
 });
 
-export const clientsRelations = relations(clients, ({ one }) => ({
-  oneTimeLink: one(oneTimeLinks, {
-    fields: [clients.id],
-    references: [oneTimeLinks.clientId],
+export const clientsRelations = relations(client, ({ one }) => ({
+  oneTimeLink: one(oneTimeLink, {
+    fields: [client.id],
+    references: [oneTimeLink.clientId],
   }),
 }));

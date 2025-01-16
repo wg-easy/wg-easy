@@ -4,9 +4,9 @@ import { int, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import { userConfig, hooks, prometheus } from '../../schema';
 
 // maybe support multiple interfaces in the future
-export const wgInterface = sqliteTable('interface_table', {
-  id: int().primaryKey({ autoIncrement: true }),
-  device: text().notNull().unique(),
+export const wgInterface = sqliteTable('interfaces_table', {
+  name: text().primaryKey(),
+  device: text().notNull(),
   port: int().notNull().unique(),
   privateKey: text('private_key').notNull(),
   publicKey: text('public_key').notNull(),
@@ -25,15 +25,15 @@ export const wgInterface = sqliteTable('interface_table', {
 
 export const wgInterfaceRelations = relations(wgInterface, ({ one }) => ({
   hooks: one(hooks, {
-    fields: [wgInterface.id],
+    fields: [wgInterface.name],
     references: [hooks.id],
   }),
   prometheus: one(prometheus, {
-    fields: [wgInterface.id],
+    fields: [wgInterface.name],
     references: [prometheus.id],
   }),
   userConfig: one(userConfig, {
-    fields: [wgInterface.id],
+    fields: [wgInterface.name],
     references: [userConfig.id],
   }),
 }));

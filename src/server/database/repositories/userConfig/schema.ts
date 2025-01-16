@@ -4,10 +4,10 @@ import { int, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import { wgInterface } from '../../schema';
 
 // default* means clients store it themselves
-export const userConfig = sqliteTable('user_config_table', {
-  id: int()
-    .primaryKey({ autoIncrement: true })
-    .references(() => wgInterface.id, {
+export const userConfig = sqliteTable('user_configs_table', {
+  id: text()
+    .primaryKey()
+    .references(() => wgInterface.name, {
       onDelete: 'cascade',
       onUpdate: 'cascade',
     }),
