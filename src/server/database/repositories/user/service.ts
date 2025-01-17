@@ -9,6 +9,11 @@ function createPreparedStatement(db: DBType) {
     findById: db.query.user
       .findFirst({ where: eq(user.id, sql.placeholder('id')) })
       .prepare(),
+    findByUsername: db.query.user
+      .findFirst({
+        where: eq(user.username, sql.placeholder('username')),
+      })
+      .prepare(),
   };
 }
 
@@ -25,5 +30,9 @@ export class UserService {
 
   async get(id: ID) {
     return this.#statements.findById.all({ id });
+  }
+
+  async getByUsername(username: string) {
+    return this.#statements.findByUsername.all({ username });
   }
 }

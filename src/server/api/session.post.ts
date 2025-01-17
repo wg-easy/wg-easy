@@ -4,7 +4,7 @@ export default defineEventHandler(async (event) => {
     validateZod(credentialsType, event)
   );
 
-  const users = await Database.user.findAll();
+  const users = await Database.users.getAll();
   const user = users.find((user) => user.username == username);
   if (!user)
     throw createError({
@@ -21,18 +21,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const system = await Database.system.get();
-
-  const conf = { ...system.sessionConfig };
-
-  if (remember) {
-    conf.cookie = {
-      ...(system.sessionConfig.cookie ?? {}),
-      maxAge: system.general.sessionTimeout,
-    };
-  }
-
-  const session = await useSession<WGSession>(event, conf);
+  const session = await useWGSession(event, remember);
 
   const data = await session.update({
     userId: user.id,
