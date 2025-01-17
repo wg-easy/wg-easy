@@ -1,20 +1,23 @@
+import {
+  ClientGetSchema,
+  ClientUpdateSchema,
+} from '#db/repositories/client/types';
+
 export default definePermissionEventHandler(
   actions.CLIENT,
   async ({ event }) => {
     const { clientId } = await getValidatedRouterParams(
       event,
-      validateZod(clientIdType)
+      validateZod(ClientGetSchema)
     );
 
     const data = await readValidatedBody(
       event,
-      validateZod(clientUpdateType, event)
+      validateZod(ClientUpdateSchema, event)
     );
 
-    await WireGuard.updateClient({
-      clientId,
-      client: data,
-    });
+    await Database.clients.update(clientId, data);
+    await WireGuard.saveConfig();
 
     return { success: true };
   }

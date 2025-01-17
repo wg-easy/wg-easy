@@ -1,5 +1,6 @@
 export default defineEventHandler(async (event) => {
-  /*const url = getRequestURL(event);
+  // TODO: improve, wrapper or smth
+  const url = getRequestURL(event);
   const session = await useWGSession(event);
 
   // Api handled by session, Setup handled with setup middleware
@@ -21,15 +22,15 @@ export default defineEventHandler(async (event) => {
   }
 
   if (url.pathname.startsWith('/admin')) {
-    const user = await Database.user.findById(session.data.userId);
+    const user = await Database.users.get(session.data.userId);
     if (!user) {
       return sendRedirect(event, '/login', 302);
     }
-    if (user.role !== 'ADMIN') {
+    if (user.role !== roles.ADMIN) {
       throw createError({
         statusCode: 403,
         statusMessage: 'Not allowed to access Admin Panel',
       });
     }
-  }*/
+  }
 });

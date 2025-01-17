@@ -1,11 +1,14 @@
+import { ClientGetSchema } from '#db/repositories/client/types';
+
 export default definePermissionEventHandler(
   actions.CLIENT,
   async ({ event }) => {
     const { clientId } = await getValidatedRouterParams(
       event,
-      validateZod(clientIdType)
+      validateZod(ClientGetSchema)
     );
-    await WireGuard.deleteClient({ clientId });
+    await Database.clients.delete(clientId);
+    await WireGuard.saveConfig();
     return { success: true };
   }
 );

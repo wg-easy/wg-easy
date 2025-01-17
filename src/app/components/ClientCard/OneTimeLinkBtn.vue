@@ -27,8 +27,10 @@ defineProps<{ client: LocalClient }>();
 const clientsStore = useClientsStore();
 
 function showOneTimeLink(client: LocalClient) {
-  api
-    .showOneTimeLink({ clientId: client.id })
+  // TODO: improve
+  $fetch(`/api/client/${client.id}/generateOneTimeLink`, {
+    method: 'post',
+  })
     .catch((err) => alert(err.message || err.toString()))
     .finally(() => clientsStore.refresh().catch(console.error));
 }

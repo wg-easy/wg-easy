@@ -1,3 +1,5 @@
+import { UserConfigSetupType } from '#db/repositories/userConfig/types';
+
 export default defineEventHandler(async (event) => {
   const { done } = await Database.general.getSetupStep();
   if (done) {
@@ -9,7 +11,7 @@ export default defineEventHandler(async (event) => {
 
   const { host, port } = await readValidatedBody(
     event,
-    validateZod(hostPortType, event)
+    validateZod(UserConfigSetupType, event)
   );
   await Database.userConfigs.updateHostPort('wg0', host, port);
   await Database.general.setSetupStep(0);

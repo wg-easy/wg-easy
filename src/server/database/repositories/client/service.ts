@@ -1,7 +1,7 @@
 import type { DBType } from '#db/sqlite';
 import { eq, sql } from 'drizzle-orm';
 import { client } from './schema';
-import type { ClientCreateType } from './types';
+import type { ClientCreateType, UpdateClientType } from './types';
 import type { ID } from '../../schema';
 import { wgInterface, userConfig } from '../../schema';
 import { parseCidr } from 'cidr-tools';
@@ -21,6 +21,10 @@ function createPreparedStatement(db: DBType) {
     toggle: db
       .update(client)
       .set({ enabled: sql.placeholder('enabled') as never as boolean })
+      .where(eq(client.id, sql.placeholder('id')))
+      .prepare(),
+    delete: db
+      .delete(client)
       .where(eq(client.id, sql.placeholder('id')))
       .prepare(),
   };
@@ -44,7 +48,7 @@ export class ClientService {
     }));
   }
 
-  async get(id: ID) {
+  get(id: ID) {
     return this.#statements.findById.execute({ id });
   }
 
@@ -110,7 +114,15 @@ export class ClientService {
     });
   }
 
-  async toggle(id: ID, enabled: boolean) {
+  toggle(id: ID, enabled: boolean) {
     return this.#statements.toggle.execute({ id, enabled });
+  }
+
+  delete(id: ID) {
+    return this.#statements.delete.execute({ id });
+  }
+
+  update(id: ID, data: UpdateClientType) {
+    return this.#db.update(client).set(data).where(eq(client.id, id)).prepare();
   }
 }

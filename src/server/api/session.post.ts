@@ -1,7 +1,9 @@
+import { UserLoginSchema } from '#db/repositories/user/types';
+
 export default defineEventHandler(async (event) => {
   const { username, password, remember } = await readValidatedBody(
     event,
-    validateZod(credentialsType, event)
+    validateZod(UserLoginSchema, event)
   );
 
   const user = await Database.users.getByUsername(username);

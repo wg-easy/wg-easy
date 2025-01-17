@@ -18,12 +18,6 @@ class API {
     });
   }
 
-  async showOneTimeLink({ clientId }: { clientId: string }) {
-    return $fetch(`/api/client/${clientId}/generateOneTimeLink`, {
-      method: 'post',
-    });
-  }
-
   async restoreConfiguration(file: string) {
     return $fetch('/api/wireguard/restore', {
       method: 'put',

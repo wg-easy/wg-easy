@@ -25,52 +25,54 @@ export type UpdateClientType = Omit<
 >;
 
 const name = zod
-  .string({ message: 'zod.name' })
-  .min(1, 'zod.nameMin')
+  .string({ message: 'zod.client.name' })
+  .min(1, 'zod.client.nameMin')
   .pipe(safeStringRefine);
 
 const expiresAt = zod
-  .string({ message: 'zod.expireDate' })
-  .min(1, 'zod.expireDateMin')
+  .string({ message: 'zod.client.expireDate' })
+  .min(1, 'zod.client.expireDateMin')
   .pipe(safeStringRefine)
   .nullable();
 
 const address = zod
-  .string({ message: 'zod.address' })
-  .min(1, { message: 'zod.addressMin' })
+  .string({ message: 'zod.client.address' })
+  .min(1, { message: 'zod.client.addressMin' })
   .pipe(safeStringRefine);
 
 const address4 = zod
-  .string({ message: 'zod.address4' })
-  .min(1, { message: 'zod.address4Min' })
+  .string({ message: 'zod.client.address4' })
+  .min(1, { message: 'zod.client.address4Min' })
   .pipe(safeStringRefine);
 
 const address6 = zod
-  .string({ message: 'zod.address6' })
-  .min(1, { message: 'zod.address6Min' })
+  .string({ message: 'zod.client.address6' })
+  .min(1, { message: 'zod.client.address6Min' })
   .pipe(safeStringRefine);
 
 const allowedIps = zod
-  .array(address, { message: 'zod.allowedIps' })
-  .min(1, { message: 'zod.allowedIpsMin' });
+  .array(address, { message: 'zod.client.allowedIps' })
+  .min(1, { message: 'zod.client.allowedIpsMin' });
 
 const serverAllowedIps = zod.array(address, {
   message: 'zod.serverAllowedIps',
 });
 
 const mtu = zod
-  .number({ message: 'zod.mtu' })
-  .min(1280, { message: 'zod.mtuMin' })
-  .max(9000, { message: 'zod.mtuMax' });
+  .number({ message: 'zod.client.mtu' })
+  .min(1280, { message: 'zod.client.mtuMin' })
+  .max(9000, { message: 'zod.client.mtuMax' });
 
 const persistentKeepalive = zod
-  .number({ message: 'zod.persistentKeepalive' })
-  .min(0, 'zod.persistentKeepaliveMin')
-  .max(65535, 'zod.persistentKeepaliveMax');
+  .number({ message: 'zod.client.persistentKeepalive' })
+  .min(0, 'zod.client.persistentKeepaliveMin')
+  .max(65535, 'zod.client.persistentKeepaliveMax');
 
 const enabled = zod.boolean({ message: 'zod.enabled' });
 
-const dns = zod.array(address, { message: 'zod.dns' }).min(1, 'zod.dnsMin');
+const dns = zod
+  .array(address, { message: 'zod.client.dns' })
+  .min(1, 'zod.client.dnsMin');
 
 export const ClientCreateSchema = zod.object({
   name: name,
@@ -93,3 +95,9 @@ export const ClientUpdateSchema = schemaForType<UpdateClientType>()(
     dns: dns,
   })
 );
+
+const clientId = zod.number({ message: 'zod.client.id' });
+
+export const ClientGetSchema = zod.object({
+  clientId: clientId,
+});

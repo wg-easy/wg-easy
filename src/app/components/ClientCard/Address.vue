@@ -1,6 +1,6 @@
 <template>
   <span class="inline-block">
-    {{ client.address4 }}, {{ client.address6 }}
+    {{ client.ipv4Address }}, {{ client.ipv6Address }}
   </span>
 </template>
 

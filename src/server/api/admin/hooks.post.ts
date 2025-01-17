@@ -3,7 +3,7 @@ export default defineEventHandler(async (event) => {
     event,
     validateZod(hooksUpdateType, event)
   );
-  await Database.system.updateHooks(data);
+  await Database.hooks.update(data);
   await WireGuard.saveConfig();
   return { success: true };
 });

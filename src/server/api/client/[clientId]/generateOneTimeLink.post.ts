@@ -1,11 +1,13 @@
+import { ClientGetSchema } from '#db/repositories/client/types';
+
 export default definePermissionEventHandler(
   actions.CLIENT,
   async ({ event }) => {
     const { clientId } = await getValidatedRouterParams(
       event,
-      validateZod(clientIdType)
+      validateZod(ClientGetSchema)
     );
-    await WireGuard.generateOneTimeLink({ clientId });
+    await Database.oneTimeLinks.generate(clientId);
     return { success: true };
   }
 );
