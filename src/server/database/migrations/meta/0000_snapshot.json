@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "37203c54-1625-40bd-89fd-9be0f7140fae",
+  "id": "25907c5f-be21-4ae6-88c4-1a72b2f335e7",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "clients_table": {
@@ -472,7 +472,15 @@
           "default": "(CURRENT_TIMESTAMP)"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "one_time_links_table_one_time_link_unique": {
+          "name": "one_time_links_table_one_time_link_unique",
+          "columns": [
+            "one_time_link"
+          ],
+          "isUnique": true
+        }
+      },
       "foreignKeys": {
         "one_time_links_table_clientId_clients_table_id_fk": {
           "name": "one_time_links_table_clientId_clients_table_id_fk",

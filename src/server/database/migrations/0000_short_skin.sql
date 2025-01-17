@@ -72,6 +72,7 @@ CREATE TABLE `one_time_links_table` (
 	FOREIGN KEY (`clientId`) REFERENCES `clients_table`(`id`) ON UPDATE cascade ON DELETE cascade
 );
 --> statement-breakpoint
+CREATE UNIQUE INDEX `one_time_links_table_one_time_link_unique` ON `one_time_links_table` (`one_time_link`);--> statement-breakpoint
 CREATE TABLE `users_table` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`username` text NOT NULL,
