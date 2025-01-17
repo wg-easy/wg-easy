@@ -1,7 +1,9 @@
+import { OneTimeLinkGetSchema } from '#db/repositories/oneTimeLink/types';
+
 export default defineEventHandler(async (event) => {
   const { oneTimeLink } = await getValidatedRouterParams(
     event,
-    validateZod(oneTimeLinkType)
+    validateZod(OneTimeLinkGetSchema)
   );
   const clients = await WireGuard.getClients();
   const client = clients.find(
@@ -15,7 +17,7 @@ export default defineEventHandler(async (event) => {
   }
   const clientId = client.id;
   const config = await WireGuard.getClientConfiguration({ clientId });
-  await WireGuard.eraseOneTimeLink({ clientId });
+  await Database.oneTimeLinks.erase(clientId);
   setHeader(
     event,
     'Content-Disposition',

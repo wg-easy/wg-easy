@@ -25,13 +25,13 @@
           <FormGroup>
             <FormHeading>Address</FormHeading>
             <FormTextField
-              id="address4"
-              v-model.trim="data.address4"
+              id="ipv4Address"
+              v-model.trim="data.ipv4Address"
               label="IPv4"
             />
             <FormTextField
-              id="address6"
-              v-model.trim="data.address6"
+              id="ipv6Address"
+              v-model.trim="data.ipv6Address"
               label="IPv6"
             />
           </FormGroup>
@@ -42,8 +42,8 @@
           <FormGroup>
             <FormHeading>Server Allowed IPs</FormHeading>
             <FormArrayField
-              v-model="data.serverAllowedIPs"
-              name="serverAllowedIPs"
+              v-model="data.serverAllowedIps"
+              name="serverAllowedIps"
             />
           </FormGroup>
           <FormGroup></FormGroup>

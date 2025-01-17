@@ -1,14 +1,15 @@
 import type { InferSelectModel } from 'drizzle-orm';
 import type { user } from './schema';
+import z from 'zod';
 
 export type UserType = InferSelectModel<typeof user>;
 
-const username = zod
+const username = z
   .string({ message: 'zod.user.username' })
   .min(8, 'zod.user.usernameMin')
   .pipe(safeStringRefine);
 
-const password = zod
+const password = z
   .string({ message: 'zod.user.password' })
   .min(12, 'zod.user.passwordMin')
   .regex(/[A-Z]/, 'zod.user.passwordUppercase')
@@ -17,9 +18,9 @@ const password = zod
   .regex(/[!@#$%^&*(),.?":{}|<>]/, 'zod.user.passwordSpecial')
   .pipe(safeStringRefine);
 
-const remember = zod.boolean({ message: 'zod.user.remember' });
+const remember = z.boolean({ message: 'zod.user.remember' });
 
-export const UserLoginSchema = zod.object(
+export const UserLoginSchema = z.object(
   {
     username: username,
     password: password,
@@ -28,11 +29,11 @@ export const UserLoginSchema = zod.object(
   { message: objectMessage }
 );
 
-const accept = zod.boolean().refine((val) => val === true, {
+const accept = z.boolean().refine((val) => val === true, {
   message: 'zod.user.accept',
 });
 
-export const UserSetupType = zod.object(
+export const UserSetupType = z.object(
   {
     username: username,
     password: password,

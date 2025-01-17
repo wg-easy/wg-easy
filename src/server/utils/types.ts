@@ -2,8 +2,6 @@ import type { ZodSchema } from 'zod';
 import z from 'zod';
 import type { H3Event, EventHandlerRequest } from 'h3';
 
-export { default as zod } from 'zod';
-
 export const objectMessage = 'zod.body';
 
 export const safeStringRefine = z
@@ -28,7 +26,7 @@ export function validateZod<T>(
       return await schema.parseAsync(data);
     } catch (error) {
       let message = 'Unexpected Error';
-      if (error instanceof zod.ZodError) {
+      if (error instanceof z.ZodError) {
         message = error.issues
           .map((v) => {
             let m = v.message;

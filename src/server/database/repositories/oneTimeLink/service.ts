@@ -18,6 +18,11 @@ function createPreparedStatement(db: DBType) {
         expiresAt: sql.placeholder('expiresAt'),
       })
       .prepare(),
+    erase: db
+      .update(oneTimeLink)
+      .set({ expiresAt: sql.placeholder('expiresAt') as never as string })
+      .where(eq(oneTimeLink.clientId, sql.placeholder('id')))
+      .prepare(),
   };
 }
 
@@ -38,5 +43,10 @@ export class OneTimeLinkService {
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString();
 
     return this.#statements.create.execute({ id, oneTimeLink, expiresAt });
+  }
+
+  erase(id: ID) {
+    const expiresAt = Date.now() + 10 * 1000;
+    return this.#statements.erase.execute({ id, expiresAt });
   }
 }
