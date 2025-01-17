@@ -5,5 +5,5 @@
     "dev": "docker compose -f docker-compose.dev.yml up",
     "build": "docker build -t wg-easy ."
   },
-  "packageManager": "pnpm@9.15.3"
+  "packageManager": "pnpm@9.15.4"
 }
