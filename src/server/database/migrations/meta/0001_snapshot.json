@@ -1,6 +1,6 @@
 {
-  "id": "5eee8e4e-69d5-4c68-b5cd-a221ad7649de",
-  "prevId": "52812a10-9028-40dc-b1dc-69e4e641aa9e",
+  "id": "1bc0abb2-1297-42d2-ba8e-213bbfd92835",
+  "prevId": "37203c54-1625-40bd-89fd-9be0f7140fae",
   "version": "6",
   "dialect": "sqlite",
   "tables": {
@@ -542,8 +542,7 @@
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false,
-          "default": 1
+          "autoincrement": false
         },
         "created_at": {
           "name": "created_at",

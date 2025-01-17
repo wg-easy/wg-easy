@@ -5,10 +5,8 @@ import { stringifyIp } from 'ip-bigint';
 import type { UserConfigType } from '#db/repositories/userConfig/types';
 import type { HooksType } from '#db/repositories/hooks/types';
 
-// TODO: replace wg0 with parameter (to allow multi interface design)
-
 export const wg = {
-  generateServerPeer: (client: ClientType) => {
+  generateServerPeer: (client: Omit<ClientType, 'createdAt' | 'updatedAt'>) => {
     const allowedIps = [
       `${client.ipv4Address}/32`,
       `${client.ipv6Address}/128`,
@@ -79,20 +77,20 @@ Endpoint = ${userConfig.host}:${userConfig.port}`;
     return exec('wg genpsk');
   },
 
-  up: () => {
-    return exec('wg-quick up wg0');
+  up: (infName: string) => {
+    return exec(`wg-quick up ${infName}`);
   },
 
-  down: () => {
-    return exec('wg-quick down wg0');
+  down: (infName: string) => {
+    return exec(`wg-quick down ${infName}`);
   },
 
-  sync: () => {
-    return exec('wg syncconf wg0 <(wg-quick strip wg0)');
+  sync: (infName: string) => {
+    return exec(`wg syncconf ${infName} <(wg-quick strip ${infName})`);
   },
 
-  dump: async () => {
-    const rawDump = await exec('wg show wg0 dump', {
+  dump: async (infName: string) => {
+    const rawDump = await exec(`wg show ${infName} dump`, {
       log: false,
     });
 

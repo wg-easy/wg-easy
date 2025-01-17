@@ -4,6 +4,9 @@ import { userConfig } from './schema';
 
 function createPreparedStatement(db: DBType) {
   return {
+    get: db.query.userConfig
+      .findFirst({ where: eq(userConfig.id, sql.placeholder('interface')) })
+      .prepare(),
     updateHostPort: db
       .update(userConfig)
       .set({
@@ -20,6 +23,10 @@ export class UserConfigService {
 
   constructor(db: DBType) {
     this.#statements = createPreparedStatement(db);
+  }
+
+  async get(wgInterface: string) {
+    return await this.#statements.get.execute({ interface: wgInterface });
   }
 
   async updateHostPort(wgInterface: string, host: string, port: number) {

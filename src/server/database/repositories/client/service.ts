@@ -2,6 +2,7 @@ import type { DBType } from '#db/sqlite';
 import { eq, sql } from 'drizzle-orm';
 import { client } from './schema';
 import type { ClientCreateType } from './types';
+import type { ID } from '../../schema';
 import { wgInterface, userConfig } from '../../schema';
 import { parseCidr } from 'cidr-tools';
 
@@ -16,6 +17,11 @@ function createPreparedStatement(db: DBType) {
       .prepare(),
     findById: db.query.client
       .findFirst({ where: eq(client.id, sql.placeholder('id')) })
+      .prepare(),
+    toggle: db
+      .update(client)
+      .set({ enabled: sql.placeholder('enabled') as never as boolean })
+      .where(eq(client.id, sql.placeholder('id')))
       .prepare(),
   };
 }
@@ -38,7 +44,7 @@ export class ClientService {
     }));
   }
 
-  async get(id: number) {
+  async get(id: ID) {
     return this.#statements.findById.execute({ id });
   }
 
@@ -102,5 +108,9 @@ export class ClientService {
         })
         .execute();
     });
+  }
+
+  async toggle(id: ID, enabled: boolean) {
+    return this.#statements.toggle.execute({ id, enabled });
   }
 }

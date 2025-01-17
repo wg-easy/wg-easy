@@ -13,7 +13,7 @@ export function nextIP(
   let address;
   for (let i = cidr.start + 2n; i <= cidr.end - 1n; i++) {
     const currentIp = stringifyIp({ number: i, version: version });
-    const client = Object.values(clients).find((client) => {
+    const client = clients.find((client) => {
       return client[`ipv${version}Address`] === currentIp;
     });
 

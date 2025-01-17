@@ -1,10 +1,7 @@
 import fs from 'node:fs/promises';
 import debug from 'debug';
 import QRCode from 'qrcode';
-import CRC32 from 'crc-32';
-import isCidr from 'is-cidr';
-
-import type { UpdateClient } from '~~/services/database/repositories/client';
+import type { ID } from '#db/schema';
 
 const DEBUG = debug('WireGuard');
 
@@ -13,20 +10,26 @@ class WireGuard {
    * Save and sync config
    */
   async saveConfig() {
-    await this.#saveWireguardConfig();
-    await this.#syncWireguardConfig();
+    await this.#saveWireguardConfig('wg0');
+    await this.#syncWireguardConfig('wg0');
   }
 
   /**
    * Generates and saves WireGuard config from database as wg0
    */
-  async #saveWireguardConfig() {
-    const system = await Database.get();
-    const clients = await Database.client.findAll();
-    const result = [];
-    result.push(wg.generateServerInterface(system));
+  async #saveWireguardConfig(infName: string) {
+    const wgInterface = await Database.interfaces.get(infName);
+    const clients = await Database.clients.getAll();
+    const hooks = await Database.hooks.get(infName);
 
-    for (const client of Object.values(clients)) {
+    if (!wgInterface || !hooks) {
+      throw new Error('Interface or Hooks not found');
+    }
+
+    const result = [];
+    result.push(wg.generateServerInterface(wgInterface, hooks));
+
+    for (const client of clients) {
       if (!client.enabled) {
         continue;
       }
@@ -34,15 +37,15 @@ class WireGuard {
     }
 
     DEBUG('Saving Config...');
-    await fs.writeFile('/etc/wireguard/wg0.conf', result.join('\n\n'), {
+    await fs.writeFile(`/etc/wireguard/${infName}.conf`, result.join('\n\n'), {
       mode: 0o600,
     });
     DEBUG('Config saved successfully.');
   }
 
-  async #syncWireguardConfig() {
+  async #syncWireguardConfig(infName: string) {
     DEBUG('Syncing Config...');
-    await wg.sync();
+    await wg.sync(infName);
     DEBUG('Config synced successfully.');
   }
 
@@ -57,7 +60,7 @@ class WireGuard {
     }));
 
     // Loop WireGuard status
-    const dump = await wg.dump();
+    const dump = await wg.dump('wg0');
     dump.forEach(
       ({ publicKey, latestHandshakeAt, endpoint, transferRx, transferTx }) => {
         const client = clients.find((client) => client.publicKey === publicKey);
@@ -75,98 +78,29 @@ class WireGuard {
     return clients;
   }
 
-  async getClientConfiguration({ clientId }: { clientId: number }) {
-    const system = await Database.system.get();
+  async getClientConfiguration({ clientId }: { clientId: ID }) {
+    const wgInterface = await Database.interfaces.get('wg0');
+    const userConfig = await Database.userConfigs.get('wg0');
+
+    if (!wgInterface || !userConfig) {
+      throw new Error('Interface or UserConfig not found');
+    }
+
     const client = await Database.clients.get(clientId);
 
-    return wg.generateClientConfig(system, client);
+    if (!client) {
+      throw new Error('Client not found');
+    }
+
+    return wg.generateClientConfig(wgInterface, userConfig, client);
   }
 
-  async getClientQRCodeSVG({ clientId }: { clientId: string }) {
+  async getClientQRCodeSVG({ clientId }: { clientId: ID }) {
     const config = await this.getClientConfiguration({ clientId });
     return QRCode.toString(config, {
       type: 'svg',
       width: 512,
     });
-  }
-
-  async deleteClient({ clientId }: { clientId: string }) {
-    await Database.client.delete(clientId);
-    await this.saveConfig();
-  }
-
-  async enableClient({ clientId }: { clientId: string }) {
-    await Database.client.toggle(clientId, true);
-
-    await this.saveConfig();
-  }
-
-  async generateOneTimeLink({ clientId }: { clientId: string }) {
-    const key = `${clientId}-${Math.floor(Math.random() * 1000)}`;
-    const oneTimeLink = Math.abs(CRC32.str(key)).toString(16);
-    const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString();
-    await Database.client.createOneTimeLink(clientId, {
-      oneTimeLink,
-      expiresAt,
-    });
-    await this.saveConfig();
-  }
-
-  async eraseOneTimeLink({ clientId }: { clientId: string }) {
-    await Database.client.deleteOneTimeLink(clientId);
-    await this.saveConfig();
-  }
-
-  async disableClient({ clientId }: { clientId: string }) {
-    await Database.client.toggle(clientId, false);
-
-    await this.saveConfig();
-  }
-
-  async updateClient({
-    clientId,
-    client,
-  }: {
-    clientId: string;
-    client: UpdateClient;
-  }) {
-    // TODO: validate ipv4, v6, expire date etc
-    await Database.client.update(clientId, client);
-    await this.saveConfig();
-  }
-
-  async updateAddressRange({
-    address4,
-    address6,
-  }: {
-    address4: string;
-    address6: string;
-  }) {
-    // TODO: be able to revert if error
-
-    if (!isCidr(address4) || !isCidr(address6)) {
-      throw new Error('Invalid CIDR');
-    }
-
-    await Database.system.updateAddressRange(address4, address6);
-
-    const systems = await Database.system.get();
-    const clients = await Database.client.findAll();
-
-    for (const _client of Object.values(clients)) {
-      const clients = await Database.client.findAll();
-
-      const client = structuredClone(_client) as DeepWriteable<typeof _client>;
-
-      client.address4 = nextIPv4(systems, clients);
-      client.address6 = nextIPv6(systems, clients);
-
-      await Database.client.update(client.id, {
-        ...client,
-      });
-    }
-
-    await this.saveConfig();
   }
 
   // TODO: reimplement database restore
@@ -189,24 +123,47 @@ class WireGuard {
   }
 
   async Startup() {
-    DEBUG('Starting Wireguard...');
-    await this.#saveWireguardConfig();
-    await wg.down().catch(() => {});
-    await wg.up().catch((err) => {
-      if (
-        err &&
-        err.message &&
-        err.message.includes('Cannot find device "wg0"')
-      ) {
-        throw new Error(
-          'WireGuard exited with the error: Cannot find device "wg0"\nThis usually means that your host\'s kernel does not support WireGuard!'
-        );
+    const wgInterfaces = await Database.interfaces.getAll();
+    for (const wgInterface of wgInterfaces) {
+      if (wgInterface.enabled !== true) {
+        continue;
       }
+      // default interface has no keys
+      if (
+        wgInterface.privateKey === '---default---' &&
+        wgInterface.publicKey === '---default---'
+      ) {
+        DEBUG('Generating new Wireguard Keys...');
+        const privateKey = await wg.generatePrivateKey();
+        const publicKey = await wg.getPublicKey(privateKey);
 
-      throw err;
-    });
-    await this.#syncWireguardConfig();
-    DEBUG('Wireguard started successfully.');
+        await Database.interfaces.updateKeyPair(
+          wgInterface.name,
+          privateKey,
+          publicKey
+        );
+        DEBUG('New Wireguard Keys generated successfully.');
+      }
+      DEBUG(`Starting Wireguard Interface ${wgInterface.name}...`);
+      await this.#saveWireguardConfig(wgInterface.name);
+      await wg.down(wgInterface.name).catch(() => {});
+      await wg.up(wgInterface.name).catch((err) => {
+        if (
+          err &&
+          err.message &&
+          err.message.includes(`Cannot find device "${wgInterface.name}"`)
+        ) {
+          throw new Error(
+            `WireGuard exited with the error: Cannot find device "${wgInterface.name}"\nThis usually means that your host's kernel does not support WireGuard!`,
+            { cause: err.message }
+          );
+        }
+
+        throw err;
+      });
+      await this.#syncWireguardConfig(wgInterface.name);
+      DEBUG(`Wireguard Interface ${wgInterface.name} started successfully.`);
+    }
 
     DEBUG('Starting Cron Job.');
     await this.startCronJob();
@@ -214,7 +171,6 @@ class WireGuard {
   }
 
   // TODO: handle as worker_thread
-  // would need a better database aswell
   async startCronJob() {
     await this.cronJob().catch((err) => {
       DEBUG('Running Cron Job failed.');
@@ -227,31 +183,34 @@ class WireGuard {
 
   // Shutdown wireguard
   async Shutdown() {
-    await wg.down().catch(() => {});
+    const wgInterfaces = await Database.interfaces.getAll();
+    for (const wgInterface of wgInterfaces) {
+      await wg.down(wgInterface.name).catch(() => {});
+    }
   }
 
   async cronJob() {
-    const clients = await Database.client.findAll();
+    const clients = await Database.clients.getAll();
     // Expires Feature
-    for (const client of Object.values(clients)) {
+    for (const client of clients) {
       if (client.enabled !== true) continue;
       if (
         client.expiresAt !== null &&
         new Date() > new Date(client.expiresAt)
       ) {
         DEBUG(`Client ${client.id} expired.`);
-        await Database.client.toggle(client.id, false);
+        await Database.clients.toggle(client.id, false);
       }
     }
 
     // One Time Link Feature
-    for (const client of Object.values(clients)) {
+    for (const client of clients) {
       if (
         client.oneTimeLink !== null &&
         new Date() > new Date(client.oneTimeLink.expiresAt)
       ) {
         DEBUG(`Client ${client.id} One Time Link expired.`);
-        await Database.client.deleteOneTimeLink(client.id);
+        await Database.oneTimeLinks.delete(client.id);
       }
     }
 
@@ -266,7 +225,7 @@ class WireGuard {
     let wireguardSentBytes = '';
     let wireguardReceivedBytes = '';
     let wireguardLatestHandshakeSeconds = '';
-    for (const client of Object.values(clients)) {
+    for (const client of clients) {
       wireguardPeerCount++;
       if (client.enabled === true) {
         wireguardEnabledPeersCount++;
@@ -274,9 +233,9 @@ class WireGuard {
       if (client.endpoint !== null) {
         wireguardConnectedPeersCount++;
       }
-      wireguardSentBytes += `wireguard_sent_bytes{interface="wg0",enabled="${client.enabled}",address4="${client.address4}",address6="${client.address6}",name="${client.name}"} ${Number(client.transferTx)}\n`;
-      wireguardReceivedBytes += `wireguard_received_bytes{interface="wg0",enabled="${client.enabled}",address4="${client.address4}",address6="${client.address6}",name="${client.name}"} ${Number(client.transferRx)}\n`;
-      wireguardLatestHandshakeSeconds += `wireguard_latest_handshake_seconds{interface="wg0",enabled="${client.enabled}",address4="${client.address4}",address6="${client.address6}",name="${client.name}"} ${client.latestHandshakeAt ? (new Date().getTime() - new Date(client.latestHandshakeAt).getTime()) / 1000 : 0}\n`;
+      wireguardSentBytes += `wireguard_sent_bytes{interface="wg0",enabled="${client.enabled}",ipv4Address="${client.ipv4Address}",ipv6Address="${client.ipv6Address}",name="${client.name}"} ${Number(client.transferTx)}\n`;
+      wireguardReceivedBytes += `wireguard_received_bytes{interface="wg0",enabled="${client.enabled}",ipv4Address="${client.ipv4Address}",ipv6Address="${client.ipv6Address}",name="${client.name}"} ${Number(client.transferRx)}\n`;
+      wireguardLatestHandshakeSeconds += `wireguard_latest_handshake_seconds{interface="wg0",enabled="${client.enabled}",ipv4Address="${client.ipv4Address}",ipv6Address="${client.ipv6Address}",name="${client.name}"} ${client.latestHandshakeAt ? (new Date().getTime() - new Date(client.latestHandshakeAt).getTime()) / 1000 : 0}\n`;
     }
 
     let returnText = '# HELP wg-easy and wireguard metrics\n';
@@ -315,7 +274,7 @@ class WireGuard {
     let wireguardPeerCount = 0;
     let wireguardEnabledPeersCount = 0;
     let wireguardConnectedPeersCount = 0;
-    for (const client of Object.values(clients)) {
+    for (const client of clients) {
       wireguardPeerCount++;
       if (client.enabled === true) {
         wireguardEnabledPeersCount++;

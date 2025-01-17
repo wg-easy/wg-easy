@@ -7,6 +7,9 @@ import { ClientService } from './repositories/client/service';
 import { GeneralService } from './repositories/general/service';
 import { UserService } from './repositories/user/service';
 import { UserConfigService } from './repositories/userConfig/service';
+import { InterfaceService } from './repositories/interface/service';
+import { HooksService } from './repositories/hooks/service';
+import { OneTimeLinkService } from './repositories/oneTimeLink/service';
 
 const client = createClient({ url: 'file:/etc/wireguard/wg0.db' });
 const db = drizzle({ client, schema });
@@ -21,11 +24,17 @@ class DBService {
   general: GeneralService;
   users: UserService;
   userConfigs: UserConfigService;
+  interfaces: InterfaceService;
+  hooks: HooksService;
+  oneTimeLinks: OneTimeLinkService;
   constructor(db: DBType) {
     this.clients = new ClientService(db);
     this.general = new GeneralService(db);
     this.users = new UserService(db);
     this.userConfigs = new UserConfigService(db);
+    this.interfaces = new InterfaceService(db);
+    this.hooks = new HooksService(db);
+    this.oneTimeLinks = new OneTimeLinkService(db);
   }
 }
 
@@ -38,7 +47,6 @@ async function migrate() {
     await drizzleMigrate(db, {
       migrationsFolder: './server/database/migrations',
     });
-    // TODO: data migration
     console.log('Migration complete');
   } catch (e) {
     if (e instanceof Error) {
