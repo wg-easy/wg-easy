@@ -12,13 +12,12 @@
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
   "typescript.tsdk": "./src/node_modules/typescript/lib",
-  "i18n-ally.enabledFrameworks": [
-    "vue"
-  ],
-  "i18n-ally.localesPaths": [
-    "src/i18n/locales"
-  ],
+  "i18n-ally.enabledFrameworks": ["vue"],
+  "i18n-ally.localesPaths": ["src/i18n/locales"],
   "i18n-ally.sortKeys": false,
   "i18n-ally.keepFulfilled": false,
   "i18n-ally.keystyle": "nested",
