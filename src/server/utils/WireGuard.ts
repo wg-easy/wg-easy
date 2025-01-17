@@ -3,7 +3,7 @@ import debug from 'debug';
 import QRCode from 'qrcode';
 import type { ID } from '#db/schema';
 
-const DEBUG = debug('WireGuard');
+const WG_DEBUG = debug('WireGuard');
 
 class WireGuard {
   /**
@@ -36,17 +36,17 @@ class WireGuard {
       result.push(wg.generateServerPeer(client));
     }
 
-    DEBUG('Saving Config...');
+    WG_DEBUG('Saving Config...');
     await fs.writeFile(`/etc/wireguard/${infName}.conf`, result.join('\n\n'), {
       mode: 0o600,
     });
-    DEBUG('Config saved successfully.');
+    WG_DEBUG('Config saved successfully.');
   }
 
   async #syncWireguardConfig(infName: string) {
-    DEBUG('Syncing Config...');
+    WG_DEBUG('Syncing Config...');
     await wg.sync(infName);
-    DEBUG('Config synced successfully.');
+    WG_DEBUG('Config synced successfully.');
   }
 
   async getClients() {
@@ -123,6 +123,7 @@ class WireGuard {
   }
 
   async Startup() {
+    WG_DEBUG('Starting WireGuard...');
     const wgInterfaces = await Database.interfaces.getAll();
     for (const wgInterface of wgInterfaces) {
       if (wgInterface.enabled !== true) {
@@ -133,7 +134,7 @@ class WireGuard {
         wgInterface.privateKey === '---default---' &&
         wgInterface.publicKey === '---default---'
       ) {
-        DEBUG('Generating new Wireguard Keys...');
+        WG_DEBUG('Generating new Wireguard Keys...');
         const privateKey = await wg.generatePrivateKey();
         const publicKey = await wg.getPublicKey(privateKey);
 
@@ -142,9 +143,9 @@ class WireGuard {
           privateKey,
           publicKey
         );
-        DEBUG('New Wireguard Keys generated successfully.');
+        WG_DEBUG('New Wireguard Keys generated successfully.');
       }
-      DEBUG(`Starting Wireguard Interface ${wgInterface.name}...`);
+      WG_DEBUG(`Starting Wireguard Interface ${wgInterface.name}...`);
       await this.#saveWireguardConfig(wgInterface.name);
       await wg.down(wgInterface.name).catch(() => {});
       await wg.up(wgInterface.name).catch((err) => {
@@ -162,18 +163,18 @@ class WireGuard {
         throw err;
       });
       await this.#syncWireguardConfig(wgInterface.name);
-      DEBUG(`Wireguard Interface ${wgInterface.name} started successfully.`);
+      WG_DEBUG(`Wireguard Interface ${wgInterface.name} started successfully.`);
     }
 
-    DEBUG('Starting Cron Job.');
+    WG_DEBUG('Starting Cron Job...');
     await this.startCronJob();
-    DEBUG('Cron Job started successfully.');
+    WG_DEBUG('Cron Job started successfully.');
   }
 
   // TODO: handle as worker_thread
   async startCronJob() {
     await this.cronJob().catch((err) => {
-      DEBUG('Running Cron Job failed.');
+      WG_DEBUG('Running Cron Job failed.');
       console.error(err);
     });
     setTimeout(() => {
@@ -198,7 +199,7 @@ class WireGuard {
         client.expiresAt !== null &&
         new Date() > new Date(client.expiresAt)
       ) {
-        DEBUG(`Client ${client.id} expired.`);
+        WG_DEBUG(`Client ${client.id} expired.`);
         await Database.clients.toggle(client.id, false);
       }
     }
@@ -209,7 +210,7 @@ class WireGuard {
         client.oneTimeLink !== null &&
         new Date() > new Date(client.oneTimeLink.expiresAt)
       ) {
-        DEBUG(`Client ${client.id} One Time Link expired.`);
+        WG_DEBUG(`Client ${client.id} One Time Link expired.`);
         await Database.oneTimeLinks.delete(client.id);
       }
     }

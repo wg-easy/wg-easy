@@ -1,6 +1,7 @@
 import { drizzle } from 'drizzle-orm/libsql';
 import { migrate as drizzleMigrate } from 'drizzle-orm/libsql/migrator';
 import { createClient } from '@libsql/client';
+import debug from 'debug';
 
 import * as schema from './schema';
 import { ClientService } from './repositories/client/service';
@@ -10,6 +11,8 @@ import { UserConfigService } from './repositories/userConfig/service';
 import { InterfaceService } from './repositories/interface/service';
 import { HooksService } from './repositories/hooks/service';
 import { OneTimeLinkService } from './repositories/oneTimeLink/service';
+
+const DB_DEBUG = debug('Database');
 
 const client = createClient({ url: 'file:/etc/wireguard/wg0.db' });
 const db = drizzle({ client, schema });
@@ -43,14 +46,14 @@ export type DBServiceType = DBService;
 
 async function migrate() {
   try {
-    console.log('Migrating database...');
+    DB_DEBUG('Migrating database...');
     await drizzleMigrate(db, {
       migrationsFolder: './server/database/migrations',
     });
-    console.log('Migration complete');
+    DB_DEBUG('Migration complete');
   } catch (e) {
     if (e instanceof Error) {
-      console.log('Failed to migrate database:', e.message);
+      DB_DEBUG('Failed to migrate database:', e.message);
     }
   }
 }

@@ -1,10 +1,10 @@
--- Insert default values --
+PRAGMA journal_mode=WAL;--> statement-breakpoint
 INSERT INTO `general_table` (`setupStep`, `session_password`, `session_timeout`)
 VALUES (1, hex(randomblob(256)), 3600);
-
+--> statement-breakpoint
 INSERT INTO `interfaces_table` (`name`, `device`, `port`, `private_key`, `public_key`, `ipv4_cidr`, `ipv6_cidr`, `mtu`, `enabled`)
 VALUES ('wg0', 'eth0', 51820, '---default---', '---default---', '10.8.0.0/24', 'fdcc:ad94:bacf:61a4::cafe:0/112', 1420, 1);
-
+--> statement-breakpoint
 INSERT INTO `hooks_table` (`id`, `pre_up`, `post_up`, `pre_down`, `post_down`)
 VALUES (
   'wg0',
