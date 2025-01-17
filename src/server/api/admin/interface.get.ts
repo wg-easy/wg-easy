@@ -1,4 +1,7 @@
 export default defineEventHandler(async () => {
-  const system = await Database.system.get();
-  return system.interface;
+  const wgInterface = await Database.interfaces.get('wg0');
+  return {
+    ...wgInterface,
+    privateKey: undefined,
+  };
 });

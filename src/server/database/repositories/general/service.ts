@@ -1,6 +1,7 @@
 import type { DBType } from '#db/sqlite';
 import { sql } from 'drizzle-orm';
 import { general } from './schema';
+import type { GeneralUpdateType } from './types';
 
 function createPreparedStatement(db: DBType) {
   return {
@@ -9,6 +10,12 @@ function createPreparedStatement(db: DBType) {
       .update(general)
       .set({
         setupStep: sql.placeholder('setupStep') as never as number,
+      })
+      .prepare(),
+    update: db
+      .update(general)
+      .set({
+        sessionTimeout: sql.placeholder('sessionTimeout') as never as number,
       })
       .prepare(),
   };
@@ -53,5 +60,9 @@ export class GeneralService {
       sessionPassword: result.sessionPassword,
       sessionTimeout: result.sessionTimeout,
     };
+  }
+
+  update(data: GeneralUpdateType) {
+    return this.#statements.update.execute(data);
   }
 }

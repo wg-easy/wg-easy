@@ -1,4 +1,6 @@
 export default defineEventHandler(async () => {
-  const system = await Database.system.get();
-  return system.general;
+  const sessionConfig = await Database.general.getSessionConfig();
+  return {
+    sessionTimeout: sessionConfig.sessionTimeout,
+  };
 });

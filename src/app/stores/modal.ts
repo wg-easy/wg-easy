@@ -9,11 +9,13 @@ export const useModalStore = defineStore('Modal', () => {
 
   function createClient() {
     const name = clientCreateName.value;
-    const expireDate = clientExpireDate.value || null;
+    const expiresAt = clientExpireDate.value || null;
     if (!name) return;
 
-    api
-      .createClient({ name, expireDate })
+    $fetch('/api/client', {
+      method: 'post',
+      body: { name, expiresAt },
+    })
       .catch((err) => alert(err.message || err.toString()))
       .finally(() => clientsStore.refresh().catch(console.error));
   }

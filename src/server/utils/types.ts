@@ -11,6 +11,8 @@ export const safeStringRefine = z
     { message: 'zod.stringMalformed' }
   );
 
+// TODO: create custom getValidatedRouterParams and readValidatedBody wrapper
+
 export function validateZod<T>(
   schema: ZodSchema<T>,
   event?: H3Event<EventHandlerRequest>
