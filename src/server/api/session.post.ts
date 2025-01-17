@@ -4,8 +4,7 @@ export default defineEventHandler(async (event) => {
     validateZod(credentialsType, event)
   );
 
-  const users = await Database.users.getAll();
-  const user = users.find((user) => user.username == username);
+  const user = await Database.users.getByUsername(username);
   if (!user)
     throw createError({
       statusCode: 400,

@@ -1,6 +1,6 @@
 export default defineEventHandler(async (event) => {
-  const setupDone = await Database.setup.done();
-  if (setupDone) {
+  const { done } = await Database.general.getSetupStep();
+  if (done) {
     throw createError({
       statusCode: 400,
       statusMessage: 'Invalid state',
@@ -11,7 +11,8 @@ export default defineEventHandler(async (event) => {
     event,
     validateZod(passwordSetupType, event)
   );
-  await Database.user.create(username, password);
-  await Database.setup.set(5);
+
+  await Database.users.create(username, password);
+  await Database.general.setSetupStep(5);
   return { success: true };
 });

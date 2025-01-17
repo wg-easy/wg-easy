@@ -28,7 +28,7 @@ ENV PORT=51821
 ENV HOST=0.0.0.0
 
 # Install Dependencies
-COPY src/package.json src/pnpm-lock.yaml ./ ./
+COPY src/package.json src/pnpm-lock.yaml ./
 RUN pnpm install
 
 # Copy Project

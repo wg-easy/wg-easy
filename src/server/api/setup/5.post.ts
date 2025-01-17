@@ -1,6 +1,6 @@
 export default defineEventHandler(async (event) => {
-  const setupDone = await Database.setup.done();
-  if (setupDone) {
+  const { done } = await Database.general.getSetupStep();
+  if (done) {
     throw createError({
       statusCode: 400,
       statusMessage: 'Invalid state',
@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
     event,
     validateZod(hostPortType, event)
   );
-  await Database.system.updateClientsHostPort(host, port);
-  await Database.setup.set('success');
+  await Database.userConfigs.updateHostPort('wg0', host, port);
+  await Database.general.setSetupStep(0);
   return { success: true };
 });

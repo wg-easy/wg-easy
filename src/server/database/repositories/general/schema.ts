@@ -1,11 +1,11 @@
 import { sql } from 'drizzle-orm';
-import { int, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, text, int } from 'drizzle-orm/sqlite-core';
 
-export const sessionConfig = sqliteTable('session_config_table', {
-  // limit to one entry
+export const general = sqliteTable('general_table', {
   id: int().primaryKey({ autoIncrement: false }).default(1),
-  password: text().notNull(),
-  timeout: int().notNull(),
+  setupStep: int().notNull(),
+  sessionPassword: text('session_password').notNull(),
+  sessionTimeout: int('session_timeout').notNull(),
   createdAt: text('created_at')
     .notNull()
     .default(sql`(CURRENT_TIMESTAMP)`),

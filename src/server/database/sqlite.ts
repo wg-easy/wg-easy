@@ -4,8 +4,9 @@ import { createClient } from '@libsql/client';
 
 import * as schema from './schema';
 import { ClientService } from './repositories/client/service';
-import { SessionConfigService } from './repositories/sessionConfig/service';
+import { GeneralService } from './repositories/general/service';
 import { UserService } from './repositories/user/service';
+import { UserConfigService } from './repositories/userConfig/service';
 
 const client = createClient({ url: 'file:/etc/wireguard/wg0.db' });
 const db = drizzle({ client, schema });
@@ -17,12 +18,14 @@ export async function connect() {
 
 class DBService {
   clients: ClientService;
-  sessionConfig: SessionConfigService;
+  general: GeneralService;
   users: UserService;
+  userConfigs: UserConfigService;
   constructor(db: DBType) {
     this.clients = new ClientService(db);
-    this.sessionConfig = new SessionConfigService(db);
+    this.general = new GeneralService(db);
     this.users = new UserService(db);
+    this.userConfigs = new UserConfigService(db);
   }
 }
 

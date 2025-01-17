@@ -8,7 +8,7 @@ export const user = sqliteTable('users_table', {
   email: text(),
   name: text().notNull(),
   role: int().$type<Role>().notNull(),
-  enabled: int().notNull().default(1),
+  enabled: int({ mode: 'boolean' }).notNull(),
   createdAt: text('created_at')
     .notNull()
     .default(sql`(CURRENT_TIMESTAMP)`),

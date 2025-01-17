@@ -30,7 +30,7 @@ export class ClientService {
   }
 
   async getAll() {
-    const result = await this.#statements.findAll.all();
+    const result = await this.#statements.findAll.execute();
     return result.map((row) => ({
       ...row,
       createdAt: new Date(row.createdAt),
@@ -39,7 +39,7 @@ export class ClientService {
   }
 
   async get(id: number) {
-    return this.#statements.findById.all({ id });
+    return this.#statements.findById.execute({ id });
   }
 
   async create({ name, expiresAt }: ClientCreateType) {
@@ -56,7 +56,7 @@ export class ClientService {
       parsedExpiresAt = expiresAtDate.toISOString();
     }
 
-    await this.#db.transaction(async (tx) => {
+    return this.#db.transaction(async (tx) => {
       const clients = await tx.query.client.findMany().execute();
       const clientInterface = await tx.query.wgInterface
         .findFirst({
@@ -83,7 +83,7 @@ export class ClientService {
       const ipv6Cidr = parseCidr(clientInterface.ipv6Cidr);
       const ipv6Address = nextIP(6, ipv6Cidr, clients);
 
-      return await tx
+      await tx
         .insert(client)
         .values({
           name,

@@ -9,18 +9,18 @@ export type WGSession = Partial<{
 const name = 'wg-easy';
 
 export async function useWGSession(event: H3Event, rememberMe = false) {
-  const sessionConfig = await Database.sessionConfig.get();
+  const sessionConfig = await Database.general.getSessionConfig();
   return useSession<WGSession>(event, {
-    password: sessionConfig.password,
+    password: sessionConfig.sessionPassword,
     name,
-    cookie: { maxAge: rememberMe ? sessionConfig.timeout : undefined },
+    cookie: { maxAge: rememberMe ? sessionConfig.sessionTimeout : undefined },
   });
 }
 
 export async function getWGSession(event: H3Event) {
-  const sessionConfig = await Database.sessionConfig.get();
+  const sessionConfig = await Database.general.getSessionConfig();
   return getSession<WGSession>(event, {
-    password: sessionConfig.password,
+    password: sessionConfig.sessionPassword,
     name,
     cookie: {},
   });

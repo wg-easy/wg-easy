@@ -1,5 +1,5 @@
 export default defineEventHandler(async (event) => {
-  const url = getRequestURL(event);
+  /*const url = getRequestURL(event);
   const session = await useWGSession(event);
 
   // Api handled by session, Setup handled with setup middleware
@@ -31,5 +31,5 @@ export default defineEventHandler(async (event) => {
         statusMessage: 'Not allowed to access Admin Panel',
       });
     }
-  }
+  }*/
 });
