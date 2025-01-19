@@ -45,7 +45,7 @@ RUN update-alternatives --install /usr/sbin/ip6tables ip6tables /usr/sbin/ip6tab
 RUN npm install libsql
 
 # Set Environment
-ENV DEBUG=Server,WireGuard,LowDB
+ENV DEBUG=Server,WireGuard,Database,CMD
 ENV PORT=51821
 ENV HOST=0.0.0.0
 
