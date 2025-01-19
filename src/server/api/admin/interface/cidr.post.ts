@@ -1,13 +1,14 @@
-import { HooksUpdateSchema } from '#db/repositories/hooks/types';
+import { InterfaceCidrUpdateSchema } from '#db/repositories/interface/types';
 
 export default definePermissionEventHandler(
   actions.ADMIN,
   async ({ event }) => {
     const data = await readValidatedBody(
       event,
-      validateZod(HooksUpdateSchema, event)
+      validateZod(InterfaceCidrUpdateSchema, event)
     );
-    await Database.hooks.update('wg0', data);
+
+    await Database.interfaces.updateCidr('wg0', data);
     await WireGuard.saveConfig();
     return { success: true };
   }

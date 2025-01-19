@@ -1,14 +1,6 @@
 import { UserConfigSetupType } from '#db/repositories/userConfig/types';
 
-export default defineEventHandler(async (event) => {
-  const { done } = await Database.general.getSetupStep();
-  if (done) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Invalid state',
-    });
-  }
-
+export default defineSetupEventHandler(async ({ event }) => {
   const { host, port } = await readValidatedBody(
     event,
     validateZod(UserConfigSetupType, event)

@@ -2,14 +2,7 @@
 import { stringifyIp } from 'ip-bigint';
 import { z } from 'zod';*/
 
-export default defineEventHandler(async (/*event*/) => {
-  const { done } = await Database.general.getSetupStep();
-  if (done) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Invalid state',
-    });
-  }
+export default defineSetupEventHandler(async (/*{ event }*/) => {
   // TODO: Implement
   /*
 

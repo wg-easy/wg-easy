@@ -1,6 +1,7 @@
 import type { DBType } from '#db/sqlite';
 import { eq, sql } from 'drizzle-orm';
 import { userConfig } from './schema';
+import type { UserConfigUpdateType } from './types';
 
 function createPreparedStatement(db: DBType) {
   return {
@@ -19,21 +20,31 @@ function createPreparedStatement(db: DBType) {
 }
 
 export class UserConfigService {
+  #db: DBType;
   #statements: ReturnType<typeof createPreparedStatement>;
 
   constructor(db: DBType) {
+    this.#db = db;
     this.#statements = createPreparedStatement(db);
   }
 
-  async get(wgInterface: string) {
-    return await this.#statements.get.execute({ interface: wgInterface });
+  get(infName: string) {
+    return this.#statements.get.execute({ interface: infName });
   }
 
-  async updateHostPort(wgInterface: string, host: string, port: number) {
-    return await this.#statements.updateHostPort.execute({
-      interface: wgInterface,
+  updateHostPort(infName: string, host: string, port: number) {
+    return this.#statements.updateHostPort.execute({
+      interface: infName,
       host,
       port,
     });
+  }
+
+  update(infName: string, data: UserConfigUpdateType) {
+    return this.#db
+      .update(userConfig)
+      .set(data)
+      .where(eq(userConfig.id, infName))
+      .execute();
   }
 }

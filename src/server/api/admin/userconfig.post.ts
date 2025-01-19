@@ -1,13 +1,13 @@
-import { HooksUpdateSchema } from '#db/repositories/hooks/types';
+import { UserConfigUpdateSchema } from '#db/repositories/userConfig/types';
 
 export default definePermissionEventHandler(
   actions.ADMIN,
   async ({ event }) => {
     const data = await readValidatedBody(
       event,
-      validateZod(HooksUpdateSchema, event)
+      validateZod(UserConfigUpdateSchema, event)
     );
-    await Database.hooks.update('wg0', data);
+    await Database.userConfigs.update('wg0', data);
     await WireGuard.saveConfig();
     return { success: true };
   }

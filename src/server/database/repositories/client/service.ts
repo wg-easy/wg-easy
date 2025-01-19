@@ -2,8 +2,8 @@ import type { DBType } from '#db/sqlite';
 import { eq, sql } from 'drizzle-orm';
 import { client } from './schema';
 import type { ClientCreateType, UpdateClientType } from './types';
-import type { ID } from '../../schema';
-import { wgInterface, userConfig } from '../../schema';
+import type { ID } from '#db/schema';
+import { wgInterface, userConfig } from '#db/schema';
 import { parseCidr } from 'cidr-tools';
 
 function createPreparedStatement(db: DBType) {

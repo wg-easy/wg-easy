@@ -1,4 +1,4 @@
-// TODO: will need to be updated when we have more roles and actions
+// TODO: implement ABAC
 
 export const actions = {
   ADMIN: 'ADMIN',

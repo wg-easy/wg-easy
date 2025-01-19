@@ -11,6 +11,14 @@
         <FormHeading>Actions</FormHeading>
         <FormActionField type="submit" label="Save" />
         <FormActionField label="Revert" @click="revert" />
+        <AdminCidrDialog
+          trigger-class="col-span-2"
+          :ipv4-cidr="data.ipv4Cidr"
+          :ipv6-cidr="data.ipv6Cidr"
+          @change="changeCidr"
+        >
+          <FormActionField label="Change CIDR" class="w-full" />
+        </AdminCidrDialog>
       </FormGroup>
     </FormElement>
   </main>
@@ -54,5 +62,31 @@ async function submit() {
 async function revert() {
   await refresh();
   data.value = toRef(_data.value).value;
+}
+
+async function changeCidr(ipv4Cidr: string, ipv6Cidr: string) {
+  try {
+    const res = await $fetch(`/api/admin/interface/cidr`, {
+      method: 'post',
+      body: { ipv4Cidr, ipv6Cidr },
+    });
+    toast.showToast({
+      type: 'success',
+      title: 'Success',
+      message: 'Changed CIDR',
+    });
+    if (!res.success) {
+      throw new Error('Failed to change CIDR');
+    }
+    await refreshNuxtData();
+  } catch (e) {
+    if (e instanceof Error) {
+      toast.showToast({
+        type: 'error',
+        title: 'Error',
+        message: e.message,
+      });
+    }
+  }
 }
 </script>

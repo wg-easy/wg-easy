@@ -54,30 +54,17 @@
     "body": "Body must be a valid object",
     "device": "Device must be a valid string",
     "deviceMin": "Device must be at least 1 Character",
-    "hook": "Hook must be a valid string",
     "client": {
       "id": "Client ID must be a valid number",
       "name": "Name must be a valid string",
       "nameMin": "Name must be at least 1 Character",
-      "mtu": "MTU must be a valid number",
-      "mtuMin": "MTU must be at least 1280",
-      "mtuMax": "MTU must be at most 9000",
-      "persistentKeepalive": "Persistent Keepalive must be a valid number",
-      "persistentKeepaliveMin": "Persistent Keepalive must be at least 0",
-      "persistentKeepaliveMax": "Persistent Keepalive must be at most 65535",
       "expireDate": "expiredDate must be a valid string",
       "expireDateMin": "expiredDate must be at least 1 Character",
-      "address": "IP Address must be a valid string",
-      "addressMin": "IP Address must be a be at least 1 Character",
       "address4": "IPv4 Address must be a valid string",
       "address4Min": "IPv4 Address must be a be at least 1 Character",
       "address6": "IPv6 Address must be a valid string",
       "address6Min": "IPv6 Address must be a be at least 1 Character",
-      "allowedIps": "Allowed IPs must be a valid array of strings",
-      "allowedIpsMin": "Allowed IPs must have at least 1 item",
-      "serverAllowedIps": "Allowed IPs must be a valid array of strings",
-      "dns": "DNS must be a valid array of strings",
-      "dnsMin": "DNS must have at least 1 item"
+      "serverAllowedIps": "Allowed IPs must be a valid array of strings"
     },
     "user": {
       "username": "Username must be a valid string",
@@ -93,14 +80,31 @@
     },
     "userConfig": {
       "host": "Host must be a valid string",
-      "hostMin": "Host must contain at least 1 character",
-      "port": "Port must be a valid number",
-      "portMin": "Port must be at least 1",
-      "portMax": "Port must be at most 65535"
+      "hostMin": "Host must contain at least 1 character"
     },
     "general": {
       "sessionTimeout": "Session Timeout must be a valid number"
-    }
+    },
+    "interface": {
+      "cidr": "CIDR must be a valid string",
+      "cidrMin": "CIDR must be at least 1 Character"
+    },
+    "hook": "Hook must be a valid string",
+    "mtu": "MTU must be a valid number",
+    "mtuMin": "MTU must be at least 1280",
+    "mtuMax": "MTU must be at most 9000",
+    "port": "Port must be a valid number",
+    "portMin": "Port must be at least 1",
+    "portMax": "Port must be at most 65535",
+    "persistentKeepalive": "Persistent Keepalive must be a valid number",
+    "persistentKeepaliveMin": "Persistent Keepalive must be at least 0",
+    "persistentKeepaliveMax": "Persistent Keepalive must be at most 65535",
+    "address": "IP Address must be a valid string",
+    "addressMin": "IP Address must be a be at least 1 Character",
+    "dns": "DNS must be a valid array of strings",
+    "dnsMin": "DNS must have at least 1 item",
+    "allowedIps": "Allowed IPs must be a valid array of strings",
+    "allowedIpsMin": "Allowed IPs must have at least 1 item"
   },
   "name": "Name",
   "username": "Username",

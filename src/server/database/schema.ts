@@ -8,4 +8,5 @@ export * from './repositories/oneTimeLink/schema';
 export * from './repositories/user/schema';
 export * from './repositories/userConfig/schema';
 
+// TODO: move to types
 export type ID = number;

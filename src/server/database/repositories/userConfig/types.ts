@@ -9,12 +9,23 @@ const host = z
   .min(1, 'zod.userConfig.hostMin')
   .pipe(safeStringRefine);
 
-const port = z
-  .number({ message: 'zod.userConfig.port' })
-  .min(1, 'zod.userConfig.portMin')
-  .max(65535, 'zod.userConfig.portMax');
-
 export const UserConfigSetupType = z.object({
   host: host,
-  port: port,
+  port: PortSchema,
 });
+
+export type UserConfigUpdateType = Omit<
+  UserConfigType,
+  'id' | 'createdAt' | 'updatedAt'
+>;
+
+export const UserConfigUpdateSchema = schemaForType<UserConfigUpdateType>()(
+  z.object({
+    port: PortSchema,
+    defaultMtu: MtuSchema,
+    defaultPersistentKeepalive: PersistentKeepaliveSchema,
+    defaultDns: DnsSchema,
+    defaultAllowedIps: AllowedIpsSchema,
+    host: host,
+  })
+);

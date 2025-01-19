@@ -11,3 +11,5 @@ export const GeneralUpdateSchema = z.object({
 });
 
 export type GeneralUpdateType = z.infer<typeof GeneralUpdateSchema>;
+
+export type SetupStepType = { step: number; done: boolean };
