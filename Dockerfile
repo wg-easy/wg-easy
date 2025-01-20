@@ -27,6 +27,9 @@ COPY --from=build_node_modules /node_modules /node_modules
 COPY --from=build_node_modules /app/wgpw.sh /bin/wgpw
 RUN chmod +x /bin/wgpw
 
+# Use Tencent Mirrors
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.cloud.tencent.com/g' /etc/apk/repositories
+
 # Install Linux packages
 RUN apk add --no-cache \
     dpkg \
