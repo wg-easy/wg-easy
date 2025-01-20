@@ -120,7 +120,7 @@ PostDown = ${WG_POST_DOWN}
 [Peer]
 PublicKey = ${client.publicKey}
 ${client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
-}AllowedIPs = ${client.allowedIPs? client.allowedIPs:(client.address+'/32')}`;
+}AllowedIPs = ${client.serverAllowedIPs}`;
     }
 
     debug('Config saving...');
@@ -152,10 +152,15 @@ ${client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
       expiredAt: client.expiredAt !== null
         ? new Date(client.expiredAt)
         : null,
-      allowedIPs: client.allowedIPs,
+      serverAllowedIPs: client.serverAllowedIPs,
+      clientAllowedIPs: client.clientAllowedIPs,
       oneTimeLink: client.oneTimeLink ?? null,
       oneTimeLinkExpiresAt: client.oneTimeLinkExpiresAt ?? null,
       downloadableConfig: 'privateKey' in client,
+      clientPreUP: client.clientPreUP ?? null,
+      clientPostUp: client.clientPostUp ?? null,
+      clientPreDown: client.clientPreDown ?? null,
+      clientPostDown: client.clientPostDown ?? null,
       persistentKeepalive: null,
       latestHandshakeAt: null,
       transferRx: null,
@@ -218,11 +223,16 @@ PrivateKey = ${client.privateKey ? `${client.privateKey}` : 'REPLACE_ME'}
 Address = ${client.address}/24
 ${WG_DEFAULT_DNS ? `DNS = ${WG_DEFAULT_DNS}\n` : ''}\
 ${WG_MTU ? `MTU = ${WG_MTU}\n` : ''}\
+${client.clientPreUP ? `PreUp = ${client.clientPreUP}\n` : ''}\
+${client.clientPostUp ? `PostUp = ${client.clientPostUp}\n` : ''}\
+${client.clientPreDown ? `PreDown = ${client.clientPreDown}\n` : ''}\
+${client.clientPostDown ? `PostDown = ${client.clientPostDown}\n` : ''}\
+
 
 [Peer]
 PublicKey = ${config.server.publicKey}
 ${client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
-}AllowedIPs = ${WG_ALLOWED_IPS}
+}AllowedIPs = ${client.clientAllowedIPs}
 PersistentKeepalive = ${WG_PERSISTENT_KEEPALIVE}
 Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
   }
@@ -250,7 +260,8 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
 
     // Calculate next IP
     let address;
-    let allowedIps;
+    let serverAllowedIPs;
+    let clientAllowedIPs;
     for (let i = 2; i < 255; i++) {
       const client = Object.values(config.clients).find((client) => {
         return client.address === WG_DEFAULT_ADDRESS.replace('x', i);
@@ -258,7 +269,8 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
 
       if (!client) {
         address = WG_DEFAULT_ADDRESS.replace('x', i);
-        allowedIps = address + '/32';
+        serverAllowedIPs = address + '/32';
+        clientAllowedIPs = WG_ALLOWED_IPS;
         break;
       }
     }
@@ -273,13 +285,18 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
       id,
       name,
       address,
-      allowedIps,
+      serverAllowedIPs,
+      clientAllowedIPs,
       privateKey,
       publicKey,
       preSharedKey,
 
       createdAt: new Date(),
       updatedAt: new Date(),
+      clientPreUP: null,
+      clientPostUp: null,
+      clientPreDown: null,
+      clientPostDown: null,
       expiredAt: null,
       enabled: true,
     };
