@@ -120,7 +120,7 @@ PostDown = ${WG_POST_DOWN}
 [Peer]
 PublicKey = ${client.publicKey}
 ${client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
-}AllowedIPs = ${client.address}/32`;
+}AllowedIPs = ${client.allowedIPs? client.allowedIPs:(client.address+'/32')}`;
     }
 
     debug('Config saving...');
@@ -250,6 +250,7 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
 
     // Calculate next IP
     let address;
+    let allowedIps;
     for (let i = 2; i < 255; i++) {
       const client = Object.values(config.clients).find((client) => {
         return client.address === WG_DEFAULT_ADDRESS.replace('x', i);
@@ -257,6 +258,7 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
 
       if (!client) {
         address = WG_DEFAULT_ADDRESS.replace('x', i);
+        allowedIps = address + '/32';
         break;
       }
     }
@@ -264,12 +266,14 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
     if (!address) {
       throw new Error('Maximum number of clients reached.');
     }
+
     // Create Client
     const id = crypto.randomUUID();
     const client = {
       id,
       name,
       address,
+      allowedIps,
       privateKey,
       publicKey,
       preSharedKey,
