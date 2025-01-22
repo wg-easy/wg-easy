@@ -15,6 +15,7 @@ services:
       # - PASSWORD_HASH=$$2y$$10$$hBCoykrB95WSzuV4fafBzOHWKu9sbyVa34GJr8VV5R/pIelfEMYyG # (needs double $$, hash of 'foobar123'; see "How_to_generate_an_bcrypt_hash.md" for generate the hash)
       # - PORT=51821
       # - WG_PORT=51820
+      # - WG_MASK=24
       # - WG_CONFIG_PORT=92820
       # - WG_DEFAULT_ADDRESS=10.8.0.x
       # - WG_DEFAULT_DNS=1.1.1.1

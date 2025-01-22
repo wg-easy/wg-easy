@@ -14,6 +14,7 @@ const {
   WG_PATH,
   WG_HOST,
   WG_PORT,
+  WG_MASK,
   WG_CONFIG_PORT,
   WG_MTU,
   WG_DEFAULT_DNS,
@@ -36,6 +37,10 @@ module.exports = class WireGuard {
         throw new Error('WG_HOST Environment Variable Not Set!');
       }
 
+      if (WG_MASK < 0 || WG_MASK > 32) {
+        throw new Error('WG_MASK should between 0 and 32!');
+      }
+
       debug('Loading configuration...');
       let config;
       try {
@@ -48,12 +53,14 @@ module.exports = class WireGuard {
           log: 'echo ***hidden*** | wg pubkey',
         });
         const address = WG_DEFAULT_ADDRESS.replace('x', '1');
+        const mask = WG_MASK;
 
         config = {
           server: {
             privateKey,
             publicKey,
             address,
+            mask,
           },
           clients: {},
         };
@@ -79,7 +86,7 @@ module.exports = class WireGuard {
 
         throw err;
       });
-      // await Util.exec(`iptables -t nat -A POSTROUTING -s ${WG_DEFAULT_ADDRESS.replace('x', '0')}/24 -o ' + WG_DEVICE + ' -j MASQUERADE`);
+      // await Util.exec(`iptables -t nat -A POSTROUTING -s ${WG_DEFAULT_ADDRESS.replace('x', '0')}/${WG_MASK} -o ' + WG_DEVICE + ' -j MASQUERADE`);
       // await Util.exec('iptables -A INPUT -p udp -m udp --dport 51820 -j ACCEPT');
       // await Util.exec('iptables -A FORWARD -i wg0 -j ACCEPT');
       // await Util.exec('iptables -A FORWARD -o wg0 -j ACCEPT');
@@ -103,7 +110,7 @@ module.exports = class WireGuard {
 # Server
 [Interface]
 PrivateKey = ${config.server.privateKey}
-Address = ${config.server.address}/24
+Address = ${config.server.address}/${config.server.mask}
 ListenPort = ${WG_PORT}
 PreUp = ${WG_PRE_UP}
 PostUp = ${WG_POST_UP}
@@ -146,6 +153,7 @@ ${client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
       name: client.name,
       enabled: client.enabled,
       address: client.address,
+      mask: client.mask,
       publicKey: client.publicKey,
       createdAt: new Date(client.createdAt),
       updatedAt: new Date(client.updatedAt),
@@ -220,7 +228,7 @@ ${client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
     return `
 [Interface]
 PrivateKey = ${client.privateKey ? `${client.privateKey}` : 'REPLACE_ME'}
-Address = ${client.address}/24
+Address = ${client.address}/${client.mask}
 ${WG_DEFAULT_DNS ? `DNS = ${WG_DEFAULT_DNS}\n` : ''}\
 ${WG_MTU ? `MTU = ${WG_MTU}\n` : ''}\
 ${client.clientPreUP ? `PreUp = ${client.clientPreUP}\n` : ''}\
@@ -291,6 +299,7 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
       publicKey,
       preSharedKey,
 
+      mask: WG_MASK,
       createdAt: new Date(),
       updatedAt: new Date(),
       clientPreUP: null,
