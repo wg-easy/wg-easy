@@ -20,7 +20,7 @@
     "crc-32": "^1.2.2",
     "debug": "^4.3.7",
     "express-session": "^1.18.1",
-    "h3": "^1.13.0",
+    "h3": "^1.14.0",
     "qrcode": "^1.5.4"
   },
   "devDependencies": {
