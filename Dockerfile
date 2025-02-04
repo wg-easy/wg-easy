@@ -2,6 +2,8 @@
 FROM docker.io/library/node:18-alpine AS build
 WORKDIR /app
 
+# update corepack
+RUN npm install --global corepack@latest
 # Install pnpm
 RUN corepack enable pnpm
 
