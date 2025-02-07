@@ -5,116 +5,106 @@
         <PanelHeadTitle :text="$t('pages.me')" />
       </PanelHead>
       <PanelBody class="dark:text-neutral-200">
-        <section class="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <h4 class="col-span-full py-6 text-2xl">
-            {{ $t('me.sectionGeneral') }}
-          </h4>
-          <Label
-            for="username"
-            class="font-semibold md:align-middle md:leading-10"
-          >
-            {{ $t('username') }}
-          </Label>
-          <input
-            id="username"
-            v-model.trim="username"
-            type="text"
-            class="rounded-lg border-2 border-gray-100 text-gray-500 focus:border-red-800 focus:outline-0 focus:ring-0 dark:border-neutral-800 dark:bg-neutral-700 dark:text-neutral-200 dark:placeholder:text-neutral-400"
-          />
-          <Label for="name" class="font-semibold md:align-middle md:leading-10">
-            {{ $t('name') }}
-          </Label>
-          <input
-            id="name"
-            v-model.trim="name"
-            type="text"
-            class="rounded-lg border-2 border-gray-100 text-gray-500 focus:border-red-800 focus:outline-0 focus:ring-0 dark:border-neutral-800 dark:bg-neutral-700 dark:text-neutral-200 dark:placeholder:text-neutral-400"
-          />
-          <Label
-            for="email"
-            class="font-semibold md:align-middle md:leading-10"
-          >
-            {{ $t('email') }}
-          </Label>
-          <input
-            id="email"
-            v-model.trim="email"
-            type="email"
-            class="rounded-lg border-2 border-gray-100 text-gray-500 focus:border-red-800 focus:outline-0 focus:ring-0 dark:border-neutral-800 dark:bg-neutral-700 dark:text-neutral-200 dark:placeholder:text-neutral-400"
-          />
-          <div class="col-span-full">
-            <BaseButton @click="submit">{{ $t('save') }}</BaseButton>
-          </div>
-        </section>
-        <section class="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <h4 class="col-span-full py-6 text-2xl">
-            {{ $t('me.sectionPassword') }}
-          </h4>
-          <Label
-            for="current-password"
-            class="font-semibold md:align-middle md:leading-10"
-          >
-            {{ $t('currentPassword') }}
-          </Label>
-          <input
-            id="current-password"
-            v-model.trim="currentPassword"
-            type="password"
-            autocomplete="current-password"
-            class="rounded-lg border-2 border-gray-100 text-gray-500 focus:border-red-800 focus:outline-0 focus:ring-0 dark:border-neutral-800 dark:bg-neutral-700 dark:text-neutral-200 dark:placeholder:text-neutral-400"
-          />
-          <Label
-            for="new-password"
-            class="font-semibold md:align-middle md:leading-10"
-          >
-            {{ $t('setup.newPassword') }}
-          </Label>
-          <input
-            id="new-password"
-            v-model.trim="newPassword"
-            type="password"
-            autocomplete="new-password"
-            class="rounded-lg border-2 border-gray-100 text-gray-500 focus:border-red-800 focus:outline-0 focus:ring-0 dark:border-neutral-800 dark:bg-neutral-700 dark:text-neutral-200 dark:placeholder:text-neutral-400"
-          />
-          <Label
-            for="confirm-password"
-            class="font-semibold md:align-middle md:leading-10"
-          >
-            {{ $t('confirmPassword') }}
-          </Label>
-          <input
-            id="confirm-password"
-            v-model.trim="confirmPassword"
-            type="password"
-            autocomplete="new-password"
-            class="rounded-lg border-2 border-gray-100 text-gray-500 focus:border-red-800 focus:outline-0 focus:ring-0 dark:border-neutral-800 dark:bg-neutral-700 dark:text-neutral-200 dark:placeholder:text-neutral-400"
-          />
-          <div class="col-span-full">
-            <BaseButton @click="updatePassword">{{
-              $t('updatePassword')
-            }}</BaseButton>
-          </div>
-        </section>
+        <FormElement @submit.prevent="submit">
+          <FormGroup>
+            <FormHeading>{{ $t('me.sectionGeneral') }}</FormHeading>
+            <FormTextField id="name" v-model="name" :label="$t('name')" />
+            <FormTextField id="email" v-model="email" :label="$t('email')" />
+            <FormActionField type="submit" :label="$t('save')" />
+          </FormGroup>
+        </FormElement>
+        <FormElement @submit.prevent="updatePassword">
+          <FormGroup>
+            <FormHeading>{{ $t('me.sectionPassword') }}</FormHeading>
+            <FormPasswordField
+              id="current-password"
+              v-model="currentPassword"
+              autocomplete="current-password"
+              :label="$t('currentPassword')"
+            />
+            <FormPasswordField
+              id="new-password"
+              v-model="newPassword"
+              autocomplete="new-password"
+              :label="$t('setup.newPassword')"
+            />
+            <FormPasswordField
+              id="confirm-password"
+              v-model="confirmPassword"
+              autocomplete="new-password"
+              :label="$t('confirmPassword')"
+            />
+            <FormActionField type="submit" :label="$t('updatePassword')" />
+          </FormGroup>
+        </FormElement>
       </PanelBody>
     </Panel>
   </main>
 </template>
 
 <script setup lang="ts">
+import { FetchError } from 'ofetch';
 const authStore = useAuthStore();
 authStore.update();
+const toast = useToast();
 
-const username = ref(authStore.userData?.username);
 const name = ref(authStore.userData?.name);
-const email = ref(authStore.userData?.email);
+
+const rawEmail = ref(authStore.userData?.email);
+const email = computed({
+  get: () => rawEmail.value ?? undefined,
+  set: (value) => {
+    const temp = value?.trim() ?? null;
+    if (temp === '') {
+      rawEmail.value = null;
+      return;
+    }
+    rawEmail.value = temp;
+    return;
+  },
+});
+
+async function submit() {
+  try {
+    const res = await $fetch(`/api/me`, {
+      method: 'post',
+      body: {
+        name: name.value,
+        email: rawEmail.value,
+      },
+    });
+    toast.showToast({
+      type: 'success',
+      title: 'Success',
+      message: 'Saved',
+    });
+    if (!res.success) {
+      throw new Error('Failed to save');
+    }
+    await refreshNuxtData();
+  } catch (e) {
+    if (e instanceof FetchError) {
+      toast.showToast({
+        type: 'error',
+        title: 'Error',
+        message: e.data.message,
+      });
+    }
+  }
+}
 
 // TODO: handle update password
+const currentPassword = ref('');
+const newPassword = ref('');
+const confirmPassword = ref('');
 
-const currentPassword = ref(authStore.userData?.email);
-const newPassword = ref(authStore.userData?.email);
-const confirmPassword = ref(authStore.userData?.email);
-
-function submit() {}
-
-function updatePassword() {}
+function updatePassword() {
+  if (newPassword.value !== confirmPassword.value) {
+    toast.showToast({
+      type: 'error',
+      title: 'Error',
+      message: 'Passwords do not match',
+    });
+  }
+}
 </script>

@@ -10,7 +10,7 @@
             <FormHeading>
               {{ $t('me.sectionGeneral') }}
             </FormHeading>
-            <FormTextField id="name" v-model.trim="data.name" label="Name" />
+            <FormTextField id="name" v-model="data.name" label="Name" />
             <FormSwitchField
               id="enabled"
               v-model="data.enabled"
@@ -18,7 +18,7 @@
             />
             <FormDateField
               id="expiresAt"
-              v-model.trim="data.expiresAt"
+              v-model="data.expiresAt"
               label="Expire Date"
             />
           </FormGroup>
@@ -26,12 +26,12 @@
             <FormHeading>Address</FormHeading>
             <FormTextField
               id="ipv4Address"
-              v-model.trim="data.ipv4Address"
+              v-model="data.ipv4Address"
               label="IPv4"
             />
             <FormTextField
               id="ipv6Address"
-              v-model.trim="data.ipv6Address"
+              v-model="data.ipv6Address"
               label="IPv6"
             />
           </FormGroup>

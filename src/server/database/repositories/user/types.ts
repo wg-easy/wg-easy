@@ -20,6 +20,18 @@ const password = z
 
 const remember = z.boolean({ message: 'zod.user.remember' });
 
+const name = z
+  .string({ message: 'zod.user.name' })
+  .min(1, 'zod.user.nameMin')
+  .pipe(safeStringRefine);
+
+const email = z
+  .string({ message: 'zod.user.email' })
+  .min(5, 'zod.user.emailMin')
+  .email({ message: 'zod.user.emailInvalid' })
+  .pipe(safeStringRefine)
+  .nullable();
+
 export const UserLoginSchema = z.object(
   {
     username: username,
@@ -38,6 +50,14 @@ export const UserSetupType = z.object(
     username: username,
     password: password,
     accept: accept,
+  },
+  { message: objectMessage }
+);
+
+export const UserUpdateSchema = z.object(
+  {
+    name: name,
+    email: email,
   },
   { message: objectMessage }
 );

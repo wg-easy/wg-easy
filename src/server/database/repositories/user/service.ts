@@ -14,6 +14,14 @@ function createPreparedStatement(db: DBType) {
         where: eq(user.username, sql.placeholder('username')),
       })
       .prepare(),
+    update: db
+      .update(user)
+      .set({
+        name: sql.placeholder('name') as never as string,
+        email: sql.placeholder('email') as never as string,
+      })
+      .where(eq(user.id, sql.placeholder('id')))
+      .prepare(),
   };
 }
 
@@ -59,5 +67,9 @@ export class UserService {
         enabled: true,
       });
     });
+  }
+
+  async update(id: ID, name: string, email: string | null) {
+    return this.#statements.update.execute({ id, name, email });
   }
 }
