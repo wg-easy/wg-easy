@@ -79,7 +79,7 @@ async function submit() {
       message: 'Saved',
     });
     if (!res.success) {
-      throw new Error('Failed to save');
+      throw new Error('Failed to update general');
     }
     await refreshNuxtData();
   } catch (e) {
@@ -98,13 +98,33 @@ const currentPassword = ref('');
 const newPassword = ref('');
 const confirmPassword = ref('');
 
-function updatePassword() {
-  if (newPassword.value !== confirmPassword.value) {
-    toast.showToast({
-      type: 'error',
-      title: 'Error',
-      message: 'Passwords do not match',
+async function updatePassword() {
+  try {
+    const res = await $fetch(`/api/me/password`, {
+      method: 'post',
+      body: {
+        currentPassword: currentPassword.value,
+        newPassword: newPassword.value,
+        confirmPassword: confirmPassword.value,
+      },
     });
+    toast.showToast({
+      type: 'success',
+      title: 'Success',
+      message: 'Saved',
+    });
+    if (!res.success) {
+      throw new Error('Failed to update password');
+    }
+    await refreshNuxtData();
+  } catch (e) {
+    if (e instanceof FetchError) {
+      toast.showToast({
+        type: 'error',
+        title: 'Error',
+        message: e.data.message,
+      });
+    }
   }
 }
 </script>

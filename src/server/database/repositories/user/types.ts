@@ -61,3 +61,16 @@ export const UserUpdateSchema = z.object(
   },
   { message: objectMessage }
 );
+
+export const UserUpdatePasswordSchema = z
+  .object(
+    {
+      currentPassword: password,
+      newPassword: password,
+      confirmPassword: password,
+    },
+    { message: objectMessage }
+  )
+  .refine((val) => val.newPassword === val.confirmPassword, {
+    message: 'zod.user.passwordMatch',
+  });

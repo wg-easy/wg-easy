@@ -72,4 +72,34 @@ export class UserService {
   async update(id: ID, name: string, email: string | null) {
     return this.#statements.update.execute({ id, name, email });
   }
+
+  async updatePassword(id: ID, currentPassword: string, newPassword: string) {
+    const hash = await hashPassword(newPassword);
+
+    return this.#db.transaction(async (tx) => {
+      // get user again to avoid password changing while request
+      const txUser = await tx.query.user
+        .findFirst({ where: eq(user.id, id) })
+        .execute();
+
+      if (!txUser) {
+        throw new Error('User not found');
+      }
+
+      const passwordValid = await isPasswordValid(
+        currentPassword,
+        txUser.password
+      );
+
+      if (!passwordValid) {
+        throw new Error('Invalid password');
+      }
+
+      await tx
+        .update(user)
+        .set({ password: hash })
+        .where(eq(user.id, id))
+        .execute();
+    });
+  }
 }
