@@ -9,7 +9,7 @@ const host = z
   .min(1, 'zod.userConfig.hostMin')
   .pipe(safeStringRefine);
 
-export const UserConfigSetupType = z.object({
+export const UserConfigSetupSchema = z.object({
   host: host,
   port: PortSchema,
 });

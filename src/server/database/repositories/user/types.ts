@@ -45,7 +45,7 @@ const accept = z.boolean().refine((val) => val === true, {
   message: 'zod.user.accept',
 });
 
-export const UserSetupType = z.object(
+export const UserSetupSchema = z.object(
   {
     username: username,
     password: password,
