@@ -15,8 +15,8 @@ export type InterfaceUpdateType = Omit<
 >;
 
 const device = z
-  .string({ message: 'zod.device' })
-  .min(1, 'zod.deviceMin')
+  .string({ message: 'zod.interface.device' })
+  .min(1, 'zod.interface.deviceMin')
   .pipe(safeStringRefine);
 
 const cidr = z

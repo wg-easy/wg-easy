@@ -39,21 +39,6 @@
     "migration": "Restore the backup"
   },
   "zod": {
-    "stringMalformed": "String is malformed",
-    "id": "Client ID must be a valid UUID",
-    "file": "File must be a valid string",
-    "otl": "oneTimeLink must be a valid string",
-    "otlMin": "oneTimeLink must be at least 1 Character",
-    "features": "key must be a valid string",
-    "ftBool": "enabled must be a valid boolean",
-    "ftObj": "value must be a valid object",
-    "ftObj2": "features must be a valid record",
-    "stat": "statistics must be a valid object",
-    "statBool": "enabled must be a valid boolean",
-    "statNumber": "chartType must be a valid number",
-    "body": "Body must be a valid object",
-    "device": "Device must be a valid string",
-    "deviceMin": "Device must be at least 1 Character",
     "client": {
       "id": "Client ID must be a valid number",
       "name": "Name must be a valid string",
@@ -87,8 +72,16 @@
     },
     "interface": {
       "cidr": "CIDR must be a valid string",
-      "cidrMin": "CIDR must be at least 1 Character"
+      "cidrMin": "CIDR must be at least 1 Character",
+      "device": "Device must be a valid string",
+      "deviceMin": "Device must be at least 1 Character"
     },
+    "otl": {
+      "otl": "oneTimeLink must be a valid string",
+      "otlMin": "oneTimeLink must be at least 1 Character"
+    },
+    "stringMalformed": "String is malformed",
+    "body": "Body must be a valid object",
     "hook": "Hook must be a valid string",
     "mtu": "MTU must be a valid number",
     "mtuMin": "MTU must be at least 1280",
