@@ -5,25 +5,6 @@ class API {
     });
   }
 
-  async createClient({
-    name,
-    expireDate,
-  }: {
-    name: string;
-    expireDate: string | null;
-  }) {
-    return $fetch('/api/client', {
-      method: 'post',
-      body: { name, expireDate },
-    });
-  }
-
-  async showOneTimeLink({ clientId }: { clientId: string }) {
-    return $fetch(`/api/client/${clientId}/generateOneTimeLink`, {
-      method: 'post',
-    });
-  }
-
   async restoreConfiguration(file: string) {
     return $fetch('/api/wireguard/restore', {
       method: 'put',

@@ -1,11 +1,12 @@
+import { UserLoginSchema } from '#db/repositories/user/types';
+
 export default defineEventHandler(async (event) => {
   const { username, password, remember } = await readValidatedBody(
     event,
-    validateZod(credentialsType, event)
+    validateZod(UserLoginSchema, event)
   );
 
-  const users = await Database.user.findAll();
-  const user = users.find((user) => user.username == username);
+  const user = await Database.users.getByUsername(username);
   if (!user)
     throw createError({
       statusCode: 400,
@@ -21,18 +22,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const system = await Database.system.get();
-
-  const conf = { ...system.sessionConfig };
-
-  if (remember) {
-    conf.cookie = {
-      ...(system.sessionConfig.cookie ?? {}),
-      maxAge: system.general.sessionTimeout,
-    };
-  }
-
-  const session = await useSession<WGSession>(event, conf);
+  const session = await useWGSession(event, remember);
 
   const data = await session.update({
     userId: user.id,

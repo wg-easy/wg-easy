@@ -7,14 +7,14 @@ export default defineEventHandler(async (event) => {
     return;
   }
 
-  const setupDone = await Database.setup.done();
-  if (!setupDone) {
+  const { step, done } = await Database.general.getSetupStep();
+  if (!done) {
     const parsedSetup = url.pathname.match(/\/setup\/(\d)/);
     if (!parsedSetup) {
       return sendRedirect(event, `/setup/1`, 302);
     }
     const [_, currentSetup] = parsedSetup;
-    const step = await Database.setup.get();
+
     if (step.toString() === currentSetup) {
       return;
     }

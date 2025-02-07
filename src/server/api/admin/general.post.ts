@@ -1,8 +1,13 @@
-export default defineEventHandler(async (event) => {
-  const data = await readValidatedBody(
-    event,
-    validateZod(generalUpdateType, event)
-  );
-  await Database.system.updateGeneral(data);
-  return { success: true };
-});
+import { GeneralUpdateSchema } from '#db/repositories/general/types';
+
+export default definePermissionEventHandler(
+  actions.ADMIN,
+  async ({ event }) => {
+    const data = await readValidatedBody(
+      event,
+      validateZod(GeneralUpdateSchema, event)
+    );
+    await Database.general.update(data);
+    return { success: true };
+  }
+);

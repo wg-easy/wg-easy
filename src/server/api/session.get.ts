@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
       statusMessage: 'Not logged in',
     });
   }
-  const user = await Database.user.findById(session.data.userId);
+  const user = await Database.users.get(session.data.userId);
   if (!user) {
     throw createError({
       statusCode: 404,

@@ -1,8 +1,8 @@
 export default defineEventHandler(async (event) => {
   // TODO: check password
 
-  const system = await Database.system.get();
-  if (!system.metrics.prometheus.enabled) {
+  const prometheus = await Database.metrics.prometheus.get('wg0');
+  if (!prometheus) {
     throw createError({
       statusCode: 400,
       message: 'Prometheus metrics are not enabled',
@@ -10,5 +10,5 @@ export default defineEventHandler(async (event) => {
   }
 
   setHeader(event, 'Content-Type', 'text/plain');
-  return WireGuard.getMetrics();
+  return getPrometheusResponse();
 });

@@ -2,10 +2,10 @@
   <main v-if="data">
     <FormElement @submit.prevent="submit">
       <FormGroup>
-        <FormTextField id="PreUp" v-model="data.PreUp" label="PreUp" />
-        <FormTextField id="PostUp" v-model="data.PostUp" label="PostUp" />
-        <FormTextField id="PreDown" v-model="data.PreDown" label="PreDown" />
-        <FormTextField id="PostDown" v-model="data.PostDown" label="PostDown" />
+        <FormTextField id="PreUp" v-model="data.preUp" label="PreUp" />
+        <FormTextField id="PostUp" v-model="data.postUp" label="PostUp" />
+        <FormTextField id="PreDown" v-model="data.preDown" label="PreDown" />
+        <FormTextField id="PostDown" v-model="data.postDown" label="PostDown" />
       </FormGroup>
       <FormGroup>
         <FormHeading>Actions</FormHeading>

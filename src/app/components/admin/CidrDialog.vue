@@ -17,8 +17,8 @@
           class="mb-5 mt-2 text-sm leading-normal text-gray-500 dark:text-neutral-300"
         >
           <FormGroup>
-            <FormTextField id="address4" v-model="address4" label="IPv4" />
-            <FormTextField id="address6" v-model="address6" label="IPv6" />
+            <FormTextField id="ipv4Cidr" v-model="ipv4Cidr" label="IPv4" />
+            <FormTextField id="ipv6Cidr" v-model="ipv6Cidr" label="IPv6" />
           </FormGroup>
         </DialogDescription>
         <div class="mt-6 flex justify-end gap-2">
@@ -26,7 +26,7 @@
             <BaseButton>{{ $t('cancel') }}</BaseButton>
           </DialogClose>
           <DialogClose as-child>
-            <BaseButton @click="$emit('change', address4, address6)"
+            <BaseButton @click="$emit('change', ipv4Cidr, ipv6Cidr)"
               >Change</BaseButton
             >
           </DialogClose>
@@ -40,10 +40,10 @@
 defineEmits(['change']);
 const props = defineProps<{
   triggerClass?: string;
-  address4: string;
-  address6: string;
+  ipv4Cidr: string;
+  ipv6Cidr: string;
 }>();
 
-const address4 = ref(props.address4);
-const address6 = ref(props.address6);
+const ipv4Cidr = ref(props.ipv4Cidr);
+const ipv6Cidr = ref(props.ipv6Cidr);
 </script>

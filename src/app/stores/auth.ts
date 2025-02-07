@@ -3,6 +3,17 @@ export const useAuthStore = defineStore('Auth', () => {
     method: 'get',
   });
 
+  async function getSession() {
+    try {
+      const { data } = await useFetch('/api/session', {
+        method: 'get',
+      });
+      return data.value;
+    } catch {
+      return null;
+    }
+  }
+
   /**
    * @throws if unsuccessful
    */
@@ -24,5 +35,5 @@ export const useAuthStore = defineStore('Auth', () => {
     return response.success;
   }
 
-  return { userData, login, logout, update };
+  return { userData, login, logout, update, getSession };
 });

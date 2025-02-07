@@ -1,4 +1,6 @@
-export default defineEventHandler(async () => {
-  const system = await Database.system.get();
-  return system.general;
+export default definePermissionEventHandler(actions.ADMIN, async () => {
+  const sessionConfig = await Database.general.getSessionConfig();
+  return {
+    sessionTimeout: sessionConfig.sessionTimeout,
+  };
 });

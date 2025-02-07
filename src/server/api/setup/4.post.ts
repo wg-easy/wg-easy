@@ -1,17 +1,12 @@
-export default defineEventHandler(async (event) => {
-  const setupDone = await Database.setup.done();
-  if (setupDone) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Invalid state',
-    });
-  }
+import { UserSetupType } from '#db/repositories/user/types';
 
+export default defineSetupEventHandler(async ({ event }) => {
   const { username, password } = await readValidatedBody(
     event,
-    validateZod(passwordSetupType, event)
+    validateZod(UserSetupType, event)
   );
-  await Database.user.create(username, password);
-  await Database.setup.set(5);
+
+  await Database.users.create(username, password);
+  await Database.general.setSetupStep(5);
   return { success: true };
 });

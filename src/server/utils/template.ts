@@ -1,5 +1,4 @@
-import type { DeepReadonly } from 'vue';
-import type { System } from '~~/services/database/repositories/system';
+import type { InterfaceType } from '#db/repositories/interface/types';
 
 /**
  * Replace all {{key}} in the template with the values[key]
@@ -12,16 +11,16 @@ export function template(templ: string, values: Record<string, string>) {
 
 /**
  * Available keys:
- * - address4: IPv4 address range
- * - address6: IPv6 address range
+ * - ipv4Cidr: IPv4 CIDR
+ * - ipv6Cidr: IPv6 CIDR
  * - device: Network device
  * - port: Port number
  */
-export function iptablesTemplate(templ: string, system: DeepReadonly<System>) {
+export function iptablesTemplate(templ: string, wgInterface: InterfaceType) {
   return template(templ, {
-    address4: system.userConfig.address4Range,
-    address6: system.userConfig.address6Range,
-    device: system.interface.device,
-    port: system.interface.port.toString(),
+    ipv4Cidr: wgInterface.ipv4Cidr,
+    ipv6Cidr: wgInterface.ipv6Cidr,
+    device: wgInterface.device,
+    port: wgInterface.port.toString(),
   });
 }

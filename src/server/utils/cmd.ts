@@ -1,13 +1,16 @@
 import childProcess from 'child_process';
+import debug from 'debug';
+
+const CMD_DEBUG = debug('CMD');
 
 export function exec(
   cmd: string,
   { log }: { log: boolean | string } = { log: true }
 ) {
   if (typeof log === 'string') {
-    console.log(`$ ${log}`);
+    CMD_DEBUG(`$ ${log}`);
   } else if (log === true) {
-    console.log(`$ ${cmd}`);
+    CMD_DEBUG(`$ ${cmd}`);
   }
 
   if (process.platform !== 'linux') {

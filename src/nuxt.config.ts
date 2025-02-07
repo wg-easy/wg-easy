@@ -1,3 +1,5 @@
+import { fileURLToPath } from 'node:url';
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   future: {
@@ -44,5 +46,12 @@ export default defineNuxtConfig({
         target: 'es2020',
       },
     },
+    alias: {
+      '#db': fileURLToPath(new URL('./server/database/', import.meta.url)),
+    },
+  },
+  alias: {
+    // for typecheck reasons (https://github.com/nuxt/cli/issues/323)
+    '#db': fileURLToPath(new URL('./server/database/', import.meta.url)),
   },
 });

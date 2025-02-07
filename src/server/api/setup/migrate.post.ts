@@ -1,16 +1,10 @@
-import { parseCidr } from 'cidr-tools';
+/*import { parseCidr } from 'cidr-tools';
 import { stringifyIp } from 'ip-bigint';
-import { z } from 'zod';
-import type { Database } from '~~/services/database/repositories/database';
+import { z } from 'zod';*/
 
-export default defineEventHandler(async (event) => {
-  const setupDone = await Database.setup.done();
-  if (setupDone) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Invalid state',
-    });
-  }
+export default defineSetupEventHandler(async (/*{ event }*/) => {
+  // TODO: Implement
+  /*
 
   const { file } = await readValidatedBody(event, validateZod(fileType, event));
   const schema = z.object({
@@ -79,7 +73,7 @@ export default defineEventHandler(async (event) => {
       address6: address6,
       mtu: 1420,
     });
-  }
+  }*/
 
   return { success: true };
 });
