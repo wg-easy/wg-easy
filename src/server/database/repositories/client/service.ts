@@ -123,6 +123,6 @@ export class ClientService {
   }
 
   update(id: ID, data: UpdateClientType) {
-    return this.#db.update(client).set(data).where(eq(client.id, id)).prepare();
+    return this.#db.update(client).set(data).where(eq(client.id, id)).execute();
   }
 }
