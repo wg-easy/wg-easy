@@ -6,6 +6,6 @@ export default defineI18nConfig(() => ({
   fallbackLocale: 'en',
   messages: {
     en,
-    '简体中文': zh_cn,
+    'zh-cn': zh_cn,
   },
 }));
