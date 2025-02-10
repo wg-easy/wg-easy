@@ -5,7 +5,30 @@ import type { GeneralUpdateType } from './types';
 
 function createPreparedStatement(db: DBType) {
   return {
-    find: db.query.general.findFirst().prepare(),
+    getSetupStep: db.query.general
+      .findFirst({
+        columns: {
+          setupStep: true,
+        },
+      })
+      .prepare(),
+    getSessionConfig: db.query.general
+      .findFirst({
+        columns: {
+          sessionPassword: true,
+          sessionTimeout: true,
+        },
+      })
+      .prepare(),
+    getMetricsConfig: db.query.general
+      .findFirst({
+        columns: {
+          metricsPrometheus: true,
+          metricsJson: true,
+          metricsPassword: true,
+        },
+      })
+      .prepare(),
     updateSetupStep: db
       .update(general)
       .set({
@@ -31,19 +54,13 @@ export class GeneralService {
   /**
    * @throws
    */
-  private async get() {
-    const result = await this.#statements.find.execute();
+  async getSetupStep() {
+    const result = await this.#statements.getSetupStep.execute();
+
     if (!result) {
       throw new Error('General Config not found');
     }
-    return result;
-  }
 
-  /**
-   * @throws
-   */
-  async getSetupStep() {
-    const result = await this.get();
     return { step: result.setupStep, done: result.setupStep === 0 };
   }
 
@@ -55,10 +72,32 @@ export class GeneralService {
    * @throws
    */
   async getSessionConfig() {
-    const result = await this.get();
+    const result = await this.#statements.getSessionConfig.execute();
+
+    if (!result) {
+      throw new Error('General Config not found');
+    }
+
     return {
       sessionPassword: result.sessionPassword,
       sessionTimeout: result.sessionTimeout,
+    };
+  }
+
+  /**
+   * @throws
+   */
+  async getMetricsConfig() {
+    const result = await this.#statements.getMetricsConfig.execute();
+
+    if (!result) {
+      throw new Error('General Config not found');
+    }
+
+    return {
+      prometheus: result.metricsPrometheus,
+      json: result.metricsJson,
+      password: result.metricsPassword,
     };
   }
 

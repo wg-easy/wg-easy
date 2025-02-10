@@ -1,4 +1,4 @@
-export default defineMetricsHandler('prometheus', async () => {
+export default defineMetricsHandler('json', async () => {
   return getMetricsJSON();
 });
 

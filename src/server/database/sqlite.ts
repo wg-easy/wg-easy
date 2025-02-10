@@ -11,7 +11,6 @@ import { UserConfigService } from './repositories/userConfig/service';
 import { InterfaceService } from './repositories/interface/service';
 import { HooksService } from './repositories/hooks/service';
 import { OneTimeLinkService } from './repositories/oneTimeLink/service';
-import { MetricsService } from './repositories/metrics/service';
 
 const DB_DEBUG = debug('Database');
 
@@ -31,7 +30,6 @@ class DBService {
   interfaces: InterfaceService;
   hooks: HooksService;
   oneTimeLinks: OneTimeLinkService;
-  metrics: MetricsService;
 
   constructor(db: DBType) {
     this.clients = new ClientService(db);
@@ -41,7 +39,6 @@ class DBService {
     this.interfaces = new InterfaceService(db);
     this.hooks = new HooksService(db);
     this.oneTimeLinks = new OneTimeLinkService(db);
-    this.metrics = new MetricsService(db);
   }
 }
 

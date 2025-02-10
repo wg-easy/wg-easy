@@ -58,7 +58,7 @@ export const defineSetupEventHandler = <
   });
 };
 
-type Metrics = 'prometheus';
+type Metrics = 'prometheus' | 'json';
 
 type MetricsHandler<
   TReq extends EventHandlerRequest,
@@ -94,22 +94,24 @@ export const defineMetricsHandler = <
       });
     }
 
-    const metricsConfig = await Database.metrics[type].get('wg0');
+    const metricsConfig = await Database.general.getMetricsConfig();
 
-    if (!metricsConfig) {
+    if (metricsConfig[type] !== true) {
       throw createError({
         statusCode: 400,
         statusMessage: 'Metrics not enabled',
       });
     }
 
-    const tokenValid = await isPasswordValid(value, metricsConfig.password);
+    if (metricsConfig.password) {
+      const tokenValid = await isPasswordValid(value, metricsConfig.password);
 
-    if (!tokenValid) {
-      throw createError({
-        statusCode: 401,
-        statusMessage: 'Incorrect token',
-      });
+      if (!tokenValid) {
+        throw createError({
+          statusCode: 401,
+          statusMessage: 'Incorrect token',
+        });
+      }
     }
 
     return await handler({ event });

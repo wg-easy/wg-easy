@@ -24,6 +24,9 @@ CREATE TABLE `general_table` (
 	`setupStep` integer NOT NULL,
 	`session_password` text NOT NULL,
 	`session_timeout` integer NOT NULL,
+	`metricsPrometheus` integer NOT NULL,
+	`metricsJson` integer NOT NULL,
+	`metricsPassword` text,
 	`created_at` text DEFAULT (CURRENT_TIMESTAMP) NOT NULL,
 	`updated_at` text DEFAULT (CURRENT_TIMESTAMP) NOT NULL
 );
@@ -54,14 +57,6 @@ CREATE TABLE `interfaces_table` (
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `interfaces_table_port_unique` ON `interfaces_table` (`port`);--> statement-breakpoint
-CREATE TABLE `prometheus_table` (
-	`id` text PRIMARY KEY NOT NULL,
-	`password` text NOT NULL,
-	`created_at` text DEFAULT (CURRENT_TIMESTAMP) NOT NULL,
-	`updated_at` text DEFAULT (CURRENT_TIMESTAMP) NOT NULL,
-	FOREIGN KEY (`id`) REFERENCES `interfaces_table`(`name`) ON UPDATE cascade ON DELETE cascade
-);
---> statement-breakpoint
 CREATE TABLE `one_time_links_table` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`one_time_link` text NOT NULL,
