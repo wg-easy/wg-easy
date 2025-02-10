@@ -57,3 +57,61 @@ export const defineSetupEventHandler = <
     return await handler({ event, setup });
   });
 };
+
+type Metrics = 'prometheus';
+
+type MetricsHandler<
+  TReq extends EventHandlerRequest,
+  TRes extends EventHandlerResponse,
+> = { (params: { event: H3Event<TReq> }): TRes };
+
+/**
+ * check if the metrics are enabled and the token is correct
+ */
+export const defineMetricsHandler = <
+  TReq extends EventHandlerRequest,
+  TRes extends EventHandlerResponse,
+>(
+  type: Metrics,
+  handler: MetricsHandler<TReq, TRes>
+) => {
+  return defineEventHandler(async (event) => {
+    const auth = getHeader(event, 'Authorization');
+
+    if (!auth) {
+      throw createError({
+        statusCode: 401,
+        statusMessage: 'Unauthorized',
+      });
+    }
+
+    const [method, value] = auth.split(' ');
+
+    if (method !== 'Bearer' || !value) {
+      throw createError({
+        statusCode: 401,
+        statusMessage: 'Bearer Auth required',
+      });
+    }
+
+    const metricsConfig = await Database.metrics[type].get('wg0');
+
+    if (!metricsConfig) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'Metrics not enabled',
+      });
+    }
+
+    const tokenValid = await isPasswordValid(value, metricsConfig.password);
+
+    if (!tokenValid) {
+      throw createError({
+        statusCode: 401,
+        statusMessage: 'Incorrect token',
+      });
+    }
+
+    return await handler({ event });
+  });
+};
