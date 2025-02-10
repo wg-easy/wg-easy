@@ -9,6 +9,20 @@
         />
       </FormGroup>
       <FormGroup>
+        <FormHeading>Metrics</FormHeading>
+        <FormNullTextField
+          id="password"
+          v-model="data.metricsPassword"
+          label="Password"
+        />
+        <FormSwitchField
+          id="Prometheus"
+          v-model="data.metricsPrometheus"
+          label="Prometheus"
+        />
+        <FormSwitchField id="JSON" v-model="data.metricsJson" label="JSON" />
+      </FormGroup>
+      <FormGroup>
         <FormHeading>Actions</FormHeading>
         <FormActionField type="submit" label="Save" />
         <FormActionField label="Revert" @click="revert" />

@@ -45,7 +45,6 @@ const menuItems = [
   { id: 'config', name: 'Config' },
   { id: 'interface', name: 'Interface' },
   { id: 'hooks', name: 'Hooks' },
-  { id: 'metrics', name: 'Metrics' },
 ];
 
 const activeMenuItem = computed(() => {

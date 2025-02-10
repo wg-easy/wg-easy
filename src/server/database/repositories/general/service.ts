@@ -29,25 +29,31 @@ function createPreparedStatement(db: DBType) {
         },
       })
       .prepare(),
+    getConfig: db.query.general
+      .findFirst({
+        columns: {
+          sessionTimeout: true,
+          metricsPrometheus: true,
+          metricsJson: true,
+          metricsPassword: true,
+        },
+      })
+      .prepare(),
     updateSetupStep: db
       .update(general)
       .set({
         setupStep: sql.placeholder('setupStep') as never as number,
       })
       .prepare(),
-    update: db
-      .update(general)
-      .set({
-        sessionTimeout: sql.placeholder('sessionTimeout') as never as number,
-      })
-      .prepare(),
   };
 }
 
 export class GeneralService {
+  #db: DBType;
   #statements: ReturnType<typeof createPreparedStatement>;
 
   constructor(db: DBType) {
+    this.#db = db;
     this.#statements = createPreparedStatement(db);
   }
 
@@ -102,6 +108,16 @@ export class GeneralService {
   }
 
   update(data: GeneralUpdateType) {
-    return this.#statements.update.execute(data);
+    return this.#db.update(general).set(data).execute();
+  }
+
+  async getConfig() {
+    const result = await this.#statements.getConfig.execute();
+
+    if (!result) {
+      throw new Error('General Config not found');
+    }
+
+    return result;
   }
 }

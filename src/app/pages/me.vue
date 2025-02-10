@@ -9,7 +9,11 @@
           <FormGroup>
             <FormHeading>{{ $t('me.sectionGeneral') }}</FormHeading>
             <FormTextField id="name" v-model="name" :label="$t('name')" />
-            <FormTextField id="email" v-model="email" :label="$t('email')" />
+            <FormNullTextField
+              id="email"
+              v-model="email"
+              :label="$t('email')"
+            />
             <FormActionField type="submit" :label="$t('save')" />
           </FormGroup>
         </FormElement>
@@ -49,20 +53,7 @@ authStore.update();
 const toast = useToast();
 
 const name = ref(authStore.userData?.name);
-
-const rawEmail = ref(authStore.userData?.email);
-const email = computed({
-  get: () => rawEmail.value ?? undefined,
-  set: (value) => {
-    const temp = value?.trim() ?? null;
-    if (temp === '') {
-      rawEmail.value = null;
-      return;
-    }
-    rawEmail.value = temp;
-    return;
-  },
-});
+const email = ref(authStore.userData?.email);
 
 async function submit() {
   try {
@@ -70,7 +61,7 @@ async function submit() {
       method: 'post',
       body: {
         name: name.value,
-        email: rawEmail.value,
+        email: email.value,
       },
     });
     toast.showToast({

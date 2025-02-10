@@ -6,7 +6,9 @@
     <div class="mb-8 flex justify-center">
       <UiChooseLang />
     </div>
-    <div><BaseButton @click="nextStep">Continue</BaseButton></div>
+    <div>
+      <NuxtLink to="/setup/2"><BaseButton>Continue</BaseButton></NuxtLink>
+    </div>
   </div>
 </template>
 
@@ -17,10 +19,4 @@ definePageMeta({
 
 const setupStore = useSetupStore();
 setupStore.setStep(1);
-
-const router = useRouter();
-
-async function nextStep() {
-  router.push('/setup/2');
-}
 </script>
