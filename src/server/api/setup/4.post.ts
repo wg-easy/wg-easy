@@ -1,9 +1,9 @@
-import { UserSetupType } from '#db/repositories/user/types';
+import { UserSetupSchema } from '#db/repositories/user/types';
 
 export default defineSetupEventHandler(async ({ event }) => {
   const { username, password } = await readValidatedBody(
     event,
-    validateZod(UserSetupType, event)
+    validateZod(UserSetupSchema, event)
   );
 
   await Database.users.create(username, password);
