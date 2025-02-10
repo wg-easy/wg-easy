@@ -50,7 +50,11 @@ export class UserService {
     const hash = await hashPassword(password);
 
     return this.#db.transaction(async (tx) => {
-      const oldUser = await this.getByUsername(username);
+      const oldUser = await tx.query.user
+        .findFirst({
+          where: eq(user.username, username),
+        })
+        .execute();
 
       if (oldUser) {
         throw new Error('User already exists');
