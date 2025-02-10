@@ -61,7 +61,13 @@
       "passwordNumber": "Password must have at least 1 number",
       "passwordSpecial": "Password must have at least 1 special character",
       "remember": "Remember must be a valid boolean",
-      "accept": "Please accept the condition"
+      "accept": "Please accept the condition",
+      "name": "Name must be a valid string",
+      "nameMin": "Name must be at least 1 Character",
+      "email": "Email must be a valid string",
+      "emailMin": "Email must be at least 1 Character",
+      "emailInvalid": "Email must be a valid email",
+      "passwordMatch": "Passwords must match"
     },
     "userConfig": {
       "host": "Host must be a valid string",
