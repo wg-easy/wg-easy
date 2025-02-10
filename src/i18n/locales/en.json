@@ -107,7 +107,6 @@
   },
   "name": "Name",
   "username": "Username",
-  "password": "Password",
   "signIn": "Sign In",
   "logout": "Logout",
   "updateAvailable": "There is an update available!",
@@ -151,5 +150,17 @@
   "error": {
     "clear": "Clear",
     "login": "Log in error"
-  }
+  },
+  "general": {
+    "sessionTimeout": "Session Timeout",
+    "metrics": "Metrics",
+    "prometheus": "Prometheus",
+    "json": "JSON"
+  },
+  "form": {
+    "actions": "Actions",
+    "save": "Save",
+    "revert": "Revert"
+  },
+  "password": "Password"
 }
