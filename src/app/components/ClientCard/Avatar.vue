@@ -6,9 +6,11 @@
 
     <div
       v-if="
-        client.latestHandshakeAt &&
-        new Date().getTime() - new Date(client.latestHandshakeAt).getTime() <
-          1000 * 60 * 10
+        isPeerConnected({
+          latestHandshakeAt: client.latestHandshakeAt
+            ? new Date(client.latestHandshakeAt)
+            : null,
+        })
       "
     >
       <div
