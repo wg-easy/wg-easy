@@ -5,45 +5,68 @@ import type { GeneralUpdateType } from './types';
 
 function createPreparedStatement(db: DBType) {
   return {
-    find: db.query.general.findFirst().prepare(),
+    getSetupStep: db.query.general
+      .findFirst({
+        columns: {
+          setupStep: true,
+        },
+      })
+      .prepare(),
+    getSessionConfig: db.query.general
+      .findFirst({
+        columns: {
+          sessionPassword: true,
+          sessionTimeout: true,
+        },
+      })
+      .prepare(),
+    getMetricsConfig: db.query.general
+      .findFirst({
+        columns: {
+          metricsPrometheus: true,
+          metricsJson: true,
+          metricsPassword: true,
+        },
+      })
+      .prepare(),
+    getConfig: db.query.general
+      .findFirst({
+        columns: {
+          sessionTimeout: true,
+          metricsPrometheus: true,
+          metricsJson: true,
+          metricsPassword: true,
+        },
+      })
+      .prepare(),
     updateSetupStep: db
       .update(general)
       .set({
         setupStep: sql.placeholder('setupStep') as never as number,
       })
       .prepare(),
-    update: db
-      .update(general)
-      .set({
-        sessionTimeout: sql.placeholder('sessionTimeout') as never as number,
-      })
-      .prepare(),
   };
 }
 
 export class GeneralService {
+  #db: DBType;
   #statements: ReturnType<typeof createPreparedStatement>;
 
   constructor(db: DBType) {
+    this.#db = db;
     this.#statements = createPreparedStatement(db);
   }
 
   /**
    * @throws
    */
-  private async get() {
-    const result = await this.#statements.find.execute();
+  async getSetupStep() {
+    const result = await this.#statements.getSetupStep.execute();
+
     if (!result) {
       throw new Error('General Config not found');
     }
-    return result;
-  }
 
-  /**
-   * @throws
-   */
-  async getSetupStep() {
-    const result = await this.get();
     return { step: result.setupStep, done: result.setupStep === 0 };
   }
 
@@ -55,14 +78,46 @@ export class GeneralService {
    * @throws
    */
   async getSessionConfig() {
-    const result = await this.get();
+    const result = await this.#statements.getSessionConfig.execute();
+
+    if (!result) {
+      throw new Error('General Config not found');
+    }
+
     return {
       sessionPassword: result.sessionPassword,
       sessionTimeout: result.sessionTimeout,
     };
   }
 
+  /**
+   * @throws
+   */
+  async getMetricsConfig() {
+    const result = await this.#statements.getMetricsConfig.execute();
+
+    if (!result) {
+      throw new Error('General Config not found');
+    }
+
+    return {
+      prometheus: result.metricsPrometheus,
+      json: result.metricsJson,
+      password: result.metricsPassword,
+    };
+  }
+
   update(data: GeneralUpdateType) {
-    return this.#statements.update.execute(data);
+    return this.#db.update(general).set(data).execute();
+  }
+
+  async getConfig() {
+    const result = await this.#statements.getConfig.execute();
+
+    if (!result) {
+      throw new Error('General Config not found');
+    }
+
+    return result;
   }
 }

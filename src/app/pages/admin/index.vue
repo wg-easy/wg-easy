@@ -5,13 +5,31 @@
         <FormNumberField
           id="session"
           v-model="data.sessionTimeout"
-          label="Session Timeout"
+          :label="$t('general.sessionTimeout')"
         />
       </FormGroup>
       <FormGroup>
-        <FormHeading>Actions</FormHeading>
-        <FormActionField type="submit" label="Save" />
-        <FormActionField label="Revert" @click="revert" />
+        <FormHeading>{{ $t('general.metrics') }}</FormHeading>
+        <FormNullTextField
+          id="password"
+          v-model="data.metricsPassword"
+          :label="$t('passsword')"
+        />
+        <FormSwitchField
+          id="prometheus"
+          v-model="data.metricsPrometheus"
+          :label="$t('general.prometheus')"
+        />
+        <FormSwitchField
+          id="json"
+          v-model="data.metricsJson"
+          :label="$t('general.json')"
+        />
+      </FormGroup>
+      <FormGroup>
+        <FormHeading>{{ $t('form.actions') }}</FormHeading>
+        <FormActionField type="submit" :label="$t('form.save')" />
+        <FormActionField :label="$t('form.revert')" @click="revert" />
       </FormGroup>
     </FormElement>
   </main>
