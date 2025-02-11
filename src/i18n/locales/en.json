@@ -39,6 +39,15 @@
     "migration": "Restore the backup"
   },
   "zod": {
+    "generic": {
+      "required": "{0} is required",
+      "validNumber": "{0} must be a valid number",
+      "validString": "{0} must be a valid string",
+      "validBoolean": "{0} must be a valid boolean",
+      "validStringArray": "{0} must be a valid array of strings",
+      "stringMin": "{0} must be at least {1} Character",
+      "numberMin": "{0} must be at least {1}"
+    },
     "client": {
       "id": "Client ID must be a valid number",
       "name": "Name must be a valid string",
@@ -52,20 +61,17 @@
       "serverAllowedIps": "Allowed IPs must be a valid array of strings"
     },
     "user": {
-      "username": "Username must be a valid string",
-      "usernameMin": "Username must be at least 8 Characters",
-      "password": "Password must be a valid string",
-      "passwordMin": "Password must be at least 12 Characters",
+      "username": "Username",
+      "password": "Password",
       "passwordUppercase": "Password must have at least 1 uppercase letter",
       "passwordLowercase": "Password must have at least 1 lowercase letter",
       "passwordNumber": "Password must have at least 1 number",
       "passwordSpecial": "Password must have at least 1 special character",
-      "remember": "Remember must be a valid boolean",
-      "accept": "Please accept the condition",
-      "name": "Name must be a valid string",
-      "nameMin": "Name must be at least 1 Character",
-      "email": "Email must be a valid string",
-      "emailMin": "Email must be at least 1 Character",
+      "remember": "Remember",
+      "accept": "Accept",
+      "acceptTrue": "Accept Conditions to continue",
+      "name": "Name",
+      "email": "Email",
       "emailInvalid": "Email must be a valid email",
       "passwordMatch": "Passwords must match"
     },

@@ -18,13 +18,13 @@ export type UpdateClientType = Omit<
 >;
 
 const name = z
-  .string({ message: 'zod.client.name' })
-  .min(1, 'zod.client.nameMin')
+  .string({ message: '!zod.generic.validString:zod.client.name' })
+  .min(1, '!zod.generic.stringMinOne:zod.client.nameMin')
   .pipe(safeStringRefine);
 
 const expiresAt = z
-  .string({ message: 'zod.client.expireDate' })
-  .min(1, 'zod.client.expireDateMin')
+  .string({ message: '!zod.generic.validString:zod.client.expireDate' })
+  .min(1, '!zod.generic.stringMinOne:zod.client.expireDateMin')
   .pipe(safeStringRefine)
   .nullable();
 

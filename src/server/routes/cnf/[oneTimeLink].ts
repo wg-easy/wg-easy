@@ -3,7 +3,7 @@ import { OneTimeLinkGetSchema } from '#db/repositories/oneTimeLink/types';
 export default defineEventHandler(async (event) => {
   const { oneTimeLink } = await getValidatedRouterParams(
     event,
-    validateZod(OneTimeLinkGetSchema)
+    validateZod(OneTimeLinkGetSchema, event)
   );
   const clients = await WireGuard.getAllClients();
   const client = clients.find(

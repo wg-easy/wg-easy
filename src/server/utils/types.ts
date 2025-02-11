@@ -52,26 +52,68 @@ export const schemaForType =
 
 export function validateZod<T>(
   schema: ZodSchema<T>,
-  event?: H3Event<EventHandlerRequest>
+  event: H3Event<EventHandlerRequest>
 ) {
   return async (data: unknown) => {
-    let t: null | ((key: string) => string) = null;
-
-    if (event) {
-      t = await useTranslation(event);
-    }
-
     try {
       return await schema.parseAsync(data);
     } catch (error) {
       let message = 'Unexpected Error';
       if (error instanceof z.ZodError) {
+        const t = await useTranslation(event);
+
         message = error.issues
           .map((v) => {
             let m = v.message;
 
             if (t) {
-              m = t(m);
+              let newMessage = null;
+              if (v.message.startsWith('zod.')) {
+                switch (v.code) {
+                  case 'too_small':
+                    switch (v.type) {
+                      case 'string':
+                        newMessage = t('zod.generic.stringMin', [
+                          t(v.message),
+                          v.minimum,
+                        ]);
+                        break;
+                      case 'number':
+                        newMessage = t('zod.generic.numberMin', [
+                          t(v.message),
+                          v.minimum,
+                        ]);
+                        break;
+                    }
+                    break;
+                  case 'invalid_type': {
+                    if (v.received === 'null' || v.received === 'undefined') {
+                      newMessage = t('zod.generic.required', [
+                        v.path.join('.'),
+                      ]);
+                    } else {
+                      switch (v.expected) {
+                        case 'string':
+                          newMessage = t('zod.generic.validString', [
+                            t(v.message),
+                          ]);
+                          break;
+                        case 'boolean':
+                          newMessage = t('zod.generic.validBoolean', [
+                            t(v.message),
+                          ]);
+                          break;
+                      }
+                    }
+                    break;
+                  }
+                }
+              }
+              if (newMessage) {
+                m = newMessage;
+              } else {
+                m = t(v.message);
+              }
             }
 
             return m;

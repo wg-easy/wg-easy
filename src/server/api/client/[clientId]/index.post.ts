@@ -9,7 +9,7 @@ export default definePermissionEventHandler(
   async ({ event, checkPermissions }) => {
     const { clientId } = await getValidatedRouterParams(
       event,
-      validateZod(ClientGetSchema)
+      validateZod(ClientGetSchema, event)
     );
 
     const data = await readValidatedBody(

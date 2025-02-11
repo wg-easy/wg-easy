@@ -4,33 +4,23 @@ import z from 'zod';
 
 export type UserType = InferSelectModel<typeof user>;
 
+const t = (v: string) => v;
+
 const username = z
-  .string({ message: 'zod.user.username' })
-  .min(8, 'zod.user.usernameMin')
+  .string({ message: t('zod.user.username') })
+  .min(8, t('zod.user.username'))
   .pipe(safeStringRefine);
 
 const password = z
-  .string({ message: 'zod.user.password' })
-  .min(12, 'zod.user.passwordMin')
-  .regex(/[A-Z]/, 'zod.user.passwordUppercase')
-  .regex(/[a-z]/, 'zod.user.passwordLowercase')
-  .regex(/\d/, 'zod.user.passwordNumber')
-  .regex(/[!@#$%^&*(),.?":{}|<>]/, 'zod.user.passwordSpecial')
+  .string({ message: t('zod.user.password') })
+  .min(12, t('zod.user.password'))
+  .regex(/[A-Z]/, t('zod.user.passwordUppercase'))
+  .regex(/[a-z]/, t('zod.user.passwordLowercase'))
+  .regex(/\d/, t('zod.user.passwordNumber'))
+  .regex(/[!@#$%^&*(),.?":{}|<>]/, t('zod.user.passwordSpecial'))
   .pipe(safeStringRefine);
 
-const remember = z.boolean({ message: 'zod.user.remember' });
-
-const name = z
-  .string({ message: 'zod.user.name' })
-  .min(1, 'zod.user.nameMin')
-  .pipe(safeStringRefine);
-
-const email = z
-  .string({ message: 'zod.user.email' })
-  .min(5, 'zod.user.emailMin')
-  .email({ message: 'zod.user.emailInvalid' })
-  .pipe(safeStringRefine)
-  .nullable();
+const remember = z.boolean({ message: t('zod.user.remember') });
 
 export const UserLoginSchema = z.object(
   {
@@ -41,9 +31,11 @@ export const UserLoginSchema = z.object(
   { message: objectMessage }
 );
 
-const accept = z.boolean().refine((val) => val === true, {
-  message: 'zod.user.accept',
-});
+const accept = z
+  .boolean({ message: t('zod.user.accept') })
+  .refine((val) => val === true, {
+    message: t('zod.user.acceptTrue'),
+  });
 
 export const UserSetupSchema = z.object(
   {
@@ -53,6 +45,18 @@ export const UserSetupSchema = z.object(
   },
   { message: objectMessage }
 );
+
+const name = z
+  .string({ message: t('zod.user.name') })
+  .min(1, 'zod.user.name')
+  .pipe(safeStringRefine);
+
+const email = z
+  .string({ message: t('zod.user.email') })
+  .min(5, t('zod.user.email'))
+  .email({ message: t('zod.user.emailInvalid') })
+  .pipe(safeStringRefine)
+  .nullable();
 
 export const UserUpdateSchema = z.object(
   {
@@ -72,5 +76,5 @@ export const UserUpdatePasswordSchema = z
     { message: objectMessage }
   )
   .refine((val) => val.newPassword === val.confirmPassword, {
-    message: 'zod.user.passwordMatch',
+    message: t('zod.user.passwordMatch'),
   });

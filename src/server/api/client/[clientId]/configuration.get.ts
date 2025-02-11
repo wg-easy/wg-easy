@@ -6,7 +6,7 @@ export default definePermissionEventHandler(
   async ({ event, checkPermissions }) => {
     const { clientId } = await getValidatedRouterParams(
       event,
-      validateZod(ClientGetSchema)
+      validateZod(ClientGetSchema, event)
     );
     const client = await Database.clients.get(clientId);
     checkPermissions(client);
