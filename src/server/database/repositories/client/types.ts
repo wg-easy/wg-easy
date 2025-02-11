@@ -3,8 +3,6 @@ import z from 'zod';
 
 import type { client } from './schema';
 
-export type ID = string;
-
 export type ClientType = InferSelectModel<typeof client>;
 
 export type CreateClientType = Omit<
@@ -18,28 +16,28 @@ export type UpdateClientType = Omit<
 >;
 
 const name = z
-  .string({ message: '!zod.generic.validString:zod.client.name' })
-  .min(1, '!zod.generic.stringMinOne:zod.client.nameMin')
+  .string({ message: t('zod.client.name') })
+  .min(1, t('zod.client.name'))
   .pipe(safeStringRefine);
 
 const expiresAt = z
-  .string({ message: '!zod.generic.validString:zod.client.expireDate' })
-  .min(1, '!zod.generic.stringMinOne:zod.client.expireDateMin')
+  .string({ message: t('zod.client.expiresAt') })
+  .min(1, t('zod.client.expiresAt'))
   .pipe(safeStringRefine)
   .nullable();
 
 const address4 = z
-  .string({ message: 'zod.client.address4' })
-  .min(1, { message: 'zod.client.address4Min' })
+  .string({ message: t('zod.client.address4') })
+  .min(1, { message: t('zod.client.address4') })
   .pipe(safeStringRefine);
 
 const address6 = z
-  .string({ message: 'zod.client.address6' })
-  .min(1, { message: 'zod.client.address6Min' })
+  .string({ message: t('zod.client.address6') })
+  .min(1, { message: t('zod.client.address6') })
   .pipe(safeStringRefine);
 
 const serverAllowedIps = z.array(AddressSchema, {
-  message: 'zod.serverAllowedIps',
+  message: t('zod.client.serverAllowedIps'),
 });
 
 export const ClientCreateSchema = z.object({
@@ -65,7 +63,7 @@ export const ClientUpdateSchema = schemaForType<UpdateClientType>()(
 );
 
 // TODO: investigate if coerce is bad
-const clientId = z.number({ message: 'zod.client.id', coerce: true });
+const clientId = z.number({ message: t('zod.client.id'), coerce: true });
 
 export const ClientGetSchema = z.object({
   clientId: clientId,

@@ -4,8 +4,6 @@ import z from 'zod';
 
 export type UserType = InferSelectModel<typeof user>;
 
-const t = (v: string) => v;
-
 const username = z
   .string({ message: t('zod.user.username') })
   .min(8, t('zod.user.username'))
