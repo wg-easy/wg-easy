@@ -37,7 +37,12 @@
             Account
           </NuxtLink>
         </DropdownMenuItem>
-        <DropdownMenuItem v-if="authStore.userData?.role === roles.ADMIN">
+        <DropdownMenuItem
+          v-if="
+            authStore.userData &&
+            hasPermissions(authStore.userData, 'admin', 'any')
+          "
+        >
           <NuxtLink
             to="/admin"
             class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"

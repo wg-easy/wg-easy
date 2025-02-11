@@ -52,7 +52,39 @@ class WireGuard {
     WG_DEBUG('Config synced successfully.');
   }
 
-  async getClients() {
+  async getClientsForUser(userId: ID) {
+    const wgInterface = await Database.interfaces.get();
+
+    const dbClients = await Database.clients.getForUser(userId);
+
+    const clients = dbClients.map((client) => ({
+      ...client,
+      latestHandshakeAt: null as Date | null,
+      endpoint: null as string | null,
+      transferRx: null as number | null,
+      transferTx: null as number | null,
+    }));
+
+    // Loop WireGuard status
+    const dump = await wg.dump(wgInterface.name);
+    dump.forEach(
+      ({ publicKey, latestHandshakeAt, endpoint, transferRx, transferTx }) => {
+        const client = clients.find((client) => client.publicKey === publicKey);
+        if (!client) {
+          return;
+        }
+
+        client.latestHandshakeAt = latestHandshakeAt;
+        client.endpoint = endpoint;
+        client.transferRx = transferRx;
+        client.transferTx = transferTx;
+      }
+    );
+
+    return clients;
+  }
+
+  async getAllClients() {
     const wgInterface = await Database.interfaces.get();
     const dbClients = await Database.clients.getAll();
     const clients = dbClients.map((client) => ({

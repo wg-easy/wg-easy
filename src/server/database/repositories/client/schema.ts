@@ -1,10 +1,16 @@
 import { sql, relations } from 'drizzle-orm';
 import { int, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
-import { oneTimeLink } from '../../schema';
+import { oneTimeLink, user } from '../../schema';
 
 export const client = sqliteTable('clients_table', {
   id: int().primaryKey({ autoIncrement: true }),
+  userId: int('user_id')
+    .notNull()
+    .references(() => user.id, {
+      onDelete: 'restrict',
+      onUpdate: 'cascade',
+    }),
   name: text().notNull(),
   ipv4Address: text('ipv4_address').notNull().unique(),
   ipv6Address: text('ipv6_address').notNull().unique(),
@@ -33,5 +39,9 @@ export const clientsRelations = relations(client, ({ one }) => ({
   oneTimeLink: one(oneTimeLink, {
     fields: [client.id],
     references: [oneTimeLink.clientId],
+  }),
+  user: one(user, {
+    fields: [client.userId],
+    references: [user.id],
   }),
 }));

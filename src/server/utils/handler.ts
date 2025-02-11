@@ -1,32 +1,65 @@
 import type { EventHandlerRequest, EventHandlerResponse, H3Event } from 'h3';
 import type { UserType } from '#db/repositories/user/types';
-import type { SetupStepType } from '../database/repositories/general/types';
+import type { SetupStepType } from '#db/repositories/general/types';
+import {
+  type Permissions,
+  hasPermissionsWithData,
+} from '#shared/utils/permissions';
 
 type PermissionHandler<
   TReq extends EventHandlerRequest,
   TRes extends EventHandlerResponse,
-> = { (params: { event: H3Event<TReq>; user: UserType }): TRes };
+  Resource extends keyof Permissions,
+> = {
+  (params: {
+    event: H3Event<TReq>;
+    user: UserType;
+    /**
+     * check if user has permissions to access the resource
+     *
+     * see: {@link hasPermissionsWithData}
+     */
+    checkPermissions: (data?: Permissions[Resource]['dataType']) => true;
+  }): TRes;
+};
 
 /**
- * check if the user has the permission to perform the action
+ * get current user
  */
 export const definePermissionEventHandler = <
   TReq extends EventHandlerRequest,
   TRes extends EventHandlerResponse,
+  Resource extends keyof Permissions,
 >(
-  action: Action,
-  handler: PermissionHandler<TReq, TRes>
+  resource: Resource,
+  action: Permissions[Resource]['action'],
+  handler: PermissionHandler<TReq, TRes, Resource>
 ) => {
   return defineEventHandler(async (event) => {
     const user = await getCurrentUser(event);
-    if (!checkPermissions(action, user)) {
+
+    const permissions = hasPermissionsWithData(user, resource, action);
+
+    // if no data is required, check permissions
+    if (permissions.isBoolean()) {
+      permissions.check();
+    }
+
+    const response = await handler({
+      event,
+      user,
+      checkPermissions: permissions.check,
+    });
+
+    // if data is required, make sure permissions were checked
+    if (!permissions.checked) {
       throw createError({
-        statusCode: 403,
-        statusMessage: 'Forbidden',
+        statusCode: 500,
+        statusMessage: 'Permission was not checked',
       });
     }
 
-    return await handler({ event, user });
+    return response;
   });
 };
 

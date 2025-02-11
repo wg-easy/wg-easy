@@ -18,6 +18,12 @@ function createPreparedStatement(db: DBType) {
     findById: db.query.client
       .findFirst({ where: eq(client.id, sql.placeholder('id')) })
       .prepare(),
+    findByUserId: db.query.client
+      .findMany({
+        where: eq(client.userId, sql.placeholder('userId')),
+        with: { oneTimeLink: true },
+      })
+      .prepare(),
     toggle: db
       .update(client)
       .set({ enabled: sql.placeholder('enabled') as never as boolean })
@@ -37,6 +43,15 @@ export class ClientService {
   constructor(db: DBType) {
     this.#db = db;
     this.#statements = createPreparedStatement(db);
+  }
+
+  async getForUser(userId: ID) {
+    const result = await this.#statements.findByUserId.execute({ userId });
+    return result.map((row) => ({
+      ...row,
+      createdAt: new Date(row.createdAt),
+      updatedAt: new Date(row.updatedAt),
+    }));
   }
 
   async getAll() {
@@ -97,6 +112,8 @@ export class ClientService {
         .insert(client)
         .values({
           name,
+          // TODO: fix
+          userId: 1,
           expiresAt: parsedExpiresAt,
           privateKey,
           publicKey,

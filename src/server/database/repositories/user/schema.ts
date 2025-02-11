@@ -1,5 +1,7 @@
-import { sql } from 'drizzle-orm';
+import { sql, relations } from 'drizzle-orm';
 import { int, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+
+import { client } from '../../schema';
 
 export const user = sqliteTable('users_table', {
   id: int().primaryKey({ autoIncrement: true }),
@@ -17,3 +19,7 @@ export const user = sqliteTable('users_table', {
     .default(sql`(CURRENT_TIMESTAMP)`)
     .$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
 });
+
+export const usersRelations = relations(user, ({ many }) => ({
+  clients: many(client),
+}));

@@ -1,7 +1,8 @@
 import { UserUpdatePasswordSchema } from '#db/repositories/user/types';
 
 export default definePermissionEventHandler(
-  actions.CLIENT,
+  'me',
+  'update',
   async ({ event, user }) => {
     const { newPassword, currentPassword } = await readValidatedBody(
       event,

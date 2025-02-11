@@ -1,4 +1,4 @@
-export default definePermissionEventHandler(actions.ADMIN, async () => {
+export default definePermissionEventHandler('admin', 'any', async () => {
   const wgInterface = await Database.interfaces.get();
 
   return {
