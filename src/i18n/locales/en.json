@@ -38,73 +38,6 @@
     "portPlaceholder": "443",
     "migration": "Restore the backup"
   },
-  "zod": {
-    "client": {
-      "id": "Client ID must be a valid number",
-      "name": "Name must be a valid string",
-      "nameMin": "Name must be at least 1 Character",
-      "expireDate": "expiredDate must be a valid string",
-      "expireDateMin": "expiredDate must be at least 1 Character",
-      "address4": "IPv4 Address must be a valid string",
-      "address4Min": "IPv4 Address must be a be at least 1 Character",
-      "address6": "IPv6 Address must be a valid string",
-      "address6Min": "IPv6 Address must be a be at least 1 Character",
-      "serverAllowedIps": "Allowed IPs must be a valid array of strings"
-    },
-    "user": {
-      "username": "Username must be a valid string",
-      "usernameMin": "Username must be at least 8 Characters",
-      "password": "Password must be a valid string",
-      "passwordMin": "Password must be at least 12 Characters",
-      "passwordUppercase": "Password must have at least 1 uppercase letter",
-      "passwordLowercase": "Password must have at least 1 lowercase letter",
-      "passwordNumber": "Password must have at least 1 number",
-      "passwordSpecial": "Password must have at least 1 special character",
-      "remember": "Remember must be a valid boolean",
-      "accept": "Please accept the condition",
-      "name": "Name must be a valid string",
-      "nameMin": "Name must be at least 1 Character",
-      "email": "Email must be a valid string",
-      "emailMin": "Email must be at least 1 Character",
-      "emailInvalid": "Email must be a valid email",
-      "passwordMatch": "Passwords must match"
-    },
-    "userConfig": {
-      "host": "Host must be a valid string",
-      "hostMin": "Host must contain at least 1 character"
-    },
-    "general": {
-      "sessionTimeout": "Session Timeout must be a valid number"
-    },
-    "interface": {
-      "cidr": "CIDR must be a valid string",
-      "cidrMin": "CIDR must be at least 1 Character",
-      "device": "Device must be a valid string",
-      "deviceMin": "Device must be at least 1 Character"
-    },
-    "otl": {
-      "otl": "oneTimeLink must be a valid string",
-      "otlMin": "oneTimeLink must be at least 1 Character"
-    },
-    "stringMalformed": "String is malformed",
-    "body": "Body must be a valid object",
-    "hook": "Hook must be a valid string",
-    "mtu": "MTU must be a valid number",
-    "mtuMin": "MTU must be at least 1280",
-    "mtuMax": "MTU must be at most 9000",
-    "port": "Port must be a valid number",
-    "portMin": "Port must be at least 1",
-    "portMax": "Port must be at most 65535",
-    "persistentKeepalive": "Persistent Keepalive must be a valid number",
-    "persistentKeepaliveMin": "Persistent Keepalive must be at least 0",
-    "persistentKeepaliveMax": "Persistent Keepalive must be at most 65535",
-    "address": "IP Address must be a valid string",
-    "addressMin": "IP Address must be a be at least 1 Character",
-    "dns": "DNS must be a valid array of strings",
-    "dnsMin": "DNS must have at least 1 item",
-    "allowedIps": "Allowed IPs must be a valid array of strings",
-    "allowedIpsMin": "Allowed IPs must have at least 1 item"
-  },
   "name": "Name",
   "username": "Username",
   "signIn": "Sign In",
@@ -151,16 +84,67 @@
     "clear": "Clear",
     "login": "Log in error"
   },
-  "general": {
-    "sessionTimeout": "Session Timeout",
-    "metrics": "Metrics",
-    "prometheus": "Prometheus",
-    "json": "JSON"
-  },
   "form": {
     "actions": "Actions",
     "save": "Save",
     "revert": "Revert"
   },
-  "password": "Password"
+  "password": "Password",
+  "zod": {
+    "generic": {
+      "required": "{0} is required",
+      "validNumber": "{0} must be a valid number",
+      "validString": "{0} must be a valid string",
+      "validBoolean": "{0} must be a valid boolean",
+      "validArray": "{0} must be a valid array",
+      "stringMin": "{0} must be at least {1} Character",
+      "numberMin": "{0} must be at least {1}"
+    },
+    "client": {
+      "id": "Client ID",
+      "name": "Name",
+      "expiresAt": "Expires At",
+      "address4": "IPv4 Address",
+      "address6": "IPv6 Address",
+      "serverAllowedIps": "Server Allowed IPs"
+    },
+    "user": {
+      "username": "Username",
+      "password": "Password",
+      "passwordUppercase": "Password must have at least 1 uppercase letter",
+      "passwordLowercase": "Password must have at least 1 lowercase letter",
+      "passwordNumber": "Password must have at least 1 number",
+      "passwordSpecial": "Password must have at least 1 special character",
+      "remember": "Remember",
+      "accept": "Accept",
+      "acceptTrue": "Accept Conditions to continue",
+      "name": "Name",
+      "email": "Email",
+      "emailInvalid": "Email must be a valid email",
+      "passwordMatch": "Passwords must match"
+    },
+    "userConfig": {
+      "host": "Host"
+    },
+    "general": {
+      "sessionTimeout": "Session Timeout",
+      "metricsEnabled": "Metrics",
+      "metricsPassword": "Metrics Password"
+    },
+    "interface": {
+      "cidr": "CIDR",
+      "device": "Device"
+    },
+    "otl": "One Time link",
+    "stringMalformed": "String is malformed",
+    "body": "Body must be a valid object",
+    "hook": "Hook",
+    "enabled": "Enabled",
+    "mtu": "MTU",
+    "port": "Port",
+    "persistentKeepalive": "Persistent Keepalive",
+    "address": "IP Address",
+    "dns": "DNS",
+    "allowedIps": "Allowed IPs"
+  }
 }

@@ -2,46 +2,53 @@ import type { ZodSchema } from 'zod';
 import z from 'zod';
 import type { H3Event, EventHandlerRequest } from 'h3';
 
-export const objectMessage = 'zod.body';
+/**
+ * return the string as is
+ *
+ * used for i18n ally
+ */
+export const t = (v: string) => v;
+
+export const objectMessage = t('zod.body');
 
 export const safeStringRefine = z
   .string()
   .refine(
     (v) => v !== '__proto__' && v !== 'constructor' && v !== 'prototype',
-    { message: 'zod.stringMalformed' }
+    { message: t('zod.stringMalformed') }
   );
 
 // TODO: create custom getValidatedRouterParams and readValidatedBody wrapper
 
-export const EnabledSchema = z.boolean({ message: 'zod.enabled' });
+export const EnabledSchema = z.boolean({ message: t('zod.enabled') });
 
 export const MtuSchema = z
-  .number({ message: 'zod.mtu' })
-  .min(1280, { message: 'zod.mtuMin' })
-  .max(9000, { message: 'zod.mtuMax' });
+  .number({ message: t('zod.mtu') })
+  .min(1280, { message: t('zod.mtu') })
+  .max(9000, { message: t('zod.mtu') });
 
 export const PortSchema = z
-  .number({ message: 'zod.port' })
-  .min(1, { message: 'zod.portMin' })
-  .max(65535, { message: 'zod.portMax' });
+  .number({ message: t('zod.port') })
+  .min(1, { message: t('zod.port') })
+  .max(65535, { message: t('zod.port') });
 
 export const PersistentKeepaliveSchema = z
-  .number({ message: 'zod.persistentKeepalive' })
-  .min(0, 'zod.persistentKeepaliveMin')
-  .max(65535, 'zod.persistentKeepaliveMax');
+  .number({ message: t('zod.persistentKeepalive') })
+  .min(0, t('zod.persistentKeepalive'))
+  .max(65535, t('zod.persistentKeepalive'));
 
 export const AddressSchema = z
-  .string({ message: 'zod.address' })
-  .min(1, { message: 'zod.addressMin' })
+  .string({ message: t('zod.address') })
+  .min(1, { message: t('zod.address') })
   .pipe(safeStringRefine);
 
 export const DnsSchema = z
-  .array(AddressSchema, { message: 'zod.dns' })
-  .min(1, 'zod.dnsMin');
+  .array(AddressSchema, { message: t('zod.dns') })
+  .min(1, t('zod.dns'));
 
 export const AllowedIpsSchema = z
-  .array(AddressSchema, { message: 'zod.allowedIps' })
-  .min(1, { message: 'zod.allowedIpsMin' });
+  .array(AddressSchema, { message: t('zod.allowedIps') })
+  .min(1, { message: t('zod.allowedIps') });
 
 export const schemaForType =
   <T>() =>
@@ -52,26 +59,78 @@ export const schemaForType =
 
 export function validateZod<T>(
   schema: ZodSchema<T>,
-  event?: H3Event<EventHandlerRequest>
+  event: H3Event<EventHandlerRequest>
 ) {
   return async (data: unknown) => {
-    let t: null | ((key: string) => string) = null;
-
-    if (event) {
-      t = await useTranslation(event);
-    }
-
     try {
       return await schema.parseAsync(data);
     } catch (error) {
       let message = 'Unexpected Error';
       if (error instanceof z.ZodError) {
+        const t = await useTranslation(event);
+
         message = error.issues
           .map((v) => {
             let m = v.message;
 
             if (t) {
-              m = t(m);
+              let newMessage = null;
+              if (v.message.startsWith('zod.')) {
+                switch (v.code) {
+                  case 'too_small':
+                    switch (v.type) {
+                      case 'string':
+                        newMessage = t('zod.generic.stringMin', [
+                          t(v.message),
+                          v.minimum,
+                        ]);
+                        break;
+                      case 'number':
+                        newMessage = t('zod.generic.numberMin', [
+                          t(v.message),
+                          v.minimum,
+                        ]);
+                        break;
+                    }
+                    break;
+                  case 'invalid_type': {
+                    if (v.received === 'null' || v.received === 'undefined') {
+                      newMessage = t('zod.generic.required', [
+                        v.path.join('.'),
+                      ]);
+                    } else {
+                      switch (v.expected) {
+                        case 'string':
+                          newMessage = t('zod.generic.validString', [
+                            t(v.message),
+                          ]);
+                          break;
+                        case 'boolean':
+                          newMessage = t('zod.generic.validBoolean', [
+                            t(v.message),
+                          ]);
+                          break;
+                        case 'number':
+                          newMessage = t('zod.generic.validNumber', [
+                            t(v.message),
+                          ]);
+                          break;
+                        case 'array':
+                          newMessage = t('zod.generic.validArray', [
+                            t(v.message),
+                          ]);
+                          break;
+                      }
+                    }
+                    break;
+                  }
+                }
+              }
+              if (newMessage) {
+                m = newMessage;
+              } else {
+                m = t(v.message);
+              }
             }
 
             return m;

@@ -6,7 +6,7 @@ export default definePermissionEventHandler(
   async ({ event }) => {
     const { name, expiresAt } = await readValidatedBody(
       event,
-      validateZod(ClientCreateSchema)
+      validateZod(ClientCreateSchema, event)
     );
 
     await Database.clients.create({ name, expiresAt });

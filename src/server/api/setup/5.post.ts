@@ -5,6 +5,7 @@ export default defineSetupEventHandler(async ({ event }) => {
     event,
     validateZod(UserConfigSetupSchema, event)
   );
+  // TODO: validate setup step
   await Database.userConfigs.updateHostPort(host, port);
   await Database.general.setSetupStep(0);
   return { success: true };

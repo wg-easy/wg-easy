@@ -15,13 +15,13 @@ export type InterfaceUpdateType = Omit<
 >;
 
 const device = z
-  .string({ message: 'zod.interface.device' })
-  .min(1, 'zod.interface.deviceMin')
+  .string({ message: t('zod.interface.device') })
+  .min(1, t('zod.interface.device'))
   .pipe(safeStringRefine);
 
 const cidr = z
-  .string({ message: 'zod.interface.cidr' })
-  .min(1, { message: 'zod.interface.cidrMin' })
+  .string({ message: t('zod.interface.cidr') })
+  .min(1, { message: t('zod.interface.cidr') })
   .pipe(safeStringRefine);
 
 export const InterfaceUpdateSchema = schemaForType<InterfaceUpdateType>()(
