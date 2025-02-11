@@ -1,7 +1,8 @@
 import { UserUpdateSchema } from '#db/repositories/user/types';
 
 export default definePermissionEventHandler(
-  actions.CLIENT,
+  'me',
+  'update',
   async ({ event, user }) => {
     const { name, email } = await readValidatedBody(
       event,

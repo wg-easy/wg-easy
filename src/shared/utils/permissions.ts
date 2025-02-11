@@ -47,6 +47,10 @@ export type Permissions = {
     dataType: never;
     action: 'any';
   };
+  me: {
+    dataType: UserType;
+    action: 'update';
+  };
 };
 
 export const ROLES = {
@@ -61,6 +65,9 @@ export const ROLES = {
     admin: {
       any: true,
     },
+    me: {
+      update: (loggedIn, toChange) => loggedIn.id === toChange.id,
+    },
   },
   CLIENT: {
     clients: {
@@ -72,6 +79,9 @@ export const ROLES = {
     },
     admin: {
       any: false,
+    },
+    me: {
+      update: (loggedIn, toChange) => loggedIn.id === toChange.id,
     },
   },
 } as const satisfies RolesWithPermissions;
