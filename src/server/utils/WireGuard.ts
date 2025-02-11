@@ -18,6 +18,8 @@ class WireGuard {
 
   /**
    * Generates and saves WireGuard config from database
+   *
+   * Make sure to pass an updated InterfaceType object
    */
   async #saveWireguardConfig(wgInterface: InterfaceType) {
     const clients = await Database.clients.getAll();
@@ -122,7 +124,8 @@ class WireGuard {
 
   async Startup() {
     WG_DEBUG('Starting WireGuard...');
-    const wgInterface = await Database.interfaces.get();
+    // let as it has to refetch if keys change
+    let wgInterface = await Database.interfaces.get();
 
     // default interface has no keys
     if (
@@ -134,6 +137,7 @@ class WireGuard {
       const publicKey = await wg.getPublicKey(privateKey);
 
       await Database.interfaces.updateKeyPair(privateKey, publicKey);
+      wgInterface = await Database.interfaces.get();
       WG_DEBUG('New Wireguard Keys generated successfully.');
     }
     WG_DEBUG(`Starting Wireguard Interface ${wgInterface.name}...`);
