@@ -4,6 +4,7 @@ export default defineMetricsHandler('prometheus', async ({ event }) => {
 });
 
 async function getPrometheusResponse() {
+  const wgInterface = await Database.interfaces.get();
   const clients = await WireGuard.getClients();
   let wireguardPeerCount = 0;
   let wireguardEnabledPeersCount = 0;
@@ -21,7 +22,7 @@ async function getPrometheusResponse() {
       wireguardConnectedPeersCount++;
     }
 
-    const id = `interface="wg0",enabled="${client.enabled}",ipv4Address="${client.ipv4Address}",ipv6Address="${client.ipv6Address}",name="${client.name}"`;
+    const id = `interface="${wgInterface.name}",enabled="${client.enabled}",ipv4Address="${client.ipv4Address}",ipv6Address="${client.ipv6Address}",name="${client.name}"`;
 
     wireguardSentBytes.push(
       `wireguard_sent_bytes{${id}} ${client.transferTx ?? 0}`
@@ -35,20 +36,22 @@ async function getPrometheusResponse() {
     );
   }
 
+  const id = `interface="${wgInterface.name}"`;
+
   const returnText = [
     '# HELP wg-easy and wireguard metrics',
     '',
     '# HELP wireguard_configured_peers',
     '# TYPE wireguard_configured_peers gauge',
-    `wireguard_configured_peers{interface="wg0"} ${wireguardPeerCount}`,
+    `wireguard_configured_peers{${id}} ${wireguardPeerCount}`,
     '',
     '# HELP wireguard_enabled_peers',
     '# TYPE wireguard_enabled_peers gauge',
-    `wireguard_enabled_peers{interface="wg0"} ${wireguardEnabledPeersCount}`,
+    `wireguard_enabled_peers{${id}} ${wireguardEnabledPeersCount}`,
     '',
     '# HELP wireguard_connected_peers',
     '# TYPE wireguard_connected_peers gauge',
-    `wireguard_connected_peers{interface="wg0"} ${wireguardConnectedPeersCount}`,
+    `wireguard_connected_peers{${id}} ${wireguardConnectedPeersCount}`,
     '',
     '# HELP wireguard_sent_bytes Bytes sent to the peer',
     '# TYPE wireguard_sent_bytes counter',

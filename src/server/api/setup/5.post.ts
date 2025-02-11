@@ -5,7 +5,7 @@ export default defineSetupEventHandler(async ({ event }) => {
     event,
     validateZod(UserConfigSetupSchema, event)
   );
-  await Database.userConfigs.updateHostPort('wg0', host, port);
+  await Database.userConfigs.updateHostPort(host, port);
   await Database.general.setSetupStep(0);
   return { success: true };
 });

@@ -2,6 +2,7 @@ import fs from 'node:fs/promises';
 import debug from 'debug';
 import QRCode from 'qrcode';
 import type { ID } from '#db/schema';
+import type { InterfaceType } from '#db/repositories/interface/types';
 
 const WG_DEBUG = debug('WireGuard');
 
@@ -10,21 +11,19 @@ class WireGuard {
    * Save and sync config
    */
   async saveConfig() {
-    await this.#saveWireguardConfig('wg0');
-    await this.#syncWireguardConfig('wg0');
+    const wgInterface = await Database.interfaces.get();
+    await this.#saveWireguardConfig(wgInterface);
+    await this.#syncWireguardConfig(wgInterface);
   }
 
   /**
-   * Generates and saves WireGuard config from database as wg0
+   * Generates and saves WireGuard config from database
+   *
+   * Make sure to pass an updated InterfaceType object
    */
-  async #saveWireguardConfig(infName: string) {
-    const wgInterface = await Database.interfaces.get(infName);
+  async #saveWireguardConfig(wgInterface: InterfaceType) {
     const clients = await Database.clients.getAll();
-    const hooks = await Database.hooks.get(infName);
-
-    if (!wgInterface || !hooks) {
-      throw new Error('Interface or Hooks not found');
-    }
+    const hooks = await Database.hooks.get();
 
     const result = [];
     result.push(wg.generateServerInterface(wgInterface, hooks));
@@ -37,19 +36,24 @@ class WireGuard {
     }
 
     WG_DEBUG('Saving Config...');
-    await fs.writeFile(`/etc/wireguard/${infName}.conf`, result.join('\n\n'), {
-      mode: 0o600,
-    });
+    await fs.writeFile(
+      `/etc/wireguard/${wgInterface.name}.conf`,
+      result.join('\n\n'),
+      {
+        mode: 0o600,
+      }
+    );
     WG_DEBUG('Config saved successfully.');
   }
 
-  async #syncWireguardConfig(infName: string) {
+  async #syncWireguardConfig(wgInterface: InterfaceType) {
     WG_DEBUG('Syncing Config...');
-    await wg.sync(infName);
+    await wg.sync(wgInterface.name);
     WG_DEBUG('Config synced successfully.');
   }
 
   async getClients() {
+    const wgInterface = await Database.interfaces.get();
     const dbClients = await Database.clients.getAll();
     const clients = dbClients.map((client) => ({
       ...client,
@@ -60,7 +64,7 @@ class WireGuard {
     }));
 
     // Loop WireGuard status
-    const dump = await wg.dump('wg0');
+    const dump = await wg.dump(wgInterface.name);
     dump.forEach(
       ({ publicKey, latestHandshakeAt, endpoint, transferRx, transferTx }) => {
         const client = clients.find((client) => client.publicKey === publicKey);
@@ -79,12 +83,8 @@ class WireGuard {
   }
 
   async getClientConfiguration({ clientId }: { clientId: ID }) {
-    const wgInterface = await Database.interfaces.get('wg0');
-    const userConfig = await Database.userConfigs.get('wg0');
-
-    if (!wgInterface || !userConfig) {
-      throw new Error('Interface or UserConfig not found');
-    }
+    const wgInterface = await Database.interfaces.get();
+    const userConfig = await Database.userConfigs.get();
 
     const client = await Database.clients.get(clientId);
 
@@ -124,47 +124,41 @@ class WireGuard {
 
   async Startup() {
     WG_DEBUG('Starting WireGuard...');
-    const wgInterfaces = await Database.interfaces.getAll();
-    for (const wgInterface of wgInterfaces) {
-      if (wgInterface.enabled !== true) {
-        continue;
-      }
-      // default interface has no keys
-      if (
-        wgInterface.privateKey === '---default---' &&
-        wgInterface.publicKey === '---default---'
-      ) {
-        WG_DEBUG('Generating new Wireguard Keys...');
-        const privateKey = await wg.generatePrivateKey();
-        const publicKey = await wg.getPublicKey(privateKey);
+    // let as it has to refetch if keys change
+    let wgInterface = await Database.interfaces.get();
 
-        await Database.interfaces.updateKeyPair(
-          wgInterface.name,
-          privateKey,
-          publicKey
-        );
-        WG_DEBUG('New Wireguard Keys generated successfully.');
-      }
-      WG_DEBUG(`Starting Wireguard Interface ${wgInterface.name}...`);
-      await this.#saveWireguardConfig(wgInterface.name);
-      await wg.down(wgInterface.name).catch(() => {});
-      await wg.up(wgInterface.name).catch((err) => {
-        if (
-          err &&
-          err.message &&
-          err.message.includes(`Cannot find device "${wgInterface.name}"`)
-        ) {
-          throw new Error(
-            `WireGuard exited with the error: Cannot find device "${wgInterface.name}"\nThis usually means that your host's kernel does not support WireGuard!`,
-            { cause: err.message }
-          );
-        }
+    // default interface has no keys
+    if (
+      wgInterface.privateKey === '---default---' &&
+      wgInterface.publicKey === '---default---'
+    ) {
+      WG_DEBUG('Generating new Wireguard Keys...');
+      const privateKey = await wg.generatePrivateKey();
+      const publicKey = await wg.getPublicKey(privateKey);
 
-        throw err;
-      });
-      await this.#syncWireguardConfig(wgInterface.name);
-      WG_DEBUG(`Wireguard Interface ${wgInterface.name} started successfully.`);
+      await Database.interfaces.updateKeyPair(privateKey, publicKey);
+      wgInterface = await Database.interfaces.get();
+      WG_DEBUG('New Wireguard Keys generated successfully.');
     }
+    WG_DEBUG(`Starting Wireguard Interface ${wgInterface.name}...`);
+    await this.#saveWireguardConfig(wgInterface);
+    await wg.down(wgInterface.name).catch(() => {});
+    await wg.up(wgInterface.name).catch((err) => {
+      if (
+        err &&
+        err.message &&
+        err.message.includes(`Cannot find device "${wgInterface.name}"`)
+      ) {
+        throw new Error(
+          `WireGuard exited with the error: Cannot find device "${wgInterface.name}"\nThis usually means that your host's kernel does not support WireGuard!`,
+          { cause: err.message }
+        );
+      }
+
+      throw err;
+    });
+    await this.#syncWireguardConfig(wgInterface);
+    WG_DEBUG(`Wireguard Interface ${wgInterface.name} started successfully.`);
 
     WG_DEBUG('Starting Cron Job...');
     await this.startCronJob();
@@ -184,10 +178,8 @@ class WireGuard {
 
   // Shutdown wireguard
   async Shutdown() {
-    const wgInterfaces = await Database.interfaces.getAll();
-    for (const wgInterface of wgInterfaces) {
-      await wg.down(wgInterface.name).catch(() => {});
-    }
+    const wgInterface = await Database.interfaces.get();
+    await wg.down(wgInterface.name).catch(() => {});
   }
 
   async cronJob() {

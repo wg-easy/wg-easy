@@ -7,7 +7,7 @@ export default definePermissionEventHandler(
       event,
       validateZod(InterfaceUpdateSchema, event)
     );
-    await Database.interfaces.update('wg0', data);
+    await Database.interfaces.update(data);
     await WireGuard.saveConfig();
     return { success: true };
   }

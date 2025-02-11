@@ -20,15 +20,19 @@ export class HooksService {
     this.#statements = createPreparedStatement(db);
   }
 
-  get(infName: string) {
-    return this.#statements.get.execute({ interface: infName });
+  async get() {
+    const hooks = await this.#statements.get.execute({ interface: 'wg0' });
+    if (!hooks) {
+      throw new Error('Hooks not found');
+    }
+    return hooks;
   }
 
-  update(infName: string, data: HooksUpdateType) {
+  update(data: HooksUpdateType) {
     return this.#db
       .update(hooks)
       .set(data)
-      .where(eq(hooks.id, infName))
+      .where(eq(hooks.id, 'wg0'))
       .execute();
   }
 }
