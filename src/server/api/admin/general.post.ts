@@ -1,7 +1,8 @@
 import { GeneralUpdateSchema } from '#db/repositories/general/types';
 
 export default definePermissionEventHandler(
-  actions.ADMIN,
+  'admin',
+  'any',
   async ({ event }) => {
     const data = await readValidatedBody(
       event,

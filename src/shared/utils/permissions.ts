@@ -43,6 +43,10 @@ export type Permissions = {
     dataType: ClientType;
     action: 'view' | 'create' | 'update' | 'delete' | 'custom';
   };
+  admin: {
+    dataType: never;
+    action: 'any';
+  };
 };
 
 export const ROLES = {
@@ -54,6 +58,9 @@ export const ROLES = {
       delete: true,
       custom: true,
     },
+    admin: {
+      any: true,
+    },
   },
   CLIENT: {
     clients: {
@@ -62,6 +69,9 @@ export const ROLES = {
       update: (user, client) => user.id === client.userId,
       delete: (user, client) => user.id === client.userId,
       custom: true,
+    },
+    admin: {
+      any: false,
     },
   },
 } as const satisfies RolesWithPermissions;

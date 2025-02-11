@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
     event,
     validateZod(OneTimeLinkGetSchema)
   );
-  const clients = await WireGuard.getClients();
+  const clients = await WireGuard.getAllClients();
   const client = clients.find(
     (client) => client.oneTimeLink?.oneTimeLink === oneTimeLink
   );

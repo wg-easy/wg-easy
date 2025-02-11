@@ -3,7 +3,7 @@ export default defineMetricsHandler('json', async () => {
 });
 
 async function getMetricsJSON() {
-  const clients = await WireGuard.getClients();
+  const clients = await WireGuard.getAllClients();
   let wireguardPeerCount = 0;
   let wireguardEnabledPeersCount = 0;
   let wireguardConnectedPeersCount = 0;

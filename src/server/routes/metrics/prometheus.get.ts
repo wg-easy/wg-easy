@@ -5,7 +5,7 @@ export default defineMetricsHandler('prometheus', async ({ event }) => {
 
 async function getPrometheusResponse() {
   const wgInterface = await Database.interfaces.get();
-  const clients = await WireGuard.getClients();
+  const clients = await WireGuard.getAllClients();
   let wireguardPeerCount = 0;
   let wireguardEnabledPeersCount = 0;
   let wireguardConnectedPeersCount = 0;

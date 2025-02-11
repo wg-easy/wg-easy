@@ -19,7 +19,10 @@ function createPreparedStatement(db: DBType) {
       .findFirst({ where: eq(client.id, sql.placeholder('id')) })
       .prepare(),
     findByUserId: db.query.client
-      .findMany({ where: eq(client.userId, sql.placeholder('userId')) })
+      .findMany({
+        where: eq(client.userId, sql.placeholder('userId')),
+        with: { oneTimeLink: true },
+      })
       .prepare(),
     toggle: db
       .update(client)
