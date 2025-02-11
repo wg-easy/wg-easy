@@ -92,7 +92,9 @@ export function hasPermissions<Resource extends keyof Permissions>(
   action: Permissions[Resource]['action'],
   data?: Permissions[Resource]['dataType']
 ) {
-  const permission = ROLES[roleToKey(user.role)][resource][action];
+  const permission = (ROLES as RolesWithPermissions)[roleToKey(user.role)][
+    resource
+  ][action];
 
   if (typeof permission === 'boolean') {
     return permission;
@@ -123,7 +125,11 @@ export function hasPermissionsWithData<Resource extends keyof Permissions>(
       return isAllowed;
     },
     isBoolean() {
-      return typeof ROLES[roleToKey(user.role)][resource][action] === 'boolean';
+      return (
+        typeof (ROLES as RolesWithPermissions)[roleToKey(user.role)][resource][
+          action
+        ] === 'boolean'
+      );
     },
     get checked() {
       return checked;
