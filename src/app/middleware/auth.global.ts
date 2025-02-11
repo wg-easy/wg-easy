@@ -21,7 +21,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
   // Check for admin access
   if (to.path.startsWith('/admin')) {
-    if (userData.role !== roles.ADMIN) {
+    if (userData && hasPermissions(userData, 'admin', 'any')) {
       return abortNavigation('Not allowed to access Admin Panel');
     }
   }

@@ -1,7 +1,11 @@
 import type { ClientType } from '#db/repositories/client/types';
 import type { UserType } from '#db/repositories/user/types';
 
-export type Role = number & { readonly __role: unique symbol };
+type BrandedRole = {
+  readonly __role: unique symbol;
+};
+
+export type Role = number & BrandedRole;
 
 export const roles = {
   ADMIN: 1 as Role,
@@ -26,9 +30,24 @@ function roleToKey(role: Role) {
   return roleKey as Roles;
 }
 
+// TODO: https://github.com/nitrojs/nitro/issues/2758#issuecomment-2650531472
+
+type BrandedNumber = {
+  toString: unknown;
+  toFixed: unknown;
+  toExponential: unknown;
+  toPrecision: unknown;
+  valueOf: unknown;
+  toLocaleString: unknown;
+} & BrandedRole;
+
+type SharedUserType =
+  | Pick<UserType, 'id' | 'role'>
+  | (Pick<UserType, 'id'> & { role: BrandedNumber });
+
 type PermissionCheck<Key extends keyof Permissions> =
   | boolean
-  | ((user: UserType, data: Permissions[Key]['dataType']) => boolean);
+  | ((user: SharedUserType, data: Permissions[Key]['dataType']) => boolean);
 
 type RolesWithPermissions = {
   [R in Roles]: {
@@ -87,14 +106,15 @@ export const ROLES = {
 } as const satisfies RolesWithPermissions;
 
 export function hasPermissions<Resource extends keyof Permissions>(
-  user: UserType,
+  user: SharedUserType,
   resource: Resource,
   action: Permissions[Resource]['action'],
   data?: Permissions[Resource]['dataType']
 ) {
-  const permission = (ROLES as RolesWithPermissions)[roleToKey(user.role)][
-    resource
-  ][action];
+  const permission = (ROLES as RolesWithPermissions)[
+    // TODO: remove typecast
+    roleToKey(user.role as Role)
+  ][resource][action];
 
   if (typeof permission === 'boolean') {
     return permission;
