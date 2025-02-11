@@ -1,5 +1,5 @@
 PRAGMA journal_mode=WAL;--> statement-breakpoint
-INSERT INTO `general_table` (`setupStep`, `session_password`, `session_timeout`, `metricsPrometheus`, `metricsJson`)
+INSERT INTO `general_table` (`setup_step`, `session_password`, `session_timeout`, `metrics_prometheus`, `metrics_json`)
 VALUES (1, hex(randomblob(256)), 3600, 0, 0);
 --> statement-breakpoint
 INSERT INTO `interfaces_table` (`name`, `device`, `port`, `private_key`, `public_key`, `ipv4_cidr`, `ipv6_cidr`, `mtu`, `enabled`)

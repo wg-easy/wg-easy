@@ -14,7 +14,7 @@ export type CreateClientType = Omit<
 
 export type UpdateClientType = Omit<
   CreateClientType,
-  'privateKey' | 'publicKey' | 'preSharedKey'
+  'privateKey' | 'publicKey' | 'preSharedKey' | 'userId'
 >;
 
 const name = z

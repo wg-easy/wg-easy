@@ -1,5 +1,6 @@
 CREATE TABLE `clients_table` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`user_id` integer NOT NULL,
 	`name` text NOT NULL,
 	`ipv4_address` text NOT NULL,
 	`ipv6_address` text NOT NULL,
@@ -14,19 +15,20 @@ CREATE TABLE `clients_table` (
 	`dns` text NOT NULL,
 	`enabled` integer NOT NULL,
 	`created_at` text DEFAULT (CURRENT_TIMESTAMP) NOT NULL,
-	`updated_at` text DEFAULT (CURRENT_TIMESTAMP) NOT NULL
+	`updated_at` text DEFAULT (CURRENT_TIMESTAMP) NOT NULL,
+	FOREIGN KEY (`user_id`) REFERENCES `users_table`(`id`) ON UPDATE cascade ON DELETE restrict
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `clients_table_ipv4_address_unique` ON `clients_table` (`ipv4_address`);--> statement-breakpoint
 CREATE UNIQUE INDEX `clients_table_ipv6_address_unique` ON `clients_table` (`ipv6_address`);--> statement-breakpoint
 CREATE TABLE `general_table` (
 	`id` integer PRIMARY KEY DEFAULT 1 NOT NULL,
-	`setupStep` integer NOT NULL,
+	`setup_step` integer NOT NULL,
 	`session_password` text NOT NULL,
 	`session_timeout` integer NOT NULL,
-	`metricsPrometheus` integer NOT NULL,
-	`metricsJson` integer NOT NULL,
-	`metricsPassword` text,
+	`metrics_prometheus` integer NOT NULL,
+	`metrics_json` integer NOT NULL,
+	`metrics_password` text,
 	`created_at` text DEFAULT (CURRENT_TIMESTAMP) NOT NULL,
 	`updated_at` text DEFAULT (CURRENT_TIMESTAMP) NOT NULL
 );
@@ -61,10 +63,10 @@ CREATE TABLE `one_time_links_table` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`one_time_link` text NOT NULL,
 	`expires_at` text NOT NULL,
-	`clientId` integer NOT NULL,
+	`client_id` integer NOT NULL,
 	`created_at` text DEFAULT (CURRENT_TIMESTAMP) NOT NULL,
 	`updated_at` text DEFAULT (CURRENT_TIMESTAMP) NOT NULL,
-	FOREIGN KEY (`clientId`) REFERENCES `clients_table`(`id`) ON UPDATE cascade ON DELETE cascade
+	FOREIGN KEY (`client_id`) REFERENCES `clients_table`(`id`) ON UPDATE cascade ON DELETE cascade
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `one_time_links_table_one_time_link_unique` ON `one_time_links_table` (`one_time_link`);--> statement-breakpoint

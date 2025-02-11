@@ -7,7 +7,7 @@ export const oneTimeLink = sqliteTable('one_time_links_table', {
   id: int().primaryKey({ autoIncrement: true }),
   oneTimeLink: text('one_time_link').notNull().unique(),
   expiresAt: text('expires_at').notNull(),
-  clientId: int()
+  clientId: int('client_id')
     .notNull()
     .references(() => client.id, { onDelete: 'cascade', onUpdate: 'cascade' }),
   createdAt: text('created_at')
