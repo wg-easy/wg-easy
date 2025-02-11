@@ -28,23 +28,29 @@ export class UserConfigService {
     this.#statements = createPreparedStatement(db);
   }
 
-  get(infName: string) {
-    return this.#statements.get.execute({ interface: infName });
+  async get() {
+    const userConfig = await this.#statements.get.execute({ interface: 'wg0' });
+
+    if (!userConfig) {
+      throw new Error('User config not found');
+    }
+
+    return userConfig;
   }
 
-  updateHostPort(infName: string, host: string, port: number) {
+  updateHostPort(host: string, port: number) {
     return this.#statements.updateHostPort.execute({
-      interface: infName,
+      interface: 'wg0',
       host,
       port,
     });
   }
 
-  update(infName: string, data: UserConfigUpdateType) {
+  update(data: UserConfigUpdateType) {
     return this.#db
       .update(userConfig)
       .set(data)
-      .where(eq(userConfig.id, infName))
+      .where(eq(userConfig.id, 'wg0'))
       .execute();
   }
 }

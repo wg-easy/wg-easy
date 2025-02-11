@@ -23,4 +23,4 @@ logs
 .env.*
 !.env.example
 
-wg0.db
+wg-easy.db

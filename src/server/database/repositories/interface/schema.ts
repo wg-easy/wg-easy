@@ -13,6 +13,7 @@ export const wgInterface = sqliteTable('interfaces_table', {
   ipv4Cidr: text('ipv4_cidr').notNull(),
   ipv6Cidr: text('ipv6_cidr').notNull(),
   mtu: int().notNull(),
+  // does nothing yet
   enabled: int({ mode: 'boolean' }).notNull(),
   createdAt: text('created_at')
     .notNull()

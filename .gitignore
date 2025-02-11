@@ -1,6 +1,2 @@
-/config
-/wg0.conf
-/wg0.json
-/src/node_modules
 .DS_Store
 *.swp

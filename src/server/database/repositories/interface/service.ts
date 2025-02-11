@@ -11,7 +11,6 @@ function createPreparedStatement(db: DBType) {
     get: db.query.wgInterface
       .findFirst({ where: eq(wgInterface.name, sql.placeholder('interface')) })
       .prepare(),
-    getAll: db.query.wgInterface.findMany().prepare(),
     updateKeyPair: db
       .update(wgInterface)
       .set({
@@ -32,31 +31,33 @@ export class InterfaceService {
     this.#statements = createPreparedStatement(db);
   }
 
-  get(infName: string) {
-    return this.#statements.get.execute({ interface: infName });
+  async get() {
+    const wgInterface = await this.#statements.get.execute({
+      interface: 'wg0',
+    });
+    if (!wgInterface) {
+      throw new Error('Interface not found');
+    }
+    return wgInterface;
   }
 
-  getAll() {
-    return this.#statements.getAll.execute();
-  }
-
-  updateKeyPair(infName: string, privateKey: string, publicKey: string) {
+  updateKeyPair(privateKey: string, publicKey: string) {
     return this.#statements.updateKeyPair.execute({
-      interface: infName,
+      interface: 'wg0',
       privateKey,
       publicKey,
     });
   }
 
-  update(infName: string, data: InterfaceUpdateType) {
+  update(data: InterfaceUpdateType) {
     return this.#db
       .update(wgInterface)
       .set(data)
-      .where(eq(wgInterface.name, infName))
+      .where(eq(wgInterface.name, 'wg0'))
       .execute();
   }
 
-  updateCidr(infName: string, data: InterfaceCidrUpdateType) {
+  updateCidr(data: InterfaceCidrUpdateType) {
     if (!isCidr(data.ipv4Cidr) || !isCidr(data.ipv6Cidr)) {
       throw new Error('Invalid CIDR');
     }
@@ -64,7 +65,7 @@ export class InterfaceService {
       await tx
         .update(wgInterface)
         .set(data)
-        .where(eq(wgInterface.name, infName))
+        .where(eq(wgInterface.name, 'wg0'))
         .execute();
 
       const clients = await tx.query.client.findMany().execute();

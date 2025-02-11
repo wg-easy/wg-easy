@@ -8,7 +8,7 @@ export default definePermissionEventHandler(
       validateZod(InterfaceCidrUpdateSchema, event)
     );
 
-    await Database.interfaces.updateCidr('wg0', data);
+    await Database.interfaces.updateCidr(data);
     await WireGuard.saveConfig();
     return { success: true };
   }

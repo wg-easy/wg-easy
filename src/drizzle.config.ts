@@ -5,6 +5,6 @@ export default defineConfig({
   schema: './server/database/schema.ts',
   dialect: 'sqlite',
   dbCredentials: {
-    url: 'file:./wg0.db',
+    url: 'file:./wg-easy.db',
   },
 });
