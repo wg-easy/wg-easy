@@ -62,7 +62,8 @@ async function submit() {
     if (!res.success) {
       throw new Error('Failed to save');
     }
-    await refreshNuxtData();
+    // TODO: avoid refreshNuxtData
+    await revert();
   } catch (e) {
     if (e instanceof Error) {
       toast.showToast({
@@ -71,6 +72,7 @@ async function submit() {
         message: e.message,
       });
     }
+    await revert();
   }
 }
 

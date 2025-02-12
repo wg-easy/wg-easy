@@ -22,6 +22,7 @@
 </template>
 
 <script setup lang="ts">
+// TODO: improve
 defineProps<{ client: LocalClient }>();
 
 const clientsStore = useClientsStore();
