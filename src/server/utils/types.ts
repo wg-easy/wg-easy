@@ -9,6 +9,7 @@ import type { H3Event, EventHandlerRequest } from 'h3';
  */
 export const t = (v: string) => v;
 
+// TODO: use everywhere or remove
 export const objectMessage = t('zod.body');
 
 export const safeStringRefine = z
@@ -49,6 +50,13 @@ export const DnsSchema = z
 export const AllowedIpsSchema = z
   .array(AddressSchema, { message: t('zod.allowedIps') })
   .min(1, { message: t('zod.allowedIps') });
+
+export const FileSchema = z.object(
+  {
+    file: z.string({ message: t('zod.file') }),
+  },
+  { message: objectMessage }
+);
 
 export const schemaForType =
   <T>() =>

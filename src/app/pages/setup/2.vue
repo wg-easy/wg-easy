@@ -1,16 +1,13 @@
 <template>
   <div>
-    <p class="p-8 text-center text-lg">
-      {{ 'Do you have a existing Setup?' }}
+    <p class="px-8 pt-8 text-center text-2xl">
+      {{ $t('setup.messageWelcome.whatIs') }}
     </p>
-    <div class="mb-8 flex justify-center">
-      <NuxtLink to="/setup/3"><BaseButton>No</BaseButton></NuxtLink>
-      <NuxtLink to="/setup/migrate"><BaseButton>Yes</BaseButton></NuxtLink>
-    </div>
+    <NuxtLink to="/setup/3"><BaseButton>Continue</BaseButton></NuxtLink>
   </div>
 </template>
 
-<script lang="ts" setup>
+<script setup lang="ts">
 definePageMeta({
   layout: 'setup',
 });

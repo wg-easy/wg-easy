@@ -1,14 +1,14 @@
 import type { parseCidr } from 'cidr-tools';
 import { stringifyIp } from 'ip-bigint';
 
-import type { ClientType } from '#db/repositories/client/types';
+import type { ClientNextIpType } from '#db/repositories/client/types';
 
 type ParsedCidr = ReturnType<typeof parseCidr>;
 
 export function nextIP(
   version: 4 | 6,
   cidr: ParsedCidr,
-  clients: ClientType[]
+  clients: ClientNextIpType[]
 ) {
   let address;
   for (let i = cidr.start + 2n; i <= cidr.end - 1n; i++) {

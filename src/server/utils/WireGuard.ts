@@ -243,4 +243,14 @@ class WireGuard {
   }
 }
 
+if (OLD_ENV.PASSWORD || OLD_ENV.PASSWORD_HASH) {
+  // TODO: change url before release
+  throw new Error(
+    `
+You are using an invalid Configuration for wg-easy
+Please follow the instructions on https://wg-easy.github.io/wg-easy/ to migrate
+`
+  );
+}
+
 export default new WireGuard();

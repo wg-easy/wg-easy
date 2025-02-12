@@ -1,7 +1,11 @@
 import type { DBType } from '#db/sqlite';
 import { eq, sql } from 'drizzle-orm';
 import { client } from './schema';
-import type { ClientCreateType, UpdateClientType } from './types';
+import type {
+  ClientCreateFromExistingType,
+  ClientCreateType,
+  UpdateClientType,
+} from './types';
 import type { ID } from '#db/schema';
 import { wgInterface, userConfig } from '#db/schema';
 import { parseCidr } from 'cidr-tools';
@@ -141,5 +145,36 @@ export class ClientService {
 
   update(id: ID, data: UpdateClientType) {
     return this.#db.update(client).set(data).where(eq(client.id, id)).execute();
+  }
+
+  async createFromExisting({
+    name,
+    enabled,
+    ipv4Address,
+    ipv6Address,
+    preSharedKey,
+    privateKey,
+    publicKey,
+  }: ClientCreateFromExistingType) {
+    const clientConfig = await Database.userConfigs.get();
+
+    return this.#db
+      .insert(client)
+      .values({
+        name,
+        userId: 1,
+        privateKey,
+        publicKey,
+        preSharedKey,
+        ipv4Address,
+        ipv6Address,
+        mtu: clientConfig.defaultMtu,
+        allowedIps: clientConfig.defaultAllowedIps,
+        dns: clientConfig.defaultDns,
+        persistentKeepalive: clientConfig.defaultPersistentKeepalive,
+        serverAllowedIps: [],
+        enabled,
+      })
+      .execute();
   }
 }

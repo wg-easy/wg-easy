@@ -4,8 +4,8 @@ export const useSetupStore = defineStore('Setup', () => {
   /**
    * @throws if unsuccessful
    */
-  async function step4(username: string, password: string, accept: boolean) {
-    const response = await $fetch('/api/setup/4', {
+  async function step3(username: string, password: string, accept: boolean) {
+    const response = await $fetch('/api/setup/3', {
       method: 'post',
       body: { username, password, accept },
     });
@@ -41,7 +41,7 @@ export const useSetupStore = defineStore('Setup', () => {
   }
 
   return {
-    step4,
+    step3,
     step5,
     runMigration,
     step,
