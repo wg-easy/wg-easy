@@ -14,6 +14,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
     }
     return;
   }
+
   // Require auth for every page other than Login
   if (!userData?.username) {
     return navigateTo('/login', { redirectCode: 302 });
@@ -21,7 +22,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
   // Check for admin access
   if (to.path.startsWith('/admin')) {
-    if (userData && hasPermissions(userData, 'admin', 'any')) {
+    if (!hasPermissions(userData, 'admin', 'any')) {
       return abortNavigation('Not allowed to access Admin Panel');
     }
   }

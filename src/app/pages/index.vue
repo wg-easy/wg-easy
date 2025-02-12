@@ -24,9 +24,6 @@
         <IconsLoading class="mx-auto w-5 animate-spin" />
       </div>
     </Panel>
-
-    <ClientsQRCodeDialog />
-    <ClientsCreateDialog />
   </main>
 </template>
 

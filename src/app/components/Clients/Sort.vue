@@ -46,6 +46,7 @@
 </template>
 
 <script setup lang="ts">
+// TODO: improve
 const globalStore = useGlobalStore();
 const clientsStore = useClientsStore();
 
