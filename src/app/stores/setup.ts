@@ -4,8 +4,8 @@ export const useSetupStore = defineStore('Setup', () => {
   /**
    * @throws if unsuccessful
    */
-  async function step3(username: string, password: string, accept: boolean) {
-    const response = await $fetch('/api/setup/3', {
+  async function step2(username: string, password: string, accept: boolean) {
+    const response = await $fetch('/api/setup/2', {
       method: 'post',
       body: { username, password, accept },
     });
@@ -15,8 +15,8 @@ export const useSetupStore = defineStore('Setup', () => {
   /**
    * @throws if unsuccessful
    */
-  async function step5(host: string, port: number) {
-    const response = await $fetch('/api/setup/5', {
+  async function step4(host: string, port: number) {
+    const response = await $fetch('/api/setup/4', {
       method: 'post',
       body: { host, port },
     });
@@ -35,14 +35,14 @@ export const useSetupStore = defineStore('Setup', () => {
   }
 
   const step = ref(1);
-  const totalSteps = ref(6);
+  const totalSteps = ref(5);
   function setStep(i: number) {
     step.value = i;
   }
 
   return {
-    step3,
-    step5,
+    step2,
+    step4,
     runMigration,
     step,
     totalSteps,

@@ -1,14 +1,9 @@
 <template>
   <div>
-    <p class="p-8 text-center text-lg">
-      {{ $t('setup.messageSetupLanguage') }}
+    <p class="px-8 pt-8 text-center text-2xl">
+      {{ $t('setup.messageWelcome.whatIs') }}
     </p>
-    <div class="mb-8 flex justify-center">
-      <UiChooseLang />
-    </div>
-    <div>
-      <NuxtLink to="/setup/2"><BaseButton>Continue</BaseButton></NuxtLink>
-    </div>
+    <NuxtLink to="/setup/2"><BaseButton>Continue</BaseButton></NuxtLink>
   </div>
 </template>
 
@@ -16,7 +11,6 @@
 definePageMeta({
   layout: 'setup',
 });
-
 const setupStore = useSetupStore();
 setupStore.setStep(1);
 </script>

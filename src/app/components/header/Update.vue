@@ -23,4 +23,6 @@
 
 <script lang="ts" setup>
 const globalStore = useGlobalStore();
+
+// TODO: only show this to admins
 </script>
