@@ -55,6 +55,11 @@ export default defineSetupEventHandler(async ({ event }) => {
 
   for (const clientId in oldConfig.clients) {
     const clientConfig = oldConfig.clients[clientId];
+
+    if (!clientConfig) {
+      continue;
+    }
+
     const clients = await Database.clients.getAll();
 
     const ipv6Address = nextIP(6, ipv6Cidr, clients);
