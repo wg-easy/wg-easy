@@ -1,7 +1,14 @@
 import { defineStore } from 'pinia';
 import { sha256 } from 'js-sha256';
+import type { TypedInternalResponse } from 'nitropack/types';
 
-export type LocalClient = WGClient & {
+type WGClientReturn = TypedInternalResponse<
+  '/api/client',
+  unknown,
+  'get'
+>[number];
+
+export type LocalClient = WGClientReturn & {
   avatar?: string;
   transferMax?: number;
 } & Omit<ClientPersist, 'transferRxPrevious' | 'transferTxPrevious'>;
@@ -24,8 +31,13 @@ export const useClientsStore = defineStore('Clients', () => {
   const clients = ref<null | LocalClient[]>(null);
   const clientsPersist = ref<Record<string, ClientPersist>>({});
 
+  const { data: _clients, refresh: _refresh } = useFetch('/api/client', {
+    method: 'get',
+  });
+
+  // TODO: rewrite
   async function refresh({ updateCharts = false } = {}) {
-    const { data: _clients } = await api.getClients();
+    await _refresh();
     let transformedClients = _clients.value?.map((client) => {
       let avatar = undefined;
       if (client.name.includes('@') && client.name.includes('.')) {
@@ -118,5 +130,5 @@ export const useClientsStore = defineStore('Clients', () => {
 
     clients.value = transformedClients ?? null;
   }
-  return { clients, clientsPersist, refresh };
+  return { clients, clientsPersist, refresh, _clients };
 });

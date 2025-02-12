@@ -69,10 +69,6 @@
     "light": "Light theme",
     "system": "System theme"
   },
-  "restore": "Restore",
-  "backup": "Backup",
-  "titleRestoreConfig": "Restore your configuration",
-  "titleBackupConfig": "Backup your configuration",
   "rememberMe": "Remember me",
   "titleRememberMe": "Stay logged after closing the browser",
   "sort": "Sort",

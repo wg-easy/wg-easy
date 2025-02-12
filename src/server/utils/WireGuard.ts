@@ -135,25 +135,6 @@ class WireGuard {
     });
   }
 
-  // TODO: reimplement database restore
-  async restoreConfiguration(_config: string) {
-    /* DEBUG('Starting configuration restore process.');
-    // TODO: sanitize config
-    const _config = JSON.parse(config);
-    await this.__saveConfig(_config);
-    await this.__reloadConfig();
-    DEBUG('Configuration restore process completed.'); */
-  }
-
-  // TODO: reimplement database restore
-  async backupConfiguration() {
-    /* DEBUG('Starting configuration backup.');
-    const config = await this.getConfig();
-    const backup = JSON.stringify(config, null, 2);
-    DEBUG('Configuration backup completed.');
-    return backup; */
-  }
-
   async Startup() {
     WG_DEBUG('Starting WireGuard...');
     // let as it has to refetch if keys change
@@ -252,5 +233,7 @@ Please follow the instructions on https://wg-easy.github.io/wg-easy/ to migrate
 `
   );
 }
+
+// TODO: make static or object
 
 export default new WireGuard();
