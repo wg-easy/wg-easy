@@ -9,6 +9,6 @@ export default defineSetupEventHandler(async ({ event }) => {
   // TODO: validate setup step
 
   await Database.users.create(username, password);
-  await Database.general.setSetupStep(5);
+  await Database.general.setSetupStep(4);
   return { success: true };
 });

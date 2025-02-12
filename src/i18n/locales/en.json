@@ -145,6 +145,7 @@
     "persistentKeepalive": "Persistent Keepalive",
     "address": "IP Address",
     "dns": "DNS",
-    "allowedIps": "Allowed IPs"
+    "allowedIps": "Allowed IPs",
+    "file": "File"
   }
 }

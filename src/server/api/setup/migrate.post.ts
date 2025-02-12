@@ -1,21 +1,25 @@
-/*import { parseCidr } from 'cidr-tools';
+import { parseCidr } from 'cidr-tools';
 import { stringifyIp } from 'ip-bigint';
-import { z } from 'zod';*/
+import { z } from 'zod';
 
-export default defineSetupEventHandler(async (/*{ event }*/) => {
-  // TODO: Implement
-  /*
+export default defineSetupEventHandler(async ({ event }) => {
+  const { file } = await readValidatedBody(
+    event,
+    validateZod(FileSchema, event)
+  );
 
-  const { file } = await readValidatedBody(event, validateZod(fileType, event));
   const schema = z.object({
     server: z.object({
       privateKey: z.string(),
       publicKey: z.string(),
+      // only used for cidr
       address: z.string(),
     }),
     clients: z.record(
       z.string(),
       z.object({
+        // not used
+        id: z.string(),
         name: z.string(),
         address: z.string(),
         privateKey: z.string(),
@@ -31,49 +35,37 @@ export default defineSetupEventHandler(async (/*{ event }*/) => {
   if (!res.success) {
     throw new Error('Invalid Config');
   }
-  const system = await Database.system.get();
+
   const oldConfig = res.data;
-  const oldCidr = parseCidr(oldConfig.server.address + '/24');
-  const db = {
-    system: {
-      ...system,
-      // TODO: migrate to db calls
-      interface: {
-        ...system.interface,
-        address4: oldConfig.server.address,
-        privateKey: oldConfig.server.privateKey,
-        publicKey: oldConfig.server.publicKey,
-      },
-      userConfig: {
-        ...system.userConfig,
-        defaultDns: [...system.userConfig.defaultDns],
-        allowedIps: [...system.userConfig.allowedIps],
-        address4Range:
-          stringifyIp({ number: oldCidr.start, version: 4 }) + '/24',
-      },
-    } satisfies Partial<Database['system']>,
-    clients: {} as Database['clients'],
-  };
 
-  for (const oldClient of Object.values(oldConfig.clients)) {
-    const address6 = nextIPv6(db.system, db.clients);
+  await Database.interfaces.updateKeyPair(
+    oldConfig.server.privateKey,
+    oldConfig.server.publicKey
+  );
 
-    await Database.client.create({
-      address4: oldClient.address,
-      enabled: oldClient.enabled,
-      name: oldClient.name,
-      preSharedKey: oldClient.preSharedKey,
-      privateKey: oldClient.privateKey,
-      publicKey: oldClient.publicKey,
-      expiresAt: null,
-      oneTimeLink: null,
-      allowedIps: [...db.system.userConfig.allowedIps],
-      serverAllowedIPs: [],
-      persistentKeepalive: 0,
-      address6: address6,
-      mtu: 1420,
+  const ipv4Cidr = parseCidr(oldConfig.server.address + '/24');
+  const ipv6Cidr = parseCidr('fdcc:ad94:bacf:61a4::cafe:0/112');
+
+  await Database.interfaces.updateCidr({
+    ipv4Cidr:
+      stringifyIp({ number: ipv4Cidr.start, version: 4 }) +
+      `/${ipv4Cidr.prefix}`,
+    ipv6Cidr: ipv6Cidr.cidr,
+  });
+
+  for (const clientId in oldConfig.clients) {
+    const clientConfig = oldConfig.clients[clientId];
+    const clients = await Database.clients.getAll();
+
+    const ipv6Address = nextIP(6, ipv6Cidr, clients);
+
+    await Database.clients.createFromExisting({
+      ...clientConfig,
+      ipv4Address: clientConfig.address,
+      ipv6Address,
     });
-  }*/
+  }
 
+  await Database.general.setSetupStep(0);
   return { success: true };
 });
