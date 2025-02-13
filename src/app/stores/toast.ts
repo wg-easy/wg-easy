@@ -2,7 +2,7 @@ export const useToast = defineStore('Toast', () => {
   const { t: $t } = useI18n();
 
   type ToastInterface = {
-    publish: (e: { title: string; message: string }) => void;
+    publish: (e: ToastParams) => void;
   };
 
   type ToastRef = Ref<null | ToastInterface>;
@@ -38,7 +38,11 @@ export const useToast = defineStore('Toast', () => {
         title = $t('toast.error');
       }
     }
-    toast.value?.value?.publish({ title: title ?? '', message: message ?? '' });
+    toast.value?.value?.publish({
+      type,
+      title: title ?? '',
+      message: message ?? '',
+    });
   }
 
   return { setToast, showToast };
