@@ -1,4 +1,6 @@
 export const useToast = defineStore('Toast', () => {
+  const { t: $t } = useI18n();
+
   type ToastInterface = {
     publish: (e: { title: string; message: string }) => void;
   };
@@ -11,15 +13,32 @@ export const useToast = defineStore('Toast', () => {
     toast.value = toastInstance;
   }
 
-  function showToast({
-    title,
-    message,
-  }: {
-    type: 'success' | 'error';
-    title: string;
-    message: string;
-  }) {
-    toast.value?.value?.publish({ title, message });
+  type ShowToast =
+    | {
+        type: 'success';
+        title?: string;
+        message?: string;
+      }
+    | {
+        type: 'error';
+        title?: string;
+        message: string;
+      };
+
+  function showToast({ type, title, message }: ShowToast) {
+    if (type === 'success') {
+      if (!title) {
+        title = $t('toast.success');
+      }
+      if (!message) {
+        message = $t('toast.saved');
+      }
+    } else if (type === 'error') {
+      if (!title) {
+        title = $t('toast.error');
+      }
+    }
+    toast.value?.value?.publish({ title: title ?? '', message: message ?? '' });
   }
 
   return { setToast, showToast };

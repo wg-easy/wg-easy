@@ -1,15 +1,14 @@
 <template>
   <DropdownMenuRoot v-model:open="toggleState">
     <DropdownMenuTrigger>
-      <button
+      <span
         class="flex items-center rounded-full pe-1 text-sm font-medium text-gray-400 hover:text-red-800 focus:ring-4 focus:ring-gray-100 md:me-0 dark:text-neutral-400 dark:hover:text-red-800 dark:focus:ring-gray-700"
-        type="button"
       >
         <BaseAvatar class="h-8 w-8">
           {{ fallbackName }}
         </BaseAvatar>
         {{ authStore.userData?.name }}
-      </button>
+      </span>
     </DropdownMenuTrigger>
 
     <DropdownMenuPortal>
@@ -26,7 +25,7 @@
             to="/"
             class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
           >
-            Clients
+            {{ $t('pages.clients') }}
           </NuxtLink>
         </DropdownMenuItem>
         <DropdownMenuItem>
@@ -34,7 +33,7 @@
             to="/me"
             class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
           >
-            Account
+            {{ $t('pages.me') }}
           </NuxtLink>
         </DropdownMenuItem>
         <DropdownMenuItem
@@ -47,7 +46,7 @@
             to="/admin"
             class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
           >
-            Admin Panel
+            {{ $t('pages.admin.panel') }}
           </NuxtLink>
         </DropdownMenuItem>
         <DropdownMenuItem>

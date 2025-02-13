@@ -78,6 +78,7 @@
 </template>
 
 <script setup lang="ts">
+// TODO: improve
 import { FetchError } from 'ofetch';
 
 const { t } = useI18n();

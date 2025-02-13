@@ -18,6 +18,8 @@
 </template>
 
 <script lang="ts" setup>
+// TODO: style
+
 const data = defineModel<string[]>();
 defineProps<{ emptyText?: string[]; name: string }>();
 

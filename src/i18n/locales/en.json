@@ -1,7 +1,14 @@
 {
   "pages": {
     "me": "Account",
-    "clients": "Clients"
+    "clients": "Clients",
+    "admin": {
+      "panel": "Admin Panel",
+      "general": "General",
+      "config": "Config",
+      "interface": "Interface",
+      "hooks": "Hooks"
+    }
   },
   "me": {
     "sectionGeneral": "General",
@@ -80,12 +87,58 @@
     "clear": "Clear",
     "login": "Log in error"
   },
+  "toast": {
+    "success": "Success",
+    "saved": "Saved",
+    "error": "Error",
+    "errored": "Failed to save"
+  },
   "form": {
     "actions": "Actions",
     "save": "Save",
     "revert": "Revert"
   },
   "password": "Password",
+  "admin": {
+    "general": {
+      "sessionTimeout": "Session Timeout",
+      "sessionTimeoutDesc": "Session duration for Remember Me (seconds)",
+      "metrics": "Metrics",
+      "metricsPassword": "Password",
+      "metricsPasswordDesc": "Bearer Password for the metrics endpoint (argon2 hash)",
+      "json": "JSON",
+      "jsonDesc": "Route for metrics in JSON format",
+      "prometheus": "Prometheus",
+      "prometheusDesc": "Route for Prometheus metrics"
+    },
+    "config": {
+      "connection": "Connection",
+      "host": "Host",
+      "hostDesc": "Public hostname clients will connect to (invalidates config)",
+      "portDesc": "Public UDP port clients will connect to (invalidates config)",
+      "allowedIps": "Allowed IPs",
+      "allowedIpsDesc": "Allowed IPs clients will use (invalidates config)",
+      "dns": "DNS",
+      "dnsDesc": "DNS server clients will use (invalidates config)",
+      "advanced": "Advanced",
+      "mtuDesc": "MTU clients will use (invalidates config)",
+      "persistentKeepalive": "Persistent Keepalive",
+      "persistentKeepaliveDesc": "Interval in seconds to send keepalives to the server. 0 = disabled (invalidates config)"
+    },
+    "interface": {
+      "cidrSuccess": "Changed CIDR",
+      "cidrError": "Failed to change CIDR",
+      "device": "Device",
+      "deviceDesc": "Ethernet device the wireguard traffic should be forwarded through",
+      "mtuDesc": "MTU WireGuard will use",
+      "portDesc": "UDP Port WireGuard will listen on (could invalidate config)",
+      "changeCidr": "Change CIDR"
+    },
+    "generic": {
+      "mtu": "MTU",
+      "port": "Port"
+    }
+  },
   "zod": {
     "generic": {
       "required": "{0} is required",

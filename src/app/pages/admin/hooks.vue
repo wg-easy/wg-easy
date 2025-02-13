@@ -8,9 +8,9 @@
         <FormTextField id="PostDown" v-model="data.postDown" label="PostDown" />
       </FormGroup>
       <FormGroup>
-        <FormHeading>Actions</FormHeading>
-        <FormActionField type="submit" label="Save" />
-        <FormActionField label="Revert" @click="revert" />
+        <FormHeading>{{ $t('form.actions') }}</FormHeading>
+        <FormActionField type="submit" :label="$t('form.save')" />
+        <FormActionField :label="$t('form.revert')" @click="revert" />
       </FormGroup>
     </FormElement>
   </main>

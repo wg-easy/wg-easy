@@ -1,5 +1,5 @@
 <template>
-  <BaseDialog>
+  <BaseDialog :trigger-class="triggerClass">
     <template #trigger><slot /></template>
     <template #title>Change CIDR</template>
     <template #description>
