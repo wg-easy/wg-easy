@@ -5,7 +5,7 @@
         <FormNumberField
           id="mtu"
           v-model="data.mtu"
-          :label="$t('admin.generic.mtu')"
+          :label="$t('general.mtu')"
           :description="$t('admin.interface.mtuDesc')"
         />
         <FormNumberField
@@ -50,31 +50,34 @@ const { data: _data, refresh } = await useFetch(`/api/admin/interface`, {
 
 const data = toRef(_data.value);
 
-const submit = useSubmit(
+const _submit = useSubmit(
   `/api/admin/interface`,
   {
     method: 'post',
-    body: data.value,
   },
   revert
 );
+
+function submit() {
+  return _submit(data.value);
+}
 
 async function revert() {
   await refresh();
   data.value = toRef(_data.value).value;
 }
 
+const _changeCidr = useSubmit(
+  `/api/admin/interface/cidr`,
+  {
+    method: 'post',
+  },
+  revert,
+  t('admin.interface.cidrSuccess'),
+  t('admin.interface.cidrError')
+);
+
 async function changeCidr(ipv4Cidr: string, ipv6Cidr: string) {
-  const _changeCidr = useSubmit(
-    `/api/admin/interface/cidr`,
-    {
-      method: 'post',
-      body: { ipv4Cidr, ipv6Cidr },
-    },
-    revert,
-    t('admin.interface.cidrSuccess'),
-    t('admin.interface.cidrError')
-  );
-  await _changeCidr();
+  await _changeCidr({ ipv4Cidr, ipv6Cidr });
 }
 </script>

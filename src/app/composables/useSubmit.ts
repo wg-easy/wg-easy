@@ -5,14 +5,17 @@ type RevertFn = () => Promise<void>;
 
 export function useSubmit<
   R extends NitroFetchRequest,
-  O extends NitroFetchOptions<R>,
+  O extends NitroFetchOptions<R> & { body?: never },
 >(url: R, options: O, revert: RevertFn, success?: string, error?: string) {
   const toast = useToast();
   const { t: $t } = useI18n();
 
-  return async () => {
+  return async (data: unknown) => {
     try {
-      const res = await $fetch(url, options);
+      const res = await $fetch(url, {
+        ...options,
+        body: data,
+      });
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if (!(res as any).success) {
         throw new Error(error || $t('toast.errored'));

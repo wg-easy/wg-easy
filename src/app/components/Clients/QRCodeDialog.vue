@@ -8,7 +8,7 @@
     </template>
     <template #actions>
       <DialogClose>
-        <BaseButton>{{ $t('cancel') }}</BaseButton>
+        <BaseButton>{{ $t('dialog.cancel') }}</BaseButton>
       </DialogClose>
     </template>
   </BaseDialog>

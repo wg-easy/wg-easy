@@ -4,20 +4,24 @@
       <slot />
     </template>
     <template #title>
-      {{ $t('newClient') }}
+      {{ $t('client.new') }}
     </template>
     <template #description>
       <div class="flex flex-col">
-        <FormTextField id="name" v-model="name" label="Name" />
-        <FormDateField id="expiresAt" v-model="expiresAt" label="Expire Date" />
+        <FormTextField id="name" v-model="name" :label="$t('client.name')" />
+        <FormDateField
+          id="expiresAt"
+          v-model="expiresAt"
+          :label="$t('client.expireDate')"
+        />
       </div>
     </template>
     <template #actions>
       <DialogClose as-child>
-        <BaseButton>{{ $t('cancel') }}</BaseButton>
+        <BaseButton>{{ $t('dialog.cancel') }}</BaseButton>
       </DialogClose>
       <DialogClose as-child>
-        <BaseButton @click="createClient">{{ $t('create') }}</BaseButton>
+        <BaseButton @click="createClient">{{ $t('client.create') }}</BaseButton>
       </DialogClose>
     </template>
   </BaseDialog>

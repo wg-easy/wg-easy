@@ -10,15 +10,22 @@
       "hooks": "Hooks"
     }
   },
-  "me": {
-    "sectionGeneral": "General",
-    "sectionPassword": "Password"
+  "user": {
+    "email": "E-Mail"
   },
-  "email": "E-Mail",
-  "save": "Save",
-  "updatePassword": "Update Password",
-  "currentPassword": "Current Password",
-  "confirmPassword": "Confirm Password",
+  "me": {
+    "currentPassword": "Current Password",
+    "confirmPassword": "Confirm Password"
+  },
+  "general": {
+    "name": "Name",
+    "password": "Password",
+    "newPassword": "New Password",
+    "updatePassword": "Update Password",
+    "mtu": "MTU",
+    "allowedIps": "Allowed IPs",
+    "persistentKeepalive": "Persistent Keepalive"
+  },
   "setup": {
     "welcome": "Welcome to your first setup of wg-easy !",
     "messageWelcome": {
@@ -33,7 +40,6 @@
     "messageSetupValidation": "Welcome to wg-easy ! The easiest way to run WireGuard VPN and Web-based Admin UI.",
     "emptyFields": "The fields are required",
     "chooseLang": "Select a language...",
-    "newPassword": "New Password",
     "accept": "I accept the condition",
     "submitBtn": "Create admin account",
     "usernamePlaceholder": "Administrator",
@@ -52,11 +58,6 @@
   "updateAvailable": "There is an update available!",
   "update": "Update",
   "new": "New",
-  "deleteClient": "Delete Client",
-  "deleteDialog1": "Are you sure you want to delete",
-  "deleteDialog2": "This action cannot be undone.",
-  "cancel": "Cancel",
-  "create": "Create",
   "createdOn": "Created on ",
   "lastSeen": "Last seen on ",
   "totalDownload": "Total Download: ",
@@ -79,13 +80,29 @@
   "rememberMe": "Remember me",
   "titleRememberMe": "Stay logged after closing the browser",
   "sort": "Sort",
-  "ExpireDate": "Expire Date",
   "Permanent": "Permanent",
   "OneTimeLink": "Generate short one time link",
   "errorInit": "Initialization failed.",
   "error": {
     "clear": "Clear",
     "login": "Log in error"
+  },
+  "client": {
+    "create": "Create Client",
+    "new": "New Client",
+    "name": "Name",
+    "expireDate": "Expire Date",
+    "deleteClient": "Delete Client",
+    "deleteDialog1": "Are you sure you want to delete",
+    "deleteDialog2": "This action cannot be undone.",
+    "enabled": "Enabled",
+    "address": "Address",
+    "serverAllowedIps": "Server Allowed IPs"
+  },
+  "dialog": {
+    "change": "Change",
+    "cancel": "Cancel",
+    "create": "Create"
   },
   "toast": {
     "success": "Success",
@@ -96,7 +113,9 @@
   "form": {
     "actions": "Actions",
     "save": "Save",
-    "revert": "Revert"
+    "revert": "Revert",
+    "sectionGeneral": "General",
+    "sectionAdvanced": "Advanced"
   },
   "password": "Password",
   "admin": {
@@ -116,13 +135,10 @@
       "host": "Host",
       "hostDesc": "Public hostname clients will connect to (invalidates config)",
       "portDesc": "Public UDP port clients will connect to (invalidates config)",
-      "allowedIps": "Allowed IPs",
       "allowedIpsDesc": "Allowed IPs clients will use (invalidates config)",
       "dns": "DNS",
       "dnsDesc": "DNS server clients will use (invalidates config)",
-      "advanced": "Advanced",
       "mtuDesc": "MTU clients will use (invalidates config)",
-      "persistentKeepalive": "Persistent Keepalive",
       "persistentKeepaliveDesc": "Interval in seconds to send keepalives to the server. 0 = disabled (invalidates config)"
     },
     "interface": {
@@ -135,7 +151,6 @@
       "changeCidr": "Change CIDR"
     },
     "generic": {
-      "mtu": "MTU",
       "port": "Port"
     }
   },

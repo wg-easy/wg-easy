@@ -17,38 +17,22 @@
 </template>
 
 <script setup lang="ts">
-const toast = useToast();
-
 const { data: _data, refresh } = await useFetch(`/api/admin/hooks`, {
   method: 'get',
 });
 
 const data = toRef(_data.value);
 
+const _submit = useSubmit(
+  `/api/admin/hooks`,
+  {
+    method: 'post',
+  },
+  revert
+);
+
 async function submit() {
-  try {
-    const res = await $fetch(`/api/admin/hooks`, {
-      method: 'post',
-      body: data.value,
-    });
-    toast.showToast({
-      type: 'success',
-      title: 'Success',
-      message: 'Saved',
-    });
-    if (!res.success) {
-      throw new Error('Failed to save');
-    }
-    await refreshNuxtData();
-  } catch (e) {
-    if (e instanceof Error) {
-      toast.showToast({
-        type: 'error',
-        title: 'Error',
-        message: e.message,
-      });
-    }
-  }
+  return _submit(data.value);
 }
 
 async function revert() {

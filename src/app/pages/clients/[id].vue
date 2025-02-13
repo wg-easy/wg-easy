@@ -8,22 +8,26 @@
         <FormElement @submit.prevent="submit">
           <FormGroup>
             <FormHeading>
-              {{ $t('me.sectionGeneral') }}
+              {{ $t('form.sectionGeneral') }}
             </FormHeading>
-            <FormTextField id="name" v-model="data.name" label="Name" />
+            <FormTextField
+              id="name"
+              v-model="data.name"
+              :label="$t('general.name')"
+            />
             <FormSwitchField
               id="enabled"
               v-model="data.enabled"
-              label="Enabled"
+              :label="$t('client.enabled')"
             />
             <FormDateField
               id="expiresAt"
               v-model="data.expiresAt"
-              label="Expire Date"
+              :label="$t('client.expireDate')"
             />
           </FormGroup>
           <FormGroup>
-            <FormHeading>Address</FormHeading>
+            <FormHeading>{{ $t('client.address') }}</FormHeading>
             <FormTextField
               id="ipv4Address"
               v-model="data.ipv4Address"
@@ -36,11 +40,11 @@
             />
           </FormGroup>
           <FormGroup>
-            <FormHeading>Allowed IPs</FormHeading>
+            <FormHeading>{{ $t('general.allowedIps') }}</FormHeading>
             <FormArrayField v-model="data.allowedIps" name="allowedIps" />
           </FormGroup>
           <FormGroup>
-            <FormHeading>Server Allowed IPs</FormHeading>
+            <FormHeading>{{ $t('client.serverAllowedIps') }}</FormHeading>
             <FormArrayField
               v-model="data.serverAllowedIps"
               name="serverAllowedIps"
@@ -48,20 +52,25 @@
           </FormGroup>
           <FormGroup></FormGroup>
           <FormGroup>
-            <FormHeading>Advanced</FormHeading>
-            <FormNumberField id="mtu" v-model="data.mtu" label="MTU" />
+            <FormHeading>{{ $t('form.sectionAdvanced') }}</FormHeading>
+            <FormNumberField
+              id="mtu"
+              v-model="data.mtu"
+              :label="$t('general.mtu')"
+            />
             <FormNumberField
               id="persistentKeepalive"
               v-model="data.persistentKeepalive"
-              label="Persistent Keepalive"
+              :label="$t('general.persistentKeepalive')"
             />
           </FormGroup>
           <FormGroup>
-            <FormHeading>Actions</FormHeading>
-            <FormActionField type="submit" label="Save" />
-            <FormActionField label="Revert" @click="revert" />
+            <FormHeading>{{ $t('form.actions') }}</FormHeading>
+            <FormActionField type="submit" :label="$t('form.save')" />
+            <FormActionField :label="$t('form.revert')" @click="revert" />
             <ClientsDeleteDialog
               trigger-class="col-span-2"
+              :client-name="data.name"
               @delete="deleteClient"
             >
               <FormActionField label="Delete" class="w-full" />
@@ -76,9 +85,10 @@
 <script lang="ts" setup>
 const authStore = useAuthStore();
 authStore.update();
+
 const router = useRouter();
+
 const route = useRoute();
-const toast = useToast();
 const id = route.params.id as string;
 
 const { data: _data, refresh } = await useFetch(`/api/client/${id}`, {
@@ -86,30 +96,18 @@ const { data: _data, refresh } = await useFetch(`/api/client/${id}`, {
 });
 const data = toRef(_data.value);
 
-async function submit() {
-  try {
-    const res = await $fetch(`/api/client/${id}`, {
-      method: 'post',
-      body: data.value,
-    });
-    toast.showToast({
-      type: 'success',
-      title: 'Success',
-      message: 'Saved',
-    });
-    if (!res.success) {
-      throw new Error('Failed to save');
-    }
+const _submit = useSubmit(
+  `/api/client/${id}`,
+  {
+    method: 'post',
+  },
+  async () => {
     router.push('/');
-  } catch (e) {
-    if (e instanceof Error) {
-      toast.showToast({
-        type: 'error',
-        title: 'Error',
-        message: e.message,
-      });
-    }
   }
+);
+
+function submit() {
+  return _submit(data.value);
 }
 
 async function revert() {
@@ -117,28 +115,17 @@ async function revert() {
   data.value = toRef(_data.value).value;
 }
 
-async function deleteClient() {
-  try {
-    const res = await $fetch(`/api/client/${id}`, {
-      method: 'delete',
-    });
-    toast.showToast({
-      type: 'success',
-      title: 'Success',
-      message: 'Deleted',
-    });
-    if (!res.success) {
-      throw new Error('Failed to delete');
-    }
+const _deleteClient = useSubmit(
+  `/api/client/${id}`,
+  {
+    method: 'delete',
+  },
+  async () => {
     router.push('/');
-  } catch (e) {
-    if (e instanceof Error) {
-      toast.showToast({
-        type: 'error',
-        title: 'Error',
-        message: e.message,
-      });
-    }
   }
+);
+
+function deleteClient() {
+  return _deleteClient(undefined);
 }
 </script>

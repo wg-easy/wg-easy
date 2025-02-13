@@ -7,38 +7,45 @@
       <PanelBody class="dark:text-neutral-200">
         <FormElement @submit.prevent="submit">
           <FormGroup>
-            <FormHeading>{{ $t('me.sectionGeneral') }}</FormHeading>
-            <FormTextField id="name" v-model="name" :label="$t('name')" />
+            <FormHeading>{{ $t('form.sectionGeneral') }}</FormHeading>
+            <FormTextField
+              id="name"
+              v-model="name"
+              :label="$t('general.name')"
+            />
             <FormNullTextField
               id="email"
               v-model="email"
-              :label="$t('email')"
+              :label="$t('user.email')"
             />
-            <FormActionField type="submit" :label="$t('save')" />
+            <FormActionField type="submit" :label="$t('form.save')" />
           </FormGroup>
         </FormElement>
         <FormElement @submit.prevent="updatePassword">
           <FormGroup>
-            <FormHeading>{{ $t('me.sectionPassword') }}</FormHeading>
+            <FormHeading>{{ $t('general.password') }}</FormHeading>
             <FormPasswordField
               id="current-password"
               v-model="currentPassword"
               autocomplete="current-password"
-              :label="$t('currentPassword')"
+              :label="$t('me.currentPassword')"
             />
             <FormPasswordField
               id="new-password"
               v-model="newPassword"
               autocomplete="new-password"
-              :label="$t('setup.newPassword')"
+              :label="$t('general.newPassword')"
             />
             <FormPasswordField
               id="confirm-password"
               v-model="confirmPassword"
               autocomplete="new-password"
-              :label="$t('confirmPassword')"
+              :label="$t('me.confirmPassword')"
             />
-            <FormActionField type="submit" :label="$t('updatePassword')" />
+            <FormActionField
+              type="submit"
+              :label="$t('general.updatePassword')"
+            />
           </FormGroup>
         </FormElement>
       </PanelBody>
@@ -47,75 +54,47 @@
 </template>
 
 <script setup lang="ts">
-import { FetchError } from 'ofetch';
 const authStore = useAuthStore();
 authStore.update();
-const toast = useToast();
 
 const name = ref(authStore.userData?.name);
 const email = ref(authStore.userData?.email);
 
-async function submit() {
-  try {
-    const res = await $fetch(`/api/me`, {
-      method: 'post',
-      body: {
-        name: name.value,
-        email: email.value,
-      },
-    });
-    toast.showToast({
-      type: 'success',
-      title: 'Success',
-      message: 'Saved',
-    });
-    if (!res.success) {
-      throw new Error('Failed to update general');
-    }
-    await refreshNuxtData();
-  } catch (e) {
-    if (e instanceof FetchError) {
-      toast.showToast({
-        type: 'error',
-        title: 'Error',
-        message: e.data.message,
-      });
-    }
+const _submit = useSubmit(
+  `/api/me`,
+  {
+    method: 'post',
+  },
+  async () => {
+    authStore.update();
   }
+);
+
+function submit() {
+  return _submit({ name: name.value, email: email.value });
 }
 
-// TODO: handle update password
 const currentPassword = ref('');
 const newPassword = ref('');
 const confirmPassword = ref('');
 
-async function updatePassword() {
-  try {
-    const res = await $fetch(`/api/me/password`, {
-      method: 'post',
-      body: {
-        currentPassword: currentPassword.value,
-        newPassword: newPassword.value,
-        confirmPassword: confirmPassword.value,
-      },
-    });
-    toast.showToast({
-      type: 'success',
-      title: 'Success',
-      message: 'Saved',
-    });
-    if (!res.success) {
-      throw new Error('Failed to update password');
-    }
-    await refreshNuxtData();
-  } catch (e) {
-    if (e instanceof FetchError) {
-      toast.showToast({
-        type: 'error',
-        title: 'Error',
-        message: e.data.message,
-      });
-    }
+const _updatePassword = useSubmit(
+  `/api/me/password`,
+  {
+    method: 'post',
+  },
+  async () => {
+    currentPassword.value = '';
+    newPassword.value = '';
+    confirmPassword.value = '';
   }
+);
+
+function updatePassword() {
+  return _updatePassword({
+    currentPassword: currentPassword.value,
+    newPassword: newPassword.value,
+    confirmPassword: confirmPassword.value,
+  });
 }
 </script>

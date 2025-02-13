@@ -1,7 +1,7 @@
 <template>
   <BaseDialog :trigger-class="triggerClass">
     <template #trigger><slot /></template>
-    <template #title>Change CIDR</template>
+    <template #title>{{ $t('admin.interface.changeCidr') }}</template>
     <template #description>
       <FormGroup>
         <FormTextField id="ipv4Cidr" v-model="ipv4Cidr" label="IPv4" />
@@ -10,11 +10,11 @@
     </template>
     <template #actions>
       <DialogClose as-child>
-        <BaseButton>{{ $t('cancel') }}</BaseButton>
+        <BaseButton>{{ $t('dialog.cancel') }}</BaseButton>
       </DialogClose>
       <DialogClose as-child>
         <BaseButton @click="$emit('change', ipv4Cidr, ipv6Cidr)">
-          Change
+          {{ $t('dialog.change') }}
         </BaseButton>
       </DialogClose>
     </template>

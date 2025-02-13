@@ -18,7 +18,7 @@
       </FormGroup>
       <FormGroup>
         <FormHeading :description="$t('admin.config.allowedIpsDesc')">{{
-          $t('admin.config.allowedIps')
+          $t('general.allowedIps')
         }}</FormHeading>
         <FormArrayField
           v-model="data.defaultAllowedIps"
@@ -32,17 +32,17 @@
         <FormArrayField v-model="data.defaultDns" name="defaultDns" />
       </FormGroup>
       <FormGroup>
-        <FormHeading>{{ $t('admin.config.advanced') }}</FormHeading>
+        <FormHeading>{{ $t('form.sectionAdvanced') }}</FormHeading>
         <FormNumberField
           id="defaultMtu"
           v-model="data.defaultMtu"
-          :label="$t('admin.generic.mtu')"
+          :label="$t('general.mtu')"
           :description="$t('admin.config.mtuDesc')"
         />
         <FormNumberField
           id="defaultPersistentKeepalive"
           v-model="data.defaultPersistentKeepalive"
-          :label="$t('admin.config.persistentKeepalive')"
+          :label="$t('general.persistentKeepalive')"
           :description="$t('admin.config.persistentKeepaliveDesc')"
         />
       </FormGroup>
@@ -62,14 +62,17 @@ const { data: _data, refresh } = await useFetch(`/api/admin/userconfig`, {
 
 const data = toRef(_data.value);
 
-const submit = useSubmit(
+const _submit = useSubmit(
   `/api/admin/userconfig`,
   {
     method: 'post',
-    body: data.value,
   },
   revert
 );
+
+function submit() {
+  return _submit(data.value);
+}
 
 async function revert() {
   await refresh();

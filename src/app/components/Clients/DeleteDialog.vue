@@ -1,19 +1,19 @@
 <template>
-  <BaseDialog>
+  <BaseDialog :trigger-class="triggerClass">
     <template #trigger><slot /></template>
-    <template #title>{{ $t('deleteClient') }}</template>
+    <template #title>{{ $t('client.deleteClient') }}</template>
     <template #description>
-      {{ $t('deleteDialog1') }}
-      <strong>{{ 'test' }}</strong
-      >? {{ $t('deleteDialog2') }}
+      {{ $t('client.deleteDialog1') }}
+      <strong>{{ clientName }}</strong
+      >? {{ $t('client.deleteDialog2') }}
     </template>
     <template #actions>
       <DialogClose as-child>
-        <BaseButton>{{ $t('cancel') }}</BaseButton>
+        <BaseButton>{{ $t('dialog.cancel') }}</BaseButton>
       </DialogClose>
       <DialogClose as-child>
         <BaseButton @click="$emit('delete')">{{
-          $t('deleteClient')
+          $t('client.deleteClient')
         }}</BaseButton>
       </DialogClose>
     </template>
@@ -22,5 +22,5 @@
 
 <script lang="ts" setup>
 defineEmits(['delete']);
-defineProps<{ triggerClass?: string }>();
+defineProps<{ triggerClass?: string; clientName: string }>();
 </script>

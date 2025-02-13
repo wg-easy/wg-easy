@@ -45,14 +45,17 @@ const { data: _data, refresh } = await useFetch(`/api/admin/general`, {
 });
 const data = toRef(_data.value);
 
-const submit = useSubmit(
+const _submit = useSubmit(
   `/api/admin/general`,
   {
     method: 'post',
-    body: data.value,
   },
   revert
 );
+
+function submit() {
+  return _submit(data.value);
+}
 
 async function revert() {
   await refresh();
