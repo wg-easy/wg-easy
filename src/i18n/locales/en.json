@@ -19,6 +19,7 @@
   },
   "general": {
     "name": "Name",
+    "username": "Username",
     "password": "Password",
     "newPassword": "New Password",
     "updatePassword": "Update Password",
@@ -51,9 +52,6 @@
     "portPlaceholder": "443",
     "migration": "Restore the backup"
   },
-  "name": "Name",
-  "username": "Username",
-  "signIn": "Sign In",
   "logout": "Logout",
   "updateAvailable": "There is an update available!",
   "update": "Update",
@@ -77,12 +75,15 @@
     "light": "Light theme",
     "system": "System theme"
   },
-  "rememberMe": "Remember me",
-  "titleRememberMe": "Stay logged after closing the browser",
   "sort": "Sort",
   "Permanent": "Permanent",
   "OneTimeLink": "Generate short one time link",
   "errorInit": "Initialization failed.",
+  "login": {
+    "signIn": "Sign In",
+    "rememberMe": "Remember me",
+    "rememberMeDesc": "Stay logged after closing the browser"
+  },
   "error": {
     "clear": "Clear",
     "login": "Log in error"
@@ -117,7 +118,6 @@
     "sectionGeneral": "General",
     "sectionAdvanced": "Advanced"
   },
-  "password": "Password",
   "admin": {
     "general": {
       "sessionTimeout": "Session Timeout",

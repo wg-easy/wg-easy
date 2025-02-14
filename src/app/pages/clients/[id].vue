@@ -73,7 +73,13 @@
               :client-name="data.name"
               @delete="deleteClient"
             >
-              <FormActionField label="Delete" class="w-full" />
+              <FormActionField
+                label="Delete"
+                class="w-full"
+                type="button"
+                tabindex="-1"
+                as="span"
+              />
             </ClientsDeleteDialog>
           </FormGroup>
         </FormElement>
