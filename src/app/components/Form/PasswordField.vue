@@ -1,7 +1,7 @@
 <template>
-  <Label :for="id" class="font-semibold md:align-middle md:leading-10">
+  <FormLabel :for="id">
     {{ label }}
-  </Label>
+  </FormLabel>
   <BaseInput
     :id="id"
     v-model.trim="data"

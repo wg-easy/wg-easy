@@ -47,7 +47,7 @@ const _submit = useSubmit(
   {
     revert: async (success) => {
       if (success) {
-        await navigateTo('/setup/5');
+        await navigateTo('/setup/success');
       }
     },
   }

@@ -17,22 +17,37 @@ const enabled = ref(props.client.enabled);
 
 const clientsStore = useClientsStore();
 
+const _disableClient = useSubmit(
+  `/api/client/${props.client.id}/disable`,
+  {
+    method: 'post',
+  },
+  {
+    revert: async () => {
+      await clientsStore.refresh();
+    },
+    noSuccessToast: true,
+  }
+);
+
+const _enableClient = useSubmit(
+  `/api/client/${props.client.id}/enable`,
+  {
+    method: 'post',
+  },
+  {
+    revert: async () => {
+      await clientsStore.refresh();
+    },
+    noSuccessToast: true,
+  }
+);
+
 async function toggleClient() {
-  // Improve
-  try {
-    if (props.client.enabled) {
-      await $fetch(`/api/client/${props.client.id}/disable`, {
-        method: 'post',
-      });
-    } else {
-      await $fetch(`/api/client/${props.client.id}/enable`, {
-        method: 'post',
-      });
-    }
-  } catch (err) {
-    alert(err);
-  } finally {
-    clientsStore.refresh().catch(console.error);
+  if (props.client.enabled) {
+    await _disableClient(undefined);
+  } else {
+    await _enableClient(undefined);
   }
 }
 </script>

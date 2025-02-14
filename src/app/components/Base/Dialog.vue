@@ -3,7 +3,7 @@
     <DialogTrigger :class="triggerClass"><slot name="trigger" /></DialogTrigger>
     <DialogPortal>
       <DialogOverlay
-        class="data-[state=open]:animate-overlayShow fixed inset-0 z-30 bg-gray-500 opacity-75 dark:bg-black dark:opacity-50"
+        class="fixed inset-0 z-30 bg-gray-500 opacity-75 dark:bg-black dark:opacity-50"
       />
       <DialogContent
         class="fixed left-1/2 top-1/2 z-[100] max-h-[85vh] w-[90vw] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-md p-6 shadow-2xl focus:outline-none dark:bg-neutral-700"
@@ -27,6 +27,5 @@
 </template>
 
 <script lang="ts" setup>
-// TODO: improve
 defineProps<{ triggerClass?: string }>();
 </script>

@@ -1,8 +1,8 @@
 <template>
   <div class="flex items-center">
-    <Label :for="id" class="font-semibold md:align-middle md:leading-10">
+    <FormLabel :for="id">
       {{ label }}
-    </Label>
+    </FormLabel>
     <BaseTooltip v-if="description" :text="description">
       <IconsInfo class="size-4" />
     </BaseTooltip>

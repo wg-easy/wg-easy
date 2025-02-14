@@ -208,15 +208,15 @@ class WireGuard {
         await Database.clients.toggle(client.id, false);
       }
     }
-
     // One Time Link Feature
     for (const client of clients) {
       if (
         client.oneTimeLink !== null &&
         new Date() > new Date(client.oneTimeLink.expiresAt)
       ) {
+        console.log(client);
         WG_DEBUG(`Client ${client.id} One Time Link expired.`);
-        await Database.oneTimeLinks.delete(client.id);
+        await Database.oneTimeLinks.delete(client.oneTimeLink.id);
       }
     }
 
