@@ -1,7 +1,9 @@
 <template>
   <BaseSwitch
     v-model="enabled"
-    :title="client.enabled ? $t('disableClient') : $t('enableClient')"
+    :title="
+      client.enabled ? $t('client.disableClient') : $t('client.enableClient')
+    "
     @click="toggleClient"
   />
 </template>
@@ -16,6 +18,7 @@ const enabled = ref(props.client.enabled);
 const clientsStore = useClientsStore();
 
 async function toggleClient() {
+  // Improve
   try {
     if (props.client.enabled) {
       await $fetch(`/api/client/${props.client.id}/disable`, {

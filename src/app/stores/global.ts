@@ -1,6 +1,8 @@
-import { defineStore } from 'pinia';
-
 export const useGlobalStore = defineStore('Global', () => {
+  const { data: release } = useFetch('/api/release', {
+    method: 'get',
+  });
+
   const sortClient = ref(true); // Sort clients by name, true = asc, false = desc
 
   const currentRelease = ref<null | string>(null);
@@ -10,10 +12,6 @@ export const useGlobalStore = defineStore('Global', () => {
   const updateAvailable = ref(false);
 
   async function fetchRelease() {
-    const { data: release } = await useFetch('/api/release', {
-      method: 'get',
-    });
-
     if (!release.value) {
       return;
     }

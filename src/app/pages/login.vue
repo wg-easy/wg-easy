@@ -3,7 +3,7 @@
     <UiBanner />
     <form
       class="mx-auto mt-10 flex w-64 flex-col gap-5 overflow-hidden rounded-md bg-white p-5 text-gray-700 shadow dark:bg-neutral-700 dark:text-neutral-200"
-      @submit.prevent="login"
+      @submit.prevent="submit"
     >
       <!-- Avatar -->
       <div
@@ -54,40 +54,38 @@
 </template>
 
 <script setup lang="ts">
-import { FetchError } from 'ofetch';
-
-const { t } = useI18n();
-
 const authenticating = ref(false);
 const remember = ref(false);
 const username = ref<null | string>(null);
 const password = ref<null | string>(null);
-const authStore = useAuthStore();
-const toast = useToast();
 
-async function login() {
+const _submit = useSubmit(
+  '/api/session',
+  {
+    method: 'post',
+  },
+  {
+    revert: async (success) => {
+      authenticating.value = false;
+      password.value = null;
+
+      if (success) {
+        await navigateTo('/');
+      }
+    },
+    noSuccessToast: true,
+  }
+);
+
+async function submit() {
   if (!username.value || !password.value || authenticating.value) return;
 
   authenticating.value = true;
-  try {
-    const res = await authStore.login(
-      username.value,
-      password.value,
-      remember.value
-    );
-    if (res) {
-      await navigateTo('/');
-    }
-  } catch (error) {
-    if (error instanceof FetchError) {
-      toast.showToast({
-        type: 'error',
-        title: t('error.login'),
-        message: error.data.message,
-      });
-    }
-  }
-  authenticating.value = false;
-  password.value = null;
+
+  return _submit({
+    username: username.value,
+    password: password.value,
+    remember: remember.value,
+  });
 }
 </script>

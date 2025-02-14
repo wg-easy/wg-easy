@@ -92,8 +92,6 @@
 const authStore = useAuthStore();
 authStore.update();
 
-const router = useRouter();
-
 const route = useRoute();
 const id = route.params.id as string;
 
@@ -107,8 +105,10 @@ const _submit = useSubmit(
   {
     method: 'post',
   },
-  async () => {
-    router.push('/');
+  {
+    revert: async () => {
+      await navigateTo('/');
+    },
   }
 );
 
@@ -126,8 +126,10 @@ const _deleteClient = useSubmit(
   {
     method: 'delete',
   },
-  async () => {
-    router.push('/');
+  {
+    revert: async () => {
+      await navigateTo('/');
+    },
   }
 );
 

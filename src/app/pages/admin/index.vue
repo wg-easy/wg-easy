@@ -50,7 +50,7 @@ const _submit = useSubmit(
   {
     method: 'post',
   },
-  revert
+  { revert }
 );
 
 function submit() {

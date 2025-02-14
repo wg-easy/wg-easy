@@ -26,7 +26,7 @@
         class="hover:underline"
         href="https://github.com/sponsors/WeeJeWel"
         target="_blank"
-        >{{ $t('donate') }}</a
+        >{{ $t('layout.donate') }}</a
       >
     </p>
   </footer>

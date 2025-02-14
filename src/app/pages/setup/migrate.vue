@@ -1,68 +1,56 @@
 <template>
   <div>
     <p class="p-8 text-center text-lg">
-      {{ $t('setup.messageSetupMigration') }}
+      {{ $t('setup.setupMigrationDesc') }}
     </p>
     <div>
       <Label for="migration">{{ $t('setup.migration') }}</Label>
       <input id="migration" type="file" @change="onChangeFile" />
     </div>
-    <BaseButton @click="sendFile">Upload</BaseButton>
+    <BaseButton @click="submit">{{ $t('setup.upload') }}</BaseButton>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { FetchError } from 'ofetch';
-
 definePageMeta({
   layout: 'setup',
 });
 
-const { t } = useI18n();
-
 const setupStore = useSetupStore();
 setupStore.setStep(5);
+
 const backupFile = ref<null | File>(null);
 
 function onChangeFile(evt: Event) {
   const target = evt.target as HTMLInputElement;
   const file = target.files?.[0];
 
-  console.log('file', file);
-
   if (file) {
     backupFile.value = file;
-    console.log('backupFile.value', backupFile.value);
+    console.log('selected file', backupFile.value);
   }
 }
 
-const router = useRouter();
-const toast = useToast();
+const _submit = useSubmit(
+  '/api/setup/migrate',
+  {
+    method: 'post',
+  },
+  {
+    revert: async (success) => {
+      if (success) {
+        await navigateTo('/setup/success');
+      }
+    },
+  }
+);
 
-async function sendFile() {
+async function submit() {
   if (!backupFile.value) {
-    toast.showToast({
-      type: 'error',
-      title: t('setup.requirements'),
-      message: t('setup.emptyFields'),
-    });
     return;
   }
-
-  try {
-    const content = await readFileContent(backupFile.value);
-
-    await setupStore.runMigration(content);
-    await router.push('/setup/success');
-  } catch (error) {
-    if (error instanceof FetchError) {
-      toast.showToast({
-        type: 'error',
-        title: t('setup.requirements'),
-        message: error.data.message,
-      });
-    }
-  }
+  const content = await readFileContent(backupFile.value);
+  return _submit({ file: content });
 }
 
 async function readFileContent(file: File): Promise<string> {

@@ -52,10 +52,10 @@
         <DropdownMenuItem>
           <button
             class="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600 dark:hover:text-white"
-            @click.prevent="logout"
+            @click.prevent="submit"
           >
             <IconsLogout class="h-5" />
-            {{ $t('logout') }}
+            {{ $t('general.logout') }}
           </button>
         </DropdownMenuItem>
       </DropdownMenuContent>
@@ -67,16 +67,21 @@
 const authStore = useAuthStore();
 const toggleState = ref(false);
 
-async function logout() {
-  try {
-    await authStore.logout();
-    navigateTo('/login');
-  } catch (err) {
-    if (err instanceof Error) {
-      // TODO: better ui
-      alert(err.message || err.toString());
-    }
+const _submit = useSubmit(
+  '/api/session',
+  {
+    method: 'delete',
+  },
+  {
+    revert: async () => {
+      await navigateTo('/login');
+    },
+    noSuccessToast: true,
   }
+);
+
+function submit() {
+  return _submit(undefined);
 }
 
 const fallbackName = computed(() => {

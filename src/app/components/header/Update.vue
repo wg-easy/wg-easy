@@ -6,7 +6,7 @@
   >
     <div class="container mx-auto flex flex-auto flex-row items-center">
       <div class="flex-grow">
-        <p class="font-bold">{{ $t('updateAvailable') }}</p>
+        <p class="font-bold">{{ $t('update.updateAvailable') }}</p>
         <p>{{ globalStore.latestRelease.changelog }}</p>
       </div>
 
@@ -15,7 +15,7 @@
         target="_blank"
         class="font-sm float-right flex-shrink-0 rounded-md border-2 border-red-800 bg-white p-3 font-semibold text-red-800 transition-all hover:border-white hover:bg-red-800 hover:text-white dark:border-red-600 dark:bg-red-100 dark:text-red-600 dark:hover:border-red-600 dark:hover:bg-red-600 dark:hover:text-red-100"
       >
-        {{ $t('update') }} →
+        {{ $t('update.update') }} →
       </a>
     </div>
   </div>

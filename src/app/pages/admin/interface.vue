@@ -11,7 +11,7 @@
         <FormNumberField
           id="port"
           v-model="data.port"
-          :label="$t('admin.generic.port')"
+          :label="$t('general.port')"
           :description="$t('admin.interface.portDesc')"
         />
         <FormTextField
@@ -55,7 +55,7 @@ const _submit = useSubmit(
   {
     method: 'post',
   },
-  revert
+  { revert }
 );
 
 function submit() {
@@ -72,9 +72,11 @@ const _changeCidr = useSubmit(
   {
     method: 'post',
   },
-  revert,
-  t('admin.interface.cidrSuccess'),
-  t('admin.interface.cidrError')
+  {
+    revert,
+    successMsg: t('admin.interface.cidrSuccess'),
+    errorMsg: t('admin.interface.cidrError'),
+  }
 );
 
 async function changeCidr(ipv4Cidr: string, ipv6Cidr: string) {

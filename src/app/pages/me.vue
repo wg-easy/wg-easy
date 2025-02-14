@@ -65,8 +65,10 @@ const _submit = useSubmit(
   {
     method: 'post',
   },
-  async () => {
-    authStore.update();
+  {
+    revert: () => {
+      return authStore.update();
+    },
   }
 );
 
@@ -83,10 +85,12 @@ const _updatePassword = useSubmit(
   {
     method: 'post',
   },
-  async () => {
-    currentPassword.value = '';
-    newPassword.value = '';
-    confirmPassword.value = '';
+  {
+    revert: async () => {
+      currentPassword.value = '';
+      newPassword.value = '';
+      confirmPassword.value = '';
+    },
   }
 );
 

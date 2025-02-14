@@ -29,17 +29,10 @@ export const UserLoginSchema = z.object(
   { message: objectMessage }
 );
 
-const accept = z
-  .boolean({ message: t('zod.user.accept') })
-  .refine((val) => val === true, {
-    message: t('zod.user.acceptTrue'),
-  });
-
 export const UserSetupSchema = z.object(
   {
     username: username,
     password: password,
-    accept: accept,
   },
   { message: objectMessage }
 );

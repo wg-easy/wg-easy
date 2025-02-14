@@ -28,7 +28,7 @@ const _submit = useSubmit(
   {
     method: 'post',
   },
-  revert
+  { revert }
 );
 
 async function submit() {

@@ -1,23 +1,3 @@
-<script setup lang="ts">
-import {
-  ToastAction,
-  ToastClose,
-  ToastDescription,
-  ToastRoot,
-  ToastTitle,
-} from 'radix-vue';
-
-defineExpose({
-  publish,
-});
-
-const count = reactive<ToastParams[]>([]);
-
-function publish(e: ToastParams) {
-  count.push({ type: e.type, title: e.title, message: e.message });
-}
-</script>
-
 <template>
   <ToastRoot
     v-for="(e, i) in count"
@@ -44,3 +24,23 @@ function publish(e: ToastParams) {
     </ToastClose>
   </ToastRoot>
 </template>
+
+<script setup lang="ts">
+import {
+  ToastAction,
+  ToastClose,
+  ToastDescription,
+  ToastRoot,
+  ToastTitle,
+} from 'radix-vue';
+
+defineExpose({
+  publish,
+});
+
+const count = reactive<ToastParams[]>([]);
+
+function publish(e: ToastParams) {
+  count.push({ type: e.type, title: e.title, message: e.message });
+}
+</script>

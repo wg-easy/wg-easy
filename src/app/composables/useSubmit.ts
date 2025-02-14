@@ -1,12 +1,19 @@
 import type { NitroFetchRequest, NitroFetchOptions } from 'nitropack/types';
 import { FetchError } from 'ofetch';
 
-type RevertFn = () => Promise<void>;
+type RevertFn = (success: boolean) => Promise<void>;
+
+type SubmitOpts = {
+  revert: RevertFn;
+  successMsg?: string;
+  errorMsg?: string;
+  noSuccessToast?: boolean;
+};
 
 export function useSubmit<
   R extends NitroFetchRequest,
   O extends NitroFetchOptions<R> & { body?: never },
->(url: R, options: O, revert: RevertFn, success?: string, error?: string) {
+>(url: R, options: O, opts: SubmitOpts) {
   const toast = useToast();
   const { t: $t } = useI18n();
 
@@ -16,15 +23,20 @@ export function useSubmit<
         ...options,
         body: data,
       });
+
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if (!(res as any).success) {
-        throw new Error(error || $t('toast.errored'));
+        throw new Error(opts.errorMsg || $t('toast.errored'));
       }
-      toast.showToast({
-        type: 'success',
-        message: success,
-      });
-      await revert();
+
+      if (!opts.noSuccessToast) {
+        toast.showToast({
+          type: 'success',
+          message: opts.successMsg,
+        });
+      }
+
+      await opts.revert(true);
     } catch (e) {
       if (e instanceof FetchError) {
         toast.showToast({
@@ -39,7 +51,7 @@ export function useSubmit<
       } else {
         console.error(e);
       }
-      await revert();
+      await opts.revert(false);
     }
   };
 }

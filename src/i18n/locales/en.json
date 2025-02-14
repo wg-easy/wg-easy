@@ -25,60 +25,39 @@
     "updatePassword": "Update Password",
     "mtu": "MTU",
     "allowedIps": "Allowed IPs",
-    "persistentKeepalive": "Persistent Keepalive"
+    "persistentKeepalive": "Persistent Keepalive",
+    "logout": "Logout",
+    "continue": "Continue",
+    "host": "Host",
+    "port": "Port",
+    "yes": "Yes",
+    "no": "No"
   },
   "setup": {
     "welcome": "Welcome to your first setup of wg-easy !",
-    "messageWelcome": {
-      "whatIs": "You have found the easiest way to install and manage WireGuard on any Linux host!",
-      "warning": "First of all, make sure you have a backup of your data if you want to migrate your users to your new wg-easy.",
-      "next": "Click on the arrow button to proceed to the next step."
-    },
-    "messageSetupLanguage": "Please choose a language for the setup.",
-    "messageSetupCreateAdminUser": "Please first enter an admin username and a strong secure password. This information will be used to log in to your administration panel.",
-    "messageSetupHostPort": "Please enter the host and port information. This will be used for the client configuration when setting up WireGuard on their devices.",
-    "messageSetupMigration": "Please provide the backup file if you want to migrate your data from your previous wg-easy version to your new setup.",
-    "messageSetupValidation": "Welcome to wg-easy ! The easiest way to run WireGuard VPN and Web-based Admin UI.",
-    "emptyFields": "The fields are required",
-    "chooseLang": "Select a language...",
-    "accept": "I accept the condition",
-    "submitBtn": "Create admin account",
-    "usernamePlaceholder": "Administrator",
-    "passwordPlaceholder": "Strong password",
-    "requirements": "Setup requirements",
-    "host": "Host",
-    "hostPlaceholder": "wg-easy.example.com",
-    "port": "Port",
-    "portPlaceholder": "443",
-    "migration": "Restore the backup"
+    "welcomeDesc": "You have found the easiest way to install and manage WireGuard on any Linux host!",
+    "existingSetup": "Do you have an existing setup?",
+    "createAdminDesc": "Please first enter an admin username and a strong secure password. This information will be used to log in to your administration panel.",
+    "setupConfigDesc": "Please enter the host and port information. This will be used for the client configuration when setting up WireGuard on their devices.",
+    "setupMigrationDesc": "Please provide the backup file if you want to migrate your data from your previous wg-easy version to your new setup.",
+    "upload": "Upload",
+    "migration": "Restore the backup",
+    "createAccount": "Create Account",
+    "successful": "Setup successful"
   },
-  "logout": "Logout",
-  "updateAvailable": "There is an update available!",
-  "update": "Update",
-  "new": "New",
-  "createdOn": "Created on ",
-  "lastSeen": "Last seen on ",
-  "totalDownload": "Total Download: ",
-  "totalUpload": "Total Upload: ",
-  "newClient": "New Client",
-  "disableClient": "Disable Client",
-  "enableClient": "Enable Client",
-  "noClients": "There are no clients yet.",
-  "noPrivKey": "This client has no known private key. Cannot create Configuration.",
-  "showQR": "Show QR Code",
-  "downloadConfig": "Download Configuration",
-  "madeBy": "Made by",
-  "donate": "Donate",
-  "toggleCharts": "Show/hide Charts",
+  "update": {
+    "updateAvailable": "There is an update available!",
+    "update": "Update"
+  },
   "theme": {
     "dark": "Dark theme",
     "light": "Light theme",
     "system": "System theme"
   },
-  "sort": "Sort",
-  "Permanent": "Permanent",
-  "OneTimeLink": "Generate short one time link",
-  "errorInit": "Initialization failed.",
+  "layout": {
+    "toggleCharts": "Show/hide Charts",
+    "donate": "Donate"
+  },
   "login": {
     "signIn": "Sign In",
     "rememberMe": "Remember me",
@@ -89,7 +68,11 @@
     "login": "Log in error"
   },
   "client": {
+    "empty": "There are no clients yet.",
+    "newShort": "New",
+    "sort": "Sort",
     "create": "Create Client",
+    "created": "Client created",
     "new": "New Client",
     "name": "Name",
     "expireDate": "Expire Date",
@@ -98,7 +81,19 @@
     "deleteDialog2": "This action cannot be undone.",
     "enabled": "Enabled",
     "address": "Address",
-    "serverAllowedIps": "Server Allowed IPs"
+    "serverAllowedIps": "Server Allowed IPs",
+    "otlDesc": "Generate short one time link",
+    "permanent": "Permanent",
+    "createdOn": "Created on ",
+    "lastSeen": "Last seen on ",
+    "totalDownload": "Total Download: ",
+    "totalUpload": "Total Upload: ",
+    "newClient": "New Client",
+    "disableClient": "Disable Client",
+    "enableClient": "Enable Client",
+    "noPrivKey": "This client has no known private key. Cannot create Configuration.",
+    "showQR": "Show QR Code",
+    "downloadConfig": "Download Configuration"
   },
   "dialog": {
     "change": "Change",
@@ -132,7 +127,6 @@
     },
     "config": {
       "connection": "Connection",
-      "host": "Host",
       "hostDesc": "Public hostname clients will connect to (invalidates config)",
       "portDesc": "Public UDP port clients will connect to (invalidates config)",
       "allowedIpsDesc": "Allowed IPs clients will use (invalidates config)",
@@ -149,9 +143,6 @@
       "mtuDesc": "MTU WireGuard will use",
       "portDesc": "UDP Port WireGuard will listen on (could invalidate config)",
       "changeCidr": "Change CIDR"
-    },
-    "generic": {
-      "port": "Port"
     }
   },
   "zod": {
@@ -180,8 +171,6 @@
       "passwordNumber": "Password must have at least 1 number",
       "passwordSpecial": "Password must have at least 1 special character",
       "remember": "Remember",
-      "accept": "Accept",
-      "acceptTrue": "Accept Conditions to continue",
       "name": "Name",
       "email": "Email",
       "emailInvalid": "Email must be a valid email",

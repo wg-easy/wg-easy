@@ -6,13 +6,13 @@
         <FormTextField
           id="host"
           v-model="data.host"
-          :label="$t('admin.config.host')"
+          :label="$t('general.host')"
           :description="$t('admin.config.hostDesc')"
         />
         <FormNumberField
           id="port"
           v-model="data.port"
-          :label="$t('admin.generic.port')"
+          :label="$t('general.port')"
           :description="$t('admin.config.portDesc')"
         />
       </FormGroup>
@@ -67,7 +67,7 @@ const _submit = useSubmit(
   {
     method: 'post',
   },
-  revert
+  { revert }
 );
 
 function submit() {

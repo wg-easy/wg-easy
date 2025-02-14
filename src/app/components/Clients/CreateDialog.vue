@@ -28,36 +28,26 @@
 </template>
 
 <script lang="ts" setup>
-import { FetchError } from 'ofetch';
-
 const name = ref<string>('');
 const expiresAt = ref<string | null>(null);
-const toast = useToast();
 const clientsStore = useClientsStore();
+
+const { t } = useI18n();
 
 defineProps<{ triggerClass?: string }>();
 
-async function createClient() {
-  try {
-    await $fetch('/api/client', {
-      method: 'post',
-      body: { name: name.value, expiresAt: expiresAt.value },
-    });
-    toast.showToast({
-      type: 'success',
-      title: 'Success',
-      message: 'Client created',
-    });
-    await clientsStore.refresh();
-  } catch (e) {
-    if (e instanceof FetchError) {
-      toast.showToast({
-        type: 'error',
-        title: 'Error',
-        message: e.data.message,
-      });
-    }
-    // TODO: handle errors better
-  }
+function createClient() {
+  return _createClient({ name: name.value, expiresAt: expiresAt.value });
 }
+
+const _createClient = useSubmit(
+  '/api/client',
+  {
+    method: 'post',
+  },
+  {
+    revert: () => clientsStore.refresh(),
+    successMsg: t('client.created'),
+  }
+);
 </script>
