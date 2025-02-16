@@ -13,7 +13,7 @@ const timer = ref<NodeJS.Timeout | null>(null);
 const { localeProperties } = useI18n();
 
 onMounted(() => {
-  timer.value = setInterval(() => {
+  timer.value = setIntervalImmediately(() => {
     if (props.client.oneTimeLink === null) {
       return;
     }

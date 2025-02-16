@@ -180,12 +180,11 @@ class WireGuard {
 
   // TODO: handle as worker_thread
   async startCronJob() {
-    await this.cronJob().catch((err) => {
-      WG_DEBUG('Running Cron Job failed.');
-      console.error(err);
-    });
-    setTimeout(() => {
-      this.startCronJob();
+    setIntervalImmediately(() => {
+      this.cronJob().catch((err) => {
+        WG_DEBUG('Running Cron Job failed.');
+        console.error(err);
+      });
     }, 60 * 1000);
   }
 
@@ -214,7 +213,6 @@ class WireGuard {
         client.oneTimeLink !== null &&
         new Date() > new Date(client.oneTimeLink.expiresAt)
       ) {
-        console.log(client);
         WG_DEBUG(`Client ${client.id} One Time Link expired.`);
         await Database.oneTimeLinks.delete(client.oneTimeLink.id);
       }

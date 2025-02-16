@@ -42,6 +42,7 @@ const _submit = useSubmit(
         await navigateTo('/setup/success');
       }
     },
+    noSuccessToast: true,
   }
 );
 
