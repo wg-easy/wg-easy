@@ -79,10 +79,6 @@ module.exports = class WireGuard {
 
         throw err;
       });
-      // await Util.exec(`iptables -t nat -A POSTROUTING -s ${WG_DEFAULT_ADDRESS.replace('x', '0')}/24 -o ' + WG_DEVICE + ' -j MASQUERADE`);
-      // await Util.exec('iptables -A INPUT -p udp -m udp --dport 51820 -j ACCEPT');
-      // await Util.exec('iptables -A FORWARD -i wg0 -j ACCEPT');
-      // await Util.exec('iptables -A FORWARD -o wg0 -j ACCEPT');
       await this.__syncConfig();
     }
 
@@ -120,7 +116,9 @@ PostDown = ${WG_POST_DOWN}
 [Peer]
 PublicKey = ${client.publicKey}
 ${client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
-}AllowedIPs = ${client.address}/32`;
+}AllowedIPs = ${client.address}/32${
+  client.serverPeerAllowedIPs ? "," + client.serverPeerAllowedIPs : ""
+}`;
     }
 
     debug('Config saving...');
@@ -153,6 +151,8 @@ ${client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
         ? new Date(client.expiredAt)
         : null,
       allowedIPs: client.allowedIPs,
+      extraAllowedIPs: client.extraAllowedIPs || '',
+      serverPeerAllowedIPs: client.serverPeerAllowedIPs || '',
       oneTimeLink: client.oneTimeLink ?? null,
       oneTimeLinkExpiresAt: client.oneTimeLinkExpiresAt ?? null,
       downloadableConfig: 'privateKey' in client,
@@ -222,7 +222,9 @@ ${WG_MTU ? `MTU = ${WG_MTU}\n` : ''}\
 [Peer]
 PublicKey = ${config.server.publicKey}
 ${client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
-}AllowedIPs = ${WG_ALLOWED_IPS}
+}AllowedIPs = ${WG_ALLOWED_IPS}${
+  client.extraAllowedIPs ? (',' + client.extraAllowedIPs) : ''
+}
 PersistentKeepalive = ${WG_PERSISTENT_KEEPALIVE}
 Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
   }
@@ -273,6 +275,8 @@ Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
       privateKey,
       publicKey,
       preSharedKey,
+      extraAllowedIPs: '',
+      serverPeerAllowedIPs: '',
 
       createdAt: new Date(),
       updatedAt: new Date(),

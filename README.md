@@ -94,7 +94,7 @@ The Web UI will now be available on `http://0.0.0.0:51821`.
 
 The Prometheus metrics will now be available on `http://0.0.0.0:51821/metrics`. Grafana dashboard [21733](https://grafana.com/grafana/dashboards/21733-wireguard/)
 
-> 💡 Your configuration files will be saved in `~/.wg-easy`
+> 💡 Your configuration files will be saved in `~/.wg-easy`. You can modify `wg0.json` file for per client configuration. `extraAllowedIPs` and `serverPeerAllowedIPs` can be used for multi-network/gateway support
 
 WireGuard Easy can be launched with Docker Compose as well - just download
 [`docker-compose.yml`](docker-compose.yml), make necessary adjustments and
