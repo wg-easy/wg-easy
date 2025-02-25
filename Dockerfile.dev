@@ -6,7 +6,7 @@ RUN npm install --global corepack@latest
 # Install pnpm
 RUN corepack enable pnpm
 
-HEALTHCHECK CMD /usr/bin/timeout 5s /bin/sh -c "/usr/bin/wg show | /bin/grep -q interface || exit 1" --interval=1m --timeout=5s --retries=3
+HEALTHCHECK --interval=1m --timeout=5s --retries=3 CMD /usr/bin/timeout 5s /bin/sh -c "/usr/bin/wg show | /bin/grep -q interface || exit 1"
 
 # Install Linux packages
 RUN apk add --no-cache \

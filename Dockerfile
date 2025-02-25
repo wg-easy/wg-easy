@@ -26,7 +26,7 @@ RUN find ./node_modules/@libsql -mindepth 1 -maxdepth 1 -type l ! -name 'linux*'
 FROM docker.io/library/node:lts-alpine
 WORKDIR /app
 
-HEALTHCHECK CMD /usr/bin/timeout 5s /bin/sh -c "/usr/bin/wg show | /bin/grep -q interface || exit 1" --interval=1m --timeout=5s --retries=3
+HEALTHCHECK --interval=1m --timeout=5s --retries=3 CMD /usr/bin/timeout 5s /bin/sh -c "/usr/bin/wg show | /bin/grep -q interface || exit 1"
 
 # Copy build
 COPY --from=build /app/.output /app
