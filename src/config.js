@@ -25,7 +25,7 @@ module.exports.WG_ALLOWED_IPS = process.env.WG_ALLOWED_IPS || '0.0.0.0/0, ::/0';
 
 module.exports.WG_PRE_UP = process.env.WG_PRE_UP || '';
 module.exports.WG_POST_UP = process.env.WG_POST_UP || `
-iptables -t nat -A POSTROUTING -s ${module.exports.WG_DEFAULT_ADDRESS.replace('x', '0')}/${module.exports.WG_SUBNET.replace} -o ${module.exports.WG_DEVICE} -j MASQUERADE;
+iptables -t nat -A POSTROUTING -s ${module.exports.WG_DEFAULT_ADDRESS.replace('x', '0')}/${module.exports.WG_SUBNET} -o ${module.exports.WG_DEVICE} -j MASQUERADE;
 iptables -A INPUT -p udp -m udp --dport ${module.exports.WG_PORT} -j ACCEPT;
 iptables -A FORWARD -i wg0 -j ACCEPT;
 iptables -A FORWARD -o wg0 -j ACCEPT;
@@ -33,7 +33,7 @@ iptables -A FORWARD -o wg0 -j ACCEPT;
 
 module.exports.WG_PRE_DOWN = process.env.WG_PRE_DOWN || '';
 module.exports.WG_POST_DOWN = process.env.WG_POST_DOWN || `
-iptables -t nat -D POSTROUTING -s ${module.exports.WG_DEFAULT_ADDRESS.replace('x', '0')}/${module.exports.WG_SUBNET.replace} -o ${module.exports.WG_DEVICE} -j MASQUERADE;
+iptables -t nat -D POSTROUTING -s ${module.exports.WG_DEFAULT_ADDRESS.replace('x', '0')}/${module.exports.WG_SUBNET} -o ${module.exports.WG_DEVICE} -j MASQUERADE;
 iptables -D INPUT -p udp -m udp --dport ${module.exports.WG_PORT} -j ACCEPT;
 iptables -D FORWARD -i wg0 -j ACCEPT;
 iptables -D FORWARD -o wg0 -j ACCEPT;
