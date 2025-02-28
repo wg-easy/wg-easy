@@ -473,7 +473,7 @@ new Vue({
       }
 
       const currentRelease = await this.api.getRelease();
-      const latestRelease = await fetch('https://raw.githubusercontent.com/alexn707/awg-easy/production/docs/changelog.json')
+      const latestRelease = await fetch('https://raw.githubusercontent.com/alexn707/awg-easy/refs/heads/master/docs/changelog.json')
         .then((res) => res.json())
         .then((releases) => {
           const releasesArray = Object.entries(releases).map(([version, changelog]) => ({
