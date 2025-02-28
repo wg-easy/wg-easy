@@ -37,11 +37,10 @@ RUN chmod +x /bin/wgpw
 RUN apk add --no-cache \
     dpkg \
     dumb-init \
-    iptables \
-    iptables-legacy
+    iptables
 
 # Use iptables-legacy
-RUN update-alternatives --install /usr/sbin/iptables iptables /usr/sbin/iptables-legacy 10 --slave /usr/sbin/iptables-restore iptables-restore /usr/sbin/iptables-legacy-restore --slave /usr/sbin/iptables-save iptables-save /usr/sbin/iptables-legacy-save
+RUN update-alternatives --install /sbin/iptables iptables /sbin/iptables-legacy 10 --slave /sbin/iptables-restore iptables-restore /sbin/iptables-legacy-restore --slave /sbin/iptables-save iptables-save /sbin/iptables-legacy-save
 
 # Set Environment
 ENV DEBUG=Server,WireGuard
