@@ -34,4 +34,4 @@ jobs:
       with:
         push: true
         platforms: linux/amd64
-        tags: ghcr.io/alexn707/amnezia-wg-easy:development
+        tags: ghcr.io/alexn707/awg-easy:development
