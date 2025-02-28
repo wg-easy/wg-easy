@@ -2,11 +2,11 @@
 <html>
 
 <head>
-  <title>WireGuard</title>
+  <title>AmneziaWG</title>
   <meta charset="utf-8"/>
   <link href="./css/app.css" rel="stylesheet">
   <link rel="manifest" href="./manifest.json">
-  <link rel="icon" type="image/png" href="./img/favicon.png">
+  <link rel="icon" href="img/favicon.ico" sizes="any">
   <link rel="apple-touch-icon" href="./img/apple-touch-icon.png">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -27,7 +27,7 @@
       <div v-if="authenticated === true">
         <div class="flex flex-col-reverse xxs:flex-row flex-auto items-center items-end gap-3">
           <h1 class="text-4xl dark:text-neutral-200 font-medium flex-grow self-start mb-4">
-            <img src="./img/logo.png" width="32" class="inline align-middle dark:bg mr-2" /><span class="align-middle">WireGuard</span>
+            <img src="./img/logo.svg" width="60" class="inline align-middle dark:bg mr-2" /><span class="align-middle">AmneziaWG</span>
           </h1>
           <div class="flex items-center grow-0 gap-3 items-end self-end xxs:self-center">
             <!-- Dark / light theme -->
@@ -82,7 +82,7 @@
               <p>{{latestRelease.changelog}}</p>
             </div>
 
-            <a href="https://github.com/wg-easy/wg-easy#updating" target="_blank"
+            <a href="https://github.com/alexn707/amnezia-wg-easy#updating" target="_blank"
               class="p-3 rounded-md bg-white dark:bg-red-100 float-right font-sm font-semibold text-red-800 dark:text-red-600 flex-shrink-0 border-2 border-red-800 dark:border-red-600 hover:border-white dark:hover:border-red-600 hover:text-white dark:hover:text-red-100 hover:bg-red-800 dark:hover:bg-red-600 transition-all">
               {{$t("update")}} →
             </a>
@@ -615,8 +615,8 @@
 
       <div v-if="authenticated === false">
         <h1 class="text-4xl font-medium my-16 text-gray-700 dark:text-neutral-200 text-center">
-          <img src="./img/logo.png" width="32" class="inline align-middle dark:bg" />
-          <span class="align-middle">WireGuard</span>
+          <img src="./img/logo.svg" width="60" class="inline align-middle dark:bg" />
+          <span class="align-middle">AmneziaWG</span>
         </h1>
 
         <form @submit="login"
