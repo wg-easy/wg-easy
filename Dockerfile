@@ -15,9 +15,9 @@ HEALTHCHECK CMD /usr/bin/timeout 5s /bin/sh -c "/usr/bin/wg show | /bin/grep -q 
 COPY --from=build_node_modules /app /app
 
 # Install Node.js
-RUN apk add --no-cache \
-    nodejs \
-    npm
+#RUN apk add --no-cache \
+#    nodejs \
+#    npm
     
 # Move node_modules one directory up, so during development
 # we don't have to mount it in a volume.
@@ -36,7 +36,8 @@ RUN chmod +x /bin/wgpw
 RUN apk add --no-cache \
     dpkg \
     dumb-init \
-    iptables
+    iptables \
+    nodejs
 
 # Use iptables-legacy
 RUN update-alternatives --install /sbin/iptables iptables /sbin/iptables-legacy 10 --slave /sbin/iptables-restore iptables-restore /sbin/iptables-legacy-restore --slave /sbin/iptables-save iptables-save /sbin/iptables-legacy-save
