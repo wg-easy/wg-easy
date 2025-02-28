@@ -472,6 +472,7 @@ new Vue({
         i18n.locale = lang;
       }
 
+      return;
       const currentRelease = await this.api.getRelease();
       const latestRelease = await fetch('https://wg-easy.github.io/wg-easy/changelog.json')
         .then((res) => res.json())
