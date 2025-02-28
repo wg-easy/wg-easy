@@ -95,6 +95,11 @@ module.exports = class Server {
         return `"${LANG}"`;
       }))
 
+      .get('/api/remember-me', defineEventHandler((event) => {
+        setHeader(event, 'Content-Type', 'application/json');
+        return MAX_AGE > 0;
+      }))
+
       .get('/api/ui-traffic-stats', defineEventHandler((event) => {
         setHeader(event, 'Content-Type', 'application/json');
         return `${UI_TRAFFIC_STATS}`;
