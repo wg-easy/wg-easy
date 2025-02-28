@@ -418,6 +418,7 @@ module.exports = class Server {
             if (id.endsWith('.json')) setHeader(event, 'Content-Type', 'application/json');
             if (id.endsWith('.css')) setHeader(event, 'Content-Type', 'text/css');
             if (id.endsWith('.png')) setHeader(event, 'Content-Type', 'image/png');
+            if (id.endsWith('.svg')) setHeader(event, 'Content-Type', 'image/svg+xml');
 
             return {
               size: stats.size,
