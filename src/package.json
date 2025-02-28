@@ -2,7 +2,7 @@
   "release": {
     "version": "1"
   },
-  "name": "amnezia-wg-easy",
+  "name": "awg-easy",
   "version": "1.0.0",
   "description": "The easiest way to run AmneziaWG VPN + Web-based Admin UI.",
   "main": "server.js",
