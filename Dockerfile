@@ -12,13 +12,8 @@ RUN npm ci --omit=dev &&\
 # This saves a lot of disk space.
 FROM amneziavpn/amnezia-wg:latest
 HEALTHCHECK CMD /usr/bin/timeout 5s /bin/sh -c "/usr/bin/wg show | /bin/grep -q interface || exit 1" --interval=1m --timeout=5s --retries=3
-COPY --from=build_node_modules /app /app
+#COPY --from=build_node_modules /app /app
 
-# Install Node.js
-#RUN apk add --no-cache \
-#    nodejs \
-#    npm
-    
 # Move node_modules one directory up, so during development
 # we don't have to mount it in a volume.
 # This results in much faster reloading!
