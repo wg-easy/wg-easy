@@ -20,13 +20,10 @@ This update is an entire rewrite to make it even easier to set up your own VPN.
 - CIDR Support
 - IPv6 Support
 - Changed API Structure
-- Changed Database Structure
+- SQLite Database
 - Deprecated Dockerless Installations
-- Added Docker Volume Mount
-
-## Minor Changes
-
-- Renamed Chinese Locales (cht -> zh-cht, chs -> zh-chs)
+- Added Docker Volume Mount (`/lib/modules`)
+- Removed ARMv6 and ARMv7 support
 
 ## [14.0.0] - 2024-09-04
 

@@ -2,78 +2,76 @@
   <main v-if="data">
     <FormElement @submit.prevent="submit">
       <FormGroup>
-        <FormHeading>Connection</FormHeading>
-        <FormTextField id="host" v-model="data.host" label="Host" />
-        <FormNumberField id="port" v-model="data.port" label="Port" />
+        <FormHeading>{{ $t('admin.config.connection') }}</FormHeading>
+        <FormTextField
+          id="host"
+          v-model="data.host"
+          :label="$t('general.host')"
+          :description="$t('admin.config.hostDesc')"
+        />
+        <FormNumberField
+          id="port"
+          v-model="data.port"
+          :label="$t('general.port')"
+          :description="$t('admin.config.portDesc')"
+        />
       </FormGroup>
       <FormGroup>
-        <FormHeading>Allowed IPs</FormHeading>
+        <FormHeading :description="$t('admin.config.allowedIpsDesc')">{{
+          $t('general.allowedIps')
+        }}</FormHeading>
         <FormArrayField
           v-model="data.defaultAllowedIps"
           name="defaultAllowedIps"
         />
       </FormGroup>
       <FormGroup>
-        <FormHeading>DNS</FormHeading>
+        <FormHeading :description="$t('admin.config.dnsDesc')">{{
+          $t('admin.config.dns')
+        }}</FormHeading>
         <FormArrayField v-model="data.defaultDns" name="defaultDns" />
       </FormGroup>
       <FormGroup>
-        <FormHeading>Advanced</FormHeading>
+        <FormHeading>{{ $t('form.sectionAdvanced') }}</FormHeading>
         <FormNumberField
           id="defaultMtu"
           v-model="data.defaultMtu"
-          label="MTU"
+          :label="$t('general.mtu')"
+          :description="$t('admin.config.mtuDesc')"
         />
         <FormNumberField
           id="defaultPersistentKeepalive"
           v-model="data.defaultPersistentKeepalive"
-          label="Persistent Keepalive"
+          :label="$t('general.persistentKeepalive')"
+          :description="$t('admin.config.persistentKeepaliveDesc')"
         />
       </FormGroup>
       <FormGroup>
-        <FormHeading>Actions</FormHeading>
-        <FormActionField type="submit" label="Save" />
-        <FormActionField label="Revert" @click="revert" />
+        <FormHeading>{{ $t('form.actions') }}</FormHeading>
+        <FormActionField type="submit" :label="$t('form.save')" />
+        <FormActionField :label="$t('form.revert')" @click="revert" />
       </FormGroup>
     </FormElement>
   </main>
 </template>
 
 <script lang="ts" setup>
-const toast = useToast();
-
 const { data: _data, refresh } = await useFetch(`/api/admin/userconfig`, {
   method: 'get',
 });
 
 const data = toRef(_data.value);
 
-async function submit() {
-  try {
-    const res = await $fetch(`/api/admin/userconfig`, {
-      method: 'post',
-      body: data.value,
-    });
-    toast.showToast({
-      type: 'success',
-      title: 'Success',
-      message: 'Saved',
-    });
-    if (!res.success) {
-      throw new Error('Failed to save');
-    }
-    // TODO: avoid refreshNuxtData
-    await revert();
-  } catch (e) {
-    if (e instanceof Error) {
-      toast.showToast({
-        type: 'error',
-        title: 'Error',
-        message: e.message,
-      });
-    }
-    await revert();
-  }
+const _submit = useSubmit(
+  `/api/admin/userconfig`,
+  {
+    method: 'post',
+  },
+  { revert }
+);
+
+function submit() {
+  return _submit(data.value);
 }
 
 async function revert() {

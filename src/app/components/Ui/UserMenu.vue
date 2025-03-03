@@ -1,15 +1,14 @@
 <template>
   <DropdownMenuRoot v-model:open="toggleState">
     <DropdownMenuTrigger>
-      <button
+      <span
         class="flex items-center rounded-full pe-1 text-sm font-medium text-gray-400 hover:text-red-800 focus:ring-4 focus:ring-gray-100 md:me-0 dark:text-neutral-400 dark:hover:text-red-800 dark:focus:ring-gray-700"
-        type="button"
       >
         <BaseAvatar class="h-8 w-8">
           {{ fallbackName }}
         </BaseAvatar>
         {{ authStore.userData?.name }}
-      </button>
+      </span>
     </DropdownMenuTrigger>
 
     <DropdownMenuPortal>
@@ -26,7 +25,7 @@
             to="/"
             class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
           >
-            Clients
+            {{ $t('pages.clients') }}
           </NuxtLink>
         </DropdownMenuItem>
         <DropdownMenuItem>
@@ -34,7 +33,7 @@
             to="/me"
             class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
           >
-            Account
+            {{ $t('pages.me') }}
           </NuxtLink>
         </DropdownMenuItem>
         <DropdownMenuItem
@@ -47,16 +46,16 @@
             to="/admin"
             class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
           >
-            Admin Panel
+            {{ $t('pages.admin.panel') }}
           </NuxtLink>
         </DropdownMenuItem>
         <DropdownMenuItem>
           <button
             class="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600 dark:hover:text-white"
-            @click.prevent="logout"
+            @click.prevent="submit"
           >
             <IconsLogout class="h-5" />
-            {{ $t('logout') }}
+            {{ $t('general.logout') }}
           </button>
         </DropdownMenuItem>
       </DropdownMenuContent>
@@ -68,16 +67,21 @@
 const authStore = useAuthStore();
 const toggleState = ref(false);
 
-async function logout() {
-  try {
-    await authStore.logout();
-    navigateTo('/login');
-  } catch (err) {
-    if (err instanceof Error) {
-      // TODO: better ui
-      alert(err.message || err.toString());
-    }
+const _submit = useSubmit(
+  '/api/session',
+  {
+    method: 'delete',
+  },
+  {
+    revert: async () => {
+      await navigateTo('/login');
+    },
+    noSuccessToast: true,
   }
+);
+
+function submit() {
+  return _submit(undefined);
 }
 
 const fallbackName = computed(() => {

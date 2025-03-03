@@ -4,56 +4,50 @@
       <slot />
     </template>
     <template #title>
-      {{ $t('newClient') }}
+      {{ $t('client.new') }}
     </template>
     <template #description>
       <div class="flex flex-col">
-        <FormTextField id="name" v-model="name" label="Name" />
-        <FormDateField id="expiresAt" v-model="expiresAt" label="Expire Date" />
+        <FormTextField id="name" v-model="name" :label="$t('client.name')" />
+        <FormDateField
+          id="expiresAt"
+          v-model="expiresAt"
+          :label="$t('client.expireDate')"
+        />
       </div>
     </template>
     <template #actions>
       <DialogClose as-child>
-        <BaseButton>{{ $t('cancel') }}</BaseButton>
+        <BaseButton>{{ $t('dialog.cancel') }}</BaseButton>
       </DialogClose>
       <DialogClose as-child>
-        <BaseButton @click="createClient">{{ $t('create') }}</BaseButton>
+        <BaseButton @click="createClient">{{ $t('client.create') }}</BaseButton>
       </DialogClose>
     </template>
   </BaseDialog>
 </template>
 
 <script lang="ts" setup>
-import { FetchError } from 'ofetch';
-
 const name = ref<string>('');
 const expiresAt = ref<string | null>(null);
-const toast = useToast();
 const clientsStore = useClientsStore();
+
+const { t } = useI18n();
 
 defineProps<{ triggerClass?: string }>();
 
-async function createClient() {
-  try {
-    await $fetch('/api/client', {
-      method: 'post',
-      body: { name: name.value, expiresAt: expiresAt.value },
-    });
-    toast.showToast({
-      type: 'success',
-      title: 'Success',
-      message: 'Client created',
-    });
-    await clientsStore.refresh();
-  } catch (e) {
-    if (e instanceof FetchError) {
-      toast.showToast({
-        type: 'error',
-        title: 'Error',
-        message: e.data.message,
-      });
-    }
-    // TODO: handle errors better
-  }
+function createClient() {
+  return _createClient({ name: name.value, expiresAt: expiresAt.value });
 }
+
+const _createClient = useSubmit(
+  '/api/client',
+  {
+    method: 'post',
+  },
+  {
+    revert: () => clientsStore.refresh(),
+    successMsg: t('client.created'),
+  }
+);
 </script>

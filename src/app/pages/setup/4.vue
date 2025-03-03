@@ -1,71 +1,60 @@
 <template>
   <div>
     <p class="p-8 text-center text-lg">
-      {{ $t('setup.messageSetupHostPort') }}
+      {{ $t('setup.setupConfigDesc') }}
     </p>
-    <div>
-      <Label for="host">{{ $t('setup.host') }}</Label>
-      <input
-        id="host"
-        v-model="host"
-        type="text"
-        class="mb-5 w-full rounded-lg border-2 border-gray-100 px-3 py-2 text-sm text-gray-500 focus:border-red-800 focus:outline-0 focus:ring-0 dark:border-neutral-800 dark:bg-neutral-700 dark:text-gray-200 dark:placeholder:text-neutral-400 dark:focus:border-red-800"
-        placeholder="vpn.example.com"
-      />
+    <div class="flex flex-col gap-3">
+      <div class="flex flex-col">
+        <FormNullTextField
+          id="host"
+          v-model="host"
+          type="text"
+          :label="$t('general.host')"
+          placeholder="vpn.example.com"
+        />
+      </div>
+      <div class="flex flex-col">
+        <FormNumberField
+          id="port"
+          v-model="port"
+          type="number"
+          :label="$t('general.port')"
+        />
+      </div>
+      <div>
+        <BaseButton @click="submit">{{ $t('general.continue') }}</BaseButton>
+      </div>
     </div>
-    <div>
-      <Label for="port">{{ $t('setup.port') }}</Label>
-      <input
-        id="port"
-        v-model="port"
-        type="number"
-        :min="1"
-        :max="65535"
-        class="mb-5 w-full rounded-lg border-2 border-gray-100 px-3 py-2 text-sm text-gray-500 focus:border-red-800 focus:outline-0 focus:ring-0 dark:border-neutral-800 dark:bg-neutral-700 dark:text-gray-200 dark:placeholder:text-neutral-400 dark:focus:border-red-800"
-      />
-    </div>
-    <BaseButton @click="updateHostPort">Continue</BaseButton>
   </div>
 </template>
 
 <script setup lang="ts">
-import { FetchError } from 'ofetch';
-
 definePageMeta({
   layout: 'setup',
 });
 
-const { t } = useI18n();
-
 const setupStore = useSetupStore();
 setupStore.setStep(4);
-const router = useRouter();
+
 const host = ref<null | string>(null);
 const port = ref<number>(51820);
 
-const toast = useToast();
-
-async function updateHostPort() {
-  if (!host.value || !port.value) {
-    toast.showToast({
-      type: 'error',
-      title: t('setup.requirements'),
-      message: t('setup.emptyFields'),
-    });
-    return;
+const _submit = useSubmit(
+  '/api/setup/4',
+  {
+    method: 'post',
+  },
+  {
+    revert: async (success) => {
+      if (success) {
+        await navigateTo('/setup/success');
+      }
+    },
+    noSuccessToast: true,
   }
+);
 
-  try {
-    await setupStore.step4(host.value, port.value);
-    await router.push('/setup/success');
-  } catch (error) {
-    if (error instanceof FetchError) {
-      toast.showToast({
-        type: 'error',
-        title: t('setup.requirements'),
-        message: error.data.message,
-      });
-    }
-  }
+function submit() {
+  return _submit({ host: host.value, port: port.value });
 }
 </script>

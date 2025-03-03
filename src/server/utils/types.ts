@@ -19,8 +19,6 @@ export const safeStringRefine = z
     { message: t('zod.stringMalformed') }
   );
 
-// TODO: create custom getValidatedRouterParams and readValidatedBody wrapper
-
 export const EnabledSchema = z.boolean({ message: t('zod.enabled') });
 
 export const MtuSchema = z

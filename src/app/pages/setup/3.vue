@@ -1,11 +1,15 @@
 <template>
   <div>
     <p class="p-8 text-center text-lg">
-      {{ 'Do you have a existing Setup?' }}
+      {{ $t('setup.existingSetup') }}
     </p>
     <div class="mb-8 flex justify-center">
-      <NuxtLink to="/setup/4"><BaseButton>No</BaseButton></NuxtLink>
-      <NuxtLink to="/setup/migrate"><BaseButton>Yes</BaseButton></NuxtLink>
+      <NuxtLink to="/setup/4">
+        <BaseButton>{{ $t('general.no') }}</BaseButton>
+      </NuxtLink>
+      <NuxtLink to="/setup/migrate">
+        <BaseButton>{{ $t('general.yes') }}</BaseButton>
+      </NuxtLink>
     </div>
   </div>
 </template>
@@ -14,6 +18,7 @@
 definePageMeta({
   layout: 'setup',
 });
+
 const setupStore = useSetupStore();
 setupStore.setStep(3);
 </script>

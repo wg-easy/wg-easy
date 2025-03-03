@@ -1,91 +1,155 @@
 {
   "pages": {
     "me": "Account",
-    "clients": "Clients"
+    "clients": "Clients",
+    "admin": {
+      "panel": "Admin Panel",
+      "general": "General",
+      "config": "Config",
+      "interface": "Interface",
+      "hooks": "Hooks"
+    }
+  },
+  "user": {
+    "email": "E-Mail"
   },
   "me": {
-    "sectionGeneral": "General",
-    "sectionPassword": "Password"
+    "currentPassword": "Current Password",
+    "confirmPassword": "Confirm Password"
   },
-  "email": "E-Mail",
-  "save": "Save",
-  "updatePassword": "Update Password",
-  "currentPassword": "Current Password",
-  "confirmPassword": "Confirm Password",
+  "general": {
+    "name": "Name",
+    "username": "Username",
+    "password": "Password",
+    "newPassword": "New Password",
+    "updatePassword": "Update Password",
+    "mtu": "MTU",
+    "allowedIps": "Allowed IPs",
+    "persistentKeepalive": "Persistent Keepalive",
+    "logout": "Logout",
+    "continue": "Continue",
+    "host": "Host",
+    "port": "Port",
+    "yes": "Yes",
+    "no": "No"
+  },
   "setup": {
     "welcome": "Welcome to your first setup of wg-easy !",
-    "messageWelcome": {
-      "whatIs": "You have found the easiest way to install and manage WireGuard on any Linux host!",
-      "warning": "First of all, make sure you have a backup of your data if you want to migrate your users to your new wg-easy.",
-      "next": "Click on the arrow button to proceed to the next step."
-    },
-    "messageSetupLanguage": "Please choose a language for the setup.",
-    "messageSetupCreateAdminUser": "Please first enter an admin username and a strong secure password. This information will be used to log in to your administration panel.",
-    "messageSetupHostPort": "Please enter the host and port information. This will be used for the client configuration when setting up WireGuard on their devices.",
-    "messageSetupMigration": "Please provide the backup file if you want to migrate your data from your previous wg-easy version to your new setup.",
-    "messageSetupValidation": "Welcome to wg-easy ! The easiest way to run WireGuard VPN and Web-based Admin UI.",
-    "emptyFields": "The fields are required",
-    "chooseLang": "Select a language...",
-    "newPassword": "New Password",
-    "accept": "I accept the condition",
-    "submitBtn": "Create admin account",
-    "usernamePlaceholder": "Administrator",
-    "passwordPlaceholder": "Strong password",
-    "requirements": "Setup requirements",
-    "host": "Host",
-    "hostPlaceholder": "wg-easy.example.com",
-    "port": "Port",
-    "portPlaceholder": "443",
-    "migration": "Restore the backup"
+    "welcomeDesc": "You have found the easiest way to install and manage WireGuard on any Linux host!",
+    "existingSetup": "Do you have an existing setup?",
+    "createAdminDesc": "Please first enter an admin username and a strong secure password. This information will be used to log in to your administration panel.",
+    "setupConfigDesc": "Please enter the host and port information. This will be used for the client configuration when setting up WireGuard on their devices.",
+    "setupMigrationDesc": "Please provide the backup file if you want to migrate your data from your previous wg-easy version to your new setup.",
+    "upload": "Upload",
+    "migration": "Restore the backup",
+    "createAccount": "Create Account",
+    "successful": "Setup successful"
   },
-  "name": "Name",
-  "username": "Username",
-  "signIn": "Sign In",
-  "logout": "Logout",
-  "updateAvailable": "There is an update available!",
-  "update": "Update",
-  "new": "New",
-  "deleteClient": "Delete Client",
-  "deleteDialog1": "Are you sure you want to delete",
-  "deleteDialog2": "This action cannot be undone.",
-  "cancel": "Cancel",
-  "create": "Create",
-  "createdOn": "Created on ",
-  "lastSeen": "Last seen on ",
-  "totalDownload": "Total Download: ",
-  "totalUpload": "Total Upload: ",
-  "newClient": "New Client",
-  "disableClient": "Disable Client",
-  "enableClient": "Enable Client",
-  "noClients": "There are no clients yet.",
-  "noPrivKey": "This client has no known private key. Cannot create Configuration.",
-  "showQR": "Show QR Code",
-  "downloadConfig": "Download Configuration",
-  "madeBy": "Made by",
-  "donate": "Donate",
-  "toggleCharts": "Show/hide Charts",
+  "update": {
+    "updateAvailable": "There is an update available!",
+    "update": "Update"
+  },
   "theme": {
     "dark": "Dark theme",
     "light": "Light theme",
     "system": "System theme"
   },
-  "rememberMe": "Remember me",
-  "titleRememberMe": "Stay logged after closing the browser",
-  "sort": "Sort",
-  "ExpireDate": "Expire Date",
-  "Permanent": "Permanent",
-  "OneTimeLink": "Generate short one time link",
-  "errorInit": "Initialization failed.",
+  "layout": {
+    "toggleCharts": "Show/hide Charts",
+    "donate": "Donate"
+  },
+  "login": {
+    "signIn": "Sign In",
+    "rememberMe": "Remember me",
+    "rememberMeDesc": "Stay logged after closing the browser"
+  },
   "error": {
     "clear": "Clear",
     "login": "Log in error"
   },
+  "client": {
+    "empty": "There are no clients yet.",
+    "newShort": "New",
+    "sort": "Sort",
+    "create": "Create Client",
+    "created": "Client created",
+    "new": "New Client",
+    "name": "Name",
+    "expireDate": "Expire Date",
+    "expireDateDesc": "Date the client will be disabled. Blank for permanent",
+    "deleteClient": "Delete Client",
+    "deleteDialog1": "Are you sure you want to delete",
+    "deleteDialog2": "This action cannot be undone.",
+    "enabled": "Enabled",
+    "address": "Address",
+    "serverAllowedIps": "Server Allowed IPs",
+    "otlDesc": "Generate short one time link",
+    "permanent": "Permanent",
+    "createdOn": "Created on ",
+    "lastSeen": "Last seen on ",
+    "totalDownload": "Total Download: ",
+    "totalUpload": "Total Upload: ",
+    "newClient": "New Client",
+    "disableClient": "Disable Client",
+    "enableClient": "Enable Client",
+    "noPrivKey": "This client has no known private key. Cannot create Configuration.",
+    "showQR": "Show QR Code",
+    "downloadConfig": "Download Configuration",
+    "allowedIpsDesc": "Which IPs will be routed through the VPN",
+    "serverAllowedIpsDesc": "Which IPs the server will route to the client",
+    "mtuDesc": "Sets the maximum transmission unit (packet size) for the VPN tunnel",
+    "persistentKeepaliveDesc": "Sets the interval (in seconds) for keep-alive packets. 0 disables it"
+  },
+  "dialog": {
+    "change": "Change",
+    "cancel": "Cancel",
+    "create": "Create"
+  },
+  "toast": {
+    "success": "Success",
+    "saved": "Saved",
+    "error": "Error",
+    "errored": "Failed to save"
+  },
   "form": {
     "actions": "Actions",
     "save": "Save",
-    "revert": "Revert"
+    "revert": "Revert",
+    "sectionGeneral": "General",
+    "sectionAdvanced": "Advanced"
   },
-  "password": "Password",
+  "admin": {
+    "general": {
+      "sessionTimeout": "Session Timeout",
+      "sessionTimeoutDesc": "Session duration for Remember Me (seconds)",
+      "metrics": "Metrics",
+      "metricsPassword": "Password",
+      "metricsPasswordDesc": "Bearer Password for the metrics endpoint (argon2 hash)",
+      "json": "JSON",
+      "jsonDesc": "Route for metrics in JSON format",
+      "prometheus": "Prometheus",
+      "prometheusDesc": "Route for Prometheus metrics"
+    },
+    "config": {
+      "connection": "Connection",
+      "hostDesc": "Public hostname clients will connect to (invalidates config)",
+      "portDesc": "Public UDP port clients will connect to (invalidates config)",
+      "allowedIpsDesc": "Allowed IPs clients will use (invalidates config)",
+      "dns": "DNS",
+      "dnsDesc": "DNS server clients will use (invalidates config)",
+      "mtuDesc": "MTU clients will use (invalidates config)",
+      "persistentKeepaliveDesc": "Interval in seconds to send keepalives to the server. 0 = disabled (invalidates config)"
+    },
+    "interface": {
+      "cidrSuccess": "Changed CIDR",
+      "cidrError": "Failed to change CIDR",
+      "device": "Device",
+      "deviceDesc": "Ethernet device the wireguard traffic should be forwarded through",
+      "mtuDesc": "MTU WireGuard will use",
+      "portDesc": "UDP Port WireGuard will listen on (could invalidate config)",
+      "changeCidr": "Change CIDR"
+    }
+  },
   "zod": {
     "generic": {
       "required": "{0} is required",
@@ -112,8 +176,6 @@
       "passwordNumber": "Password must have at least 1 number",
       "passwordSpecial": "Password must have at least 1 special character",
       "remember": "Remember",
-      "accept": "Accept",
-      "acceptTrue": "Accept Conditions to continue",
       "name": "Name",
       "email": "Email",
       "emailInvalid": "Email must be a valid email",

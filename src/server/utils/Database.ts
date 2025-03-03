@@ -21,5 +21,4 @@ connect().then((db) => {
   WireGuard.Startup();
 });
 
-// TODO: check if old config exists and tell user about migration path
 export default provider;

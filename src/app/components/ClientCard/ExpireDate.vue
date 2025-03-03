@@ -12,7 +12,7 @@ defineProps<{ client: LocalClient }>();
 const { t, locale } = useI18n();
 
 function expiredDateFormat(value: string | null) {
-  if (value === null) return t('Permanent');
+  if (value === null) return t('client.permanent');
   const dateTime = new Date(value);
   return dateTime.toLocaleDateString(locale.value, {
     year: 'numeric',

@@ -2,22 +2,39 @@
   <main v-if="data">
     <FormElement @submit.prevent="submit">
       <FormGroup>
-        <FormHeading>Interface Settings</FormHeading>
-        <FormNumberField id="mtu" v-model="data.mtu" label="MTU" />
-        <FormNumberField id="port" v-model="data.port" label="Port" />
-        <FormTextField id="device" v-model="data.device" label="Device" />
+        <FormNumberField
+          id="mtu"
+          v-model="data.mtu"
+          :label="$t('general.mtu')"
+          :description="$t('admin.interface.mtuDesc')"
+        />
+        <FormNumberField
+          id="port"
+          v-model="data.port"
+          :label="$t('general.port')"
+          :description="$t('admin.interface.portDesc')"
+        />
+        <FormTextField
+          id="device"
+          v-model="data.device"
+          :label="$t('admin.interface.device')"
+          :description="$t('admin.interface.deviceDesc')"
+        />
       </FormGroup>
       <FormGroup>
-        <FormHeading>Actions</FormHeading>
-        <FormActionField type="submit" label="Save" />
-        <FormActionField label="Revert" @click="revert" />
+        <FormHeading>{{ $t('form.actions') }}</FormHeading>
+        <FormActionField type="submit" :label="$t('form.save')" />
+        <FormActionField :label="$t('form.revert')" @click="revert" />
         <AdminCidrDialog
           trigger-class="col-span-2"
           :ipv4-cidr="data.ipv4Cidr"
           :ipv6-cidr="data.ipv6Cidr"
           @change="changeCidr"
         >
-          <FormActionField label="Change CIDR" class="w-full" />
+          <FormActionField
+            :label="$t('admin.interface.changeCidr')"
+            class="w-full"
+          />
         </AdminCidrDialog>
       </FormGroup>
     </FormElement>
@@ -25,7 +42,7 @@
 </template>
 
 <script setup lang="ts">
-const toast = useToast();
+const { t } = useI18n();
 
 const { data: _data, refresh } = await useFetch(`/api/admin/interface`, {
   method: 'get',
@@ -33,30 +50,16 @@ const { data: _data, refresh } = await useFetch(`/api/admin/interface`, {
 
 const data = toRef(_data.value);
 
-async function submit() {
-  try {
-    const res = await $fetch(`/api/admin/interface`, {
-      method: 'post',
-      body: data.value,
-    });
-    toast.showToast({
-      type: 'success',
-      title: 'Success',
-      message: 'Saved',
-    });
-    if (!res.success) {
-      throw new Error('Failed to save');
-    }
-    await refreshNuxtData();
-  } catch (e) {
-    if (e instanceof Error) {
-      toast.showToast({
-        type: 'error',
-        title: 'Error',
-        message: e.message,
-      });
-    }
-  }
+const _submit = useSubmit(
+  `/api/admin/interface`,
+  {
+    method: 'post',
+  },
+  { revert }
+);
+
+function submit() {
+  return _submit(data.value);
 }
 
 async function revert() {
@@ -64,29 +67,19 @@ async function revert() {
   data.value = toRef(_data.value).value;
 }
 
-async function changeCidr(ipv4Cidr: string, ipv6Cidr: string) {
-  try {
-    const res = await $fetch(`/api/admin/interface/cidr`, {
-      method: 'post',
-      body: { ipv4Cidr, ipv6Cidr },
-    });
-    toast.showToast({
-      type: 'success',
-      title: 'Success',
-      message: 'Changed CIDR',
-    });
-    if (!res.success) {
-      throw new Error('Failed to change CIDR');
-    }
-    await refreshNuxtData();
-  } catch (e) {
-    if (e instanceof Error) {
-      toast.showToast({
-        type: 'error',
-        title: 'Error',
-        message: e.message,
-      });
-    }
+const _changeCidr = useSubmit(
+  `/api/admin/interface/cidr`,
+  {
+    method: 'post',
+  },
+  {
+    revert,
+    successMsg: t('admin.interface.cidrSuccess'),
+    errorMsg: t('admin.interface.cidrError'),
   }
+);
+
+async function changeCidr(ipv4Cidr: string, ipv6Cidr: string) {
+  await _changeCidr({ ipv4Cidr, ipv6Cidr });
 }
 </script>

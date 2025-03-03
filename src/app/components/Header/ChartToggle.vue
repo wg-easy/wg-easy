@@ -2,7 +2,7 @@
   <Toggle
     v-model:pressed="globalStore.uiShowCharts"
     class="group inline-flex h-8 w-8 cursor-pointer items-center justify-center whitespace-nowrap rounded-full bg-gray-200 transition hover:bg-gray-300 dark:bg-neutral-700 dark:hover:bg-neutral-600"
-    :title="$t('toggleCharts')"
+    :title="$t('layout.toggleCharts')"
     @update:pressed="globalStore.toggleCharts"
   >
     <IconsChart

@@ -1,10 +1,10 @@
 <template>
   <p class="m-10 text-center text-sm text-gray-400 dark:text-neutral-400">
-    {{ $t('noClients') }}<br /><br />
+    {{ $t('client.empty') }}<br /><br />
     <ClientsCreateDialog>
-      <BaseButton>
+      <BaseButton as="span">
         <IconsPlus class="w-4 md:mr-2" />
-        <span class="text-sm">{{ $t('new') }}</span>
+        <span class="text-sm">{{ $t('client.new') }}</span>
       </BaseButton>
     </ClientsCreateDialog>
   </p>

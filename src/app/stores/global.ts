@@ -1,27 +1,9 @@
-import { defineStore } from 'pinia';
-
 export const useGlobalStore = defineStore('Global', () => {
+  const { data: release } = useFetch('/api/release', {
+    method: 'get',
+  });
+
   const sortClient = ref(true); // Sort clients by name, true = asc, false = desc
-
-  const currentRelease = ref<null | string>(null);
-  const latestRelease = ref<null | { version: string; changelog: string }>(
-    null
-  );
-  const updateAvailable = ref(false);
-
-  async function fetchRelease() {
-    const { data: release } = await useFetch('/api/release', {
-      method: 'get',
-    });
-
-    if (!release.value) {
-      return;
-    }
-
-    currentRelease.value = release.value.currentRelease;
-    latestRelease.value = release.value.latestRelease;
-    updateAvailable.value = release.value.updateAvailable;
-  }
 
   const uiShowCharts = ref(getItem('uiShowCharts') === '1');
 
@@ -33,10 +15,7 @@ export const useGlobalStore = defineStore('Global', () => {
 
   return {
     sortClient,
-    currentRelease,
-    latestRelease,
-    updateAvailable,
-    fetchRelease,
+    release,
     uiShowCharts,
     toggleCharts,
     uiChartType,

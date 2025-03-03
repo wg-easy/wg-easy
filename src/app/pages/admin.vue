@@ -5,7 +5,7 @@
         <div class="mr-4 w-64 rounded-lg bg-white p-4 dark:bg-neutral-700">
           <NuxtLink to="/admin">
             <h2 class="mb-4 text-xl font-bold dark:text-neutral-200">
-              Admin Panel
+              {{ t('pages.admin.panel') }}
             </h2>
           </NuxtLink>
           <div class="flex flex-col space-y-2">
@@ -38,13 +38,15 @@
 const authStore = useAuthStore();
 authStore.update();
 
+const { t } = useI18n();
+
 const route = useRoute();
 
 const menuItems = [
-  { id: '', name: 'General' },
-  { id: 'config', name: 'Config' },
-  { id: 'interface', name: 'Interface' },
-  { id: 'hooks', name: 'Hooks' },
+  { id: '', name: t('pages.admin.general') },
+  { id: 'config', name: t('pages.admin.config') },
+  { id: 'interface', name: t('pages.admin.interface') },
+  { id: 'hooks', name: t('pages.admin.hooks') },
 ];
 
 const activeMenuItem = computed(() => {

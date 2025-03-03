@@ -8,3 +8,8 @@ export function isPeerConnected(client: { latestHandshakeAt: Date | null }) {
   // connected if last handshake was less than 10 minutes ago
   return lastHandshakeMs < 1000 * 60 * 10;
 }
+
+export function setIntervalImmediately(func: () => void, interval: number) {
+  func();
+  return setInterval(func, interval);
+}

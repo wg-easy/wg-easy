@@ -16,6 +16,9 @@ const toast = useToast();
 const toastRef = useTemplateRef('toastRef');
 toast.setToast(toastRef);
 
+// make sure to fetch release early
+useGlobalStore();
+
 useHead({
   bodyAttrs: {
     class: 'bg-gray-50 dark:bg-neutral-800',
