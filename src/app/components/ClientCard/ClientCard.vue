@@ -9,10 +9,14 @@
         <div class="flex flex-grow flex-col gap-1">
           <ClientCardName :client="client" />
           <div
-            class="block pb-1 text-xs text-gray-500 md:inline-block md:pb-0 dark:text-neutral-400"
+            class="flex flex-col pb-1 text-xs text-gray-500 md:inline-block md:pb-0 dark:text-neutral-400"
           >
-            <ClientCardAddress :client="client" />
-            <ClientCardLastSeen :client="client" />
+            <div>
+              <ClientCardAddress :client="client" />
+            </div>
+            <div>
+              <ClientCardLastSeen :client="client" />
+            </div>
           </div>
           <ClientCardOneTimeLink :client="client" />
           <ClientCardExpireDate :client="client" />

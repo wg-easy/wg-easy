@@ -5,6 +5,8 @@ export const useGlobalStore = defineStore('Global', () => {
 
   const sortClient = ref(true); // Sort clients by name, true = asc, false = desc
 
+  // TODO: migrate to cookies
+
   const uiShowCharts = ref(getItem('uiShowCharts') === '1');
 
   function toggleCharts() {
