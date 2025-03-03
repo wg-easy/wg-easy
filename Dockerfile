@@ -1,5 +1,4 @@
-# nodejs 20 hangs on build with armv6/armv7 (https://github.com/nodejs/docker-node/issues/2077)
-FROM docker.io/library/node:18-alpine AS build
+FROM docker.io/library/node:lts-alpine
 WORKDIR /app
 
 # update corepack
