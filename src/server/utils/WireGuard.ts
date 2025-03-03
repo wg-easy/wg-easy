@@ -1,7 +1,6 @@
 import fs from 'node:fs/promises';
 import debug from 'debug';
 import QRCode from 'qrcode';
-import type { ID } from '#db/schema';
 import type { InterfaceType } from '#db/repositories/interface/types';
 
 const WG_DEBUG = debug('WireGuard');

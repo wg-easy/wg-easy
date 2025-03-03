@@ -6,7 +6,6 @@ import type {
   ClientCreateType,
   UpdateClientType,
 } from './types';
-import type { ID } from '#db/schema';
 import { wgInterface, userConfig } from '#db/schema';
 import { parseCidr } from 'cidr-tools';
 
@@ -116,7 +115,7 @@ export class ClientService {
         .insert(client)
         .values({
           name,
-          // TODO: fix
+          // TODO: properly assign user id
           userId: 1,
           expiresAt: parsedExpiresAt,
           privateKey,

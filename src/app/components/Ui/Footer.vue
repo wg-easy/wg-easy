@@ -18,7 +18,7 @@
       <a
         class="hover:underline"
         target="_blank"
-        href="https://spdx.org/licenses/AGPL-3.0-only.html"
+        href="https://opensource.org/license/agpl-v3"
         >AGPL-3.0-only</a
       >
       ·

@@ -1,4 +1,4 @@
-/* First setup of wg-easy app */
+/* First setup of wg-easy */
 export default defineEventHandler(async (event) => {
   const url = getRequestURL(event);
 

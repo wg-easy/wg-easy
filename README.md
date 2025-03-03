@@ -1,12 +1,15 @@
 # WireGuard Easy
 
-[![Build & Publish Docker Image to Docker Hub](https://github.com/wg-easy/wg-easy/actions/workflows/deploy.yml/badge.svg?branch=production)](https://github.com/wg-easy/wg-easy/actions/workflows/deploy.yml)
+[![Build & Publish latest Image](https://github.com/wg-easy/wg-easy/actions/workflows/deploy.yml/badge.svg?branch=production)](https://github.com/wg-easy/wg-easy/actions/workflows/deploy.yml)
 [![Lint](https://github.com/wg-easy/wg-easy/actions/workflows/lint.yml/badge.svg?branch=master)](https://github.com/wg-easy/wg-easy/actions/workflows/lint.yml)
-![Docker](https://img.shields.io/docker/pulls/weejewel/wg-easy.svg)
-[![Sponsor](https://img.shields.io/github/sponsors/weejewel)](https://github.com/sponsors/WeeJeWel)
-![GitHub Stars](https://img.shields.io/github/stars/wg-easy/wg-easy)
+[![GitHub Stars](https://img.shields.io/github/stars/wg-easy/wg-easy)](https://github.com/wg-easy/wg-easy/stargazers)
+[![License](https://img.shields.io/github/license/wg-easy/wg-easy)](LICENSE)
+[![GitHub Release](https://img.shields.io/github/v/release/wg-easy/wg-easy)](https://github.com/wg-easy/wg-easy/releases/latest)
+[![Image Pulls](https://img.shields.io/badge/image_pulls-11M-blue)](https://github.com/wg-easy/wg-easy/pkgs/container/wg-easy)
 
 You have found the easiest way to install & manage WireGuard on any Linux host!
+
+<!-- TOOD: update screenshot -->
 
 <p align="center">
   <img src="./assets/screenshot.png" width="802" />
@@ -24,10 +27,12 @@ You have found the easiest way to install & manage WireGuard on any Linux host!
 - Gravatar support.
 - Automatic Light / Dark Mode
 - Multilanguage Support
-- Traffic Stats (default off)
-- One Time Links (default off)
-- Client Expiration (default off)
-- Prometheus metrics support (default off)
+- Traffic Stats
+- One Time Links
+- Client Expiration
+- Prometheus metrics support
+- IPv6 support
+- CIDR support
 
 ## Requirements
 
@@ -40,14 +45,14 @@ You have found the easiest way to install & manage WireGuard on any Linux host!
 
 We offer multiple Docker image tags to suit your needs. The table below is in a particular order, with the first tag being the most recommended:
 
-| tag           | Branch                                                             | Example                                                       | Description                                                                                                                                |
-| ------------- | ------------------------------------------------------------------ | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| `15`          | latest minor for that major tag                                    | `ghcr.io/wg-easy/wg-easy:15`                                  | latest features for specific major versions, no breaking changes                                                                           |
-| `latest`      | latest tag                                                         | `ghcr.io/wg-easy/wg-easy:latest` or `ghcr.io/wg-easy/wg-easy` | stable as possible get bug fixes quickly when needed, see Releases for more information.                                                   |
-| `15.0`        | latest patch for that minor tag                                    | `ghcr.io/wg-easy/wg-easy:15.0`                                | latest patches for specific minor version                                                                                                  |
-| `15.0.0`      | specific tag                                                       | `ghcr.io/wg-easy/wg-easy:15.0.0`                              | specific release, don't use this as this will not get updated                                                                              |
-| `nightly`     | [`master`](https://github.com/wg-easy/wg-easy/tree/master)         | `ghcr.io/wg-easy/wg-easy:nightly`                             | mostly unstable gets frequent package and code updates, deployed against [`master`](https://github.com/wg-easy/wg-easy/tree/master).       |
-| `development` | pull requests                                                      | `ghcr.io/wg-easy/wg-easy:development`                         | used for development, testing code from PRs before landing into [`master`](https://github.com/wg-easy/wg-easy/tree/master).                |
+| tag           | Branch                                                     | Example                                                       | Description                                                                                                                          |
+| ------------- | ---------------------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `15`          | latest minor for that major tag                            | `ghcr.io/wg-easy/wg-easy:15`                                  | latest features for specific major versions, no breaking changes                                                                     |
+| `latest`      | latest tag                                                 | `ghcr.io/wg-easy/wg-easy:latest` or `ghcr.io/wg-easy/wg-easy` | stable as possible get bug fixes quickly when needed, see Releases for more information.                                             |
+| `15.0`        | latest patch for that minor tag                            | `ghcr.io/wg-easy/wg-easy:15.0`                                | latest patches for specific minor version                                                                                            |
+| `15.0.0`      | specific tag                                               | `ghcr.io/wg-easy/wg-easy:15.0.0`                              | specific release, don't use this as this will not get updated                                                                        |
+| `nightly`     | [`master`](https://github.com/wg-easy/wg-easy/tree/master) | `ghcr.io/wg-easy/wg-easy:nightly`                             | mostly unstable gets frequent package and code updates, deployed against [`master`](https://github.com/wg-easy/wg-easy/tree/master). |
+| `development` | pull requests                                              | `ghcr.io/wg-easy/wg-easy:development`                         | used for development, testing code from PRs before landing into [`master`](https://github.com/wg-easy/wg-easy/tree/master).          |
 
 ## Installation
 
@@ -65,8 +70,16 @@ And log in again.
 
 ### 2. Run WireGuard Easy
 
-<!-- TODO: prioritize docker compose over docker run -->
+The easiest way to run WireGuard Easy is with Docker Compose.
 
+Just download [`docker-compose.yml`](docker-compose.yml), make necessary adjustments and
+execute `docker compose up -d`.
+
+The Web UI will now be available on `http://0.0.0.0:51821`.
+
+<!-- TOOD: add to docs: Grafana dashboard [21733](https://grafana.com/grafana/dashboards/21733-wireguard/) -->
+
+<!-- TOOD: add to docs
 To setup the IPv6 Network, simply run once:
 
 ```bash
@@ -107,22 +120,26 @@ The Prometheus metrics will now be available on `http://0.0.0.0:51821/api/metric
 
 > 💡 Your configuration files will be saved in `~/.wg-easy`
 
-WireGuard Easy can be launched with Docker Compose as well - just download
-[`docker-compose.yml`](docker-compose.yml), make necessary adjustments and
-execute `docker compose up -d`.
+-->
 
 ### 3. Sponsor
 
-Are you enjoying this project? [Buy Emile a beer!](https://github.com/sponsors/WeeJeWel) 🍻
+Are you enjoying this project? Consider donating.
+
+Founder: [Buy Emile a beer!](https://github.com/sponsors/WeeJeWel) 🍻
+
+Maintainer: [Buy kaaax0815 a coffee!](https://github.com/sponsors/kaaax0815) ☕
+
+<!-- TOOD: add to docs
 
 ## Options
 
 These options can be configured by setting environment variables using `-e KEY="VALUE"` in the `docker run` command.
 
-| Env       | Default           | Example       | Description                                  |
-| --------- | ----------------- | ------------- | -------------------------------------------- |
-| `PORT`    | `51821`           | `6789`        | TCP port for Web UI.                         |
-| `HOST`    | `0.0.0.0`         | `localhost`   | IP address web UI binds to.                  |
+| Env    | Default   | Example     | Description                 |
+| ------ | --------- | ----------- | --------------------------- |
+| `PORT` | `51821`   | `6789`      | TCP port for Web UI.        |
+| `HOST` | `0.0.0.0` | `localhost` | IP address web UI binds to. |
 
 ## Updating
 
@@ -151,9 +168,11 @@ was pulled.
 
 For less common or specific edge-case scenarios, please refer to the detailed information provided in the [Wiki](https://github.com/wg-easy/wg-easy/wiki).
 
+-->
+
 ## License
 
-This project is licensed under the AGPL-3.0-only License - see the LICENSE file for details
+This project is licensed under the AGPL-3.0-only License - see the [LICENSE](LICENSE) file for details
 
 This project is not affiliated, associated, authorized, endorsed by, or in any way officially connected with Jason A. Donenfeld, ZX2C4 or Edge Security
 

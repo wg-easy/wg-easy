@@ -1,5 +1,4 @@
 import type { H3Event } from 'h3';
-import type { ID } from '#db/schema';
 import type { UserType } from '#db/repositories/user/types';
 
 export type WGSession = Partial<{

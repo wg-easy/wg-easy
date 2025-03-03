@@ -2,7 +2,7 @@ import { parseCidr } from 'cidr-tools';
 import { stringifyIp } from 'ip-bigint';
 import { z } from 'zod';
 
-export default defineSetupEventHandler(async ({ event }) => {
+export default defineSetupEventHandler('migrate', async ({ event }) => {
   const { file } = await readValidatedBody(
     event,
     validateZod(FileSchema, event)
