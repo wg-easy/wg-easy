@@ -7,19 +7,13 @@ RUN npm install --global corepack@latest
 # Install pnpm
 RUN corepack enable pnpm
 
-# add build tools for argon2
-RUN apk add --no-cache make gcc g++ python3
-
 # Copy Web UI
-COPY src ./
+COPY src/package.json src/pnpm-lock.yaml ./
 RUN pnpm install
 
 # Build UI
+COPY src ./
 RUN pnpm build
-
-# Remove unnecessary node modules
-RUN find ./node_modules/.pnpm -mindepth 1 -maxdepth 1 -type d ! -name '@libsql+linux*' -exec rm -r {} +
-RUN find ./node_modules/@libsql -mindepth 1 -maxdepth 1 -type l ! -name 'linux*' -exec rm -r {} +
 
 # Copy build result to a new image.
 # This saves a lot of disk space.
@@ -33,8 +27,7 @@ COPY --from=build /app/.output /app
 # Copy migrations
 COPY --from=build /app/server/database/migrations /app/server/database/migrations
 # libsql
-COPY --from=build /app/node_modules/.pnpm/ /app/node_modules/.pnpm/
-COPY --from=build /app/node_modules/@libsql /app/node_modules/@libsql
+RUN npm install --no-save libsql
 
 # Install Linux packages
 RUN apk add --no-cache \
