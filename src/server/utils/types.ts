@@ -2,6 +2,8 @@ import type { ZodSchema } from 'zod';
 import z from 'zod';
 import type { H3Event, EventHandlerRequest } from 'h3';
 
+export type ID = number;
+
 /**
  * return the string as is
  *
