@@ -76,6 +76,7 @@
     "new": "New Client",
     "name": "Name",
     "expireDate": "Expire Date",
+    "expireDateDesc": "Date the client will be disabled. Blank for permanent",
     "deleteClient": "Delete Client",
     "deleteDialog1": "Are you sure you want to delete",
     "deleteDialog2": "This action cannot be undone.",
@@ -93,7 +94,11 @@
     "enableClient": "Enable Client",
     "noPrivKey": "This client has no known private key. Cannot create Configuration.",
     "showQR": "Show QR Code",
-    "downloadConfig": "Download Configuration"
+    "downloadConfig": "Download Configuration",
+    "allowedIpsDesc": "Which IPs will be routed through the VPN",
+    "serverAllowedIpsDesc": "Which IPs the server will route to the client",
+    "mtuDesc": "Sets the maximum transmission unit (packet size) for the VPN tunnel",
+    "persistentKeepaliveDesc": "Sets the interval (in seconds) for keep-alive packets. 0 disables it"
   },
   "dialog": {
     "change": "Change",

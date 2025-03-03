@@ -23,6 +23,7 @@
             <FormDateField
               id="expiresAt"
               v-model="data.expiresAt"
+              :description="$t('client.expireDateDesc')"
               :label="$t('client.expireDate')"
             />
           </FormGroup>
@@ -40,11 +41,15 @@
             />
           </FormGroup>
           <FormGroup>
-            <FormHeading>{{ $t('general.allowedIps') }}</FormHeading>
+            <FormHeading :description="$t('client.allowedIpsDesc')">{{
+              $t('general.allowedIps')
+            }}</FormHeading>
             <FormArrayField v-model="data.allowedIps" name="allowedIps" />
           </FormGroup>
           <FormGroup>
-            <FormHeading>{{ $t('client.serverAllowedIps') }}</FormHeading>
+            <FormHeading :description="$t('client.serverAllowedIpsDesc')">{{
+              $t('client.serverAllowedIps')
+            }}</FormHeading>
             <FormArrayField
               v-model="data.serverAllowedIps"
               name="serverAllowedIps"
@@ -56,11 +61,13 @@
             <FormNumberField
               id="mtu"
               v-model="data.mtu"
+              :description="$t('client.mtuDesc')"
               :label="$t('general.mtu')"
             />
             <FormNumberField
               id="persistentKeepalive"
               v-model="data.persistentKeepalive"
+              :description="$t('client.persistentKeepaliveDesc')"
               :label="$t('general.persistentKeepalive')"
             />
           </FormGroup>
