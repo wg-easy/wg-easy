@@ -1,6 +1,12 @@
 <template>
   <ClientOnly>
-    <apexchart width="100%" height="100%" :options="options" :series="series" />
+    <apexchart
+      width="100%"
+      height="100%"
+      v-bind="$attrs"
+      :options="options"
+      :series="series"
+    />
   </ClientOnly>
 </template>
 

@@ -3,7 +3,7 @@
   <div v-if="client.transferTx" class="min-w-20 md:min-w-24">
     <span
       class="flex gap-1"
-      :title="$t('totalDownload') + bytes(client.transferTx)"
+      :title="$t('client.totalDownload') + bytes(client.transferTx)"
     >
       <IconsArrowDown class="mt-0.5 inline h-3 align-middle" />
       <div>
@@ -22,7 +22,7 @@
   <div v-if="client.transferRx" class="min-w-20 md:min-w-24">
     <span
       class="flex gap-1"
-      :title="$t('totalUpload') + bytes(client.transferRx)"
+      :title="$t('client.totalUpload') + bytes(client.transferRx)"
     >
       <IconsArrowUp class="mt-0.5 inline h-3 align-middle" />
       <div>

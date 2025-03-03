@@ -5,13 +5,19 @@ export const useGlobalStore = defineStore('Global', () => {
 
   const sortClient = ref(true); // Sort clients by name, true = asc, false = desc
 
-  const uiShowCharts = ref(getItem('uiShowCharts') === '1');
+  const uiShowCharts = useCookie<boolean>('uiShowCharts', {
+    default: () => false,
+    maxAge: 365 * 24 * 60 * 60,
+  });
 
   function toggleCharts() {
-    setItem('uiShowCharts', uiShowCharts.value ? '1' : '0');
+    uiShowCharts.value = !uiShowCharts.value;
   }
 
-  const uiChartType = ref(getItem('uiChartType') ?? 'area');
+  const uiChartType = useCookie<'area' | 'bar' | 'line'>('uiChartType', {
+    default: () => 'area',
+    maxAge: 365 * 24 * 60 * 60,
+  });
 
   return {
     sortClient,
