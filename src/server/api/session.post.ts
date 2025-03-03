@@ -28,7 +28,7 @@ export default defineEventHandler(async (event) => {
     userId: user.id,
   });
 
-  // TODO: create audit log?
+  // TODO?: create audit log
 
   SERVER_DEBUG(`New Session: ${data.id} for ${user.id} (${user.username})`);
 
