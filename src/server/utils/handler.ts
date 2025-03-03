@@ -63,6 +63,17 @@ export const definePermissionEventHandler = <
   });
 };
 
+// which api route is allowed for each setup step
+// 0 is done, 1 is start
+// 3 means step 2 is done
+const ValidSetupSteps = {
+  1: [2] as const,
+  3: [4, 'migrate'] as const,
+} as const;
+
+type ValidSteps =
+  (typeof ValidSetupSteps)[keyof typeof ValidSetupSteps][number];
+
 type SetupHandler<
   TReq extends EventHandlerRequest,
   TRes extends EventHandlerResponse,
@@ -75,6 +86,7 @@ export const defineSetupEventHandler = <
   TReq extends EventHandlerRequest,
   TRes extends EventHandlerResponse,
 >(
+  step: ValidSteps,
   handler: SetupHandler<TReq, TRes>
 ) => {
   return defineEventHandler(async (event) => {
@@ -84,6 +96,23 @@ export const defineSetupEventHandler = <
       throw createError({
         statusCode: 400,
         statusMessage: 'Invalid state',
+      });
+    }
+
+    const validSetupSteps =
+      ValidSetupSteps[setup.step as keyof typeof ValidSetupSteps];
+
+    if (!validSetupSteps) {
+      throw createError({
+        statusCode: 500,
+        statusMessage: 'Invalid setup step',
+      });
+    }
+
+    if (!validSetupSteps.includes(step as never)) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'Invalid step',
       });
     }
 
