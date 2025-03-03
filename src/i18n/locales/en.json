@@ -116,7 +116,9 @@
     "save": "Save",
     "revert": "Revert",
     "sectionGeneral": "General",
-    "sectionAdvanced": "Advanced"
+    "sectionAdvanced": "Advanced",
+    "noItems": "No items",
+    "add": "Add"
   },
   "admin": {
     "general": {

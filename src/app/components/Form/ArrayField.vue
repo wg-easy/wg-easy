@@ -1,25 +1,32 @@
 <template>
   <div v-if="data?.length === 0">
-    {{ emptyText || 'No items' }}
+    {{ emptyText || $t('form.noItems') }}
   </div>
-  <div v-else class="flex flex-col">
+  <div v-else class="flex flex-col gap-2">
     <div v-for="(item, i) in data" :key="i">
-      <input
-        :value="item"
-        :name="name"
-        type="text"
-        class="rounded-lg border-2 border-gray-100 text-gray-500 focus:border-red-800 focus:outline-0 focus:ring-0 dark:border-neutral-800 dark:bg-neutral-700 dark:text-neutral-200 dark:placeholder:text-neutral-400"
-        @input="update($event, i)"
+      <div class="flex flex-row gap-1">
+        <input
+          :value="item"
+          :name="name"
+          type="text"
+          class="rounded-lg border-2 border-gray-100 text-gray-500 focus:border-red-800 focus:outline-0 focus:ring-0 dark:border-neutral-800 dark:bg-neutral-700 dark:text-neutral-200 dark:placeholder:text-neutral-400"
+          @input="update($event, i)"
+        />
+        <BaseButton as="input" type="button" value="-" @click="del(i)" />
+      </div>
+    </div>
+    <div class="mt-2">
+      <BaseButton
+        as="input"
+        type="button"
+        :value="$t('form.add')"
+        @click="add"
       />
-      <input type="button" value="-" @click="del(i)" />
     </div>
   </div>
-  <input type="button" value="Add" @click="add" />
 </template>
 
 <script lang="ts" setup>
-// TODO: style
-
 const data = defineModel<string[]>();
 defineProps<{ emptyText?: string[]; name: string }>();
 
