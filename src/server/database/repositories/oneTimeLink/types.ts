@@ -9,9 +9,6 @@ const oneTimeLinkType = z
   .min(1, t('zod.otl'))
   .pipe(safeStringRefine);
 
-export const OneTimeLinkGetSchema = z.object(
-  {
-    oneTimeLink: oneTimeLinkType,
-  },
-  { message: objectMessage }
-);
+export const OneTimeLinkGetSchema = z.object({
+  oneTimeLink: oneTimeLinkType,
+});

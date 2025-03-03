@@ -115,7 +115,7 @@ export class ClientService {
         .insert(client)
         .values({
           name,
-          // TODO: fix
+          // TODO: properly assign user id
           userId: 1,
           expiresAt: parsedExpiresAt,
           privateKey,

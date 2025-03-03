@@ -20,22 +20,16 @@ const password = z
 
 const remember = z.boolean({ message: t('zod.user.remember') });
 
-export const UserLoginSchema = z.object(
-  {
-    username: username,
-    password: password,
-    remember: remember,
-  },
-  { message: objectMessage }
-);
+export const UserLoginSchema = z.object({
+  username: username,
+  password: password,
+  remember: remember,
+});
 
-export const UserSetupSchema = z.object(
-  {
-    username: username,
-    password: password,
-  },
-  { message: objectMessage }
-);
+export const UserSetupSchema = z.object({
+  username: username,
+  password: password,
+});
 
 const name = z
   .string({ message: t('zod.user.name') })
@@ -49,23 +43,17 @@ const email = z
   .pipe(safeStringRefine)
   .nullable();
 
-export const UserUpdateSchema = z.object(
-  {
-    name: name,
-    email: email,
-  },
-  { message: objectMessage }
-);
+export const UserUpdateSchema = z.object({
+  name: name,
+  email: email,
+});
 
 export const UserUpdatePasswordSchema = z
-  .object(
-    {
-      currentPassword: password,
-      newPassword: password,
-      confirmPassword: password,
-    },
-    { message: objectMessage }
-  )
+  .object({
+    currentPassword: password,
+    newPassword: password,
+    confirmPassword: password,
+  })
   .refine((val) => val.newPassword === val.confirmPassword, {
     message: t('zod.user.passwordMatch'),
   });
