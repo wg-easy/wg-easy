@@ -46,8 +46,11 @@ All workflows are using the tagging convention listed below. It is subsequently 
 | `cron` on `master`      | `nightly`                     |
 | `push` a tag (`v1.2.3`) | `1.2.3`, `1.2`, `1`, `latest` |
 
+When publishing a tag we follow the [Semantic Versioning][semver] specification. The `latest` tag is always pointing to the latest stable release. If you want to avoid breaking changes, use the major version tag (e.g. `15`).
+
 [github-ci]: https://github.com/wg-easy/wg-easy/actions
 [ghcr-image]: https://github.com/wg-easy/wg-easy/pkgs/container/wg-easy
+[semver]: https://semver.org/
 
 ### Get All Files
 

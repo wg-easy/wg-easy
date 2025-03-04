@@ -2,8 +2,6 @@
 title: Podman
 ---
 
-# Podman
-
 This guide will show you how to run `wg-easy` with rootful Podman and nftables.
 
 ## Requirements
@@ -82,16 +80,17 @@ In the Admin Panel of your WireGuard server, go to the `Hooks` tab and add the f
 
 1. PostUp
 
-```shell
-apk add nftables; nft add table inet wg_table; nft add chain inet wg_table postrouting { type nat hook postrouting priority 100 \; }; nft add rule inet wg_table postrouting ip saddr {{ipv4Cidr}} oifname {{device}} masquerade; nft add rule inet wg_table postrouting ip6 saddr {{ipv6Cidr}} oifname {{device}} masquerade; nft add chain inet wg_table input { type filter hook input priority 0 \; }; nft add rule inet wg_table input udp dport {{port}} accept; nft add chain inet wg_table forward { type filter hook forward priority 0 \; }; nft add rule inet wg_table forward iifname "wg0" accept; nft add rule inet wg_table forward oifname "wg0" accept;
-```
+   ```shell
+   apk add nftables; nft add table inet wg_table; nft add chain inet wg_table postrouting { type nat hook postrouting priority 100 \; }; nft add rule inet wg_table postrouting ip saddr {{ipv4Cidr}} oifname {{device}} masquerade; nft add rule inet wg_table postrouting ip6 saddr {{ipv6Cidr}} oifname {{device}} masquerade; nft add chain inet wg_table input { type filter hook input priority 0 \; policy drop \; }; nft add rule inet wg_table input udp dport {{port}} accept; nft add chain inet wg_table forward { type filter hook forward priority 0 \; policy drop \; }; nft add rule inet wg_table forward iifname "wg0" accept; nft add rule inet wg_table forward oifname "wg0" accept;
+   ```
 
 2. PostDown
 
-```shell
-nft delete table inet wg_table
-```
+   ```shell
+   nft delete table inet wg_table
+   ```
 
 <!--
 TODO: improve docs after better nftables support
+TODO: fix accept web ui port
 -->
