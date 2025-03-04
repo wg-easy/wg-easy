@@ -1,10 +1,10 @@
-import type { DBType } from '#db/sqlite';
 import isCidr from 'is-cidr';
 import { eq, sql } from 'drizzle-orm';
+import { parseCidr } from 'cidr-tools';
 import { wgInterface } from './schema';
 import type { InterfaceCidrUpdateType, InterfaceUpdateType } from './types';
 import { client as clientSchema } from '#db/schema';
-import { parseCidr } from 'cidr-tools';
+import type { DBType } from '#db/sqlite';
 
 function createPreparedStatement(db: DBType) {
   return {

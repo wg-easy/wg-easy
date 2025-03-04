@@ -55,6 +55,7 @@
     "drizzle-kit": "^0.30.5",
     "eslint": "^9.21.0",
     "eslint-config-prettier": "^10.0.2",
+    "eslint-plugin-import": "^2.31.0",
     "prettier": "^3.5.3",
     "prettier-plugin-tailwindcss": "^0.6.11",
     "typescript": "^5.8.2",

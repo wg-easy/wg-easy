@@ -1,13 +1,13 @@
-import type { DBType } from '#db/sqlite';
 import { eq, sql } from 'drizzle-orm';
+import { parseCidr } from 'cidr-tools';
 import { client } from './schema';
 import type {
   ClientCreateFromExistingType,
   ClientCreateType,
   UpdateClientType,
 } from './types';
+import type { DBType } from '#db/sqlite';
 import { wgInterface, userConfig } from '#db/schema';
-import { parseCidr } from 'cidr-tools';
 
 function createPreparedStatement(db: DBType) {
   return {

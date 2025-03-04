@@ -1,7 +1,7 @@
-import type { DBType } from '#db/sqlite';
 import { eq, sql } from 'drizzle-orm';
 import { userConfig } from './schema';
 import type { UserConfigUpdateType } from './types';
+import type { DBType } from '#db/sqlite';
 
 function createPreparedStatement(db: DBType) {
   return {

@@ -1,7 +1,7 @@
-import type { DBType } from '#db/sqlite';
 import { eq, sql } from 'drizzle-orm';
-import { oneTimeLink } from './schema';
 import CRC32 from 'crc-32';
+import { oneTimeLink } from './schema';
+import type { DBType } from '#db/sqlite';
 
 function createPreparedStatement(db: DBType) {
   return {
