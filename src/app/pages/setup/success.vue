@@ -2,7 +2,7 @@
   <div>
     <p>{{ $t('setup.successful') }}</p>
     <NuxtLink to="/login">
-      <BaseButton>{{ $t('login.signIn') }}</BaseButton>
+      <BaseButton as="span">{{ $t('login.signIn') }}</BaseButton>
     </NuxtLink>
   </div>
 </template>

@@ -5,10 +5,10 @@
     </p>
     <div class="mb-8 flex justify-center">
       <NuxtLink to="/setup/4">
-        <BaseButton>{{ $t('general.no') }}</BaseButton>
+        <BaseButton as="span">{{ $t('general.no') }}</BaseButton>
       </NuxtLink>
       <NuxtLink to="/setup/migrate">
-        <BaseButton>{{ $t('general.yes') }}</BaseButton>
+        <BaseButton as="span">{{ $t('general.yes') }}</BaseButton>
       </NuxtLink>
     </div>
   </div>

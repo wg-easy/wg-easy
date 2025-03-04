@@ -15,6 +15,7 @@
               :to="`/admin/${item.id}`"
             >
               <BaseButton
+                as="span"
                 class="w-full cursor-pointer rounded p-2 font-medium transition-colors duration-200 hover:bg-red-800 dark:text-neutral-200"
               >
                 {{ item.name }}

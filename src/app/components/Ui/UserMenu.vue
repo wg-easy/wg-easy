@@ -17,8 +17,10 @@
         class="z-10 w-44 divide-y divide-gray-100 rounded-lg bg-white text-gray-700 shadow dark:divide-neutral-800 dark:bg-neutral-700 dark:text-gray-200"
       >
         <DropdownMenuItem>
-          <div class="truncate">{{ authStore.userData?.name }}</div>
-          <div class="truncate">@{{ authStore.userData?.username }}</div>
+          <div class="px-4 py-2">
+            <div class="truncate">{{ authStore.userData?.name }}</div>
+            <div class="truncate">@{{ authStore.userData?.username }}</div>
+          </div>
         </DropdownMenuItem>
         <DropdownMenuItem>
           <NuxtLink
