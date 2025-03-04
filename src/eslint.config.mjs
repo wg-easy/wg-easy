@@ -5,7 +5,7 @@ export default withNuxt([
   {
     rules: {
       'import/order': 'warn',
-    }
+    },
   },
-  eslintConfigPrettier
-])
+  eslintConfigPrettier,
+]);
