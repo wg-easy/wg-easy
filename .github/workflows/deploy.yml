@@ -71,3 +71,16 @@ jobs:
           cd docs
           git fetch origin gh-pages --depth=1
           mike deploy --push --update-aliases ${{ github.ref_name }} latest
+
+          # Extract version numbers (remove 'v' prefix)
+          DOCS_VERSION=${GITHUB_REF#refs/tags/}  # e.g. v1.2.3 or v1.2.3-beta
+          MINOR_VERSION=$(echo $DOCS_VERSION | cut -d. -f1,2)  # e.g. v1.2
+
+          # Check if it's a stable release (only numbers, no '-')
+          if [[ "$DOCS_VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Stable release detected: $DOCS_VERSION"
+            mike deploy --push --update-aliases $MINOR_VERSION latest
+          else
+            echo "Prerelease detected: $DOCS_VERSION"
+            mike deploy --push --update-aliases Pre-release
+          fi
