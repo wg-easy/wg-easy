@@ -49,11 +49,16 @@ jobs:
       contents: write
     needs: docker
     steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: master
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: 3.11.9
           cache: "pip"
+          cache-dependency-path: docs/requirements.txt
 
       - name: Install Dependencies
         run: |
