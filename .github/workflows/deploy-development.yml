@@ -1,11 +1,11 @@
-name: Build & Publish Development
+name: Development
 
 on:
   workflow_dispatch:
 
 jobs:
-  deploy:
-    name: Build & Deploy
+  docker:
+    name: Build & Deploy Docker
     runs-on: ubuntu-latest
     if: github.repository_owner == 'wg-easy'
     permissions:
@@ -32,7 +32,37 @@ jobs:
         with:
           context: .
           push: true
-          platforms: linux/amd64,linux/arm64/v8
+          platforms: linux/amd64,linux/arm64
           tags: ghcr.io/wg-easy/wg-easy:development
           cache-from: type=gha
           cache-to: type=gha,mode=min
+
+  docs:
+    name: Build & Deploy Docs
+    runs-on: ubuntu-latest
+    if: github.repository_owner == 'wg-easy'
+    permissions:
+      contents: write
+    needs: docker
+    steps:
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11.9
+          cache: "pip"
+
+      - name: Install Dependencies
+        run: |
+          pip install -r docs/requirements.txt
+
+      - name: Setup Git User
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Build Docs Website
+        run: |
+          cd docs
+          git fetch origin gh-pages --depth=1 || true
+
+          mike deploy --push --update-aliases development

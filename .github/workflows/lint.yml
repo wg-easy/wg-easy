@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - master
-      - production
   pull_request:
 
 jobs:
@@ -12,6 +11,13 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     if: github.repository_owner == 'wg-easy'
+
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        command: ["lint", "typecheck", "format:check"]
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -28,60 +34,8 @@ jobs:
           check-latest: true
           cache: "pnpm"
 
-      - name: pnpm lint
+      - name: pnpm ${{ matrix.command }}
         run: |
           cd src
           pnpm install
-          pnpm lint
-
-  typecheck:
-    name: Typecheck
-    runs-on: ubuntu-latest
-    if: github.repository_owner == 'wg-easy'
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - uses: pnpm/action-setup@v4
-        name: Install pnpm
-        with:
-          run_install: false
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          check-latest: true
-          cache: "pnpm"
-
-      - name: pnpm typecheck
-        run: |
-          cd src
-          pnpm install
-          pnpm typecheck
-
-  formatcheck:
-    name: Check format
-    runs-on: ubuntu-latest
-    if: github.repository_owner == 'wg-easy'
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - uses: pnpm/action-setup@v4
-        name: Install pnpm
-        with:
-          run_install: false
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          check-latest: true
-          cache: "pnpm"
-
-      - name: pnpm format:check
-        run: |
-          cd src
-          pnpm install
-          pnpm format:check
+          pnpm ${{ matrix.command }}
