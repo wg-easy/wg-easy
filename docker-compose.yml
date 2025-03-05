@@ -7,6 +7,7 @@ services:
     #  Optional:
     #  - PORT=51821
     #  - HOST=0.0.0.0
+    #  - INSECURE=false
 
     image: ghcr.io/wg-easy/wg-easy
     container_name: wg-easy

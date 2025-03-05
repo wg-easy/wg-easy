@@ -45,6 +45,10 @@ If you are using a firewall, you need to open the following ports:
 
 These ports can be changed, so if you change them you have to update your firewall rules accordingly.
 
+## Setup Reverse Proxy
+
+TODO
+
 ## Access the Web UI
 
 Open your browser and navigate to `https://<your-domain>:51821` or `https://<your-ip>:51821`.

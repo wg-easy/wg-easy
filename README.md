@@ -27,12 +27,17 @@ You have found the easiest way to install & manage WireGuard on any Linux host!
 - Gravatar support.
 - Automatic Light / Dark Mode
 - Multilanguage Support
-- Traffic Stats
 - One Time Links
 - Client Expiration
 - Prometheus metrics support
 - IPv6 support
 - CIDR support
+
+> [!NOTE]
+> To better manage documentation for this project, it has its own site here: [https://wg-easy.github.io/wg-easy/latest](https://wg-easy.github.io/wg-easy/latest)
+
+- [Getting Started](https://wg-easy.github.io/wg-easy/latest/getting-started/)
+- [Basic Installation](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/basic-installation/)
 
 ## Requirements
 
@@ -58,11 +63,10 @@ We offer multiple Docker image tags to suit your needs. The table below is in a 
 
 ### 1. Install Docker
 
-If you haven't installed Docker yet, install it by running:
+If you haven't installed Docker yet, install it by running as root:
 
 ```shell
 curl -sSL https://get.docker.com | sh
-sudo usermod -aG docker $(whoami)
 exit
 ```
 
@@ -73,9 +77,11 @@ And log in again.
 The easiest way to run WireGuard Easy is with Docker Compose.
 
 Just download [`docker-compose.yml`](docker-compose.yml), make necessary adjustments and
-execute `docker compose up -d`.
+execute `sudo docker compose up -d`.
 
-The Web UI will now be available on `http://0.0.0.0:51821`.
+Now setup a reverse proxy to be able to access the Web UI from the internet.
+
+If you want to access the Web UI over HTTP, change the env var `INSECURE` to `true`. This is not recommended. Only use this for testing
 
 <!-- TOOD: add to docs: Grafana dashboard [21733](https://grafana.com/grafana/dashboards/21733-wireguard/) -->
 
@@ -136,10 +142,11 @@ Maintainer: [Buy kaaax0815 a coffee!](https://github.com/sponsors/kaaax0815) ☕
 
 These options can be configured by setting environment variables using `-e KEY="VALUE"` in the `docker run` command.
 
-| Env    | Default   | Example     | Description                 |
-| ------ | --------- | ----------- | --------------------------- |
-| `PORT` | `51821`   | `6789`      | TCP port for Web UI.        |
-| `HOST` | `0.0.0.0` | `localhost` | IP address web UI binds to. |
+| Env        | Default   | Example     | Description                    |
+| ---------- | --------- | ----------- | ------------------------------ |
+| `PORT`.    | `51821`   | `6789`      | TCP port for Web UI.           |
+| `HOST`     | `0.0.0.0` | `localhost` | IP address web UI binds to.    |
+| `INSECURE` | `false`   | `true`      | If access over http is allowed |
 
 ## Updating
 

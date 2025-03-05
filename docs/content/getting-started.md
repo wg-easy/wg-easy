@@ -1,5 +1,5 @@
 ---
-title: Usage
+title: Getting Started
 hide:
   - navigation
 ---
@@ -86,3 +86,7 @@ sudo docker compose down
 ///
 
 **That's it! It really is that easy**.
+
+If you need more help you can read the [Basic Installation Tutorial][basic-installation].
+
+[basic-installation]: ./examples/tutorials/basic-installation.md

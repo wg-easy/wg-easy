@@ -46,6 +46,7 @@ RUN update-alternatives --install /usr/sbin/ip6tables ip6tables /usr/sbin/ip6tab
 ENV DEBUG=Server,WireGuard,Database,CMD
 ENV PORT=51821
 ENV HOST=0.0.0.0
+ENV INSECURE=false
 
 LABEL org.opencontainers.image.source=https://github.com/wg-easy/wg-easy
 
