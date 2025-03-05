@@ -5,7 +5,7 @@ export default defineNuxtConfig({
   future: {
     compatibilityVersion: 4,
   },
-  compatibilityDate: '2024-04-03',
+  compatibilityDate: '2025-02-04',
   devtools: { enabled: true },
   modules: [
     '@nuxtjs/i18n',
@@ -13,6 +13,7 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
     '@eschricht/nuxt-color-mode',
     'radix-vue/nuxt',
+    '@nuxt/eslint',
   ],
   colorMode: {
     preference: 'system',

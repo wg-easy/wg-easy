@@ -1,5 +1,5 @@
 ---
-title: 'General Information'
+title: General Information
 ---
 
 ## Coding Style
@@ -14,10 +14,10 @@ When refactoring, writing or altering files, adhere to these rules:
 
 Make sure to select `nightly` in the dropdown menu at the top. Navigate to the page you would like to edit and click the edit button in the top right. This allows you to make changes and create a pull-request.
 
-Alternatively you can make the changes locally. For that you'll need to have Docker installed. Navigate into the `docs/` directory. Then run:
+Alternatively you can make the changes locally. For that you'll need to have Docker installed. Run
 
 ```sh
-docker run --rm -it -p 8000:8000 -v "${PWD}:/docs" squidfunk/mkdocs-material
+pnpm docs:serve
 ```
 
-This serves the documentation on your local machine on port `8000`. Each change will be hot-reloaded onto the page you view, just edit, save and look at the result.
+This serves the documentation on your local machine on port `8080`. Each change will be hot-reloaded onto the page you view, just edit, save and look at the result.

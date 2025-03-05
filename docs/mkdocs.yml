@@ -53,7 +53,13 @@ markdown_extensions:
       anchorlink: true
   - abbr
   - attr_list
-  - admonition
+  - pymdownx.blocks.admonition:
+      types:
+        - danger
+        - note
+        - info
+        - question
+        - warning
   - pymdownx.details
   - pymdownx.superfences:
       custom_fences:

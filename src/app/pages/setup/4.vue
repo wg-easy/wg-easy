@@ -8,18 +8,12 @@
         <FormNullTextField
           id="host"
           v-model="host"
-          type="text"
           :label="$t('general.host')"
           placeholder="vpn.example.com"
         />
       </div>
       <div class="flex flex-col">
-        <FormNumberField
-          id="port"
-          v-model="port"
-          type="number"
-          :label="$t('general.port')"
-        />
+        <FormNumberField id="port" v-model="port" :label="$t('general.port')" />
       </div>
       <div>
         <BaseButton @click="submit">{{ $t('general.continue') }}</BaseButton>

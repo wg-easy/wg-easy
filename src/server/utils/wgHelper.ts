@@ -1,7 +1,7 @@
 import { parseCidr } from 'cidr-tools';
+import { stringifyIp } from 'ip-bigint';
 import type { ClientType } from '#db/repositories/client/types';
 import type { InterfaceType } from '#db/repositories/interface/types';
-import { stringifyIp } from 'ip-bigint';
 import type { UserConfigType } from '#db/repositories/userConfig/types';
 import type { HooksType } from '#db/repositories/hooks/types';
 
