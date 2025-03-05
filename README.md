@@ -36,7 +36,7 @@ You have found the easiest way to install & manage WireGuard on any Linux host!
 > [!NOTE]
 > To better manage documentation for this project, it has its own site here: [https://wg-easy.github.io/wg-easy/latest](https://wg-easy.github.io/wg-easy/latest)
 
-- [Get Started](https://wg-easy.github.io/wg-easy/latest/usage/)
+- [Getting Started](https://wg-easy.github.io/wg-easy/latest/getting-started/)
 - [Basic Installation](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/basic-installation/)
 
 ## Requirements
