@@ -6,10 +6,12 @@ export default defineEventHandler(async (event) => {
     validateZod(UserLoginSchema, event)
   );
 
+  // TODO: timing can be used to enumerate usernames
+
   const user = await Database.users.getByUsername(username);
   if (!user)
     throw createError({
-      statusCode: 400,
+      statusCode: 401,
       statusMessage: 'Incorrect credentials',
     });
 

@@ -53,8 +53,8 @@ export async function getCurrentUser(event: H3Event) {
     // TODO: support personal access token or similar
     if (method !== 'Basic' || !value) {
       throw createError({
-        statusCode: 401,
-        statusMessage: 'Session failed',
+        statusCode: 400,
+        statusMessage: 'Invalid Basic Authorization',
       });
     }
 
@@ -67,10 +67,12 @@ export async function getCurrentUser(event: H3Event) {
 
     if (!username || !password) {
       throw createError({
-        statusCode: 401,
-        statusMessage: 'Session failed',
+        statusCode: 400,
+        statusMessage: 'Invalid Basic Authorization',
       });
     }
+
+    // TODO: timing can be used to enumerate usernames
 
     const foundUser = await Database.users.getByUsername(username);
 
@@ -87,7 +89,7 @@ export async function getCurrentUser(event: H3Event) {
     if (!passwordValid) {
       throw createError({
         statusCode: 401,
-        statusMessage: 'Incorrect Password',
+        statusMessage: 'Session failed',
       });
     }
     user = foundUser;
