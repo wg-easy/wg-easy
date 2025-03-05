@@ -75,15 +75,6 @@ export class ClientService {
     const publicKey = await wg.getPublicKey(privateKey);
     const preSharedKey = await wg.generatePreSharedKey();
 
-    let parsedExpiresAt = expiresAt;
-    if (parsedExpiresAt) {
-      const expiresAtDate = new Date(parsedExpiresAt);
-      expiresAtDate.setHours(23);
-      expiresAtDate.setMinutes(59);
-      expiresAtDate.setSeconds(59);
-      parsedExpiresAt = expiresAtDate.toISOString();
-    }
-
     return this.#db.transaction(async (tx) => {
       const clients = await tx.query.client.findMany().execute();
       const clientInterface = await tx.query.wgInterface
@@ -117,7 +108,7 @@ export class ClientService {
           name,
           // TODO: properly assign user id
           userId: 1,
-          expiresAt: parsedExpiresAt,
+          expiresAt,
           privateKey,
           publicKey,
           preSharedKey,

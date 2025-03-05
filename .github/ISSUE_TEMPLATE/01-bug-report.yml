@@ -2,8 +2,6 @@
 name: 🐛 Bug Report
 description: Create a report to help us improve
 title: "[Bug]: "
-labels:
-  - "type: bug"
 type: Bug
 
 body:

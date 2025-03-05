@@ -16,5 +16,3 @@ export const WG_ENV = {
   /** UI is hosted on HTTP instead of HTTPS */
   INSECURE: process.env.INSECURE === 'true',
 };
-
-console.log(WG_ENV);
