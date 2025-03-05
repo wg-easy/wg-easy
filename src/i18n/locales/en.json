@@ -1,0 +1,211 @@
+{
+  "pages": {
+    "me": "Account",
+    "clients": "Clients",
+    "admin": {
+      "panel": "Admin Panel",
+      "general": "General",
+      "config": "Config",
+      "interface": "Interface",
+      "hooks": "Hooks"
+    }
+  },
+  "user": {
+    "email": "E-Mail"
+  },
+  "me": {
+    "currentPassword": "Current Password",
+    "confirmPassword": "Confirm Password"
+  },
+  "general": {
+    "name": "Name",
+    "username": "Username",
+    "password": "Password",
+    "newPassword": "New Password",
+    "updatePassword": "Update Password",
+    "mtu": "MTU",
+    "allowedIps": "Allowed IPs",
+    "persistentKeepalive": "Persistent Keepalive",
+    "logout": "Logout",
+    "continue": "Continue",
+    "host": "Host",
+    "port": "Port",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "setup": {
+    "welcome": "Welcome to your first setup of wg-easy !",
+    "welcomeDesc": "You have found the easiest way to install and manage WireGuard on any Linux host!",
+    "existingSetup": "Do you have an existing setup?",
+    "createAdminDesc": "Please first enter an admin username and a strong secure password. This information will be used to log in to your administration panel.",
+    "setupConfigDesc": "Please enter the host and port information. This will be used for the client configuration when setting up WireGuard on their devices.",
+    "setupMigrationDesc": "Please provide the backup file if you want to migrate your data from your previous wg-easy version to your new setup.",
+    "upload": "Upload",
+    "migration": "Restore the backup",
+    "createAccount": "Create Account",
+    "successful": "Setup successful"
+  },
+  "update": {
+    "updateAvailable": "There is an update available!",
+    "update": "Update"
+  },
+  "theme": {
+    "dark": "Dark theme",
+    "light": "Light theme",
+    "system": "System theme"
+  },
+  "layout": {
+    "toggleCharts": "Show/hide Charts",
+    "donate": "Donate"
+  },
+  "login": {
+    "signIn": "Sign In",
+    "rememberMe": "Remember me",
+    "rememberMeDesc": "Stay logged after closing the browser"
+  },
+  "error": {
+    "clear": "Clear",
+    "login": "Log in error"
+  },
+  "client": {
+    "empty": "There are no clients yet.",
+    "newShort": "New",
+    "sort": "Sort",
+    "create": "Create Client",
+    "created": "Client created",
+    "new": "New Client",
+    "name": "Name",
+    "expireDate": "Expire Date",
+    "expireDateDesc": "Date the client will be disabled. Blank for permanent",
+    "deleteClient": "Delete Client",
+    "deleteDialog1": "Are you sure you want to delete",
+    "deleteDialog2": "This action cannot be undone.",
+    "enabled": "Enabled",
+    "address": "Address",
+    "serverAllowedIps": "Server Allowed IPs",
+    "otlDesc": "Generate short one time link",
+    "permanent": "Permanent",
+    "createdOn": "Created on ",
+    "lastSeen": "Last seen on ",
+    "totalDownload": "Total Download: ",
+    "totalUpload": "Total Upload: ",
+    "newClient": "New Client",
+    "disableClient": "Disable Client",
+    "enableClient": "Enable Client",
+    "noPrivKey": "This client has no known private key. Cannot create Configuration.",
+    "showQR": "Show QR Code",
+    "downloadConfig": "Download Configuration",
+    "allowedIpsDesc": "Which IPs will be routed through the VPN",
+    "serverAllowedIpsDesc": "Which IPs the server will route to the client",
+    "mtuDesc": "Sets the maximum transmission unit (packet size) for the VPN tunnel",
+    "persistentKeepaliveDesc": "Sets the interval (in seconds) for keep-alive packets. 0 disables it"
+  },
+  "dialog": {
+    "change": "Change",
+    "cancel": "Cancel",
+    "create": "Create"
+  },
+  "toast": {
+    "success": "Success",
+    "saved": "Saved",
+    "error": "Error",
+    "errored": "Failed to save"
+  },
+  "form": {
+    "actions": "Actions",
+    "save": "Save",
+    "revert": "Revert",
+    "sectionGeneral": "General",
+    "sectionAdvanced": "Advanced",
+    "noItems": "No items",
+    "add": "Add"
+  },
+  "admin": {
+    "general": {
+      "sessionTimeout": "Session Timeout",
+      "sessionTimeoutDesc": "Session duration for Remember Me (seconds)",
+      "metrics": "Metrics",
+      "metricsPassword": "Password",
+      "metricsPasswordDesc": "Bearer Password for the metrics endpoint (argon2 hash)",
+      "json": "JSON",
+      "jsonDesc": "Route for metrics in JSON format",
+      "prometheus": "Prometheus",
+      "prometheusDesc": "Route for Prometheus metrics"
+    },
+    "config": {
+      "connection": "Connection",
+      "hostDesc": "Public hostname clients will connect to (invalidates config)",
+      "portDesc": "Public UDP port clients will connect to (invalidates config)",
+      "allowedIpsDesc": "Allowed IPs clients will use (invalidates config)",
+      "dns": "DNS",
+      "dnsDesc": "DNS server clients will use (invalidates config)",
+      "mtuDesc": "MTU clients will use (invalidates config)",
+      "persistentKeepaliveDesc": "Interval in seconds to send keepalives to the server. 0 = disabled (invalidates config)"
+    },
+    "interface": {
+      "cidrSuccess": "Changed CIDR",
+      "cidrError": "Failed to change CIDR",
+      "device": "Device",
+      "deviceDesc": "Ethernet device the wireguard traffic should be forwarded through",
+      "mtuDesc": "MTU WireGuard will use",
+      "portDesc": "UDP Port WireGuard will listen on (could invalidate config)",
+      "changeCidr": "Change CIDR"
+    }
+  },
+  "zod": {
+    "generic": {
+      "required": "{0} is required",
+      "validNumber": "{0} must be a valid number",
+      "validString": "{0} must be a valid string",
+      "validBoolean": "{0} must be a valid boolean",
+      "validArray": "{0} must be a valid array",
+      "stringMin": "{0} must be at least {1} Character",
+      "numberMin": "{0} must be at least {1}"
+    },
+    "client": {
+      "id": "Client ID",
+      "name": "Name",
+      "expiresAt": "Expires At",
+      "address4": "IPv4 Address",
+      "address6": "IPv6 Address",
+      "serverAllowedIps": "Server Allowed IPs"
+    },
+    "user": {
+      "username": "Username",
+      "password": "Password",
+      "passwordUppercase": "Password must have at least 1 uppercase letter",
+      "passwordLowercase": "Password must have at least 1 lowercase letter",
+      "passwordNumber": "Password must have at least 1 number",
+      "passwordSpecial": "Password must have at least 1 special character",
+      "remember": "Remember",
+      "name": "Name",
+      "email": "Email",
+      "emailInvalid": "Email must be a valid email",
+      "passwordMatch": "Passwords must match"
+    },
+    "userConfig": {
+      "host": "Host"
+    },
+    "general": {
+      "sessionTimeout": "Session Timeout",
+      "metricsEnabled": "Metrics",
+      "metricsPassword": "Metrics Password"
+    },
+    "interface": {
+      "cidr": "CIDR",
+      "device": "Device"
+    },
+    "otl": "One Time link",
+    "stringMalformed": "String is malformed",
+    "body": "Body must be a valid object",
+    "hook": "Hook",
+    "enabled": "Enabled",
+    "mtu": "MTU",
+    "port": "Port",
+    "persistentKeepalive": "Persistent Keepalive",
+    "address": "IP Address",
+    "dns": "DNS",
+    "allowedIps": "Allowed IPs",
+    "file": "File"
+  }
+}

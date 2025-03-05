@@ -2,8 +2,7 @@
 name: 🛠️ Feature Request
 description: Suggest an idea to help us improve
 title: "[Feat]: "
-labels:
-  - "type: feature request"
+type: Feature
 
 body:
   - type: markdown

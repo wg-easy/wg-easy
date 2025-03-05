@@ -2,8 +2,7 @@
 name: 🐛 Bug Report
 description: Create a report to help us improve
 title: "[Bug]: "
-labels:
-  - "type: bug"
+type: Bug
 
 body:
   - type: markdown
@@ -11,7 +10,7 @@ body:
       value: |
         **Thanks :heart: for taking the time to fill out this bug report!**
         We kindly ask that you search to see if an issue [already exists](https://github.com/wg-easy/wg-easy/issues?q=is%3Aissue+sort%3Acreated-desc+) for the bug you encountered.
-  
+
   - type: textarea
     id: what-happened
     attributes:
@@ -20,7 +19,7 @@ body:
       value: "A bug happened!"
     validations:
       required: true
-  
+
   - type: textarea
     id: what-should-happen
     attributes:
@@ -29,7 +28,7 @@ body:
       value: "Work just fine!"
     validations:
       required: true
-  
+
   - type: textarea
     id: logs
     attributes:

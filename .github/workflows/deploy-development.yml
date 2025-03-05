@@ -1,37 +1,71 @@
-name: Build & Publish Development
+name: Development
 
 on:
   workflow_dispatch:
 
 jobs:
-  deploy:
-    name: Build & Deploy
+  docker:
+    name: Build & Deploy Docker
     runs-on: ubuntu-latest
     if: github.repository_owner == 'wg-easy'
     permissions:
       packages: write
       contents: read
     steps:
-    - uses: actions/checkout@v4
-      with:
-        ref: master
+      - uses: actions/checkout@v4
 
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v3
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-    - name: Login to GitHub Container Registry
-      uses: docker/login-action@v3
-      with:
-        registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Build & Publish Docker Image
-      uses: docker/build-push-action@v6
-      with:
-        push: true
-        platforms: linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8
-        tags: ghcr.io/wg-easy/wg-easy:development
+      - name: Build & Publish Docker Image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: ghcr.io/wg-easy/wg-easy:development
+          cache-from: type=gha
+          cache-to: type=gha,mode=min
+
+  docs:
+    name: Build & Deploy Docs
+    runs-on: ubuntu-latest
+    if: github.repository_owner == 'wg-easy'
+    permissions:
+      contents: write
+    needs: docker
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11.9
+          cache: "pip"
+          cache-dependency-path: docs/requirements.txt
+
+      - name: Install Dependencies
+        run: |
+          pip install -r docs/requirements.txt
+
+      - name: Setup Git User
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Build Docs Website
+        run: |
+          cd docs
+          git fetch origin gh-pages --depth=1 || true
+
+          mike deploy --push --update-aliases development
