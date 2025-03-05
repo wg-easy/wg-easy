@@ -1,0 +1,25 @@
+{
+  "editor.tabSize": 2,
+  "editor.useTabStops": false,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "nuxtr.vueFiles.style.addStyleTag": false,
+  "nuxtr.piniaFiles.defaultTemplate": "setup",
+  "nuxtr.monorepoMode.DirectoryName": "src",
+  "[vue]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "typescript.tsdk": "./src/node_modules/typescript/lib",
+  "i18n-ally.enabledFrameworks": ["vue"],
+  "i18n-ally.localesPaths": ["src/i18n/locales"],
+  "i18n-ally.sortKeys": false,
+  "i18n-ally.keepFulfilled": false,
+  "i18n-ally.keystyle": "nested",
+  "editor.gotoLocation.multipleDefinitions": "goto"
+}
