@@ -18,8 +18,8 @@ export default defineSetupEventHandler('migrate', async ({ event }) => {
     clients: z.record(
       z.string(),
       z.object({
-        // not used
-        id: z.string(),
+        // not used, breaks compatibility with older versions
+        id: z.string().optional(),
         name: z.string(),
         address: z.string(),
         privateKey: z.string(),
