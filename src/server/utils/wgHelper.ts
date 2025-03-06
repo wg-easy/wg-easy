@@ -54,10 +54,11 @@ PrivateKey = ${client.privateKey}
 Address = ${client.ipv4Address}/${cidr4Block}, ${client.ipv6Address}/${cidr6Block}
 DNS = ${client.dns.join(', ')}
 MTU = ${client.mtu}
-PreUp = ${client.preUp}
-PostUp = ${client.postUp}
-PreDown = ${client.preDown}
-PostDown = ${client.postDown}
+${client.preUp ? `PreUp = ${client.preUp}\n` : ''
+    }${client.postUp ? `PostUp = ${client.postUp}\n` : ''
+    }${client.preDown ? `PreDown = ${client.preDown}\n` : ''
+    }${client.postDown ? `PostDown = ${client.postDown}\n` : ''
+    }
 
 [Peer]
 PublicKey = ${wgInterface.publicKey}
