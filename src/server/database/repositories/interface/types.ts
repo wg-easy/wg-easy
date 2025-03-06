@@ -1,5 +1,6 @@
 import type { InferSelectModel } from 'drizzle-orm';
 import z from 'zod';
+import isCidr from 'is-cidr';
 import type { wgInterface } from './schema';
 
 export type InterfaceType = InferSelectModel<typeof wgInterface>;
@@ -22,6 +23,7 @@ const device = z
 const cidr = z
   .string({ message: t('zod.interface.cidr') })
   .min(1, { message: t('zod.interface.cidr') })
+  .refine((value) => isCidr(value), { message: t('zod.interface.cidrValid') })
   .pipe(safeStringRefine);
 
 export const InterfaceUpdateSchema = schemaForType<InterfaceUpdateType>()(
