@@ -1,4 +1,3 @@
-import isCidr from 'is-cidr';
 import { eq, sql } from 'drizzle-orm';
 import { parseCidr } from 'cidr-tools';
 import { wgInterface } from './schema';
@@ -58,10 +57,18 @@ export class InterfaceService {
   }
 
   updateCidr(data: InterfaceCidrUpdateType) {
-    if (!isCidr(data.ipv4Cidr) || !isCidr(data.ipv6Cidr)) {
-      throw new Error('Invalid CIDR');
-    }
     return this.#db.transaction(async (tx) => {
+      const oldCidr = await tx.query.wgInterface
+        .findFirst({
+          where: eq(wgInterface.name, 'wg0'),
+          columns: { ipv4Cidr: true, ipv6Cidr: true },
+        })
+        .execute();
+
+      if (!oldCidr) {
+        throw new Error('Interface not found');
+      }
+
       await tx
         .update(wgInterface)
         .set(data)
@@ -74,8 +81,17 @@ export class InterfaceService {
         // TODO: optimize
         const clients = await tx.query.client.findMany().execute();
 
-        const nextIpv4 = nextIP(4, parseCidr(data.ipv4Cidr), clients);
-        const nextIpv6 = nextIP(6, parseCidr(data.ipv6Cidr), clients);
+        // only calculate ip if cidr has changed
+
+        let nextIpv4 = client.ipv4Address;
+        if (data.ipv4Cidr !== oldCidr.ipv4Cidr) {
+          nextIpv4 = nextIP(4, parseCidr(data.ipv4Cidr), clients);
+        }
+
+        let nextIpv6 = client.ipv6Address;
+        if (data.ipv6Cidr !== oldCidr.ipv6Cidr) {
+          nextIpv6 = nextIP(6, parseCidr(data.ipv6Cidr), clients);
+        }
 
         await tx
           .update(clientSchema)

@@ -194,7 +194,8 @@
     },
     "interface": {
       "cidr": "CIDR",
-      "device": "Device"
+      "device": "Device",
+      "cidrValid": "CIDR must be valid"
     },
     "otl": "One Time link",
     "stringMalformed": "String is malformed",
