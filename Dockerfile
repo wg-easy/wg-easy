@@ -1,6 +1,8 @@
 FROM docker.io/library/node:lts-alpine AS build
 WORKDIR /app
 
+RUN npm install --global npm@latest
+
 # update corepack
 RUN npm install --global corepack@latest
 # Install pnpm
