@@ -1,4 +1,3 @@
-import isCidr from 'is-cidr';
 import { eq, sql } from 'drizzle-orm';
 import { parseCidr } from 'cidr-tools';
 import { wgInterface } from './schema';
