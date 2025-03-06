@@ -1,6 +1,14 @@
 <template>
   <div v-if="data?.length === 0">
     {{ emptyText || $t('form.noItems') }}
+    <div class="mt-2">
+      <BaseButton
+        as="input"
+        type="button"
+        :value="$t('form.add')"
+        @click="add"
+      />
+    </div>
   </div>
   <div v-else class="flex flex-col gap-2">
     <div v-for="(item, i) in data" :key="i">
