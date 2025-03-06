@@ -54,10 +54,10 @@ PrivateKey = ${client.privateKey}
 Address = ${client.ipv4Address}/${cidr4Block}, ${client.ipv6Address}/${cidr6Block}
 DNS = ${client.dns.join(', ')}
 MTU = ${client.mtu}
-${client.preUp ? `PreUp = ${client.preUp}\n` : ''
-    }${client.postUp ? `PostUp = ${client.postUp}\n` : ''
-    }${client.preDown ? `PreDown = ${client.preDown}\n` : ''
-    }${client.postDown ? `PostDown = ${client.postDown}\n` : ''
+${client.preUp ? `PreUp = ${client.preUp}\n` : ''}${
+      client.postUp ? `PostUp = ${client.postUp}\n` : ''
+    }${client.preDown ? `PreDown = ${client.preDown}\n` : ''}${
+      client.postDown ? `PostDown = ${client.postDown}\n` : ''
     }
 
 [Peer]

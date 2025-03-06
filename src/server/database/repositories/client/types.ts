@@ -41,23 +41,19 @@ const address6 = z
 
 const preUp = z
   .string({ message: t('zod.client.preUp') })
-  .pipe(safeStringRefine)
-  .nullable();
+  .pipe(safeStringRefine);
 
 const postUp = z
   .string({ message: t('zod.client.postUp') })
-  .pipe(safeStringRefine)
-  .nullable();
+  .pipe(safeStringRefine);
 
 const preDown = z
   .string({ message: t('zod.client.preDown') })
-  .pipe(safeStringRefine)
-  .nullable();
+  .pipe(safeStringRefine);
 
 const postDown = z
   .string({ message: t('zod.client.postDown') })
-  .pipe(safeStringRefine)
-  .nullable();
+  .pipe(safeStringRefine);
 
 const serverAllowedIps = z.array(AddressSchema, {
   message: t('zod.client.serverAllowedIps'),

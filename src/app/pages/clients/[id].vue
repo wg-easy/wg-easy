@@ -75,8 +75,16 @@
             <FormHeading>{{ $t('form.hooks') }}</FormHeading>
             <FormTextField id="PreUp" v-model="data.preUp" label="PreUp" />
             <FormTextField id="PostUp" v-model="data.postUp" label="PostUp" />
-            <FormTextField id="PreDown" v-model="data.preDown" label="PreDown" />
-            <FormTextField id="PostDown" v-model="data.postDown" label="PostDown" />
+            <FormTextField
+              id="PreDown"
+              v-model="data.preDown"
+              label="PreDown"
+            />
+            <FormTextField
+              id="PostDown"
+              v-model="data.postDown"
+              label="PostDown"
+            />
           </FormGroup>
           <FormGroup>
             <FormHeading>{{ $t('form.actions') }}</FormHeading>
