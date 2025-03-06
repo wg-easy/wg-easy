@@ -28,10 +28,6 @@ export default defineSetupEventHandler('migrate', async ({ event }) => {
         createdAt: z.string(),
         updatedAt: z.string(),
         enabled: z.boolean(),
-        preUp: z.string(),
-        postUp: z.string(),
-        preDown: z.string(),
-        postDown: z.string(),
       })
     ),
   });
@@ -67,15 +63,19 @@ export default defineSetupEventHandler('migrate', async ({ event }) => {
     const clients = await Database.clients.getAll();
 
     const ipv6Address = nextIP(6, ipv6Cidr, clients);
+    const preUp = '';
+    const postUp = '';
+    const preDown = '';
+    const postDown = '';
 
     await Database.clients.createFromExisting({
       ...clientConfig,
       ipv4Address: clientConfig.address,
       ipv6Address,
-      preUp: clientConfig.preUp,
-      postUp: clientConfig.postUp,
-      preDown: clientConfig.preDown,
-      postDown: clientConfig.postDown
+      preUp,
+      postUp,
+      preDown,
+      postDown,
     });
   }
 
