@@ -101,6 +101,10 @@ export class ClientService {
       const ipv4Address = nextIP(4, ipv4Cidr, clients);
       const ipv6Cidr = parseCidr(clientInterface.ipv6Cidr);
       const ipv6Address = nextIP(6, ipv6Cidr, clients);
+      const preUp = '';
+      const postUp = '';
+      const preDown = '';
+      const postDown = '';
 
       await tx
         .insert(client)
@@ -114,6 +118,10 @@ export class ClientService {
           preSharedKey,
           ipv4Address,
           ipv6Address,
+          preUp,
+          postUp,
+          preDown,
+          postDown,
           mtu: clientConfig.defaultMtu,
           allowedIps: clientConfig.defaultAllowedIps,
           dns: clientConfig.defaultDns,
@@ -145,6 +153,10 @@ export class ClientService {
     preSharedKey,
     privateKey,
     publicKey,
+    preUp,
+    postUp,
+    preDown,
+    postDown
   }: ClientCreateFromExistingType) {
     const clientConfig = await Database.userConfigs.get();
 
@@ -158,6 +170,10 @@ export class ClientService {
         preSharedKey,
         ipv4Address,
         ipv6Address,
+        preUp,
+        postUp,
+        preDown,
+        postDown,
         mtu: clientConfig.defaultMtu,
         allowedIps: clientConfig.defaultAllowedIps,
         dns: clientConfig.defaultDns,

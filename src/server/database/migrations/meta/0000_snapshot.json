@@ -98,6 +98,34 @@
           "notNull": true,
           "autoincrement": false
         },
+        "pre_up": {
+          "name": "pre_up",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "post_up": {
+          "name": "post_up",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "pre_down": {
+          "name": "pre_down",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "post_down": {
+          "name": "post_down",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
         "dns": {
           "name": "dns",
           "type": "text",

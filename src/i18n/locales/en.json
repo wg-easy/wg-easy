@@ -118,7 +118,8 @@
     "sectionGeneral": "General",
     "sectionAdvanced": "Advanced",
     "noItems": "No items",
-    "add": "Add"
+    "add": "Add",
+    "hooks": "Hooks"
   },
   "admin": {
     "general": {

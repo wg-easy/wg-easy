@@ -54,6 +54,10 @@ PrivateKey = ${client.privateKey}
 Address = ${client.ipv4Address}/${cidr4Block}, ${client.ipv6Address}/${cidr6Block}
 DNS = ${client.dns.join(', ')}
 MTU = ${client.mtu}
+PreUp = ${client.preUp}
+PostUp = ${client.postUp}
+PreDown = ${client.preDown}
+PostDown = ${client.postDown}
 
 [Peer]
 PublicKey = ${wgInterface.publicKey}
@@ -103,6 +107,10 @@ Endpoint = ${userConfig.host}:${userConfig.port}`;
       string,
       string,
       string,
+      string,
+      string,
+      string,
+      string,
     ];
 
     return rawDump
@@ -120,6 +128,10 @@ Endpoint = ${userConfig.host}:${userConfig.port}`;
           transferRx,
           transferTx,
           persistentKeepalive,
+          preUp,
+          postUp,
+          preDown,
+          postDown
         ] = splitLines as wgDumpLine;
 
         return {
@@ -134,6 +146,10 @@ Endpoint = ${userConfig.host}:${userConfig.port}`;
           transferRx: Number.parseInt(transferRx),
           transferTx: Number.parseInt(transferTx),
           persistentKeepalive: persistentKeepalive,
+          preUp: preUp,
+          postUp: postUp,
+          preDown: preDown,
+          postDown: postDown
         };
       });
   },

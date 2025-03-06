@@ -28,6 +28,10 @@ export default defineSetupEventHandler('migrate', async ({ event }) => {
         createdAt: z.string(),
         updatedAt: z.string(),
         enabled: z.boolean(),
+        preUp: z.string(),
+        postUp: z.string(),
+        preDown: z.string(),
+        postDown: z.string(),
       })
     ),
   });
@@ -68,6 +72,10 @@ export default defineSetupEventHandler('migrate', async ({ event }) => {
       ...clientConfig,
       ipv4Address: clientConfig.address,
       ipv6Address,
+      preUp: clientConfig.preUp,
+      postUp: clientConfig.postUp,
+      preDown: clientConfig.preDown,
+      postDown: clientConfig.postDown
     });
   }
 

@@ -39,6 +39,26 @@ const address6 = z
   .min(1, { message: t('zod.client.address6') })
   .pipe(safeStringRefine);
 
+const preUp = z
+  .string({ message: t('zod.client.preUp') })
+  .pipe(safeStringRefine)
+  .nullable();
+
+const postUp = z
+  .string({ message: t('zod.client.postUp') })
+  .pipe(safeStringRefine)
+  .nullable();
+
+const preDown = z
+  .string({ message: t('zod.client.preDown') })
+  .pipe(safeStringRefine)
+  .nullable();
+
+const postDown = z
+  .string({ message: t('zod.client.postDown') })
+  .pipe(safeStringRefine)
+  .nullable();
+
 const serverAllowedIps = z.array(AddressSchema, {
   message: t('zod.client.serverAllowedIps'),
 });
@@ -57,6 +77,10 @@ export const ClientUpdateSchema = schemaForType<UpdateClientType>()(
     expiresAt: expiresAt,
     ipv4Address: address4,
     ipv6Address: address6,
+    preUp: preUp,
+    postUp: postUp,
+    preDown: preDown,
+    postDown: postDown,
     allowedIps: AllowedIpsSchema,
     serverAllowedIps: serverAllowedIps,
     mtu: MtuSchema,
@@ -77,6 +101,10 @@ export type ClientCreateFromExistingType = Pick<
   | 'name'
   | 'ipv4Address'
   | 'ipv6Address'
+  | 'preUp'
+  | 'postUp'
+  | 'preDown'
+  | 'postDown'
   | 'privateKey'
   | 'preSharedKey'
   | 'publicKey'
