@@ -8,9 +8,6 @@ RUN corepack enable pnpm
 
 HEALTHCHECK --interval=1m --timeout=5s --retries=3 CMD /usr/bin/timeout 5s /bin/sh -c "/usr/bin/wg show | /bin/grep -q interface || exit 1"
 
-# Use Tencent Mirrors
-RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.cloud.tencent.com/g' /etc/apk/repositories
-
 # Install Linux packages
 RUN apk add --no-cache \
     dpkg \
