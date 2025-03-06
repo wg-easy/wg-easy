@@ -63,19 +63,11 @@ export default defineSetupEventHandler('migrate', async ({ event }) => {
     const clients = await Database.clients.getAll();
 
     const ipv6Address = nextIP(6, ipv6Cidr, clients);
-    const preUp = '';
-    const postUp = '';
-    const preDown = '';
-    const postDown = '';
 
     await Database.clients.createFromExisting({
       ...clientConfig,
       ipv4Address: clientConfig.address,
       ipv6Address,
-      preUp,
-      postUp,
-      preDown,
-      postDown,
     });
   }
 

@@ -108,10 +108,6 @@ Endpoint = ${userConfig.host}:${userConfig.port}`;
       string,
       string,
       string,
-      string,
-      string,
-      string,
-      string,
     ];
 
     return rawDump
@@ -129,10 +125,6 @@ Endpoint = ${userConfig.host}:${userConfig.port}`;
           transferRx,
           transferTx,
           persistentKeepalive,
-          preUp,
-          postUp,
-          preDown,
-          postDown
         ] = splitLines as wgDumpLine;
 
         return {
@@ -147,10 +139,6 @@ Endpoint = ${userConfig.host}:${userConfig.port}`;
           transferRx: Number.parseInt(transferRx),
           transferTx: Number.parseInt(transferTx),
           persistentKeepalive: persistentKeepalive,
-          preUp: preUp,
-          postUp: postUp,
-          preDown: preDown,
-          postDown: postDown
         };
       });
   },
