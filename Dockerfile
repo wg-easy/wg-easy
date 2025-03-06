@@ -28,9 +28,6 @@ COPY --from=build /app/server/database/migrations /app/server/database/migration
 # libsql
 RUN npm install --no-save libsql
 
-# Use Tencent Mirrors
-RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.cloud.tencent.com/g' /etc/apk/repositories
-
 # Install Linux packages
 RUN apk add --no-cache \
     dpkg \
