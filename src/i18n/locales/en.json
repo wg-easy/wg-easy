@@ -98,7 +98,14 @@
     "allowedIpsDesc": "Which IPs will be routed through the VPN",
     "serverAllowedIpsDesc": "Which IPs the server will route to the client",
     "mtuDesc": "Sets the maximum transmission unit (packet size) for the VPN tunnel",
-    "persistentKeepaliveDesc": "Sets the interval (in seconds) for keep-alive packets. 0 disables it"
+    "persistentKeepaliveDesc": "Sets the interval (in seconds) for keep-alive packets. 0 disables it",
+    "hooks": "Hooks",
+    "hooksDescription": "Hooks only works with wg-quick",
+    "hooksLeaveEmpty": "Only for wg-quick. Otherwise, please leave it empty",
+    "PreUp": "PreUp",
+    "PostUp": "PostUp",
+    "PreDown": "PreDown",
+    "PostDown": "PostDown"
   },
   "dialog": {
     "change": "Change",
@@ -118,8 +125,7 @@
     "sectionGeneral": "General",
     "sectionAdvanced": "Advanced",
     "noItems": "No items",
-    "add": "Add",
-    "hooks": "Hooks"
+    "add": "Add"
   },
   "admin": {
     "general": {
