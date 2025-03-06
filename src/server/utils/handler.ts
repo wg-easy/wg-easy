@@ -138,34 +138,27 @@ export const defineMetricsHandler = <
   handler: MetricsHandler<TReq, TRes>
 ) => {
   return defineEventHandler(async (event) => {
-    const auth = getHeader(event, 'Authorization');
-
-    if (!auth) {
-      throw createError({
-        statusCode: 401,
-        statusMessage: 'Unauthorized',
-      });
-    }
-
-    const [method, value] = auth.split(' ');
-
-    if (method !== 'Bearer' || !value) {
-      throw createError({
-        statusCode: 401,
-        statusMessage: 'Bearer Auth required',
-      });
-    }
-
     const metricsConfig = await Database.general.getMetricsConfig();
 
-    if (metricsConfig[type] !== true) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'Metrics not enabled',
-      });
-    }
-
     if (metricsConfig.password) {
+      const auth = getHeader(event, 'Authorization');
+
+      if (!auth) {
+        throw createError({
+          statusCode: 401,
+          statusMessage: 'Unauthorized',
+        });
+      }
+
+      const [method, value] = auth.split(' ');
+
+      if (method !== 'Bearer' || !value) {
+        throw createError({
+          statusCode: 401,
+          statusMessage: 'Bearer Auth required',
+        });
+      }
+
       const tokenValid = await isPasswordValid(value, metricsConfig.password);
 
       if (!tokenValid) {
@@ -174,6 +167,13 @@ export const defineMetricsHandler = <
           statusMessage: 'Incorrect token',
         });
       }
+    }
+
+    if (metricsConfig[type] !== true) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'Metrics not enabled',
+      });
     }
 
     return await handler({ event });
