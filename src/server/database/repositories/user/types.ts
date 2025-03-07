@@ -26,10 +26,15 @@ export const UserLoginSchema = z.object({
   remember: remember,
 });
 
-export const UserSetupSchema = z.object({
-  username: username,
-  password: password,
-});
+export const UserSetupSchema = z
+  .object({
+    username: username,
+    password: password,
+    confirmPassword: password,
+  })
+  .refine((val) => val.password === val.confirmPassword, {
+    message: t('zod.user.passwordMatch'),
+  });
 
 const name = z
   .string({ message: t('zod.user.name') })

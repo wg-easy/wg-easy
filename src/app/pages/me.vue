@@ -40,7 +40,7 @@
               id="confirm-password"
               v-model="confirmPassword"
               autocomplete="new-password"
-              :label="$t('me.confirmPassword')"
+              :label="$t('general.confirmPassword')"
             />
             <FormActionField
               type="submit"

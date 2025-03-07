@@ -14,8 +14,7 @@
     "email": "E-Mail"
   },
   "me": {
-    "currentPassword": "Current Password",
-    "confirmPassword": "Confirm Password"
+    "currentPassword": "Current Password"
   },
   "general": {
     "name": "Name",
@@ -32,7 +31,8 @@
     "host": "Host",
     "port": "Port",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "confirmPassword": "Confirm Password"
   },
   "setup": {
     "welcome": "Welcome to your first setup of wg-easy !",
