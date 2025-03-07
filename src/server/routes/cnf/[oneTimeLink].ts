@@ -5,20 +5,28 @@ export default defineEventHandler(async (event) => {
     event,
     validateZod(OneTimeLinkGetSchema, event)
   );
-  const clients = await WireGuard.getAllClients();
-  // TODO: filter on the database level
-  const client = clients.find(
-    (client) => client.oneTimeLink?.oneTimeLink === oneTimeLink
-  );
+
+  const otl = await Database.oneTimeLinks.getByOtl(oneTimeLink);
+  if (!otl) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: 'Invalid One Time Link',
+    });
+  }
+
+  const client = await Database.clients.get(otl.clientId);
   if (!client) {
     throw createError({
       statusCode: 404,
       statusMessage: 'Invalid One Time Link',
     });
   }
-  const clientId = client.id;
-  const config = await WireGuard.getClientConfiguration({ clientId });
-  await Database.oneTimeLinks.erase(clientId);
+
+  const config = await WireGuard.getClientConfiguration({
+    clientId: client.id,
+  });
+  await Database.oneTimeLinks.erase(otl.id);
+
   setHeader(
     event,
     'Content-Disposition',

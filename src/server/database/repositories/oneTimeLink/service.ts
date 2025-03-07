@@ -12,7 +12,7 @@ function createPreparedStatement(db: DBType) {
     create: db
       .insert(oneTimeLink)
       .values({
-        clientId: sql.placeholder('id'),
+        clientId: sql.placeholder('clientId'),
         oneTimeLink: sql.placeholder('oneTimeLink'),
         expiresAt: sql.placeholder('expiresAt'),
       })
@@ -20,7 +20,12 @@ function createPreparedStatement(db: DBType) {
     erase: db
       .update(oneTimeLink)
       .set({ expiresAt: sql.placeholder('expiresAt') as never as string })
-      .where(eq(oneTimeLink.clientId, sql.placeholder('id')))
+      .where(eq(oneTimeLink.id, sql.placeholder('id')))
+      .prepare(),
+    findByOneTimeLink: db.query.oneTimeLink
+      .findFirst({
+        where: eq(oneTimeLink.oneTimeLink, sql.placeholder('oneTimeLink')),
+      })
       .prepare(),
   };
 }
@@ -36,16 +41,24 @@ export class OneTimeLinkService {
     return this.#statements.delete.execute({ id });
   }
 
-  generate(id: ID) {
-    const key = `${id}-${Math.floor(Math.random() * 1000)}`;
+  getByOtl(oneTimeLink: string) {
+    return this.#statements.findByOneTimeLink.execute({ oneTimeLink });
+  }
+
+  generate(clientId: ID) {
+    const key = `${clientId}-${Math.floor(Math.random() * 1000)}`;
     const oneTimeLink = Math.abs(CRC32.str(key)).toString(16);
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString();
 
-    return this.#statements.create.execute({ id, oneTimeLink, expiresAt });
+    return this.#statements.create.execute({
+      clientId,
+      oneTimeLink,
+      expiresAt,
+    });
   }
 
   erase(id: ID) {
-    const expiresAt = Date.now() + 10 * 1000;
+    const expiresAt = new Date(Date.now() + 10 * 1000).toISOString();
     return this.#statements.erase.execute({ id, expiresAt });
   }
 }

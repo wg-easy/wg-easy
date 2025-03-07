@@ -39,11 +39,8 @@ export const client = sqliteTable('clients_table', {
     .$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
 });
 
-export const clientsRelations = relations(client, ({ one }) => ({
-  oneTimeLink: one(oneTimeLink, {
-    fields: [client.id],
-    references: [oneTimeLink.clientId],
-  }),
+export const clientsRelations = relations(client, ({ one, many }) => ({
+  oneTimeLinks: many(oneTimeLink),
   user: one(user, {
     fields: [client.userId],
     references: [user.id],
