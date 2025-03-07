@@ -72,6 +72,35 @@
             />
           </FormGroup>
           <FormGroup>
+            <FormHeading :description="$t('client.hooksDescription')">
+              {{ $t('client.hooks') }}
+            </FormHeading>
+            <FormTextField
+              id="PreUp"
+              v-model="data.preUp"
+              :description="$t('client.hooksLeaveEmpty')"
+              :label="$t('hooks.preUp')"
+            />
+            <FormTextField
+              id="PostUp"
+              v-model="data.postUp"
+              :description="$t('client.hooksLeaveEmpty')"
+              :label="$t('hooks.postUp')"
+            />
+            <FormTextField
+              id="PreDown"
+              v-model="data.preDown"
+              :description="$t('client.hooksLeaveEmpty')"
+              :label="$t('hooks.preDown')"
+            />
+            <FormTextField
+              id="PostDown"
+              v-model="data.postDown"
+              :description="$t('client.hooksLeaveEmpty')"
+              :label="$t('hooks.postDown')"
+            />
+          </FormGroup>
+          <FormGroup>
             <FormHeading>{{ $t('form.actions') }}</FormHeading>
             <FormActionField type="submit" :label="$t('form.save')" />
             <FormActionField :label="$t('form.revert')" @click="revert" />

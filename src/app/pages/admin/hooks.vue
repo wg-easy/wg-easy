@@ -2,10 +2,26 @@
   <main v-if="data">
     <FormElement @submit.prevent="submit">
       <FormGroup>
-        <FormTextField id="PreUp" v-model="data.preUp" label="PreUp" />
-        <FormTextField id="PostUp" v-model="data.postUp" label="PostUp" />
-        <FormTextField id="PreDown" v-model="data.preDown" label="PreDown" />
-        <FormTextField id="PostDown" v-model="data.postDown" label="PostDown" />
+        <FormTextField
+          id="PreUp"
+          v-model="data.preUp"
+          :label="$t('hooks.preUp')"
+        />
+        <FormTextField
+          id="PostUp"
+          v-model="data.postUp"
+          :label="$t('hooks.postUp')"
+        />
+        <FormTextField
+          id="PreDown"
+          v-model="data.preDown"
+          :label="$t('hooks.preDown')"
+        />
+        <FormTextField
+          id="PostDown"
+          v-model="data.postDown"
+          :label="$t('hooks.postDown')"
+        />
       </FormGroup>
       <FormGroup>
         <FormHeading>{{ $t('form.actions') }}</FormHeading>

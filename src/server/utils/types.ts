@@ -52,6 +52,10 @@ export const FileSchema = z.object({
   file: z.string({ message: t('zod.file') }),
 });
 
+export const HookSchema = z
+  .string({ message: t('zod.hook') })
+  .pipe(safeStringRefine);
+
 export const schemaForType =
   <T>() =>
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
