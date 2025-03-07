@@ -19,15 +19,22 @@ sudo mkdir -p /etc/containers/volumes/wg-easy
 
 Create a file `/etc/containers/systemd/wg-easy/wg-easy.container` with the following content:
 
+<!-- ref: major version -->
+
 ```ini
 [Container]
 ContainerName=wg-easy
-Image=ghcr.io/wg-easy/wg-easy:latest
+Image=ghcr.io/wg-easy/wg-easy:15
+AutoUpdate=registry
 
 Volume=/etc/containers/volumes/wg-easy:/etc/wireguard:Z
 Network=wg-easy.network
 PublishPort=51820:51820/udp
 PublishPort=51821:51821/tcp
+
+# this is used to allow access over HTTP
+# remove this when using a reverse proxy
+Environment=INSECURE=true
 
 AddCapability=NET_ADMIN
 AddCapability=SYS_MODULE
@@ -89,6 +96,16 @@ In the Admin Panel of your WireGuard server, go to the `Hooks` tab and add the f
    ```shell
    nft delete table inet wg_table
    ```
+
+If you don't have iptables loaded on your server, you could see many errors in the logs or in the UI. You can ignore them.
+
+## Restart the Container
+
+Restart the container to apply the new hooks:
+
+```shell
+sudo systemctl restart wg-easy
+```
 
 <!--
 TODO: improve docs after better nftables support

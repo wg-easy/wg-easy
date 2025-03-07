@@ -4,7 +4,8 @@
   "scripts": {
     "dev": "docker compose -f docker-compose.dev.yml up --build",
     "build": "docker build -t wg-easy .",
-    "docs:preview": "docker run --rm -it -p 8080:8080 -v ./docs:/docs squidfunk/mkdocs-material serve -a 0.0.0.0:8080"
+    "docs:preview": "docker run --rm -it -p 8080:8080 -v ./docs:/docs squidfunk/mkdocs-material serve -a 0.0.0.0:8080",
+    "scripts:version": "bash scripts/version.sh"
   },
   "packageManager": "pnpm@10.5.2"
 }

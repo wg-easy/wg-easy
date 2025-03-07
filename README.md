@@ -42,8 +42,21 @@ You have found the easiest way to install & manage WireGuard on any Linux host!
 > [!NOTE]
 > To better manage documentation for this project, it has its own site here: [https://wg-easy.github.io/wg-easy/latest](https://wg-easy.github.io/wg-easy/latest)
 
+<!-- TODO: remove after release -->
+
+> [!WARNING]
+> As the Docs are still in Pre-release, you can access them here [https://wg-easy.github.io/wg-easy/Pre-release](https://wg-easy.github.io/wg-easy/Pre-release)
+
 - [Getting Started](https://wg-easy.github.io/wg-easy/latest/getting-started/)
 - [Basic Installation](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/basic-installation/)
+- [Caddy](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/caddy/)
+- [Nginx](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/nginx/)
+- [Traefik](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/traefik/)
+- [Podman](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/podman/)
+- [AdGuard Home](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/adguard/)
+
+> [!NOTE]
+> If you want to migrate from the old version to the new version, you can find the migration guide here: [Migration Guide](https://wg-easy.github.io/wg-easy/latest/advanced/migrate/)
 
 ## Requirements
 
@@ -89,51 +102,6 @@ Now setup a reverse proxy to be able to access the Web UI from the internet.
 
 If you want to access the Web UI over HTTP, change the env var `INSECURE` to `true`. This is not recommended. Only use this for testing
 
-<!-- TOOD: add to docs: Grafana dashboard [21733](https://grafana.com/grafana/dashboards/21733-wireguard/) -->
-
-<!-- TOOD: add to docs
-To setup the IPv6 Network, simply run once:
-
-```bash
-  docker network create \
-  -d bridge --ipv6 \
-  -d default \
-  --subnet 10.42.42.0/24 \
-  --subnet fdcc:ad94:bacf:61a3::/64 wg \
-```
-
-To automatically install & run wg-easy, simply run:
-
-```bash
-  docker run -d \
-  --net wg \
-  -e PORT=51821 \
-  --name wg-easy \
-  --ip6 fdcc:ad94:bacf:61a3::2a \
-  --ip 10.42.42.42 \
-  -v ~/.wg-easy:/etc/wireguard \
-  -v /lib/modules:/lib/modules:ro \
-  -p 51820:51820/udp \
-  -p 51821:51821/tcp \
-  --cap-add NET_ADMIN \
-  --cap-add SYS_MODULE \
-  --sysctl net.ipv4.ip_forward=1 \
-  --sysctl net.ipv4.conf.all.src_valid_mark=1 \
-  --sysctl net.ipv6.conf.all.disable_ipv6=0 \
-  --sysctl net.ipv6.conf.all.forwarding=1 \
-  --sysctl net.ipv6.conf.default.forwarding=1 \
-  --restart unless-stopped \
-  ghcr.io/wg-easy/wg-easy
-```
-
-The Web UI will now be available on `http://0.0.0.0:51821`.
-
-The Prometheus metrics will now be available on `http://0.0.0.0:51821/api/metrics`. Grafana dashboard [21733](https://grafana.com/grafana/dashboards/21733-wireguard/)
-
-> 💡 Your configuration files will be saved in `~/.wg-easy`
-
--->
-
 ### 3. Sponsor
 
 Are you enjoying this project? Consider donating.
@@ -142,46 +110,30 @@ Founder: [Buy Emile a beer!](https://github.com/sponsors/WeeJeWel) 🍻
 
 Maintainer: [Buy kaaax0815 a coffee!](https://github.com/sponsors/kaaax0815) ☕
 
-<!-- TOOD: add to docs
+## Development
 
-## Options
+### Prerequisites
 
-These options can be configured by setting environment variables using `-e KEY="VALUE"` in the `docker run` command.
+- Docker
+- Node LTS & corepack enabled
+- Visual Studio Code
 
-| Env        | Default   | Example     | Description                    |
-| ---------- | --------- | ----------- | ------------------------------ |
-| `PORT`.    | `51821`   | `6789`      | TCP port for Web UI.           |
-| `HOST`     | `0.0.0.0` | `localhost` | IP address web UI binds to.    |
-| `INSECURE` | `false`   | `true`      | If access over http is allowed |
+### Dev Server
 
-## Updating
-
-To update to the latest version, simply run:
+This starts the development server with docker
 
 ```shell
-docker stop wg-easy
-docker rm wg-easy
-docker pull ghcr.io/wg-easy/wg-easy
+pnpm dev
 ```
 
-And then run the `docker run -d \ ...` command above again.
+### Update Auto Imports
 
-With Docker Compose WireGuard Easy can be updated with a single command:
-`docker compose up --detach --pull always` (if an image tag is specified in the
-Compose file and it is not `latest`, make sure that it is changed to the desired
-one; by default it is omitted and
-[defaults to `latest`](https://docs.docker.com/engine/reference/run/#image-references)). \
-The WireGuard Easy container will be automatically recreated if a newer image
-was pulled.
+If you add something that should be auto-importable and VSCode complains, run:
 
-## Common Use Cases
-
-- [Using WireGuard-Easy with Pi-Hole](https://github.com/wg-easy/wg-easy/wiki/Using-WireGuard-Easy-with-Pi-Hole)
-- [Using WireGuard-Easy with nginx/SSL](https://github.com/wg-easy/wg-easy/wiki/Using-WireGuard-Easy-with-nginx-SSL)
-
-For less common or specific edge-case scenarios, please refer to the detailed information provided in the [Wiki](https://github.com/wg-easy/wg-easy/wiki).
-
--->
+```shell
+cd src
+pnpm install
+```
 
 ## License
 

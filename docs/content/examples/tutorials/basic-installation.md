@@ -27,7 +27,7 @@ Follow the Docs here: <https://docs.docker.com/engine/install/> and install Dock
 2. Download docker compose file
 
    ```shell
-   sudo curl -o $URL/docker-compose.yml https://raw.githubusercontent.com/wg-easy/wg-easy/master/docker-compose.yml
+   sudo curl -o $DIR/docker-compose.yml https://raw.githubusercontent.com/wg-easy/wg-easy/master/docker-compose.yml
    ```
 
 3. Start `wg-easy`
@@ -54,3 +54,18 @@ TODO
 Open your browser and navigate to `https://<your-domain>:51821` or `https://<your-ip>:51821`.
 
 Follow the instructions to set up your WireGuard VPN.
+
+## Update `wg-easy`
+
+To update `wg-easy` to the latest version, run:
+
+```shell
+sudo docker-compose -f $DIR/docker-compose.yml pull
+sudo docker-compose -f $DIR/docker-compose.yml up -d
+```
+
+## Auto Update
+
+If you want to enable auto-updates, follow the instructions here: [Auto Updates][auto-updates]
+
+[auto-updates]: ./auto-updates.md
