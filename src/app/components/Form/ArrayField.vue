@@ -1,18 +1,10 @@
 <template>
-  <div v-if="data?.length === 0">
-    {{ emptyText || $t('form.noItems') }}
-    <div class="mt-2">
-      <BaseButton
-        as="input"
-        type="button"
-        :value="$t('form.add')"
-        @click="add"
-      />
+  <div class="flex flex-col gap-2">
+    <div v-if="data?.length === 0">
+      {{ emptyText || $t('form.noItems') }}
     </div>
-  </div>
-  <div v-else class="flex flex-col gap-2">
     <div v-for="(item, i) in data" :key="i">
-      <div class="flex flex-row gap-1">
+      <div class="mt-1 flex flex-row gap-1">
         <input
           :value="item"
           :name="name"
@@ -20,13 +12,20 @@
           class="rounded-lg border-2 border-gray-100 text-gray-500 focus:border-red-800 focus:outline-0 focus:ring-0 dark:border-neutral-800 dark:bg-neutral-700 dark:text-neutral-200 dark:placeholder:text-neutral-400"
           @input="update($event, i)"
         />
-        <BaseButton as="input" type="button" value="-" @click="del(i)" />
+        <BaseButton
+          as="input"
+          type="button"
+          class="rounded-lg"
+          value="-"
+          @click="del(i)"
+        />
       </div>
     </div>
     <div class="mt-2">
       <BaseButton
         as="input"
         type="button"
+        class="rounded-lg"
         :value="$t('form.add')"
         @click="add"
       />
