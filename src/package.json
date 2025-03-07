@@ -1,6 +1,6 @@
 {
   "name": "wg-easy",
-  "version": "15.0.0-beta.6",
+  "version": "15.0.0-beta.7",
   "description": "The easiest way to run WireGuard VPN + Web-based Admin UI.",
   "private": true,
   "type": "module",
