@@ -96,7 +96,7 @@
     "noPrivKey": "This client has no known private key. Cannot create Configuration.",
     "showQR": "Show QR Code",
     "downloadConfig": "Download Configuration",
-    "allowedIpsDesc": "Which IPs will be routed through the VPN",
+    "allowedIpsDesc": "Which IPs will be routed through the VPN (overrides global config)",
     "serverAllowedIpsDesc": "Which IPs the server will route to the client",
     "mtuDesc": "Sets the maximum transmission unit (packet size) for the VPN tunnel",
     "persistentKeepaliveDesc": "Sets the interval (in seconds) for keep-alive packets. 0 disables it",
@@ -142,10 +142,10 @@
       "connection": "Connection",
       "hostDesc": "Public hostname clients will connect to (invalidates config)",
       "portDesc": "Public UDP port clients will connect to (invalidates config)",
-      "allowedIpsDesc": "Allowed IPs clients will use (invalidates config)",
+      "allowedIpsDesc": "Allowed IPs clients will use (global config)",
       "dnsDesc": "DNS server clients will use (global config)",
-      "mtuDesc": "MTU clients will use (invalidates config)",
-      "persistentKeepaliveDesc": "Interval in seconds to send keepalives to the server. 0 = disabled (invalidates config)"
+      "mtuDesc": "MTU clients will use (only for new clients)",
+      "persistentKeepaliveDesc": "Interval in seconds to send keepalives to the server. 0 = disabled (only for new clients)"
     },
     "interface": {
       "cidrSuccess": "Changed CIDR",
