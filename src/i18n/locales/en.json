@@ -100,8 +100,8 @@
     "mtuDesc": "Sets the maximum transmission unit (packet size) for the VPN tunnel",
     "persistentKeepaliveDesc": "Sets the interval (in seconds) for keep-alive packets. 0 disables it",
     "hooks": "Hooks",
-    "hooksDescription": "Hooks only works with wg-quick",
-    "hooksLeaveEmpty": "Only for wg-quick. Otherwise, please leave it empty"
+    "hooksDescription": "Hooks only work with wg-quick",
+    "hooksLeaveEmpty": "Only for wg-quick. Otherwise, leave it empty"
   },
   "dialog": {
     "change": "Change",

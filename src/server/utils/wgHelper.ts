@@ -49,17 +49,19 @@ PostDown = ${iptablesTemplate(hooks.postDown, wgInterface)}`;
     const cidr4Block = parseCidr(wgInterface.ipv4Cidr).prefix;
     const cidr6Block = parseCidr(wgInterface.ipv6Cidr).prefix;
 
+    const hookLines = [
+      client.preUp ? `PreUp = ${client.preUp}` : null,
+      client.postUp ? `PostUp = ${client.postUp}` : null,
+      client.preDown ? `PreDown = ${client.preDown}` : null,
+      client.postDown ? `PostDown = ${client.postDown}` : null,
+    ].filter((v) => v !== null);
+
     return `[Interface]
 PrivateKey = ${client.privateKey}
 Address = ${client.ipv4Address}/${cidr4Block}, ${client.ipv6Address}/${cidr6Block}
 DNS = ${client.dns.join(', ')}
 MTU = ${client.mtu}
-${client.preUp ? `PreUp = ${client.preUp}\n` : ''}${
-      client.postUp ? `PostUp = ${client.postUp}\n` : ''
-    }${client.preDown ? `PreDown = ${client.preDown}\n` : ''}${
-      client.postDown ? `PostDown = ${client.postDown}\n` : ''
-    }
-
+${hookLines.length ? `${hookLines.join('\n')}\n` : ''}
 [Peer]
 PublicKey = ${wgInterface.publicKey}
 PresharedKey = ${client.preSharedKey}

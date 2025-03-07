@@ -6,13 +6,11 @@ export type HooksType = InferSelectModel<typeof hooks>;
 
 export type HooksUpdateType = Omit<HooksType, 'id' | 'createdAt' | 'updatedAt'>;
 
-const hook = z.string({ message: t('zod.hook') }).pipe(safeStringRefine);
-
 export const HooksUpdateSchema = schemaForType<HooksUpdateType>()(
   z.object({
-    preUp: hook,
-    postUp: hook,
-    preDown: hook,
-    postDown: hook,
+    preUp: HookSchema,
+    postUp: HookSchema,
+    preDown: HookSchema,
+    postDown: HookSchema,
   })
 );

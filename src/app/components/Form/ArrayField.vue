@@ -3,7 +3,7 @@
     <div v-if="data?.length === 0">
       {{ emptyText || $t('form.noItems') }}
     </div>
-    <div v-for="(item, i) in data" :key="i">
+    <div v-for="(item, i) in data" v-else :key="i">
       <div class="mt-1 flex flex-row gap-1">
         <input
           :value="item"
