@@ -17,6 +17,14 @@
          <lastmod>2025-03-07</lastmod>
     </url>
     <url>
+         <loc>https://wg-easy.github.io/wg-easy/Pre-release/advanced/metrics/prometheus/</loc>
+         <lastmod>2025-03-07</lastmod>
+    </url>
+    <url>
+         <loc>https://wg-easy.github.io/wg-easy/Pre-release/advanced/migrate/</loc>
+         <lastmod>2025-03-07</lastmod>
+    </url>
+    <url>
          <loc>https://wg-easy.github.io/wg-easy/Pre-release/advanced/migrate/from-14-to-15/</loc>
          <lastmod>2025-03-07</lastmod>
     </url>
@@ -29,7 +37,23 @@
          <lastmod>2025-03-07</lastmod>
     </url>
     <url>
+         <loc>https://wg-easy.github.io/wg-easy/Pre-release/examples/tutorials/adguard/</loc>
+         <lastmod>2025-03-07</lastmod>
+    </url>
+    <url>
+         <loc>https://wg-easy.github.io/wg-easy/Pre-release/examples/tutorials/auto-updates/</loc>
+         <lastmod>2025-03-07</lastmod>
+    </url>
+    <url>
          <loc>https://wg-easy.github.io/wg-easy/Pre-release/examples/tutorials/basic-installation/</loc>
+         <lastmod>2025-03-07</lastmod>
+    </url>
+    <url>
+         <loc>https://wg-easy.github.io/wg-easy/Pre-release/examples/tutorials/caddy/</loc>
+         <lastmod>2025-03-07</lastmod>
+    </url>
+    <url>
+         <loc>https://wg-easy.github.io/wg-easy/Pre-release/examples/tutorials/docker-run/</loc>
          <lastmod>2025-03-07</lastmod>
     </url>
     <url>
@@ -37,7 +61,15 @@
          <lastmod>2025-03-07</lastmod>
     </url>
     <url>
+         <loc>https://wg-easy.github.io/wg-easy/Pre-release/examples/tutorials/nginx/</loc>
+         <lastmod>2025-03-07</lastmod>
+    </url>
+    <url>
          <loc>https://wg-easy.github.io/wg-easy/Pre-release/examples/tutorials/podman/</loc>
+         <lastmod>2025-03-07</lastmod>
+    </url>
+    <url>
+         <loc>https://wg-easy.github.io/wg-easy/Pre-release/examples/tutorials/traefik/</loc>
          <lastmod>2025-03-07</lastmod>
     </url>
 </urlset>
