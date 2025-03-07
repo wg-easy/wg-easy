@@ -20,6 +20,14 @@
           :label="$t('general.password')"
         />
       </div>
+      <div class="flex flex-col">
+        <FormPasswordField
+          id="confirmPassword"
+          v-model="confirmPassword"
+          autocomplete="new-password"
+          :label="$t('general.confirmPassword')"
+        />
+      </div>
       <div>
         <BaseButton @click="submit">{{ $t('setup.createAccount') }}</BaseButton>
       </div>
@@ -37,6 +45,7 @@ setupStore.setStep(2);
 
 const username = ref<null | string>(null);
 const password = ref<string>('');
+const confirmPassword = ref<string>('');
 
 const _submit = useSubmit(
   '/api/setup/2',
@@ -54,6 +63,10 @@ const _submit = useSubmit(
 );
 
 function submit() {
-  return _submit({ username: username.value, password: password.value });
+  return _submit({
+    username: username.value,
+    password: password.value,
+    confirmPassword: confirmPassword.value,
+  });
 }
 </script>
