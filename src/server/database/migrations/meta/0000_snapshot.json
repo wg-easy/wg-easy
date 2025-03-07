@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "2cabecf8-93d5-4d32-81b7-2e4369c1cb29",
+  "id": "383501e4-f8de-4413-847f-a9082f6dc398",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "clients_table": {
@@ -452,7 +452,7 @@
           "type": "integer",
           "primaryKey": true,
           "notNull": true,
-          "autoincrement": true
+          "autoincrement": false
         },
         "one_time_link": {
           "name": "one_time_link",
@@ -464,13 +464,6 @@
         "expires_at": {
           "name": "expires_at",
           "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "client_id": {
-          "name": "client_id",
-          "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -502,12 +495,12 @@
         }
       },
       "foreignKeys": {
-        "one_time_links_table_client_id_clients_table_id_fk": {
-          "name": "one_time_links_table_client_id_clients_table_id_fk",
+        "one_time_links_table_id_clients_table_id_fk": {
+          "name": "one_time_links_table_id_clients_table_id_fk",
           "tableFrom": "one_time_links_table",
           "tableTo": "clients_table",
           "columnsFrom": [
-            "client_id"
+            "id"
           ],
           "columnsTo": [
             "id"
