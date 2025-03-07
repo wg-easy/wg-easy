@@ -27,7 +27,7 @@
       </FormGroup>
       <FormGroup>
         <FormHeading :description="$t('admin.config.dnsDesc')">{{
-          $t('admin.config.dns')
+          $t('general.dns')
         }}</FormHeading>
         <FormArrayField v-model="data.defaultDns" name="defaultDns" />
       </FormGroup>

@@ -41,21 +41,26 @@
             />
           </FormGroup>
           <FormGroup>
-            <FormHeading :description="$t('client.allowedIpsDesc')">{{
-              $t('general.allowedIps')
-            }}</FormHeading>
-            <FormArrayField v-model="data.allowedIps" name="allowedIps" />
+            <FormHeading :description="$t('client.allowedIpsDesc')">
+              {{ $t('general.allowedIps') }}
+            </FormHeading>
+            <FormNullArrayField v-model="data.allowedIps" name="allowedIps" />
           </FormGroup>
           <FormGroup>
-            <FormHeading :description="$t('client.serverAllowedIpsDesc')">{{
-              $t('client.serverAllowedIps')
-            }}</FormHeading>
+            <FormHeading :description="$t('client.serverAllowedIpsDesc')">
+              {{ $t('client.serverAllowedIps') }}
+            </FormHeading>
             <FormArrayField
               v-model="data.serverAllowedIps"
               name="serverAllowedIps"
             />
           </FormGroup>
-          <FormGroup></FormGroup>
+          <FormGroup>
+            <FormHeading :description="$t('client.dnsDesc')">
+              {{ $t('general.dns') }}
+            </FormHeading>
+            <FormNullArrayField v-model="data.dns" name="dns" />
+          </FormGroup>
           <FormGroup>
             <FormHeading>{{ $t('form.sectionAdvanced') }}</FormHeading>
             <FormNumberField
@@ -142,8 +147,12 @@ const _submit = useSubmit(
     method: 'post',
   },
   {
-    revert: async () => {
-      await navigateTo('/');
+    revert: async (success) => {
+      if (success) {
+        await navigateTo('/');
+      } else {
+        await revert();
+      }
     },
   }
 );

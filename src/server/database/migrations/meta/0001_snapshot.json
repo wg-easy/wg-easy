@@ -1,6 +1,6 @@
 {
-  "id": "bf316694-e2ce-4e29-bd66-ce6c0a9d3c90",
-  "prevId": "383501e4-f8de-4413-847f-a9082f6dc398",
+  "id": "a61263b1-9af1-4d2e-99e9-80d08127b545",
+  "prevId": "8c2af02b-c4bd-4880-a9ad-b38805636208",
   "version": "6",
   "dialect": "sqlite",
   "tables": {
@@ -106,7 +106,7 @@
           "name": "allowed_ips",
           "type": "text",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false
         },
         "server_allowed_ips": {
@@ -134,7 +134,7 @@
           "name": "dns",
           "type": "text",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false
         },
         "enabled": {
