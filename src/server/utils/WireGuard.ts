@@ -212,8 +212,8 @@ class WireGuard {
         client.oneTimeLink !== null &&
         new Date() > new Date(client.oneTimeLink.expiresAt)
       ) {
-        WG_DEBUG(`Client ${client.id} One Time Link expired.`);
-        await Database.oneTimeLinks.delete(client.oneTimeLink.id);
+        WG_DEBUG(`OneTimeLink for Client ${client.id} expired.`);
+        await Database.oneTimeLinks.delete(client.id);
       }
     }
 
@@ -222,11 +222,10 @@ class WireGuard {
 }
 
 if (OLD_ENV.PASSWORD || OLD_ENV.PASSWORD_HASH) {
-  // TODO: change url before release
   throw new Error(
     `
 You are using an invalid Configuration for wg-easy
-Please follow the instructions on https://wg-easy.github.io/wg-easy/ to migrate
+Please follow the instructions on https://wg-easy.github.io/wg-easy/latest/advanced/migrate/from-14-to-15/ to migrate
 `
   );
 }

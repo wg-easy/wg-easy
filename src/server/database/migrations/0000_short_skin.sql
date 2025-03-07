@@ -64,13 +64,12 @@ CREATE TABLE `interfaces_table` (
 --> statement-breakpoint
 CREATE UNIQUE INDEX `interfaces_table_port_unique` ON `interfaces_table` (`port`);--> statement-breakpoint
 CREATE TABLE `one_time_links_table` (
-	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`id` integer PRIMARY KEY NOT NULL,
 	`one_time_link` text NOT NULL,
 	`expires_at` text NOT NULL,
-	`client_id` integer NOT NULL,
 	`created_at` text DEFAULT (CURRENT_TIMESTAMP) NOT NULL,
 	`updated_at` text DEFAULT (CURRENT_TIMESTAMP) NOT NULL,
-	FOREIGN KEY (`client_id`) REFERENCES `clients_table`(`id`) ON UPDATE cascade ON DELETE cascade
+	FOREIGN KEY (`id`) REFERENCES `clients_table`(`id`) ON UPDATE cascade ON DELETE cascade
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `one_time_links_table_one_time_link_unique` ON `one_time_links_table` (`one_time_link`);--> statement-breakpoint

@@ -42,7 +42,7 @@ export const client = sqliteTable('clients_table', {
 export const clientsRelations = relations(client, ({ one }) => ({
   oneTimeLink: one(oneTimeLink, {
     fields: [client.id],
-    references: [oneTimeLink.clientId],
+    references: [oneTimeLink.id],
   }),
   user: one(user, {
     fields: [client.userId],
