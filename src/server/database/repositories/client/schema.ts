@@ -24,7 +24,7 @@ export const client = sqliteTable('clients_table', {
   publicKey: text('public_key').notNull(),
   preSharedKey: text('pre_shared_key').notNull(),
   expiresAt: text('expires_at'),
-  allowedIps: text('allowed_ips', { mode: 'json' }).$type<string[]>().notNull(),
+  allowedIps: text('allowed_ips', { mode: 'json' }).$type<string[]>(),
   serverAllowedIps: text('server_allowed_ips', { mode: 'json' })
     .$type<string[]>()
     .notNull(),

@@ -44,7 +44,7 @@
             <FormHeading :description="$t('client.allowedIpsDesc')">
               {{ $t('general.allowedIps') }}
             </FormHeading>
-            <FormArrayField v-model="data.allowedIps" name="allowedIps" />
+            <FormNullArrayField v-model="data.allowedIps" name="allowedIps" />
           </FormGroup>
           <FormGroup>
             <FormHeading :description="$t('client.serverAllowedIpsDesc')">

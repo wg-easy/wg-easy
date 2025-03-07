@@ -12,7 +12,7 @@ CREATE TABLE `clients_table` (
 	`public_key` text NOT NULL,
 	`pre_shared_key` text NOT NULL,
 	`expires_at` text,
-	`allowed_ips` text NOT NULL,
+	`allowed_ips` text,
 	`server_allowed_ips` text NOT NULL,
 	`persistent_keepalive` integer NOT NULL,
 	`mtu` integer NOT NULL,
