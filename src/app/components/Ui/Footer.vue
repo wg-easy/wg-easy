@@ -24,7 +24,7 @@
       ·
       <a
         class="hover:underline"
-        href="https://github.com/sponsors/WeeJeWel"
+        href="https://github.com/wg-easy/wg-easy#donate"
         target="_blank"
         >{{ $t('layout.donate') }}</a
       >

@@ -102,7 +102,7 @@ Now setup a reverse proxy to be able to access the Web UI from the internet.
 
 If you want to access the Web UI over HTTP, change the env var `INSECURE` to `true`. This is not recommended. Only use this for testing
 
-### 3. Sponsor
+### Donate
 
 Are you enjoying this project? Consider donating.
 
