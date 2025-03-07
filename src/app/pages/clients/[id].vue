@@ -79,25 +79,25 @@
               id="PreUp"
               v-model="data.preUp"
               :description="$t('client.hooksLeaveEmpty')"
-              :label="$t('client.PreUp')"
+              :label="$t('hooks.preUp')"
             />
             <FormTextField
               id="PostUp"
               v-model="data.postUp"
               :description="$t('client.hooksLeaveEmpty')"
-              :label="$t('client.PostUp')"
+              :label="$t('hooks.postUp')"
             />
             <FormTextField
               id="PreDown"
               v-model="data.preDown"
               :description="$t('client.hooksLeaveEmpty')"
-              :label="$t('client.PreDown')"
+              :label="$t('hooks.preDown')"
             />
             <FormTextField
               id="PostDown"
               v-model="data.postDown"
               :description="$t('client.hooksLeaveEmpty')"
-              :label="$t('client.PostDown')"
+              :label="$t('hooks.postDown')"
             />
           </FormGroup>
           <FormGroup>

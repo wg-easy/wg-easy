@@ -101,11 +101,7 @@
     "persistentKeepaliveDesc": "Sets the interval (in seconds) for keep-alive packets. 0 disables it",
     "hooks": "Hooks",
     "hooksDescription": "Hooks only works with wg-quick",
-    "hooksLeaveEmpty": "Only for wg-quick. Otherwise, please leave it empty",
-    "PreUp": "PreUp",
-    "PostUp": "PostUp",
-    "PreDown": "PreDown",
-    "PostDown": "PostDown"
+    "hooksLeaveEmpty": "Only for wg-quick. Otherwise, please leave it empty"
   },
   "dialog": {
     "change": "Change",
@@ -215,5 +211,11 @@
     "dns": "DNS",
     "allowedIps": "Allowed IPs",
     "file": "File"
+  },
+  "hooks": {
+    "preUp": "PreUp",
+    "postUp": "PostUp",
+    "preDown": "PreDown",
+    "postDown": "PostDown"
   }
 }
