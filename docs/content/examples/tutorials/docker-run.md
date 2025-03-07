@@ -4,7 +4,7 @@ title: Docker Run
 
 To setup the IPv6 Network, simply run once:
 
-```bash
+```shell
   docker network create \
   -d bridge --ipv6 \
   -d default \
@@ -14,9 +14,9 @@ To setup the IPv6 Network, simply run once:
 
 <!-- ref: major version -->
 
-To automatically install & run wg-easy, simply run:
+To automatically install & run ``wg-easy, simply run:
 
-```bash
+```shell
   docker run -d \
   --net wg \
   -e INSECURE=true \

@@ -4,13 +4,13 @@ title: Auto Updates
 
 ## Docker Compose
 
-With Docker Compose WireGuard Easy can be updated with a single command:
+With Docker Compose `wg-easy` can be updated with a single command:
 
 Replace `$DIR` with the directory where your `docker-compose.yml` is located.
 
 ```shell
 cd $DIR
-sudo docker compose -f up -d --pull always
+sudo docker compose up -d --pull always
 ```
 
 ## Docker Run
@@ -27,7 +27,7 @@ And then run the `docker run -d \ ...` command from [Docker Run][docker-run] aga
 
 ## Podman
 
-To update `wg-easy` (and every container that has auto updates enabled), you can run the following commands:
+To update `wg-easy` (and every container that has auto updates enabled), you can run the following command:
 
 ```shell
 sudo podman auto-update
