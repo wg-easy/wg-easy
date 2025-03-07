@@ -5,6 +5,7 @@ import { wgInterface } from '../../schema';
 
 // default* means clients store it themselves
 export const userConfig = sqliteTable('user_configs_table', {
+  /** same as `wgInterface.name` */
   id: text()
     .primaryKey()
     .references(() => wgInterface.name, {

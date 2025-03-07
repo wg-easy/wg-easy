@@ -4,6 +4,7 @@ import { sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import { wgInterface } from '../../schema';
 
 export const hooks = sqliteTable('hooks_table', {
+  /** same as `wgInterface.name` */
   id: text()
     .primaryKey()
     .references(() => wgInterface.name, {

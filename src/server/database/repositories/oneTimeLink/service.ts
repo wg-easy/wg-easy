@@ -50,11 +50,7 @@ export class OneTimeLinkService {
     const oneTimeLink = Math.abs(CRC32.str(key)).toString(16);
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString();
 
-    return this.#statements.create.execute({
-      id,
-      oneTimeLink,
-      expiresAt,
-    });
+    return this.#statements.create.execute({ id, oneTimeLink, expiresAt });
   }
 
   erase(id: ID) {
