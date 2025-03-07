@@ -1,6 +1,6 @@
 <template>
-  <div v-if="props.client.oneTimeLink" class="text-xs text-gray-400">
-    <a :href="'./cnf/' + props.client.oneTimeLink.oneTimeLink">{{ path }}</a>
+  <div v-if="client.oneTimeLink !== null" class="text-xs text-gray-400">
+    <a :href="'./cnf/' + client.oneTimeLink.oneTimeLink">{{ path }}</a>
   </div>
 </template>
 
@@ -8,14 +8,13 @@
 const props = defineProps<{ client: LocalClient }>();
 
 const path = ref('Loading...');
-
 const timer = ref<NodeJS.Timeout | null>(null);
 
 const { localeProperties } = useI18n();
 
 onMounted(() => {
   timer.value = setIntervalImmediately(() => {
-    if (!props.client.oneTimeLink) {
+    if (props.client.oneTimeLink === null) {
       return;
     }
 
