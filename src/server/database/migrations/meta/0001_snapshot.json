@@ -1,6 +1,6 @@
 {
-  "id": "bf316694-e2ce-4e29-bd66-ce6c0a9d3c90",
-  "prevId": "383501e4-f8de-4413-847f-a9082f6dc398",
+  "id": "241a0a75-03d1-4b39-9a13-e7b1b621e8b2",
+  "prevId": "80307290-b752-4fc4-8ba4-c6d39222c7f5",
   "version": "6",
   "dialect": "sqlite",
   "tables": {
@@ -134,7 +134,7 @@
           "name": "dns",
           "type": "text",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false
         },
         "enabled": {

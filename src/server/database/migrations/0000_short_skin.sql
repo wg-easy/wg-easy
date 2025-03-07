@@ -16,7 +16,7 @@ CREATE TABLE `clients_table` (
 	`server_allowed_ips` text NOT NULL,
 	`persistent_keepalive` integer NOT NULL,
 	`mtu` integer NOT NULL,
-	`dns` text NOT NULL,
+	`dns` text,
 	`enabled` integer NOT NULL,
 	`created_at` text DEFAULT (CURRENT_TIMESTAMP) NOT NULL,
 	`updated_at` text DEFAULT (CURRENT_TIMESTAMP) NOT NULL,

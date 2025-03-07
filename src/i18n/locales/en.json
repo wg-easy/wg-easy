@@ -25,6 +25,7 @@
     "updatePassword": "Update Password",
     "mtu": "MTU",
     "allowedIps": "Allowed IPs",
+    "dns": "DNS",
     "persistentKeepalive": "Persistent Keepalive",
     "logout": "Logout",
     "continue": "Continue",
@@ -101,7 +102,8 @@
     "persistentKeepaliveDesc": "Sets the interval (in seconds) for keep-alive packets. 0 disables it",
     "hooks": "Hooks",
     "hooksDescription": "Hooks only work with wg-quick",
-    "hooksLeaveEmpty": "Only for wg-quick. Otherwise, leave it empty"
+    "hooksLeaveEmpty": "Only for wg-quick. Otherwise, leave it empty",
+    "dnsDesc": "DNS server clients will use (overrides global config)"
   },
   "dialog": {
     "change": "Change",
@@ -121,6 +123,7 @@
     "sectionGeneral": "General",
     "sectionAdvanced": "Advanced",
     "noItems": "No items",
+    "nullNoItems": "No items. Using global config",
     "add": "Add"
   },
   "admin": {
@@ -140,8 +143,7 @@
       "hostDesc": "Public hostname clients will connect to (invalidates config)",
       "portDesc": "Public UDP port clients will connect to (invalidates config)",
       "allowedIpsDesc": "Allowed IPs clients will use (invalidates config)",
-      "dns": "DNS",
-      "dnsDesc": "DNS server clients will use (invalidates config)",
+      "dnsDesc": "DNS server clients will use (global config)",
       "mtuDesc": "MTU clients will use (invalidates config)",
       "persistentKeepaliveDesc": "Interval in seconds to send keepalives to the server. 0 = disabled (invalidates config)"
     },

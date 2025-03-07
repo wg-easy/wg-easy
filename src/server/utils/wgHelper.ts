@@ -59,7 +59,7 @@ PostDown = ${iptablesTemplate(hooks.postDown, wgInterface)}`;
     return `[Interface]
 PrivateKey = ${client.privateKey}
 Address = ${client.ipv4Address}/${cidr4Block}, ${client.ipv6Address}/${cidr6Block}
-DNS = ${client.dns.join(', ')}
+DNS = ${(client.dns ?? userConfig.defaultDns).join(', ')}
 MTU = ${client.mtu}
 ${hookLines.length ? `${hookLines.join('\n')}\n` : ''}
 [Peer]

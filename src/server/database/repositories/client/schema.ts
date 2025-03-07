@@ -3,6 +3,8 @@ import { int, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 import { oneTimeLink, user } from '../../schema';
 
+/** null means use value from userConfig */
+
 export const client = sqliteTable('clients_table', {
   id: int().primaryKey({ autoIncrement: true }),
   userId: int('user_id')
@@ -28,7 +30,7 @@ export const client = sqliteTable('clients_table', {
     .notNull(),
   persistentKeepalive: int('persistent_keepalive').notNull(),
   mtu: int().notNull(),
-  dns: text({ mode: 'json' }).$type<string[]>().notNull(),
+  dns: text({ mode: 'json' }).$type<string[]>(),
   enabled: int({ mode: 'boolean' }).notNull(),
   createdAt: text('created_at')
     .notNull()

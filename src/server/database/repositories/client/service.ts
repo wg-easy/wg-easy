@@ -116,7 +116,6 @@ export class ClientService {
           ipv6Address,
           mtu: clientConfig.defaultMtu,
           allowedIps: clientConfig.defaultAllowedIps,
-          dns: clientConfig.defaultDns,
           persistentKeepalive: clientConfig.defaultPersistentKeepalive,
           serverAllowedIps: [],
           enabled: true,
