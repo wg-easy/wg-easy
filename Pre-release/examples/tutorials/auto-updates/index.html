@@ -1249,10 +1249,10 @@
   <h1>Auto Updates</h1>
 
 <h2 id="docker-compose"><a class="toclink" href="#docker-compose">Docker Compose</a></h2>
-<p>With Docker Compose WireGuard Easy can be updated with a single command:</p>
+<p>With Docker Compose <code>wg-easy</code> can be updated with a single command:</p>
 <p>Replace <code>$DIR</code> with the directory where your <code>docker-compose.yml</code> is located.</p>
 <div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span><span class="nv">$DIR</span>
-sudo<span class="w"> </span>docker<span class="w"> </span>compose<span class="w"> </span>-f<span class="w"> </span>up<span class="w"> </span>-d<span class="w"> </span>--pull<span class="w"> </span>always
+sudo<span class="w"> </span>docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>-d<span class="w"> </span>--pull<span class="w"> </span>always
 </code></pre></div>
 <h2 id="docker-run"><a class="toclink" href="#docker-run">Docker Run</a></h2>
 <div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>docker<span class="w"> </span>stop<span class="w"> </span>wg-easy
@@ -1261,7 +1261,7 @@ sudo<span class="w"> </span>docker<span class="w"> </span>pull<span class="w"> <
 </code></pre></div>
 <p>And then run the <code>docker run -d \ ...</code> command from <a href="../docker-run/">Docker Run</a> again.</p>
 <h2 id="podman"><a class="toclink" href="#podman">Podman</a></h2>
-<p>To update <code>wg-easy</code> (and every container that has auto updates enabled), you can run the following commands:</p>
+<p>To update <code>wg-easy</code> (and every container that has auto updates enabled), you can run the following command:</p>
 <div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>podman<span class="w"> </span>auto-update
 </code></pre></div>
 
