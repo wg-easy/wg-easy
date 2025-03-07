@@ -14,7 +14,7 @@ function createPreparedStatement(db: DBType) {
     findAll: db.query.client
       .findMany({
         with: {
-          oneTimeLinks: true,
+          oneTimeLink: true,
         },
       })
       .prepare(),
@@ -24,7 +24,7 @@ function createPreparedStatement(db: DBType) {
     findByUserId: db.query.client
       .findMany({
         where: eq(client.userId, sql.placeholder('userId')),
-        with: { oneTimeLinks: true },
+        with: { oneTimeLink: true },
       })
       .prepare(),
     toggle: db

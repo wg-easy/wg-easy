@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const client = await Database.clients.get(otl.clientId);
+  const client = await Database.clients.get(otl.id);
   if (!client) {
     throw createError({
       statusCode: 404,

@@ -12,7 +12,7 @@ function createPreparedStatement(db: DBType) {
     create: db
       .insert(oneTimeLink)
       .values({
-        clientId: sql.placeholder('clientId'),
+        id: sql.placeholder('id'),
         oneTimeLink: sql.placeholder('oneTimeLink'),
         expiresAt: sql.placeholder('expiresAt'),
       })
@@ -45,13 +45,13 @@ export class OneTimeLinkService {
     return this.#statements.findByOneTimeLink.execute({ oneTimeLink });
   }
 
-  generate(clientId: ID) {
-    const key = `${clientId}-${Math.floor(Math.random() * 1000)}`;
+  generate(id: ID) {
+    const key = `${id}-${Math.floor(Math.random() * 1000)}`;
     const oneTimeLink = Math.abs(CRC32.str(key)).toString(16);
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString();
 
     return this.#statements.create.execute({
-      clientId,
+      id,
       oneTimeLink,
       expiresAt,
     });

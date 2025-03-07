@@ -4,12 +4,14 @@ import { int, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import { client } from '../../schema';
 
 export const oneTimeLink = sqliteTable('one_time_links_table', {
-  id: int().primaryKey({ autoIncrement: true }),
+  id: int()
+    .primaryKey()
+    .references(() => client.id, {
+      onDelete: 'cascade',
+      onUpdate: 'cascade',
+    }),
   oneTimeLink: text('one_time_link').notNull().unique(),
   expiresAt: text('expires_at').notNull(),
-  clientId: int('client_id')
-    .notNull()
-    .references(() => client.id, { onDelete: 'cascade', onUpdate: 'cascade' }),
   createdAt: text('created_at')
     .notNull()
     .default(sql`(CURRENT_TIMESTAMP)`),
@@ -21,7 +23,7 @@ export const oneTimeLink = sqliteTable('one_time_links_table', {
 
 export const oneTimeLinksRelations = relations(oneTimeLink, ({ one }) => ({
   client: one(client, {
-    fields: [oneTimeLink.clientId],
+    fields: [oneTimeLink.id],
     references: [client.id],
   }),
 }));
