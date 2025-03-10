@@ -48,7 +48,7 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
-    "@nuxt/eslint": "1.1.0",
+    "@nuxt/eslint": "1.2.0",
     "@types/debug": "^4.1.12",
     "@types/qrcode": "^1.5.5",
     "@types/semver": "^7.5.8",
