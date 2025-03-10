@@ -41,7 +41,7 @@
     "qrcode": "^1.5.4",
     "radix-vue": "^1.9.17",
     "semver": "^7.7.1",
-    "tailwindcss": "^3.4.17",
+    "tailwindcss": "^4.0.12",
     "timeago.js": "^4.0.2",
     "vue": "latest",
     "vue3-apexcharts": "^1.8.0",
