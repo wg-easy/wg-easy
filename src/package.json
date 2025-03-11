@@ -21,7 +21,7 @@
     "@eschricht/nuxt-color-mode": "^1.1.5",
     "@libsql/client": "^0.14.0",
     "@nuxtjs/i18n": "^9.3.1",
-    "@nuxtjs/tailwindcss": "^6.13.1",
+    "@nuxtjs/tailwindcss": "^6.13.2",
     "@pinia/nuxt": "^0.10.1",
     "@tailwindcss/forms": "^0.5.10",
     "apexcharts": "^4.5.0",
@@ -54,11 +54,11 @@
     "@types/semver": "^7.5.8",
     "drizzle-kit": "^0.30.5",
     "eslint": "^9.22.0",
-    "eslint-config-prettier": "^10.0.2",
+    "eslint-config-prettier": "^10.1.1",
     "prettier": "^3.5.3",
     "prettier-plugin-tailwindcss": "^0.6.11",
     "typescript": "^5.8.2",
     "vue-tsc": "^2.2.8"
   },
-  "packageManager": "pnpm@10.5.2"
+  "packageManager": "pnpm@10.6.2"
 }
