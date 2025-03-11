@@ -1,5 +1,5 @@
 import { eq, sql } from 'drizzle-orm';
-import { parseCidr } from 'cidr-tools';
+import { containsCidr, parseCidr } from 'cidr-tools';
 import { client } from './schema';
 import type {
   ClientCreateFromExistingType,
@@ -132,7 +132,27 @@ export class ClientService {
   }
 
   update(id: ID, data: UpdateClientType) {
-    return this.#db.update(client).set(data).where(eq(client.id, id)).execute();
+    return this.#db.transaction(async (tx) => {
+      const clientInterface = await tx.query.wgInterface
+        .findFirst({
+          where: eq(wgInterface.name, 'wg0'),
+        })
+        .execute();
+
+      if (!clientInterface) {
+        throw new Error('WireGuard interface not found');
+      }
+
+      if (!containsCidr(clientInterface.ipv4Cidr, data.ipv4Address)) {
+        throw new Error('IPv4 address is not within the CIDR range');
+      }
+
+      if (!containsCidr(clientInterface.ipv6Cidr, data.ipv6Address)) {
+        throw new Error('IPv6 address is not within the CIDR range');
+      }
+
+      await tx.update(client).set(data).where(eq(client.id, id)).execute();
+    });
   }
 
   async createFromExisting({
