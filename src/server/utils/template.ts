@@ -15,6 +15,7 @@ export function template(templ: string, values: Record<string, string>) {
  * - ipv6Cidr: IPv6 CIDR
  * - device: Network device
  * - port: Port number
+ * - uiPort: UI port number
  */
 export function iptablesTemplate(templ: string, wgInterface: InterfaceType) {
   return template(templ, {
@@ -22,5 +23,6 @@ export function iptablesTemplate(templ: string, wgInterface: InterfaceType) {
     ipv6Cidr: wgInterface.ipv6Cidr,
     device: wgInterface.device,
     port: wgInterface.port.toString(),
+    uiPort: WG_ENV.PORT,
   });
 }

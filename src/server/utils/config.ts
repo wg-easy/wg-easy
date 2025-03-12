@@ -15,4 +15,16 @@ export const OLD_ENV = {
 export const WG_ENV = {
   /** UI is hosted on HTTP instead of HTTPS */
   INSECURE: process.env.INSECURE === 'true',
+  /** Port the UI is listening on */
+  PORT: assertEnv('PORT'),
 };
+
+function assertEnv<T extends string>(env: T) {
+  const val = process.env[env];
+
+  if (!val) {
+    throw new Error(`Missing environment variable: ${env}`);
+  }
+
+  return val;
+}

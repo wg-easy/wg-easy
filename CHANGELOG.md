@@ -24,6 +24,8 @@ This update is an entire rewrite to make it even easier to set up your own VPN.
 - Deprecated Dockerless Installations
 - Added Docker Volume Mount (`/lib/modules`)
 - Removed ARMv6 and ARMv7 support
+- Connections over HTTP require setting the `INSECURE` env var
+- Changed license from CC BY-NC-SA 4.0 to AGPL-3.0-only
 
 ## [14.0.0] - 2024-09-04
 
