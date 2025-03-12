@@ -15,8 +15,10 @@
         <link rel="canonical" href="https://wg-easy.github.io/wg-easy/development/examples/tutorials/podman/">
       
       
-        <link rel="prev" href="../dockerless/">
+        <link rel="prev" href="../nginx/">
       
+      
+        <link rel="next" href="../traefik/">
       
       
       <link rel="icon" href="../../../assets/logo/favicon.png">
@@ -302,7 +304,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="../basic-installation/" class="md-tabs__link">
+        <a href="../adguard/" class="md-tabs__link">
           
   
   Examples
@@ -562,7 +564,7 @@
             
   
   <span class="md-ellipsis">
-    Migrate
+    Metrics
     
   </span>
   
@@ -573,9 +575,102 @@
         <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3_3">
             <span class="md-nav__icon md-icon"></span>
+            Metrics
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../advanced/metrics/prometheus/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Prometheus
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Migrate
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4">
+            <span class="md-nav__icon md-icon"></span>
             Migrate
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../advanced/migrate/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Migrate
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -798,6 +893,50 @@
   
   
     <li class="md-nav__item">
+      <a href="../adguard/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AdGuard Home
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../auto-updates/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Auto Updates
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../basic-installation/" class="md-nav__link">
         
   
@@ -820,11 +959,77 @@
   
   
     <li class="md-nav__item">
+      <a href="../caddy/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Caddy
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../docker-run/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Docker Run
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../dockerless/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
     Without Docker
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../nginx/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    NGINX
     
   </span>
   
@@ -930,10 +1135,41 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#restart-the-container" class="md-nav__link">
+    <span class="md-ellipsis">
+      Restart the Container
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../traefik/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Traefik
+    
+  </span>
+  
+
+      </a>
     </li>
   
 
@@ -1023,6 +1259,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#restart-the-container" class="md-nav__link">
+    <span class="md-ellipsis">
+      Restart the Container
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1068,14 +1313,21 @@
 sudo<span class="w"> </span>mkdir<span class="w"> </span>-p<span class="w"> </span>/etc/containers/volumes/wg-easy
 </code></pre></div>
 <p>Create a file <code>/etc/containers/systemd/wg-easy/wg-easy.container</code> with the following content:</p>
+<!-- ref: major version -->
+
 <div class="highlight"><pre><span></span><code><span class="k">[Container]</span>
 <span class="na">ContainerName</span><span class="o">=</span><span class="s">wg-easy</span>
-<span class="na">Image</span><span class="o">=</span><span class="s">ghcr.io/wg-easy/wg-easy:latest</span>
+<span class="na">Image</span><span class="o">=</span><span class="s">ghcr.io/wg-easy/wg-easy:15</span>
+<span class="na">AutoUpdate</span><span class="o">=</span><span class="s">registry</span>
 
 <span class="na">Volume</span><span class="o">=</span><span class="s">/etc/containers/volumes/wg-easy:/etc/wireguard:Z</span>
 <span class="na">Network</span><span class="o">=</span><span class="s">wg-easy.network</span>
 <span class="na">PublishPort</span><span class="o">=</span><span class="s">51820:51820/udp</span>
 <span class="na">PublishPort</span><span class="o">=</span><span class="s">51821:51821/tcp</span>
+
+<span class="c1"># this is used to allow access over HTTP</span>
+<span class="c1"># remove this when using a reverse proxy</span>
+<span class="na">Environment</span><span class="o">=</span><span class="s">INSECURE=true</span>
 
 <span class="na">AddCapability</span><span class="o">=</span><span class="s">NET_ADMIN</span>
 <span class="na">AddCapability</span><span class="o">=</span><span class="s">SYS_MODULE</span>
@@ -1113,12 +1365,17 @@ sudo<span class="w"> </span>systemctl<span class="w"> </span>start<span class="w
 <ol>
 <li>PostUp</li>
 </ol>
-<div class="highlight"><pre><span></span><code>apk<span class="w"> </span>add<span class="w"> </span>nftables<span class="p">;</span><span class="w"> </span>nft<span class="w"> </span>add<span class="w"> </span>table<span class="w"> </span>inet<span class="w"> </span>wg_table<span class="p">;</span><span class="w"> </span>nft<span class="w"> </span>add<span class="w"> </span>chain<span class="w"> </span>inet<span class="w"> </span>wg_table<span class="w"> </span>postrouting<span class="w"> </span><span class="o">{</span><span class="w"> </span><span class="nb">type</span><span class="w"> </span>nat<span class="w"> </span>hook<span class="w"> </span>postrouting<span class="w"> </span>priority<span class="w"> </span><span class="m">100</span><span class="w"> </span><span class="se">\;</span><span class="w"> </span><span class="o">}</span><span class="p">;</span><span class="w"> </span>nft<span class="w"> </span>add<span class="w"> </span>rule<span class="w"> </span>inet<span class="w"> </span>wg_table<span class="w"> </span>postrouting<span class="w"> </span>ip<span class="w"> </span>saddr<span class="w"> </span><span class="o">{{</span>ipv4Cidr<span class="o">}}</span><span class="w"> </span>oifname<span class="w"> </span><span class="o">{{</span>device<span class="o">}}</span><span class="w"> </span>masquerade<span class="p">;</span><span class="w"> </span>nft<span class="w"> </span>add<span class="w"> </span>rule<span class="w"> </span>inet<span class="w"> </span>wg_table<span class="w"> </span>postrouting<span class="w"> </span>ip6<span class="w"> </span>saddr<span class="w"> </span><span class="o">{{</span>ipv6Cidr<span class="o">}}</span><span class="w"> </span>oifname<span class="w"> </span><span class="o">{{</span>device<span class="o">}}</span><span class="w"> </span>masquerade<span class="p">;</span><span class="w"> </span>nft<span class="w"> </span>add<span class="w"> </span>chain<span class="w"> </span>inet<span class="w"> </span>wg_table<span class="w"> </span>input<span class="w"> </span><span class="o">{</span><span class="w"> </span><span class="nb">type</span><span class="w"> </span>filter<span class="w"> </span>hook<span class="w"> </span>input<span class="w"> </span>priority<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="se">\;</span><span class="w"> </span>policy<span class="w"> </span>drop<span class="w"> </span><span class="se">\;</span><span class="w"> </span><span class="o">}</span><span class="p">;</span><span class="w"> </span>nft<span class="w"> </span>add<span class="w"> </span>rule<span class="w"> </span>inet<span class="w"> </span>wg_table<span class="w"> </span>input<span class="w"> </span>udp<span class="w"> </span>dport<span class="w"> </span><span class="o">{{</span>port<span class="o">}}</span><span class="w"> </span>accept<span class="p">;</span><span class="w"> </span>nft<span class="w"> </span>add<span class="w"> </span>chain<span class="w"> </span>inet<span class="w"> </span>wg_table<span class="w"> </span>forward<span class="w"> </span><span class="o">{</span><span class="w"> </span><span class="nb">type</span><span class="w"> </span>filter<span class="w"> </span>hook<span class="w"> </span>forward<span class="w"> </span>priority<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="se">\;</span><span class="w"> </span>policy<span class="w"> </span>drop<span class="w"> </span><span class="se">\;</span><span class="w"> </span><span class="o">}</span><span class="p">;</span><span class="w"> </span>nft<span class="w"> </span>add<span class="w"> </span>rule<span class="w"> </span>inet<span class="w"> </span>wg_table<span class="w"> </span>forward<span class="w"> </span>iifname<span class="w"> </span><span class="s2">&quot;wg0&quot;</span><span class="w"> </span>accept<span class="p">;</span><span class="w"> </span>nft<span class="w"> </span>add<span class="w"> </span>rule<span class="w"> </span>inet<span class="w"> </span>wg_table<span class="w"> </span>forward<span class="w"> </span>oifname<span class="w"> </span><span class="s2">&quot;wg0&quot;</span><span class="w"> </span>accept<span class="p">;</span>
+<div class="highlight"><pre><span></span><code>apk<span class="w"> </span>add<span class="w"> </span>nftables<span class="p">;</span><span class="w"> </span>nft<span class="w"> </span>add<span class="w"> </span>table<span class="w"> </span>inet<span class="w"> </span>wg_table<span class="p">;</span><span class="w"> </span>nft<span class="w"> </span>add<span class="w"> </span>chain<span class="w"> </span>inet<span class="w"> </span>wg_table<span class="w"> </span>postrouting<span class="w"> </span><span class="o">{</span><span class="w"> </span><span class="nb">type</span><span class="w"> </span>nat<span class="w"> </span>hook<span class="w"> </span>postrouting<span class="w"> </span>priority<span class="w"> </span><span class="m">100</span><span class="w"> </span><span class="se">\;</span><span class="w"> </span><span class="o">}</span><span class="p">;</span><span class="w"> </span>nft<span class="w"> </span>add<span class="w"> </span>rule<span class="w"> </span>inet<span class="w"> </span>wg_table<span class="w"> </span>postrouting<span class="w"> </span>ip<span class="w"> </span>saddr<span class="w"> </span><span class="o">{{</span>ipv4Cidr<span class="o">}}</span><span class="w"> </span>oifname<span class="w"> </span><span class="o">{{</span>device<span class="o">}}</span><span class="w"> </span>masquerade<span class="p">;</span><span class="w"> </span>nft<span class="w"> </span>add<span class="w"> </span>rule<span class="w"> </span>inet<span class="w"> </span>wg_table<span class="w"> </span>postrouting<span class="w"> </span>ip6<span class="w"> </span>saddr<span class="w"> </span><span class="o">{{</span>ipv6Cidr<span class="o">}}</span><span class="w"> </span>oifname<span class="w"> </span><span class="o">{{</span>device<span class="o">}}</span><span class="w"> </span>masquerade<span class="p">;</span><span class="w"> </span>nft<span class="w"> </span>add<span class="w"> </span>chain<span class="w"> </span>inet<span class="w"> </span>wg_table<span class="w"> </span>input<span class="w"> </span><span class="o">{</span><span class="w"> </span><span class="nb">type</span><span class="w"> </span>filter<span class="w"> </span>hook<span class="w"> </span>input<span class="w"> </span>priority<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="se">\;</span><span class="w"> </span>policy<span class="w"> </span>drop<span class="w"> </span><span class="se">\;</span><span class="w"> </span><span class="o">}</span><span class="p">;</span><span class="w"> </span>nft<span class="w"> </span>add<span class="w"> </span>rule<span class="w"> </span>inet<span class="w"> </span>wg_table<span class="w"> </span>input<span class="w"> </span>udp<span class="w"> </span>dport<span class="w"> </span><span class="o">{{</span>port<span class="o">}}</span><span class="w"> </span>accept<span class="p">;</span><span class="w"> </span>nft<span class="w"> </span>add<span class="w"> </span>rule<span class="w"> </span>inet<span class="w"> </span>wg_table<span class="w"> </span>input<span class="w"> </span>tcp<span class="w"> </span>dport<span class="w"> </span><span class="o">{{</span>uiPort<span class="o">}}</span><span class="w"> </span>accept<span class="p">;</span><span class="w"> </span>nft<span class="w"> </span>add<span class="w"> </span>chain<span class="w"> </span>inet<span class="w"> </span>wg_table<span class="w"> </span>forward<span class="w"> </span><span class="o">{</span><span class="w"> </span><span class="nb">type</span><span class="w"> </span>filter<span class="w"> </span>hook<span class="w"> </span>forward<span class="w"> </span>priority<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="se">\;</span><span class="w"> </span>policy<span class="w"> </span>drop<span class="w"> </span><span class="se">\;</span><span class="w"> </span><span class="o">}</span><span class="p">;</span><span class="w"> </span>nft<span class="w"> </span>add<span class="w"> </span>rule<span class="w"> </span>inet<span class="w"> </span>wg_table<span class="w"> </span>forward<span class="w"> </span>iifname<span class="w"> </span><span class="s2">&quot;wg0&quot;</span><span class="w"> </span>accept<span class="p">;</span><span class="w"> </span>nft<span class="w"> </span>add<span class="w"> </span>rule<span class="w"> </span>inet<span class="w"> </span>wg_table<span class="w"> </span>forward<span class="w"> </span>oifname<span class="w"> </span><span class="s2">&quot;wg0&quot;</span><span class="w"> </span>accept<span class="p">;</span>
 </code></pre></div>
 <ol>
 <li>PostDown</li>
 </ol>
 <div class="highlight"><pre><span></span><code>nft<span class="w"> </span>delete<span class="w"> </span>table<span class="w"> </span>inet<span class="w"> </span>wg_table
+</code></pre></div>
+<p>If you don't have iptables loaded on your server, you could see many errors in the logs or in the UI. You can ignore them.</p>
+<h2 id="restart-the-container"><a class="toclink" href="#restart-the-container">Restart the Container</a></h2>
+<p>Restart the container to apply the new hooks:</p>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>systemctl<span class="w"> </span>restart<span class="w"> </span>wg-easy
 </code></pre></div>
 <!--
 TODO: improve docs after better nftables support
