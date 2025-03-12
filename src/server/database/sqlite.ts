@@ -19,7 +19,13 @@ const db = drizzle({ client, schema });
 
 export async function connect() {
   await migrate();
-  return new DBService(db);
+  const dbService = new DBService(db);
+
+  if (WG_INITIAL_ENV.ENABLED) {
+    await initialSetup(dbService);
+  }
+
+  return dbService;
 }
 
 class DBService {
@@ -57,4 +63,36 @@ async function migrate() {
       DB_DEBUG('Failed to migrate database:', e.message);
     }
   }
+}
+
+async function initialSetup(db: DBServiceType) {
+  const setup = await db.general.getSetupStep();
+
+  if (setup.done) {
+    DB_DEBUG('Warning: Setup already done. Skiping initial setup.');
+    return;
+  }
+
+  if (WG_INITIAL_ENV.USERNAME && WG_INITIAL_ENV.PASSWORD) {
+    await db.users.create(WG_INITIAL_ENV.USERNAME, WG_INITIAL_ENV.PASSWORD);
+  }
+
+  if (WG_INITIAL_ENV.IPV4_CIDR && WG_INITIAL_ENV.IPV6_CIDR) {
+    await db.interfaces.updateCidr({
+      ipv4Cidr: WG_INITIAL_ENV.IPV4_CIDR,
+      ipv6Cidr: WG_INITIAL_ENV.IPV6_CIDR,
+    });
+  }
+
+  if (WG_INITIAL_ENV.DNS) {
+    const userConfig = await db.userConfigs.get();
+    await db.userConfigs.update({
+      ...userConfig,
+      defaultDns: WG_INITIAL_ENV.DNS,
+    });
+  }
+
+  // TODO: set host, port
+
+  await db.general.setSetupStep(0);
 }
