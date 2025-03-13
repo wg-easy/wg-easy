@@ -1,5 +1,5 @@
 <template>
-  <section class="grid grid-cols-1 gap-4 md:grid-cols-2">
+  <section class="grid grid-cols-2 gap-4">
     <slot />
     <Separator
       decorative
