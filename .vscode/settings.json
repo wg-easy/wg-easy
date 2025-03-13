@@ -6,6 +6,9 @@
   "nuxtr.vueFiles.style.addStyleTag": false,
   "nuxtr.piniaFiles.defaultTemplate": "setup",
   "nuxtr.monorepoMode.DirectoryName": "src",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "always"
+  },
   "[vue]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },

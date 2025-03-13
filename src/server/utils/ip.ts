@@ -1,5 +1,6 @@
-import type { parseCidr } from 'cidr-tools';
+import { Resolver } from 'node:dns/promises';
 import { stringifyIp } from 'ip-bigint';
+import type { parseCidr } from 'cidr-tools';
 
 import type { ClientNextIpType } from '#db/repositories/client/types';
 
@@ -30,4 +31,55 @@ export function nextIP(
   }
 
   return address;
+}
+
+// use opendns to get public ip
+const dnsServers = {
+  ip4: ['208.67.222.222'],
+  ip6: ['2620:119:35::35'],
+  ip: 'myip.opendns.com',
+};
+
+export async function getPublicInformation() {
+  const ipv4 = await getPublicIpv4();
+  const ipv6 = await getPublicIpv6();
+
+  const ptr4 = ipv4 ? await getReverseDns(ipv4) : [];
+  const ptr6 = ipv6 ? await getReverseDns(ipv6) : [];
+  const hostnames = [...new Set([...ptr4, ...ptr6])];
+
+  return { ipv4, ipv6, hostnames };
+}
+
+async function getPublicIpv4() {
+  try {
+    const resolver = new Resolver();
+    resolver.setServers(dnsServers.ip4);
+    const ipv4 = await resolver.resolve4(dnsServers.ip);
+    return ipv4[0];
+  } catch {
+    return null;
+  }
+}
+
+async function getPublicIpv6() {
+  try {
+    const resolver = new Resolver();
+    resolver.setServers(dnsServers.ip6);
+    const ipv6 = await resolver.resolve6(dnsServers.ip);
+    return ipv6[0];
+  } catch {
+    return null;
+  }
+}
+
+async function getReverseDns(ip: string) {
+  try {
+    const resolver = new Resolver();
+    resolver.setServers([...dnsServers.ip4, ...dnsServers.ip6]);
+    const ptr = await resolver.reverse(ip);
+    return ptr;
+  } catch {
+    return [];
+  }
 }
