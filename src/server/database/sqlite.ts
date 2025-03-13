@@ -69,7 +69,7 @@ async function initialSetup(db: DBServiceType) {
   const setup = await db.general.getSetupStep();
 
   if (setup.done) {
-    DB_DEBUG('Warning: Setup already done. Skiping initial setup.');
+    DB_DEBUG('Setup already done. Skiping initial setup.');
     return;
   }
 
