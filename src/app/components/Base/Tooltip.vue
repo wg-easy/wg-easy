@@ -1,14 +1,17 @@
 <template>
   <TooltipProvider>
-    <TooltipRoot>
+    <TooltipRoot :open="open" @update:open="open = $event">
       <TooltipTrigger
-        class="inline-flex h-8 w-8 items-center justify-center rounded-full text-gray-400 outline-none focus:shadow-sm focus:shadow-black"
+        class="mx-2 inline-flex h-4 w-4 items-center justify-center rounded-full text-gray-400 outline-none focus:shadow-sm focus:shadow-black"
+        as-child
       >
-        <slot />
+        <button @click="open = !open">
+          <slot />
+        </button>
       </TooltipTrigger>
       <TooltipPortal>
         <TooltipContent
-          class="select-none rounded bg-gray-600 px-3 py-2 text-sm leading-none text-white shadow-lg will-change-[transform,opacity]"
+          class="select-none whitespace-pre-line rounded bg-gray-600 px-3 py-2 text-sm leading-none text-white shadow-lg will-change-[transform,opacity]"
           :side-offset="5"
         >
           {{ text }}
@@ -21,4 +24,6 @@
 
 <script lang="ts" setup>
 defineProps<{ text: string }>();
+
+const open = ref(false);
 </script>

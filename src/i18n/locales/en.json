@@ -35,16 +35,18 @@
     "confirmPassword": "Confirm Password"
   },
   "setup": {
-    "welcome": "Welcome to your first setup of wg-easy !",
-    "welcomeDesc": "You have found the easiest way to install and manage WireGuard on any Linux host!",
+    "welcome": "Welcome to your first setup of wg-easy",
+    "welcomeDesc": "You have found the easiest way to install and manage WireGuard on any Linux host",
     "existingSetup": "Do you have an existing setup?",
     "createAdminDesc": "Please first enter an admin username and a strong secure password. This information will be used to log in to your administration panel.",
     "setupConfigDesc": "Please enter the host and port information. This will be used for the client configuration when setting up WireGuard on their devices.",
     "setupMigrationDesc": "Please provide the backup file if you want to migrate your data from your previous wg-easy version to your new setup.",
     "upload": "Upload",
-    "migration": "Restore the backup",
+    "migration": "Restore the backup:",
     "createAccount": "Create Account",
-    "successful": "Setup successful"
+    "successful": "Setup successful",
+    "hostDesc": "Public hostname clients will connect to\nIPv6 address has to be in square brackets",
+    "portDesc": "Public UDP port clients will connect to (same as port mapping)"
   },
   "update": {
     "updateAvailable": "There is an update available!",

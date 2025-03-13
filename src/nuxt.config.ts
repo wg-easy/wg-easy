@@ -28,7 +28,9 @@ export default defineNuxtConfig({
     },
     locales: [
       {
+        // same as i18n.config.ts
         code: 'en',
+        // BCP 47 language tag
         language: 'en-US',
         name: 'English',
       },

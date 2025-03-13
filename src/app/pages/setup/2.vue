@@ -1,9 +1,9 @@
 <template>
   <div>
-    <p class="p-8 text-center text-lg">
+    <p class="text-center text-lg">
       {{ $t('setup.createAdminDesc') }}
     </p>
-    <div class="flex flex-col gap-3">
+    <div class="mt-8 flex flex-col gap-3">
       <div class="flex flex-col">
         <FormNullTextField
           id="username"
@@ -28,7 +28,7 @@
           :label="$t('general.confirmPassword')"
         />
       </div>
-      <div>
+      <div class="mt-4 flex justify-center">
         <BaseButton @click="submit">{{ $t('setup.createAccount') }}</BaseButton>
       </div>
     </div>
