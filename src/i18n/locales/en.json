@@ -46,7 +46,7 @@
     "createAccount": "Create Account",
     "successful": "Setup successful",
     "hostDesc": "Public hostname clients will connect to",
-    "portDesc": "Public UDP port clients will connect to (same as port mapping)"
+    "portDesc": "Public UDP port clients will connect to and WireGuard will listen on"
   },
   "update": {
     "updateAvailable": "There is an update available!",
@@ -143,7 +143,7 @@
     "config": {
       "connection": "Connection",
       "hostDesc": "Public hostname clients will connect to (invalidates config)",
-      "portDesc": "Public UDP port clients will connect to (invalidates config)",
+      "portDesc": "Public UDP port clients will connect to (invalidates config, you probably want to change Interface Port too)",
       "allowedIpsDesc": "Allowed IPs clients will use (global config)",
       "dnsDesc": "DNS server clients will use (global config)",
       "mtuDesc": "MTU clients will use (only for new clients)",
@@ -155,7 +155,7 @@
       "device": "Device",
       "deviceDesc": "Ethernet device the wireguard traffic should be forwarded through",
       "mtuDesc": "MTU WireGuard will use",
-      "portDesc": "UDP Port WireGuard will listen on (could invalidate config)",
+      "portDesc": "UDP Port WireGuard will listen on (you probably want to change Config Port too)",
       "changeCidr": "Change CIDR"
     },
     "introText": "Welcome to the admin panel.\n\nHere you can manage the general settings, the configuration, the interface settings and the hooks.\n\nStart by choosing one of the sections in the sidebar."
