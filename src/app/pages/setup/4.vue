@@ -1,21 +1,27 @@
 <template>
   <div>
-    <p class="p-8 text-center text-lg">
+    <p class="text-center text-lg">
       {{ $t('setup.setupConfigDesc') }}
     </p>
-    <div class="flex flex-col gap-3">
+    <div class="mt-8 flex flex-col gap-3">
       <div class="flex flex-col">
         <FormNullTextField
           id="host"
           v-model="host"
           :label="$t('general.host')"
           placeholder="vpn.example.com"
+          :description="$t('setup.hostDesc')"
         />
       </div>
       <div class="flex flex-col">
-        <FormNumberField id="port" v-model="port" :label="$t('general.port')" />
+        <FormNumberField
+          id="port"
+          v-model="port"
+          :label="$t('general.port')"
+          :description="$t('setup.portDesc')"
+        />
       </div>
-      <div>
+      <div class="mt-4 flex justify-center">
         <BaseButton @click="submit">{{ $t('general.continue') }}</BaseButton>
       </div>
     </div>

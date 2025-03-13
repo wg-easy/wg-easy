@@ -1,20 +1,13 @@
 import { eq, sql } from 'drizzle-orm';
 import { userConfig } from './schema';
 import type { UserConfigUpdateType } from './types';
+import { wgInterface } from '#db/schema';
 import type { DBType } from '#db/sqlite';
 
 function createPreparedStatement(db: DBType) {
   return {
     get: db.query.userConfig
       .findFirst({ where: eq(userConfig.id, sql.placeholder('interface')) })
-      .prepare(),
-    updateHostPort: db
-      .update(userConfig)
-      .set({
-        host: sql.placeholder('host') as never as string,
-        port: sql.placeholder('port') as never as number,
-      })
-      .where(eq(userConfig.id, sql.placeholder('interface')))
       .prepare(),
   };
 }
@@ -38,11 +31,26 @@ export class UserConfigService {
     return userConfig;
   }
 
+  // TODO: wrap ipv6 host in square brackets
+
+  /**
+   * sets host of user config
+   *
+   * sets port of user config and interface
+   */
   updateHostPort(host: string, port: number) {
-    return this.#statements.updateHostPort.execute({
-      interface: 'wg0',
-      host,
-      port,
+    return this.#db.transaction(async (tx) => {
+      await tx
+        .update(userConfig)
+        .set({ host, port })
+        .where(eq(userConfig.id, 'wg0'))
+        .execute();
+
+      await tx
+        .update(wgInterface)
+        .set({ port })
+        .where(eq(wgInterface.name, 'wg0'))
+        .execute();
     });
   }
 

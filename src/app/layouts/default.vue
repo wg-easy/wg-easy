@@ -1,23 +1,23 @@
 <template>
   <div>
-    <header class="container mx-auto mt-4 max-w-3xl px-3 xs:mt-6 md:px-0">
+    <header class="mx-auto mt-4 flex max-w-3xl flex-col justify-center">
       <div
-        class="mb-5"
+        class="mb-5 w-full"
         :class="
           loggedIn
-            ? 'flex flex-auto flex-col-reverse items-center gap-3 xxs:flex-row'
+            ? 'flex flex-col items-center justify-between sm:flex-row'
             : 'flex justify-end'
         "
       >
         <HeaderLogo v-if="loggedIn" />
-        <div class="flex grow-0 items-center gap-3 self-end xxs:self-center">
+        <div class="flex flex-row gap-3">
           <HeaderLangSelector />
           <HeaderThemeSwitch />
           <HeaderChartToggle v-if="loggedIn" />
           <UiUserMenu v-if="loggedIn" />
         </div>
       </div>
-      <HeaderUpdate class="mt-5" />
+      <HeaderUpdate class="mt-4" />
     </header>
     <slot />
     <UiFooter />

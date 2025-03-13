@@ -1,13 +1,15 @@
 <template>
-  <div>
-    <p class="p-8 text-center text-lg">
+  <div class="flex flex-col items-center">
+    <p class="text-center text-lg">
       {{ $t('setup.setupMigrationDesc') }}
     </p>
-    <div>
+    <div class="mt-8 flex gap-3">
       <Label for="migration">{{ $t('setup.migration') }}</Label>
       <input id="migration" type="file" @change="onChangeFile" />
     </div>
-    <BaseButton @click="submit">{{ $t('setup.upload') }}</BaseButton>
+    <div class="mt-4">
+      <BaseButton @click="submit">{{ $t('setup.upload') }}</BaseButton>
+    </div>
   </div>
 </template>
 

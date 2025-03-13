@@ -1,6 +1,10 @@
 <template>
   <div
-    v-if="globalStore.release?.updateAvailable"
+    v-if="
+      globalStore.release?.updateAvailable &&
+      authStore.userData &&
+      hasPermissions(authStore.userData, 'admin', 'any')
+    "
     class="font-small mb-10 rounded-md bg-red-800 p-4 text-sm text-white shadow-lg dark:bg-red-100 dark:text-red-600"
     :title="`v${globalStore.release.currentRelease} → v${globalStore.release.latestRelease.version}`"
   >
@@ -23,6 +27,5 @@
 
 <script lang="ts" setup>
 const globalStore = useGlobalStore();
-
-// TODO: only show this to admins
+const authStore = useAuthStore();
 </script>

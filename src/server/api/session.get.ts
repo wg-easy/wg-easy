@@ -2,11 +2,10 @@ export default defineEventHandler(async (event) => {
   const session = await useWGSession(event);
 
   if (!session.data.userId) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: 'Not logged in',
-    });
+    // not logged in
+    return null;
   }
+
   const user = await Database.users.get(session.data.userId);
   if (!user) {
     throw createError({

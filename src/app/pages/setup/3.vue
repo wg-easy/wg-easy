@@ -1,14 +1,18 @@
 <template>
   <div>
-    <p class="p-8 text-center text-lg">
+    <p class="text-center text-lg">
       {{ $t('setup.existingSetup') }}
     </p>
-    <div class="mb-8 flex justify-center">
-      <NuxtLink to="/setup/4">
-        <BaseButton as="span">{{ $t('general.no') }}</BaseButton>
+    <div class="mt-4 flex justify-center gap-3">
+      <NuxtLink to="/setup/4" class="w-20">
+        <BaseButton as="span" class="w-full justify-center">
+          {{ $t('general.no') }}
+        </BaseButton>
       </NuxtLink>
-      <NuxtLink to="/setup/migrate">
-        <BaseButton as="span">{{ $t('general.yes') }}</BaseButton>
+      <NuxtLink to="/setup/migrate" class="w-20">
+        <BaseButton as="span" class="w-full justify-center">
+          {{ $t('general.yes') }}
+        </BaseButton>
       </NuxtLink>
     </div>
   </div>

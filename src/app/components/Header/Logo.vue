@@ -1,5 +1,5 @@
 <template>
-  <NuxtLink to="/" class="mb-4 flex-grow self-start">
+  <NuxtLink to="/" class="mb-4">
     <h1 class="text-4xl font-medium dark:text-neutral-200">
       <img
         src="/logo.png"

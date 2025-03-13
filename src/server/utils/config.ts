@@ -19,6 +19,19 @@ export const WG_ENV = {
   PORT: assertEnv('PORT'),
 };
 
+export const WG_INITIAL_ENV = {
+  ENABLED: process.env.INIT_ENABLED === 'true',
+  USERNAME: process.env.INIT_USERNAME,
+  PASSWORD: process.env.INIT_PASSWORD,
+  DNS: process.env.INIT_DNS?.split(',').map((x) => x.trim()),
+  IPV4_CIDR: process.env.INIT_IPV4_CIDR,
+  IPV6_CIDR: process.env.INIT_IPV6_CIDR,
+  HOST: process.env.INIT_HOST,
+  PORT: process.env.INIT_PORT
+    ? Number.parseInt(process.env.INIT_PORT, 10)
+    : undefined,
+};
+
 function assertEnv<T extends string>(env: T) {
   const val = process.env[env];
 
