@@ -54,6 +54,9 @@
 </template>
 
 <script setup lang="ts">
+const authStore = useAuthStore();
+authStore.update();
+
 const authenticating = ref(false);
 const remember = ref(false);
 const username = ref<null | string>(null);

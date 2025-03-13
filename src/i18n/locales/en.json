@@ -45,7 +45,7 @@
     "migration": "Restore the backup:",
     "createAccount": "Create Account",
     "successful": "Setup successful",
-    "hostDesc": "Public hostname clients will connect to\nIPv6 address has to be in square brackets",
+    "hostDesc": "Public hostname clients will connect to",
     "portDesc": "Public UDP port clients will connect to (same as port mapping)"
   },
   "update": {
@@ -157,7 +157,8 @@
       "mtuDesc": "MTU WireGuard will use",
       "portDesc": "UDP Port WireGuard will listen on (could invalidate config)",
       "changeCidr": "Change CIDR"
-    }
+    },
+    "introText": "Welcome to the admin panel.\n\nHere you can manage the general settings, the configuration, the interface settings and the hooks.\n\nStart by choosing one of the sections in the sidebar."
   },
   "zod": {
     "generic": {

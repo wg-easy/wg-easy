@@ -38,6 +38,8 @@ export class UserConfigService {
     return userConfig;
   }
 
+  // TODO: wrap ipv6 host in square brackets
+
   updateHostPort(host: string, port: number) {
     return this.#statements.updateHostPort.execute({
       interface: 'wg0',
