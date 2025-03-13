@@ -73,11 +73,6 @@ async function initialSetup(db: DBServiceType) {
     return;
   }
 
-  if (WG_INITIAL_ENV.USERNAME && WG_INITIAL_ENV.PASSWORD) {
-    DB_DEBUG('Creating initial user...');
-    await db.users.create(WG_INITIAL_ENV.USERNAME, WG_INITIAL_ENV.PASSWORD);
-  }
-
   if (WG_INITIAL_ENV.IPV4_CIDR && WG_INITIAL_ENV.IPV6_CIDR) {
     DB_DEBUG('Setting initial CIDR...');
     await db.interfaces.updateCidr({
@@ -95,13 +90,21 @@ async function initialSetup(db: DBServiceType) {
     });
   }
 
-  if (WG_INITIAL_ENV.HOST && WG_INITIAL_ENV.PORT) {
+  if (
+    WG_INITIAL_ENV.USERNAME &&
+    WG_INITIAL_ENV.PASSWORD &&
+    WG_INITIAL_ENV.HOST &&
+    WG_INITIAL_ENV.PORT
+  ) {
+    DB_DEBUG('Creating initial user...');
+    await db.users.create(WG_INITIAL_ENV.USERNAME, WG_INITIAL_ENV.PASSWORD);
+
     DB_DEBUG('Setting initial host and port...');
     await db.userConfigs.updateHostPort(
       WG_INITIAL_ENV.HOST,
       WG_INITIAL_ENV.PORT
     );
-  }
 
-  await db.general.setSetupStep(0);
+    await db.general.setSetupStep(0);
+  }
 }
