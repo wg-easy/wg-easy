@@ -7,5 +7,5 @@
     "docs:preview": "docker run --rm -it -p 8080:8080 -v ./docs:/docs squidfunk/mkdocs-material serve -a 0.0.0.0:8080",
     "scripts:version": "bash scripts/version.sh"
   },
-  "packageManager": "pnpm@10.6.2"
+  "packageManager": "pnpm@10.6.3"
 }
