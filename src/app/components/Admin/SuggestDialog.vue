@@ -3,10 +3,13 @@
     <template #trigger><slot /></template>
     <template #title>{{ $t('admin.config.suggest') }}</template>
     <template #description>
-      <p v-if="status === 'pending'">
+      <p v-if="!values">
         {{ $t('general.loading') }}
       </p>
-      <BaseSelect v-else v-model="selected" :options="values" />
+      <div v-else class="flex flex-col items-start gap-2">
+        <p>{{ $t('admin.config.suggestDesc') }}</p>
+        <BaseSelect v-model="selected" :options="values" />
+      </div>
     </template>
     <template #actions>
       <DialogClose as-child>
@@ -27,7 +30,7 @@ defineProps<{
   triggerClass?: string;
 }>();
 
-const { data, status } = useFetch('/api/admin/ip-info', {
+const { data } = useFetch('/api/admin/ip-info', {
   method: 'get',
 });
 

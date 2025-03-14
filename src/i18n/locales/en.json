@@ -149,7 +149,8 @@
       "dnsDesc": "DNS server clients will use (global config)",
       "mtuDesc": "MTU clients will use (only for new clients)",
       "persistentKeepaliveDesc": "Interval in seconds to send keepalives to the server. 0 = disabled (only for new clients)",
-      "suggest": "Suggest"
+      "suggest": "Suggest",
+      "suggestDesc": "Choose a IP-Address or Hostname for the Host field"
     },
     "interface": {
       "cidrSuccess": "Changed CIDR",

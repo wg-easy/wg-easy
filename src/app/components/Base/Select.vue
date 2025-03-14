@@ -1,47 +1,29 @@
 <template>
   <SelectRoot v-model="selected">
     <SelectTrigger
-      class="text-grass11 hover:bg-mauve3 data-[placeholder]:text-green9 inline-flex h-[35px] min-w-[160px] items-center justify-between gap-[5px] rounded bg-white px-[15px] text-[13px] leading-none shadow-[0_2px_10px] shadow-black/10 outline-none focus:shadow-[0_0_0_2px] focus:shadow-black"
-      aria-label="Customise options"
+      class="inline-flex h-8 items-center justify-around gap-2 rounded bg-gray-200 px-3 text-sm leading-none dark:bg-neutral-500 dark:text-neutral-200"
+      aria-label="Choose option"
     >
       <SelectValue placeholder="Select..." />
-      <IconsArrowDown class="h-3.5 w-3.5" />
+      <IconsArrowDown class="size-3" />
     </SelectTrigger>
 
     <SelectPortal>
       <SelectContent
-        class="data-[side=top]:animate-slideDownAndFade data-[side=right]:animate-slideLeftAndFade data-[side=bottom]:animate-slideUpAndFade data-[side=left]:animate-slideRightAndFade z-[100] min-w-[160px] rounded bg-white shadow-[0px_10px_38px_-10px_rgba(22,_23,_24,_0.35),_0px_10px_20px_-15px_rgba(22,_23,_24,_0.2)] will-change-[opacity,transform]"
-        :side-offset="5"
+        class="z-[100] min-w-28 rounded bg-gray-300 dark:bg-neutral-500"
       >
-        <SelectScrollUpButton
-          class="text-violet11 flex h-[25px] cursor-default items-center justify-center bg-white"
-        >
-          <Icon icon="radix-icons:chevron-up" />
-        </SelectScrollUpButton>
-
-        <SelectViewport class="p-[5px]">
+        <SelectViewport class="p-2">
           <SelectItem
             v-for="(option, index) in options"
             :key="index"
-            class="text-grass11 data-[disabled]:text-mauve8 data-[highlighted]:bg-green9 data-[highlighted]:text-green1 relative flex h-[25px] select-none items-center rounded-[3px] pl-[25px] pr-[35px] text-[13px] leading-none data-[disabled]:pointer-events-none data-[highlighted]:outline-none"
             :value="option.value"
+            class="relative flex h-6 items-center rounded px-3 text-sm leading-none outline-none hover:bg-red-800 hover:text-white dark:text-white"
           >
-            <SelectItemIndicator
-              class="absolute left-0 inline-flex w-[25px] items-center justify-center"
-            >
-              <Icon icon="radix-icons:check" />
-            </SelectItemIndicator>
             <SelectItemText>
               {{ option.value }} - {{ option.label }}
             </SelectItemText>
           </SelectItem>
         </SelectViewport>
-
-        <SelectScrollDownButton
-          class="text-violet11 flex h-[25px] cursor-default items-center justify-center bg-white"
-        >
-          <Icon icon="radix-icons:chevron-down" />
-        </SelectScrollDownButton>
       </SelectContent>
     </SelectPortal>
   </SelectRoot>
