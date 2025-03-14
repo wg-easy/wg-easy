@@ -3,11 +3,12 @@
     <FormElement @submit.prevent="submit">
       <FormGroup>
         <FormHeading>{{ $t('admin.config.connection') }}</FormHeading>
-        <FormTextField
+        <FormHostField
           id="host"
           v-model="data.host"
           :label="$t('general.host')"
           :description="$t('admin.config.hostDesc')"
+          url="/api/admin/ip-info"
         />
         <FormNumberField
           id="port"

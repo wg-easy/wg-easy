@@ -3,29 +3,6 @@ type GithubRelease = {
   body: string;
 };
 
-/**
- * Cache function for 1 hour
- */
-function cacheFunction<T>(fn: () => T): () => T {
-  let cache: { value: T; expiry: number } | null = null;
-
-  return (): T => {
-    const now = Date.now();
-
-    if (cache && cache.expiry > now) {
-      return cache.value;
-    }
-
-    const result = fn();
-    cache = {
-      value: result,
-      expiry: now + 3600000,
-    };
-
-    return result;
-  };
-}
-
 async function fetchLatestRelease() {
   try {
     const response = await $fetch<GithubRelease>(
@@ -53,4 +30,6 @@ async function fetchLatestRelease() {
  * Fetch latest release from GitHub
  * @cache Response is cached for 1 hour
  */
-export const cachedFetchLatestRelease = cacheFunction(fetchLatestRelease);
+export const cachedFetchLatestRelease = cacheFunction(fetchLatestRelease, {
+  expiry: 60 * 60 * 1000,
+});

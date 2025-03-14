@@ -91,6 +91,11 @@ export async function getCurrentUser(event: H3Event) {
       });
     }
     user = foundUser;
+  } else {
+    throw createError({
+      statusCode: 401,
+      statusMessage: 'Session failed. No Authorization',
+    });
   }
 
   if (!user) {

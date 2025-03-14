@@ -5,12 +5,13 @@
     </p>
     <div class="mt-8 flex flex-col gap-3">
       <div class="flex flex-col">
-        <FormNullTextField
+        <FormHostField
           id="host"
           v-model="host"
           :label="$t('general.host')"
           placeholder="vpn.example.com"
           :description="$t('setup.hostDesc')"
+          url="/api/setup/4"
         />
       </div>
       <div class="flex flex-col">

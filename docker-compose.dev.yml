@@ -16,7 +16,7 @@ services:
       - NET_ADMIN
       - SYS_MODULE
     environment:
-      - INIT_ENABLED=true
+      - INIT_ENABLED=false
       - INIT_HOST=test
       - INIT_PORT=51820
       - INIT_USERNAME=testtest
