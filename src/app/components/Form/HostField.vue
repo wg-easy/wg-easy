@@ -14,8 +14,9 @@
       :name="id"
       type="text"
       class="w-full"
+      :placeholder="placeholder"
     />
-    <AdminSuggestDialog @change="data = $event">
+    <AdminSuggestDialog :url="url" @change="data = $event">
       <BaseButton as="span">
         <div class="flex items-center gap-3">
           <IconsSparkles class="w-4" />
@@ -31,7 +32,17 @@ defineProps<{
   id: string;
   label: string;
   description?: string;
+  placeholder?: string;
+  url: '/api/admin/ip-info' | '/api/setup/4';
 }>();
 
-const data = defineModel<string>();
+const data = defineModel<string | null>({
+  set(value) {
+    const temp = value?.trim() ?? null;
+    if (temp === '') {
+      return null;
+    }
+    return temp;
+  },
+});
 </script>

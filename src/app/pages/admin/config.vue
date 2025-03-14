@@ -8,6 +8,7 @@
           v-model="data.host"
           :label="$t('general.host')"
           :description="$t('admin.config.hostDesc')"
+          url="/api/admin/ip-info"
         />
         <FormNumberField
           id="port"

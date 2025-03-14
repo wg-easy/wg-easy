@@ -26,11 +26,12 @@
 
 <script lang="ts" setup>
 defineEmits(['change']);
-defineProps<{
+const props = defineProps<{
   triggerClass?: string;
+  url: '/api/admin/ip-info' | '/api/setup/4';
 }>();
 
-const { data } = useFetch('/api/admin/ip-info', {
+const { data } = await useFetch(props.url, {
   method: 'get',
 });
 
