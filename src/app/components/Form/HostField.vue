@@ -15,12 +15,14 @@
       type="text"
       class="w-full"
     />
-    <BaseButton type="button" @click="data = ''">
-      <div class="flex items-center gap-3">
-        <IconsSparkles class="w-4" />
-        <span>Suggest</span>
-      </div>
-    </BaseButton>
+    <AdminSuggestDialog @change="data = $event">
+      <BaseButton as="span">
+        <div class="flex items-center gap-3">
+          <IconsSparkles class="w-4" />
+          <span>{{ $t('admin.config.suggest') }}</span>
+        </div>
+      </BaseButton>
+    </AdminSuggestDialog>
   </div>
 </template>
 

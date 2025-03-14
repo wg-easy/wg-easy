@@ -32,7 +32,8 @@
     "port": "Port",
     "yes": "Yes",
     "no": "No",
-    "confirmPassword": "Confirm Password"
+    "confirmPassword": "Confirm Password",
+    "loading": "Loading"
   },
   "setup": {
     "welcome": "Welcome to your first setup of wg-easy",
@@ -147,7 +148,8 @@
       "allowedIpsDesc": "Allowed IPs clients will use (global config)",
       "dnsDesc": "DNS server clients will use (global config)",
       "mtuDesc": "MTU clients will use (only for new clients)",
-      "persistentKeepaliveDesc": "Interval in seconds to send keepalives to the server. 0 = disabled (only for new clients)"
+      "persistentKeepaliveDesc": "Interval in seconds to send keepalives to the server. 0 = disabled (only for new clients)",
+      "suggest": "Suggest"
     },
     "interface": {
       "cidrSuccess": "Changed CIDR",
