@@ -34,8 +34,19 @@
           <FormActionField
             :label="$t('admin.interface.changeCidr')"
             class="w-full"
+            tabindex="-1"
           />
         </AdminCidrDialog>
+        <AdminRestartInterfaceDialog
+          trigger-class="col-span-2"
+          @restart="restartInterface"
+        >
+          <FormActionField
+            :label="$t('admin.interface.restart')"
+            class="w-full"
+            tabindex="-1"
+          />
+        </AdminRestartInterfaceDialog>
       </FormGroup>
     </FormElement>
   </main>
@@ -81,5 +92,21 @@ const _changeCidr = useSubmit(
 
 async function changeCidr(ipv4Cidr: string, ipv6Cidr: string) {
   await _changeCidr({ ipv4Cidr, ipv6Cidr });
+}
+
+const _restartInterface = useSubmit(
+  `/api/admin/interface/restart`,
+  {
+    method: 'post',
+  },
+  {
+    revert,
+    successMsg: t('admin.interface.restartSuccess'),
+    errorMsg: t('admin.interface.restartError'),
+  }
+);
+
+async function restartInterface() {
+  await _restartInterface(undefined);
 }
 </script>

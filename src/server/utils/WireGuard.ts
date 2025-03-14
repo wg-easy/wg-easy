@@ -193,6 +193,11 @@ class WireGuard {
     await wg.down(wgInterface.name).catch(() => {});
   }
 
+  async Restart() {
+    const wgInterface = await Database.interfaces.get();
+    await wg.restart(wgInterface.name);
+  }
+
   async cronJob() {
     const clients = await Database.clients.getAll();
     // Expires Feature

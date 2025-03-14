@@ -92,6 +92,10 @@ Endpoint = ${userConfig.host}:${userConfig.port}`;
     return exec(`wg-quick down ${infName}`);
   },
 
+  restart: (infName: string) => {
+    return exec(`wg-quick down ${infName}; wg-quick up ${infName}`);
+  },
+
   sync: (infName: string) => {
     return exec(`wg syncconf ${infName} <(wg-quick strip ${infName})`);
   },
