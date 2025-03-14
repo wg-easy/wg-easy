@@ -26,7 +26,7 @@ COPY --from=build /app/.output /app
 # Copy migrations
 COPY --from=build /app/server/database/migrations /app/server/database/migrations
 # libsql
-RUN npm install --no-save libsql
+RUN cd /app/server && npm install --no-save libsql
 
 # Install Linux packages
 RUN apk add --no-cache \
