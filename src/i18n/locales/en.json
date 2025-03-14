@@ -159,7 +159,12 @@
       "deviceDesc": "Ethernet device the wireguard traffic should be forwarded through",
       "mtuDesc": "MTU WireGuard will use",
       "portDesc": "UDP Port WireGuard will listen on (you probably want to change Config Port too)",
-      "changeCidr": "Change CIDR"
+      "changeCidr": "Change CIDR",
+      "restart": "Restart Interface",
+      "restartDesc": "Restart the WireGuard interface",
+      "restartWarn": "Are you sure to restart the interface? This will disconnect all clients.",
+      "restartSuccess": "Interface restarted",
+      "restartError": "Failed to restart interface"
     },
     "introText": "Welcome to the admin panel.\n\nHere you can manage the general settings, the configuration, the interface settings and the hooks.\n\nStart by choosing one of the sections in the sidebar."
   },
