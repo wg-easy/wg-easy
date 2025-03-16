@@ -6,7 +6,7 @@ export type UserType = InferSelectModel<typeof user>;
 
 const username = z
   .string({ message: t('zod.user.username') })
-  .min(8, t('zod.user.username'))
+  .min(2, t('zod.user.username'))
   .pipe(safeStringRefine);
 
 const password = z
