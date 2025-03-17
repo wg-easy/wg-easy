@@ -3,12 +3,12 @@
     <template #trigger><slot /></template>
     <template #title>{{ $t('admin.config.suggest') }}</template>
     <template #description>
-      <p v-if="!values">
-        {{ $t('general.loading') }}
-      </p>
-      <div v-else class="flex flex-col items-start gap-2">
+      <div class="flex flex-col items-start gap-2">
         <p>{{ $t('admin.config.suggestDesc') }}</p>
-        <BaseSelect v-model="selected" :options="values" />
+        <p v-if="!data">
+          {{ $t('general.loading') }}
+        </p>
+        <BaseSelect v-else v-model="selected" :options="data" />
       </div>
     </template>
     <template #actions>
@@ -31,10 +31,9 @@ const props = defineProps<{
   url: '/api/admin/ip-info' | '/api/setup/4';
 }>();
 
-const { data } = await useFetch(props.url, {
+const { data } = useFetch(props.url, {
   method: 'get',
 });
 
 const selected = ref<string>();
-const values = toRef(data.value);
 </script>

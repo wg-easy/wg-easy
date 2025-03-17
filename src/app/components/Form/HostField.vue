@@ -16,14 +16,16 @@
       class="w-full"
       :placeholder="placeholder"
     />
-    <AdminSuggestDialog :url="url" @change="data = $event">
-      <BaseButton as="span">
-        <div class="flex items-center gap-3">
-          <IconsSparkles class="w-4" />
-          <span>{{ $t('admin.config.suggest') }}</span>
-        </div>
-      </BaseButton>
-    </AdminSuggestDialog>
+    <ClientOnly>
+      <AdminSuggestDialog :url="url" @change="data = $event">
+        <BaseButton as="span">
+          <div class="flex items-center gap-3">
+            <IconsSparkles class="w-4" />
+            <span>{{ $t('admin.config.suggest') }}</span>
+          </div>
+        </BaseButton>
+      </AdminSuggestDialog>
+    </ClientOnly>
   </div>
 </template>
 

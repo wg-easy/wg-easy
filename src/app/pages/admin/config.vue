@@ -18,18 +18,18 @@
         />
       </FormGroup>
       <FormGroup>
-        <FormHeading :description="$t('admin.config.allowedIpsDesc')">{{
-          $t('general.allowedIps')
-        }}</FormHeading>
+        <FormHeading :description="$t('admin.config.allowedIpsDesc')">
+          {{ $t('general.allowedIps') }}
+        </FormHeading>
         <FormArrayField
           v-model="data.defaultAllowedIps"
           name="defaultAllowedIps"
         />
       </FormGroup>
       <FormGroup>
-        <FormHeading :description="$t('admin.config.dnsDesc')">{{
-          $t('general.dns')
-        }}</FormHeading>
+        <FormHeading :description="$t('admin.config.dnsDesc')">
+          {{ $t('general.dns') }}
+        </FormHeading>
         <FormArrayField v-model="data.defaultDns" name="defaultDns" />
       </FormGroup>
       <FormGroup>
