@@ -33,7 +33,7 @@
     "yes": "Yes",
     "no": "No",
     "confirmPassword": "Confirm Password",
-    "loading": "Loading"
+    "loading": "Loading..."
   },
   "setup": {
     "welcome": "Welcome to your first setup of wg-easy",
