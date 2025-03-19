@@ -5,7 +5,7 @@
         class="mx-2 inline-flex h-4 w-4 items-center justify-center rounded-full text-gray-400 outline-none focus:shadow-sm focus:shadow-black"
         as-child
       >
-        <button @click="open = !open">
+        <button type="button" @click="open = !open">
           <slot />
         </button>
       </TooltipTrigger>
