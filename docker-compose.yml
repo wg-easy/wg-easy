@@ -12,7 +12,7 @@ services:
       - WG_HOST=raspberrypi.local
 
       # Optional:
-      # For PASSWORD_HASH  -> needs double $$, hash of 'foobar123' and NO QUOTES ('); see "How_to_generate_an_bcrypt_hash.md" to generate the hash
+      # For PASSWORD_HASH  -> needs double $$, and no quotes ('). Example is the hash of 'foobar123'; see "How_to_generate_an_bcrypt_hash.md" to generate the hash
       # - PASSWORD_HASH=$$2y$$10$$hBCoykrB95WSzuV4fafBzOHWKu9sbyVa34GJr8VV5R/pIelfEMYyG
       # - PORT=51821
       # - WG_PORT=51820
