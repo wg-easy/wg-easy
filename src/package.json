@@ -31,7 +31,7 @@
     "cidr-tools": "^11.0.3",
     "crc-32": "^1.2.2",
     "debug": "^4.4.0",
-    "drizzle-orm": "^0.40.0",
+    "drizzle-orm": "^0.41.0",
     "ip-bigint": "^8.2.1",
     "is-cidr": "^5.1.1",
     "is-ip": "^5.0.1",
