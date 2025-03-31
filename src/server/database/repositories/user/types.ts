@@ -12,10 +12,6 @@ const username = z
 const password = z
   .string({ message: t('zod.user.password') })
   .min(12, t('zod.user.password'))
-  .regex(/[A-Z]/, t('zod.user.passwordUppercase'))
-  .regex(/[a-z]/, t('zod.user.passwordLowercase'))
-  .regex(/\d/, t('zod.user.passwordNumber'))
-  .regex(/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/? ]/, t('zod.user.passwordSpecial'))
   .pipe(safeStringRefine);
 
 const remember = z.boolean({ message: t('zod.user.remember') });
