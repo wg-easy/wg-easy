@@ -53,7 +53,7 @@
     "@types/debug": "^4.1.12",
     "@types/qrcode": "^1.5.5",
     "@types/semver": "^7.5.8",
-    "drizzle-kit": "^0.30.5",
+    "drizzle-kit": "^0.30.6",
     "eslint": "^9.23.0",
     "eslint-config-prettier": "^10.1.1",
     "prettier": "^3.5.3",
