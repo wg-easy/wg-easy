@@ -107,7 +107,15 @@ export class GeneralService {
     };
   }
 
-  update(data: GeneralUpdateType) {
+  async update(data: GeneralUpdateType) {
+    // only hash the password if it is not already hashed
+    if (
+      data.metricsPassword !== null &&
+      !isValidPasswordHash(data.metricsPassword)
+    ) {
+      data.metricsPassword = await hashPassword(data.metricsPassword);
+    }
+
     return this.#db.update(general).set(data).execute();
   }
 
