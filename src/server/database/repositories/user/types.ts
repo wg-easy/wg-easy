@@ -6,16 +6,12 @@ export type UserType = InferSelectModel<typeof user>;
 
 const username = z
   .string({ message: t('zod.user.username') })
-  .min(8, t('zod.user.username'))
+  .min(2, t('zod.user.username'))
   .pipe(safeStringRefine);
 
 const password = z
   .string({ message: t('zod.user.password') })
   .min(12, t('zod.user.password'))
-  .regex(/[A-Z]/, t('zod.user.passwordUppercase'))
-  .regex(/[a-z]/, t('zod.user.passwordLowercase'))
-  .regex(/\d/, t('zod.user.passwordNumber'))
-  .regex(/[!@#$%^&*(),.?":{}|<>]/, t('zod.user.passwordSpecial'))
   .pipe(safeStringRefine);
 
 const remember = z.boolean({ message: t('zod.user.remember') });
