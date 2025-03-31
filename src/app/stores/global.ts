@@ -1,5 +1,5 @@
 export const useGlobalStore = defineStore('Global', () => {
-  const { data: release } = useFetch('/api/release', {
+  const { data: information } = useFetch('/api/information', {
     method: 'get',
   });
 
@@ -21,7 +21,7 @@ export const useGlobalStore = defineStore('Global', () => {
 
   return {
     sortClient,
-    release,
+    information,
     uiShowCharts,
     toggleCharts,
     uiChartType,
