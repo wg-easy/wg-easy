@@ -135,7 +135,7 @@
       "sessionTimeoutDesc": "Session duration for Remember Me (seconds)",
       "metrics": "Metrics",
       "metricsPassword": "Password",
-      "metricsPasswordDesc": "Bearer Password for the metrics endpoint (argon2 hash)",
+      "metricsPasswordDesc": "Bearer Password for the metrics endpoint (password or argon2 hash)",
       "json": "JSON",
       "jsonDesc": "Route for metrics in JSON format",
       "prometheus": "Prometheus",
