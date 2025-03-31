@@ -1,6 +1,7 @@
 <template>
   <main>
     <UiBanner />
+    <HeaderInsecure />
     <form
       class="mx-auto mt-10 flex w-64 flex-col gap-5 overflow-hidden rounded-md bg-white p-5 text-gray-700 shadow dark:bg-neutral-700 dark:text-neutral-200"
       @submit.prevent="submit"

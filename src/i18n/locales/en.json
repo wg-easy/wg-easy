@@ -65,7 +65,8 @@
   "login": {
     "signIn": "Sign In",
     "rememberMe": "Remember me",
-    "rememberMeDesc": "Stay logged after closing the browser"
+    "rememberMeDesc": "Stay logged after closing the browser",
+    "insecure": "You can't log in with an insecure connection. Use HTTPS."
   },
   "error": {
     "clear": "Clear",
