@@ -1,6 +1,6 @@
 {
-  "id": "a61263b1-9af1-4d2e-99e9-80d08127b545",
-  "prevId": "8c2af02b-c4bd-4880-a9ad-b38805636208",
+  "id": "8d03a104-4de0-4efe-9348-962fac317055",
+  "prevId": "cd2794c5-3e55-4b55-b2ba-678f53cfdec7",
   "version": "6",
   "dialect": "sqlite",
   "tables": {
@@ -556,6 +556,13 @@
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
+          "autoincrement": false
+        },
+        "totp": {
+          "name": "totp",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
           "autoincrement": false
         },
         "enabled": {

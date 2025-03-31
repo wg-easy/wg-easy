@@ -10,6 +10,7 @@ export const user = sqliteTable('users_table', {
   email: text(),
   name: text().notNull(),
   role: int().$type<Role>().notNull(),
+  totp: text(),
   enabled: int({ mode: 'boolean' }).notNull(),
   createdAt: text('created_at')
     .notNull()

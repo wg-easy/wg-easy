@@ -4,7 +4,9 @@
       <slot />
     </template>
     <template #description>
-      <img :src="qrCode" />
+      <div class="bg-white">
+        <img :src="qrCode" />
+      </div>
     </template>
     <template #actions>
       <DialogClose>

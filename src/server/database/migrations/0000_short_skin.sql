@@ -80,6 +80,7 @@ CREATE TABLE `users_table` (
 	`email` text,
 	`name` text NOT NULL,
 	`role` integer NOT NULL,
+	`totp` text,
 	`enabled` integer NOT NULL,
 	`created_at` text DEFAULT (CURRENT_TIMESTAMP) NOT NULL,
 	`updated_at` text DEFAULT (CURRENT_TIMESTAMP) NOT NULL
