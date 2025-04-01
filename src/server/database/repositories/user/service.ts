@@ -158,4 +158,31 @@ export class UserService {
         .execute();
     });
   }
+
+  deleteTotpKey(id: ID, currentPassword: string) {
+    return this.#db.transaction(async (tx) => {
+      const txUser = await tx.query.user
+        .findFirst({ where: eq(user.id, id) })
+        .execute();
+
+      if (!txUser) {
+        throw new Error('User not found');
+      }
+
+      const passwordValid = await isPasswordValid(
+        currentPassword,
+        txUser.password
+      );
+
+      if (!passwordValid) {
+        throw new Error('Invalid password');
+      }
+
+      await tx
+        .update(user)
+        .set({ totpKey: null, totpVerified: false })
+        .where(eq(user.id, id))
+        .execute();
+    });
+  }
 }

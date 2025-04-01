@@ -4,27 +4,26 @@ import { UserUpdateTotpSchema } from '#db/repositories/user/types';
 type Response =
   | {
       success: boolean;
-      type: 'create';
+      type: 'setup';
       key: string;
       uri: string;
     }
-  | {
-      success: boolean;
-      type: 'created';
-    };
+  | { success: boolean; type: 'created' }
+  | { success: boolean; type: 'deleted' }
+  | { success: boolean; type: 'error' };
 
 export default definePermissionEventHandler(
   'me',
   'update',
   async ({ event, user, checkPermissions }) => {
-    const { code } = await readValidatedBody(
+    const body = await readValidatedBody(
       event,
       validateZod(UserUpdateTotpSchema, event)
     );
 
     checkPermissions(user);
 
-    if (!code) {
+    if (body.type === 'setup') {
       const key = new Secret({ size: 20 });
 
       const totp = new TOTP({
@@ -40,17 +39,25 @@ export default definePermissionEventHandler(
 
       return {
         success: true,
-        type: 'create',
+        type: 'setup',
         key: key.base32,
         uri: totp.toString(),
       } as Response;
-    } else {
-      await Database.users.verifyTotp(user.id, code);
+    } else if (body.type === 'create') {
+      await Database.users.verifyTotp(user.id, body.code);
 
       return {
         success: true,
         type: 'created',
       } as Response;
+    } else if (body.type === 'delete') {
+      await Database.users.deleteTotpKey(user.id, body.currentPassword);
+
+      return {
+        success: true,
+        type: 'deleted',
+      } as Response;
     }
+    return { success: false, type: 'error' } as Response;
   }
 );

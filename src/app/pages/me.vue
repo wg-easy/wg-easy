@@ -51,11 +51,12 @@
         <FormElement @submit.prevent>
           <FormGroup>
             <FormHeading>{{ $t('general.2fa') }}</FormHeading>
-            <FormActionField
+            <div
               v-if="!authStore.userData?.totpVerified && !twofa"
-              :label="$t('me.enable2fa')"
-              @click="enable2fa1"
-            />
+              class="col-span-2 flex flex-col"
+            >
+              <FormActionField :label="$t('me.enable2fa')" @click="setup2fa" />
+            </div>
             <div
               v-if="!authStore.userData?.totpVerified && twofa"
               class="col-span-2"
@@ -75,14 +76,14 @@
                 <p class="text-sm text-gray-500 dark:text-gray-400">
                   {{ $t('me.2faCodeDesc') }}
                 </p>
-                <FormNullTextField
+                <FormTextField
                   id="2facode"
                   v-model="code"
                   :label="$t('me.2faCode')"
                 />
                 <FormActionField
                   :label="$t('me.enable2fa')"
-                  @click="enable2fa2"
+                  @click="enable2fa"
                 />
               </div>
             </div>
@@ -93,6 +94,13 @@
               <p class="text-sm text-gray-500 dark:text-gray-400">
                 {{ $t('me.disable2faDesc') }}
               </p>
+              <FormPasswordField
+                id="2fapassword"
+                v-model="disable2faPassword"
+                :label="$t('me.currentPassword')"
+                type="password"
+                autocomplete="current-password"
+              />
               <FormActionField
                 :label="$t('me.disable2fa')"
                 @click="disable2fa"
@@ -158,53 +166,78 @@ function updatePassword() {
 
 const twofa = ref<{ key: string; qrcode: string } | null>(null);
 
-async function enable2fa1() {
-  try {
-    const response = await $fetch('/api/me/totp', {
-      method: 'post',
-      body: {
-        code: null,
-      },
-    });
-    if (!response.success && !response.type) {
-      throw new Error('Failed to enable 2FA');
-    }
-    if (response.type === 'create') {
-      const qrcode = encodeQR(response.uri, 'svg', {
-        ecc: 'high',
-        scale: 4,
-        encoding: 'byte',
-      });
-      const svg = new Blob([qrcode], { type: 'image/svg+xml' });
-      twofa.value = { key: response.key, qrcode: URL.createObjectURL(svg) };
-    }
-  } catch (e) {
-    console.error(e);
+const _setup2fa = useSubmit(
+  `/api/me/totp`,
+  {
+    method: 'post',
+  },
+  {
+    revert: async (success, data) => {
+      if (success && data?.type === 'setup') {
+        const qrcode = encodeQR(data.uri, 'svg', {
+          ecc: 'high',
+          scale: 4,
+          encoding: 'byte',
+        });
+        const svg = new Blob([qrcode], { type: 'image/svg+xml' });
+        twofa.value = { key: data.key, qrcode: URL.createObjectURL(svg) };
+      }
+    },
   }
+);
+
+async function setup2fa() {
+  return _setup2fa({
+    type: 'setup',
+  });
 }
 
-const code = ref<string | null>(null);
+const code = ref<string>('');
 
-async function enable2fa2() {
-  try {
-    const response = await $fetch('/api/me/totp', {
-      method: 'post',
-      body: {
-        code: code.value,
-      },
-    });
-    if (!response.type) {
-      throw new Error('Failed to enable 2FA');
-    }
-    if (response.type === 'created' && response.success) {
-      authStore.update();
-      twofa.value = null;
-      code.value = null;
-    }
-  } catch (e) {
-    console.error(e);
+const _enable2fa = useSubmit(
+  `/api/me/totp`,
+  {
+    method: 'post',
+  },
+  {
+    revert: async (success, data) => {
+      if (success && data?.type === 'created') {
+        authStore.update();
+        twofa.value = null;
+        code.value = '';
+      }
+    },
   }
+);
+
+async function enable2fa() {
+  return _enable2fa({
+    type: 'create',
+    code: code.value,
+  });
 }
 
-async function disable2fa() {}
+const disable2faPassword = ref('');
+
+const _disable2fa = useSubmit(
+  `/api/me/totp`,
+  {
+    method: 'post',
+  },
+  {
+    revert: async (success, data) => {
+      if (success && data?.type === 'deleted') {
+        authStore.update();
+        disable2faPassword.value = '';
+      }
+    },
+  }
+);
+
+async function disable2fa() {
+  return _disable2fa({
+    type: 'delete',
+    currentPassword: disable2faPassword.value,
+  });
+}
 </script>

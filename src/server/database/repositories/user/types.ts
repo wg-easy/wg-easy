@@ -59,10 +59,16 @@ export const UserUpdatePasswordSchema = z
     message: t('zod.user.passwordMatch'),
   });
 
-export const UserUpdateTotpSchema = z.object({
-  code: z
-    .string({
-      message: t('zod.user.totpCode'),
-    })
-    .nullable(),
-});
+export const UserUpdateTotpSchema = z.union([
+  z.object({
+    type: z.literal('setup'),
+  }),
+  z.object({
+    type: z.literal('create'),
+    code: z.string().min(6, t('zod.user.totpCode')),
+  }),
+  z.object({
+    type: z.literal('delete'),
+    currentPassword: password,
+  }),
+]);
