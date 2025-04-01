@@ -12,7 +12,7 @@
     v-model.trim="data"
     :name="id"
     type="text"
-    :autcomplete="autocomplete"
+    :autocomplete="autocomplete"
     :placeholder="placeholder"
   />
 </template>

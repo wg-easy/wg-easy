@@ -86,7 +86,6 @@ const _changeCidr = useSubmit(
   {
     revert,
     successMsg: t('admin.interface.cidrSuccess'),
-    errorMsg: t('admin.interface.cidrError'),
   }
 );
 
@@ -102,7 +101,6 @@ const _restartInterface = useSubmit(
   {
     revert,
     successMsg: t('admin.interface.restartSuccess'),
-    errorMsg: t('admin.interface.restartError'),
   }
 );
 

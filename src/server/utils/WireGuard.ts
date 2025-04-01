@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises';
 import debug from 'debug';
-import QRCode from 'qrcode';
+import { encodeQR } from 'qr';
 import type { InterfaceType } from '#db/repositories/interface/types';
 
 const WG_DEBUG = debug('WireGuard');
@@ -128,9 +128,10 @@ class WireGuard {
 
   async getClientQRCodeSVG({ clientId }: { clientId: ID }) {
     const config = await this.getClientConfiguration({ clientId });
-    return QRCode.toString(config, {
-      type: 'svg',
-      width: 512,
+    return encodeQR(config, 'svg', {
+      ecc: 'high',
+      scale: 4,
+      encoding: 'byte',
     });
   }
 

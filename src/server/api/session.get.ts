@@ -20,5 +20,6 @@ export default defineEventHandler(async (event) => {
     username: user.username,
     name: user.name,
     email: user.email,
+    totpVerified: user.totpVerified,
   };
 });

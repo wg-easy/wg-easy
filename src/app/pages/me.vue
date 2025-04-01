@@ -48,12 +48,74 @@
             />
           </FormGroup>
         </FormElement>
+        <FormElement @submit.prevent>
+          <FormGroup>
+            <FormHeading>{{ $t('general.2fa') }}</FormHeading>
+            <div
+              v-if="!authStore.userData?.totpVerified && !twofa"
+              class="col-span-2 flex flex-col"
+            >
+              <FormActionField :label="$t('me.enable2fa')" @click="setup2fa" />
+            </div>
+            <div
+              v-if="!authStore.userData?.totpVerified && twofa"
+              class="col-span-2"
+            >
+              <p class="text-sm text-gray-500 dark:text-gray-400">
+                {{ $t('me.enable2faDesc') }}
+              </p>
+              <div class="mt-2 flex flex-col gap-2">
+                <img :src="twofa.qrcode" size="128" class="bg-white" />
+                <FormTextField
+                  id="2fakey"
+                  :model-value="twofa.key"
+                  :on-update:model-value="() => {}"
+                  :label="$t('me.2faKey')"
+                  :disabled="true"
+                />
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                  {{ $t('me.2faCodeDesc') }}
+                </p>
+                <FormTextField
+                  id="2facode"
+                  v-model="code"
+                  :label="$t('general.2faCode')"
+                />
+                <FormActionField
+                  :label="$t('me.enable2fa')"
+                  @click="enable2fa"
+                />
+              </div>
+            </div>
+            <div
+              v-if="authStore.userData?.totpVerified"
+              class="col-span-2 flex flex-col gap-2"
+            >
+              <p class="text-sm text-gray-500 dark:text-gray-400">
+                {{ $t('me.disable2faDesc') }}
+              </p>
+              <FormPasswordField
+                id="2fapassword"
+                v-model="disable2faPassword"
+                :label="$t('me.currentPassword')"
+                type="password"
+                autocomplete="current-password"
+              />
+              <FormActionField
+                :label="$t('me.disable2fa')"
+                @click="disable2fa"
+              />
+            </div>
+          </FormGroup>
+        </FormElement>
       </PanelBody>
     </Panel>
   </main>
 </template>
 
 <script setup lang="ts">
+import { encodeQR } from 'qr';
+
 const authStore = useAuthStore();
 authStore.update();
 
@@ -99,6 +161,83 @@ function updatePassword() {
     currentPassword: currentPassword.value,
     newPassword: newPassword.value,
     confirmPassword: confirmPassword.value,
+  });
+}
+
+const twofa = ref<{ key: string; qrcode: string } | null>(null);
+
+const _setup2fa = useSubmit(
+  `/api/me/totp`,
+  {
+    method: 'post',
+  },
+  {
+    revert: async (success, data) => {
+      if (success && data?.type === 'setup') {
+        const qrcode = encodeQR(data.uri, 'svg', {
+          ecc: 'high',
+          scale: 4,
+          encoding: 'byte',
+        });
+        const svg = new Blob([qrcode], { type: 'image/svg+xml' });
+        twofa.value = { key: data.key, qrcode: URL.createObjectURL(svg) };
+      }
+    },
+  }
+);
+
+async function setup2fa() {
+  return _setup2fa({
+    type: 'setup',
+  });
+}
+
+const code = ref<string>('');
+
+const _enable2fa = useSubmit(
+  `/api/me/totp`,
+  {
+    method: 'post',
+  },
+  {
+    revert: async (success, data) => {
+      if (success && data?.type === 'created') {
+        authStore.update();
+        twofa.value = null;
+        code.value = '';
+      }
+    },
+  }
+);
+
+async function enable2fa() {
+  return _enable2fa({
+    type: 'create',
+    code: code.value,
+  });
+}
+
+const disable2faPassword = ref('');
+
+const _disable2fa = useSubmit(
+  `/api/me/totp`,
+  {
+    method: 'post',
+  },
+  {
+    revert: async (success, data) => {
+      if (success && data?.type === 'deleted') {
+        authStore.update();
+        disable2faPassword.value = '';
+      }
+    },
+  }
+);
+
+async function disable2fa() {
+  return _disable2fa({
+    type: 'delete',
+    currentPassword: disable2faPassword.value,
   });
 }
 </script>

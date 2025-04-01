@@ -14,7 +14,13 @@
     "email": "E-Mail"
   },
   "me": {
-    "currentPassword": "Current Password"
+    "currentPassword": "Current Password",
+    "enable2fa": "Enable Two Factor Authentication",
+    "enable2faDesc": "Scan the QR code with your authenticator app or enter the key manually.",
+    "2faKey": "TOTP Key",
+    "2faCodeDesc": "Enter the code from your authenticator app.",
+    "disable2fa": "Disable Two Factor Authentication",
+    "disable2faDesc": "Enter your password to disable Two Factor Authentication."
   },
   "general": {
     "name": "Name",
@@ -33,7 +39,9 @@
     "yes": "Yes",
     "no": "No",
     "confirmPassword": "Confirm Password",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "2fa": "Two Factor Authentication",
+    "2faCode": "TOTP Code"
   },
   "setup": {
     "welcome": "Welcome to your first setup of wg-easy",
@@ -66,11 +74,9 @@
     "signIn": "Sign In",
     "rememberMe": "Remember me",
     "rememberMeDesc": "Stay logged after closing the browser",
-    "insecure": "You can't log in with an insecure connection. Use HTTPS."
-  },
-  "error": {
-    "clear": "Clear",
-    "login": "Log in error"
+    "insecure": "You can't log in with an insecure connection. Use HTTPS.",
+    "2faRequired": "Two Factor Authentication is required",
+    "2faWrong": "Two Factor Authentication is wrong"
   },
   "client": {
     "empty": "There are no clients yet.",
@@ -117,8 +123,7 @@
   "toast": {
     "success": "Success",
     "saved": "Saved",
-    "error": "Error",
-    "errored": "Failed to save"
+    "error": "Error"
   },
   "form": {
     "actions": "Actions",
@@ -155,7 +160,6 @@
     },
     "interface": {
       "cidrSuccess": "Changed CIDR",
-      "cidrError": "Failed to change CIDR",
       "device": "Device",
       "deviceDesc": "Ethernet device the wireguard traffic should be forwarded through",
       "mtuDesc": "MTU WireGuard will use",
@@ -164,8 +168,7 @@
       "restart": "Restart Interface",
       "restartDesc": "Restart the WireGuard interface",
       "restartWarn": "Are you sure to restart the interface? This will disconnect all clients.",
-      "restartSuccess": "Interface restarted",
-      "restartError": "Failed to restart interface"
+      "restartSuccess": "Interface restarted"
     },
     "introText": "Welcome to the admin panel.\n\nHere you can manage the general settings, the configuration, the interface settings and the hooks.\n\nStart by choosing one of the sections in the sidebar."
   },
@@ -194,7 +197,10 @@
       "name": "Name",
       "email": "Email",
       "emailInvalid": "Email must be a valid email",
-      "passwordMatch": "Passwords must match"
+      "passwordMatch": "Passwords must match",
+      "totpEnable": "TOTP Enable",
+      "totpEnableTrue": "TOTP Enable must be true",
+      "totpCode": "TOTP Code"
     },
     "userConfig": {
       "host": "Host"

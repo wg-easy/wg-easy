@@ -16,10 +16,16 @@ const password = z
 
 const remember = z.boolean({ message: t('zod.user.remember') });
 
+const totpCode = z
+  .string({ message: t('zod.user.totpCode') })
+  .min(6, t('zod.user.totpCode'))
+  .pipe(safeStringRefine);
+
 export const UserLoginSchema = z.object({
   username: username,
   password: password,
   remember: remember,
+  totpCode: totpCode.optional(),
 });
 
 export const UserSetupSchema = z
@@ -58,3 +64,17 @@ export const UserUpdatePasswordSchema = z
   .refine((val) => val.newPassword === val.confirmPassword, {
     message: t('zod.user.passwordMatch'),
   });
+
+export const UserUpdateTotpSchema = z.union([
+  z.object({
+    type: z.literal('setup'),
+  }),
+  z.object({
+    type: z.literal('create'),
+    code: totpCode,
+  }),
+  z.object({
+    type: z.literal('delete'),
+    currentPassword: password,
+  }),
+]);

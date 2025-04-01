@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 We're super excited to announce v15!
 This update is an entire rewrite to make it even easier to set up your own VPN.
 
+## Breaking Changes
+
+As the whole setup has changed, we recommend to start from scratch. And import your existing configs.
+
 ## Major Changes
 
 - Almost all Environment variables removed
@@ -26,6 +30,8 @@ This update is an entire rewrite to make it even easier to set up your own VPN.
 - Removed ARMv6 and ARMv7 support
 - Connections over HTTP require setting the `INSECURE` env var
 - Changed license from CC BY-NC-SA 4.0 to AGPL-3.0-only
+- Added 2FA using TOTP
+- Improved mobile support
 
 ## [14.0.0] - 2024-09-04
 

@@ -12,7 +12,8 @@
     v-model.trim="data"
     :name="id"
     type="text"
-    :autcomplete="autocomplete"
+    :autocomplete="autocomplete"
+    :disabled="disabled"
   />
 </template>
 
@@ -22,6 +23,7 @@ defineProps<{
   label: string;
   description?: string;
   autocomplete?: string;
+  disabled?: boolean;
 }>();
 
 const data = defineModel<string>();
