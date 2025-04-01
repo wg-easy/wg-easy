@@ -65,6 +65,7 @@ export const ClientUpdateSchema = schemaForType<UpdateClientType>()(
     serverAllowedIps: serverAllowedIps,
     mtu: MtuSchema,
     persistentKeepalive: PersistentKeepaliveSchema,
+    serverEndpoint: AddressSchema.nullable(),
     dns: DnsSchema.nullable(),
   })
 );
