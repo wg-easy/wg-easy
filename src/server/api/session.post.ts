@@ -9,12 +9,21 @@ export default defineEventHandler(async (event) => {
   // TODO: timing can be used to enumerate usernames
 
   const user = await Database.users.getByUsername(username);
-  if (!user)
+  if (!user) {
     throw createError({
       statusCode: 401,
       statusMessage: 'Incorrect credentials',
     });
+  }
 
+  if (!user.enabled) {
+    throw createError({
+      statusCode: 403,
+      statusMessage: 'User is disabled',
+    });
+  }
+
+  // todo: handle in service
   const userHashPassword = user.password;
   const passwordValid = await isPasswordValid(password, userHashPassword);
   if (!passwordValid) {
