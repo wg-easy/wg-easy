@@ -20,7 +20,7 @@
   "dependencies": {
     "@eschricht/nuxt-color-mode": "^1.1.5",
     "@heroicons/vue": "^2.2.0",
-    "@libsql/client": "^0.15.1",
+    "@libsql/client": "^0.15.2",
     "@nuxtjs/i18n": "^9.4.0",
     "@nuxtjs/tailwindcss": "^6.13.2",
     "@phc/format": "^1.0.0",
@@ -38,7 +38,7 @@
     "is-ip": "^5.0.1",
     "js-sha256": "^0.11.0",
     "lowdb": "^7.0.1",
-    "nuxt": "^3.16.1",
+    "nuxt": "^3.16.2",
     "otpauth": "^9.4.0",
     "pinia": "^3.0.1",
     "qr": "^0.4.0",
