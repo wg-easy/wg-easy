@@ -169,12 +169,7 @@ export class UserService {
             secret: txUser.totpKey,
           });
 
-          console.log(txUser.totpKey);
-          console.log(code);
-
           const valid = totp.validate({ token: code, window: 1 });
-
-          console.log(valid);
 
           if (valid === null) {
             return { success: false, error: 'INVALID_TOTP_CODE' };
@@ -212,8 +207,6 @@ export class UserService {
         period: 30,
         secret: txUser.totpKey,
       });
-
-      console.log({ code, key: txUser.totpKey });
 
       const valid = totp.validate({ token: code, window: 1 });
 
