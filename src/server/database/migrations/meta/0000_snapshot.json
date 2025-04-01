@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "91f8ccee-7842-4fd3-bb84-f43e00466b20",
+  "id": "b812341a-1ec2-49a6-8bc8-0332f5b32df4",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "clients_table": {
@@ -132,6 +132,13 @@
         },
         "dns": {
           "name": "dns",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "server_endpoint": {
+          "name": "server_endpoint",
           "type": "text",
           "primaryKey": false,
           "notNull": false,

@@ -34,6 +34,8 @@ class WireGuard {
       result.push(wg.generateServerPeer(client));
     }
 
+    result.push('');
+
     WG_DEBUG('Saving Config...');
     await fs.writeFile(
       `/etc/wireguard/${wgInterface.name}.conf`,

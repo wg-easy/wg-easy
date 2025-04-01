@@ -31,6 +31,7 @@ export const client = sqliteTable('clients_table', {
   persistentKeepalive: int('persistent_keepalive').notNull(),
   mtu: int().notNull(),
   dns: text({ mode: 'json' }).$type<string[]>(),
+  serverEndpoint: text('server_endpoint'),
   enabled: int({ mode: 'boolean' }).notNull(),
   createdAt: text('created_at')
     .notNull()
