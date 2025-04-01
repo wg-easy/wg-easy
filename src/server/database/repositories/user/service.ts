@@ -1,7 +1,23 @@
 import { eq, sql } from 'drizzle-orm';
 import { TOTP } from 'otpauth';
 import { user } from './schema';
+import type { UserType } from './types';
 import type { DBType } from '#db/sqlite';
+
+type LoginResult =
+  | {
+      success: true;
+      user: UserType;
+    }
+  | {
+      success: false;
+      error:
+        | 'INCORRECT_CREDENTIALS'
+        | 'TOTP_REQUIRED'
+        | 'USER_DISABLED'
+        | 'INVALID_TOTP_CODE'
+        | 'UNEXPECTED_ERROR';
+    };
 
 function createPreparedStatement(db: DBType) {
   return {
@@ -118,6 +134,60 @@ export class UserService {
 
   updateTotpKey(id: ID, key: string | null) {
     return this.#statements.updateKey.execute({ id, key });
+  }
+
+  login(username: string, password: string, code: string | undefined) {
+    return this.#db.transaction(async (tx): Promise<LoginResult> => {
+      const txUser = await tx.query.user
+        .findFirst({ where: eq(user.username, username) })
+        .execute();
+
+      if (!txUser) {
+        return { success: false, error: 'INCORRECT_CREDENTIALS' };
+      }
+
+      const passwordValid = await isPasswordValid(password, txUser.password);
+
+      if (!passwordValid) {
+        return { success: false, error: 'INCORRECT_CREDENTIALS' };
+      }
+
+      if (txUser.totpVerified) {
+        if (!code) {
+          return { success: false, error: 'TOTP_REQUIRED' };
+        } else {
+          if (!txUser.totpKey) {
+            return { success: false, error: 'UNEXPECTED_ERROR' };
+          }
+
+          const totp = new TOTP({
+            issuer: 'wg-easy',
+            label: txUser.username,
+            algorithm: 'SHA1',
+            digits: 6,
+            period: 30,
+            secret: txUser.totpKey,
+          });
+
+          console.log(txUser.totpKey);
+          console.log(code);
+
+          const valid = totp.validate({ token: code, window: 1 });
+
+          console.log(valid);
+
+          if (valid === null) {
+            return { success: false, error: 'INVALID_TOTP_CODE' };
+          }
+        }
+      }
+
+      if (!txUser.enabled) {
+        return { success: false, error: 'USER_DISABLED' };
+      }
+
+      return { success: true, user: txUser };
+    });
   }
 
   verifyTotp(id: ID, code: string) {

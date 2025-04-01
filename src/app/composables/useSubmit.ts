@@ -28,7 +28,6 @@ type SubmitOpts<
 > = {
   revert: RevertFn<R, T, O>;
   successMsg?: string;
-  errorMsg?: string;
   noSuccessToast?: boolean;
 };
 
@@ -38,7 +37,6 @@ export function useSubmit<
   T = unknown,
 >(url: R, options: O, opts: SubmitOpts<R, T, O>) {
   const toast = useToast();
-  const { t: $t } = useI18n();
 
   return async (data: unknown) => {
     try {
@@ -46,11 +44,6 @@ export function useSubmit<
         ...options,
         body: data,
       });
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      if (!(res as any).success) {
-        throw new Error(opts.errorMsg || $t('toast.errored'));
-      }
 
       if (!opts.noSuccessToast) {
         toast.showToast({

@@ -30,6 +30,18 @@
         autocomplete="current-password"
       />
 
+      <BaseInput
+        v-if="totpRequired"
+        v-model="totp"
+        type="text"
+        name="totp"
+        :placeholder="$t('general.2faCode')"
+        autocomplete="one-time-code"
+        inputmode="numeric"
+        maxlength="6"
+        pattern="\d{6}"
+      />
+
       <label
         class="flex gap-2 whitespace-nowrap"
         :title="$t('login.rememberMeDesc')"
@@ -58,10 +70,15 @@
 const authStore = useAuthStore();
 authStore.update();
 
+const toast = useToast();
+const { t } = useI18n();
+
 const authenticating = ref(false);
 const remember = ref(false);
-const username = ref<null | string>(null);
-const password = ref<null | string>(null);
+const username = ref<string>('');
+const password = ref<string>('');
+const totpRequired = ref(false);
+const totp = ref<string>('');
 
 const _submit = useSubmit(
   '/api/session',
@@ -69,13 +86,32 @@ const _submit = useSubmit(
     method: 'post',
   },
   {
-    revert: async (success) => {
-      authenticating.value = false;
-      password.value = null;
-
+    revert: async (success, data) => {
       if (success) {
-        await navigateTo('/');
+        if (data?.status === 'success') {
+          await navigateTo('/');
+        } else if (data?.status === 'TOTP_REQUIRED') {
+          authenticating.value = false;
+          totpRequired.value = true;
+          toast.showToast({
+            title: t('general.2fa'),
+            message: t('login.2faRequired'),
+            type: 'error',
+          });
+          return;
+        } else if (data?.status === 'INVALID_TOTP_CODE') {
+          authenticating.value = false;
+          totp.value = '';
+          toast.showToast({
+            title: t('general.2fa'),
+            message: t('login.2faWrong'),
+            type: 'error',
+          });
+          return;
+        }
       }
+      authenticating.value = false;
+      password.value = '';
     },
     noSuccessToast: true,
   }
@@ -90,6 +126,7 @@ async function submit() {
     username: username.value,
     password: password.value,
     remember: remember.value,
+    totpCode: totpRequired.value ? totp.value : undefined,
   });
 }
 </script>

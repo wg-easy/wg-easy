@@ -79,7 +79,7 @@
                 <FormTextField
                   id="2facode"
                   v-model="code"
-                  :label="$t('me.2faCode')"
+                  :label="$t('general.2faCode')"
                 />
                 <FormActionField
                   :label="$t('me.enable2fa')"

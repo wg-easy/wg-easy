@@ -9,8 +9,7 @@ type Response =
       uri: string;
     }
   | { success: boolean; type: 'created' }
-  | { success: boolean; type: 'deleted' }
-  | { success: boolean; type: 'error' };
+  | { success: boolean; type: 'deleted' };
 
 export default definePermissionEventHandler(
   'me',
@@ -58,6 +57,9 @@ export default definePermissionEventHandler(
         type: 'deleted',
       } as Response;
     }
-    return { success: false, type: 'error' } as Response;
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Invalid request',
+    });
   }
 );
