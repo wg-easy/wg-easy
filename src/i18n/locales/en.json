@@ -14,7 +14,14 @@
     "email": "E-Mail"
   },
   "me": {
-    "currentPassword": "Current Password"
+    "currentPassword": "Current Password",
+    "enable2fa": "Enable Two Factor Authentication",
+    "enable2faDesc": "Scan the QR code with your authenticator app or enter the key manually.",
+    "2faKey": "2FA Key",
+    "2faCode": "2FA Code",
+    "2faCodeDesc": "Enter the code from your authenticator app.",
+    "disable2fa": "Disable Two Factor Authentication",
+    "disable2faDesc": "Enter your password to disable Two Factor Authentication."
   },
   "general": {
     "name": "Name",
@@ -33,7 +40,8 @@
     "yes": "Yes",
     "no": "No",
     "confirmPassword": "Confirm Password",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "2fa": "Two Factor Authentication"
   },
   "setup": {
     "welcome": "Welcome to your first setup of wg-easy",
@@ -194,7 +202,10 @@
       "name": "Name",
       "email": "Email",
       "emailInvalid": "Email must be a valid email",
-      "passwordMatch": "Passwords must match"
+      "passwordMatch": "Passwords must match",
+      "totpEnable": "TOTP Enable",
+      "totpEnableTrue": "TOTP Enable must be true",
+      "totpCode": "TOTP Code"
     },
     "userConfig": {
       "host": "Host"

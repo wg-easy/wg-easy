@@ -13,6 +13,7 @@
     :name="id"
     type="text"
     :autcomplete="autocomplete"
+    :disabled="disabled"
   />
 </template>
 
@@ -22,6 +23,7 @@ defineProps<{
   label: string;
   description?: string;
   autocomplete?: string;
+  disabled?: boolean;
 }>();
 
 const data = defineModel<string>();

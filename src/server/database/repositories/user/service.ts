@@ -1,4 +1,5 @@
 import { eq, sql } from 'drizzle-orm';
+import { TOTP } from 'otpauth';
 import { user } from './schema';
 import type { DBType } from '#db/sqlite';
 
@@ -18,6 +19,14 @@ function createPreparedStatement(db: DBType) {
       .set({
         name: sql.placeholder('name') as never as string,
         email: sql.placeholder('email') as never as string,
+      })
+      .where(eq(user.id, sql.placeholder('id')))
+      .prepare(),
+    updateKey: db
+      .update(user)
+      .set({
+        totpKey: sql.placeholder('key') as never as string,
+        totpVerified: false,
       })
       .where(eq(user.id, sql.placeholder('id')))
       .prepare(),
@@ -67,6 +76,7 @@ export class UserService {
         email: null,
         name: 'Administrator',
         role: userCount === 0 ? roles.ADMIN : roles.CLIENT,
+        totpVerified: false,
         enabled: true,
       });
     });
@@ -101,6 +111,49 @@ export class UserService {
       await tx
         .update(user)
         .set({ password: hash })
+        .where(eq(user.id, id))
+        .execute();
+    });
+  }
+
+  updateTotpKey(id: ID, key: string | null) {
+    return this.#statements.updateKey.execute({ id, key });
+  }
+
+  verifyTotp(id: ID, code: string) {
+    return this.#db.transaction(async (tx) => {
+      const txUser = await tx.query.user
+        .findFirst({ where: eq(user.id, id) })
+        .execute();
+
+      if (!txUser) {
+        throw new Error('User not found');
+      }
+
+      if (!txUser.totpKey) {
+        throw new Error('TOTP key is not set');
+      }
+
+      const totp = new TOTP({
+        issuer: 'wg-easy',
+        label: txUser.username,
+        algorithm: 'SHA1',
+        digits: 6,
+        period: 30,
+        secret: txUser.totpKey,
+      });
+
+      console.log({ code, key: txUser.totpKey });
+
+      const valid = totp.validate({ token: code, window: 1 });
+
+      if (valid === null) {
+        throw new Error('Invalid TOTP code');
+      }
+
+      await tx
+        .update(user)
+        .set({ totpVerified: true })
         .where(eq(user.id, id))
         .execute();
     });

@@ -58,3 +58,11 @@ export const UserUpdatePasswordSchema = z
   .refine((val) => val.newPassword === val.confirmPassword, {
     message: t('zod.user.passwordMatch'),
   });
+
+export const UserUpdateTotpSchema = z.object({
+  code: z
+    .string({
+      message: t('zod.user.totpCode'),
+    })
+    .nullable(),
+});

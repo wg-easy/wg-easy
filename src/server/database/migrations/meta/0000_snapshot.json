@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "cd2794c5-3e55-4b55-b2ba-678f53cfdec7",
+  "id": "91f8ccee-7842-4fd3-bb84-f43e00466b20",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "clients_table": {
@@ -558,11 +558,18 @@
           "notNull": true,
           "autoincrement": false
         },
-        "totp": {
-          "name": "totp",
+        "totp_key": {
+          "name": "totp_key",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
+          "autoincrement": false
+        },
+        "totp_verified": {
+          "name": "totp_verified",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
           "autoincrement": false
         },
         "enabled": {
