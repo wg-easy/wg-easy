@@ -1,6 +1,6 @@
 {
-  "id": "0224c6a5-3456-402d-a40d-0821637015da",
-  "prevId": "91f8ccee-7842-4fd3-bb84-f43e00466b20",
+  "id": "c4c5bfb7-a66c-4e6b-a15c-232b16689dcf",
+  "prevId": "b812341a-1ec2-49a6-8bc8-0332f5b32df4",
   "version": "6",
   "dialect": "sqlite",
   "tables": {
@@ -132,6 +132,13 @@
         },
         "dns": {
           "name": "dns",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "server_endpoint": {
+          "name": "server_endpoint",
           "type": "text",
           "primaryKey": false,
           "notNull": false,

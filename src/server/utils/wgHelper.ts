@@ -13,11 +13,16 @@ export const wg = {
       ...(client.serverAllowedIps ?? []),
     ];
 
+    const extraLines = [];
+    if (client.serverEndpoint) {
+      extraLines.push(`Endpoint = ${client.serverEndpoint}`);
+    }
+
     return `# Client: ${client.name} (${client.id})
 [Peer]
 PublicKey = ${client.publicKey}
 PresharedKey = ${client.preSharedKey}
-AllowedIPs = ${allowedIps.join(', ')}`;
+AllowedIPs = ${allowedIps.join(', ')}${extraLines.length ? `\n${extraLines.join('\n')}` : ''}`;
   },
 
   generateServerInterface: (wgInterface: InterfaceType, hooks: HooksType) => {
