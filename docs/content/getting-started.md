@@ -29,7 +29,7 @@ If you're using podman, make sure to read the related [documentation][docs-podma
 [docker-compose]: https://docs.docker.com/compose/
 [docker-compose-installation]: https://docs.docker.com/compose/install/
 [docker-compose-specification]: https://docs.docker.com/compose/compose-file/
-[docs-podman]: ./examples/tutorials/podman.md
+[docs-podman]: ./examples/tutorials/podman-nft.md
 
 ## Deploying the Actual Image
 
@@ -41,10 +41,14 @@ To understand which tags you should use, read this section carefully. [Our CI][g
 
 All workflows are using the tagging convention listed below. It is subsequently applied to all images.
 
-| Event                   | Image Tags                    |
-| ----------------------- | ----------------------------- |
-| `cron` on `master`      | `nightly`                     |
-| `push` a tag (`v1.2.3`) | `1.2.3`, `1.2`, `1`, `latest` |
+| tag           | Type                                                       | Example                                                       | Description                                                                                                                          |
+| ------------- | ---------------------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `15`          | latest minor for that major tag                            | `ghcr.io/wg-easy/wg-easy:15`                                  | latest features for specific major versions, no breaking changes                                                                     |
+| `latest`      | latest tag                                                 | `ghcr.io/wg-easy/wg-easy:latest` or `ghcr.io/wg-easy/wg-easy` | stable as possible get bug fixes quickly when needed, see Releases for more information.                                             |
+| `15.0`        | latest patch for that minor tag                            | `ghcr.io/wg-easy/wg-easy:15.0`                                | latest patches for specific minor version                                                                                            |
+| `15.0.0`      | specific tag                                               | `ghcr.io/wg-easy/wg-easy:15.0.0`                              | specific release, don't use this as this will not get updated                                                                        |
+| `nightly`     | [`master`](https://github.com/wg-easy/wg-easy/tree/master) | `ghcr.io/wg-easy/wg-easy:nightly`                             | mostly unstable gets frequent package and code updates, deployed against [`master`](https://github.com/wg-easy/wg-easy/tree/master). |
+| `development` | pull requests                                              | `ghcr.io/wg-easy/wg-easy:development`                         | used for development, testing code from PRs before landing into [`master`](https://github.com/wg-easy/wg-easy/tree/master).          |
 
 When publishing a tag we follow the [Semantic Versioning][semver] specification. The `latest` tag is always pointing to the latest stable release. If you want to avoid breaking changes, use the major version tag (e.g. `15`).
 

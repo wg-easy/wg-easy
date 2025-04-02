@@ -20,20 +20,20 @@ Follow the Docs here: <https://docs.docker.com/engine/install/> and install Dock
 1. Create a directory for the configuration files (you can choose any directory you like):
 
    ```shell
-   DIR=/docker/wg-easy
-   sudo mkdir -p $DIR
+   sudo mkdir -p /etc/docker/containers/wg-easy
    ```
 
 2. Download docker compose file
 
    ```shell
-   sudo curl -o $DIR/docker-compose.yml https://raw.githubusercontent.com/wg-easy/wg-easy/master/docker-compose.yml
+   sudo curl -o /etc/docker/containers/wg-easy/docker-compose.yml https://raw.githubusercontent.com/wg-easy/wg-easy/master/docker-compose.yml
    ```
 
 3. Start `wg-easy`
 
    ```shell
-    sudo docker-compose -f $DIR/docker-compose.yml up -d
+    cd /etc/docker/containers/wg-easy
+    sudo docker-compose up -d
    ```
 
 ## Setup Firewall
@@ -41,27 +41,22 @@ Follow the Docs here: <https://docs.docker.com/engine/install/> and install Dock
 If you are using a firewall, you need to open the following ports:
 
 - UDP 51820 (WireGuard)
-- TCP 51821 (Web UI)
 
 These ports can be changed, so if you change them you have to update your firewall rules accordingly.
 
 ## Setup Reverse Proxy
 
-TODO
-
-## Access the Web UI
-
-Open your browser and navigate to `https://<your-domain>:51821` or `https://<your-ip>:51821`.
-
-Follow the instructions to set up your WireGuard VPN.
+- To setup traefik follow the instructions here: [Traefik](./traefik.md)
+- To setup caddy follow the instructions here: [Caddy](./caddy.md)
 
 ## Update `wg-easy`
 
 To update `wg-easy` to the latest version, run:
 
 ```shell
-sudo docker-compose -f $DIR/docker-compose.yml pull
-sudo docker-compose -f $DIR/docker-compose.yml up -d
+cd /etc/docker/containers/wg-easy
+sudo docker-compose pull
+sudo docker-compose up -d
 ```
 
 ## Auto Update
