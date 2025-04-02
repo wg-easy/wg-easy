@@ -14,7 +14,7 @@ To setup the IPv6 Network, simply run once:
 
 <!-- ref: major version -->
 
-To automatically install & run ``wg-easy, simply run:
+To automatically install & run wg-easy, simply run:
 
 ```shell
   docker run -d \
@@ -39,5 +39,3 @@ To automatically install & run ``wg-easy, simply run:
 ```
 
 The Web UI will now be available on `http://0.0.0.0:51821`.
-
-> 💡 Your configuration files will be saved in `~/.wg-easy`
