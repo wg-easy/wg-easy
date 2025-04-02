@@ -203,6 +203,7 @@ class WireGuard {
 
   async cronJob() {
     const clients = await Database.clients.getAll();
+    let needsSave = false;
     // Expires Feature
     for (const client of clients) {
       if (client.enabled !== true) continue;
@@ -212,6 +213,7 @@ class WireGuard {
       ) {
         WG_DEBUG(`Client ${client.id} expired.`);
         await Database.clients.toggle(client.id, false);
+        needsSave = true;
       }
     }
     // One Time Link Feature
@@ -222,10 +224,13 @@ class WireGuard {
       ) {
         WG_DEBUG(`OneTimeLink for Client ${client.id} expired.`);
         await Database.oneTimeLinks.delete(client.id);
+        // otl does not need wireguard sync
       }
     }
 
-    await this.saveConfig();
+    if (needsSave) {
+      await this.saveConfig();
+    }
   }
 }
 
