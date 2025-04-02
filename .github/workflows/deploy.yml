@@ -6,6 +6,9 @@ on:
     tags:
       - "v*"
 
+# This workflow does not support fixing old versions
+# as this will break the latest and major tags
+
 jobs:
   docker:
     name: Build & Deploy Docker
@@ -31,6 +34,8 @@ jobs:
         with:
           images: |
             ghcr.io/wg-easy/wg-easy
+          flavor: |
+            latest=false
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}
@@ -86,8 +91,6 @@ jobs:
         run: |
           cd docs
           git fetch origin gh-pages --depth=1 || true
-
-          # latest will point to old docs if old tag is pushed
 
           # Extract version numbers
           DOCS_VERSION=${GITHUB_REF#refs/tags/}  # e.g. v1.2.3 or v1.2.3-beta
