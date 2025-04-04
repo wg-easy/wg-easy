@@ -5,7 +5,7 @@
 [![GitHub Stars](https://img.shields.io/github/stars/wg-easy/wg-easy)](https://github.com/wg-easy/wg-easy/stargazers)
 [![License](https://img.shields.io/github/license/wg-easy/wg-easy)](LICENSE)
 [![GitHub Release](https://img.shields.io/github/v/release/wg-easy/wg-easy)](https://github.com/wg-easy/wg-easy/releases/latest)
-[![Image Pulls](https://img.shields.io/badge/image_pulls-11M-blue)](https://github.com/wg-easy/wg-easy/pkgs/container/wg-easy)
+[![Image Pulls](https://img.shields.io/badge/image_pulls-12M+-blue)](https://github.com/wg-easy/wg-easy/pkgs/container/wg-easy)
 
 <!-- TODO: remove after release -->
 
@@ -51,35 +51,18 @@ You have found the easiest way to install & manage WireGuard on any Linux host!
 - [Getting Started](https://wg-easy.github.io/wg-easy/latest/getting-started/)
 - [Basic Installation](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/basic-installation/)
 - [Caddy](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/caddy/)
-- [Nginx](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/nginx/)
 - [Traefik](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/traefik/)
-- [Podman](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/podman/)
+- [Podman](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/podman-nft/)
 - [AdGuard Home](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/adguard/)
 
 > [!NOTE]
 > If you want to migrate from the old version to the new version, you can find the migration guide here: [Migration Guide](https://wg-easy.github.io/wg-easy/latest/advanced/migrate/)
 
-## Requirements
-
-- A host with a kernel that supports WireGuard (all modern kernels).
-- A host with Docker installed.
-
-## Versions
-
-> 💡 We follow semantic versioning (semver)
-
-We offer multiple Docker image tags to suit your needs. The table below is in a particular order, with the first tag being the most recommended:
-
-| tag           | Branch                                                     | Example                                                       | Description                                                                                                                          |
-| ------------- | ---------------------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `15`          | latest minor for that major tag                            | `ghcr.io/wg-easy/wg-easy:15`                                  | latest features for specific major versions, no breaking changes                                                                     |
-| `latest`      | latest tag                                                 | `ghcr.io/wg-easy/wg-easy:latest` or `ghcr.io/wg-easy/wg-easy` | stable as possible get bug fixes quickly when needed, see Releases for more information.                                             |
-| `15.0`        | latest patch for that minor tag                            | `ghcr.io/wg-easy/wg-easy:15.0`                                | latest patches for specific minor version                                                                                            |
-| `15.0.0`      | specific tag                                               | `ghcr.io/wg-easy/wg-easy:15.0.0`                              | specific release, don't use this as this will not get updated                                                                        |
-| `nightly`     | [`master`](https://github.com/wg-easy/wg-easy/tree/master) | `ghcr.io/wg-easy/wg-easy:nightly`                             | mostly unstable gets frequent package and code updates, deployed against [`master`](https://github.com/wg-easy/wg-easy/tree/master). |
-| `development` | pull requests                                              | `ghcr.io/wg-easy/wg-easy:development`                         | used for development, testing code from PRs before landing into [`master`](https://github.com/wg-easy/wg-easy/tree/master).          |
-
 ## Installation
+
+This is a quick start guide to get you up and running with WireGuard Easy.
+
+For a more detailed installation guide, please refer to the [Getting Started](https://wg-easy.github.io/wg-easy/latest/getting-started/) page.
 
 ### 1. Install Docker
 
@@ -96,14 +79,13 @@ And log in again.
 
 The easiest way to run WireGuard Easy is with Docker Compose.
 
-Just download [`docker-compose.yml`](docker-compose.yml), make necessary adjustments and
-execute `sudo docker compose up -d`.
+Just download [`docker-compose.yml`](docker-compose.yml) and execute `sudo docker compose up -d`.
 
 Now setup a reverse proxy to be able to access the Web UI from the internet.
 
 If you want to access the Web UI over HTTP, change the env var `INSECURE` to `true`. This is not recommended. Only use this for testing
 
-### Donate
+## Donate
 
 Are you enjoying this project? Consider donating.
 
