@@ -2,7 +2,7 @@
 title: Traefik
 ---
 
-/// note | Opiniated
+/// note | Opinionated
 
 This guide is opinionated. If you use other conventions or folder layouts, feel free to change the commands and paths.
 ///
