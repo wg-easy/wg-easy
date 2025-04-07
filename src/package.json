@@ -21,7 +21,7 @@
     "@eschricht/nuxt-color-mode": "^1.1.5",
     "@heroicons/vue": "^2.2.0",
     "@libsql/client": "^0.15.2",
-    "@nuxtjs/i18n": "^9.4.0",
+    "@nuxtjs/i18n": "^9.5.2",
     "@nuxtjs/tailwindcss": "^6.13.2",
     "@phc/format": "^1.0.0",
     "@pinia/nuxt": "^0.10.1",
