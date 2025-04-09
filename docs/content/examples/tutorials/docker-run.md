@@ -5,7 +5,7 @@ title: Docker Run
 To setup the IPv6 Network, simply run once:
 
 ```shell
-  docker network create \
+docker network create \
   -d bridge --ipv6 \
   -d default \
   --subnet 10.42.42.0/24 \
@@ -14,10 +14,10 @@ To setup the IPv6 Network, simply run once:
 
 <!-- ref: major version -->
 
-To automatically install & run ``wg-easy, simply run:
+To automatically install & run `wg-easy`, simply run:
 
 ```shell
-  docker run -d \
+docker run -d \
   --net wg \
   -e INSECURE=true \
   --name wg-easy \
@@ -38,6 +38,6 @@ To automatically install & run ``wg-easy, simply run:
   ghcr.io/wg-easy/wg-easy:15
 ```
 
-The Web UI will now be available on `http://0.0.0.0:51821`.
+The Web UI will now be available at <http://0.0.0.0:51821>.
 
 > 💡 Your configuration files will be saved in `~/.wg-easy`
