@@ -2,78 +2,102 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://wg-easy.github.io/wg-easy/Pre-release/</loc>
-         <lastmod>2025-03-31</lastmod>
+         <lastmod>2025-04-11</lastmod>
+    </url>
+    <url>
+         <loc>https://wg-easy.github.io/wg-easy/Pre-release/faq/</loc>
+         <lastmod>2025-04-11</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/Pre-release/getting-started/</loc>
-         <lastmod>2025-03-31</lastmod>
+         <lastmod>2025-04-11</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/Pre-release/advanced/api/</loc>
-         <lastmod>2025-03-31</lastmod>
+         <lastmod>2025-04-11</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/Pre-release/advanced/config/optional-config/</loc>
-         <lastmod>2025-03-31</lastmod>
+         <lastmod>2025-04-11</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/Pre-release/advanced/config/unattended-setup/</loc>
-         <lastmod>2025-03-31</lastmod>
+         <lastmod>2025-04-11</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/Pre-release/advanced/metrics/prometheus/</loc>
-         <lastmod>2025-03-31</lastmod>
+         <lastmod>2025-04-11</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/Pre-release/advanced/migrate/</loc>
-         <lastmod>2025-03-31</lastmod>
+         <lastmod>2025-04-11</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/Pre-release/advanced/migrate/from-14-to-15/</loc>
-         <lastmod>2025-03-31</lastmod>
+         <lastmod>2025-04-11</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/Pre-release/contributing/general/</loc>
-         <lastmod>2025-03-31</lastmod>
+         <lastmod>2025-04-11</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/Pre-release/contributing/issues-and-pull-requests/</loc>
-         <lastmod>2025-03-31</lastmod>
+         <lastmod>2025-04-11</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/Pre-release/examples/tutorials/adguard/</loc>
-         <lastmod>2025-03-31</lastmod>
+         <lastmod>2025-04-11</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/Pre-release/examples/tutorials/auto-updates/</loc>
-         <lastmod>2025-03-31</lastmod>
+         <lastmod>2025-04-11</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/Pre-release/examples/tutorials/basic-installation/</loc>
-         <lastmod>2025-03-31</lastmod>
+         <lastmod>2025-04-11</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/Pre-release/examples/tutorials/caddy/</loc>
-         <lastmod>2025-03-31</lastmod>
+         <lastmod>2025-04-11</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/Pre-release/examples/tutorials/docker-run/</loc>
-         <lastmod>2025-03-31</lastmod>
+         <lastmod>2025-04-11</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/Pre-release/examples/tutorials/dockerless/</loc>
-         <lastmod>2025-03-31</lastmod>
+         <lastmod>2025-04-11</lastmod>
     </url>
     <url>
-         <loc>https://wg-easy.github.io/wg-easy/Pre-release/examples/tutorials/nginx/</loc>
-         <lastmod>2025-03-31</lastmod>
-    </url>
-    <url>
-         <loc>https://wg-easy.github.io/wg-easy/Pre-release/examples/tutorials/podman/</loc>
-         <lastmod>2025-03-31</lastmod>
+         <loc>https://wg-easy.github.io/wg-easy/Pre-release/examples/tutorials/podman-nft/</loc>
+         <lastmod>2025-04-11</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/Pre-release/examples/tutorials/traefik/</loc>
-         <lastmod>2025-03-31</lastmod>
+         <lastmod>2025-04-11</lastmod>
+    </url>
+    <url>
+         <loc>https://wg-easy.github.io/wg-easy/Pre-release/guides/2fa/</loc>
+         <lastmod>2025-04-11</lastmod>
+    </url>
+    <url>
+         <loc>https://wg-easy.github.io/wg-easy/Pre-release/guides/account/</loc>
+         <lastmod>2025-04-11</lastmod>
+    </url>
+    <url>
+         <loc>https://wg-easy.github.io/wg-easy/Pre-release/guides/admin/</loc>
+         <lastmod>2025-04-11</lastmod>
+    </url>
+    <url>
+         <loc>https://wg-easy.github.io/wg-easy/Pre-release/guides/clients/</loc>
+         <lastmod>2025-04-11</lastmod>
+    </url>
+    <url>
+         <loc>https://wg-easy.github.io/wg-easy/Pre-release/guides/login/</loc>
+         <lastmod>2025-04-11</lastmod>
+    </url>
+    <url>
+         <loc>https://wg-easy.github.io/wg-easy/Pre-release/guides/setup/</loc>
+         <lastmod>2025-04-11</lastmod>
     </url>
 </urlset>
