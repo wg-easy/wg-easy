@@ -6,7 +6,7 @@ To monitor the WireGuard server, you can use [Prometheus](https://prometheus.io/
 
 ## Enable Prometheus
 
-The enable Prometheus metrics go to Admin Panel > General and enable Prometheus.
+To enable Prometheus metrics, go to Admin Panel > General and enable Prometheus.
 
 You can optionally set a Bearer Password for the metrics endpoints. This is useful if you want to expose the metrics endpoint to the internet.
 
