@@ -20,11 +20,11 @@
   "dependencies": {
     "@eschricht/nuxt-color-mode": "^1.1.5",
     "@heroicons/vue": "^2.2.0",
-    "@libsql/client": "^0.15.2",
-    "@nuxtjs/i18n": "^9.4.0",
+    "@libsql/client": "^0.15.3",
+    "@nuxtjs/i18n": "^9.5.3",
     "@nuxtjs/tailwindcss": "^6.13.2",
     "@phc/format": "^1.0.0",
-    "@pinia/nuxt": "^0.10.1",
+    "@pinia/nuxt": "^0.11.0",
     "@tailwindcss/forms": "^0.5.10",
     "apexcharts": "^4.5.0",
     "argon2": "^0.41.1",
@@ -40,7 +40,7 @@
     "lowdb": "^7.0.1",
     "nuxt": "^3.16.2",
     "otpauth": "^9.4.0",
-    "pinia": "^3.0.1",
+    "pinia": "^3.0.2",
     "qr": "^0.4.0",
     "radix-vue": "^1.9.17",
     "semver": "^7.7.1",
@@ -56,12 +56,12 @@
     "@types/phc__format": "^1.0.1",
     "@types/semver": "^7.7.0",
     "drizzle-kit": "^0.30.6",
-    "eslint": "^9.23.0",
-    "eslint-config-prettier": "^10.1.1",
+    "eslint": "^9.24.0",
+    "eslint-config-prettier": "^10.1.2",
     "prettier": "^3.5.3",
     "prettier-plugin-tailwindcss": "^0.6.11",
-    "typescript": "^5.8.2",
+    "typescript": "^5.8.3",
     "vue-tsc": "^2.2.8"
   },
-  "packageManager": "pnpm@10.7.0"
+  "packageManager": "pnpm@10.8.0"
 }
