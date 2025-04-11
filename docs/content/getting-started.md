@@ -4,7 +4,7 @@ hide:
   - navigation
 ---
 
-This page explains how to get started with wg-easy. The guide uses Docker Compose as a reference. In our examples, we mount the named volume `etc_wireguard` to `/etc/wireguard` inside the container.
+This page explains how to get started with `wg-easy`. The guide uses Docker Compose as a reference. In our examples, we mount the named volume `etc_wireguard` to `/etc/wireguard` inside the container.
 
 ## Preliminary Steps
 
@@ -84,7 +84,7 @@ To stop the container, issue the following command:
 sudo docker compose down
 ```
 
-/// danger | Using the Correct Commands For Stopping and Starting wg-easy
+/// danger | Using the Correct Commands For Stopping and Starting `wg-easy`
 
 **Use `sudo docker compose up / down`, not `sudo docker compose start / stop`**. Otherwise, the container is not properly destroyed and you may experience problems during startup because of inconsistent state.
 ///

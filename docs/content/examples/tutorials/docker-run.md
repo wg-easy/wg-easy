@@ -14,7 +14,7 @@ docker network create \
 
 <!-- ref: major version -->
 
-To automatically install & run wg-easy, simply run:
+To automatically install & run `wg-easy`, simply run:
 
 ```shell
 docker run -d \

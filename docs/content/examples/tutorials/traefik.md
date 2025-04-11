@@ -146,7 +146,7 @@ sudo docker-compose up -d
 
 You can no access the Traefik dashboard at `https://traefik.$example.com$` with the credentials you set in `traefik_dynamic.yml`.
 
-## Add Labels to wg-easy
+## Add Labels to `wg-easy`
 
 To add labels to your `wg-easy` service, you can add the following to your `docker-compose.yml` file:
 
@@ -174,7 +174,7 @@ networks:
     external: true
 ```
 
-## Restart wg-easy
+## Restart `wg-easy`
 
 ```shell
 cd /etc/docker/containers/wg-easy
