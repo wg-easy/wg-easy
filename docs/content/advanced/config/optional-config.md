@@ -2,7 +2,7 @@
 title: Optional Configuration
 ---
 
-TODO
+You can set these environment variables to configure the container. They are not required, but can be useful in some cases.
 
 | Env        | Default   | Example     | Description                    |
 | ---------- | --------- | ----------- | ------------------------------ |

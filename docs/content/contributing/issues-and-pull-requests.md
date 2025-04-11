@@ -24,9 +24,9 @@ Maintainers take the time to improve on this project and help by solving issues 
 
 ### Filing a Bug Report
 
-Thank you for participating in this project and reporting a bug. wg-easy is a community-driven project, and each contribution counts!
+Thank you for participating in this project and reporting a bug. `wg-easy` is a community-driven project, and each contribution counts!
 
-Maintainers and moderators are volunteers. We greatly appreciate reports that take the time to provide detailed information via the template, enabling us to help you in the best and quickest way. Ignoring the template provided may seem easier, but discourages receiving any support (_via assignment of the label `meta/no template - no support`_).
+Maintainers and moderators are volunteers. We greatly appreciate reports that take the time to provide detailed information via the template, enabling us to help you in the best and quickest way. Ignoring the template provided may seem easier, but discourages receiving any support.
 
 Markdown formatting can be used in almost all text fields (_unless stated otherwise in the description_).
 

@@ -39,5 +39,3 @@ docker run -d \
 ```
 
 The Web UI will now be available at <http://0.0.0.0:51821>.
-
-> 💡 Your configuration files will be saved in `~/.wg-easy`

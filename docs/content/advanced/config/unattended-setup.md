@@ -26,7 +26,7 @@ If you want to skip the setup process, you have to configure group `1`
 
 /// note | Security
 
-The initial username and password is not checked for complexity. Make sure to set a long enough username and a secure password. Otherwise, the user won't be able to log in.
+The initial username and password is not checked for complexity. Make sure to set a long enough username and password. Otherwise, the user won't be able to log in.
 
-Its recommended to remove the variables after the setup is done to prevent the password from being exposed.
+It's recommended to remove the variables after the setup is done to prevent the password from being exposed.
 ///
