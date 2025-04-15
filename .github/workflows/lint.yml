@@ -34,6 +34,10 @@ jobs:
           check-latest: true
           cache: "pnpm"
 
+      - name: Chec docs formatting
+        run: |
+          pnpm format:check:docs
+
       - name: pnpm ${{ matrix.command }}
         run: |
           cd src

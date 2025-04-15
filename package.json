@@ -5,7 +5,12 @@
     "dev": "docker compose -f docker-compose.dev.yml up --build",
     "build": "docker build -t wg-easy .",
     "docs:preview": "docker run --rm -it -p 8080:8080 -v ./docs:/docs squidfunk/mkdocs-material serve -a 0.0.0.0:8080",
-    "scripts:version": "bash scripts/version.sh"
+    "scripts:version": "bash scripts/version.sh",
+    "format:check:docs": "prettier --check docs"
   },
-  "packageManager": "pnpm@10.8.0"
+  "devDependencies": {
+    "prettier": "^3.5.3",
+    "prettier-plugin-tailwindcss": "^0.6.11"
+  },
+  "packageManager": "pnpm@10.8.1"
 }

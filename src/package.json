@@ -20,7 +20,7 @@
   "dependencies": {
     "@eschricht/nuxt-color-mode": "^1.1.5",
     "@heroicons/vue": "^2.2.0",
-    "@libsql/client": "^0.15.3",
+    "@libsql/client": "^0.15.4",
     "@nuxtjs/i18n": "^9.5.3",
     "@nuxtjs/tailwindcss": "^6.13.2",
     "@phc/format": "^1.0.0",
@@ -61,5 +61,5 @@
     "typescript": "^5.8.3",
     "vue-tsc": "^2.2.8"
   },
-  "packageManager": "pnpm@10.8.0"
+  "packageManager": "pnpm@10.8.1"
 }
