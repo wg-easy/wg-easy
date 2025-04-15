@@ -19,22 +19,22 @@ Follow the Docs here: <https://docs.docker.com/engine/install/> and install Dock
 
 1. Create a directory for the configuration files (you can choose any directory you like):
 
-   ```shell
-   sudo mkdir -p /etc/docker/containers/wg-easy
-   ```
+    ```shell
+    sudo mkdir -p /etc/docker/containers/wg-easy
+    ```
 
 2. Download docker compose file
 
-   ```shell
-   sudo curl -o /etc/docker/containers/wg-easy/docker-compose.yml https://raw.githubusercontent.com/wg-easy/wg-easy/master/docker-compose.yml
-   ```
+    ```shell
+    sudo curl -o /etc/docker/containers/wg-easy/docker-compose.yml https://raw.githubusercontent.com/wg-easy/wg-easy/master/docker-compose.yml
+    ```
 
 3. Start `wg-easy`
 
-   ```shell
-    cd /etc/docker/containers/wg-easy
-    sudo docker-compose up -d
-   ```
+    ```shell
+     cd /etc/docker/containers/wg-easy
+     sudo docker-compose up -d
+    ```
 
 ## Setup Firewall
 
@@ -48,6 +48,7 @@ These ports can be changed, so if you change them you have to update your firewa
 
 - To setup traefik follow the instructions here: [Traefik](./traefik.md)
 - To setup caddy follow the instructions here: [Caddy](./caddy.md)
+- If you do not want to use a reverse proxy follow the instructions here: [No Reverse Proxy](./reverse-proxyless.md)
 
 ## Update `wg-easy`
 

@@ -1,7 +1,7 @@
 ---
 title: Home
 hide:
-  - navigation
+    - navigation
 ---
 
 # Welcome to the Documentation for `wg-easy`

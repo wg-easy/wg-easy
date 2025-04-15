@@ -81,7 +81,7 @@ The easiest way to run WireGuard Easy is with Docker Compose.
 
 Just download [`docker-compose.yml`](docker-compose.yml) and execute `sudo docker compose up -d`.
 
-Now setup a reverse proxy to be able to access the Web UI from the internet.
+Now setup a reverse proxy to be able to access the Web UI securely from the internet.
 
 If you want to access the Web UI over HTTP, change the env var `INSECURE` to `true`. This is not recommended. Only use this for testing
 
