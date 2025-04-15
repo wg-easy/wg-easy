@@ -2,8 +2,6 @@
 title: No Reverse Proxy
 ---
 
-# asd
-
 /// warning | Insecure
 
 This is insecure. You should use a reverse proxy to secure the connection.
