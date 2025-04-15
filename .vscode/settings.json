@@ -18,6 +18,11 @@
   "[json]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
+  "[markdown]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.tabSize": 4,
+    "editor.useTabStops": false
+  },
   "typescript.tsdk": "./src/node_modules/typescript/lib",
   "i18n-ally.enabledFrameworks": ["vue"],
   "i18n-ally.localesPaths": ["src/i18n/locales"],

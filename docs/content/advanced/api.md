@@ -2,6 +2,11 @@
 title: API
 ---
 
+/// warning | Breaking Changes
+
+This API is not yet stable and may change in the future. The API is currently in development and is subject to change without notice. The API is not yet documented, but we will add documentation as the API stabilizes.
+///
+
 You can use the API to interact with the application programmatically. The API is available at `/api` and supports both GET and POST requests. The API is designed to be simple and easy to use, with a focus on providing a consistent interface for all endpoints.
 
 There is no documentation for the API yet, but this will be added as the underlying library supports it.

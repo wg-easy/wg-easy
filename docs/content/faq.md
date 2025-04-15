@@ -1,7 +1,7 @@
 ---
 title: FAQ
 hide:
-  - navigation
+    - navigation
 ---
 
 Here are some frequently asked questions or errors about `wg-easy`. If you have a question that is not answered here, please feel free to open a discussion on GitHub.
@@ -14,15 +14,15 @@ To resolve this issue, you can try the following steps:
 
 1. **Load the WireGuard kernel module**: If the WireGuard kernel module is not loaded, you can load it manually by running:
 
-   ```bash
+    ```bash
     sudo modprobe wireguard
-   ```
+    ```
 
 2. **Load the WireGuard kernel module on boot**: If you want to ensure that the WireGuard kernel module is loaded automatically on boot, you can add it to the `/etc/modules` file:
 
-   ```bash
-   echo "wireguard" | sudo tee -a /etc/modules
-   ```
+    ```bash
+    echo "wireguard" | sudo tee -a /etc/modules
+    ```
 
 ## can't initialize iptables table `nat': Table does not exist (do you need to insmod?)
 
@@ -32,15 +32,15 @@ To resolve this issue, you can try the following steps:
 
 1. **Load the `nat` kernel module**: If the `nat` kernel module is not loaded, you can load it manually by running:
 
-   ```bash
-   sudo modprobe iptable_nat
-   ```
+    ```bash
+    sudo modprobe iptable_nat
+    ```
 
 2. **Load the `nat` kernel module on boot**: If you want to ensure that the `nat` kernel module is loaded automatically on boot, you can add it to the `/etc/modules` file:
 
-   ```bash
-    echo "iptable_nat" | sudo tee -a /etc/modules
-   ```
+    ```bash
+     echo "iptable_nat" | sudo tee -a /etc/modules
+    ```
 
 ## can't initialize ip6tables table `nat': Table does not exist (do you need to insmod?)
 
@@ -50,15 +50,15 @@ To resolve this issue, you can try the following steps:
 
 1. **Load the `nat` kernel module**: If the `nat` kernel module is not loaded, you can load it manually by running:
 
-   ```bash
-   sudo modprobe ip6table_nat
-   ```
+    ```bash
+    sudo modprobe ip6table_nat
+    ```
 
 2. **Load the `nat` kernel module on boot**: If you want to ensure that the `nat` kernel module is loaded automatically on boot, you can add it to the `/etc/modules` file:
 
-   ```bash
-    echo "ip6table_nat" | sudo tee -a /etc/modules
-   ```
+    ```bash
+     echo "ip6table_nat" | sudo tee -a /etc/modules
+    ```
 
 ## can't initialize iptables table `filter': Permission denied
 
@@ -68,15 +68,15 @@ To resolve this issue, you can try the following steps:
 
 1. **Load the `filter` kernel module**: If the `filter` kernel module is not loaded, you can load it manually by running:
 
-   ```bash
-   sudo modprobe iptable_filter
-   ```
+    ```bash
+    sudo modprobe iptable_filter
+    ```
 
 2. **Load the `filter` kernel module on boot**: If you want to ensure that the `filter` kernel module is loaded automatically on boot, you can add it to the `/etc/modules` file:
 
-   ```bash
-   echo "iptable_filter" | sudo tee -a /etc/modules
-   ```
+    ```bash
+    echo "iptable_filter" | sudo tee -a /etc/modules
+    ```
 
 ## can't initialize ip6tables table `filter': Permission denied
 
@@ -86,12 +86,12 @@ To resolve this issue, you can try the following steps:
 
 1. **Load the `filter` kernel module**: If the `filter` kernel module is not loaded, you can load it manually by running:
 
-   ```bash
-   sudo modprobe ip6table_filter
-   ```
+    ```bash
+    sudo modprobe ip6table_filter
+    ```
 
 2. **Load the `filter` kernel module on boot**: If you want to ensure that the `filter` kernel module is loaded automatically on boot, you can add it to the `/etc/modules` file:
 
-   ```bash
-    echo "ip6table_filter" | sudo tee -a /etc/modules
-   ```
+    ```bash
+     echo "ip6table_filter" | sudo tee -a /etc/modules
+    ```

@@ -19,13 +19,13 @@ File: `/etc/docker/containers/watchtower/docker-compose.yml`
 
 ```yaml
 services:
-  watchtower:
-    image: containrrr/watchtower:latest
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    env_file:
-      - watchtower.env
-    restart: unless-stopped
+    watchtower:
+        image: containrrr/watchtower:latest
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+        env_file:
+            - watchtower.env
+        restart: unless-stopped
 ```
 
 File: `/etc/docker/containers/watchtower/watchtower.env`

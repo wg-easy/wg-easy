@@ -1,7 +1,7 @@
 ---
 title: Getting Started
 hide:
-  - navigation
+    - navigation
 ---
 
 This page explains how to get started with `wg-easy`. The guide uses Docker Compose as a reference. In our examples, we mount the named volume `etc_wireguard` to `/etc/wireguard` inside the container.
@@ -43,12 +43,14 @@ All workflows are using the tagging convention listed below. It is subsequently 
 
 | tag           | Type                                                       | Example                                                       | Description                                                                                                                          |
 | ------------- | ---------------------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `15`          | latest minor for that major tag                            | `ghcr.io/wg-easy/wg-easy:15`                                  | latest features for specific major versions, no breaking changes                                                                     |
-| `latest`      | latest tag                                                 | `ghcr.io/wg-easy/wg-easy:latest` or `ghcr.io/wg-easy/wg-easy` | stable as possible get bug fixes quickly when needed, see Releases for more information.                                             |
+| `15`          | latest minor for that major tag                            | `ghcr.io/wg-easy/wg-easy:15`                                  | latest features for specific major versions, no breaking changes, recommended                                                        |
+| `latest`      | latest tag                                                 | `ghcr.io/wg-easy/wg-easy:latest` or `ghcr.io/wg-easy/wg-easy` | points to latest release, can include breaking changes                                                                               |
 | `15.0`        | latest patch for that minor tag                            | `ghcr.io/wg-easy/wg-easy:15.0`                                | latest patches for specific minor version                                                                                            |
-| `15.0.0`      | specific tag                                               | `ghcr.io/wg-easy/wg-easy:15.0.0`                              | specific release, don't use this as this will not get updated                                                                        |
+| `15.0.0`      | specific tag                                               | `ghcr.io/wg-easy/wg-easy:15.0.0`                              | specific release, no updates                                                                                                         |
 | `nightly`     | [`master`](https://github.com/wg-easy/wg-easy/tree/master) | `ghcr.io/wg-easy/wg-easy:nightly`                             | mostly unstable gets frequent package and code updates, deployed against [`master`](https://github.com/wg-easy/wg-easy/tree/master). |
 | `development` | pull requests                                              | `ghcr.io/wg-easy/wg-easy:development`                         | used for development, testing code from PRs before landing into [`master`](https://github.com/wg-easy/wg-easy/tree/master).          |
+
+<!-- ref: major version -->
 
 When publishing a tag we follow the [Semantic Versioning][semver] specification. The `latest` tag is always pointing to the latest stable release. If you want to avoid breaking changes, use the major version tag (e.g. `15`).
 
@@ -56,41 +58,15 @@ When publishing a tag we follow the [Semantic Versioning][semver] specification.
 [ghcr-image]: https://github.com/wg-easy/wg-easy/pkgs/container/wg-easy
 [semver]: https://semver.org/
 
-### Get All Files
+### Follow tutorials
 
-Issue the following command to acquire the necessary file:
+- [Basic Installation with Docker Compose (Recommended)](./examples/tutorials/basic-installation.md)
+- [Simple Installation with Docker Run](./examples/tutorials/docker-run.md)
+- [Advanced Installation with Podman](./examples/tutorials/podman-nft.md)
 
-```shell
-wget "https://raw.githubusercontent.com/wg-easy/wg-easy/master/docker-compose.yml"
-```
-
-### Start the Container
-
-To start the container, issue the following command:
-
-```shell
-sudo docker compose up -d
-```
-
-### Configuration Steps
-
-Now follow the setup process in your web browser
-
-### Stopping the Container
-
-To stop the container, issue the following command:
-
-```shell
-sudo docker compose down
-```
-
-/// danger | Using the Correct Commands For Stopping and Starting `wg-easy`
+/// danger | Use the Correct Commands For Stopping and Starting `wg-easy`
 
 **Use `sudo docker compose up / down`, not `sudo docker compose start / stop`**. Otherwise, the container is not properly destroyed and you may experience problems during startup because of inconsistent state.
 ///
 
 **That's it! It really is that easy**.
-
-If you need more help you can read the [Basic Installation Tutorial][basic-installation].
-
-[basic-installation]: ./examples/tutorials/basic-installation.md

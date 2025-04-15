@@ -16,15 +16,15 @@ You need to add a scrape config to your Prometheus configuration file. Here is a
 
 ```yaml
 scrape_configs:
-  - job_name: "wg-easy"
-    scrape_interval: 30s
-    metrics_path: /metrics/prometheus
-    static_configs:
-      - targets:
-          - "localhost:51821"
-    authorization:
-      type: Bearer
-      credentials: "SuperSecurePassword"
+    - job_name: 'wg-easy'
+      scrape_interval: 30s
+      metrics_path: /metrics/prometheus
+      static_configs:
+          - targets:
+                - 'localhost:51821'
+      authorization:
+          type: Bearer
+          credentials: 'SuperSecurePassword'
 ```
 
 ## Grafana Dashboard

@@ -9,6 +9,7 @@
     "yoavbls.pretty-ts-errors",
     "bradlc.vscode-tailwindcss",
     "vue.volar",
-    "lokalise.i18n-ally"
+    "lokalise.i18n-ally",
+    "DavidAnson.vscode-markdownlint"
   ]
 }
