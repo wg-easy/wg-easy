@@ -17,7 +17,7 @@ title: Edit Client
 
 Which IPs will be routed through the VPN.
 
-This will not prevent the user from modifing it locally and accessing IP ranges that they should not be able to access.
+This will not prevent the user from modifying it locally and accessing IP ranges that they should not be able to access.
 
 Use firewall rules to prevent access to IP ranges that the user should not be able to access.
 
