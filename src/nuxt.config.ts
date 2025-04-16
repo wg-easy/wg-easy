@@ -41,6 +41,9 @@ export default defineNuxtConfig({
     detectBrowserLanguage: {
       useCookie: true,
     },
+    bundle: {
+      optimizeTranslationDirective: false,
+    },
   },
   nitro: {
     esbuild: {
@@ -51,6 +54,9 @@ export default defineNuxtConfig({
     },
     alias: {
       '#db': fileURLToPath(new URL('./server/database/', import.meta.url)),
+    },
+    externals: {
+      traceInclude: [fileURLToPath(new URL('./cli/index.ts', import.meta.url))],
     },
   },
   alias: {
