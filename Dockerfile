@@ -27,6 +27,9 @@ COPY --from=build /app/.output /app
 COPY --from=build /app/server/database/migrations /app/server/database/migrations
 # libsql
 RUN cd /app/server && npm install --no-save libsql
+# cli
+COPY --from=build /app/cli/cli.sh  /usr/local/bin/cli
+RUN chmod +x /usr/local/bin/cli
 
 # Install Linux packages
 RUN apk add --no-cache \

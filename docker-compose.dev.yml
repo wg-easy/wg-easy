@@ -2,7 +2,7 @@ services:
   wg-easy:
     build:
       dockerfile: ./Dockerfile.dev
-    command: pnpm run dev
+    command: dev
     volumes:
       - ./src/:/app/
       - temp:/app/.nuxt/
