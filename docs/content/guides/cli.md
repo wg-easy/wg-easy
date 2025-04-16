@@ -8,7 +8,7 @@ If you want to use the CLI, you can run it with
 
 ```shell
 cd /etc/docker/containers/wg-easy
-docker compose run --rm -it wg-easy cli
+docker compose exec -it wg-easy cli
 ```
 
 ### Docker Run
@@ -28,7 +28,7 @@ If you want to reset the password for the admin user, you can run the following 
 
 ```shell
 cd /etc/docker/containers/wg-easy
-docker compose run --rm -it wg-easy cli db:admin:reset
+docker compose exec -it wg-easy cli db:admin:reset
 ```
 
 You are asked to provide the new password
@@ -37,7 +37,7 @@ You are asked to provide the new password
 
 ```shell
 cd /etc/docker/containers/wg-easy
-docker compose run --rm -it wg-easy cli db:admin:reset --password <new_password>
+docker compose exec -it wg-easy cli db:admin:reset --password <new_password>
 ```
 
 This will reset the password for the admin user to the new password you provided. If you include special characters in the password, make sure to escape them properly.

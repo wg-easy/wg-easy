@@ -73,7 +73,7 @@ const dbAdminReset = defineCommand({
     }
 
     consola.success(
-      `Successfully updated admin user ${user.id} (${user.name})`
+      `Successfully updated admin user ${user.id} (${user.username})`
     );
   },
 });
