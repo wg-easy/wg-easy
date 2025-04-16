@@ -14,13 +14,13 @@ To resolve this issue, you can try the following steps:
 
 1. **Load the WireGuard kernel module**: If the WireGuard kernel module is not loaded, you can load it manually by running:
 
-    ```bash
+    ```shell
     sudo modprobe wireguard
     ```
 
 2. **Load the WireGuard kernel module on boot**: If you want to ensure that the WireGuard kernel module is loaded automatically on boot, you can add it to the `/etc/modules` file:
 
-    ```bash
+    ```shell
     echo "wireguard" | sudo tee -a /etc/modules
     ```
 
@@ -32,13 +32,13 @@ To resolve this issue, you can try the following steps:
 
 1. **Load the `nat` kernel module**: If the `nat` kernel module is not loaded, you can load it manually by running:
 
-    ```bash
+    ```shell
     sudo modprobe iptable_nat
     ```
 
 2. **Load the `nat` kernel module on boot**: If you want to ensure that the `nat` kernel module is loaded automatically on boot, you can add it to the `/etc/modules` file:
 
-    ```bash
+    ```shell
      echo "iptable_nat" | sudo tee -a /etc/modules
     ```
 
@@ -50,13 +50,13 @@ To resolve this issue, you can try the following steps:
 
 1. **Load the `nat` kernel module**: If the `nat` kernel module is not loaded, you can load it manually by running:
 
-    ```bash
+    ```shell
     sudo modprobe ip6table_nat
     ```
 
 2. **Load the `nat` kernel module on boot**: If you want to ensure that the `nat` kernel module is loaded automatically on boot, you can add it to the `/etc/modules` file:
 
-    ```bash
+    ```shell
      echo "ip6table_nat" | sudo tee -a /etc/modules
     ```
 
@@ -68,13 +68,13 @@ To resolve this issue, you can try the following steps:
 
 1. **Load the `filter` kernel module**: If the `filter` kernel module is not loaded, you can load it manually by running:
 
-    ```bash
+    ```shell
     sudo modprobe iptable_filter
     ```
 
 2. **Load the `filter` kernel module on boot**: If you want to ensure that the `filter` kernel module is loaded automatically on boot, you can add it to the `/etc/modules` file:
 
-    ```bash
+    ```shell
     echo "iptable_filter" | sudo tee -a /etc/modules
     ```
 
@@ -86,12 +86,12 @@ To resolve this issue, you can try the following steps:
 
 1. **Load the `filter` kernel module**: If the `filter` kernel module is not loaded, you can load it manually by running:
 
-    ```bash
+    ```shell
     sudo modprobe ip6table_filter
     ```
 
 2. **Load the `filter` kernel module on boot**: If you want to ensure that the `filter` kernel module is loaded automatically on boot, you can add it to the `/etc/modules` file:
 
-    ```bash
+    ```shell
      echo "ip6table_filter" | sudo tee -a /etc/modules
     ```

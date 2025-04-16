@@ -5,7 +5,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "nuxt build",
+    "build": "nuxt build && pnpm cli:build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
@@ -15,7 +15,9 @@
     "format:check": "prettier . --check",
     "typecheck": "nuxt typecheck",
     "check:all": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm build",
-    "db:generate": "drizzle-kit generate"
+    "db:generate": "drizzle-kit generate",
+    "cli:build": "node cli/build.js",
+    "cli:dev": "tsx cli/index.ts"
   },
   "dependencies": {
     "@eschricht/nuxt-color-mode": "^1.1.5",
@@ -29,6 +31,8 @@
     "apexcharts": "^4.5.0",
     "argon2": "^0.41.1",
     "cidr-tools": "^11.0.3",
+    "citty": "^0.1.6",
+    "consola": "^3.4.2",
     "crc-32": "^1.2.2",
     "debug": "^4.4.0",
     "drizzle-orm": "^0.41.0",
@@ -54,10 +58,12 @@
     "@types/phc__format": "^1.0.1",
     "@types/semver": "^7.7.0",
     "drizzle-kit": "^0.30.6",
+    "esbuild": "^0.25.2",
     "eslint": "^9.24.0",
     "eslint-config-prettier": "^10.1.2",
     "prettier": "^3.5.3",
     "prettier-plugin-tailwindcss": "^0.6.11",
+    "tsx": "^4.19.3",
     "typescript": "^5.8.3",
     "vue-tsc": "^2.2.8"
   },

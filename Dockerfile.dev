@@ -36,3 +36,4 @@ RUN pnpm install
 # Copy Project
 COPY src ./
 
+ENTRYPOINT [ "pnpm", "run" ]

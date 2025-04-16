@@ -116,6 +116,15 @@ If you add something that should be auto-importable and VSCode complains, run:
 ```shell
 cd src
 pnpm install
+cd ..
+```
+
+### Test Cli
+
+This starts the cli with docker
+
+```shell
+pnpm cli:dev
 ```
 
 ## License
