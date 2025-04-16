@@ -13,10 +13,13 @@ esbuild.build({
     {
       name: 'make-all-packages-external',
       setup(build) {
-        let filter = /^[^./]|^\.[^./]|^\.\.[^/]/ // Must not start with "/" or "./" or "../"
-        build.onResolve({ filter }, args => ({ path: args.path, external: true }))
+        let filter = /^[^./]|^\.[^./]|^\.\.[^/]/; // Must not start with "/" or "./" or "../"
+        build.onResolve({ filter }, (args) => ({
+          path: args.path,
+          external: true,
+        }));
       },
-    }
+    },
   ],
   logLevel: 'info',
-})
+});
