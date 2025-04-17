@@ -50,7 +50,7 @@ The development workflow is the following:
 3. Document your improvements if necessary
 4. [Commit][commit] (and [sign your commit][gpg]), push and create a pull-request to merge into `master`. Please **use the pull-request template** to provide a minimum of contextual information and make sure to meet the requirements of the checklist.
 
-Pull requests are automatically tested against the CI and will be reviewed when tests pass. When your changes are validated, your branch is merged. CI builds the new `:nightly` image every night and your changes will be includes in the next version release.
+Pull requests are automatically tested against the CI and will be reviewed when tests pass. When your changes are validated, your branch is merged. CI builds the new `:edge` image on every push to the `master` branch and your changes will be included in the next version release.
 
 [docs-latest]: https://wg-easy.github.io/wg-easy/latest
 [github-file-readme]: https://github.com/wg-easy/wg-easy/blob/master/README.md
