@@ -32,6 +32,8 @@ As the whole setup has changed, we recommend to start from scratch. And import y
 - Changed license from CC BY-NC-SA 4.0 to AGPL-3.0-only
 - Added 2FA using TOTP
 - Improved mobile support
+- CLI
+- Replaced `nightly` with `edge`
 
 ## [14.0.0] - 2024-09-04
 

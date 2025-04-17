@@ -1,9 +1,14 @@
-name: Nightly
+name: Edge
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "0 0 * * *"
+  push:
+    branches:
+      - master
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   docker:
@@ -37,7 +42,7 @@ jobs:
           context: .
           push: true
           platforms: linux/amd64,linux/arm64
-          tags: ghcr.io/wg-easy/wg-easy:nightly
+          tags: ghcr.io/wg-easy/wg-easy:edge
           cache-from: type=gha
           cache-to: type=gha,mode=min
 
@@ -74,4 +79,4 @@ jobs:
           cd docs
           git fetch origin gh-pages --depth=1 || true
 
-          mike deploy --push --update-aliases nightly
+          mike deploy --push --update-aliases edge

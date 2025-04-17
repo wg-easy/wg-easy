@@ -12,7 +12,7 @@ When refactoring, writing or altering files, adhere to these rules:
 
 ## Documentation
 
-Make sure to select `nightly` in the dropdown menu at the top. Navigate to the page you would like to edit and click the edit button in the top right. This allows you to make changes and create a pull-request.
+Make sure to select `edge` in the dropdown menu at the top. Navigate to the page you would like to edit and click the edit button in the top right. This allows you to make changes and create a pull-request.
 
 Alternatively you can make the changes locally. For that you'll need to have Docker installed. Run
 
