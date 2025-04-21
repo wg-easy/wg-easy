@@ -57,7 +57,7 @@
     "@types/debug": "^4.1.12",
     "@types/phc__format": "^1.0.1",
     "@types/semver": "^7.7.0",
-    "drizzle-kit": "^0.30.6",
+    "drizzle-kit": "^0.31.0",
     "esbuild": "^0.25.2",
     "eslint": "^9.24.0",
     "eslint-config-prettier": "^10.1.2",
