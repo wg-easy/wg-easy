@@ -75,6 +75,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#user-setup" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -1369,6 +1374,19 @@
       
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Setup
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -1380,6 +1398,65 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#user-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      User Setup
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#existing-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      Existing Setup
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Existing Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#no-host-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      No - Host Setup
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#yes-migration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Yes - Migration
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -1410,6 +1487,56 @@
   
   
   
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#user-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      User Setup
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#existing-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      Existing Setup
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Existing Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#no-host-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      No - Host Setup
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#yes-migration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Yes - Migration
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
   
 </nav>
                   </div>
@@ -1443,7 +1570,22 @@
 
   <h1>Setup</h1>
 
-<p>TODO</p>
+<h2 id="user-setup"><a class="toclink" href="#user-setup">User Setup</a></h2>
+<ul>
+<li><strong>Username</strong>: The username of the user.</li>
+<li><strong>Password</strong>: The password of the user.</li>
+<li><strong>Confirm Password</strong>: The password of the user.</li>
+</ul>
+<h2 id="existing-setup"><a class="toclink" href="#existing-setup">Existing Setup</a></h2>
+<p>If you have the config from the previous version, you can import it by clicking "Yes". This currently expects a config from v14.</p>
+<p>If this is the first time you are using this, you can click "No" to create a new config.</p>
+<h3 id="no-host-setup"><a class="toclink" href="#no-host-setup">No - Host Setup</a></h3>
+<ul>
+<li><strong>Host</strong>: The host of the server. The clients will connect to this address. This can be a domain name or an IP address. Make sure to wrap it in brackets if it is an IPv6 address. For example: <code>[::1]</code> or <code>[2001:db8::1]</code>.</li>
+<li><strong>Port</strong>: The port of the server. The clients will connect to this port. The server will listen on this port.</li>
+</ul>
+<h3 id="yes-migration"><a class="toclink" href="#yes-migration">Yes - Migration</a></h3>
+<p>Select the <code>wg0.json</code> file from the previous version. Read <a href="../../advanced/migrate/from-14-to-15/">Migrate from v14 to v15</a> for more information.</p>
 
 
 
