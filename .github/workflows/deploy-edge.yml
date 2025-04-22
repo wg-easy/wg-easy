@@ -11,23 +11,38 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  docker:
-    name: Build & Deploy Docker
-    runs-on: ubuntu-latest
+  docker-build:
+    name: Build Docker
+    runs-on: ${{ matrix.arch.os }}
     if: github.repository_owner == 'wg-easy'
     permissions:
       packages: write
-      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        arch:
+          - platform: linux/amd64
+            os: ubuntu-latest
+          - platform: linux/arm64
+            os: ubuntu-24.04-arm
     steps:
       - uses: actions/checkout@v4
         with:
           ref: master
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+      - name: Prepare
+        run: |
+          platform=${{ matrix.arch.platform }}
+          echo "PLATFORM_PAIR=${platform//\//-}" >> $GITHUB_ENV
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ghcr.io/wg-easy/wg-easy
+          flavor: |
+            latest=false
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
@@ -36,15 +51,83 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build & Publish Docker Image
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push by digest
+        id: build
         uses: docker/build-push-action@v6
         with:
           context: .
-          push: true
-          platforms: linux/amd64,linux/arm64
-          tags: ghcr.io/wg-easy/wg-easy:edge
-          cache-from: type=gha
-          cache-to: type=gha,mode=min
+          platforms: ${{ matrix.arch.platform }}
+          labels: ${{ steps.meta.outputs.labels }}
+          tags: ghcr.io/wg-easy/wg-easy
+          outputs: type=image,push-by-digest=true,name-canonical=true,push=true
+          cache-from: type=gha,scope=build-${{ env.PLATFORM_PAIR }}
+          cache-to: type=gha,mode=min,scope=build-${{ env.PLATFORM_PAIR }}
+
+      - name: Export digest
+        run: |
+          mkdir -p ${{ runner.temp }}/digests
+          digest="${{ steps.build.outputs.digest }}"
+          touch "${{ runner.temp }}/digests/${digest#sha256:}"
+
+      - name: Upload digest
+        uses: actions/upload-artifact@v4
+        with:
+          name: digests-${{ env.PLATFORM_PAIR }}
+          path: ${{ runner.temp }}/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+  docker-merge:
+    name: Merge & Deploy Docker
+    runs-on: ubuntu-latest
+    if: github.repository_owner == 'wg-easy'
+    permissions:
+      packages: write
+    needs: docker-build
+    steps:
+      - name: Download digests
+        uses: actions/download-artifact@v4
+        with:
+          path: ${{ runner.temp }}/digests
+          pattern: digests-*
+          merge-multiple: true
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ghcr.io/wg-easy/wg-easy
+          flavor: |
+            latest=false
+          tags: |
+            type=raw,value=edge
+
+      - name: Create manifest list and push
+        working-directory: ${{ runner.temp }}/digests
+        run: |
+          docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+            $(printf 'ghcr.io/wg-easy/wg-easy@sha256:%s ' *)
+
+      - name: Inspect image
+        run: |
+          docker buildx imagetools inspect ghcr.io/wg-easy/wg-easy:${{ steps.meta.outputs.version }}
 
   docs:
     name: Build & Deploy Docs
@@ -52,7 +135,7 @@ jobs:
     if: github.repository_owner == 'wg-easy'
     permissions:
       contents: write
-    needs: docker
+    needs: docker-merge
     steps:
       - uses: actions/checkout@v4
         with:

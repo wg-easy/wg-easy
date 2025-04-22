@@ -11,13 +11,23 @@ concurrency:
 jobs:
   docker:
     name: Build Docker
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.arch.os }}
     if: github.repository_owner == 'wg-easy'
-    permissions:
-      packages: write
-      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        arch:
+          - platform: linux/amd64
+            os: ubuntu-latest
+          - platform: linux/arm64
+            os: ubuntu-24.04-arm
     steps:
       - uses: actions/checkout@v4
+
+      - name: Prepare
+        run: |
+          platform=${{ matrix.arch.platform }}
+          echo "PLATFORM_PAIR=${platform//\//-}" >> $GITHUB_ENV
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -37,7 +47,7 @@ jobs:
         with:
           context: .
           push: false
-          platforms: linux/amd64,linux/arm64
+          platforms: ${{ matrix.arch.platform }}
           tags: ghcr.io/wg-easy/wg-easy:pr
           cache-from: type=gha
-          cache-to: type=gha,mode=min
+          cache-to: type=gha,mode=min,scope=build-${{ env.PLATFORM_PAIR }}

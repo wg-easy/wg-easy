@@ -10,20 +10,101 @@ on:
 # as this will break the latest and major tags
 
 jobs:
-  docker:
-    name: Build & Deploy Docker
+  docker-build:
+    name: Build Docker
+    runs-on: ${{ matrix.arch.os }}
+    if: |
+      github.repository_owner == 'wg-easy' &&
+      startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        arch:
+          - platform: linux/amd64
+            os: ubuntu-latest
+          - platform: linux/arm64
+            os: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare
+        run: |
+          platform=${{ matrix.arch.platform }}
+          echo "PLATFORM_PAIR=${platform//\//-}" >> $GITHUB_ENV
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ghcr.io/wg-easy/wg-easy
+          flavor: |
+            latest=false
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push by digest
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: ${{ matrix.arch.platform }}
+          labels: ${{ steps.meta.outputs.labels }}
+          tags: ghcr.io/wg-easy/wg-easy
+          outputs: type=image,push-by-digest=true,name-canonical=true,push=true
+          cache-from: type=gha,scope=build-${{ env.PLATFORM_PAIR }}
+          cache-to: type=gha,mode=min,scope=build-${{ env.PLATFORM_PAIR }}
+
+      - name: Export digest
+        run: |
+          mkdir -p ${{ runner.temp }}/digests
+          digest="${{ steps.build.outputs.digest }}"
+          touch "${{ runner.temp }}/digests/${digest#sha256:}"
+
+      - name: Upload digest
+        uses: actions/upload-artifact@v4
+        with:
+          name: digests-${{ env.PLATFORM_PAIR }}
+          path: ${{ runner.temp }}/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+  docker-merge:
+    name: Merge & Deploy Docker
     runs-on: ubuntu-latest
     if: |
       github.repository_owner == 'wg-easy' &&
       startsWith(github.ref, 'refs/tags/v')
     permissions:
       packages: write
-      contents: read
+    needs: docker-build
     steps:
-      - uses: actions/checkout@v4
+      - name: Download digests
+        uses: actions/download-artifact@v4
+        with:
+          path: ${{ runner.temp }}/digests
+          pattern: digests-*
+          merge-multiple: true
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -41,23 +122,15 @@ jobs:
             type=semver,pattern={{major}}
             type=semver,pattern={{major}}.{{minor}}
 
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create manifest list and push
+        working-directory: ${{ runner.temp }}/digests
+        run: |
+          docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+            $(printf 'ghcr.io/wg-easy/wg-easy@sha256:%s ' *)
 
-      - name: Build & Publish Docker Image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          push: true
-          platforms: linux/amd64,linux/arm64
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=min
+      - name: Inspect image
+        run: |
+          docker buildx imagetools inspect ghcr.io/wg-easy/wg-easy:${{ steps.meta.outputs.version }}
 
   docs:
     name: Build & Deploy Docs
@@ -67,7 +140,7 @@ jobs:
       startsWith(github.ref, 'refs/tags/v')
     permissions:
       contents: write
-    needs: docker
+    needs: docker-merge
     steps:
       - uses: actions/checkout@v4
 
@@ -93,8 +166,8 @@ jobs:
           git fetch origin gh-pages --depth=1 || true
 
           # Extract version numbers
-          DOCS_VERSION=${GITHUB_REF#refs/tags/}  # e.g. v1.2.3 or v1.2.3-beta
-          MINOR_VERSION=$(echo $DOCS_VERSION | cut -d. -f1,2)  # e.g. v1.2
+          DOCS_VERSION=${GITHUB_REF#refs/tags/} # e.g. v1.2.3 or v1.2.3-beta
+          MINOR_VERSION=$(echo $DOCS_VERSION | cut -d. -f1,2) # e.g. v1.2
 
           # Check if it's a stable release (only numbers, no '-')
           if [[ "$DOCS_VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
