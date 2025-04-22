@@ -25,8 +25,10 @@ HEALTHCHECK --interval=1m --timeout=5s --retries=3 CMD /usr/bin/timeout 5s /bin/
 COPY --from=build /app/.output /app
 # Copy migrations
 COPY --from=build /app/server/database/migrations /app/server/database/migrations
-# libsql
-RUN cd /app/server && npm install --no-save libsql
+# libsql (https://github.com/nitrojs/nitro/issues/3328)
+RUN cd /app/server && \
+    npm install --no-save libsql && \
+    npm cache clean --force
 # cli
 COPY --from=build /app/cli/cli.sh /usr/local/bin/cli
 RUN chmod +x /usr/local/bin/cli
