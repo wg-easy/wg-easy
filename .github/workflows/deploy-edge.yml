@@ -13,6 +13,7 @@ concurrency:
 jobs:
   docker-build:
     name: Build Docker
+    runs-on: ${{ matrix.arch.os }}
     if: github.repository_owner == 'wg-easy'
     permissions:
       packages: write
@@ -24,7 +25,6 @@ jobs:
             os: ubuntu-latest
           - platform: linux/arm64
             os: ubuntu-24.04-arm
-    runs-on: ${{ matrix.arch.os }}
     steps:
       - uses: actions/checkout@v4
         with:
