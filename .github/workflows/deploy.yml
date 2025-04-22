@@ -163,8 +163,8 @@ jobs:
           git fetch origin gh-pages --depth=1 || true
 
           # Extract version numbers
-          DOCS_VERSION=${GITHUB_REF#refs/tags/}  # e.g. v1.2.3 or v1.2.3-beta
-          MINOR_VERSION=$(echo $DOCS_VERSION | cut -d. -f1,2)  # e.g. v1.2
+          DOCS_VERSION=${GITHUB_REF#refs/tags/} # e.g. v1.2.3 or v1.2.3-beta
+          MINOR_VERSION=$(echo $DOCS_VERSION | cut -d. -f1,2) # e.g. v1.2
 
           # Check if it's a stable release (only numbers, no '-')
           if [[ "$DOCS_VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then

@@ -73,8 +73,7 @@ jobs:
   docker-merge:
     name: Merge & Deploy Docker
     runs-on: ubuntu-latest
-    if: |
-      github.repository_owner == 'wg-easy'
+    if: github.repository_owner == 'wg-easy'
     permissions:
       packages: write
       contents: read
