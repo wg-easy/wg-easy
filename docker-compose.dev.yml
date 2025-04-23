@@ -21,6 +21,11 @@ services:
       - INIT_PORT=51820
       - INIT_USERNAME=testtest
       - INIT_PASSWORD=Qweasdyxcv!2
+    healthcheck:
+      test: /usr/bin/timeout 5s /bin/sh -c "/usr/bin/wg show | /bin/grep -q interface || exit 1"
+      interval: 1m
+      timeout: 5s
+      retries: 3
 
 # folders should be generated inside container
 volumes:

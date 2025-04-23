@@ -32,6 +32,11 @@ services:
       - net.ipv6.conf.all.disable_ipv6=0
       - net.ipv6.conf.all.forwarding=1
       - net.ipv6.conf.default.forwarding=1
+    healthcheck:
+      test: /usr/bin/timeout 5s /bin/sh -c "/usr/bin/wg show | /bin/grep -q interface || exit 1"
+      interval: 1m
+      timeout: 5s
+      retries: 3
 
 networks:
   wg:
