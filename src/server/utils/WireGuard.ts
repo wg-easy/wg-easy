@@ -132,7 +132,7 @@ class WireGuard {
     const config = await this.getClientConfiguration({ clientId });
     return encodeQR(config, 'svg', {
       ecc: 'high',
-      scale: 4,
+      scale: 2,
       encoding: 'byte',
     });
   }
