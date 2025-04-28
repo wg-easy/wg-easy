@@ -24,7 +24,7 @@
     "@heroicons/vue": "^2.2.0",
     "@libsql/client": "^0.15.4",
     "@nuxtjs/i18n": "^9.5.3",
-    "@nuxtjs/tailwindcss": "^6.13.2",
+    "@nuxtjs/tailwindcss": "^6.14.0",
     "@phc/format": "^1.0.0",
     "@pinia/nuxt": "^0.11.0",
     "@tailwindcss/forms": "^0.5.10",
