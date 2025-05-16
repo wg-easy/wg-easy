@@ -5,55 +5,55 @@ import type { H3Event } from 'h3';
 export type ID = number;
 
 /**
- * return the string as is
- *
- * used for i18n ally
+ * does not translate
  */
-export const t = (v: string) => v;
+export function $i18n(text: string) {
+  return text;
+}
 
 export const safeStringRefine = z
   .string()
   .refine(
     (v) => v !== '__proto__' && v !== 'constructor' && v !== 'prototype',
-    { message: t('zod.stringMalformed') }
+    { message: $i18n('zod.stringMalformed') }
   );
 
-export const EnabledSchema = z.boolean({ message: t('zod.enabled') });
+export const EnabledSchema = z.boolean({ message: $i18n('zod.enabled') });
 
 export const MtuSchema = z
-  .number({ message: t('zod.mtu') })
-  .min(1280, { message: t('zod.mtu') })
-  .max(9000, { message: t('zod.mtu') });
+  .number({ message: $i18n('zod.mtu') })
+  .min(1280, { message: $i18n('zod.mtu') })
+  .max(9000, { message: $i18n('zod.mtu') });
 
 export const PortSchema = z
-  .number({ message: t('zod.port') })
-  .min(1, { message: t('zod.port') })
-  .max(65535, { message: t('zod.port') });
+  .number({ message: $i18n('zod.port') })
+  .min(1, { message: $i18n('zod.port') })
+  .max(65535, { message: $i18n('zod.port') });
 
 export const PersistentKeepaliveSchema = z
-  .number({ message: t('zod.persistentKeepalive') })
-  .min(0, t('zod.persistentKeepalive'))
-  .max(65535, t('zod.persistentKeepalive'));
+  .number({ message: $i18n('zod.persistentKeepalive') })
+  .min(0, $i18n('zod.persistentKeepalive'))
+  .max(65535, $i18n('zod.persistentKeepalive'));
 
 export const AddressSchema = z
-  .string({ message: t('zod.address') })
-  .min(1, { message: t('zod.address') })
+  .string({ message: $i18n('zod.address') })
+  .min(1, { message: $i18n('zod.address') })
   .pipe(safeStringRefine);
 
 export const DnsSchema = z
-  .array(AddressSchema, { message: t('zod.dns') })
-  .min(1, t('zod.dns'));
+  .array(AddressSchema, { message: $i18n('zod.dns') })
+  .min(1, $i18n('zod.dns'));
 
 export const AllowedIpsSchema = z
-  .array(AddressSchema, { message: t('zod.allowedIps') })
-  .min(1, { message: t('zod.allowedIps') });
+  .array(AddressSchema, { message: $i18n('zod.allowedIps') })
+  .min(1, { message: $i18n('zod.allowedIps') });
 
 export const FileSchema = z.object({
-  file: z.string({ message: t('zod.file') }),
+  file: z.string({ message: $i18n('zod.file') }),
 });
 
 export const HookSchema = z
-  .string({ message: t('zod.hook') })
+  .string({ message: $i18n('zod.hook') })
   .pipe(safeStringRefine);
 
 export const schemaForType =

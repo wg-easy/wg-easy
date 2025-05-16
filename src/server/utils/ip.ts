@@ -104,7 +104,7 @@ function getPrivateInformation() {
       if (internal) {
         continue;
       }
-      if (!(name in obj)) {
+      if (!obj[name]) {
         obj[name] = {
           ipv4: [],
           ipv6: [],

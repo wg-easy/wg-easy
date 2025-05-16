@@ -5,8 +5,8 @@ import type { userConfig } from './schema';
 export type UserConfigType = InferSelectModel<typeof userConfig>;
 
 const host = z
-  .string({ message: t('zod.userConfig.host') })
-  .min(1, t('zod.userConfig.host'))
+  .string({ message: $i18n('zod.userConfig.host') })
+  .min(1, $i18n('zod.userConfig.host'))
   .pipe(safeStringRefine);
 
 export const UserConfigSetupSchema = z.object({
