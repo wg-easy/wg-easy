@@ -63,4 +63,11 @@ export default defineNuxtConfig({
     // for typecheck reasons (https://github.com/nuxt/cli/issues/323)
     '#db': fileURLToPath(new URL('./server/database/', import.meta.url)),
   },
+  eslint: {
+    config: {
+      typescript: {
+        tsconfigPath: './tsconfig.json',
+      },
+    },
+  },
 });
