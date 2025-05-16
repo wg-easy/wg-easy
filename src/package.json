@@ -22,7 +22,7 @@
   "dependencies": {
     "@eschricht/nuxt-color-mode": "^1.1.5",
     "@heroicons/vue": "^2.2.0",
-    "@libsql/client": "^0.15.5",
+    "@libsql/client": "^0.15.6",
     "@nuxtjs/i18n": "^9.5.4",
     "@nuxtjs/tailwindcss": "^6.14.0",
     "@phc/format": "^1.0.0",
@@ -34,18 +34,18 @@
     "citty": "^0.1.6",
     "consola": "^3.4.2",
     "crc-32": "^1.2.2",
-    "debug": "^4.4.0",
+    "debug": "^4.4.1",
     "drizzle-orm": "^0.43.1",
     "ip-bigint": "^8.2.1",
     "is-cidr": "^5.1.1",
     "is-ip": "^5.0.1",
     "js-sha256": "^0.11.0",
-    "nuxt": "^3.17.2",
+    "nuxt": "^3.17.3",
     "otpauth": "^9.4.0",
     "pinia": "^3.0.2",
     "qr": "^0.4.2",
     "radix-vue": "^1.9.17",
-    "semver": "^7.7.1",
+    "semver": "^7.7.2",
     "tailwindcss": "^3.4.17",
     "timeago.js": "^4.0.2",
     "vue": "latest",
@@ -67,5 +67,5 @@
     "typescript": "^5.8.3",
     "vue-tsc": "^2.2.10"
   },
-  "packageManager": "pnpm@10.10.0"
+  "packageManager": "pnpm@10.11.0"
 }
