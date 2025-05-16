@@ -1,6 +1,6 @@
 import type { ZodSchema } from 'zod';
 import z from 'zod';
-import type { H3Event, EventHandlerRequest } from 'h3';
+import type { H3Event } from 'h3';
 
 export type ID = number;
 
@@ -63,10 +63,7 @@ export const schemaForType =
     return arg;
   };
 
-export function validateZod<T>(
-  schema: ZodSchema<T>,
-  event: H3Event<EventHandlerRequest>
-) {
+export function validateZod<T>(schema: ZodSchema<T>, event: H3Event) {
   return async (data: unknown) => {
     try {
       return await schema.parseAsync(data);
@@ -79,64 +76,60 @@ export function validateZod<T>(
           .map((v) => {
             let m = v.message;
 
-            if (t) {
-              let newMessage = null;
-              if (v.message.startsWith('zod.')) {
-                switch (v.code) {
-                  case 'too_small':
-                    switch (v.type) {
+            let newMessage = null;
+            if (v.message.startsWith('zod.')) {
+              switch (v.code) {
+                case 'too_small':
+                  switch (v.type) {
+                    case 'string':
+                      newMessage = t('zod.generic.stringMin', [
+                        t(v.message),
+                        v.minimum,
+                      ]);
+                      break;
+                    case 'number':
+                      newMessage = t('zod.generic.numberMin', [
+                        t(v.message),
+                        v.minimum,
+                      ]);
+                      break;
+                  }
+                  break;
+                case 'invalid_type': {
+                  if (v.received === 'null' || v.received === 'undefined') {
+                    newMessage = t('zod.generic.required', [v.path.join('.')]);
+                  } else {
+                    switch (v.expected) {
                       case 'string':
-                        newMessage = t('zod.generic.stringMin', [
+                        newMessage = t('zod.generic.validString', [
                           t(v.message),
-                          v.minimum,
+                        ]);
+                        break;
+                      case 'boolean':
+                        newMessage = t('zod.generic.validBoolean', [
+                          t(v.message),
                         ]);
                         break;
                       case 'number':
-                        newMessage = t('zod.generic.numberMin', [
+                        newMessage = t('zod.generic.validNumber', [
                           t(v.message),
-                          v.minimum,
+                        ]);
+                        break;
+                      case 'array':
+                        newMessage = t('zod.generic.validArray', [
+                          t(v.message),
                         ]);
                         break;
                     }
-                    break;
-                  case 'invalid_type': {
-                    if (v.received === 'null' || v.received === 'undefined') {
-                      newMessage = t('zod.generic.required', [
-                        v.path.join('.'),
-                      ]);
-                    } else {
-                      switch (v.expected) {
-                        case 'string':
-                          newMessage = t('zod.generic.validString', [
-                            t(v.message),
-                          ]);
-                          break;
-                        case 'boolean':
-                          newMessage = t('zod.generic.validBoolean', [
-                            t(v.message),
-                          ]);
-                          break;
-                        case 'number':
-                          newMessage = t('zod.generic.validNumber', [
-                            t(v.message),
-                          ]);
-                          break;
-                        case 'array':
-                          newMessage = t('zod.generic.validArray', [
-                            t(v.message),
-                          ]);
-                          break;
-                      }
-                    }
-                    break;
                   }
+                  break;
                 }
               }
-              if (newMessage) {
-                m = newMessage;
-              } else {
-                m = t(v.message);
-              }
+            }
+            if (newMessage) {
+              m = newMessage;
+            } else {
+              m = t(v.message);
             }
 
             return m;
