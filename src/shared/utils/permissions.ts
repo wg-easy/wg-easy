@@ -134,7 +134,7 @@ export function hasPermissionsWithData<Resource extends keyof Permissions>(
 ) {
   let checked = false;
   return {
-    check(data?: Permissions[Resource]['dataType']) {
+    check(this: void, data?: Permissions[Resource]['dataType']) {
       checked = true;
       const isAllowed = hasPermissions(user, resource, action, data);
 

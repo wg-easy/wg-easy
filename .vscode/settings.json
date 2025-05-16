@@ -15,6 +15,9 @@
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
   "[json]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
@@ -29,5 +32,8 @@
   "i18n-ally.sortKeys": false,
   "i18n-ally.keepFulfilled": false,
   "i18n-ally.keystyle": "nested",
+  "i18n-ally.regex.usageMatchAppend": [
+    "[^\\w\\d]\\$i18n\\(['\"`]({key})['\"`]"
+  ],
   "editor.gotoLocation.multipleDefinitions": "goto"
 }
