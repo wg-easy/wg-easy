@@ -67,5 +67,10 @@
     "typescript": "^5.8.3",
     "vue-tsc": "^2.2.10"
   },
-  "packageManager": "pnpm@10.11.0"
+  "packageManager": "pnpm@10.11.0",
+  "pnpm": {
+    "overrides": {
+      "oxc-parser": "^0.70.0"
+    }
+  }
 }
