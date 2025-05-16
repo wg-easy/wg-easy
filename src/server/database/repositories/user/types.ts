@@ -5,20 +5,20 @@ import type { user } from './schema';
 export type UserType = InferSelectModel<typeof user>;
 
 const username = z
-  .string({ message: t('zod.user.username') })
-  .min(2, t('zod.user.username'))
+  .string({ message: $i18n('zod.user.username') })
+  .min(2, $i18n('zod.user.username'))
   .pipe(safeStringRefine);
 
 const password = z
-  .string({ message: t('zod.user.password') })
-  .min(12, t('zod.user.password'))
+  .string({ message: $i18n('zod.user.password') })
+  .min(12, $i18n('zod.user.password'))
   .pipe(safeStringRefine);
 
-const remember = z.boolean({ message: t('zod.user.remember') });
+const remember = z.boolean({ message: $i18n('zod.user.remember') });
 
 const totpCode = z
-  .string({ message: t('zod.user.totpCode') })
-  .min(6, t('zod.user.totpCode'))
+  .string({ message: $i18n('zod.user.totpCode') })
+  .min(6, $i18n('zod.user.totpCode'))
   .pipe(safeStringRefine);
 
 export const UserLoginSchema = z.object({
@@ -35,18 +35,18 @@ export const UserSetupSchema = z
     confirmPassword: password,
   })
   .refine((val) => val.password === val.confirmPassword, {
-    message: t('zod.user.passwordMatch'),
+    message: $i18n('zod.user.passwordMatch'),
   });
 
 const name = z
-  .string({ message: t('zod.user.name') })
+  .string({ message: $i18n('zod.user.name') })
   .min(1, 'zod.user.name')
   .pipe(safeStringRefine);
 
 const email = z
-  .string({ message: t('zod.user.email') })
-  .min(5, t('zod.user.email'))
-  .email({ message: t('zod.user.emailInvalid') })
+  .string({ message: $i18n('zod.user.email') })
+  .min(5, $i18n('zod.user.email'))
+  .email({ message: $i18n('zod.user.emailInvalid') })
   .pipe(safeStringRefine)
   .nullable();
 
@@ -62,7 +62,7 @@ export const UserUpdatePasswordSchema = z
     confirmPassword: password,
   })
   .refine((val) => val.newPassword === val.confirmPassword, {
-    message: t('zod.user.passwordMatch'),
+    message: $i18n('zod.user.passwordMatch'),
   });
 
 export const UserUpdateTotpSchema = z.union([

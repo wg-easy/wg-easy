@@ -4,11 +4,13 @@ import type { InterfaceType } from '#db/repositories/interface/types';
  * Replace all {{key}} in the template with the values[key]
  */
 export function template(templ: string, values: Record<string, string>) {
-  return templ.replace(/\{\{(\w+)\}\}/g, (match, key: string) => {
-    if (key in values) {
+  return templ.replace(/\{\{(\w+)\}\}/g, (match, ...keys: string[]) => {
+    const key = keys[0];
+    if (key && values[key] !== undefined) {
       return values[key];
+    } else {
+      return match;
     }
-    return match;
   });
 }
 

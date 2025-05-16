@@ -63,8 +63,8 @@ async function readFileContent(file: File): Promise<string> {
     reader.onload = (event) => {
       resolve(event.target?.result as string);
     };
-    reader.onerror = (error) => {
-      reject(error);
+    reader.onerror = () => {
+      reject(reader.error ?? new Error('Failed to read file'));
     };
     reader.readAsText(file);
   });

@@ -18,29 +18,29 @@ export type UpdateClientType = Omit<
 >;
 
 const name = z
-  .string({ message: t('zod.client.name') })
-  .min(1, t('zod.client.name'))
+  .string({ message: $i18n('zod.client.name') })
+  .min(1, $i18n('zod.client.name'))
   .pipe(safeStringRefine);
 
 // TODO?: validate iso string
 const expiresAt = z
-  .string({ message: t('zod.client.expiresAt') })
-  .min(1, t('zod.client.expiresAt'))
+  .string({ message: $i18n('zod.client.expiresAt') })
+  .min(1, $i18n('zod.client.expiresAt'))
   .pipe(safeStringRefine)
   .nullable();
 
 const address4 = z
-  .string({ message: t('zod.client.address4') })
-  .min(1, { message: t('zod.client.address4') })
+  .string({ message: $i18n('zod.client.address4') })
+  .min(1, { message: $i18n('zod.client.address4') })
   .pipe(safeStringRefine);
 
 const address6 = z
-  .string({ message: t('zod.client.address6') })
-  .min(1, { message: t('zod.client.address6') })
+  .string({ message: $i18n('zod.client.address6') })
+  .min(1, { message: $i18n('zod.client.address6') })
   .pipe(safeStringRefine);
 
 const serverAllowedIps = z.array(AddressSchema, {
-  message: t('zod.client.serverAllowedIps'),
+  message: $i18n('zod.client.serverAllowedIps'),
 });
 
 export const ClientCreateSchema = z.object({
@@ -71,7 +71,7 @@ export const ClientUpdateSchema = schemaForType<UpdateClientType>()(
 );
 
 // TODO: investigate if coerce is bad
-const clientId = z.number({ message: t('zod.client.id'), coerce: true });
+const clientId = z.number({ message: $i18n('zod.client.id'), coerce: true });
 
 export const ClientGetSchema = z.object({
   clientId: clientId,

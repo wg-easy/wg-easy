@@ -16,14 +16,16 @@ export type InterfaceUpdateType = Omit<
 >;
 
 const device = z
-  .string({ message: t('zod.interface.device') })
-  .min(1, t('zod.interface.device'))
+  .string({ message: $i18n('zod.interface.device') })
+  .min(1, $i18n('zod.interface.device'))
   .pipe(safeStringRefine);
 
 const cidr = z
-  .string({ message: t('zod.interface.cidr') })
-  .min(1, { message: t('zod.interface.cidr') })
-  .refine((value) => isCidr(value), { message: t('zod.interface.cidrValid') })
+  .string({ message: $i18n('zod.interface.cidr') })
+  .min(1, { message: $i18n('zod.interface.cidr') })
+  .refine((value) => isCidr(value), {
+    message: $i18n('zod.interface.cidrValid'),
+  })
   .pipe(safeStringRefine);
 
 export const InterfaceUpdateSchema = schemaForType<InterfaceUpdateType>()(

@@ -117,7 +117,7 @@
 import { encodeQR } from 'qr';
 
 const authStore = useAuthStore();
-authStore.update();
+void authStore.update();
 
 const name = ref(authStore.userData?.name);
 const email = ref(authStore.userData?.email);
@@ -148,6 +148,7 @@ const _updatePassword = useSubmit(
     method: 'post',
   },
   {
+    // eslint-disable-next-line @typescript-eslint/require-await
     revert: async () => {
       currentPassword.value = '';
       newPassword.value = '';
@@ -172,6 +173,7 @@ const _setup2fa = useSubmit(
     method: 'post',
   },
   {
+    // eslint-disable-next-line @typescript-eslint/require-await
     revert: async (success, data) => {
       if (success && data?.type === 'setup') {
         const qrcode = encodeQR(data.uri, 'svg', {
@@ -202,9 +204,9 @@ const _enable2fa = useSubmit(
   {
     revert: async (success, data) => {
       if (success && data?.type === 'created') {
-        authStore.update();
         twofa.value = null;
         code.value = '';
+        await authStore.update();
       }
     },
   }
@@ -227,8 +229,8 @@ const _disable2fa = useSubmit(
   {
     revert: async (success, data) => {
       if (success && data?.type === 'deleted') {
-        authStore.update();
         disable2faPassword.value = '';
+        await authStore.update();
       }
     },
   }

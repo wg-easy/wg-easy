@@ -29,7 +29,7 @@
 
 <script setup lang="ts">
 const authStore = useAuthStore();
-authStore.update();
+void authStore.update();
 
 const globalStore = useGlobalStore();
 const clientsStore = useClientsStore();
@@ -39,7 +39,7 @@ const clientsStore = useClientsStore();
 
 const intervalId = ref<NodeJS.Timeout | null>(null);
 
-clientsStore.refresh();
+void clientsStore.refresh();
 
 onMounted(() => {
   // TODO?: replace with websocket or similar
