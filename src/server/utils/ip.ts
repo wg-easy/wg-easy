@@ -104,17 +104,22 @@ function getPrivateInformation() {
       if (internal) {
         continue;
       }
-      if (!obj[name]) {
+      if (!(name in obj)) {
         obj[name] = {
           ipv4: [],
           ipv6: [],
         };
       }
-      if (family === 'IPv4') {
-        obj[name].ipv4.push(address);
-      } else if (family === 'IPv6') {
-        obj[name].ipv6.push(address);
+
+      switch (family) {
+        case 'IPv4':
+          obj[name].ipv4.push(address);
+          continue;
+        case 'IPv6':
+          obj[name].ipv6.push(address);
+          continue;
       }
+      assertUnreachable(family);
     }
   }
 

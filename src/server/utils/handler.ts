@@ -99,15 +99,15 @@ export const defineSetupEventHandler = <
       });
     }
 
-    const validSetupSteps =
-      ValidSetupSteps[setup.step as keyof typeof ValidSetupSteps];
-
-    if (!validSetupSteps) {
+    if (!(setup.step in ValidSetupSteps)) {
       throw createError({
         statusCode: 500,
         statusMessage: 'Invalid setup step',
       });
     }
+
+    const validSetupSteps =
+      ValidSetupSteps[setup.step as keyof typeof ValidSetupSteps];
 
     if (!validSetupSteps.includes(step as never)) {
       throw createError({
@@ -169,7 +169,7 @@ export const defineMetricsHandler = <
       }
     }
 
-    if (metricsConfig[type] !== true) {
+    if (!metricsConfig[type]) {
       throw createError({
         statusCode: 400,
         statusMessage: 'Metrics not enabled',
