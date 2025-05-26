@@ -22,7 +22,7 @@
   "dependencies": {
     "@eschricht/nuxt-color-mode": "^1.1.5",
     "@heroicons/vue": "^2.2.0",
-    "@libsql/client": "^0.15.6",
+    "@libsql/client": "^0.15.7",
     "@nuxtjs/i18n": "^9.5.4",
     "@nuxtjs/tailwindcss": "^6.14.0",
     "@phc/format": "^1.0.0",
