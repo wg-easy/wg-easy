@@ -7,8 +7,7 @@ export function bytes(
   if (bytes === 0) return '0 B';
   if (Number.isNaN(bytes) && !Number.isFinite(bytes)) return 'NaN';
   const k = kib ? 1024 : 1000;
-  const dm =
-    decimals != null && !Number.isNaN(decimals) && decimals >= 0 ? decimals : 2;
+  const dm = !Number.isNaN(decimals) && decimals >= 0 ? decimals : 2;
   const sizes = kib
     ? ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB', 'BiB']
     : ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB', 'BB'];
@@ -17,7 +16,7 @@ export function bytes(
     const index = sizes.indexOf(maxunit);
     if (index !== -1) i = index;
   }
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i] ?? 'NaN'}`;
 }
 
 /**
