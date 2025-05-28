@@ -15,12 +15,12 @@
               :to="`/admin/${item.id}`"
               active-class="bg-red-800 rounded"
             >
-              <BaseButton
+              <BaseSecondaryButton
                 as="span"
                 class="w-full cursor-pointer rounded p-2 font-medium transition-colors duration-200 hover:bg-red-800 dark:text-neutral-200"
               >
                 {{ item.name }}
-              </BaseButton>
+              </BaseSecondaryButton>
             </NuxtLink>
           </div>
         </div>

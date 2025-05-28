@@ -8,7 +8,9 @@
       <input id="migration" type="file" @change="onChangeFile" />
     </div>
     <div class="mt-4">
-      <BaseButton @click="submit">{{ $t('setup.upload') }}</BaseButton>
+      <BasePrimaryButton @click="submit">
+        {{ $t('setup.upload') }}
+      </BasePrimaryButton>
     </div>
   </div>
 </template>

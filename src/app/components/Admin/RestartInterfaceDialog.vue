@@ -7,12 +7,12 @@
     </template>
     <template #actions>
       <DialogClose as-child>
-        <BaseButton>{{ $t('dialog.cancel') }}</BaseButton>
+        <BaseSecondaryButton>{{ $t('dialog.cancel') }}</BaseSecondaryButton>
       </DialogClose>
       <DialogClose as-child>
-        <BaseButton @click="$emit('restart')">
+        <BasePrimaryButton @click="$emit('restart')">
           {{ $t('admin.interface.restart') }}
-        </BaseButton>
+        </BasePrimaryButton>
       </DialogClose>
     </template>
   </BaseDialog>

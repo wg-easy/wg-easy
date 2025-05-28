@@ -10,12 +10,12 @@
     </template>
     <template #actions>
       <DialogClose as-child>
-        <BaseButton>{{ $t('dialog.cancel') }}</BaseButton>
+        <BaseSecondaryButton>{{ $t('dialog.cancel') }}</BaseSecondaryButton>
       </DialogClose>
       <DialogClose as-child>
-        <BaseButton @click="$emit('change', ipv4Cidr, ipv6Cidr)">
+        <BasePrimaryButton @click="$emit('change', ipv4Cidr, ipv6Cidr)">
           {{ $t('dialog.change') }}
-        </BaseButton>
+        </BasePrimaryButton>
       </DialogClose>
     </template>
   </BaseDialog>

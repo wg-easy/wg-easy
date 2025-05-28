@@ -18,10 +18,12 @@
     </template>
     <template #actions>
       <DialogClose as-child>
-        <BaseButton>{{ $t('dialog.cancel') }}</BaseButton>
+        <BaseSecondaryButton>{{ $t('dialog.cancel') }}</BaseSecondaryButton>
       </DialogClose>
       <DialogClose as-child>
-        <BaseButton @click="createClient">{{ $t('client.create') }}</BaseButton>
+        <BasePrimaryButton @click="createClient">
+          {{ $t('client.create') }}
+        </BasePrimaryButton>
       </DialogClose>
     </template>
   </BaseDialog>

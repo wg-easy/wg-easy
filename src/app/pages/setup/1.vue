@@ -4,7 +4,9 @@
       {{ $t('setup.welcomeDesc') }}
     </p>
     <NuxtLink to="/setup/2" class="mt-8">
-      <BaseButton as="span">{{ $t('general.continue') }}</BaseButton>
+      <BasePrimaryButton as="span">
+        {{ $t('general.continue') }}
+      </BasePrimaryButton>
     </NuxtLink>
   </div>
 </template>

@@ -18,7 +18,7 @@
               v-model="email"
               :label="$t('user.email')"
             />
-            <FormActionField type="submit" :label="$t('form.save')" />
+            <FormSecondaryActionField type="submit" :label="$t('form.save')" />
           </FormGroup>
         </FormElement>
         <FormElement @submit.prevent="updatePassword">
@@ -42,7 +42,7 @@
               autocomplete="new-password"
               :label="$t('general.confirmPassword')"
             />
-            <FormActionField
+            <FormSecondaryActionField
               type="submit"
               :label="$t('general.updatePassword')"
             />
@@ -55,7 +55,10 @@
               v-if="!authStore.userData?.totpVerified && !twofa"
               class="col-span-2 flex flex-col"
             >
-              <FormActionField :label="$t('me.enable2fa')" @click="setup2fa" />
+              <FormSecondaryActionField
+                :label="$t('me.enable2fa')"
+                @click="setup2fa"
+              />
             </div>
             <div
               v-if="!authStore.userData?.totpVerified && twofa"
@@ -81,7 +84,7 @@
                   v-model="code"
                   :label="$t('general.2faCode')"
                 />
-                <FormActionField
+                <FormSecondaryActionField
                   :label="$t('me.enable2fa')"
                   @click="enable2fa"
                 />
@@ -101,7 +104,7 @@
                 type="password"
                 autocomplete="current-password"
               />
-              <FormActionField
+              <FormSecondaryActionField
                 :label="$t('me.disable2fa')"
                 @click="disable2fa"
               />
