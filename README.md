@@ -7,12 +7,6 @@
 [![GitHub Release](https://img.shields.io/github/v/release/wg-easy/wg-easy)](https://github.com/wg-easy/wg-easy/releases/latest)
 [![Image Pulls](https://img.shields.io/badge/image_pulls-12M+-blue)](https://github.com/wg-easy/wg-easy/pkgs/container/wg-easy)
 
-<!-- TODO: remove after release -->
-
-> [!WARNING]
-> You are viewing the README of the pre-release of v15.
-> If you want to setup wg-easy right now. Read the README in the production branch here: [README](https://github.com/wg-easy/wg-easy/tree/production) or here for the last nightly: [README](https://github.com/wg-easy/wg-easy/tree/c6dce0f6fb2e28e7e40ddac1498bd67e9bb17cba)
-
 You have found the easiest way to install & manage WireGuard on any Linux host!
 
 <!-- TOOD: update screenshot -->
@@ -42,11 +36,6 @@ You have found the easiest way to install & manage WireGuard on any Linux host!
 
 > [!NOTE]
 > To better manage documentation for this project, it has its own site here: [https://wg-easy.github.io/wg-easy/latest](https://wg-easy.github.io/wg-easy/latest)
-
-<!-- TODO: remove after release -->
-
-> [!WARNING]
-> As the Docs are still in Pre-release, you can access them here [https://wg-easy.github.io/wg-easy/Pre-release](https://wg-easy.github.io/wg-easy/Pre-release)
 
 - [Getting Started](https://wg-easy.github.io/wg-easy/latest/getting-started/)
 - [Basic Installation](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/basic-installation/)
