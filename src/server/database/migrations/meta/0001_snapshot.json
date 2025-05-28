@@ -1,6 +1,6 @@
 {
-  "id": "c4c5bfb7-a66c-4e6b-a15c-232b16689dcf",
-  "prevId": "b812341a-1ec2-49a6-8bc8-0332f5b32df4",
+  "id": "78de2e52-c4a8-4900-86c5-92f34739623a",
+  "prevId": "dae61656-1107-4729-ac83-f43d4cab3881",
   "version": "6",
   "dialect": "sqlite",
   "tables": {
@@ -17,6 +17,13 @@
         "user_id": {
           "name": "user_id",
           "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "interface_id": {
+          "name": "interface_id",
+          "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -197,6 +204,19 @@
           ],
           "onUpdate": "cascade",
           "onDelete": "restrict"
+        },
+        "clients_table_interface_id_interfaces_table_name_fk": {
+          "name": "clients_table_interface_id_interfaces_table_name_fk",
+          "tableFrom": "clients_table",
+          "columnsFrom": [
+            "interface_id"
+          ],
+          "tableTo": "interfaces_table",
+          "columnsTo": [
+            "name"
+          ],
+          "onUpdate": "cascade",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},

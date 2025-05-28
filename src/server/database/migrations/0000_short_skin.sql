@@ -1,6 +1,7 @@
 CREATE TABLE `clients_table` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`user_id` integer NOT NULL,
+	`interface_id` text NOT NULL,
 	`name` text NOT NULL,
 	`ipv4_address` text NOT NULL,
 	`ipv6_address` text NOT NULL,
@@ -21,7 +22,8 @@ CREATE TABLE `clients_table` (
 	`enabled` integer NOT NULL,
 	`created_at` text DEFAULT (CURRENT_TIMESTAMP) NOT NULL,
 	`updated_at` text DEFAULT (CURRENT_TIMESTAMP) NOT NULL,
-	FOREIGN KEY (`user_id`) REFERENCES `users_table`(`id`) ON UPDATE cascade ON DELETE restrict
+	FOREIGN KEY (`user_id`) REFERENCES `users_table`(`id`) ON UPDATE cascade ON DELETE restrict,
+	FOREIGN KEY (`interface_id`) REFERENCES `interfaces_table`(`name`) ON UPDATE cascade ON DELETE cascade
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `clients_table_ipv4_address_unique` ON `clients_table` (`ipv4_address`);--> statement-breakpoint
