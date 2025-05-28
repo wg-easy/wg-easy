@@ -27,7 +27,7 @@ As the whole setup has changed, we recommend to start from scratch. And import y
 - SQLite Database
 - Deprecated Dockerless Installations
 - Added Docker Volume Mount (`/lib/modules`)
-- Removed ARMv6 and ARMv7 support
+- Removed ARMv6 support
 - Connections over HTTP require setting the `INSECURE` env var
 - Changed license from CC BY-NC-SA 4.0 to AGPL-3.0-only
 - Added 2FA using TOTP

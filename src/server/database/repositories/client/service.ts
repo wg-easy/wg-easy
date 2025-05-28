@@ -108,6 +108,7 @@ export class ClientService {
           name,
           // TODO: properly assign user id
           userId: 1,
+          interfaceId: 'wg0',
           expiresAt,
           privateKey,
           publicKey,
@@ -171,6 +172,7 @@ export class ClientService {
       .values({
         name,
         userId: 1,
+        interfaceId: 'wg0',
         privateKey,
         publicKey,
         preSharedKey,

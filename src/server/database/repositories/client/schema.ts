@@ -1,7 +1,7 @@
 import { sql, relations } from 'drizzle-orm';
 import { int, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
-import { oneTimeLink, user } from '../../schema';
+import { oneTimeLink, user, wgInterface } from '../../schema';
 
 /** null means use value from userConfig */
 
@@ -11,6 +11,12 @@ export const client = sqliteTable('clients_table', {
     .notNull()
     .references(() => user.id, {
       onDelete: 'restrict',
+      onUpdate: 'cascade',
+    }),
+  interfaceId: text('interface_id')
+    .notNull()
+    .references(() => wgInterface.name, {
+      onDelete: 'cascade',
       onUpdate: 'cascade',
     }),
   name: text().notNull(),
@@ -50,5 +56,9 @@ export const clientsRelations = relations(client, ({ one }) => ({
   user: one(user, {
     fields: [client.userId],
     references: [user.id],
+  }),
+  interface: one(wgInterface, {
+    fields: [client.interfaceId],
+    references: [wgInterface.name],
   }),
 }));
