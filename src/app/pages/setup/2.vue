@@ -29,7 +29,9 @@
         />
       </div>
       <div class="mt-4 flex justify-center">
-        <BaseButton @click="submit">{{ $t('setup.createAccount') }}</BaseButton>
+        <BasePrimaryButton @click="submit">
+          {{ $t('setup.createAccount') }}
+        </BasePrimaryButton>
       </div>
     </div>
   </div>

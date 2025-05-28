@@ -7,7 +7,7 @@
       <IconsInfo class="size-4" />
     </BaseTooltip>
   </div>
-  <div class="flex">
+  <div class="flex gap-1">
     <BaseInput
       :id="id"
       v-model.trim="data"
@@ -18,12 +18,12 @@
     />
     <ClientOnly>
       <AdminSuggestDialog :url="url" @change="data = $event">
-        <BaseButton as="span">
+        <BasePrimaryButton as="span">
           <div class="flex items-center gap-3">
             <IconsSparkles class="w-4" />
             <span>{{ $t('admin.config.suggest') }}</span>
           </div>
-        </BaseButton>
+        </BasePrimaryButton>
       </AdminSuggestDialog>
     </ClientOnly>
   </div>

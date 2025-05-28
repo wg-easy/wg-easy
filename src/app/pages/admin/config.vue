@@ -49,8 +49,8 @@
       </FormGroup>
       <FormGroup>
         <FormHeading>{{ $t('form.actions') }}</FormHeading>
-        <FormActionField type="submit" :label="$t('form.save')" />
-        <FormActionField :label="$t('form.revert')" @click="revert" />
+        <FormPrimaryActionField type="submit" :label="$t('form.save')" />
+        <FormSecondaryActionField :label="$t('form.revert')" @click="revert" />
       </FormGroup>
     </FormElement>
   </main>

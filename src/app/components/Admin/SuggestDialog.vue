@@ -13,12 +13,12 @@
     </template>
     <template #actions>
       <DialogClose as-child>
-        <BaseButton>{{ $t('dialog.cancel') }}</BaseButton>
+        <BaseSecondaryButton>{{ $t('dialog.cancel') }}</BaseSecondaryButton>
       </DialogClose>
       <DialogClose as-child>
-        <BaseButton @click="$emit('change', selected)">
+        <BasePrimaryButton @click="$emit('change', selected)">
           {{ $t('dialog.change') }}
-        </BaseButton>
+        </BasePrimaryButton>
       </DialogClose>
     </template>
   </BaseDialog>

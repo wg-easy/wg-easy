@@ -10,7 +10,7 @@
     </template>
     <template #actions>
       <DialogClose>
-        <BaseButton>{{ $t('dialog.cancel') }}</BaseButton>
+        <BaseSecondaryButton>{{ $t('dialog.cancel') }}</BaseSecondaryButton>
       </DialogClose>
     </template>
   </BaseDialog>

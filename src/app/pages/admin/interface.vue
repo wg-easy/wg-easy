@@ -23,15 +23,15 @@
       </FormGroup>
       <FormGroup>
         <FormHeading>{{ $t('form.actions') }}</FormHeading>
-        <FormActionField type="submit" :label="$t('form.save')" />
-        <FormActionField :label="$t('form.revert')" @click="revert" />
+        <FormPrimaryActionField type="submit" :label="$t('form.save')" />
+        <FormSecondaryActionField :label="$t('form.revert')" @click="revert" />
         <AdminCidrDialog
           trigger-class="col-span-2"
           :ipv4-cidr="data.ipv4Cidr"
           :ipv6-cidr="data.ipv6Cidr"
           @change="changeCidr"
         >
-          <FormActionField
+          <FormSecondaryActionField
             :label="$t('admin.interface.changeCidr')"
             class="w-full"
             tabindex="-1"
@@ -41,7 +41,7 @@
           trigger-class="col-span-2"
           @restart="restartInterface"
         >
-          <FormActionField
+          <FormSecondaryActionField
             :label="$t('admin.interface.restart')"
             class="w-full"
             tabindex="-1"

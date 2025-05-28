@@ -23,7 +23,9 @@
         />
       </div>
       <div class="mt-4 flex justify-center">
-        <BaseButton @click="submit">{{ $t('general.continue') }}</BaseButton>
+        <BasePrimaryButton @click="submit">
+          {{ $t('general.continue') }}
+        </BasePrimaryButton>
       </div>
     </div>
   </div>
