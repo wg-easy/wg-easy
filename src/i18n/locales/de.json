@@ -1,0 +1,237 @@
+{
+  "pages": {
+    "me": "Konto",
+    "clients": "Geräte",
+    "admin": {
+      "panel": "Admin-Panel",
+      "general": "Allgemein",
+      "config": "Konfiguration",
+      "interface": "Oberfläche",
+      "hooks": "Hooks"
+    }
+  },
+  "user": {
+    "email": "Email"
+  },
+  "me": {
+    "currentPassword": "Aktuelles Passwort",
+    "enable2fa": "Zwei-Faktor-Authentifizierunng aktivieren",
+    "enable2faDesc": "Scannen Sie den QR-Code mit ihrer AUTHENTICATOR-App oder geben Sie den Schlüssel manuell ein.", // TODO
+    "2faKey": "TOTP-Schlüssel",
+    "2faCodeDesc": "Geben Sie den Code aus Ihrer AUTHENTICATOR-App ein.", // TODO
+    "disable2fa": "Zwei-Faktor-Authentifizierung deaktivieren",
+    "disable2faDesc": "Geben Sie Ihr Passwort ein, um die Zwei-Faktor-Authentifizierung zu deaktivieren."
+  },
+  "general": {
+    "name": "Name",
+    "username": "Benutzername",
+    "password": "Passwort",
+    "newPassword": "Neues Passwort",
+    "updatePassword": "Passwort aktualisieren",
+    "mtu": "MTU",
+    "allowedIps": "Erlaubte IP-Adressen",
+    "dns": "DNS",
+    "persistentKeepalive": "Persistent Keepalive", // TODO
+    "logout": "Abmelden",
+    "continue": "Weiter",
+    "host": "Host",
+    "port": "Port",
+    "yes": "Ja",
+    "no": "Nein",
+    "confirmPassword": "Passwort bestätigen",
+    "loading": "Laden...",
+    "2fa": "Zwei-Faktor-Authentifizierung",
+    "2faCode": "TOTP-Code"
+  },
+  "setup": {
+    "welcome": "Willkommen zur Ersteinrichtung von wg-easy",
+    "welcomeDesc": "Das ist der einfachste Weg, um Wireguard auf jedem Linux-Server zu installieren und zu betreiben.",
+    "existingSetup": "Do you have an existing setup?", // TODO
+    "createAdminDesc": "Bitte geben Sie zuerst einen Admin-Benutzernamen sowie ein starkes, sicheres Passwort ein. Diese Anmeldedaten benötigen Sie, um sich im Admin-Panel anzumelden.",
+    "setupConfigDesc": "Please enter the host and port information. This will be used for the client configuration when setting up WireGuard on their devices.", // TODO
+    "setupMigrationDesc": "Please provide the backup file if you want to migrate your data from your previous wg-easy version to your new setup.", // TODO
+    "upload": "Hochladen",
+    "migration": "Sicherung wiederherstellen:",
+    "createAccount": "Konto erstellen",
+    "successful": "Einrichtung erfolgreich",
+    "hostDesc": "Public hostname clients will connect to",
+    "portDesc": "Public UDP port clients will connect to and WireGuard will listen on"
+  },
+  "update": {
+    "updateAvailable": "Es ist ein neue Aktualisierung verfügbar!",
+    "update": "Aktualisieren"
+  },
+  "theme": {
+    "dark": "Dunkler Modus", // TODO
+    "light": "Heller Modus", // TODO
+    "system": "System" // TODO
+  },
+  "layout": {
+    "toggleCharts": "Show/hide Charts", // TODO
+    "donate": "Spenden"
+  },
+  "login": {
+    "signIn": "Anmelden",
+    "rememberMe": "Remember me", // TODO
+    "rememberMeDesc": "Bleiben Sie auch nach dem Schließen des Browsers angemeldet",
+    "insecure": "Sie können sich nicht über eine unsichere Verbindung anmelden. Bitte benutzen Sie HTTPS.",
+    "2faRequired": "Zwei-Faktor-Authentifizierung wird benötigt",
+    "2faWrong": "Two Factor Authentication is wrong" // TODO
+  },
+  "client": {
+    "empty": "Es gibt noch keine Geräte.",
+    "newShort": "Neu",
+    "sort": "Sortieren",
+    "create": "Gerät anlegen",
+    "created": "Gerät wurde angelegt",
+    "new": "Neues Gerät",
+    "name": "Name",
+    "expireDate": "Ablaufdatum",
+    "expireDateDesc": "Datum, an dem das Gerät deaktiviert wird. Leer lassen, damit dies nie passiert.",
+    "deleteClient": "Gerät löschen",
+    "deleteDialog1": "Sind Sie sicher, dass Sie dieses Gerät löschen wollen",
+    "deleteDialog2": "Diese Aktion kann nicht rückgängig gemacht werden.",
+    "enabled": "Aktiviert",
+    "address": "Adresse",
+    "serverAllowedIps": "Server Allowed IPs", // TODO
+    "otlDesc": "Einen kurzen Einmal-Link generieren", // TODO
+    "permanent": "Permanent", // TODO
+    "createdOn": "Created on ", // TODO
+    "lastSeen": "Last seen on ", // TODO
+    "totalDownload": "Total Download: ", // TODO
+    "totalUpload": "Total Upload: ", // TODO
+    "newClient": "Neues Gerät",
+    "disableClient": "Gerät deaktivieren",
+    "enableClient": "Gerät aktivieren",
+    "noPrivKey": "Dieses Gerät hat keinen bekannten privaten Schlüssel, weshalb keine Konfiguration angelegt werden kann.",
+    "showQR": "QR-Code anzeigen",
+    "downloadConfig": "Konfiguration herunterladen",
+    "allowedIpsDesc": "Welche IP-Adressen durch das VPN geleitet werden (überschreibt die globale Konfiguration)", // TODO
+    "serverAllowedIpsDesc": "Welche IP-Adressen der Server zum Gerät leiten wird", // TODO
+    "mtuDesc": "Setzt die maximale Übertragungsgröße (Paketgröße) für den VPN-Tunnel",
+    "persistentKeepaliveDesc": "Sets the interval (in seconds) for keep-alive packets. 0 disables it", // TODO
+    "hooks": "Hooks",
+    "hooksDescription": "Hooks funktionieren nur mit wg-quick",
+    "hooksLeaveEmpty": "Nur für wg-quick. Sonst leer lassen",
+    "dnsDesc": "DNS-Server, den die Geräte benutzen (überschreibt die globale Konfiguration)"
+  },
+  "dialog": {
+    "change": "Ändern", // TODO
+    "cancel": "Abbrechen",
+    "create": "Create" // TODO
+  },
+  "toast": {
+    "success": "Success", // TODO
+    "saved": "Gespeichert",
+    "error": "Fehler"
+  },
+  "form": {
+    "actions": "Aktionen", // TODO
+    "save": "Speichern",
+    "revert": "Rückgängig machen",
+    "sectionGeneral": "Allgemein",
+    "sectionAdvanced": "Erweitert",
+    "noItems": "Keine Einträge",
+    "nullNoItems": "Keine Einträge. Die globale Konfiguration wird benutzt",
+    "add": "Hinzufügen"
+  },
+  "admin": {
+    "general": {
+      "sessionTimeout": "Sitzungszeitüberschreitung", // TODO
+      "sessionTimeoutDesc": "Sitzungsdauer für Remember Me (Sekunden)", // TODO
+      "metrics": "Statistiken",
+      "metricsPassword": "Passwort",
+      "metricsPasswordDesc": "Bearer-Passwort für den Statistik-Endpunkt (Passwort oder Argon2-Hash)",
+      "json": "JSON",
+      "jsonDesc": "Pfad zu den Statistiken als JSON",
+      "prometheus": "Prometheus",
+      "prometheusDesc": "Pfad zu den Prometheus-Statistiken"
+    },
+    "config": {
+      "connection": "Verbindung",
+      "hostDesc": "Öffentlicher Hostname mit dem sich die Geräte verbinden (überschreibt die Konfiguration)", // TODO
+      "portDesc": "Öffentlicher UDP-Port an dem sich die Geräte verbinden (überschreibt die Konfiguration, vermutlich wollen Sie ebenfalls den Port der Weboberfläche ändern)",
+      "allowedIpsDesc": "Erlaubte IP-Adressen, die die Geräte nutzen werden (Globale Konfiguration)",
+      "dnsDesc": "DNS-Server, den die Geräte nutzen werden (Globale Konfiguration)",
+      "mtuDesc": "MTU, den die Geräte benutzen werden (nur für neue Geräte)",
+      "persistentKeepaliveDesc": "Interval in seconds to send keepalives to the server. 0 = disabled (only for new clients)", // TODO
+      "suggest": "Suggest", // TODO
+      "suggestDesc": "Choose a IP-Address or Hostname for the Host field" // TODO
+    },
+    "interface": {
+      "cidrSuccess": "CIDR wurde geändert",
+      "device": "Gerät",
+      "deviceDesc": "Ethernet device the wireguard traffic should be forwarded through", // TODO
+      "mtuDesc": "MTU, den WireGuard benutzen wird",
+      "portDesc": "UDP Port WireGuard will listen on (you probably want to change Config Port too)", // TODO
+      "changeCidr": "CIDR ändern",
+      "restart": "Interface neu starten",
+      "restartDesc": "Das WireGuard-Interface neu starten",
+      "restartWarn": "Sind Sie sicher, dass Sie das Interface neu starten wollen? Dies wird die Verbindungen aller Geräte trennen.",
+      "restartSuccess": "Interface neu gestartet"
+    },
+    "introText": "Welcome to the admin panel.\n\nHere you can manage the general settings, the configuration, the interface settings and the hooks.\n\nStart by choosing one of the sections in the sidebar." // TODO
+  },
+  "zod": {
+    "generic": {
+      "required": "{0} ist erforderlich", // TODO
+      "validNumber": "{0} muss eine Zahl sein",
+      "validString": "{0} muss eine Zeichenkette sein",
+      "validBoolean": "{0} muss ein Wahrheitswert sein",
+      "validArray": "{0} muss eine Liste sein",
+      "stringMin": "{0} must be at least {1} Character", // TODO
+      "numberMin": "{0} must be at least {1}" // TODO
+    },
+    "client": {
+      "id": "Geräte-ID",
+      "name": "Name",
+      "expiresAt": "Expires At", // TODO
+      "address4": "IPv4-Adresse",
+      "address6": "IPv6-Adresse",
+      "serverAllowedIps": "Server Allowed IPs" // TODO
+    },
+    "user": {
+      "username": "Benutzername",
+      "password": "Passwort",
+      "remember": "Remember", // TODO
+      "name": "Name",
+      "email": "Email",
+      "emailInvalid": "Die Email-Adresse muss valide sein",
+      "passwordMatch": "Die Passwörter müssen übereinstimmen",
+      "totpEnable": "TOTP aktivieren",
+      "totpEnableTrue": "TOTP Enable must be true", // TODO
+      "totpCode": "TOTP-Code"
+    },
+    "userConfig": {
+      "host": "Host"
+    },
+    "general": {
+      "sessionTimeout": "Sitzungszeitüberschreitung",
+      "metricsEnabled": "Statistiken",
+      "metricsPassword": "Metrics Password" // TODO
+    },
+    "interface": {
+      "cidr": "CIDR",
+      "device": "Geräte",
+      "cidrValid": "CIDR must be valid" // TODO
+    },
+    "otl": "Einmal-Link",
+    "stringMalformed": "String is malformed", // TODO
+    "body": "Body must be a valid object", // TODO
+    "hook": "Hook",
+    "enabled": "Aktiviert",
+    "mtu": "MTU",
+    "port": "Port",
+    "persistentKeepalive": "Persistent Keepalive", // TODO
+    "address": "IP-Adresse",
+    "dns": "DNS",
+    "allowedIps": "Erlaubte IP-Adressen",
+    "file": "Datei"
+  },
+  "hooks": {
+    "preUp": "PreUp",
+    "postUp": "PostUp",
+    "preDown": "PreDown",
+    "postDown": "PostDown"
+  }
+}
