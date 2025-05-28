@@ -13,5 +13,12 @@
     "version": "Pre-release",
     "title": "Pre-release",
     "aliases": []
+  },
+  {
+    "version": "v15.0",
+    "title": "v15.0",
+    "aliases": [
+      "latest"
+    ]
   }
 ]
