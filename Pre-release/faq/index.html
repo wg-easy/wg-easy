@@ -22,7 +22,7 @@
       
       
       <link rel="icon" href="../assets/logo/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.11">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
     
     
       
@@ -30,7 +30,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.4af4bdda.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.342714a4.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
@@ -1255,6 +1255,29 @@
   
   
     <li class="md-nav__item">
+      <a href="../examples/tutorials/reverse-proxyless/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    No Reverse Proxy
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../examples/tutorials/traefik/" class="md-nav__link">
         
   
@@ -1359,29 +1382,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/account/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    Edit Account
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../guides/admin/" class="md-nav__link">
         
   
@@ -1405,12 +1405,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/clients/" class="md-nav__link">
+      <a href="../guides/cli/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    Edit Client
+    CLI
     
   </span>
   
@@ -1428,12 +1428,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/login/" class="md-nav__link">
+      <a href="../guides/clients/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    Login
+    Edit Client
     
   </span>
   
@@ -1586,67 +1586,77 @@
 <p>This error indicates that the WireGuard interface <code>wg0</code> does not exist. This can happen if the WireGuard kernel module is not loaded or if the interface was not created properly.</p>
 <p>To resolve this issue, you can try the following steps:</p>
 <ol>
-<li><strong>Load the WireGuard kernel module</strong>: If the WireGuard kernel module is not loaded, you can load it manually by running:</li>
-</ol>
-<div class="highlight"><pre><span></span><code><span class="w"> </span>sudo<span class="w"> </span>modprobe<span class="w"> </span>wireguard
+<li>
+<p><strong>Load the WireGuard kernel module</strong>: If the WireGuard kernel module is not loaded, you can load it manually by running:</p>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>modprobe<span class="w"> </span>wireguard
 </code></pre></div>
-<ol>
-<li><strong>Load the WireGuard kernel module on boot</strong>: If you want to ensure that the WireGuard kernel module is loaded automatically on boot, you can add it to the <code>/etc/modules</code> file:</li>
-</ol>
+</li>
+<li>
+<p><strong>Load the WireGuard kernel module on boot</strong>: If you want to ensure that the WireGuard kernel module is loaded automatically on boot, you can add it to the <code>/etc/modules</code> file:</p>
 <div class="highlight"><pre><span></span><code><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;wireguard&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>tee<span class="w"> </span>-a<span class="w"> </span>/etc/modules
 </code></pre></div>
+</li>
+</ol>
 <h2 id="cant-initialize-iptables-table-nat-table-does-not-exist-do-you-need-to-insmod"><a class="toclink" href="#cant-initialize-iptables-table-nat-table-does-not-exist-do-you-need-to-insmod">can't initialize iptables table `nat': Table does not exist (do you need to insmod?)</a></h2>
 <p>This error indicates that the <code>nat</code> table in <code>iptables</code> does not exist. This can happen if the <code>iptables</code> kernel module is not loaded or if the <code>nat</code> table is not supported by your kernel.</p>
 <p>To resolve this issue, you can try the following steps:</p>
 <ol>
-<li><strong>Load the <code>nat</code> kernel module</strong>: If the <code>nat</code> kernel module is not loaded, you can load it manually by running:</li>
-</ol>
+<li>
+<p><strong>Load the <code>nat</code> kernel module</strong>: If the <code>nat</code> kernel module is not loaded, you can load it manually by running:</p>
 <div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>modprobe<span class="w"> </span>iptable_nat
 </code></pre></div>
-<ol>
-<li><strong>Load the <code>nat</code> kernel module on boot</strong>: If you want to ensure that the <code>nat</code> kernel module is loaded automatically on boot, you can add it to the <code>/etc/modules</code> file:</li>
-</ol>
+</li>
+<li>
+<p><strong>Load the <code>nat</code> kernel module on boot</strong>: If you want to ensure that the <code>nat</code> kernel module is loaded automatically on boot, you can add it to the <code>/etc/modules</code> file:</p>
 <div class="highlight"><pre><span></span><code><span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;iptable_nat&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>tee<span class="w"> </span>-a<span class="w"> </span>/etc/modules
 </code></pre></div>
+</li>
+</ol>
 <h2 id="cant-initialize-ip6tables-table-nat-table-does-not-exist-do-you-need-to-insmod"><a class="toclink" href="#cant-initialize-ip6tables-table-nat-table-does-not-exist-do-you-need-to-insmod">can't initialize ip6tables table `nat': Table does not exist (do you need to insmod?)</a></h2>
 <p>This error indicates that the <code>nat</code> table in <code>ip6tables</code> does not exist. This can happen if the <code>ip6tables</code> kernel module is not loaded or if the <code>nat</code> table is not supported by your kernel.</p>
 <p>To resolve this issue, you can try the following steps:</p>
 <ol>
-<li><strong>Load the <code>nat</code> kernel module</strong>: If the <code>nat</code> kernel module is not loaded, you can load it manually by running:</li>
-</ol>
+<li>
+<p><strong>Load the <code>nat</code> kernel module</strong>: If the <code>nat</code> kernel module is not loaded, you can load it manually by running:</p>
 <div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>modprobe<span class="w"> </span>ip6table_nat
 </code></pre></div>
-<ol>
-<li><strong>Load the <code>nat</code> kernel module on boot</strong>: If you want to ensure that the <code>nat</code> kernel module is loaded automatically on boot, you can add it to the <code>/etc/modules</code> file:</li>
-</ol>
+</li>
+<li>
+<p><strong>Load the <code>nat</code> kernel module on boot</strong>: If you want to ensure that the <code>nat</code> kernel module is loaded automatically on boot, you can add it to the <code>/etc/modules</code> file:</p>
 <div class="highlight"><pre><span></span><code><span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;ip6table_nat&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>tee<span class="w"> </span>-a<span class="w"> </span>/etc/modules
 </code></pre></div>
+</li>
+</ol>
 <h2 id="cant-initialize-iptables-table-filter-permission-denied"><a class="toclink" href="#cant-initialize-iptables-table-filter-permission-denied">can't initialize iptables table `filter': Permission denied</a></h2>
 <p>This error indicates that the <code>filter</code> table in <code>iptables</code> cannot be initialized due to permission issues. This can happen if you are not running the command with sufficient privileges.</p>
 <p>To resolve this issue, you can try the following steps:</p>
 <ol>
-<li><strong>Load the <code>filter</code> kernel module</strong>: If the <code>filter</code> kernel module is not loaded, you can load it manually by running:</li>
-</ol>
+<li>
+<p><strong>Load the <code>filter</code> kernel module</strong>: If the <code>filter</code> kernel module is not loaded, you can load it manually by running:</p>
 <div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>modprobe<span class="w"> </span>iptable_filter
 </code></pre></div>
-<ol>
-<li><strong>Load the <code>filter</code> kernel module on boot</strong>: If you want to ensure that the <code>filter</code> kernel module is loaded automatically on boot, you can add it to the <code>/etc/modules</code> file:</li>
-</ol>
+</li>
+<li>
+<p><strong>Load the <code>filter</code> kernel module on boot</strong>: If you want to ensure that the <code>filter</code> kernel module is loaded automatically on boot, you can add it to the <code>/etc/modules</code> file:</p>
 <div class="highlight"><pre><span></span><code><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;iptable_filter&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>tee<span class="w"> </span>-a<span class="w"> </span>/etc/modules
 </code></pre></div>
+</li>
+</ol>
 <h2 id="cant-initialize-ip6tables-table-filter-permission-denied"><a class="toclink" href="#cant-initialize-ip6tables-table-filter-permission-denied">can't initialize ip6tables table `filter': Permission denied</a></h2>
 <p>This error indicates that the <code>filter</code> table in <code>ip6tables</code> cannot be initialized due to permission issues. This can happen if you are not running the command with sufficient privileges.</p>
 <p>To resolve this issue, you can try the following steps:</p>
 <ol>
-<li><strong>Load the <code>filter</code> kernel module</strong>: If the <code>filter</code> kernel module is not loaded, you can load it manually by running:</li>
-</ol>
+<li>
+<p><strong>Load the <code>filter</code> kernel module</strong>: If the <code>filter</code> kernel module is not loaded, you can load it manually by running:</p>
 <div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>modprobe<span class="w"> </span>ip6table_filter
 </code></pre></div>
-<ol>
-<li><strong>Load the <code>filter</code> kernel module on boot</strong>: If you want to ensure that the <code>filter</code> kernel module is loaded automatically on boot, you can add it to the <code>/etc/modules</code> file:</li>
-</ol>
+</li>
+<li>
+<p><strong>Load the <code>filter</code> kernel module on boot</strong>: If you want to ensure that the <code>filter</code> kernel module is loaded automatically on boot, you can add it to the <code>/etc/modules</code> file:</p>
 <div class="highlight"><pre><span></span><code><span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;ip6table_filter&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>tee<span class="w"> </span>-a<span class="w"> </span>/etc/modules
 </code></pre></div>
+</li>
+</ol>
 
 
 
@@ -1711,10 +1721,10 @@
     
     
       
-      <script id="__config" type="application/json">{"base": "..", "features": ["navigation.tabs", "navigation.top", "navigation.expand", "navigation.instant", "content.action.edit", "content.action.view", "content.code.annotate"], "search": "../assets/javascripts/workers/search.f8cc74c7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"base": "..", "features": ["navigation.tabs", "navigation.top", "navigation.expand", "navigation.instant", "content.action.edit", "content.action.view", "content.code.annotate"], "search": "../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.c8b220af.min.js"></script>
+      <script src="../assets/javascripts/bundle.13a4f30d.min.js"></script>
       
     
   </body>

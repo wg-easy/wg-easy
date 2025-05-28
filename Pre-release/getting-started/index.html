@@ -22,7 +22,7 @@
       
       
       <link rel="icon" href="../assets/logo/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.11">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
     
     
       
@@ -30,7 +30,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.4af4bdda.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.342714a4.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
@@ -555,36 +555,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#get-all-files" class="md-nav__link">
+  <a href="#follow-tutorials" class="md-nav__link">
     <span class="md-ellipsis">
-      Get All Files
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#start-the-container" class="md-nav__link">
-    <span class="md-ellipsis">
-      Start the Container
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#configuration-steps" class="md-nav__link">
-    <span class="md-ellipsis">
-      Configuration Steps
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#stopping-the-container" class="md-nav__link">
-    <span class="md-ellipsis">
-      Stopping the Container
+      Follow tutorials
     </span>
   </a>
   
@@ -1294,6 +1267,29 @@
   
   
     <li class="md-nav__item">
+      <a href="../examples/tutorials/reverse-proxyless/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    No Reverse Proxy
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../examples/tutorials/traefik/" class="md-nav__link">
         
   
@@ -1398,29 +1394,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/account/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    Edit Account
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../guides/admin/" class="md-nav__link">
         
   
@@ -1444,12 +1417,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/clients/" class="md-nav__link">
+      <a href="../guides/cli/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    Edit Client
+    CLI
     
   </span>
   
@@ -1467,12 +1440,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/login/" class="md-nav__link">
+      <a href="../guides/clients/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    Login
+    Edit Client
     
   </span>
   
@@ -1583,36 +1556,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#get-all-files" class="md-nav__link">
+  <a href="#follow-tutorials" class="md-nav__link">
     <span class="md-ellipsis">
-      Get All Files
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#start-the-container" class="md-nav__link">
-    <span class="md-ellipsis">
-      Start the Container
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#configuration-steps" class="md-nav__link">
-    <span class="md-ellipsis">
-      Configuration Steps
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#stopping-the-container" class="md-nav__link">
-    <span class="md-ellipsis">
-      Stopping the Container
+      Follow tutorials
     </span>
   </a>
   
@@ -1665,7 +1611,7 @@
 <ol>
 <li>You need to have a host that you can manage</li>
 <li>You need to have a domain name or a public IP address</li>
-<li>You need a supported architecture (x86_64, arm64)</li>
+<li>You need a supported architecture (x86_64, arm64, armv7)</li>
 </ol>
 <h3 id="host-setup"><a class="toclink" href="#host-setup">Host Setup</a></h3>
 <p>There are a few requirements for a suitable host system:</p>
@@ -1698,13 +1644,13 @@ If you're using podman, make sure to read the related <a href="../examples/tutor
 <td><code>15</code></td>
 <td>latest minor for that major tag</td>
 <td><code>ghcr.io/wg-easy/wg-easy:15</code></td>
-<td>latest features for specific major versions, no breaking changes</td>
+<td>latest features for specific major versions, no breaking changes, recommended</td>
 </tr>
 <tr>
 <td><code>latest</code></td>
 <td>latest tag</td>
 <td><code>ghcr.io/wg-easy/wg-easy:latest</code> or <code>ghcr.io/wg-easy/wg-easy</code></td>
-<td>stable as possible get bug fixes quickly when needed, see Releases for more information.</td>
+<td>points to latest release, can include breaking changes</td>
 </tr>
 <tr>
 <td><code>15.0</code></td>
@@ -1716,43 +1662,36 @@ If you're using podman, make sure to read the related <a href="../examples/tutor
 <td><code>15.0.0</code></td>
 <td>specific tag</td>
 <td><code>ghcr.io/wg-easy/wg-easy:15.0.0</code></td>
-<td>specific release, don't use this as this will not get updated</td>
+<td>specific release, no updates</td>
 </tr>
 <tr>
-<td><code>nightly</code></td>
-<td><a href="https://github.com/wg-easy/wg-easy/tree/master"><code>master</code></a></td>
-<td><code>ghcr.io/wg-easy/wg-easy:nightly</code></td>
-<td>mostly unstable gets frequent package and code updates, deployed against <a href="https://github.com/wg-easy/wg-easy/tree/master"><code>master</code></a>.</td>
+<td><code>edge</code></td>
+<td>push to <code>master</code></td>
+<td><code>ghcr.io/wg-easy/wg-easy:edge</code></td>
+<td>mostly unstable, gets frequent package and code updates</td>
 </tr>
 <tr>
 <td><code>development</code></td>
 <td>pull requests</td>
 <td><code>ghcr.io/wg-easy/wg-easy:development</code></td>
-<td>used for development, testing code from PRs before landing into <a href="https://github.com/wg-easy/wg-easy/tree/master"><code>master</code></a>.</td>
+<td>used for development, testing code from PRs</td>
 </tr>
 </tbody>
 </table>
+<!-- ref: major version -->
+
 <p>When publishing a tag we follow the <a href="https://semver.org/">Semantic Versioning</a> specification. The <code>latest</code> tag is always pointing to the latest stable release. If you want to avoid breaking changes, use the major version tag (e.g. <code>15</code>).</p>
-<h3 id="get-all-files"><a class="toclink" href="#get-all-files">Get All Files</a></h3>
-<p>Issue the following command to acquire the necessary file:</p>
-<div class="highlight"><pre><span></span><code>wget<span class="w"> </span><span class="s2">&quot;https://raw.githubusercontent.com/wg-easy/wg-easy/master/docker-compose.yml&quot;</span>
-</code></pre></div>
-<h3 id="start-the-container"><a class="toclink" href="#start-the-container">Start the Container</a></h3>
-<p>To start the container, issue the following command:</p>
-<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>-d
-</code></pre></div>
-<h3 id="configuration-steps"><a class="toclink" href="#configuration-steps">Configuration Steps</a></h3>
-<p>Now follow the setup process in your web browser</p>
-<h3 id="stopping-the-container"><a class="toclink" href="#stopping-the-container">Stopping the Container</a></h3>
-<p>To stop the container, issue the following command:</p>
-<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>docker<span class="w"> </span>compose<span class="w"> </span>down
-</code></pre></div>
+<h3 id="follow-tutorials"><a class="toclink" href="#follow-tutorials">Follow tutorials</a></h3>
+<ul>
+<li><a href="../examples/tutorials/basic-installation/">Basic Installation with Docker Compose (Recommended)</a></li>
+<li><a href="../examples/tutorials/docker-run/">Simple Installation with Docker Run</a></li>
+<li><a href="../examples/tutorials/podman-nft/">Advanced Installation with Podman</a></li>
+</ul>
 <div class="admonition danger">
-<p class="admonition-title">Using the Correct Commands For Stopping and Starting <code>wg-easy</code></p>
+<p class="admonition-title">Use the Correct Commands For Stopping and Starting <code>wg-easy</code></p>
 <p><strong>Use <code>sudo docker compose up / down</code>, not <code>sudo docker compose start / stop</code></strong>. Otherwise, the container is not properly destroyed and you may experience problems during startup because of inconsistent state.</p>
 </div>
 <p><strong>That's it! It really is that easy</strong>.</p>
-<p>If you need more help you can read the <a href="../examples/tutorials/basic-installation/">Basic Installation Tutorial</a>.</p>
 
 
 
@@ -1817,10 +1756,10 @@ If you're using podman, make sure to read the related <a href="../examples/tutor
     
     
       
-      <script id="__config" type="application/json">{"base": "..", "features": ["navigation.tabs", "navigation.top", "navigation.expand", "navigation.instant", "content.action.edit", "content.action.view", "content.code.annotate"], "search": "../assets/javascripts/workers/search.f8cc74c7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"base": "..", "features": ["navigation.tabs", "navigation.top", "navigation.expand", "navigation.instant", "content.action.edit", "content.action.view", "content.code.annotate"], "search": "../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.c8b220af.min.js"></script>
+      <script src="../assets/javascripts/bundle.13a4f30d.min.js"></script>
       
     
   </body>
