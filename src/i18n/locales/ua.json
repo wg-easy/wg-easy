@@ -138,7 +138,7 @@
   "admin": {
     "general": {
       "sessionTimeout": "Час очікування сеансу",
-      "sessionTimeoutDesc": "Тривалість сеансу для функції "Запам'ятати мене" (секунди)",
+      "sessionTimeoutDesc": "Тривалість сеансу для функції 'Запам'ятати мене' (секунди)",
       "metrics": "Метрики",
       "metricsPassword": "Пароль",
       "metricsPasswordDesc": "Пароль носія для кінцевої точки метрик (пароль або хеш argon2)",
