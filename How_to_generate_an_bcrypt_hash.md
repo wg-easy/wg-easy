@@ -12,6 +12,8 @@ docker run ghcr.io/wg-easy/wg-easy node -e 'const bcrypt = require("bcryptjs"); 
 
 The hashed password will get printed on your terminal. Copy it and use on the `PASSWORD_HASH` environment variable.
 
+If you are using `docker run` for running wg-easy, you must enclose the hash string in single quotes (`'...'`).
+
 ## Using Docker + wgpw
 
 `wg-password` (wgpw) is a script that generates bcrypt password hashes. You can use it with docker:
