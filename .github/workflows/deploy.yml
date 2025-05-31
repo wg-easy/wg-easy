@@ -1,23 +1,24 @@
 name: Build & Publish Latest
 
 on:
-  workflow_dispatch:
   push:
     branches:
-      - production
+      - v14
 
 jobs:
   deploy:
     name: Build & Deploy
     runs-on: ubuntu-latest
-    if: github.repository_owner == 'wg-easy'
+    if: |
+      github.repository_owner == 'wg-easy' &&
+      !contains(github.event.head_commit.message, '!skipci')
     permissions:
       packages: write
       contents: read
     steps:
     - uses: actions/checkout@v4
       with:
-        ref: production
+        ref: v14
 
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v3
@@ -32,12 +33,9 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Set environment variables
-      run: echo RELEASE=$(cat ./src/package.json | jq -r .release | jq -r .version) >> $GITHUB_ENV
-
     - name: Build & Publish Docker Image
       uses: docker/build-push-action@v6
       with:
         push: true
         platforms: linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8
-        tags: ghcr.io/wg-easy/wg-easy:latest, ghcr.io/wg-easy/wg-easy:${{ env.RELEASE }}
+        tags: ghcr.io/wg-easy/wg-easy:latest, ghcr.io/wg-easy/wg-easy:14

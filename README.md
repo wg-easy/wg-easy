@@ -32,15 +32,8 @@ You have found the easiest way to install & manage WireGuard on any Linux host!
 
 ## Versions
 
-We provide more then 1 docker image to get, this will help you decide which one is best for you. <br>
-For **stable** versions instead of nightly or development please read **README** from the **production** branch!
-
-| tag | Branch | Example | Description |
-| - | - | - | - |
-| `latest` | production | `ghcr.io/wg-easy/wg-easy:latest` or `ghcr.io/wg-easy/wg-easy` | stable as possbile get bug fixes quickly when needed, deployed against `production`. |
-| `13` | production | `ghcr.io/wg-easy/wg-easy:13` | same as latest, stick to a version tag. |
-| `nightly` | master | `ghcr.io/wg-easy/wg-easy:nightly` | mostly unstable gets frequent package and code updates, deployed against `master`. |
-| `development` | pull requests | `ghcr.io/wg-easy/wg-easy:development` | used for development, testing code from PRs before landing into `master`. |
+This branch is only for the v14 release of WireGuard Easy.
+For newer versions, please refer to the [master branch](https://github.com/wg-easy/wg-easy/tree/master).
 
 ## Installation
 
@@ -76,7 +69,7 @@ To automatically install & run wg-easy, simply run:
   --sysctl="net.ipv4.conf.all.src_valid_mark=1" \
   --sysctl="net.ipv4.ip_forward=1" \
   --restart unless-stopped \
-  ghcr.io/wg-easy/wg-easy
+  ghcr.io/wg-easy/wg-easy:14
 ```
 
 > 💡 Replace `YOUR_SERVER_IP` with your WAN IP, or a Dynamic DNS hostname.
@@ -130,7 +123,7 @@ To update to the latest version, simply run:
 ```bash
 docker stop wg-easy
 docker rm wg-easy
-docker pull ghcr.io/wg-easy/wg-easy
+docker pull ghcr.io/wg-easy/wg-easy:14
 ```
 
 And then run the `docker run -d \ ...` command above again.
@@ -140,12 +133,5 @@ With Docker Compose WireGuard Easy can be updated with a single command:
 Compose file and it is not `latest`, make sure that it is changed to the desired
 one; by default it is omitted and
 [defaults to `latest`](https://docs.docker.com/engine/reference/run/#image-references)). \
-The WireGuared Easy container will be automatically recreated if a newer image
+The WireGuard Easy container will be automatically recreated if a newer image
 was pulled.
-
-## Common Use Cases
-
-* [Using WireGuard-Easy with Pi-Hole](https://github.com/wg-easy/wg-easy/wiki/Using-WireGuard-Easy-with-Pi-Hole)
-* [Using WireGuard-Easy with nginx/SSL](https://github.com/wg-easy/wg-easy/wiki/Using-WireGuard-Easy-with-nginx-SSL)
-
-For less common or specific edge-case scenarios, please refer to the detailed information provided in the [Wiki](https://github.com/wg-easy/wg-easy/wiki).
