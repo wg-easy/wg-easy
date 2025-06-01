@@ -62,7 +62,7 @@
     "update": "Оновлення"
   },
   "theme": {
-    "dark": "Темна тем",
+    "dark": "Темна тема",
     "light": "Світла тема",
     "system": "Системна тема"
   },
@@ -141,11 +141,11 @@
       "sessionTimeoutDesc": "Тривалість сеансу для функції 'Запам'ятати мене' (секунди)",
       "metrics": "Метрики",
       "metricsPassword": "Пароль",
-      "metricsPasswordDesc": "Пароль носія для кінцевої точки метрик (пароль або хеш argon2)",
+      "metricsPasswordDesc": "Пароль Bearer для точки доступу метрик (пароль або хеш argon2)",
       "json": "JSON",
       "jsonDesc": "Маршрут для метрик у форматі JSON",
       "prometheus": "Prometheus",
-      "prometheusDesc": "Маршрут для метрик Prometheus"
+      "prometheusDesc": "Маршрут для метрики Prometheus"
     },
     "config": {
       "connection": "З'єднання",
