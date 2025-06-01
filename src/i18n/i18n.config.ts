@@ -1,11 +1,11 @@
 import en from './locales/en.json';
-import ua from './locales/ua.json';
+import uk from './locales/uk.json';
 
 export default defineI18nConfig(() => ({
   legacy: false,
   fallbackLocale: 'en',
   messages: {
     en,
-    ua,
+    uk,
   },
 }));
