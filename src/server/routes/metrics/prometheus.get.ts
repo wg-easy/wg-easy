@@ -14,7 +14,7 @@ async function getPrometheusResponse() {
   const wireguardLatestHandshakeSeconds = [];
   for (const client of clients) {
     wireguardPeerCount++;
-    if (client.enabled === true) {
+    if (client.enabled) {
       wireguardEnabledPeersCount++;
     }
 
@@ -55,15 +55,15 @@ async function getPrometheusResponse() {
     '',
     '# HELP wireguard_sent_bytes Bytes sent to the peer',
     '# TYPE wireguard_sent_bytes counter',
-    `${wireguardSentBytes.join('\n')}`,
+    wireguardSentBytes.join('\n'),
     '',
     '# HELP wireguard_received_bytes Bytes received from the peer',
     '# TYPE wireguard_received_bytes counter',
-    `${wireguardReceivedBytes.join('\n')}`,
+    wireguardReceivedBytes.join('\n'),
     '',
     '# HELP wireguard_latest_handshake_seconds UNIX timestamp seconds of the last handshake',
     '# TYPE wireguard_latest_handshake_seconds gauge',
-    `${wireguardLatestHandshakeSeconds.join('\n')}`,
+    wireguardLatestHandshakeSeconds.join('\n'),
   ];
 
   return returnText.join('\n');

@@ -158,10 +158,12 @@ class WireGuard {
     WG_DEBUG(`Starting Wireguard Interface ${wgInterface.name}...`);
     await this.#saveWireguardConfig(wgInterface);
     await wg.down(wgInterface.name).catch(() => {});
-    await wg.up(wgInterface.name).catch((err) => {
+    await wg.up(wgInterface.name).catch((err: unknown) => {
       if (
         err &&
-        err.message &&
+        typeof err === 'object' &&
+        'message' in err &&
+        typeof err.message === 'string' &&
         err.message.includes(`Cannot find device "${wgInterface.name}"`)
       ) {
         throw new Error(
@@ -181,13 +183,15 @@ class WireGuard {
   }
 
   // TODO: handle as worker_thread
+  // eslint-disable-next-line @typescript-eslint/require-await
   async startCronJob() {
     setIntervalImmediately(() => {
-      this.cronJob().catch((err) => {
+      this.cronJob().catch((err: unknown) => {
         WG_DEBUG('Running Cron Job failed.');
         console.error(err);
       });
     }, 60 * 1000);
+    return;
   }
 
   // Shutdown wireguard
@@ -206,7 +210,7 @@ class WireGuard {
     let needsSave = false;
     // Expires Feature
     for (const client of clients) {
-      if (client.enabled !== true) continue;
+      if (!client.enabled) continue;
       if (
         client.expiresAt !== null &&
         new Date() > new Date(client.expiresAt)
@@ -234,6 +238,7 @@ class WireGuard {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-deprecated
 if (OLD_ENV.PASSWORD || OLD_ENV.PASSWORD_HASH) {
   throw new Error(
     `
