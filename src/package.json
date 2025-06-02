@@ -22,8 +22,8 @@
   "dependencies": {
     "@eschricht/nuxt-color-mode": "^1.1.5",
     "@heroicons/vue": "^2.2.0",
-    "@libsql/client": "^0.15.7",
-    "@nuxtjs/i18n": "^9.5.4",
+    "@libsql/client": "^0.15.8",
+    "@nuxtjs/i18n": "^9.5.5",
     "@nuxtjs/tailwindcss": "^6.14.0",
     "@phc/format": "^1.0.0",
     "@pinia/nuxt": "^0.11.0",
@@ -35,7 +35,7 @@
     "consola": "^3.4.2",
     "crc-32": "^1.2.2",
     "debug": "^4.4.1",
-    "drizzle-orm": "^0.43.1",
+    "drizzle-orm": "^0.44.1",
     "ip-bigint": "^8.2.1",
     "is-cidr": "^5.1.1",
     "is-ip": "^5.0.1",
@@ -50,7 +50,7 @@
     "timeago.js": "^4.0.2",
     "vue": "latest",
     "vue3-apexcharts": "^1.8.0",
-    "zod": "^3.25.30"
+    "zod": "^3.25.47"
   },
   "devDependencies": {
     "@nuxt/eslint": "^1.4.1",
@@ -59,18 +59,13 @@
     "@types/semver": "^7.7.0",
     "drizzle-kit": "^0.31.1",
     "esbuild": "^0.25.5",
-    "eslint": "^9.27.0",
+    "eslint": "^9.28.0",
     "eslint-config-prettier": "^10.1.5",
     "prettier": "^3.5.3",
-    "prettier-plugin-tailwindcss": "^0.6.11",
+    "prettier-plugin-tailwindcss": "^0.6.12",
     "tsx": "^4.19.4",
     "typescript": "^5.8.3",
     "vue-tsc": "^2.2.10"
   },
-  "packageManager": "pnpm@10.11.0",
-  "pnpm": {
-    "overrides": {
-      "oxc-parser": "^0.70.0"
-    }
-  }
+  "packageManager": "pnpm@10.11.0"
 }
