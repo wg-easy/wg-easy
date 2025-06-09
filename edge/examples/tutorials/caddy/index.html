@@ -77,6 +77,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#create-a-docker-composition-for-caddy" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -1085,6 +1090,19 @@
       
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Caddy
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -1096,6 +1114,41 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#create-a-docker-composition-for-caddy" class="md-nav__link">
+    <span class="md-ellipsis">
+      Create a docker composition for caddy
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adapt-the-docker-composition-of-wg-easy" class="md-nav__link">
+    <span class="md-ellipsis">
+      Adapt the docker composition of wg-easy
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -1415,6 +1468,32 @@
   
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#create-a-docker-composition-for-caddy" class="md-nav__link">
+    <span class="md-ellipsis">
+      Create a docker composition for caddy
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adapt-the-docker-composition-of-wg-easy" class="md-nav__link">
+    <span class="md-ellipsis">
+      Adapt the docker composition of wg-easy
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -1447,9 +1526,86 @@
 
   <h1>Caddy</h1>
 
-<p>It seems like the Docs on how to setup Caddy are not available yet.</p>
-<p>Feel free to create a PR and add them here.</p>
-<!-- TODO -->
+<div class="admonition note">
+<p class="admonition-title">Opinionated</p>
+<p>This guide is opinionated. If you use other conventions or folder layouts, feel free to change the commands and paths.</p>
+</div>
+<p>We're using <a href="https://caddyserver.com/">Caddy</a> here as reserve proxy to serve <code>wg-easy</code> on <a href="https://wg-easy.example.com">https://wg-easy.example.com</a> via TLS.</p>
+<h2 id="create-a-docker-composition-for-caddy"><a class="toclink" href="#create-a-docker-composition-for-caddy">Create a docker composition for <code>caddy</code></a></h2>
+<div class="highlight"><pre><span></span><code>.
+├── compose.yml
+└── Caddyfile
+
+1 directory, 2 files
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="c1"># compose.yml</span>
+
+<span class="nt">services</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">caddy</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">container_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">caddy</span>
+<span class="w">        </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">caddy:2.10.0-alpine</span>
+<span class="w">        </span><span class="c1"># publish everything you deem necessary</span>
+<span class="w">        </span><span class="nt">ports</span><span class="p">:</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;80:80/tcp&#39;</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;443:443/tcp&#39;</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;443:443/udp&#39;</span>
+<span class="w">        </span><span class="nt">networks</span><span class="p">:</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">caddy</span>
+<span class="w">        </span><span class="nt">restart</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">unless-stopped</span>
+<span class="w">        </span><span class="nt">volumes</span><span class="p">:</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;./Caddyfile:/etc/caddy/Caddyfile:ro&#39;</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">config:/config</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">data:/data</span>
+
+<span class="nt">networks</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">caddy</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">caddy</span>
+
+<span class="nt">volumes</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">config</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">data</span><span class="p">:</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code># Caddyfile
+
+{
+        # setup your email address
+        email mail@example.com
+}
+
+wg-easy.example.com {
+        # since the container will share the network with wg-easy
+        # we can use the proper container name
+        reverse_proxy wg-easy:80
+        tls internal
+}
+</code></pre></div>
+<p>...and start it with:</p>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>docker-compose<span class="w"> </span>up<span class="w"> </span>-d
+</code></pre></div>
+<h2 id="adapt-the-docker-composition-of-wg-easy"><a class="toclink" href="#adapt-the-docker-composition-of-wg-easy">Adapt the docker composition of <code>wg-easy</code></a></h2>
+<div class="highlight"><pre><span></span><code><span class="nt">services</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">wg-easy</span><span class="p">:</span>
+<span class="w">    </span><span class="c1"># sync container name and port according to Caddyfile</span>
+<span class="w">    </span><span class="nt">container_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wg-easy</span>
+<span class="w">    </span><span class="nt">environment</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PORT=80</span>
+<span class="w">    </span><span class="c1"># no need to publish the HTTP server anymore</span>
+<span class="w">    </span><span class="nt">ports</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;51820:51820/udp&quot;</span>
+<span class="w">    </span><span class="c1"># add to caddy network</span>
+<span class="w">    </span><span class="nt">networks</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">caddy</span><span class="p">:</span>
+<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">...</span>
+
+<span class="nt">networks</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">caddy</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">external</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">...</span>
+</code></pre></div>
+<p>...and restart it with:</p>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>docker-compose<span class="w"> </span>up<span class="w"> </span>-d
+</code></pre></div>
+<p>You can now access <code>wg-easy</code> at <a href="https://wg-easy.example.com">https://wg-easy.example.com</a> and start the setup.</p>
 
 
 
