@@ -23,6 +23,8 @@ jobs:
             os: ubuntu-24.04-arm
           - platform: linux/arm/v7
             os: ubuntu-24.04-arm
+          - platform: linux/arm/v6
+            os: ubuntu-24.04-arm
     steps:
       - uses: actions/checkout@v4
 

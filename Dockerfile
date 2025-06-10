@@ -1,14 +1,17 @@
-FROM docker.io/library/node:lts-alpine AS build
+FROM node:18-alpine3.21 AS build
 WORKDIR /app
 
-# update corepack
-RUN npm install --global corepack@latest
-# Install pnpm
-RUN corepack enable pnpm
+# install tools needed to build argon2 from source
+RUN apk add build-base python3
+
+# install pnpm
+RUN npm i -g pnpm
+RUN npm install -g node-gyp
 
 # Copy Web UI
 COPY src/package.json src/pnpm-lock.yaml ./
 RUN pnpm install
+RUN npx node-gyp rebuild -C ./node_modules/argon2
 
 # Build UI
 COPY src ./
@@ -16,7 +19,7 @@ RUN pnpm build
 
 # Copy build result to a new image.
 # This saves a lot of disk space.
-FROM docker.io/library/node:lts-alpine
+FROM node:18-alpine3.21
 WORKDIR /app
 
 HEALTHCHECK --interval=1m --timeout=5s --retries=3 CMD /usr/bin/timeout 5s /bin/sh -c "/usr/bin/wg show | /bin/grep -q interface || exit 1"
