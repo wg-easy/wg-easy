@@ -12,13 +12,13 @@
         <meta name="author" content="WireGuard Easy">
       
       
-        <link rel="canonical" href="https://wg-easy.github.io/wg-easy/development/examples/tutorials/dockerless/">
+        <link rel="canonical" href="https://wg-easy.github.io/wg-easy/development/examples/tutorials/reverse-proxyless/">
       
       
-        <link rel="prev" href="../docker-run/">
+        <link rel="prev" href="../podman-nft/">
       
       
-        <link rel="next" href="../podman-nft/">
+        <link rel="next" href="../traefik/">
       
       
       <link rel="icon" href="../../../assets/logo/favicon.png">
@@ -26,7 +26,7 @@
     
     
       
-        <title>Without Docker - wg-easy</title>
+        <title>No Reverse Proxy - wg-easy</title>
       
     
     
@@ -77,6 +77,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#setup" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -110,7 +115,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Without Docker
+              No Reverse Proxy
             
           </span>
         </div>
@@ -1121,17 +1126,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../dockerless/" class="md-nav__link">
         
   
   
@@ -1142,7 +1140,6 @@
   
 
       </a>
-      
     </li>
   
 
@@ -1175,10 +1172,30 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../reverse-proxyless/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    No Reverse Proxy
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1189,6 +1206,33 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      Setup
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1415,6 +1459,23 @@
   
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      Setup
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -1429,7 +1490,7 @@
 
 
   
-    <a href="https://github.com/wg-easy/wg-easy/edit/master/docs/content/examples/tutorials/dockerless.md" title="Edit this page" class="md-content__button md-icon">
+    <a href="https://github.com/wg-easy/wg-easy/edit/master/docs/content/examples/tutorials/reverse-proxyless.md" title="Edit this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -1438,17 +1499,42 @@
     
       
     
-    <a href="https://github.com/wg-easy/wg-easy/raw/master/docs/content/examples/tutorials/dockerless.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/wg-easy/wg-easy/raw/master/docs/content/examples/tutorials/reverse-proxyless.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
     </a>
   
 
 
-  <h1>Without Docker</h1>
+  <h1>No Reverse Proxy</h1>
 
-<p>This is currently not yet supported.</p>
-<!-- TODO -->
+<div class="admonition warning">
+<p class="admonition-title">Insecure</p>
+<p>This is insecure. You should use a reverse proxy to secure the connection.</p>
+<p>Only use this method if you know what you are doing.</p>
+</div>
+<p>If you only allow access to the web UI from your local network, you can skip the reverse proxy setup. This is not recommended, but it is possible.</p>
+<h2 id="setup"><a class="toclink" href="#setup">Setup</a></h2>
+<ul>
+<li>
+<p>Edit the <code>docker-compose.yml</code> file and uncomment <code>environment</code> and <code>INSECURE</code></p>
+</li>
+<li>
+<p>Set <code>INSECURE</code> to <code>true</code> to allow access to the web UI over a non-secure connection.</p>
+</li>
+<li>
+<p>The <code>docker-compose.yml</code> file should look something like this:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">environment</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">INSECURE=true</span>
+</code></pre></div>
+</li>
+<li>
+<p>Save the file and restart <code>wg-easy</code>.</p>
+</li>
+<li>
+<p>Make sure that the Web UI is not accessible from outside your local network.</p>
+</li>
+</ul>
 
 
 

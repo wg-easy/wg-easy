@@ -12,28 +12,28 @@
         <meta name="author" content="WireGuard Easy">
       
       
-        <link rel="canonical" href="https://wg-easy.github.io/wg-easy/development/examples/tutorials/dockerless/">
+        <link rel="canonical" href="https://wg-easy.github.io/wg-easy/development/guides/cli/">
       
       
-        <link rel="prev" href="../docker-run/">
+        <link rel="prev" href="../admin/">
       
       
-        <link rel="next" href="../podman-nft/">
+        <link rel="next" href="../clients/">
       
       
-      <link rel="icon" href="../../../assets/logo/favicon.png">
+      <link rel="icon" href="../../assets/logo/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
     
     
       
-        <title>Without Docker - wg-easy</title>
+        <title>CLI - wg-easy</title>
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.342714a4.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.342714a4.min.css">
       
         
-        <link rel="stylesheet" href="../../../assets/stylesheets/palette.06af60db.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
       
       
 
@@ -52,7 +52,7 @@
       
     
     
-    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -77,6 +77,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#docker-compose" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -91,9 +96,9 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../.." title="wg-easy" class="md-header__button md-logo" aria-label="wg-easy" data-md-component="logo">
+    <a href="../.." title="wg-easy" class="md-header__button md-logo" aria-label="wg-easy" data-md-component="logo">
       
-  <img src="../../../assets/logo/logo.png" alt="logo">
+  <img src="../../assets/logo/logo.png" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -110,7 +115,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Without Docker
+              CLI
             
           </span>
         </div>
@@ -221,7 +226,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../.." class="md-tabs__link">
+      <a href="../.." class="md-tabs__link">
         
   
   
@@ -240,7 +245,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../../faq/" class="md-tabs__link">
+      <a href="../../faq/" class="md-tabs__link">
         
   
   
@@ -259,7 +264,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../../getting-started/" class="md-tabs__link">
+      <a href="../../getting-started/" class="md-tabs__link">
         
   
   
@@ -280,7 +285,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../advanced/api/" class="md-tabs__link">
+        <a href="../../advanced/api/" class="md-tabs__link">
           
   
   
@@ -300,7 +305,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../contributing/general/" class="md-tabs__link">
+        <a href="../../contributing/general/" class="md-tabs__link">
           
   
   
@@ -316,8 +321,6 @@
   
   
   
-    
-  
   
     
     
@@ -325,13 +328,11 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../adguard/" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../examples/tutorials/adguard/" class="md-tabs__link">
           
   
   
@@ -350,11 +351,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../../guides/2fa/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../2fa/" class="md-tabs__link">
           
   
   
@@ -388,9 +391,9 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../.." title="wg-easy" class="md-nav__button md-logo" aria-label="wg-easy" data-md-component="logo">
+    <a href="../.." title="wg-easy" class="md-nav__button md-logo" aria-label="wg-easy" data-md-component="logo">
       
-  <img src="../../../assets/logo/logo.png" alt="logo">
+  <img src="../../assets/logo/logo.png" alt="logo">
 
     </a>
     wg-easy
@@ -417,7 +420,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../.." class="md-nav__link">
+      <a href="../.." class="md-nav__link">
         
   
   
@@ -439,7 +442,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../faq/" class="md-nav__link">
+      <a href="../../faq/" class="md-nav__link">
         
   
   
@@ -461,7 +464,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../getting-started/" class="md-nav__link">
+      <a href="../../getting-started/" class="md-nav__link">
         
   
   
@@ -526,7 +529,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../advanced/api/" class="md-nav__link">
+      <a href="../../advanced/api/" class="md-nav__link">
         
   
   
@@ -592,7 +595,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../advanced/config/optional-config/" class="md-nav__link">
+      <a href="../../advanced/config/optional-config/" class="md-nav__link">
         
   
   
@@ -615,7 +618,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../advanced/config/unattended-setup/" class="md-nav__link">
+      <a href="../../advanced/config/unattended-setup/" class="md-nav__link">
         
   
   
@@ -689,7 +692,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../advanced/metrics/prometheus/" class="md-nav__link">
+      <a href="../../advanced/metrics/prometheus/" class="md-nav__link">
         
   
   
@@ -763,7 +766,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../advanced/migrate/" class="md-nav__link">
+      <a href="../../advanced/migrate/" class="md-nav__link">
         
   
   
@@ -786,7 +789,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../advanced/migrate/from-14-to-15/" class="md-nav__link">
+      <a href="../../advanced/migrate/from-14-to-15/" class="md-nav__link">
         
   
   
@@ -867,7 +870,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../contributing/general/" class="md-nav__link">
+      <a href="../../contributing/general/" class="md-nav__link">
         
   
   
@@ -890,7 +893,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../contributing/issues-and-pull-requests/" class="md-nav__link">
+      <a href="../../contributing/issues-and-pull-requests/" class="md-nav__link">
         
   
   
@@ -901,6 +904,314 @@
   
 
       </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Examples
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            Examples
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_6_1" id="__nav_6_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Tutorials
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_6_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6_1">
+            <span class="md-nav__icon md-icon"></span>
+            Tutorials
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/tutorials/adguard/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    AdGuard Home
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/tutorials/auto-updates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Auto Updates
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/tutorials/basic-installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Basic Installation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/tutorials/caddy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Caddy
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/tutorials/docker-run/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Docker Run
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/tutorials/dockerless/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Without Docker
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/tutorials/podman-nft/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Podman + nftables
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/tutorials/reverse-proxyless/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    No Reverse Proxy
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/tutorials/traefik/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Traefik
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -936,15 +1247,15 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" checked>
         
           
-          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
             
   
   
   <span class="md-ellipsis">
-    Examples
+    Guides
     
   </span>
   
@@ -952,53 +1263,10 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_6">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_7">
             <span class="md-nav__icon md-icon"></span>
-            Examples
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6_1" checked>
-        
-          
-          <label class="md-nav__link" for="__nav_6_1" id="__nav_6_1_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    Tutorials
-    
-  </span>
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_6_1_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_6_1">
-            <span class="md-nav__icon md-icon"></span>
-            Tutorials
+            Guides
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -1009,12 +1277,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../adguard/" class="md-nav__link">
+      <a href="../2fa/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    AdGuard Home
+    2FA
     
   </span>
   
@@ -1032,81 +1300,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../auto-updates/" class="md-nav__link">
+      <a href="../admin/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    Auto Updates
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../basic-installation/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    Basic Installation
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../caddy/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    Caddy
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../docker-run/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    Docker Run
+    Admin Panel
     
   </span>
   
@@ -1131,204 +1330,20 @@
       
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    CLI
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
-        
-  
-  
-  <span class="md-ellipsis">
-    Without Docker
-    
-  </span>
-  
-
-      </a>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../podman-nft/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    Podman + nftables
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../reverse-proxyless/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    No Reverse Proxy
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../traefik/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    Traefik
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
-        
-          
-          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    Guides
-    
-  </span>
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_7">
-            <span class="md-nav__icon md-icon"></span>
-            Guides
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../guides/2fa/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    2FA
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../guides/admin/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    Admin Panel
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../guides/cli/" class="md-nav__link">
         
   
   
@@ -1339,6 +1354,75 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#docker-compose" class="md-nav__link">
+    <span class="md-ellipsis">
+      Docker Compose
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#docker-run" class="md-nav__link">
+    <span class="md-ellipsis">
+      Docker Run
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reset-password" class="md-nav__link">
+    <span class="md-ellipsis">
+      Reset Password
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Reset Password">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#by-prompt" class="md-nav__link">
+    <span class="md-ellipsis">
+      By Prompt
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#by-argument" class="md-nav__link">
+    <span class="md-ellipsis">
+      By Argument
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1351,7 +1435,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../guides/clients/" class="md-nav__link">
+      <a href="../clients/" class="md-nav__link">
         
   
   
@@ -1374,7 +1458,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../guides/setup/" class="md-nav__link">
+      <a href="../setup/" class="md-nav__link">
         
   
   
@@ -1415,6 +1499,65 @@
   
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#docker-compose" class="md-nav__link">
+    <span class="md-ellipsis">
+      Docker Compose
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#docker-run" class="md-nav__link">
+    <span class="md-ellipsis">
+      Docker Run
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reset-password" class="md-nav__link">
+    <span class="md-ellipsis">
+      Reset Password
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Reset Password">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#by-prompt" class="md-nav__link">
+    <span class="md-ellipsis">
+      By Prompt
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#by-argument" class="md-nav__link">
+    <span class="md-ellipsis">
+      By Argument
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -1429,7 +1572,7 @@
 
 
   
-    <a href="https://github.com/wg-easy/wg-easy/edit/master/docs/content/examples/tutorials/dockerless.md" title="Edit this page" class="md-content__button md-icon">
+    <a href="https://github.com/wg-easy/wg-easy/edit/master/docs/content/guides/cli.md" title="Edit this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -1438,17 +1581,38 @@
     
       
     
-    <a href="https://github.com/wg-easy/wg-easy/raw/master/docs/content/examples/tutorials/dockerless.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/wg-easy/wg-easy/raw/master/docs/content/guides/cli.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
     </a>
   
 
 
-  <h1>Without Docker</h1>
+  <h1>CLI</h1>
 
-<p>This is currently not yet supported.</p>
-<!-- TODO -->
+<p>If you want to use the CLI, you can run it with</p>
+<h3 id="docker-compose"><a class="toclink" href="#docker-compose">Docker Compose</a></h3>
+<div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>/etc/docker/containers/wg-easy
+docker<span class="w"> </span>compose<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span>wg-easy<span class="w"> </span>cli
+</code></pre></div>
+<h3 id="docker-run"><a class="toclink" href="#docker-run">Docker Run</a></h3>
+<div class="highlight"><pre><span></span><code>docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>-it<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-v<span class="w"> </span>~/.wg-easy:/etc/wireguard<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>ghcr.io/wg-easy/wg-easy:15<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>cli
+</code></pre></div>
+<h3 id="reset-password"><a class="toclink" href="#reset-password">Reset Password</a></h3>
+<p>If you want to reset the password for the admin user, you can run the following command:</p>
+<h4 id="by-prompt"><a class="toclink" href="#by-prompt">By Prompt</a></h4>
+<div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>/etc/docker/containers/wg-easy
+docker<span class="w"> </span>compose<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span>wg-easy<span class="w"> </span>cli<span class="w"> </span>db:admin:reset
+</code></pre></div>
+<p>You are asked to provide the new password</p>
+<h4 id="by-argument"><a class="toclink" href="#by-argument">By Argument</a></h4>
+<div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>/etc/docker/containers/wg-easy
+docker<span class="w"> </span>compose<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span>wg-easy<span class="w"> </span>cli<span class="w"> </span>db:admin:reset<span class="w"> </span>--password<span class="w"> </span>&lt;new_password&gt;
+</code></pre></div>
+<p>This will reset the password for the admin user to the new password you provided. If you include special characters in the password, make sure to escape them properly.</p>
 
 
 
@@ -1511,10 +1675,10 @@
     
     
       
-      <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.tabs", "navigation.top", "navigation.expand", "navigation.instant", "content.action.edit", "content.action.view", "content.code.annotate"], "search": "../../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.top", "navigation.expand", "navigation.instant", "content.action.edit", "content.action.view", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.13a4f30d.min.js"></script>
+      <script src="../../assets/javascripts/bundle.13a4f30d.min.js"></script>
       
     
   </body>
