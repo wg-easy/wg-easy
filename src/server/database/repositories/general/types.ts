@@ -4,13 +4,17 @@ import type { general } from './schema';
 
 export type GeneralType = InferSelectModel<typeof general>;
 
-const sessionTimeout = z.number({ message: t('zod.general.sessionTimeout') });
+const sessionTimeout = z.number({
+  message: $i18n('zod.general.sessionTimeout'),
+});
 
-const metricsEnabled = z.boolean({ message: t('zod.general.metricsEnabled') });
+const metricsEnabled = z.boolean({
+  message: $i18n('zod.general.metricsEnabled'),
+});
 
 const metricsPassword = z
-  .string({ message: t('zod.general.metricsPassword') })
-  .min(1, { message: t('zod.general.metricsPassword') })
+  .string({ message: $i18n('zod.general.metricsPassword') })
+  .min(1, { message: $i18n('zod.general.metricsPassword') })
   .nullable();
 
 export const GeneralUpdateSchema = z.object({

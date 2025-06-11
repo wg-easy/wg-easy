@@ -37,7 +37,7 @@ const { locales, locale, setLocale } = useI18n();
 const langProxy = ref(locale);
 
 watchEffect(() => {
-  setLocale(langProxy.value);
+  void setLocale(langProxy.value);
 });
 
 const langs = locales.value.sort((a, b) => a.code.localeCompare(b.code));
