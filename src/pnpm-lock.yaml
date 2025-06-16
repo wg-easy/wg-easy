@@ -99,8 +99,8 @@ importers:
         specifier: ^1.8.0
         version: 1.8.0(apexcharts@4.7.0)(vue@3.5.16(typescript@5.8.3))
       zod:
-        specifier: ^3.25.58
-        version: 3.25.58
+        specifier: ^3.25.64
+        version: 3.25.64
     devDependencies:
       '@nuxt/eslint':
         specifier: ^1.4.1
@@ -5480,8 +5480,8 @@ packages:
     resolution: {integrity: sha512-zK7YHHz4ZXpW89AHXUPbQVGKI7uvkd3hzusTdotCg1UxyaVtg0zFJSTfW/Dq5f7OBBVnq6cZIaC8Ti4hb6dtCA==}
     engines: {node: '>= 14'}
 
-  zod@3.25.58:
-    resolution: {integrity: sha512-DVLmMQzSZwNYzQoMaM3MQWnxr2eq+AtM9Hx3w1/Yl0pH8sLTSjN4jGP7w6f7uand6Hw44tsnSu1hz1AOA6qI2Q==}
+  zod@3.25.64:
+    resolution: {integrity: sha512-hbP9FpSZf7pkS7hRVUrOjhwKJNyampPgtXKc3AN6DsWtoHsg2Sb4SQaS4Tcay380zSwd2VPo9G9180emBACp5g==}
 
 snapshots:
 
@@ -6324,7 +6324,7 @@ snapshots:
       unixify: 1.0.0
       urlpattern-polyfill: 8.0.2
       yargs: 17.7.2
-      zod: 3.25.58
+      zod: 3.25.64
     transitivePeerDependencies:
       - encoding
       - rollup
@@ -11192,4 +11192,4 @@ snapshots:
       compress-commons: 6.0.2
       readable-stream: 4.7.0
 
-  zod@3.25.58: {}
+  zod@3.25.64: {}
