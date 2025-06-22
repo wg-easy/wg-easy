@@ -61,8 +61,12 @@ const _submit = useSubmit(
   { revert }
 );
 
-function submit() {
-  return _submit(data.value);
+async function submit() {
+  // Submit the form data
+  await _submit(data.value);
+  
+  // Refresh the site-title data globally to update the browser tab title
+  await refreshNuxtData('site-title');
 }
 
 async function revert() {
