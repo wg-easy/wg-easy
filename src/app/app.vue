@@ -19,6 +19,12 @@ toast.setToast(toastRef);
 // make sure to fetch release early
 useGlobalStore();
 
+// Fetch site title from general configuration with a key for refreshing
+const { data: generalConfig } = await useFetch('/api/admin/general', { key: 'site-title' });
+
+// Compute the title with fallback
+const siteTitle = computed(() => generalConfig.value?.siteTitle || 'WireGuard');
+
 useHead({
   bodyAttrs: {
     class: 'bg-gray-50 dark:bg-neutral-800',
@@ -52,6 +58,6 @@ useHead({
       content: 'black-translucent',
     },
   ],
-  title: 'WireGuard',
+  title: siteTitle,
 });
 </script>

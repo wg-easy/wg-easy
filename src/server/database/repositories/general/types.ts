@@ -13,11 +13,17 @@ const metricsPassword = z
   .min(1, { message: t('zod.general.metricsPassword') })
   .nullable();
 
+const siteTitle = z
+  .string({ message: 'Site Title' })
+  .nullable();
+
+
 export const GeneralUpdateSchema = z.object({
   sessionTimeout: sessionTimeout,
   metricsPrometheus: metricsEnabled,
   metricsJson: metricsEnabled,
   metricsPassword: metricsPassword,
+  siteTitle: siteTitle,
 });
 
 export type GeneralUpdateType = z.infer<typeof GeneralUpdateSchema>;

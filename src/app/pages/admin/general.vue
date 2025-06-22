@@ -2,6 +2,14 @@
   <main v-if="data">
     <FormElement @submit.prevent="submit">
       <FormGroup>
+        <FormNullTextField
+          id="site-title"
+          v-model="data.siteTitle"
+          label="Site Title"
+          description="Custom title for browser tabs. Leave empty to use the default 'WireGuard' title."
+        />
+      </FormGroup>
+      <FormGroup>
         <FormNumberField
           id="session"
           v-model="data.sessionTimeout"
