@@ -1,6 +1,6 @@
 <template>
   <div
-    v-for="client in clientsStore.clients"
+    v-for="client in clientsStore.filteredClients"
     :key="client.id"
     class="relative overflow-hidden border-b border-solid border-gray-100 last:border-b-0 dark:border-neutral-600"
   >

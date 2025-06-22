@@ -29,7 +29,9 @@ export type ClientPersist = {
 export const useClientsStore = defineStore('Clients', () => {
   const globalStore = useGlobalStore();
   const clients = ref<null | LocalClient[]>(null);
+  const filteredClients = ref<null | LocalClient[]>(null);
   const clientsPersist = ref<Record<string, ClientPersist>>({});
+  const searchQuery = ref('');
 
   const { data: _clients, refresh: _refresh } = useFetch('/api/client', {
     method: 'get',
@@ -129,6 +131,35 @@ export const useClientsStore = defineStore('Clients', () => {
     }
 
     clients.value = transformedClients ?? null;
+    // Update filtered clients whenever clients change
+    updateFilteredClients();
   }
-  return { clients, clientsPersist, refresh, _clients };
+  // Function to set search query and filter clients
+  function setSearchQuery(query: string) {
+    searchQuery.value = query;
+    updateFilteredClients();
+  }
+
+  // Function to filter clients based on search query
+  function updateFilteredClients() {
+    if (!clients.value || searchQuery.value === '') {
+      filteredClients.value = clients.value;
+      return;
+    }
+
+    const query = searchQuery.value.toLowerCase();
+    filteredClients.value = clients.value.filter(client => 
+      client.name.toLowerCase().includes(query)
+    );
+  }
+
+  return { 
+    clients, 
+    clientsPersist, 
+    refresh, 
+    _clients, 
+    filteredClients, 
+    searchQuery, 
+    setSearchQuery 
+  };
 });
