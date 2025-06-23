@@ -10,7 +10,7 @@
     "format:check:docs": "prettier --check docs"
   },
   "devDependencies": {
-    "prettier": "^3.5.3"
+    "prettier": "^3.6.0"
   },
   "packageManager": "pnpm@10.12.1"
 }

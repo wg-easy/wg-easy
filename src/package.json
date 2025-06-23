@@ -50,7 +50,7 @@
     "timeago.js": "^4.0.2",
     "vue": "latest",
     "vue3-apexcharts": "^1.8.0",
-    "zod": "^3.25.58"
+    "zod": "^3.25.67"
   },
   "devDependencies": {
     "@nuxt/eslint": "^1.4.1",
@@ -59,11 +59,11 @@
     "@types/semver": "^7.7.0",
     "drizzle-kit": "^0.31.1",
     "esbuild": "^0.25.5",
-    "eslint": "^9.28.0",
+    "eslint": "^9.29.0",
     "eslint-config-prettier": "^10.1.5",
-    "prettier": "^3.5.3",
-    "prettier-plugin-tailwindcss": "^0.6.12",
-    "tsx": "^4.20.0",
+    "prettier": "^3.6.0",
+    "prettier-plugin-tailwindcss": "^0.6.13",
+    "tsx": "^4.20.3",
     "typescript": "^5.8.3",
     "vue-tsc": "^2.2.10"
   },
