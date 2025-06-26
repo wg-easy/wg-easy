@@ -12,7 +12,7 @@ You have found the easiest way to install & manage WireGuard on any Linux host!
 <!-- TOOD: update screenshot -->
 
 <p align="center">
-  <img src="./assets/screenshot.png" width="802" />
+  <img src="./assets/screenshot.png" width="802" alt="wg-easy Screenshot" />
 </p>
 
 ## Features
