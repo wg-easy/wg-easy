@@ -52,7 +52,7 @@ export default defineNuxtConfig({
       {
         code: 'zh-HK',
         language: 'zh-HK',
-        name: '繁體中文（香港）'
+        name: '繁體中文（香港）',
       },
     ],
     defaultLocale: 'en',

@@ -2,7 +2,7 @@ import en from './locales/en.json';
 import uk from './locales/uk.json';
 import fr from './locales/fr.json';
 import de from './locales/de.json';
-import zhhk from './locales/zh-HK.json'
+import zhhk from './locales/zh-HK.json';
 
 export default defineI18nConfig(() => ({
   legacy: false,
@@ -12,6 +12,6 @@ export default defineI18nConfig(() => ({
     uk,
     fr,
     de,
-    "zh-HK": zhhk
+    'zh-HK': zhhk,
   },
 }));
