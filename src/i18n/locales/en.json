@@ -81,6 +81,7 @@
   "client": {
     "empty": "There are no clients yet.",
     "newShort": "New",
+    "search": "Search clients...",
     "sort": "Sort",
     "create": "Create Client",
     "created": "Client created",
