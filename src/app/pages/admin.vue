@@ -38,7 +38,7 @@
 
 <script setup lang="ts">
 const authStore = useAuthStore();
-authStore.update();
+void authStore.update();
 
 const { t } = useI18n();
 
