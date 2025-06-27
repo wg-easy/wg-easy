@@ -1,0 +1,237 @@
+{
+  "pages": {
+    "me": "帳戶",
+    "clients": "客戶端",
+    "admin": {
+      "panel": "管理員版面",
+      "general": "一般設定",
+      "config": "配置設定",
+      "interface": "介面設定",
+      "hooks": "掛鉤設定"
+    }
+  },
+  "user": {
+    "email": "電郵"
+  },
+  "me": {
+    "currentPassword": "目前密碼",
+    "enable2fa": "啟用雙重認證",
+    "enable2faDesc": "使用認證應用程式掃描二維碼，或手動輸入密匙。",
+    "2faKey": "TOTP密匙",
+    "2faCodeDesc": "請輸入認證應用程式中的驗證碼。",
+    "disable2fa": "停用雙重認證",
+    "disable2faDesc": "請輸入密碼以停用雙重認證。"
+  },
+  "general": {
+    "name": "名稱",
+    "username": "用戶名",
+    "password": "密碼",
+    "newPassword": "新密碼",
+    "updatePassword": "更改密碼",
+    "mtu": "MTU",
+    "allowedIps": "IP白名單",
+    "dns": "域名系統",
+    "persistentKeepalive": "保持連線",
+    "logout": "登出",
+    "continue": "繼續",
+    "host": "主機",
+    "port": "連接埠",
+    "yes": "是",
+    "no": "否",
+    "confirmPassword": "確認新密碼",
+    "loading": "載入中...",
+    "2fa": "雙重認證",
+    "2faCode": "TOTP驗證碼"
+  },
+  "setup": {
+    "welcome": "歡迎首次設定wg-easy",
+    "welcomeDesc": "這是最簡單的方法讓你在任何Linux主機上安裝及管理WireGuard",
+    "existingSetup": "你有現存設定嗎？",
+    "createAdminDesc": "請輸入管理員用戶名及一個高強度密碼。這些資料將用於登入管理員版面。",
+    "setupConfigDesc": "請輸入主機及連接埠資料。這將用於客戶端設定，以便在他們的裝置上設定WireGuard。",
+    "setupMigrationDesc": "如果你想將舊版wg-easy的資料轉移到新設定，請提供備份檔案。",
+    "upload": "上傳",
+    "migration": "還原備份：",
+    "createAccount": "建立帳戶",
+    "successful": "設定成功",
+    "hostDesc": "客戶端連接的公共主機名稱",
+    "portDesc": "客戶端和WireGuard使用的公共UDP連接埠"
+  },
+  "update": {
+    "updateAvailable": "有新版本更新！",
+    "update": "更新"
+  },
+  "theme": {
+    "dark": "深色模式",
+    "light": "淺色模式",
+    "system": "系統預設"
+  },
+  "layout": {
+    "toggleCharts": "顯示或隱藏圖表",
+    "donate": "贊助"
+  },
+  "login": {
+    "signIn": "登入",
+    "rememberMe": "保持登入",
+    "rememberMeDesc": "關閉瀏覽器後仍保持登入",
+    "insecure": "連線不安全，請使用HTTPS。",
+    "2faRequired": "需要雙重認證",
+    "2faWrong": "雙重認證失敗"
+  },
+  "client": {
+    "empty": "目前沒有客戶端。",
+    "newShort": "新增",
+    "sort": "排序",
+    "create": "建立客戶端",
+    "created": "客戶端已建立",
+    "new": "新增客戶端",
+    "name": "名稱",
+    "expireDate": "有效期",
+    "expireDateDesc": "客戶端將於此日期停用。留空則為永久有效",
+    "deleteClient": "刪除客戶端",
+    "deleteDialog1": "你確定要刪除",
+    "deleteDialog2": "此操作無法還原。",
+    "enabled": "已啟用",
+    "address": "IP地址",
+    "serverAllowedIps": "伺服器IP白名單",
+    "otlDesc": "生成短暫單次超連結",
+    "permanent": "永久",
+    "createdOn": "建立於",
+    "lastSeen": "上次活動於",
+    "totalDownload": "總下載量：",
+    "totalUpload": "總上傳量：",
+    "newClient": "新客戶端",
+    "disableClient": "停用客戶端",
+    "enableClient": "啟用客戶端",
+    "noPrivKey": "此客戶端沒有已知的密匙。無法建立配置。",
+    "showQR": "顯示二維碼",
+    "downloadConfig": "下載配置",
+    "allowedIpsDesc": "通過VPN的IP地址（取代全局配置）",
+    "serverAllowedIpsDesc": "伺服器路由到客戶端的IP地址",
+    "mtuDesc": "設定VPN隧道的最大傳輸單位（封包大小）",
+    "persistentKeepaliveDesc": "設定保持連線封包的秒數間隔。0代表停用",
+    "hooks": "掛鉤",
+    "hooksDescription": "掛鉤僅適用於wg-quick",
+    "hooksLeaveEmpty": "僅適用於wg-quick，否則請留空",
+    "dnsDesc": "客戶端使用的域名系統伺服器（取代全局配置）"
+  },
+  "dialog": {
+    "change": "更改",
+    "cancel": "取消",
+    "create": "創建"
+  },
+  "toast": {
+    "success": "成功",
+    "saved": "已保存",
+    "error": "錯誤"
+  },
+  "form": {
+    "actions": "操作",
+    "save": "保存",
+    "revert": "重置",
+    "sectionGeneral": "一般設定",
+    "sectionAdvanced": "進階",
+    "noItems": "未有設定",
+    "nullNoItems": "未有設定，使用全局配置",
+    "add": "新增"
+  },
+  "admin": {
+    "general": {
+      "sessionTimeout": "工作階段逾時",
+      "sessionTimeoutDesc": "「保持登入」的工作階段持續時間（秒）",
+      "metrics": "指標",
+      "metricsPassword": "密碼",
+      "metricsPasswordDesc": "指標端點的Bearer密碼（密碼或argon2雜湊）",
+      "json": "JSON",
+      "jsonDesc": "JSON格式指標的路由",
+      "prometheus": "Prometheus",
+      "prometheusDesc": "Prometheus指標的路由"
+    },
+    "config": {
+      "connection": "連線",
+      "hostDesc": "客戶端連接的公共主機名稱（使配置無效）",
+      "portDesc": "客戶端連接的公共UDP連接埠（使配置無效，你可能也想更改介面連接埠）",
+      "allowedIpsDesc": "客戶端使用的IP白名單（全局配置）",
+      "dnsDesc": "客戶端使用的域名系統伺服器（全局配置）",
+      "mtuDesc": "客戶端使用的MTU（僅適用於新客戶端）",
+      "persistentKeepaliveDesc": "向伺服器發送保持連線封包的秒數間隔。0代表停用（僅適用於新客戶端）",
+      "suggest": "建議",
+      "suggestDesc": "選擇一個IP地址或主機名稱"
+    },
+    "interface": {
+      "cidrSuccess": "成功更改CIDR",
+      "device": "裝置",
+      "deviceDesc": "WireGuard流量通過的乙太網路裝置",
+      "mtuDesc": "WireGuard使用的MTU",
+      "portDesc": "WireGuard監聽的UDP連接埠 (你可能也想更改設定連接埠)",
+      "changeCidr": "更改CIDR",
+      "restart": "重啟介面",
+      "restartDesc": "重啟WireGuard介面",
+      "restartWarn": "你確定要重新啟動介面嗎？這將中斷所有客戶端連線。",
+      "restartSuccess": "介面已重啟"
+    },
+    "introText": "歡迎來到管理員版面。\n\n你可以在側邊欄中管理一般、配置、介面和掛鉤設定。"
+  },
+  "zod": {
+    "generic": {
+      "required": "{0}為必填項",
+      "validNumber": "{0}必須是有效的數字",
+      "validString": "{0}必須是有效的字串",
+      "validBoolean": "{0}必須是有效的布林值",
+      "validArray": "{0}必須是有效的陣列",
+      "stringMin": "{0}至少需要{1}個字元",
+      "numberMin": "{0}至少為{1}"
+    },
+    "client": {
+      "id": "客戶端ID",
+      "name": "名稱",
+      "expiresAt": "到期於",
+      "address4": "IPv4地址",
+      "address6": "IPv6地址",
+      "serverAllowedIps": "伺服器IP白名單"
+    },
+    "user": {
+      "username": "用戶名",
+      "password": "密碼",
+      "remember": "保持",
+      "name": "名稱",
+      "email": "電郵",
+      "emailInvalid": "必須是有效的電郵地址",
+      "passwordMatch": "密碼必須一致",
+      "totpEnable": "TOTP啟用",
+      "totpEnableTrue": "TOTP啟用必須為正確",
+      "totpCode": "TOTP驗證碼"
+    },
+    "userConfig": {
+      "host": "主機"
+    },
+    "general": {
+      "sessionTimeout": "工作階段逾時",
+      "metricsEnabled": "指標",
+      "metricsPassword": "指標密碼"
+    },
+    "interface": {
+      "cidr": "CIDR",
+      "device": "裝置",
+      "cidrValid": "CIDR必須有效"
+    },
+    "otl": "單次超連結",
+    "stringMalformed": "字串格式不正確",
+    "body": "主體必須是有效的物件",
+    "hook": "掛鉤",
+    "enabled": "已啟動",
+    "mtu": "MTU",
+    "port": "連接埠",
+    "persistentKeepalive": "保持連線",
+    "address": "IP地址",
+    "dns": "域名系統",
+    "allowedIps": "IP白名單",
+    "file": "文件"
+  },
+  "hooks": {
+    "preUp": "PreUp",
+    "postUp": "PostUp",
+    "preDown": "PreDown",
+    "postDown": "PostDown"
+  }
+}
