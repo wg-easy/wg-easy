@@ -1,0 +1,236 @@
+{
+  "pages": {
+    "me": "账户管理",
+    "clients": "客户端管理",
+    "admin": {
+      "panel": "管理面板",
+      "general": "通用设置",
+      "config": "网络配置",
+      "interface": "接口配置",
+      "hooks": "钩子脚本"
+    }
+  },
+  "user": {
+    "email": "电子邮箱"
+  },
+  "me": {
+    "currentPassword": "当前密码",
+    "enable2fa": "启用双重认证",
+    "enable2faDesc": "使用认证器应用扫描二维码或手动输入密钥进行配置",
+    "2faKey": "TOTP密钥",
+    "2faCodeDesc": "请输入您的认证器应用生成的验证码",
+    "disable2fa": "禁用双重认证",
+    "disable2faDesc": "您需要输入当前密码来禁用双重认证功能"
+  },
+  "general": {
+    "name": "名称",
+    "username": "用户名",
+    "password": "密码",
+    "newPassword": "新密码",
+    "updatePassword": "更新密码",
+    "mtu": "MTU",
+    "allowedIps": "允许的IP",
+    "dns": "DNS",
+    "persistentKeepalive": "保活间隔",
+    "logout": "注销登录",
+    "continue": "继续",
+    "host": "主机",
+    "port": "端口",
+    "yes": "是",
+    "no": "否",
+    "confirmPassword": "确认密码",
+    "loading": "加载中...",
+    "2fa": "双重认证",
+    "2faCode": "验证码"
+  },
+  "setup": {
+    "welcome": "欢迎使用wg-easy安装向导",
+    "welcomeDesc": "您正在使用最简单的WireGuard Linux主机安装和管理方案",
+    "existingSetup": "是否已有现有配置？",
+    "createAdminDesc": "请首先输入管理员用户名和强密码。这些信息将用于登录管理面板。",
+    "setupConfigDesc": "请输入服务器主机和端口信息。这些设置将用于客户端设备连接WireGuard时的配置。",
+    "setupMigrationDesc": "如果您希望从旧版wg-easy迁移数据到新安装，请提供备份文件。",
+    "upload": "上传文件",
+    "migration": "从备份恢复配置：",
+    "createAccount": "创建账户",
+    "successful": "安装配置成功",
+    "hostDesc": "客户端将连接到的公共主机名或IP地址",
+    "portDesc": "客户端将连接到的公共UDP端口，也是WireGuard服务监听的端口"
+  },
+  "update": {
+    "updateAvailable": "检测到可用更新！",
+    "update": "立即更新"
+  },
+  "theme": {
+    "dark": "深色模式",
+    "light": "浅色模式",
+    "system": "系统默认"
+  },
+  "layout": {
+    "toggleCharts": "显示/隐藏 流量图表",
+    "donate": "捐赠支持"
+  },
+  "login": {
+    "signIn": "登录系统",
+    "rememberMe": "记住我",
+    "rememberMeDesc": "关闭浏览器后保持登录状态",
+    "insecure": "无法通过不安全连接登录。请使用HTTPS。",
+    "2faRequired": "需要进行双重认证",
+    "2faWrong": "双重认证验证码错误"
+  },
+  "client": {
+    "empty": "当前没有客户端配置",
+    "newShort": "新建",
+    "sort": "排序",
+    "create": "创建客户端",
+    "created": "客户端创建成功",
+    "new": "新建客户端",
+    "name": "客户端名称",
+    "expireDate": "过期日期",
+    "expireDateDesc": "客户端将被自动禁用的日期。留空表示永久有效",
+    "deleteClient": "删除客户端",
+    "deleteDialog1": "您确定要删除此客户端吗？",
+    "deleteDialog2": "此操作无法撤销。",
+    "enabled": "已启用",
+    "address": "IP地址",
+    "serverAllowedIps": "服务端允许的IP",
+    "otlDesc": "生成一次性使用的短链接配置",
+    "permanent": "永久有效",
+    "createdOn": "创建于 ",
+    "lastSeen": "最后在线时间 ",
+    "totalDownload": "总下载流量： ",
+    "totalUpload": "总上传流量： ",
+    "newClient": "新建客户端",
+    "disableClient": "禁用客户端",
+    "enableClient": "启用客户端",
+    "noPrivKey": "此客户端没有已知的私钥，无法创建配置文件",
+    "showQR": "显示二维码",
+    "downloadConfig": "下载配置文件",
+    "allowedIpsDesc": "指定将通过VPN路由的IP地址（覆盖全局配置）",
+    "serverAllowedIpsDesc": "指定服务端将路由到客户端的IP地址范围",
+    "mtuDesc": "设置VPN隧道的MTU（最大传输单元）",
+    "persistentKeepaliveDesc": "设置保活数据包的发送间隔（秒）。0表示禁用",
+    "hooks": "钩子脚本",
+    "hooksDescription": "钩子脚本仅在使用wg-quick时有效",
+    "hooksLeaveEmpty": "如果不使用wg-quick，请留空此字段"
+  },
+  "dialog": {
+    "change": "确认修改",
+    "cancel": "取消",
+    "create": "创建"
+  },
+  "toast": {
+    "success": "操作成功",
+    "saved": "保存成功",
+    "error": "发生错误"
+  },
+  "form": {
+    "actions": "操作",
+    "save": "保存更改",
+    "revert": "恢复默认",
+    "sectionGeneral": "基本配置",
+    "sectionAdvanced": "高级选项",
+    "noItems": "未配置",
+    "nullNoItems": "未配置。将使用全局配置",
+    "add": "添加"
+  },
+  "admin": {
+    "general": {
+      "sessionTimeout": "会话超时时间",
+      "sessionTimeoutDesc": "'记住我'功能的会话持续时间（秒）",
+      "metrics": "监控指标",
+      "metricsPassword": "密码",
+      "metricsPasswordDesc": "用于监控端点的Bearer密码（支持密码或Argon2哈希）",
+      "json": "JSON格式",
+      "jsonDesc": "获取JSON格式的监控数据路由",
+      "prometheus": "Prometheus格式",
+      "prometheusDesc": "获取Prometheus格式监控数据的路由"
+    },
+    "config": {
+      "connection": "连接设置",
+      "hostDesc": "客户端将连接到的公共主机名（修改会使现有配置失效）",
+      "portDesc": "客户端将连接到的公共UDP端口（修改会使现有配置失效，通常需要同时修改接口端口）",
+      "allowedIpsDesc": "客户端使用的全局允许的IP范围",
+      "dnsDesc": "客户端使用的全局DNS设置",
+      "mtuDesc": "新客户端将使用的MTU（仅影响新客户端）",
+      "persistentKeepaliveDesc": "向服务器发送保活数据包的间隔秒数。0表示禁用（仅影响新客户端）",
+      "suggest": "自动检测",
+      "suggestDesc": "为'主机'字段选择IP地址或主机名"
+    },
+    "interface": {
+      "cidrSuccess": "CIDR修改成功",
+      "device": "网络设备",
+      "deviceDesc": "用于转发WireGuard流量的以太网设备",
+      "mtuDesc": "WireGuard接口使用的MTU",
+      "portDesc": "WireGuard监听的UDP端口（通常需要同时修改配置端口）",
+      "changeCidr": "修改CIDR",
+      "restart": "重启接口",
+      "restartDesc": "重新启动WireGuard接口",
+      "restartWarn": "确定要重启接口吗？这将断开所有客户端的连接。",
+      "restartSuccess": "接口重启成功"
+    },
+    "introText": "欢迎使用管理控制台。\n\n您可以在这里管理通用设置、网络配置、接口设置和钩子脚本。\n\n请从侧边栏选择一个功能模块开始。"
+  },
+  "zod": {
+    "generic": {
+      "required": "{0}是必填项",
+      "validNumber": "{0}必须是有效数字",
+      "validString": "{0}必须是有效文本",
+      "validBoolean": "{0}必须是是/否选项",
+      "validArray": "{0}必须是有效数组",
+      "stringMin": "{0}至少需要{1}个字符",
+      "numberMin": "{0}不能小于{1}"
+    },
+    "client": {
+      "id": "客户端ID",
+      "name": "客户端名称",
+      "expiresAt": "过期时间",
+      "address4": "IPv4地址",
+      "address6": "IPv6地址",
+      "serverAllowedIps": "服务端允许的IP"
+    },
+    "user": {
+      "username": "用户名",
+      "password": "密码",
+      "remember": "记住登录",
+      "name": "姓名",
+      "email": "电子邮箱",
+      "emailInvalid": "请输入有效的电子邮箱地址",
+      "passwordMatch": "两次输入的密码必须一致",
+      "totpEnable": "启用TOTP",
+      "totpEnableTrue": "必须启用双重认证",
+      "totpCode": "验证码"
+    },
+    "userConfig": {
+      "host": "服务器地址"
+    },
+    "general": {
+      "sessionTimeout": "会话超时",
+      "metricsEnabled": "启用监控",
+      "metricsPassword": "监控密码"
+    },
+    "interface": {
+      "cidr": "CIDR",
+      "device": "网络设备",
+      "cidrValid": "CIDR必须有效"
+    },
+    "otl": "一次性链接",
+    "stringMalformed": "文本格式错误",
+    "body": "请求体必须是有效对象",
+    "hook": "钩子脚本",
+    "enabled": "启用状态",
+    "mtu": "MTU",
+    "port": "端口",
+    "persistentKeepalive": "保活间隔",
+    "address": "IP地址",
+    "dns": "DNS",
+    "allowedIps": "允许的IP",
+    "file": "文件"
+  },
+  "hooks": {
+    "preUp": "启动前脚本",
+    "postUp": "启动后脚本",
+    "preDown": "停止前脚本",
+    "postDown": "停止后脚本"
+  }
+}
