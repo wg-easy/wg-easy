@@ -34,10 +34,10 @@ If you are using `docker run`
 docker stop wg-easy
 ```
 
-If you are using `docker-compose`
+If you are using `docker compose`
 
 ```shell
-docker-compose down
+docker compose down
 ```
 
 ### Start new container
