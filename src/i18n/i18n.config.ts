@@ -14,6 +14,6 @@ export default defineI18nConfig(() => ({
     fr,
     de,
     'zh-HK': zhhk,
-    'zh-CN': zhcn
+    'zh-CN': zhcn,
   },
 }));
