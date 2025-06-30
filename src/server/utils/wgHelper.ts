@@ -10,7 +10,7 @@ export const wg = {
     const allowedIps = [
       `${client.ipv4Address}/32`,
       `${client.ipv6Address}/128`,
-      ...(client.serverAllowedIps ?? []),
+      ...client.serverAllowedIps,
     ];
 
     const extraLines = [];

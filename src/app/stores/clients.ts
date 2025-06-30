@@ -46,9 +46,9 @@ export const useClientsStore = defineStore('Clients', () => {
 
       if (!clientsPersist.value[client.id]) {
         clientsPersist.value[client.id] = {
-          transferRxHistory: Array(50).fill(0),
+          transferRxHistory: (Array(50) as number[]).fill(0),
           transferRxPrevious: client.transferRx ?? 0,
-          transferTxHistory: Array(50).fill(0),
+          transferTxHistory: (Array(50) as number[]).fill(0),
           transferTxPrevious: client.transferTx ?? 0,
           transferRxCurrent: 0,
           transferTxCurrent: 0,

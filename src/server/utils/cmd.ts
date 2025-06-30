@@ -9,7 +9,7 @@ export function exec(
 ) {
   if (typeof log === 'string') {
     CMD_DEBUG(`$ ${log}`);
-  } else if (log === true) {
+  } else if (log) {
     CMD_DEBUG(`$ ${cmd}`);
   }
 
@@ -24,8 +24,11 @@ export function exec(
         shell: 'bash',
       },
       (err, stdout) => {
-        if (err) return reject(err);
-        return resolve(String(stdout).trim());
+        if (err) {
+          reject(err);
+          return;
+        }
+        resolve(String(stdout).trim());
       }
     );
   });

@@ -52,12 +52,13 @@ export function useSubmit<
         });
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
       await opts.revert(true, res as any);
     } catch (e) {
       if (e instanceof FetchError) {
         toast.showToast({
           type: 'error',
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
           message: e.data.message,
         });
       } else if (e instanceof Error) {

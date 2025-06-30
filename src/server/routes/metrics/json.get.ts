@@ -9,7 +9,7 @@ async function getMetricsJSON() {
   let wireguardConnectedPeersCount = 0;
   for (const client of clients) {
     wireguardPeerCount++;
-    if (client.enabled === true) {
+    if (client.enabled) {
       wireguardEnabledPeersCount++;
     }
     if (isPeerConnected(client)) {
