@@ -1790,7 +1790,7 @@ sudo<span class="w"> </span>chmod<span class="w"> </span><span class="m">600</sp
 <div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>docker<span class="w"> </span>network<span class="w"> </span>create<span class="w"> </span>traefik
 </code></pre></div>
 <h2 id="start-traefik"><a class="toclink" href="#start-traefik">Start traefik</a></h2>
-<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>docker-compose<span class="w"> </span>up<span class="w"> </span>-d
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>-d
 </code></pre></div>
 <p>You can no access the Traefik dashboard at <code>https://traefik.$example.com$</code> with the credentials you set in <code>traefik_dynamic.yml</code>.</p>
 <h2 id="add-labels-to-wg-easy"><a class="toclink" href="#add-labels-to-wg-easy">Add Labels to <code>wg-easy</code></a></h2>
@@ -1818,7 +1818,7 @@ sudo<span class="w"> </span>chmod<span class="w"> </span><span class="m">600</sp
 </code></pre></div>
 <h2 id="restart-wg-easy"><a class="toclink" href="#restart-wg-easy">Restart <code>wg-easy</code></a></h2>
 <div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>/etc/docker/containers/wg-easy
-sudo<span class="w"> </span>docker-compose<span class="w"> </span>up<span class="w"> </span>-d
+sudo<span class="w"> </span>docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>-d
 </code></pre></div>
 <p>You can now access <code>wg-easy</code> at <code>https://wg-easy.$example.com$</code> and start the setup.</p>
 
