@@ -61,7 +61,7 @@
     "esbuild": "^0.25.5",
     "eslint": "^9.29.0",
     "eslint-config-prettier": "^10.1.5",
-    "prettier": "^3.6.0",
+    "prettier": "^3.6.2",
     "prettier-plugin-tailwindcss": "^0.6.13",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3",
