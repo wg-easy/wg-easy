@@ -23,7 +23,7 @@
     "@eschricht/nuxt-color-mode": "^1.1.5",
     "@heroicons/vue": "^2.2.0",
     "@libsql/client": "^0.15.9",
-    "@nuxtjs/i18n": "^9.5.5",
+    "@nuxtjs/i18n": "^9.5.6",
     "@nuxtjs/tailwindcss": "^6.14.0",
     "@phc/format": "^1.0.0",
     "@pinia/nuxt": "^0.11.1",
@@ -57,15 +57,15 @@
     "@types/debug": "^4.1.12",
     "@types/phc__format": "^1.0.1",
     "@types/semver": "^7.7.0",
-    "drizzle-kit": "^0.31.1",
+    "drizzle-kit": "^0.31.4",
     "esbuild": "^0.25.5",
-    "eslint": "^9.29.0",
+    "eslint": "^9.30.0",
     "eslint-config-prettier": "^10.1.5",
-    "prettier": "^3.6.0",
+    "prettier": "^3.6.2",
     "prettier-plugin-tailwindcss": "^0.6.13",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3",
     "vue-tsc": "^2.2.10"
   },
-  "packageManager": "pnpm@10.12.1"
+  "packageManager": "pnpm@10.12.4"
 }
