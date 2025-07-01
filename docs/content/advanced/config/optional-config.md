@@ -13,7 +13,9 @@ You can set these environment variables to configure the container. They are not
 
 /// note | IPv6 Caveats
 
-Disabling IPv6 will only disable the creation of the default IPv6 firewall rules. The clients will still get an IPv6 address assigned.
+Disabling IPv6 will disable the creation of the default IPv6 firewall rules and won't add a IPv6 address to the interface and clients.
+
+You will however still see a IPv6 address in the Web UI, but it won't be used.
 
 This option can be removed in the future, as more devices support IPv6.
 
