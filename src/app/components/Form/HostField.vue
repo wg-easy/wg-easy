@@ -21,13 +21,19 @@
         <BasePrimaryButton as="span">
           <div class="flex items-center gap-3">
             <IconsSparkles class="w-4" />
-            <span>{{ $t('admin.config.suggest') }}</span>
+            <span class="w-16">{{ $t('admin.config.suggest') }}</span>
           </div>
         </BasePrimaryButton>
       </AdminSuggestDialog>
     </ClientOnly>
   </div>
 </template>
+
+<style scoped lang="css">
+.w-16{
+  width: 4rem;
+}
+</style>
 
 <script lang="ts" setup>
 defineProps<{
