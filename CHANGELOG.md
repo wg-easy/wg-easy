@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [15.1.0] - 2025-07-01
 
-## Added
+### Added
 
 - Added Ukrainian language (#1906)
 - Add French language (#1924)
@@ -18,12 +18,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add Chinese Simplified (#1990)
 - Add option to disable ipv6 (#1951)
 
-## Fixed
+### Fixed
 
 - Updated container launch commands (#1989)
 - update screenshot (962bfa2)
 
-## Changed
+### Changed
 
 - Updated dependencies
 
@@ -32,11 +32,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 We're super excited to announce v15!
 This update is an entire rewrite to make it even easier to set up your own VPN.
 
-## Breaking Changes
+### Breaking Changes
 
 As the whole setup has changed, we recommend to start from scratch. And import your existing configs.
 
-## Major Changes
+### Major Changes
 
 - Almost all Environment variables removed
 - New and Improved UI
