@@ -67,7 +67,7 @@ wg-easy.example.com {
 ...and start it with:
 
 ```shell
-sudo docker-compose up -d
+sudo docker compose up -d
 ```
 
 ## Adapt the docker composition of `wg-easy`
@@ -96,7 +96,7 @@ networks:
 ...and restart it with:
 
 ```shell
-sudo docker-compose up -d
+sudo docker compose up -d
 ```
 
 You can now access `wg-easy` at [https://wg-easy.example.com](https://wg-easy.example.com) and start the setup.

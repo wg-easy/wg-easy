@@ -17,6 +17,8 @@ export const WG_ENV = {
   INSECURE: process.env.INSECURE === 'true',
   /** Port the UI is listening on */
   PORT: assertEnv('PORT'),
+  /** If IPv6 should be disabled */
+  DISABLE_IPV6: process.env.DISABLE_IPV6 === 'true',
 };
 
 export const WG_INITIAL_ENV = {

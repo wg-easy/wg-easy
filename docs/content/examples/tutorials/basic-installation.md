@@ -33,7 +33,7 @@ Follow the Docs here: <https://docs.docker.com/engine/install/> and install Dock
 
     ```shell
      cd /etc/docker/containers/wg-easy
-     sudo docker-compose up -d
+     sudo docker compose up -d
     ```
 
 ## Setup Firewall
@@ -56,8 +56,8 @@ To update `wg-easy` to the latest version, run:
 
 ```shell
 cd /etc/docker/containers/wg-easy
-sudo docker-compose pull
-sudo docker-compose up -d
+sudo docker compose pull
+sudo docker compose up -d
 ```
 
 ## Auto Update
