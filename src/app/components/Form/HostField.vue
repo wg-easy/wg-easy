@@ -21,7 +21,7 @@
         <BasePrimaryButton as="span">
           <div class="flex items-center gap-3">
             <IconsSparkles class="w-4" />
-            <span class="w-16">{{ $t('admin.config.suggest') }}</span>
+            <span :class="widthClass">{{ $t('admin.config.suggest') }}</span>
           </div>
         </BasePrimaryButton>
       </AdminSuggestDialog>
@@ -29,13 +29,24 @@
   </div>
 </template>
 
-<style scoped lang="css">
-.w-16{
-  width: 4rem;
-}
-</style>
-
 <script lang="ts" setup>
+import { useI18n } from 'vue-i18n';
+
+const { locale } = useI18n();
+
+type LocaleCode = 'uk' | 'de' |'zh-CN';
+
+const widthMap: Partial<Record<LocaleCode, string>> & { default: string } = {
+  'uk': 'w-28',
+  'de': 'w-24',
+  'zh-CN':'w-8',
+  default: 'w-16',
+};
+
+const widthClass = (locale.value in widthMap)
+  ? widthMap[locale.value as LocaleCode]
+  : widthMap.default;
+
 defineProps<{
   id: string;
   label: string;
