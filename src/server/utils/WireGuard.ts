@@ -25,13 +25,21 @@ class WireGuard {
     const hooks = await Database.hooks.get();
 
     const result = [];
-    result.push(wg.generateServerInterface(wgInterface, hooks));
+    result.push(
+      wg.generateServerInterface(wgInterface, hooks, {
+        enableIpv6: !WG_ENV.DISABLE_IPV6,
+      })
+    );
 
     for (const client of clients) {
       if (!client.enabled) {
         continue;
       }
-      result.push(wg.generateServerPeer(client));
+      result.push(
+        wg.generateServerPeer(client, {
+          enableIpv6: !WG_ENV.DISABLE_IPV6,
+        })
+      );
     }
 
     result.push('');
@@ -125,7 +133,9 @@ class WireGuard {
       throw new Error('Client not found');
     }
 
-    return wg.generateClientConfig(wgInterface, userConfig, client);
+    return wg.generateClientConfig(wgInterface, userConfig, client, {
+      enableIpv6: !WG_ENV.DISABLE_IPV6,
+    });
   }
 
   async getClientQRCodeSVG({ clientId }: { clientId: ID }) {
