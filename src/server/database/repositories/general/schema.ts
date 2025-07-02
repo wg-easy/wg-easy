@@ -12,6 +12,8 @@ export const general = sqliteTable('general_table', {
   metricsPrometheus: int('metrics_prometheus', { mode: 'boolean' }).notNull(),
   metricsJson: int('metrics_json', { mode: 'boolean' }).notNull(),
   metricsPassword: text('metrics_password'),
+  
+  siteTitle: text('site_title'),
 
   createdAt: text('created_at')
     .notNull()
