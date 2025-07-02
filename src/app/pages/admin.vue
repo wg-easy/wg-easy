@@ -44,18 +44,19 @@ const { t } = useI18n();
 
 const route = useRoute();
 
-const menuItems = [
+const menuItems = computed(() => [
   { id: 'general', name: t('pages.admin.general') },
   { id: 'config', name: t('pages.admin.config') },
   { id: 'interface', name: t('pages.admin.interface') },
   { id: 'hooks', name: t('pages.admin.hooks') },
-];
+]);
 
 const defaultItem = { id: '', name: t('pages.admin.panel') };
 
 const activeMenuItem = computed(() => {
   return (
-    menuItems.find((item) => route.path === `/admin/${item.id}`) ?? defaultItem
+    menuItems.value.find((item) => route.path === `/admin/${item.id}`) ??
+    defaultItem
   );
 });
 </script>
