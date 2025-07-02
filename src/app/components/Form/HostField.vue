@@ -21,7 +21,9 @@
         <BasePrimaryButton as="span">
           <div class="flex items-center gap-3">
             <IconsSparkles class="w-4" />
-            <span>{{ $t('admin.config.suggest') }}</span>
+            <span class="whitespace-nowrap">
+              {{ $t('admin.config.suggest') }}
+            </span>
           </div>
         </BasePrimaryButton>
       </AdminSuggestDialog>
