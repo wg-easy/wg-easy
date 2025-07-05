@@ -166,6 +166,7 @@ services:
       - "traefik.http.routers.wg-easy.entrypoints=websecure"
       - "traefik.http.routers.wg-easy.service=wg-easy"
       - "traefik.http.services.wg-easy.loadbalancer.server.port=51821"
+      - "traefik.docker.network=traefik"
     ...
 
 networks:
