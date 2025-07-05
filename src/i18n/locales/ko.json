@@ -1,0 +1,237 @@
+{
+  "pages": {
+    "me": "계정",
+    "clients": "클라이언트",
+    "admin": {
+      "panel": "관리 패널",
+      "general": "일반",
+      "config": "구성",
+      "interface": "인터페이스",
+      "hooks": "후크"
+    }
+  },
+  "user": {
+    "email": "이메일"
+  },
+  "me": {
+    "currentPassword": "현재 비밀번호",
+    "enable2fa": "2단계 인증 활성화",
+    "enable2faDesc": "인증 앱으로 QR 코드를 스캔하거나 키를 수동으로 입력하세요.",
+    "2faKey": "TOTP 키",
+    "2faCodeDesc": "인증기 앱에서 코드를 입력하십시오.",
+    "disable2fa": "이중 인증 비활성화",
+    "disable2faDesc": "이중 인증을 비활성화하려면 비밀번호를 입력하세요."
+  },
+  "general": {
+    "name": "이름",
+    "username": "사용자 이름",
+    "password": "비밀번호",
+    "newPassword": "새 비밀번호",
+    "updatePassword": "비밀번호 업데이트",
+    "mtu": "MTU",
+    "allowedIps": "허용된 IP",
+    "dns": "DNS",
+    "persistentKeepalive": "지속적인 유지",
+    "logout": "로그아웃",
+    "continue": "계속",
+    "host": "호스트",
+    "port": "포트",
+    "yes": "예",
+    "no": "아니요",
+    "confirmPassword": "비밀번호 확인",
+    "loading": "로딩 중...",
+    "2fa": "이중 인증",
+    "2faCode": "TOTP 코드"
+  },
+  "setup": {
+    "welcome": "wg-easy의 첫 번째 설정에 오신 것을 환영합니다.",
+    "welcomeDesc": "모든 Linux 호스트에서 WireGuard를 설치하고 관리하는 가장 쉬운 방법을 찾았습니다",
+    "existingSetup": "기존 설정이 있습니까?",
+    "createAdminDesc": "먼저 관리자 사용자 이름과 강력한 보안 비밀번호를 입력하십시오. 이 정보는 관리 패널에 로그인하는 데 사용됩니다.",
+    "setupConfigDesc": "호스트 및 포트 정보를 입력하십시오. 이는 장치에서 WireGuard를 설정할 때 클라이언트 구성에 사용됩니다.",
+    "setupMigrationDesc": "이전 wg-easy 버전에서 새 설정으로 데이터를 마이그레이션하려면 백업 파일을 제공하십시오.",
+    "upload": "업로드",
+    "migration": "백업 복원:",
+    "createAccount": "계정 생성",
+    "successful": "설정 성공",
+    "hostDesc": "클라이언트가 연결할 공개 호스트 이름",
+    "portDesc": "클라이언트가 연결할 공용 UDP 포트 및 WireGuard가 수신 대기할 포트"
+  },
+  "update": {
+    "updateAvailable": "업데이트가 가능합니다!",
+    "update": "업데이트"
+  },
+  "theme": {
+    "dark": "어두운 테마",
+    "light": "라이트 테마",
+    "system": "시스템 테마"
+  },
+  "layout": {
+    "toggleCharts": "차트 표시/숨기기",
+    "donate": "기부"
+  },
+  "login": {
+    "signIn": "로그인",
+    "rememberMe": "로그인 상태 유지",
+    "rememberMeDesc": "브라우저를 닫은 후에도 로그인 유지",
+    "insecure": "안전하지 않은 연결로 로그인할 수 없습니다. HTTPS를 사용하세요.",
+    "2faRequired": "이중 인증이 필요합니다",
+    "2faWrong": "이중 인증이 잘못되었습니다"
+  },
+  "client": {
+    "empty": "아직 클라이언트가 없습니다.",
+    "newShort": "새로 만들기",
+    "sort": "정렬",
+    "create": "클라이언트 생성",
+    "created": "클라이언트 생성됨",
+    "new": "새 클라이언트",
+    "name": "이름",
+    "expireDate": "만료 날짜",
+    "expireDateDesc": "클라이언트가 비활성화될 날짜. 영구적으로 비워두기",
+    "deleteClient": "클라이언트 삭제",
+    "deleteDialog1": "정말로 삭제하시겠습니까",
+    "deleteDialog2": "이 작업은 실행 취소할 수 없습니다.",
+    "enabled": "활성화됨",
+    "address": "주소",
+    "serverAllowedIps": "서버 허용된 IP",
+    "otlDesc": "짧은 일회성 링크 생성",
+    "permanent": "영구적",
+    "createdOn": "생성일 ",
+    "lastSeen": "마지막으로 본 시간 ",
+    "totalDownload": "총 다운로드: ",
+    "totalUpload": "총 업로드: ",
+    "newClient": "새 클라이언트",
+    "disableClient": "클라이언트 비활성화",
+    "enableClient": "클라이언트 활성화",
+    "noPrivKey": "이 클라이언트는 알려진 개인 키가 없습니다. 구성을 생성할 수 없습니다.",
+    "showQR": "QR 코드 표시",
+    "downloadConfig": "구성 다운로드",
+    "allowedIpsDesc": "VPN을 통해 라우팅될 IP(전역 구성 재정의)",
+    "serverAllowedIpsDesc": "서버가 클라이언트로 라우팅할 IPs",
+    "mtuDesc": "VPN 터널의 최대 전송 단위(패킷 크기)를 설정합니다",
+    "persistentKeepaliveDesc": "유지 관리 패킷의 간격(초 단위)을 설정합니다. 0은 비활성화합니다.",
+    "hooks": "후크",
+    "hooksDescription": "후크는 wg-quick과만 작동합니다",
+    "hooksLeaveEmpty": "wg-quick 전용입니다. 그렇지 않으면 비워 두십시오.",
+    "dnsDesc": "클라이언트가 사용할 DNS 서버(전역 구성 무시)"
+  },
+  "dialog": {
+    "change": "변경",
+    "cancel": "취소",
+    "create": "생성"
+  },
+  "toast": {
+    "success": "성공",
+    "saved": "저장됨",
+    "error": "오류"
+  },
+  "form": {
+    "actions": "작업",
+    "save": "저장",
+    "revert": "되돌리기",
+    "sectionGeneral": "일반",
+    "sectionAdvanced": "고급",
+    "noItems": "항목 없음",
+    "nullNoItems": "항목이 없습니다. 전역 구성 사용 중",
+    "add": "추가"
+  },
+  "admin": {
+    "general": {
+      "sessionTimeout": "세션 타임아웃",
+      "sessionTimeoutDesc": "기억하기 위한 세션 지속 시간(초)",
+      "metrics": "메트릭",
+      "metricsPassword": "비밀번호",
+      "metricsPasswordDesc": "메트릭 엔드포인트에 대한 베어러 비밀번호(비밀번호 또는 argon2 해시)",
+      "json": "JSON",
+      "jsonDesc": "JSON 형식의 메트릭 경로",
+      "prometheus": "프로메테우스",
+      "prometheusDesc": "Prometheus 메트릭을 위한 경로"
+    },
+    "config": {
+      "connection": "연결",
+      "hostDesc": "클라이언트가 연결할 공용 호스트 이름(구성 무효화)",
+      "portDesc": "공용 UDP 포트 클라이언트가 연결할 (구성을 무효화하며, 인터페이스 포트도 변경하는 것이 좋습니다)",
+      "allowedIpsDesc": "클라이언트가 사용할 수 있는 허용된 IP(전역 설정)",
+      "dnsDesc": "클라이언트가 사용할 DNS 서버(전역 설정)",
+      "mtuDesc": "MTU 클라이언트가 사용할 (신규 클라이언트 전용)",
+      "persistentKeepaliveDesc": "서버에 유지 신호를 보내기 위한 간격(초). 0 = 비활성화(새 클라이언트 전용)",
+      "suggest": "제안",
+      "suggestDesc": "호스트 필드에 사용할 IP 주소 또는 호스트 이름을 선택하세요."
+    },
+    "interface": {
+      "cidrSuccess": "CIDR가 변경되었습니다.",
+      "device": "장치",
+      "deviceDesc": "WireGuard 트래픽이 전달되어야 하는 이더넷 장치",
+      "mtuDesc": "MTU WireGuard가 사용할 값",
+      "portDesc": "WireGuard가 수신할 UDP 포트 (구성 포트도 변경하는 것이 좋습니다)",
+      "changeCidr": "CIDR 변경",
+      "restart": "인터페이스 재시작",
+      "restartDesc": "WireGuard 인터페이스를 재시작합니다.",
+      "restartWarn": "인터페이스를 재시작하시겠습니까? 이 작업은 모든 클라이언트를 연결 해제합니다.",
+      "restartSuccess": "인터페이스가 재시작되었습니다"
+    },
+    "introText": "관리 패널에 오신 것을 환영합니다.\n\n여기에서 일반 설정, 구성, 인터페이스 설정 및 후크를 관리할 수 있습니다.\n\n사이드바에서 섹션 중 하나를 선택하여 시작하세요."
+  },
+  "zod": {
+    "generic": {
+      "required": "{0}은(는) 필수입니다.",
+      "validNumber": "{0}은(는) 유효한 숫자여야 합니다.",
+      "validString": "{0}은 유효한 문자열이어야 합니다",
+      "validBoolean": "{0}은(는) 유효한 불리언이어야 합니다.",
+      "validArray": "{0}는 유효한 배열이어야 합니다",
+      "stringMin": "{0}은(는) 최소 {1}자 이상이어야 합니다.",
+      "numberMin": "{0}은(는) 최소 {1} 이상이어야 합니다."
+    },
+    "client": {
+      "id": "클라이언트 ID",
+      "name": "이름",
+      "expiresAt": "만료 시간",
+      "address4": "IPv4 주소",
+      "address6": "IPv6 주소",
+      "serverAllowedIps": "서버 허용된 IP"
+    },
+    "user": {
+      "username": "사용자 이름",
+      "password": "비밀번호",
+      "remember": "기억하기",
+      "name": "이름",
+      "email": "이메일",
+      "emailInvalid": "이메일은 유효한 이메일이어야 합니다.",
+      "passwordMatch": "비밀번호가 일치해야 합니다",
+      "totpEnable": "TOTP 활성화",
+      "totpEnableTrue": "TOTP 사용은 true여야 합니다.",
+      "totpCode": "TOTP 코드"
+    },
+    "userConfig": {
+      "host": "호스트"
+    },
+    "general": {
+      "sessionTimeout": "세션 타임아웃",
+      "metricsEnabled": "메트릭",
+      "metricsPassword": "메트릭 비밀번호"
+    },
+    "interface": {
+      "cidr": "CIDR",
+      "device": "장치",
+      "cidrValid": "CIDR는 유효해야 합니다."
+    },
+    "otl": "일회성 링크",
+    "stringMalformed": "문자열이 잘못되었습니다.",
+    "body": "본문은 유효한 객체여야 합니다",
+    "hook": "후크",
+    "enabled": "활성화됨",
+    "mtu": "MTU",
+    "port": "포트",
+    "persistentKeepalive": "지속적인 유지",
+    "address": "IP 주소",
+    "dns": "DNS",
+    "allowedIps": "허용된 IP",
+    "file": "파일"
+  },
+  "hooks": {
+    "preUp": "프리업",
+    "postUp": "PostUp",
+    "preDown": "PreDown",
+    "postDown": "PostDown"
+  }
+}
