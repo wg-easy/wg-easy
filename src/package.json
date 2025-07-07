@@ -40,7 +40,7 @@
     "is-cidr": "^5.1.1",
     "is-ip": "^5.0.1",
     "js-sha256": "^0.11.1",
-    "nuxt": "^3.17.5",
+    "nuxt": "^3.17.6",
     "otpauth": "^9.4.0",
     "pinia": "^3.0.3",
     "qr": "^0.5.0",
@@ -50,22 +50,22 @@
     "timeago.js": "^4.0.2",
     "vue": "latest",
     "vue3-apexcharts": "^1.8.0",
-    "zod": "^3.25.67"
+    "zod": "^3.25.75"
   },
   "devDependencies": {
-    "@nuxt/eslint": "^1.4.1",
+    "@nuxt/eslint": "^1.5.2",
     "@types/debug": "^4.1.12",
     "@types/phc__format": "^1.0.1",
     "@types/semver": "^7.7.0",
     "drizzle-kit": "^0.31.4",
     "esbuild": "^0.25.5",
-    "eslint": "^9.30.0",
+    "eslint": "^9.30.1",
     "eslint-config-prettier": "^10.1.5",
     "prettier": "^3.6.2",
     "prettier-plugin-tailwindcss": "^0.6.13",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3",
-    "vue-tsc": "^2.2.10"
+    "vue-tsc": "^3.0.1"
   },
   "packageManager": "pnpm@10.12.4"
 }
