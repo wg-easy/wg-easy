@@ -59,7 +59,7 @@ type RolesWithPermissions = {
 
 export type Permissions = {
   clients: {
-    dataType: ClientType;
+    dataType: Pick<ClientType, 'id' | 'userId'>;
     action: 'view' | 'create' | 'update' | 'delete' | 'custom';
   };
   admin: {
