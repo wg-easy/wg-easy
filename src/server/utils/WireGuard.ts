@@ -95,7 +95,7 @@ class WireGuard {
 
   async getAllClients() {
     const wgInterface = await Database.interfaces.get();
-    const dbClients = await Database.clients.getAll();
+    const dbClients = await Database.clients.getAllPublic();
     const clients = dbClients.map((client) => ({
       ...client,
       latestHandshakeAt: null as Date | null,

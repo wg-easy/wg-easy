@@ -18,6 +18,17 @@ function createPreparedStatement(db: DBType) {
         },
       })
       .prepare(),
+    findAllPublic: db.query.client
+      .findMany({
+        with: {
+          oneTimeLink: true,
+        },
+        columns: {
+          privateKey: false,
+          preSharedKey: false,
+        },
+      })
+      .prepare(),
     findById: db.query.client
       .findFirst({ where: eq(client.id, sql.placeholder('id')) })
       .prepare(),
@@ -25,6 +36,10 @@ function createPreparedStatement(db: DBType) {
       .findMany({
         where: eq(client.userId, sql.placeholder('userId')),
         with: { oneTimeLink: true },
+        columns: {
+          privateKey: false,
+          preSharedKey: false,
+        },
       })
       .prepare(),
     toggle: db
@@ -57,8 +72,23 @@ export class ClientService {
     }));
   }
 
+  /**
+   * Never return values directly from this function. Use {@link getAllPublic} instead.
+   */
   async getAll() {
     const result = await this.#statements.findAll.execute();
+    return result.map((row) => ({
+      ...row,
+      createdAt: new Date(row.createdAt),
+      updatedAt: new Date(row.updatedAt),
+    }));
+  }
+
+  /**
+   * Returns all clients without sensitive data
+   */
+  async getAllPublic() {
+    const result = await this.#statements.findAllPublic.execute();
     return result.map((row) => ({
       ...row,
       createdAt: new Date(row.createdAt),
