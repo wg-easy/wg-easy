@@ -36,6 +36,7 @@ function createPreparedStatement(db: DBType) {
           metricsPrometheus: true,
           metricsJson: true,
           metricsPassword: true,
+          siteTitle: true,
         },
       })
       .prepare(),
