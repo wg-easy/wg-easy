@@ -8,7 +8,8 @@ To setup the IPv6 Network, simply run once:
 docker network create \
   -d bridge --ipv6 \
   --subnet 10.42.42.0/24 \
-  --subnet fdcc:ad94:bacf:61a3::/64 wg
+  --subnet fdcc:ad94:bacf:61a3::/64 \
+   wg
 ```
 
 <!-- ref: major version -->
