@@ -28,7 +28,7 @@
     "@phc/format": "^1.0.0",
     "@pinia/nuxt": "^0.11.1",
     "@tailwindcss/forms": "^0.5.10",
-    "apexcharts": "^4.7.0",
+    "apexcharts": "^5.2.0",
     "argon2": "^0.43.0",
     "cidr-tools": "^11.0.3",
     "citty": "^0.1.6",

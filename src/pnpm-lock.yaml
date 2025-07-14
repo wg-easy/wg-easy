@@ -33,8 +33,8 @@ importers:
         specifier: ^0.5.10
         version: 0.5.10(tailwindcss@3.4.17)
       apexcharts:
-        specifier: ^4.7.0
-        version: 4.7.0
+        specifier: ^5.2.0
+        version: 5.2.0
       argon2:
         specifier: ^0.43.0
         version: 0.43.0
@@ -97,7 +97,7 @@ importers:
         version: 3.5.17(typescript@5.8.3)
       vue3-apexcharts:
         specifier: ^1.8.0
-        version: 1.8.0(apexcharts@4.7.0)(vue@3.5.17(typescript@5.8.3))
+        version: 1.8.0(apexcharts@5.2.0)(vue@3.5.17(typescript@5.8.3))
       zod:
         specifier: ^3.25.75
         version: 3.25.75
@@ -1944,8 +1944,8 @@ packages:
     resolution: {integrity: sha512-KMReFUr0B4t+D+OBkjR3KYqvocp2XaSzO55UcB6mgQMd3KbcE+mWTyvVV7D/zsdEbNnV6acZUutkiHQXvTr1Rw==}
     engines: {node: '>= 8'}
 
-  apexcharts@4.7.0:
-    resolution: {integrity: sha512-iZSrrBGvVlL+nt2B1NpqfDuBZ9jX61X9I2+XV0hlYXHtTwhwLTHDKGXjNXAgFBDLuvSYCB/rq2nPWVPRv2DrGA==}
+  apexcharts@5.2.0:
+    resolution: {integrity: sha512-BZ+v4Wqf4BKVRKBatVghDVu9vu2SXhl/F7ujT2awnf7Zv6RT39FQWtAAV3bpH+G5c8IADw0PyOKG00+rN1UoNg==}
 
   archiver-utils@5.0.2:
     resolution: {integrity: sha512-wuLJMmIBQYCsGZgYLTy5FIB2pF6Lfb6cXMSF8Qywwk3t20zWnAi7zLcQFdKQmIB8wyZpY5ER38x08GbwtR2cLA==}
@@ -7444,7 +7444,7 @@ snapshots:
       normalize-path: 3.0.0
       picomatch: 2.3.1
 
-  apexcharts@4.7.0:
+  apexcharts@5.2.0:
     dependencies:
       '@svgdotjs/svg.draggable.js': 3.0.6(@svgdotjs/svg.js@3.2.4)
       '@svgdotjs/svg.filter.js': 3.0.9
@@ -10932,9 +10932,9 @@ snapshots:
       '@vue/language-core': 3.0.1(typescript@5.8.3)
       typescript: 5.8.3
 
-  vue3-apexcharts@1.8.0(apexcharts@4.7.0)(vue@3.5.17(typescript@5.8.3)):
+  vue3-apexcharts@1.8.0(apexcharts@5.2.0)(vue@3.5.17(typescript@5.8.3)):
     dependencies:
-      apexcharts: 4.7.0
+      apexcharts: 5.2.0
       vue: 3.5.17(typescript@5.8.3)
 
   vue@3.5.17(typescript@5.8.3):
