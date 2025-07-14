@@ -71,7 +71,7 @@ export const ClientUpdateSchema = schemaForType<UpdateClientType>()(
 );
 
 // TODO: investigate if coerce is bad
-const clientId = z.number({ message: t('zod.client.id'), coerce: true });
+const clientId = z.coerce.number({ message: t('zod.client.id') });
 
 export const ClientGetSchema = z.object({
   clientId: clientId,

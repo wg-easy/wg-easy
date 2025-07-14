@@ -84,7 +84,7 @@ export function validateZod<T>(
               if (v.message.startsWith('zod.')) {
                 switch (v.code) {
                   case 'too_small':
-                    switch (v.type) {
+                    switch (v.origin) {
                       case 'string':
                         newMessage = t('zod.generic.stringMin', [
                           t(v.message),
@@ -100,7 +100,7 @@ export function validateZod<T>(
                     }
                     break;
                   case 'invalid_type': {
-                    if (v.received === 'null' || v.received === 'undefined') {
+                    if (v.input === null || v.input === undefined) {
                       newMessage = t('zod.generic.required', [
                         v.path.join('.'),
                       ]);
