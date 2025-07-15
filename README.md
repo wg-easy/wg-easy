@@ -74,8 +74,6 @@ You can also install WireGuard Easy with the [docker run command](https://wg-eas
 
 Now [setup a reverse proxy](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/basic-installation/#setup-reverse-proxy) to be able to access the Web UI securely from the internet. This step is optional, just make sure to follow the guide [here](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/reverse-proxyless/) if you decide not to do it.
 
-If you want to access the Web UI over HTTP, change the env var `INSECURE` to `true`. This is not recommended. Only use this for testing or running your Web UI in a private network.
-
 ## Donate
 
 Are you enjoying this project? Consider donating.
