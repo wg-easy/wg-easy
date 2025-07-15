@@ -137,6 +137,8 @@
   },
   "admin": {
     "general": {
+      "siteTitle": "Site Title",
+      "siteTitleDesc": "Custom title for the web interface",
       "sessionTimeout": "Session Timeout",
       "sessionTimeoutDesc": "Session duration for Remember Me (seconds)",
       "metrics": "Metrics",
