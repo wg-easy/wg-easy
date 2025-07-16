@@ -90,5 +90,5 @@ export default defineNuxtConfig({
   },
   alias: {
     '#db': fileURLToPath(new URL('./server/database/', import.meta.url)),
-  }
-})
+  },
+});
