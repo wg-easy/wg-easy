@@ -3,7 +3,7 @@ export default defineEventHandler(async (event) => {
 
   if (!session.data.userId) {
     // not logged in
-    return null;
+    return {};
   }
 
   const user = await Database.users.get(session.data.userId);

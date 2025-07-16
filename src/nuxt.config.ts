@@ -2,10 +2,7 @@ import { fileURLToPath } from 'node:url';
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  future: {
-    compatibilityVersion: 4,
-  },
-  compatibilityDate: '2025-02-04',
+  compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
   modules: [
     '@nuxtjs/i18n',
@@ -87,15 +84,11 @@ export default defineNuxtConfig({
         target: 'es2020',
       },
     },
-    alias: {
-      '#db': fileURLToPath(new URL('./server/database/', import.meta.url)),
-    },
     externals: {
       traceInclude: [fileURLToPath(new URL('./cli/index.ts', import.meta.url))],
     },
   },
   alias: {
-    // for typecheck reasons (https://github.com/nuxt/cli/issues/323)
     '#db': fileURLToPath(new URL('./server/database/', import.meta.url)),
-  },
-});
+  }
+})
