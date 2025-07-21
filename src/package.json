@@ -20,7 +20,7 @@
     "cli:dev": "tsx cli/index.ts"
   },
   "dependencies": {
-    "@eschricht/nuxt-color-mode": "^1.1.5",
+    "@eschricht/nuxt-color-mode": "^1.2.0",
     "@heroicons/vue": "^2.2.0",
     "@libsql/client": "^0.15.9",
     "@nuxtjs/i18n": "^9.5.6",
