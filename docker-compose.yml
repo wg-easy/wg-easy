@@ -13,6 +13,7 @@ services:
     container_name: wg-easy
     networks:
       wg:
+        interface_name: eth0
         ipv4_address: 10.42.42.42
         ipv6_address: fdcc:ad94:bacf:61a3::2a
     volumes:
