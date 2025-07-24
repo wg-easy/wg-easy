@@ -22,7 +22,7 @@
       
       
       <link rel="icon" href="../../../assets/logo/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.15">
     
     
       
@@ -884,6 +884,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#environment-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      Environment Variables
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#done" class="md-nav__link">
     <span class="md-ellipsis">
       Done
@@ -1000,6 +1009,29 @@
   
   <span class="md-ellipsis">
     Issues and Pull Requests
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../contributing/translation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Translation
     
   </span>
   
@@ -1561,6 +1593,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#environment-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      Environment Variables
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#done" class="md-nav__link">
     <span class="md-ellipsis">
       Done
@@ -1590,7 +1631,7 @@
 
 
   
-    <a href="https://github.com/wg-easy/wg-easy/edit/master/docs/content/advanced/migrate/from-14-to-15.md" title="Edit this page" class="md-content__button md-icon">
+    <a href="https://github.com/wg-easy/wg-easy/edit/master/docs/content/advanced/migrate/from-14-to-15.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -1611,16 +1652,17 @@
 <p>This guide will help you migrate from <code>v14</code> to version <code>v15</code> of <code>wg-easy</code>.</p>
 <h2 id="changes"><a class="toclink" href="#changes">Changes</a></h2>
 <ul>
-<li>This is a complete rewrite of the <code>wg-easy</code> project. Therefore the configuration files and the way you interact with the project have changed.</li>
+<li>This is a complete rewrite of the <code>wg-easy</code> project, therefore the configuration files and the way you interact with the project have changed.</li>
 <li>If you use armv6, you unfortunately won't be able to migrate to <code>v15</code>.</li>
-<li>If you are connecting to the web ui via HTTP, you need to set the <code>INSECURE</code> environment variable to <code>true</code> in the new container.</li>
+<li>If you are connecting to the Web UI via HTTP, you need to set the <code>INSECURE</code> environment variable to <code>true</code> in the new container.</li>
 </ul>
 <h2 id="migration"><a class="toclink" href="#migration">Migration</a></h2>
 <h3 id="backup"><a class="toclink" href="#backup">Backup</a></h3>
-<p>Before you start the migration, make sure to backup your existing configuration files.</p>
-<p>Go into the Web Ui and click the Backup button, this should download a <code>wg0.json</code> file.</p>
+<p>Before you start the migration, make sure to back up your existing configuration files.</p>
+<p>Go into the Web UI and click the Backup button, this should download a <code>wg0.json</code> file.</p>
 <p>Or download the <code>wg0.json</code> file from your container volume to your pc.</p>
 <p>You will need this file for the migration</p>
+<p>You will also need to back up the old environment variables you set for the container, as they will not be automatically migrated.</p>
 <h3 id="remove-old-container"><a class="toclink" href="#remove-old-container">Remove old container</a></h3>
 <ol>
 <li>Stop the running container</li>
@@ -1628,12 +1670,14 @@
 <p>If you are using <code>docker run</code></p>
 <div class="highlight"><pre><span></span><code>docker<span class="w"> </span>stop<span class="w"> </span>wg-easy
 </code></pre></div>
-<p>If you are using <code>docker-compose</code></p>
-<div class="highlight"><pre><span></span><code>docker-compose<span class="w"> </span>down
+<p>If you are using <code>docker compose</code></p>
+<div class="highlight"><pre><span></span><code>docker<span class="w"> </span>compose<span class="w"> </span>down
 </code></pre></div>
 <h3 id="start-new-container"><a class="toclink" href="#start-new-container">Start new container</a></h3>
 <p>Follow the instructions in the <a href="../../../getting-started/">Getting Started</a> or <a href="../../../examples/tutorials/basic-installation/">Basic Installation</a> guide to start the new container.</p>
 <p>In the setup wizard, select that you already have a configuration file and upload the <code>wg0.json</code> file you downloaded in the backup step.</p>
+<h3 id="environment-variables"><a class="toclink" href="#environment-variables">Environment Variables</a></h3>
+<p>v15 does not use the same environment variables as v14, most of them have been moved to the Admin Panel in the Web UI.</p>
 <h3 id="done"><a class="toclink" href="#done">Done</a></h3>
 <p>You have now successfully migrated to <code>v15</code> of <code>wg-easy</code>.</p>
 
@@ -1701,7 +1745,7 @@
       <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.tabs", "navigation.top", "navigation.expand", "navigation.instant", "content.action.edit", "content.action.view", "content.code.annotate"], "search": "../../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.13a4f30d.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.56ea9cef.min.js"></script>
       
     
   </body>
