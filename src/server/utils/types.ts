@@ -80,7 +80,6 @@ export function validateZod<T>(
             if (t) {
               let newMessage = null;
               if (v.message.startsWith('zod.')) {
-                console.log(v);
                 switch (v.code) {
                   case 'too_small':
                     switch (v.origin) {
