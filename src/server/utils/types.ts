@@ -40,9 +40,7 @@ export const AddressSchema = z
   .min(1, { message: t('zod.address') })
   .pipe(safeStringRefine);
 
-export const DnsSchema = z
-  .array(AddressSchema, { message: t('zod.dns') })
-  .min(1, t('zod.dns'));
+export const DnsSchema = z.array(AddressSchema, { message: t('zod.dns') });
 
 export const AllowedIpsSchema = z
   .array(AddressSchema, { message: t('zod.allowedIps') })
