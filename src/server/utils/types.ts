@@ -40,9 +40,7 @@ export const AddressSchema = z
   .min(1, { message: t('zod.address') })
   .pipe(safeStringRefine);
 
-export const DnsSchema = z
-  .array(AddressSchema, { message: t('zod.dns') })
-  .min(1, t('zod.dns'));
+export const DnsSchema = z.array(AddressSchema, { message: t('zod.dns') });
 
 export const AllowedIpsSchema = z
   .array(AddressSchema, { message: t('zod.allowedIps') })
@@ -82,6 +80,7 @@ export function validateZod<T>(
             if (t) {
               let newMessage = null;
               if (v.message.startsWith('zod.')) {
+                console.log(v);
                 switch (v.code) {
                   case 'too_small':
                     switch (v.origin) {
