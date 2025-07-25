@@ -39,6 +39,12 @@
               v-model="data.ipv6Address"
               label="IPv6"
             />
+            <FormInfoField
+              id="endpoint"
+              :data="data.endpoint ?? $t('client.notConnected')"
+              :label="$t('client.endpoint')"
+              :description="$t('client.endpointDesc')"
+            />
           </FormGroup>
           <FormGroup>
             <FormHeading :description="$t('client.allowedIpsDesc')">

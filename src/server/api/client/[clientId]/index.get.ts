@@ -18,6 +18,18 @@ export default definePermissionEventHandler(
         statusMessage: 'Client not found',
       });
     }
-    return result;
+
+    const data = await WireGuard.dumpByPublicKey(result.publicKey);
+    if (!data) {
+      throw createError({
+        statusCode: 500,
+        statusMessage: 'Failed to dump client data',
+      });
+    }
+
+    return {
+      ...result,
+      endpoint: data.endpoint,
+    };
   }
 );
