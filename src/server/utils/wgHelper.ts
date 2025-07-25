@@ -85,14 +85,19 @@ PostDown = ${iptablesTemplate(hooks.postDown, wgInterface)}`;
       client.postUp ? `PostUp = ${client.postUp}` : null,
       client.preDown ? `PreDown = ${client.preDown}` : null,
       client.postDown ? `PostDown = ${client.postDown}` : null,
-    ].filter((v) => v !== null);
+    ];
+
+    const dnsServers = client.dns ?? userConfig.defaultDns;
+    const dnsLine =
+      dnsServers.length > 0 ? `DNS = ${dnsServers.join(', ')}` : null;
+
+    const extraLines = [dnsLine, ...hookLines].filter((v) => v !== null);
 
     return `[Interface]
 PrivateKey = ${client.privateKey}
 Address = ${address}
-DNS = ${(client.dns ?? userConfig.defaultDns).join(', ')}
 MTU = ${client.mtu}
-${hookLines.length ? `${hookLines.join('\n')}\n` : ''}
+${extraLines.length ? `${extraLines.join('\n')}\n` : ''}
 [Peer]
 PublicKey = ${wgInterface.publicKey}
 PresharedKey = ${client.preSharedKey}
