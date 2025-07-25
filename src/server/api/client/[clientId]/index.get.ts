@@ -23,7 +23,7 @@ export default definePermissionEventHandler(
     if (!data) {
       throw createError({
         statusCode: 404,
-        statusMessage: 'Could not dump client data',
+        statusMessage: 'Failed to dump client data',
       });
     }
 

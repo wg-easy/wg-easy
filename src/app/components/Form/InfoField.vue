@@ -15,7 +15,6 @@ defineProps<{
   id: string;
   label: string;
   description?: string;
-  disabled?: boolean;
   data?: string;
 }>();
 </script>
