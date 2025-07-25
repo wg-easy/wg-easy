@@ -1,7 +1,8 @@
-import { sql, relations } from 'drizzle-orm';
+import { sql, relations, type InferSelectModel } from 'drizzle-orm';
 import { int, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 import { client } from '../../schema';
+import type { Role } from '#shared/utils/permissions';
 
 export const user = sqliteTable('users_table', {
   id: int().primaryKey({ autoIncrement: true }),
@@ -25,3 +26,5 @@ export const user = sqliteTable('users_table', {
 export const usersRelations = relations(user, ({ many }) => ({
   clients: many(client),
 }));
+
+export type UserType = InferSelectModel<typeof user>;

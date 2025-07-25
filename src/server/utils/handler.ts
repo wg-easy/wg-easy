@@ -1,5 +1,5 @@
 import type { EventHandlerRequest, EventHandlerResponse, H3Event } from 'h3';
-import type { UserType } from '#db/repositories/user/types';
+import type { UserType } from '#db/repositories/user/schema';
 import type { SetupStepType } from '#db/repositories/general/types';
 import {
   type Permissions,

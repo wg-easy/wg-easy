@@ -1,7 +1,7 @@
 import { eq, sql } from 'drizzle-orm';
 import { TOTP } from 'otpauth';
 import { user } from './schema';
-import type { UserType } from './types';
+import type { UserType } from './schema';
 import type { DBType } from '#db/sqlite';
 
 type LoginResult =

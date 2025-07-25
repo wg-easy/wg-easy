@@ -73,9 +73,6 @@ export default defineNuxtConfig({
     detectBrowserLanguage: {
       useCookie: true,
     },
-    bundle: {
-      optimizeTranslationDirective: false,
-    },
   },
   nitro: {
     esbuild: {

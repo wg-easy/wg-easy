@@ -1,4 +1,4 @@
-import type { ZodSchema } from 'zod';
+import type { ZodType } from 'zod';
 import z from 'zod';
 import type { H3Event, EventHandlerRequest } from 'h3';
 
@@ -64,7 +64,7 @@ export const schemaForType =
   };
 
 export function validateZod<T>(
-  schema: ZodSchema<T>,
+  schema: ZodType<T>,
   event: H3Event<EventHandlerRequest>
 ) {
   return async (data: unknown) => {
