@@ -22,7 +22,7 @@ export default definePermissionEventHandler(
     const data = await WireGuard.dumpByPublicKey(result.publicKey);
     if (!data) {
       throw createError({
-        statusCode: 404,
+        statusCode: 500,
         statusMessage: 'Failed to dump client data',
       });
     }
