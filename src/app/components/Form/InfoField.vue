@@ -7,7 +7,7 @@
       <IconsInfo class="size-4" />
     </BaseTooltip>
   </div>
-  <span :id="id">{{ data }}</span>
+  <span :id="id" class="flex flex-col justify-center">{{ data }}</span>
 </template>
 
 <script lang="ts" setup>
