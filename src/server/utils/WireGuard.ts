@@ -93,6 +93,17 @@ class WireGuard {
     return clients;
   }
 
+  async dumpByPublicKey(publicKey: string) {
+    const wgInterface = await Database.interfaces.get();
+
+    const dump = await wg.dump(wgInterface.name);
+    const clientDump = dump.find(
+      ({ publicKey: dumpPublicKey }) => dumpPublicKey === publicKey
+    );
+
+    return clientDump;
+  }
+
   async getAllClients() {
     const wgInterface = await Database.interfaces.get();
     const dbClients = await Database.clients.getAllPublic();

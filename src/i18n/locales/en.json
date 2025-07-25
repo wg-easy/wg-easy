@@ -113,7 +113,10 @@
     "hooks": "Hooks",
     "hooksDescription": "Hooks only work with wg-quick",
     "hooksLeaveEmpty": "Only for wg-quick. Otherwise, leave it empty",
-    "dnsDesc": "DNS server clients will use (overrides global config)"
+    "dnsDesc": "DNS server clients will use (overrides global config)",
+    "notConnected": "Client not connected",
+    "endpoint": "Endpoint",
+    "endpointDesc": "IP of the client from which the WireGuard connection is established"
   },
   "dialog": {
     "change": "Change",
