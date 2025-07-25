@@ -1,5 +1,5 @@
-import type { ClientType } from '#db/repositories/client/types';
-import type { UserType } from '#db/repositories/user/types';
+import type { ClientType } from '#db/repositories/client/schema';
+import type { UserType } from '#db/repositories/user/schema';
 
 type BrandedRole = {
   readonly __role: unique symbol;

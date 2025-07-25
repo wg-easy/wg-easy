@@ -1,4 +1,4 @@
-import { sql, relations } from 'drizzle-orm';
+import { sql, relations, type InferSelectModel } from 'drizzle-orm';
 import { int, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 import { oneTimeLink, user, wgInterface } from '../../schema';
@@ -62,3 +62,5 @@ export const clientsRelations = relations(client, ({ one }) => ({
     references: [wgInterface.name],
   }),
 }));
+
+export type ClientType = InferSelectModel<typeof client>;

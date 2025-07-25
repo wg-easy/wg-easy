@@ -1,8 +1,4 @@
-import type { InferSelectModel } from 'drizzle-orm';
 import z from 'zod';
-import type { user } from './schema';
-
-export type UserType = InferSelectModel<typeof user>;
 
 const username = z
   .string({ message: t('zod.user.username') })
@@ -44,9 +40,7 @@ const name = z
   .pipe(safeStringRefine);
 
 const email = z
-  .string({ message: t('zod.user.email') })
-  .min(5, t('zod.user.email'))
-  .email({ message: t('zod.user.emailInvalid') })
+  .email({ message: t('zod.user.email') })
   .pipe(safeStringRefine)
   .nullable();
 
