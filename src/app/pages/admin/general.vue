@@ -2,6 +2,14 @@
   <main v-if="data">
     <FormElement @submit.prevent="submit">
       <FormGroup>
+        <FormNullTextField
+          id="site-title"
+          v-model="data.siteTitle"
+          label="Site Title"
+          description="Custom title for browser tabs. Leave empty to use the default 'WireGuard' title."
+        />
+      </FormGroup>
+      <FormGroup>
         <FormNumberField
           id="session"
           v-model="data.sessionTimeout"
@@ -53,8 +61,12 @@ const _submit = useSubmit(
   { revert }
 );
 
-function submit() {
-  return _submit(data.value);
+async function submit() {
+  // Submit the form data
+  await _submit(data.value);
+  
+  // Refresh the site-title data globally to update the browser tab title
+  await refreshNuxtData('site-title');
 }
 
 async function revert() {
