@@ -99,8 +99,8 @@ importers:
         specifier: ^1.8.0
         version: 1.8.0(apexcharts@5.3.1)(vue@3.5.18(typescript@5.8.3))
       zod:
-        specifier: ^4.0.10
-        version: 4.0.10
+        specifier: ^4.0.14
+        version: 4.0.14
     devDependencies:
       '@nuxt/eslint':
         specifier: ^1.7.1
@@ -5696,8 +5696,8 @@ packages:
   zod@3.25.76:
     resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
 
-  zod@4.0.10:
-    resolution: {integrity: sha512-3vB+UU3/VmLL2lvwcY/4RV2i9z/YU0DTV/tDuYjrwmx5WeJ7hwy+rGEEx8glHp6Yxw7ibRbKSaIFBgReRPe5KA==}
+  zod@4.0.14:
+    resolution: {integrity: sha512-nGFJTnJN6cM2v9kXL+SOBq3AtjQby3Mv5ySGFof5UGRHrRioSJ5iG680cYNjE/yWk671nROcpPj4hAS8nyLhSw==}
 
 snapshots:
 
@@ -11610,4 +11610,4 @@ snapshots:
 
   zod@3.25.76: {}
 
-  zod@4.0.10: {}
+  zod@4.0.14: {}
