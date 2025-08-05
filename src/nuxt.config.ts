@@ -26,23 +26,12 @@ export default defineNuxtConfig({
     experimental: {
       localeDetector: './localeDetector.ts',
     },
+    // https://wg-easy.github.io/wg-easy/latest/contributing/translation/
     locales: [
       {
-        // same as i18n.config.ts
         code: 'en',
-        // BCP 47 language tag
         language: 'en-US',
         name: 'English',
-      },
-      {
-        code: 'uk',
-        language: 'uk-UA',
-        name: 'Українська',
-      },
-      {
-        code: 'fr',
-        language: 'fr-FR',
-        name: 'Français',
       },
       {
         code: 'de',
@@ -50,14 +39,29 @@ export default defineNuxtConfig({
         name: 'Deutsch',
       },
       {
+        code: 'es',
+        language: 'es-ES',
+        name: 'Español',
+      },
+      {
+        code: 'fr',
+        language: 'fr-FR',
+        name: 'Français',
+      },
+      {
+        code: 'ko',
+        language: 'ko-KR',
+        name: '한국어',
+      },
+      {
         code: 'ru',
         language: 'ru-RU',
         name: 'Русский',
       },
       {
-        code: 'zh-HK',
-        language: 'zh-HK',
-        name: '繁體中文（香港）',
+        code: 'uk',
+        language: 'uk-UA',
+        name: 'Українська',
       },
       {
         code: 'zh-CN',
@@ -65,9 +69,9 @@ export default defineNuxtConfig({
         name: '简体中文',
       },
       {
-        code: 'ko',
-        language: 'ko-KR',
-        name: '한국어',
+        code: 'zh-HK',
+        language: 'zh-HK',
+        name: '繁體中文（香港）',
       },
     ],
     defaultLocale: 'en',
@@ -75,9 +79,6 @@ export default defineNuxtConfig({
     strategy: 'no_prefix',
     detectBrowserLanguage: {
       useCookie: true,
-    },
-    bundle: {
-      optimizeTranslationDirective: false,
     },
   },
   nitro: {
