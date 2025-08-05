@@ -8,6 +8,7 @@ services:
     #  - PORT=51821
     #  - HOST=0.0.0.0
     #  - INSECURE=false
+    #  - DISABLE_IPV6=false
 
     image: ghcr.io/wg-easy/wg-easy:15
     container_name: wg-easy
