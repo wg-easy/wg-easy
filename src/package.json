@@ -16,7 +16,7 @@
     "typecheck": "nuxt typecheck",
     "check:all": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm build",
     "db:generate": "drizzle-kit generate",
-    "cli:build": "node cli/build.js",
+    "cli:build": "rolldown --config ./cli/rolldown.config.ts",
     "cli:dev": "tsx cli/index.ts"
   },
   "dependencies": {
@@ -40,7 +40,7 @@
     "is-cidr": "^6.0.0",
     "is-ip": "^5.0.1",
     "js-sha256": "^0.11.1",
-    "nuxt": "^3.18.0",
+    "nuxt": "^3.18.1",
     "otpauth": "^9.4.0",
     "pinia": "^3.0.3",
     "qr": "^0.5.0",
@@ -58,11 +58,11 @@
     "@types/phc__format": "^1.0.1",
     "@types/semver": "^7.7.0",
     "drizzle-kit": "^0.31.4",
-    "esbuild": "^0.25.8",
     "eslint": "^9.32.0",
     "eslint-config-prettier": "^10.1.8",
     "prettier": "^3.6.2",
     "prettier-plugin-tailwindcss": "^0.6.14",
+    "rolldown": "1.0.0-beta.31",
     "tsx": "^4.20.3",
     "typescript": "^5.9.2",
     "vue-tsc": "^3.0.5"
