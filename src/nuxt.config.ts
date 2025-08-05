@@ -73,6 +73,11 @@ export default defineNuxtConfig({
         language: 'zh-HK',
         name: '繁體中文（香港）',
       },
+      {
+        code: 'pt-BR',
+        language: 'pt-BR',
+        name: 'Português (Brasil)',
+      },
     ],
     defaultLocale: 'en',
     vueI18n: './i18n.config.ts',

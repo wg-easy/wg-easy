@@ -1,0 +1,240 @@
+{
+  "pages": {
+    "me": "Conta",
+    "clients": "Clientes",
+    "admin": {
+      "panel": "Panel de administração.",
+      "general": "Geral",
+      "config": "Configuração",
+      "interface": "Interface",
+      "hooks": "Hooks"
+    }
+  },
+  "user": {
+    "email": "E-mail"
+  },
+  "me": {
+    "currentPassword": "Senha atual",
+    "enable2fa": "Habilitar autenticação em dois fatores",
+    "enable2faDesc": "Escaneie o QR Code com seu aplicativo autenticador ou insira a chave manualmente.",
+    "2faKey": "Chave TOTP",
+    "2faCodeDesc": "Digite o código do seu aplicativo autenticador.",
+    "disable2fa": "Desativar autenticação de dois fatores.",
+    "disable2faDesc": "Digite sua senha para desativar a autenticação de dois fatores."
+  },
+  "general": {
+    "name": "Nome",
+    "username": "Nome de usuário",
+    "password": "Senha",
+    "newPassword": "Nova senha",
+    "updatePassword": "Atualizar senha",
+    "mtu": "MTU",
+    "allowedIps": "IPs permitidos",
+    "dns": "DNS",
+    "persistentKeepalive": "Keepalive persistente",
+    "logout": "Sair",
+    "continue": "Continue",
+    "host": "Host",
+    "port": "Porta",
+    "yes": "Sim",
+    "no": "Não",
+    "confirmPassword": "Confirmar senha",
+    "loading": "Carregando...",
+    "2fa": "Autenticação de dois fatores",
+    "2faCode": "Código TOTP"
+  },
+  "setup": {
+    "welcome": "Bem-vindo à sua primeira configuração do wg-easy",
+    "welcomeDesc": "Você encontrou a maneira mais fácil de instalar e gerenciar o WireGuard em qualquer host Linux",
+    "existingSetup": "Você já tem uma configuração?",
+    "createAdminDesc": "Primeiro, insira um nome de usuário de administrador e uma senha forte e segura. Essas informações serão usadas para fazer login no seu painel de administração.",
+    "setupConfigDesc": "Insira as informações do host e da porta. Essas informações serão usadas para a configuração do cliente ao instalar o WireGuard em seus dispositivos.",
+    "setupMigrationDesc": "Forneça o arquivo de backup se quiser migrar seus dados da versão anterior do wg-easy para a nova configuração.",
+    "upload": "Upload",
+    "migration": "Restaurar backup:",
+    "createAccount": "Criar conta",
+    "successful": "Configuração bem-sucedida",
+    "hostDesc": "Nome de host público que os clientes se conectarão",
+    "portDesc": "Porta UDP pública que os clientes se conectarão e o WireGuard escutará"
+  },
+  "update": {
+    "updateAvailable": "Há uma atualização disponível!",
+    "update": "Atualizar"
+  },
+  "theme": {
+    "dark": "Tema escuro",
+    "light": "Tema claro",
+    "system": "Tema do sistema"
+  },
+  "layout": {
+    "toggleCharts": "Mostrar/ocultar gráficos",
+    "donate": "Doar"
+  },
+  "login": {
+    "signIn": "Entrar",
+    "rememberMe": "Lembrar de mim",
+    "rememberMeDesc": "Permanecer conectado após fechar o navegador",
+    "insecure": "Não é possível fazer login com uma conexão insegura. Use HTTPS.",
+    "2faRequired": "É necessária autenticação de dois fatores",
+    "2faWrong": "A autenticação de dois fatores está errada"
+  },
+  "client": {
+    "empty": "Ainda não há clientes.",
+    "newShort": "Novo",
+    "sort": "Organizar",
+    "create": "Criar cliente",
+    "created": "Cliente criado",
+    "new": "Novo cliente",
+    "name": "Nome",
+    "expireDate": "Data de expiração",
+    "expireDateDesc": "Data em que o cliente será desativado. Em branco para permanente",
+    "deleteClient": "Deletar cliente",
+    "deleteDialog1": "Tem certeza de que deseja excluir?",
+    "deleteDialog2": "Esta ação não pode ser desfeita.",
+    "enabled": "Ativado",
+    "address": "Endereço",
+    "serverAllowedIps": "IPs permitidos do servidor",
+    "otlDesc": "Gerar link curto e único",
+    "permanent": "Permanente",
+    "createdOn": "Criado em ",
+    "lastSeen": "Visto pela última vez em",
+    "totalDownload": "Download total: ",
+    "totalUpload": "Upload total: ",
+    "newClient": "Novo cliente",
+    "disableClient": "Desativar cliente",
+    "enableClient": "Ativar cliente",
+    "noPrivKey": "Este cliente não possui uma chave privada conhecida. Não é possível criar a configuração.",
+    "showQR": "Mostrar QR Code",
+    "downloadConfig": "Download da configuração",
+    "allowedIpsDesc": "Quais IPs serão roteados pela VPN (substitui a configuração global)",
+    "serverAllowedIpsDesc": "Quais IPs o servidor irá rotear para o cliente",
+    "mtuDesc": "Define a unidade máxima de transmissão (tamanho do pacote) para o túnel VPN",
+    "persistentKeepaliveDesc": "Define o intervalo (em segundos) para pacotes keep-alive. 0 desabilita-o",
+    "hooks": "Hooks",
+    "hooksDescription": "Os hooks só funcionam com wg-quick",
+    "hooksLeaveEmpty": "Somente para wg-quick. Caso contrário, deixe em branco.",
+    "dnsDesc": "Os clientes do servidor DNS usarão (substitui a configuração global)",
+    "notConnected": "Client não conectado",
+    "endpoint": "Endpoint",
+    "endpointDesc": "IP do cliente a partir do qual a conexão WireGuard é estabelecida"
+  },
+  "dialog": {
+    "change": "Mudar",
+    "cancel": "Cancelar",
+    "create": "Criar"
+  },
+  "toast": {
+    "success": "Sucesso",
+    "saved": "Salvo",
+    "error": "Erro"
+  },
+  "form": {
+    "actions": "Ação",
+    "save": "Salvar",
+    "revert": "Reverter",
+    "sectionGeneral": "Geral",
+    "sectionAdvanced": "Avançado",
+    "noItems": "Sem items",
+    "nullNoItems": "Sem items. Usando configuração global",
+    "add": "Adicionar"
+  },
+  "admin": {
+    "general": {
+      "sessionTimeout": "Tempo limite da sessão",
+      "sessionTimeoutDesc": "Duração da sessão para Lembrar de mim (segundos)",
+      "metrics": "Métricas",
+      "metricsPassword": "Senha",
+      "metricsPasswordDesc": "Senha do portador para o ponto final de métricas (senha ou hash argon2)",
+      "json": "JSON",
+      "jsonDesc": "Rota para métricas em formato JSON",
+      "prometheus": "Prometheus",
+      "prometheusDesc": "Rota para métricas do Prometheus"
+    },
+    "config": {
+      "connection": "Conexão",
+      "hostDesc": "Nome de host público ao qual os clientes se conectarão (invalida a configuração)",
+      "portDesc": "Porta UDP pública à qual os clientes se conectarão (invalida a configuração, você provavelmente desejará alterar a porta da interface também)",
+      "allowedIpsDesc": "IPs permitidos que os clientes usarão (configuração global)",
+      "dnsDesc": "Os clientes do servidor DNS usarão (configuração global)",
+      "mtuDesc": "Os clientes da MTU usarão (somente para novos clientes)",
+      "persistentKeepaliveDesc": "Intervalo em segundos para enviar keepalives para o servidor. 0 = desabilitado (somente para novos clientes)",
+      "suggest": "Sugestão",
+      "suggestDesc": "Escolha um endereço IP ou nome de host para o campo Host"
+    },
+    "interface": {
+      "cidrSuccess": "Mudar CIDR",
+      "device": "Dispositivo",
+      "deviceDesc": "Dispositivo Ethernet que o tráfego wireguard deve ser encaminhado",
+      "mtuDesc": "MTU que o WireGuard usará",
+      "portDesc": "A porta UDP que o WireGuard irá escutar (você provavelmente vai querer mudar a porta de configuração também)",
+      "changeCidr": "Mudar CIDR",
+      "restart": "Reiniciar interface",
+      "restartDesc": "Reiniciar a interface do WireGuard",
+      "restartWarn": "Tem certeza de que deseja reiniciar a interface? Isso desconectará todos os clientes.",
+      "restartSuccess": "Interface reiniciada"
+    },
+    "introText": "Bem-vindo ao painel de administração.\n\nAqui você pode gerenciar as configurações gerais, a configuração, as configurações da interface e os hooks.\n\nComece escolhendo uma das seções na barra lateral."
+  },
+  "zod": {
+    "generic": {
+      "required": "{0} é obrigatório",
+      "validNumber": "{0} deve ser um número válido",
+      "validString": "{0} deve ser uma string válida",
+      "validBoolean": "{0} deve ser um booleano válido",
+      "validArray": "{0} deve ser uma matriz válida",
+      "stringMin": "{0} deve ter pelo menos {1} caracteres",
+      "numberMin": "{0} deve ter pelo menos {1}"
+    },
+    "client": {
+      "id": "ID do cliente",
+      "name": "Nome",
+      "expiresAt": "Expira em",
+      "address4": "Endereço IPv4",
+      "address6": "Endereço IPv6",
+      "serverAllowedIps": "IPs permitidos do servidor"
+    },
+    "user": {
+      "username": "Usuário",
+      "password": "Senha",
+      "remember": "Lembrar",
+      "name": "Nome",
+      "email": "E-mail",
+      "emailInvalid": "O e-mail deve ser um e-mail válido",
+      "passwordMatch": "As senhas devem corresponder",
+      "totpEnable": "Habilitar TOTP",
+      "totpEnableTrue": "TOTP deve estar ativado",
+      "totpCode": "Código TOTP"
+    },
+    "userConfig": {
+      "host": "Host"
+    },
+    "general": {
+      "sessionTimeout": "Tempo limite da sessão",
+      "metricsEnabled": "Métricas",
+      "metricsPassword": "Senha de métricas"
+    },
+    "interface": {
+      "cidr": "CIDR",
+      "device": "Dispositivo",
+      "cidrValid": "O CIDR deve ser válido"
+    },
+    "otl": "Link de uso único",
+    "stringMalformed": "A string está malformada",
+    "body": "O corpo deve ser um objeto válido",
+    "hook": "Hook",
+    "enabled": "Ativado",
+    "mtu": "MTU",
+    "port": "Porta",
+    "persistentKeepalive": "Keepalive persistente",
+    "address": "Endereço IP",
+    "dns": "DNS",
+    "allowedIps": "IPs permitidos",
+    "file": "Arquivo"
+  },
+  "hooks": {
+    "preUp": "PreUp",
+    "postUp": "PostUp",
+    "preDown": "PreDown",
+    "postDown": "PostDown"
+  }
+}

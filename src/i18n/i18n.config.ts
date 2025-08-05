@@ -7,6 +7,7 @@ import zhhk from './locales/zh-HK.json';
 import zhcn from './locales/zh-CN.json';
 import ko from './locales/ko.json';
 import es from './locales/es.json';
+import ptbr from './locales/pt-BR.json';
 
 export default defineI18nConfig(() => ({
   legacy: false,
@@ -21,5 +22,6 @@ export default defineI18nConfig(() => ({
     'zh-CN': zhcn,
     ko,
     es,
+    'pt-BR': ptbr,
   },
 }));
