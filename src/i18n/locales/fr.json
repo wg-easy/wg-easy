@@ -113,7 +113,10 @@
     "hooks": "Hooks",
     "hooksDescription": "Les hooks ne fonctionnent qu'avec wg-quick",
     "hooksLeaveEmpty": "Uniquement pour wg-quick. Sinon, laissez-le vide",
-    "dnsDesc": "Serveur DNS que les clients utiliseront (remplace la configuration globale)"
+    "dnsDesc": "Serveur DNS que les clients utiliseront (remplace la configuration globale)",
+    "notConnected": "Client non connecté",
+    "endpoint": "Endpoint",
+    "endpointDesc": "Adresse IP du client à partir duquel la connexion WireGuard est établie"
   },
   "dialog": {
     "change": "Modifier",
