@@ -1,0 +1,240 @@
+{
+  "pages": {
+    "me": "Hesap",
+    "clients": "İstemciler",
+    "admin": {
+      "panel": "Yönetici Paneli",
+      "general": "Genel",
+      "config": "Yapılandırma",
+      "interface": "Arayüz",
+      "hooks": "Hook'lar"
+    }
+  },
+  "user": {
+    "email": "E-Posta"
+  },
+  "me": {
+    "currentPassword": "Mevcut Şifre",
+    "enable2fa": "İki Faktörlü Kimlik Doğrulamayı Etkinleştir",
+    "enable2faDesc": "QR kodunu kimlik doğrulayıcı uygulamanızla tarayın veya anahtarı manuel olarak girin.",
+    "2faKey": "TOTP Anahtarı",
+    "2faCodeDesc": "Kimlik doğrulayıcı uygulamanızdan kodu girin.",
+    "disable2fa": "İki Faktörlü Kimlik Doğrulamayı Devre Dışı Bırak",
+    "disable2faDesc": "İki Faktörlü Kimlik Doğrulamayı devre dışı bırakmak için şifrenizi girin."
+  },
+  "general": {
+    "name": "Ad",
+    "username": "Kullanıcı Adı",
+    "password": "Şifre",
+    "newPassword": "Yeni Şifre",
+    "updatePassword": "Şifreyi Güncelle",
+    "mtu": "MTU",
+    "allowedIps": "İzin Verilen IP'ler",
+    "dns": "DNS",
+    "persistentKeepalive": "Kalıcı Keepalive",
+    "logout": "Çıkış Yap",
+    "continue": "Devam Et",
+    "host": "Ana Bilgisayar",
+    "port": "Port",
+    "yes": "Evet",
+    "no": "Hayır",
+    "confirmPassword": "Şifreyi Onayla",
+    "loading": "Yükleniyor...",
+    "2fa": "İki Faktörlü Kimlik Doğrulama",
+    "2faCode": "TOTP Kodu"
+  },
+  "setup": {
+    "welcome": "wg-easy ilk kurulumunuza hoş geldiniz",
+    "welcomeDesc": "Herhangi bir Linux ana bilgisayarda WireGuard kurmanın ve yönetmenin en kolay yolunu buldunuz",
+    "existingSetup": "Mevcut bir kurulumunuz var mı?",
+    "createAdminDesc": "Lütfen önce bir yönetici kullanıcı adı ve güçlü bir güvenli şifre girin. Bu bilgiler yönetim panelinize giriş yapmak için kullanılacaktır.",
+    "setupConfigDesc": "Lütfen ana bilgisayar ve port bilgilerini girin. Bu, cihazlarında WireGuard kurulumu yaparken istemci yapılandırması için kullanılacaktır.",
+    "setupMigrationDesc": "Verilerinizi önceki wg-easy sürümünüzden yeni kurulumunuza taşımak istiyorsanız yedekleme dosyasını sağlayın.",
+    "upload": "Yükle",
+    "migration": "Yedeği geri yükle:",
+    "createAccount": "Hesap Oluştur",
+    "successful": "Kurulum başarılı",
+    "hostDesc": "İstemcilerin bağlanacağı genel ana bilgisayar adı",
+    "portDesc": "İstemcilerin bağlanacağı ve WireGuard'ın dinleyeceği genel UDP portu"
+  },
+  "update": {
+    "updateAvailable": "Güncelleme mevcut!",
+    "update": "Güncelle"
+  },
+  "theme": {
+    "dark": "Koyu tema",
+    "light": "Açık tema",
+    "system": "Sistem teması"
+  },
+  "layout": {
+    "toggleCharts": "Grafikleri Göster/Gizle",
+    "donate": "Bağış Yap"
+  },
+  "login": {
+    "signIn": "Giriş Yap",
+    "rememberMe": "Beni hatırla",
+    "rememberMeDesc": "Tarayıcıyı kapattıktan sonra giriş yapmış olarak kal",
+    "insecure": "Güvensiz bir bağlantı ile giriş yapamazsınız. HTTPS kullanın.",
+    "2faRequired": "İki Faktörlü Kimlik Doğrulama gerekli",
+    "2faWrong": "İki Faktörlü Kimlik Doğrulama yanlış"
+  },
+  "client": {
+    "empty": "Henüz istemci yok.",
+    "newShort": "Yeni",
+    "sort": "Sırala",
+    "create": "İstemci Oluştur",
+    "created": "İstemci oluşturuldu",
+    "new": "Yeni İstemci",
+    "name": "Ad",
+    "expireDate": "Son Kullanma Tarihi",
+    "expireDateDesc": "İstemcinin devre dışı bırakılacağı tarih. Kalıcı için boş bırakın",
+    "deleteClient": "İstemciyi Sil",
+    "deleteDialog1": "Silmek istediğinizden emin misiniz",
+    "deleteDialog2": "Bu eylem geri alınamaz.",
+    "enabled": "Etkin",
+    "address": "Adres",
+    "serverAllowedIps": "Sunucu İzin Verilen IP'ler",
+    "otlDesc": "Kısa tek seferlik bağlantı oluştur",
+    "permanent": "Kalıcı",
+    "createdOn": "Oluşturulma tarihi ",
+    "lastSeen": "Son görülme ",
+    "totalDownload": "Toplam İndirme: ",
+    "totalUpload": "Toplam Yükleme: ",
+    "newClient": "Yeni İstemci",
+    "disableClient": "İstemciyi Devre Dışı Bırak",
+    "enableClient": "İstemciyi Etkinleştir",
+    "noPrivKey": "Bu istemcinin bilinen özel anahtarı yok. Yapılandırma oluşturulamıyor.",
+    "showQR": "QR Kodunu Göster",
+    "downloadConfig": "Yapılandırmayı İndir",
+    "allowedIpsDesc": "Hangi IP'lerin VPN üzerinden yönlendirileceği (genel yapılandırmayı geçersiz kılar)",
+    "serverAllowedIpsDesc": "Sunucunun istemciye yönlendireceği IP'ler",
+    "mtuDesc": "VPN tüneli için maksimum iletim birimini (paket boyutu) ayarlar",
+    "persistentKeepaliveDesc": "Keepalive paketleri için aralığı (saniye cinsinden) ayarlar. 0 devre dışı bırakır",
+    "hooks": "Hook'lar",
+    "hooksDescription": "Hook'lar sadece wg-quick ile çalışır",
+    "hooksLeaveEmpty": "Sadece wg-quick için. Aksi takdirde boş bırakın",
+    "dnsDesc": "İstemcilerin kullanacağı DNS sunucusu (genel yapılandırmayı geçersiz kılar)",
+    "notConnected": "İstemci bağlı değil",
+    "endpoint": "Uç Nokta",
+    "endpointDesc": "WireGuard bağlantısının kurulduğu istemcinin IP'si"
+  },
+  "dialog": {
+    "change": "Değiştir",
+    "cancel": "İptal",
+    "create": "Oluştur"
+  },
+  "toast": {
+    "success": "Başarılı",
+    "saved": "Kaydedildi",
+    "error": "Hata"
+  },
+  "form": {
+    "actions": "Eylemler",
+    "save": "Kaydet",
+    "revert": "Geri Al",
+    "sectionGeneral": "Genel",
+    "sectionAdvanced": "Gelişmiş",
+    "noItems": "Öğe yok",
+    "nullNoItems": "Öğe yok. Genel yapılandırma kullanılıyor",
+    "add": "Ekle"
+  },
+  "admin": {
+    "general": {
+      "sessionTimeout": "Oturum Zaman Aşımı",
+      "sessionTimeoutDesc": "Beni Hatırla için oturum süresi (saniye)",
+      "metrics": "Metrikler",
+      "metricsPassword": "Şifre",
+      "metricsPasswordDesc": "Metrik uç noktası için Bearer şifresi (şifre veya argon2 hash)",
+      "json": "JSON",
+      "jsonDesc": "JSON formatında metrikler için rota",
+      "prometheus": "Prometheus",
+      "prometheusDesc": "Prometheus metrikleri için rota"
+    },
+    "config": {
+      "connection": "Bağlantı",
+      "hostDesc": "İstemcilerin bağlanacağı genel ana bilgisayar adı (yapılandırmayı geçersiz kılar)",
+      "portDesc": "İstemcilerin bağlanacağı genel UDP portu (yapılandırmayı geçersiz kılar, muhtemelen Arayüz Portunu da değiştirmek isteyeceksiniz)",
+      "allowedIpsDesc": "İstemcilerin kullanacağı İzin Verilen IP'ler (genel yapılandırma)",
+      "dnsDesc": "İstemcilerin kullanacağı DNS sunucusu (genel yapılandırma)",
+      "mtuDesc": "İstemcilerin kullanacağı MTU (sadece yeni istemciler için)",
+      "persistentKeepaliveDesc": "Sunucuya keepalive göndermek için saniye cinsinden aralık. 0 = devre dışı (sadece yeni istemciler için)",
+      "suggest": "Öner",
+      "suggestDesc": "Ana Bilgisayar alanı için bir IP Adresi veya Ana Bilgisayar Adı seçin"
+    },
+    "interface": {
+      "cidrSuccess": "CIDR değiştirildi",
+      "device": "Cihaz",
+      "deviceDesc": "WireGuard trafiğinin yönlendirileceği Ethernet cihazı",
+      "mtuDesc": "WireGuard'ın kullanacağı MTU",
+      "portDesc": "WireGuard'ın dinleyeceği UDP Portu (muhtemelen Yapılandırma Portunu da değiştirmek isteyeceksiniz)",
+      "changeCidr": "CIDR'ı Değiştir",
+      "restart": "Arayüzü Yeniden Başlat",
+      "restartDesc": "WireGuard arayüzünü yeniden başlat",
+      "restartWarn": "Arayüzü yeniden başlatmak istediğinizden emin misiniz? Bu tüm istemcilerin bağlantısını kesecektir.",
+      "restartSuccess": "Arayüz yeniden başlatıldı"
+    },
+    "introText": "Yönetici paneline hoş geldiniz.\n\nBurada genel ayarları, yapılandırmayı, arayüz ayarlarını ve hook'ları yönetebilirsiniz.\n\nKenar çubuğundaki bölümlerden birini seçerek başlayın."
+  },
+  "zod": {
+    "generic": {
+      "required": "{0} gerekli",
+      "validNumber": "{0} geçerli bir sayı olmalı",
+      "validString": "{0} geçerli bir dize olmalı",
+      "validBoolean": "{0} geçerli bir boolean olmalı",
+      "validArray": "{0} geçerli bir dizi olmalı",
+      "stringMin": "{0} en az {1} karakter olmalı",
+      "numberMin": "{0} en az {1} olmalı"
+    },
+    "client": {
+      "id": "İstemci ID",
+      "name": "Ad",
+      "expiresAt": "Son Kullanma Tarihi",
+      "address4": "IPv4 Adresi",
+      "address6": "IPv6 Adresi",
+      "serverAllowedIps": "Sunucu İzin Verilen IP'ler"
+    },
+    "user": {
+      "username": "Kullanıcı Adı",
+      "password": "Şifre",
+      "remember": "Hatırla",
+      "name": "Ad",
+      "email": "E-posta",
+      "emailInvalid": "E-posta geçerli bir e-posta olmalı",
+      "passwordMatch": "Şifreler eşleşmeli",
+      "totpEnable": "TOTP Etkinleştir",
+      "totpEnableTrue": "TOTP Etkinleştir doğru olmalı",
+      "totpCode": "TOTP Kodu"
+    },
+    "userConfig": {
+      "host": "Ana Bilgisayar"
+    },
+    "general": {
+      "sessionTimeout": "Oturum Zaman Aşımı",
+      "metricsEnabled": "Metrikler",
+      "metricsPassword": "Metrik Şifresi"
+    },
+    "interface": {
+      "cidr": "CIDR",
+      "device": "Cihaz",
+      "cidrValid": "CIDR geçerli olmalı"
+    },
+    "otl": "Tek seferlik bağlantı",
+    "stringMalformed": "Dize hatalı biçimlendirilmiş",
+    "body": "Gövde geçerli bir nesne olmalı",
+    "hook": "Hook",
+    "enabled": "Etkin",
+    "mtu": "MTU",
+    "port": "Port",
+    "persistentKeepalive": "Kalıcı Keepalive",
+    "address": "IP Adresi",
+    "dns": "DNS",
+    "allowedIps": "İzin Verilen IP'ler",
+    "file": "Dosya"
+  },
+  "hooks": {
+    "preUp": "PreUp",
+    "postUp": "PostUp",
+    "preDown": "PreDown",
+    "postDown": "PostDown"
+  }
+}
