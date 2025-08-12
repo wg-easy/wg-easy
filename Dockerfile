@@ -14,6 +14,12 @@ RUN pnpm install
 COPY src ./
 RUN pnpm build
 
+# Build amneziawg-tools
+RUN apk add linux-headers build-base git && \
+    git clone https://github.com/amnezia-vpn/amneziawg-tools.git && \
+    cd amneziawg-tools/src && \
+    make
+
 # Copy build result to a new image.
 # This saves a lot of disk space.
 FROM docker.io/library/node:lts-alpine
@@ -32,6 +38,10 @@ RUN cd /app/server && \
 # cli
 COPY --from=build /app/cli/cli.sh /usr/local/bin/cli
 RUN chmod +x /usr/local/bin/cli
+# Copy amneziawg-tools
+COPY --from=build /app/amneziawg-tools/src/wg /usr/bin/awg
+COPY --from=build /app/amneziawg-tools/src/wg-quick/linux.bash /usr/bin/awg-quick
+RUN chmod +x /usr/bin/awg /usr/bin/awg-quick
 
 # Install Linux packages
 RUN apk add --no-cache \
@@ -43,6 +53,9 @@ RUN apk add --no-cache \
     kmod \
     iptables-legacy \
     wireguard-tools
+
+RUN mkdir -p /etc/amnezia
+RUN ln -s /etc/wireguard /etc/amnezia/amneziawg
 
 # Use iptables-legacy
 RUN update-alternatives --install /usr/sbin/iptables iptables /usr/sbin/iptables-legacy 10 --slave /usr/sbin/iptables-restore iptables-restore /usr/sbin/iptables-legacy-restore --slave /usr/sbin/iptables-save iptables-save /usr/sbin/iptables-legacy-save
