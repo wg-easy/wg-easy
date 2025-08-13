@@ -9,9 +9,17 @@ type Options = {
   enableIpv6?: boolean;
 };
 
-const wgExecutable = await exec('modinfo amneziawg')
-  .then(() => 'awg' as const)
-  .catch(() => 'wg' as const);
+let wgExecutable: 'awg' | 'wg' = 'wg';
+
+if (WG_ENV.EXPERIMENTAL_AWG) {
+  if (WG_ENV.AWG !== undefined) {
+    wgExecutable = WG_ENV.AWG ? 'awg' : 'wg';
+  } else {
+    wgExecutable = await exec('modinfo amneziawg')
+      .then(() => 'awg' as const)
+      .catch(() => 'wg' as const);
+  }
+}
 
 export const wg = {
   generateServerPeer: (

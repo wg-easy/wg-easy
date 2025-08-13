@@ -19,6 +19,15 @@ export const WG_ENV = {
   PORT: assertEnv('PORT'),
   /** If IPv6 should be disabled */
   DISABLE_IPV6: process.env.DISABLE_IPV6 === 'true',
+  /** Override automatic detection */
+  AWG:
+    process.env.AWG === 'true'
+      ? true
+      : process.env.AWG === 'false'
+        ? false
+        : undefined,
+  /** TODO: delete on next major version */
+  EXPERIMENTAL_AWG: process.env.EXPERIMENTAL_AWG === 'true',
 };
 
 export const WG_INITIAL_ENV = {
