@@ -20,10 +20,10 @@ export const WG_ENV = {
   /** If IPv6 should be disabled */
   DISABLE_IPV6: process.env.DISABLE_IPV6 === 'true',
   /** Override automatic detection */
-  AWG:
-    process.env.AWG === 'true'
+  OVERRIDE_AUTO_AWG:
+    process.env.OVERRIDE_AUTO_AWG === 'true'
       ? true
-      : process.env.AWG === 'false'
+      : process.env.OVERRIDE_AUTO_AWG === 'false'
         ? false
         : undefined,
   /** TODO: delete on next major version */
