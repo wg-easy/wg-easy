@@ -95,7 +95,7 @@ export default defineNuxtConfig({
     esbuild: {
       options: {
         // to support big int
-        target: 'es2020',
+        target: 'node20',
       },
     },
     alias: {

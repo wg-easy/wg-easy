@@ -9,6 +9,18 @@ type Options = {
   enableIpv6?: boolean;
 };
 
+let wgExecutable: 'awg' | 'wg' = 'wg';
+
+if (WG_ENV.EXPERIMENTAL_AWG) {
+  if (WG_ENV.OVERRIDE_AUTO_AWG !== undefined) {
+    wgExecutable = WG_ENV.OVERRIDE_AUTO_AWG;
+  } else {
+    wgExecutable = await exec('modinfo amneziawg')
+      .then(() => 'awg' as const)
+      .catch(() => 'wg' as const);
+  }
+}
+
 export const wg = {
   generateServerPeer: (
     client: Omit<ClientType, 'createdAt' | 'updatedAt'>,
@@ -107,37 +119,41 @@ Endpoint = ${userConfig.host}:${userConfig.port}`;
   },
 
   generatePrivateKey: () => {
-    return exec('wg genkey');
+    return exec(`${wgExecutable} genkey`);
   },
 
   getPublicKey: (privateKey: string) => {
-    return exec(`echo ${privateKey} | wg pubkey`, {
-      log: 'echo ***hidden*** | wg pubkey',
+    return exec(`echo ${privateKey} | ${wgExecutable} pubkey`, {
+      log: `echo ***hidden*** | ${wgExecutable} pubkey`,
     });
   },
 
   generatePreSharedKey: () => {
-    return exec('wg genpsk');
+    return exec(`${wgExecutable} genpsk`);
   },
 
   up: (infName: string) => {
-    return exec(`wg-quick up ${infName}`);
+    return exec(`${wgExecutable}-quick up ${infName}`);
   },
 
   down: (infName: string) => {
-    return exec(`wg-quick down ${infName}`);
+    return exec(`${wgExecutable}-quick down ${infName}`);
   },
 
   restart: (infName: string) => {
-    return exec(`wg-quick down ${infName}; wg-quick up ${infName}`);
+    return exec(
+      `${wgExecutable}-quick down ${infName}; ${wgExecutable}-quick up ${infName}`
+    );
   },
 
   sync: (infName: string) => {
-    return exec(`wg syncconf ${infName} <(wg-quick strip ${infName})`);
+    return exec(
+      `${wgExecutable} syncconf ${infName} <(${wgExecutable}-quick strip ${infName})`
+    );
   },
 
   dump: async (infName: string) => {
-    const rawDump = await exec(`wg show ${infName} dump`, {
+    const rawDump = await exec(`${wgExecutable} show ${infName} dump`, {
       log: false,
     });
 
