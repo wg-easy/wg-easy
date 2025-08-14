@@ -13,7 +13,7 @@ let wgExecutable: 'awg' | 'wg' = 'wg';
 
 if (WG_ENV.EXPERIMENTAL_AWG) {
   if (WG_ENV.OVERRIDE_AUTO_AWG !== undefined) {
-    wgExecutable = WG_ENV.OVERRIDE_AUTO_AWG ? 'awg' : 'wg';
+    wgExecutable = WG_ENV.OVERRIDE_AUTO_AWG;
   } else {
     wgExecutable = await exec('modinfo amneziawg')
       .then(() => 'awg' as const)

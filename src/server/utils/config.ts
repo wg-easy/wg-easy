@@ -12,6 +12,8 @@ export const OLD_ENV = {
   PASSWORD_HASH: process.env.PASSWORD_HASH,
 };
 
+const OVERRIDE_AUTO_AWG = process.env.OVERRIDE_AUTO_AWG?.toLowerCase();
+
 export const WG_ENV = {
   /** UI is hosted on HTTP instead of HTTPS */
   INSECURE: process.env.INSECURE === 'true',
@@ -21,11 +23,10 @@ export const WG_ENV = {
   DISABLE_IPV6: process.env.DISABLE_IPV6 === 'true',
   /** Override automatic detection */
   OVERRIDE_AUTO_AWG:
-    process.env.OVERRIDE_AUTO_AWG === 'true'
-      ? true
-      : process.env.OVERRIDE_AUTO_AWG === 'false'
-        ? false
-        : undefined,
+    OVERRIDE_AUTO_AWG === ('wg' as const) ||
+    OVERRIDE_AUTO_AWG === ('awg' as const)
+      ? OVERRIDE_AUTO_AWG
+      : undefined,
   /** TODO: delete on next major version */
   EXPERIMENTAL_AWG: process.env.EXPERIMENTAL_AWG === 'true',
 };
