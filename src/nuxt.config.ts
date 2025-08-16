@@ -83,6 +83,11 @@ export default defineNuxtConfig({
         language: 'tr-TR',
         name: 'Türkçe',
       },
+      {
+        code: 'bn',
+        language: 'bn-BD',
+        name: 'বাংলা',
+      },
     ],
     defaultLocale: 'en',
     vueI18n: './i18n.config.ts',
