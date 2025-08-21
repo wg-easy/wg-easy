@@ -74,6 +74,11 @@ export default defineNuxtConfig({
         name: '繁體中文（香港）',
       },
       {
+        code: 'pl',
+        language: 'pl-PL',
+        name: 'Polski',
+      },
+      {
         code: 'pt-BR',
         language: 'pt-BR',
         name: 'Português (Brasil)',
