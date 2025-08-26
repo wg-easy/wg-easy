@@ -144,7 +144,7 @@ sudo docker network create traefik
 sudo docker compose up -d
 ```
 
-You can no access the Traefik dashboard at `https://traefik.$example.com$` with the credentials you set in `traefik_dynamic.yml`.
+You can now access the Traefik dashboard at `https://traefik.$example.com$` with the credentials you set in `traefik_dynamic.yml`.
 
 ## Add Labels to `wg-easy`
 
