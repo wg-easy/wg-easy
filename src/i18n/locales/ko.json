@@ -19,8 +19,8 @@
     "enable2faDesc": "인증 앱으로 QR 코드를 스캔하거나 키를 수동으로 입력하세요.",
     "2faKey": "TOTP 키",
     "2faCodeDesc": "인증기 앱에서 코드를 입력하십시오.",
-    "disable2fa": "이중 인증 비활성화",
-    "disable2faDesc": "이중 인증을 비활성화하려면 비밀번호를 입력하세요."
+    "disable2fa": "2단계 인증 비활성화",
+    "disable2faDesc": "2단계 인증을 비활성화하려면 비밀번호를 입력하세요."
   },
   "general": {
     "name": "이름",
@@ -40,7 +40,7 @@
     "no": "아니요",
     "confirmPassword": "비밀번호 확인",
     "loading": "로딩 중...",
-    "2fa": "이중 인증",
+    "2fa": "2단계 인증",
     "2faCode": "TOTP 코드"
   },
   "setup": {
@@ -75,8 +75,8 @@
     "rememberMe": "로그인 상태 유지",
     "rememberMeDesc": "브라우저를 닫은 후에도 로그인 유지",
     "insecure": "안전하지 않은 연결로 로그인할 수 없습니다. HTTPS를 사용하세요.",
-    "2faRequired": "이중 인증이 필요합니다",
-    "2faWrong": "이중 인증이 잘못되었습니다"
+    "2faRequired": "2단계 인증이 필요합니다",
+    "2faWrong": "2단계 인증이 잘못되었습니다"
   },
   "client": {
     "empty": "아직 클라이언트가 없습니다.",
@@ -113,7 +113,10 @@
     "hooks": "후크",
     "hooksDescription": "후크는 wg-quick과만 작동합니다",
     "hooksLeaveEmpty": "wg-quick 전용입니다. 그렇지 않으면 비워 두십시오.",
-    "dnsDesc": "클라이언트가 사용할 DNS 서버(전역 구성 무시)"
+    "dnsDesc": "클라이언트가 사용할 DNS 서버(전역 구성 무시)",
+    "notConnected": "클라이언트가 연결되지 않음",
+    "endpoint": "엔드포인트",
+    "endpointDesc": "WireGuard에 연결된 클라이언트의 IP 주소"
   },
   "dialog": {
     "change": "변경",
@@ -229,7 +232,7 @@
     "file": "파일"
   },
   "hooks": {
-    "preUp": "프리업",
+    "preUp": "PreUp",
     "postUp": "PostUp",
     "preDown": "PreDown",
     "postDown": "PostDown"
