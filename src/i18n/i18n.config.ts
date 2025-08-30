@@ -11,6 +11,7 @@ import es from './locales/es.json';
 import ptbr from './locales/pt-BR.json';
 import tr from './locales/tr.json';
 import bn from './locales/bn.json';
+import id from './locales/id.json';
 
 export default defineI18nConfig(() => ({
   legacy: false,
@@ -29,5 +30,6 @@ export default defineI18nConfig(() => ({
     'pt-BR': ptbr,
     tr,
     bn,
+    id,
   },
 }));
