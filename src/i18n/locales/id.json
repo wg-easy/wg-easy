@@ -1,0 +1,240 @@
+{
+  "pages": {
+    "me": "Akun",
+    "clients": "Klien",
+    "admin": {
+      "panel": "Panel Admin",
+      "general": "General",
+      "config": "Umum",
+      "interface": "Antarmuka",
+      "hooks": "Hooks"
+    }
+  },
+  "user": {
+    "email": "E-Mail"
+  },
+  "me": {
+    "currentPassword": "Kata Sandi Saat Ini",
+    "enable2fa": "Aktifkan autentikasi dua faktor",
+    "enable2faDesc": "Pindai kode QR dengan aplikasi autentikator anda atau masukkan kuncinya secara manual.",
+    "2faKey": "Kunci TOTP",
+    "2faCodeDesc": "Masukkan kode dari aplikasi autentikator Anda.",
+    "disable2fa": "Nonaktifkan autentikasi dua faktor",
+    "disable2faDesc": "Masukkan kata sandi anda untuk menonaktifkan autentikasi dua faktor."
+  },
+  "general": {
+    "name": "Nama",
+    "username": "Name Pengguna",
+    "password": "Kata Sandi",
+    "newPassword": "Kata Sandi Baru",
+    "updatePassword": "Ubah Kata Sandi",
+    "mtu": "MTU",
+    "allowedIps": "IP yang diizinkan",
+    "dns": "DNS",
+    "persistentKeepalive": "Keepalive Persisten",
+    "logout": "Keluar",
+    "continue": "Lanjutkan",
+    "host": "Host",
+    "port": "Port",
+    "yes": "Ya",
+    "no": "Tidak",
+    "confirmPassword": "Konfirmasi Kata Sandi",
+    "loading": "Memuat...",
+    "2fa": "Autentikasi Dua Faktor",
+    "2faCode": "Kode TOTP"
+  },
+  "setup": {
+    "welcome": "Selamat datang di pengaturan pertama wg-easy anda",
+    "welcomeDesc": "Anda telah menemukan cara termudah untuk menginstal dan mengelola WireGuard di host Linux mana pun",
+    "existingSetup": "Apakah anda sudah memiliki pengaturan sebelumnya?",
+    "createAdminDesc": "Silakan masukkan dulu nama pengguna admin dan kata sandi yang kuat dan aman. Informasi ini akan digunakan untuk masuk ke panel administrasi Anda.",
+    "setupConfigDesc": "Silakan masukkan informasi host dan port. Ini akan digunakan untuk konfigurasi klien saat mengatur WireGuard di perangkat mereka.",
+    "setupMigrationDesc": "Silakan berikan file cadangan jika anda ingin memigrasikan data dari versi wg-easy sebelumnya ke pengaturan baru anda.",
+    "upload": "Unggah",
+    "migration": "Pulihkan cadangan:",
+    "createAccount": "Buat Akun",
+    "successful": "Pengaturan berhasil",
+    "hostDesc": "Hostname publik yang akan digunakan klien untuk terhubung",
+    "portDesc": "Port UDP publik yang akan digunakan klien untuk terhubung dan dibaca oleh WireGuard"
+  },
+  "update": {
+    "updateAvailable": "Ada pembaruan tersedia!",
+    "update": "Pembaruan"
+  },
+  "theme": {
+    "dark": "Tema gelap",
+    "light": "Tema terang",
+    "system": "Tema sistem"
+  },
+  "layout": {
+    "toggleCharts": "Tampilkan/sembunyikan Grafik",
+    "donate": "Donasi"
+  },
+  "login": {
+    "signIn": "Masuk",
+    "rememberMe": "Ingat saya",
+    "rememberMeDesc": "Tetap masuk setelah menutup browser",
+    "insecure": "Anda tidak dapat masuk dengan koneksi yang tidak aman. Gunakan HTTPS.",
+    "2faRequired": "Autentikasi dua faktor wajib digunakan",
+    "2faWrong": "Autentikasi dua faktor salah"
+  },
+  "client": {
+    "empty": "Belum ada klien.",
+    "newShort": "Baru",
+    "sort": "Urutkan",
+    "create": "Buat Klien",
+    "created": "Klien terbuat",
+    "new": "Klien Baru",
+    "name": "Nama",
+    "expireDate": "Tanggal Kedaluwarsa",
+    "expireDateDesc": "Tanggal klien akan dinonaktifkan. Kosongkan untuk opsi permanen.",
+    "deleteClient": "Hapus Klien",
+    "deleteDialog1": "Apakah anda yakin ingin menghapus",
+    "deleteDialog2": "Tindakan ini tidak dapat dibatalkan.",
+    "enabled": "Aktifkan",
+    "address": "Alamat",
+    "serverAllowedIps": "IP yang Diizinkan pada Server",
+    "otlDesc": "Buat tautan sekali pakai singkat",
+    "permanent": "Permanen",
+    "createdOn": "Dibuat pada ",
+    "lastSeen": "Terakhir terlihat pada ",
+    "totalDownload": "Total Unduhan: ",
+    "totalUpload": "Total Unggahan: ",
+    "newClient": "Klien Baru",
+    "disableClient": "Nonaktifkan Klien",
+    "enableClient": "Aktifkan Klien",
+    "noPrivKey": "Klien ini tidak memiliki kunci pribadi (private key) yang diketahui. Tidak dapat membuat konfigurasi.",
+    "showQR": "Tampilkan Kode QR",
+    "downloadConfig": "Unduh Konfigurasi",
+    "allowedIpsDesc": "IP mana yang akan dialihkan melalui VPN (menggantikan konfigurasi global)",
+    "serverAllowedIpsDesc": "IP mana yang akan dialihkan server ke klien",
+    "mtuDesc": "Menetapkan unit transmisi maksimum (ukuran paket) untuk terowongan VPN",
+    "persistentKeepaliveDesc": "Menetapkan interval (dalam detik) untuk paket keep-alive. 0 menonaktifkannya.",
+    "hooks": "Hooks",
+    "hooksDescription": "Hooks hanya berfungsi dengan wg-quick",
+    "hooksLeaveEmpty": "Hanya untuk wg-quick. Jika tidak, biarkan kosong.",
+    "dnsDesc": "Server DNS yang akan digunakan klien (menggantikan konfigurasi global)",
+    "notConnected": "Klien tidak terhubung",
+    "endpoint": "Titik Akhir (Endpoint)",
+    "endpointDesc": "IP klien dari mana koneksi WireGuard dibuat"
+  },
+  "dialog": {
+    "change": "Ubah",
+    "cancel": "Batal",
+    "create": "Buat"
+  },
+  "toast": {
+    "success": "Berhasil",
+    "saved": "Tersimpan",
+    "error": "Kesalahan"
+  },
+  "form": {
+    "actions": "Tindakan",
+    "save": "Simpan",
+    "revert": "Kembalikan",
+    "sectionGeneral": "Umum",
+    "sectionAdvanced": "Lanjutan",
+    "noItems": "Tidak ada item",
+    "nullNoItems": "Tidak ada item. Menggunakan konfigurasi global",
+    "add": "Tambah"
+  },
+  "admin": {
+    "general": {
+      "sessionTimeout": "Waktu Sesi Habis",
+      "sessionTimeoutDesc": "Durasi sesi untuk Ingat Saya (dalam detik)",
+      "metrics": "Metrik",
+      "metricsPassword": "Kata Sandi",
+      "metricsPasswordDesc": "Kata sandi Bearer untuk endpoint metrik (kata sandi atau hash argon2)",
+      "json": "JSON",
+      "jsonDesc": "Rute untuk metrik dalam format JSON",
+      "prometheus": "Prometheus",
+      "prometheusDesc": "Rute untuk metrik Prometheus"
+    },
+    "config": {
+      "connection": "Koneksi",
+      "hostDesc": "Hostname publik yang akan digunakan klien untuk terhubung (membatalkan konfigurasi)",
+      "portDesc": "Port UDP publik yang akan digunakan klien untuk terhubung (membatalkan konfigurasi, anda mungkin ingin mengubah Port Antarmuka juga)",
+      "allowedIpsDesc": "IP yang diizinkan untuk digunakan klien (konfigurasi global)",
+      "dnsDesc": "Server DNS yang akan digunakan klien (konfigurasi global)",
+      "mtuDesc": "MTU yang akan digunakan klien (hanya untuk klien baru)",
+      "persistentKeepaliveDesc": "Interval dalam detik untuk mengirim keepalive ke server. 0 = dinonaktifkan (hanya untuk klien baru)",
+      "suggest": "Menyarankan",
+      "suggestDesc": "Pilih alamat IP atau hostname untuk kolom Host"
+    },
+    "interface": {
+      "cidrSuccess": "CIDR diperbarui",
+      "device": "Perangkat",
+      "deviceDesc": "Perangkat Ethernet tempat lalu lintas WireGuard harus diteruskan",
+      "mtuDesc": "MTU yang akan digunakan oleh WireGuard",
+      "portDesc": "Port UDP yang akan didengarkan oleh WireGuard (Anda mungkin ingin mengubah Port Konfigurasi juga)",
+      "changeCidr": "Ubah CIDR",
+      "restart": "Mulai Ulang Antarmuka",
+      "restartDesc": "Mulai ulang antarmuka WireGuard",
+      "restartWarn": "Apakah Anda yakin ingin memulai ulang antarmuka? Ini akan membuat semua klien menjadi terputus.",
+      "restartSuccess": "Antarmuka telah dimulai ulang."
+    },
+    "introText": "Selamat datang di panel admin.\n\nDi sini Anda dapat mengelola pengaturan umum, konfigurasi, pengaturan antarmuka, dan hooks.\n\nMulailah dengan memilih salah satu bagian di bilah samping."
+  },
+  "zod": {
+    "generic": {
+      "required": "{0} diperlukan",
+      "validNumber": "{0} harus berupa angka yang valid",
+      "validString": "{0} harus berupa string yang valid",
+      "validBoolean": "{0} harus berupa boolean yang valid",
+      "validArray": "{0} harus berupa array yang valid",
+      "stringMin": "{0} harus memiliki setidaknya {1} karakter",
+      "numberMin": "{0} harus minimal {1}"
+    },
+    "client": {
+      "id": "ID Klien",
+      "name": "Nama",
+      "expiresAt": "Berakhir pada",
+      "address4": "Alamat IPv4",
+      "address6": "Alamat IPv6",
+      "serverAllowedIps": "IP yang diizinkan untuk Server"
+    },
+    "user": {
+      "username": "Nama Pengguna",
+      "password": "Kata Sandi",
+      "remember": "Ingat",
+      "name": "Nama",
+      "email": "Email",
+      "emailInvalid": "Harus berupa email yang valid",
+      "passwordMatch": "Kata sandi harus cocok",
+      "totpEnable": "Aktifkan TOTP",
+      "totpEnableTrue": "Aktifkan TOTP harus bernilai true",
+      "totpCode": "Kode TOTP"
+    },
+    "userConfig": {
+      "host": "Host"
+    },
+    "general": {
+      "sessionTimeout": "Waktu Sesi Habis",
+      "metricsEnabled": "Metrik",
+      "metricsPassword": "Kata Sandi Metrik"
+    },
+    "interface": {
+      "cidr": "CIDR",
+      "device": "Perangkat",
+      "cidrValid": "CIDR harus valid"
+    },
+    "otl": "Tautan Sekali Pakai",
+    "stringMalformed": "String tidak terformat dengan benar",
+    "body": "Body harus berupa objek yang valid",
+    "hook": "Hook",
+    "enabled": "Diaktifkan",
+    "mtu": "MTU",
+    "port": "Port",
+    "persistentKeepalive": "Keepalive Persisten",
+    "address": "Alamat IP",
+    "dns": "DNS",
+    "allowedIps": "IP yang diizinkan",
+    "file": "Berkas"
+  },
+  "hooks": {
+    "preUp": "PreUp",
+    "postUp": "PostUp",
+    "preDown": "PreDown",
+    "postDown": "PostDown"
+  }
+}
