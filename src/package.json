@@ -67,5 +67,11 @@
     "typescript": "^5.9.2",
     "vue-tsc": "^3.0.6"
   },
-  "packageManager": "pnpm@10.15.1"
+  "packageManager": "pnpm@10.15.1",
+  "pnpm": {
+    "overrides": {
+      "nuxt": "3.19.0",
+      "rollup": "4.50.0"
+    }
+  }
 }
