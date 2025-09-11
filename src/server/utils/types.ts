@@ -20,6 +20,23 @@ export const safeStringRefine = z
 
 export const EnabledSchema = z.boolean({ message: t('zod.enabled') });
 
+export const JcSchema = z.number().min(1).max(128);
+
+export const JminSchema = z.number().max(1279);
+
+export const JmaxSchema = z.number().max(1280);
+
+export const S1Schema = z.number().max(1132);
+
+export const S2Schema = z.number().max(1188);
+
+export const HSchema = z.number().min(5).max(2147483647);
+
+const ISchema = z.preprocess(
+  (val) => (val === '' ? null : val),
+  z.string().nullable()
+);
+
 export const MtuSchema = z
   .number({ message: t('zod.mtu') })
   .min(1280, { message: t('zod.mtu') })

@@ -20,6 +20,16 @@
           :label="$t('admin.interface.device')"
           :description="$t('admin.interface.deviceDesc')"
         />
+        <FormNumberField id="jC" v-model="data.jC" label="Jc" />
+        <FormNumberField id="jMin" v-model="data.jMin" label="Jmin" />
+        <FormNumberField id="jMax" v-model="data.jMax" label="Jmax" />
+        <FormNumberField id="s1" v-model="data.s1" label="S1" />
+        <FormNumberField id="s2" v-model="data.s2" label="S2" />
+        <FormNumberField id="h1" v-model="data.h1" label="H1" />
+        <FormNumberField id="h2" v-model="data.h2" label="H2" />
+        <FormNumberField id="h3" v-model="data.h3" label="H3" />
+        <FormNumberField id="h4" v-model="data.h4" label="H4" />
+        <FormNumberField id="i1" v-model="data.i1" label="I1" />
       </FormGroup>
       <FormGroup>
         <FormHeading>{{ $t('form.actions') }}</FormHeading>

@@ -13,6 +13,16 @@ export const wgInterface = sqliteTable('interfaces_table', {
   ipv4Cidr: text('ipv4_cidr').notNull(),
   ipv6Cidr: text('ipv6_cidr').notNull(),
   mtu: int().notNull(),
+  jC: int().notNull().default(7),
+  jMin: int().notNull().default(50),
+  jMax: int().notNull().default(1000),
+  s1: int().notNull().default(68),
+  s2: int().notNull().default(149),
+  h1: int().notNull().default(1106457265),
+  h2: int().notNull().default(249455488),
+  h3: int().notNull().default(1209847463),
+  h4: int().notNull().default(1646644382),
+  i1: text('i1'),
   // does nothing yet
   enabled: int({ mode: 'boolean' }).notNull(),
   createdAt: text('created_at')
