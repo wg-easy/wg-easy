@@ -12,7 +12,7 @@ jobs:
   docker:
     name: Build Docker
     runs-on: ${{ matrix.arch.os }}
-    if: github.repository_owner == 'wg-easy'
+    if: github.repository_owner == 'ph4'
     strategy:
       fail-fast: false
       matrix:
@@ -50,6 +50,6 @@ jobs:
           context: .
           push: false
           platforms: ${{ matrix.arch.platform }}
-          tags: ghcr.io/wg-easy/wg-easy:pr
+          tags: ghcr.io/ph4/wg-easy:pr
           cache-from: type=gha
           cache-to: type=gha,mode=min,scope=build-${{ env.PLATFORM_PAIR }}
