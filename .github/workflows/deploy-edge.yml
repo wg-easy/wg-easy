@@ -107,6 +107,13 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Login to Codeberg
+        uses: docker/login-action@v3
+        with:
+          registry: codeberg.org
+          username: ${{ secrets.CODEBERG_USER }}
+          password: ${{ secrets.CODEBERG_PASS }}
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -116,6 +123,7 @@ jobs:
         with:
           images: |
             ghcr.io/wg-easy/wg-easy
+            codeberg.org/wg-easy/wg-easy
           flavor: |
             latest=false
           tags: |
