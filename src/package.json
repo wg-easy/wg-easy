@@ -23,7 +23,7 @@
     "@eschricht/nuxt-color-mode": "^1.2.0",
     "@heroicons/vue": "^2.2.0",
     "@libsql/client": "^0.15.15",
-    "@nuxtjs/i18n": "^10.0.6",
+    "@nuxtjs/i18n": "^10.1.0",
     "@nuxtjs/tailwindcss": "^6.14.0",
     "@phc/format": "^1.0.0",
     "@pinia/nuxt": "^0.11.2",
@@ -40,7 +40,7 @@
     "is-cidr": "^6.0.0",
     "is-ip": "^5.0.1",
     "js-sha256": "^0.11.1",
-    "nuxt": "^3.19.1",
+    "nuxt": "^3.19.2",
     "otpauth": "^9.4.1",
     "pinia": "^3.0.3",
     "qr": "^0.5.1",
@@ -50,7 +50,7 @@
     "timeago.js": "^4.0.2",
     "vue": "latest",
     "vue3-apexcharts": "^1.8.0",
-    "zod": "^4.1.5"
+    "zod": "^4.1.8"
   },
   "devDependencies": {
     "@nuxt/eslint": "^1.9.0",
@@ -65,12 +65,11 @@
     "prettier-plugin-tailwindcss": "^0.6.14",
     "tsx": "^4.20.5",
     "typescript": "^5.9.2",
-    "vue-tsc": "^3.0.6"
+    "vue-tsc": "^3.0.7"
   },
-  "packageManager": "pnpm@10.15.1",
+  "packageManager": "pnpm@10.16.0",
   "pnpm": {
     "overrides": {
-      "nuxt": "3.19.0",
       "rollup": "4.50.0"
     }
   }
