@@ -54,7 +54,7 @@ export class UserConfigService {
     });
   }
 
-  update(data: UserConfigUpdateType) {
+  update(data: Partial<UserConfigUpdateType>) {
     return this.#db
       .update(userConfig)
       .set(data)
