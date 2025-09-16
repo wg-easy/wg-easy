@@ -18,8 +18,7 @@ These will only be used during the first start of the container. After that, the
 | `INIT_IPV6_CIDR`   | `2001:0DB8::/32`             | Sets IPv6 cidr                                            | 3     |
 | `INIT_ALLOWED_IPS` | `10.8.0.0/24,2001:0DB8::/32` | Sets global Allowed IPs                                   | 4     |
 
-
-/// warning | Variables have to be used together
+/// warning | Variables have to be used together
 
 If variables are in the same group, you have to set all of them. For example, if you set `INIT_IPV4_CIDR`, you also have to set `INIT_IPV6_CIDR`.
 
