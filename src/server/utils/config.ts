@@ -38,6 +38,7 @@ export const WG_INITIAL_ENV = {
   DNS: process.env.INIT_DNS?.split(',').map((x) => x.trim()),
   IPV4_CIDR: process.env.INIT_IPV4_CIDR,
   IPV6_CIDR: process.env.INIT_IPV6_CIDR,
+  ALLOWED_IPS: process.env.INIT_ALLOWED_IPS?.split(',').map((x) => x.trim()),
   HOST: process.env.INIT_HOST,
   PORT: process.env.INIT_PORT
     ? Number.parseInt(process.env.INIT_PORT, 10)

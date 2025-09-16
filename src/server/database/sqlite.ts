@@ -89,10 +89,15 @@ async function initialSetup(db: DBServiceType) {
 
   if (WG_INITIAL_ENV.DNS) {
     DB_DEBUG('Setting initial DNS...');
-    const userConfig = await db.userConfigs.get();
     await db.userConfigs.update({
-      ...userConfig,
       defaultDns: WG_INITIAL_ENV.DNS,
+    });
+  }
+
+  if (WG_INITIAL_ENV.ALLOWED_IPS) {
+    DB_DEBUG('Setting initial Allowed IPs...');
+    await db.userConfigs.update({
+      defaultAllowedIps: WG_INITIAL_ENV.ALLOWED_IPS,
     });
   }
 
