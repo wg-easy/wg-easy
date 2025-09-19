@@ -113,7 +113,8 @@
     "hooks": "掛鉤",
     "hooksDescription": "掛鉤僅適用於wg-quick",
     "hooksLeaveEmpty": "僅適用於wg-quick，否則請留空",
-    "dnsDesc": "客戶端使用的域名系統伺服器（取代全局配置）"
+    "dnsDesc": "客戶端使用的域名系統伺服器（取代全局配置）",
+    "search": "搜尋客戶端..."
   },
   "dialog": {
     "change": "更改",

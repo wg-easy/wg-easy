@@ -134,6 +134,29 @@ class WireGuard {
     return clients;
   }
 
+  async filterClients(userId: ID | null, filter: string) {
+    let clients;
+    if (userId != null) {
+      await this.getClientsForUser(userId);
+    } else {
+      clients = await this.getAllClients();
+    }
+
+    if (!clients) {
+      return [];
+    }
+
+    if (!filter.trim()) return clients;
+
+    const searchTerm = filter.toLowerCase().trim();
+    return clients?.filter((client) => {
+      const nameMatches = client.name.toLowerCase().includes(searchTerm);
+      const ipv4Matches = client.ipv4Address.toLowerCase().includes(searchTerm);
+      const ipv6Matches = client.ipv6Address.toLowerCase().includes(searchTerm);
+      return nameMatches || ipv4Matches || ipv6Matches;
+    });
+  }
+
   async getClientConfiguration({ clientId }: { clientId: ID }) {
     const wgInterface = await Database.interfaces.get();
     const userConfig = await Database.userConfigs.get();

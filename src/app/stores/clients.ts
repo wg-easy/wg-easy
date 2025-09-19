@@ -31,8 +31,13 @@ export const useClientsStore = defineStore('Clients', () => {
   const clients = ref<null | LocalClient[]>(null);
   const clientsPersist = ref<Record<string, ClientPersist>>({});
 
+  const searchParams = ref({
+    filter: '',
+  });
+
   const { data: _clients, refresh: _refresh } = useFetch('/api/client', {
     method: 'get',
+    params: searchParams,
   });
 
   // TODO: rewrite
@@ -130,5 +135,11 @@ export const useClientsStore = defineStore('Clients', () => {
 
     clients.value = transformedClients ?? null;
   }
-  return { clients, clientsPersist, refresh, _clients };
+
+  function setSearchQuery(filter: string) {
+    clients.value = null;
+    searchParams.value.filter = filter;
+  }
+
+  return { clients, clientsPersist, refresh, _clients, setSearchQuery };
 });

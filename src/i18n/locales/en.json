@@ -116,7 +116,8 @@
     "dnsDesc": "DNS server clients will use (overrides global config)",
     "notConnected": "Client not connected",
     "endpoint": "Endpoint",
-    "endpointDesc": "IP of the client from which the WireGuard connection is established"
+    "endpointDesc": "IP of the client from which the WireGuard connection is established",
+    "search": "Search clients..."
   },
   "dialog": {
     "change": "Change",
