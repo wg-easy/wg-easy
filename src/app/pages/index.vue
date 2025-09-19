@@ -4,6 +4,7 @@
       <PanelHead>
         <PanelHeadTitle :text="$t('pages.clients')" />
         <PanelHeadBoat>
+          <ClientsSearch />
           <ClientsSort />
           <ClientsNew />
         </PanelHeadBoat>

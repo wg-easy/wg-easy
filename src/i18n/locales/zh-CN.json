@@ -112,7 +112,8 @@
     "persistentKeepaliveDesc": "设置保活数据包的发送间隔（秒）。0表示禁用",
     "hooks": "钩子脚本",
     "hooksDescription": "钩子脚本仅在使用wg-quick时有效",
-    "hooksLeaveEmpty": "如果不使用wg-quick，请留空此字段"
+    "hooksLeaveEmpty": "如果不使用wg-quick，请留空此字段",
+    "search": "搜索客户端..."
   },
   "dialog": {
     "change": "确认修改",
