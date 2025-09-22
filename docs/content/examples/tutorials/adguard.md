@@ -39,8 +39,8 @@ services:
       - /etc/docker/volumes/adguard/adguard_conf:/opt/adguardhome/conf
     networks:
       traefik:
-        ipv4_address: 10.42.42.43
-        ipv6_address: fdcc:ad94:bacf:61a3::2b
+        ipv4_address: 10.99.99.43
+        ipv6_address: fdcc:99:99::2b
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.adguard.rule=Host(`adguard.$example.com$`)"
@@ -52,7 +52,6 @@ services:
 networks:
   traefik:
     external: true
-    name: traefik
 ```
 
 ## Upgrade Network
@@ -70,7 +69,7 @@ This setup requires static IPs, so the `traefik` network must be upgraded.
 2. Next, create it again with:
 
     ```bash
-    sudo docker network create --driver=bridge --subnet=10.42.42.0/24 --ipv6 --subnet=fdcc:ad94:bacf:61a3::/64 traefik
+    sudo docker network create --driver=bridge --subnet=10.99.99.0/24 --ipv6 --subnet=fdcc:99:99::/64 traefik
     ```
 
 ## Update `wg-easy` configuration
@@ -90,10 +89,10 @@ services:
       - "51820:51820/udp"
     ...
     networks:
-      # Make sure the name is traefik and not something else
+      ...
       traefik:
-        ipv4_address: 10.42.42.42
-        ipv6_address: fdcc:ad94:bacf:61a3::2a
+        ipv4_address: 10.99.99.42
+        ipv6_address: fdcc:99:99::2a
     ...
     environment:
       # Unattended Setup
@@ -105,15 +104,15 @@ services:
       # Replace $example.com$ with your domain
       - INIT_HOST=wg-easy.$example.com$
       - INIT_PORT=51820
-      - INIT_DNS=10.42.42.43,fdcc:ad94:bacf:61a3::2b
+      - INIT_DNS=10.99.99.43,fdcc:99:99::2b
       - INIT_IPV4_CIDR=10.8.0.0/24
       - INIT_IPV6_CIDR=fd42:42:42::/64
     ...
 
 networks:
+  ...
   traefik:
     external: true
-    name: traefik
 ```
 
 ## Start services
