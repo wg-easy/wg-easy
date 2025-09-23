@@ -38,9 +38,10 @@ services:
       - /etc/docker/volumes/adguard/adguard_work:/opt/adguardhome/work
       - /etc/docker/volumes/adguard/adguard_conf:/opt/adguardhome/conf
     networks:
-      traefik:
-        ipv4_address: 10.99.99.43
-        ipv6_address: fdcc:99:99::2b
+      wg:
+        ipv4_address: 10.42.42.43
+        ipv6_address: fdcc:ad94:bacf:61a3::2b
+      traefik: {}
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.adguard.rule=Host(`adguard.$example.com$`)"
@@ -50,31 +51,15 @@ services:
       - "traefik.docker.network=traefik"
 
 networks:
+  wg:
+    external: true
   traefik:
     external: true
 ```
 
-## Upgrade Network
-
-This setup requires static IPs, so the `traefik` network must be upgraded.
-
-1. Remove the old `traefik` network:
-
-    ```bash
-    sudo docker network rm traefik
-    ```
-
-    *(It is safe to ignore any error message if the network does not exist.)*
-
-2. Next, create it again with:
-
-    ```bash
-    sudo docker network create --driver=bridge --subnet=10.99.99.0/24 --ipv6 --subnet=fdcc:99:99::/64 traefik
-    ```
-
 ## Update `wg-easy` configuration
 
-**Replace each section** of your existing `wg-easy` compose file with the updated version below.
+Modify the corresponding sections of your existing `wg-easy` compose file to match the updated version below.
 
 File: `/etc/docker/containers/wg-easy/docker-compose.yml`
 
@@ -88,12 +73,6 @@ services:
     ports:
       - "51820:51820/udp"
     ...
-    networks:
-      ...
-      traefik:
-        ipv4_address: 10.99.99.42
-        ipv6_address: fdcc:99:99::2a
-    ...
     environment:
       # Unattended Setup
       - INIT_ENABLED=true
@@ -104,15 +83,17 @@ services:
       # Replace $example.com$ with your domain
       - INIT_HOST=wg-easy.$example.com$
       - INIT_PORT=51820
-      - INIT_DNS=10.99.99.43,fdcc:99:99::2b
+      - INIT_DNS=10.42.42.43,fdcc:ad94:bacf:61a3::2b
       - INIT_IPV4_CIDR=10.8.0.0/24
       - INIT_IPV6_CIDR=fd42:42:42::/64
     ...
 
 networks:
+  wg:
+    # Prevents Docker Compose from prefixing the network name.
+    name: wg
+    ...
   ...
-  traefik:
-    external: true
 ```
 
 ## Start services
