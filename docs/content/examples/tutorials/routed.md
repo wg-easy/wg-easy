@@ -20,8 +20,6 @@ services:
     image: ghcr.io/wg-easy/wg-easy:15
     container_name: wg-easy
     network_mode: "host"
-    environment:
-      - INSECURE=true # TEMPORARY for testing only; remove for production
     volumes:
       - ./config:/etc/wireguard
       - /lib/modules:/lib/modules:ro
