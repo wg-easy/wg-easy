@@ -30,7 +30,7 @@ export default defineEventHandler(async (event) => {
   setHeader(
     event,
     'Content-Disposition',
-    `attachment; filename="${client.name}.conf"`
+    `attachment; filename="${encodeURIComponent(client.name)}.conf"`
   );
   setHeader(event, 'Content-Type', 'text/plain');
   return config;
