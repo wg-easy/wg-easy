@@ -73,7 +73,7 @@ On your router:
 - Route `192.168.0.0/24` → next hop `192.168.10.118`
 - Route `2001:db8:abc:0::/64` → next hop `2001:db8:abc:10:216:3eff:fedb:949e`
 
-Don't forget to create the neccesary firewall rules to allow these subnets to travel across your LAN.
+Don't forget to create the neccesary firewall rules to allow these subnets to travel across your LAN. Some routers like OPNSense/PFSense may require specific Outbound NAT rules for the chosen IPv4 subnet.
 
 ## Wireguard Easy configuration
 
