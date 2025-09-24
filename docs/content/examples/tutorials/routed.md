@@ -60,7 +60,6 @@ Pick an IPv4 and IPv6 subnet for your clients and add static routes on your rout
 /// note | 2001:db8::/32
 
 The *documentation prefix* `2001:db8::/32` (RFC 3849) used in this example is not meant for production use, replace it with your own ISP-assigned IPv6 prefix (GUA) or local prefix (LUA)
-
 ///
 
 
