@@ -16,19 +16,19 @@ To make use of our own IPv4/IPv6 addresses, run the container with the `network_
 
 ```yaml
 services:
-  wg-easy:
-    image: ghcr.io/wg-easy/wg-easy:15
-    container_name: wg-easy
-    network_mode: "host"
-    volumes:
-      - ./config:/etc/wireguard
-      - /lib/modules:/lib/modules:ro
-    cap_add:
-      - NET_ADMIN
-      - SYS_MODULE
-    devices:
-      - /dev/net/tun:/dev/net/tun
-    restart: unless-stopped
+    wg-easy:
+        image: ghcr.io/wg-easy/wg-easy:15
+        container_name: wg-easy
+        network_mode: 'host'
+        volumes:
+            - ./config:/etc/wireguard
+            - /lib/modules:/lib/modules:ro
+        cap_add:
+            - NET_ADMIN
+            - SYS_MODULE
+        devices:
+            - /dev/net/tun:/dev/net/tun
+        restart: unless-stopped
 ```
 
 Because we’re on the host network, remove any `ports:` and container `sysctls:` you might have had before.
@@ -37,7 +37,7 @@ Because we’re on the host network, remove any `ports:` and container `sysctls:
 
 With host networking, system sysctls must be set on the **host**. On your host, create `/etc/sysctl.d/90-wireguard.conf`:
 
-```
+```txt
 net.ipv4.ip_forward=1
 net.ipv4.conf.all.src_valid_mark=1
 net.ipv6.conf.all.disable_ipv6=0
@@ -46,7 +46,8 @@ net.ipv6.conf.default.forwarding=1
 ```
 
 Apply and verify:
-```bash
+
+```shell
 sysctl -p /etc/sysctl.d/90-wireguard.conf
 sysctl -n net.ipv4.ip_forward   # should print 1
 ```
@@ -59,9 +60,8 @@ Pick an IPv4 and IPv6 subnet for your clients and add static routes on your rout
 
 /// note | 2001:db8::/32
 
-The *documentation prefix* `2001:db8::/32` (RFC 3849) used in this example is not meant for production use, replace it with your own ISP-assigned IPv6 prefix (GUA) or local prefix (LUA)
+The _documentation prefix_ `2001:db8::/32` (RFC 3849) used in this example is not meant for production use, replace it with your own ISP-assigned IPv6 prefix (GUA) or local prefix (LUA)
 ///
-
 
 I want my WireGuard clients in `192.168.0.0/24` and `2001:db8:abc:0::/64`.
 
@@ -70,6 +70,7 @@ I want my WireGuard clients in `192.168.0.0/24` and `2001:db8:abc:0::/64`.
 - WireGuard server IPs: `192.168.10.118` and `2001:db8:abc:10:216:3eff:fedb:949e`
 
 On your router:
+
 - Route `192.168.0.0/24` → next hop `192.168.10.118`
 - Route `2001:db8:abc:0::/64` → next hop `2001:db8:abc:10:216:3eff:fedb:949e`
 
@@ -82,11 +83,13 @@ In the web UI → Admin → Interface, click Change CIDR and set the IPv4/IPv6 r
 Then go to Admin → Hooks and add:
 
 PostUp
-```
+
+```shell
 iptables -A INPUT -p udp -m udp --dport {{port}} -j ACCEPT; iptables -A FORWARD -i wg0 -j ACCEPT; iptables -A FORWARD -o wg0 -j ACCEPT; ip6tables -A INPUT -p udp -m udp --dport {{port}} -j ACCEPT; ip6tables -A FORWARD -i wg0 -j ACCEPT; ip6tables -A FORWARD -o wg0 -j ACCEPT
 ```
 
 PostDown
-```
+
+```shell
 iptables -D INPUT -p udp -m udp --dport {{port}} -j ACCEPT; iptables -D FORWARD -i wg0 -j ACCEPT; iptables -D FORWARD -o wg0 -j ACCEPT; ip6tables -D INPUT -p udp -m udp --dport {{port}} -j ACCEPT; ip6tables -D FORWARD -i wg0 -j ACCEPT; ip6tables -D FORWARD -o wg0 -j ACCEPT
 ```
