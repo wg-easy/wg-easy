@@ -25,6 +25,7 @@ services:
       - /lib/modules:/lib/modules:ro
     cap_add:
       - NET_ADMIN
+      - SYS_MODULE
     devices:
       - /dev/net/tun:/dev/net/tun
     restart: unless-stopped
