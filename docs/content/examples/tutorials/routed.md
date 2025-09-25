@@ -60,7 +60,7 @@ Pick an IPv4 and IPv6 subnet for your clients and add static routes on your rout
 
 /// note | 2001:db8::/32
 
-The _documentation prefix_ `2001:db8::/32` (RFC 3849) used in this example is not meant for production use, replace it with your own ISP-assigned IPv6 prefix (GUA) or local prefix (LUA)
+The _documentation prefix_ `2001:db8::/32` (RFC 3849) used in this example is not meant for production use, replace it with your own ISP-assigned IPv6 prefix (GUA) or local prefix (ULA)
 ///
 
 I want my WireGuard clients in `192.168.0.0/24` and `2001:db8:abc:0::/64`.
@@ -74,7 +74,7 @@ On your router:
 - Route `192.168.0.0/24` → next hop `192.168.10.118`
 - Route `2001:db8:abc:0::/64` → next hop `2001:db8:abc:10:216:3eff:fedb:949e`
 
-Don't forget to create the neccesary firewall rules to allow these subnets to travel across your LAN. Some routers like OPNSense/PFSense may require specific Outbound NAT rules for the chosen IPv4 subnet.
+Don't forget to create the neccesary firewall rules to allow these subnets to travel across your LAN. Some routers like OPNSense/PFSense may require specific Outbound NAT rules for the chosen IPv4 subnet (And IPv6 if ULA).
 
 ## Wireguard Easy configuration
 
