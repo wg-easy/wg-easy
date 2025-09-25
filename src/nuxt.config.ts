@@ -44,6 +44,11 @@ export default defineNuxtConfig({
         name: 'Español',
       },
       {
+        code: 'it',
+        language: 'it-IT',
+        name: 'Italiano',
+      },
+      {
         code: 'fr',
         language: 'fr-FR',
         name: 'Français',
