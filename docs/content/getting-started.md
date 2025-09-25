@@ -38,6 +38,7 @@ If you're using podman, make sure to read the related [documentation][docs-podma
 To understand which tags you should use, read this section carefully. [Our CI][github-ci] will automatically build, test and push new images to the following container registry:
 
 1. GitHub Container Registry ([`ghcr.io/wg-easy/wg-easy`][ghcr-image])
+2. Codeberg Container Registry ([`codeberg.org/wg-easy/wg-easy`][codeberg-image]) (IPv6 support)
 
 All workflows are using the tagging convention listed below. It is subsequently applied to all images.
 
@@ -50,12 +51,13 @@ All workflows are using the tagging convention listed below. It is subsequently 
 | `edge`        | push to `master`                | `ghcr.io/wg-easy/wg-easy:edge`                                | mostly unstable, gets frequent package and code updates                       |
 | `development` | pull requests                   | `ghcr.io/wg-easy/wg-easy:development`                         | used for development, testing code from PRs                                   |
 
-<!-- ref: major version -->
+<!-- ref: major version (check links too) -->
 
 When publishing a tag we follow the [Semantic Versioning][semver] specification. The `latest` tag is always pointing to the latest stable release. If you want to avoid breaking changes, use the major version tag (e.g. `15`).
 
 [github-ci]: https://github.com/wg-easy/wg-easy/actions
 [ghcr-image]: https://github.com/wg-easy/wg-easy/pkgs/container/wg-easy
+[codeberg-image]: https://codeberg.org/wg-easy/-/packages/container/wg-easy/15
 [semver]: https://semver.org/
 
 ### Follow tutorials
