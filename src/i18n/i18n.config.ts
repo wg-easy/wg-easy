@@ -3,6 +3,7 @@ import pl from './locales/pl.json';
 import uk from './locales/uk.json';
 import fr from './locales/fr.json';
 import de from './locales/de.json';
+import it from './locales/it.json';
 import ru from './locales/ru.json';
 import zhhk from './locales/zh-HK.json';
 import zhcn from './locales/zh-CN.json';
