@@ -8,7 +8,13 @@ This tutorial is a follow-up to the official [Traefik tutorial](./traefik.md). I
 
 - A working [wg-easy](./basic-installation.md) and [Traefik](./traefik.md) setup from the previous guides.
 
-## Setup `AdGuardHome`
+/// warning | Important: Following this guide will reset your WireGuard configuration.
+The process involves re-creating the `wg-easy` container and its data, which means **all existing WireGuard clients and settings will be deleted.**
+
+You will need to create your clients again after completing this guide.
+///
+
+## Add `adguard` configuration
 
 1. Create a directory for the configuration files:
 
@@ -39,9 +45,11 @@ services:
             - /etc/docker/volumes/adguard/adguard_conf:/opt/adguardhome/conf
         networks:
             wg:
+                interface_name: eth0
                 ipv4_address: 10.42.42.43
                 ipv6_address: fdcc:ad94:bacf:61a3::2b
-            traefik: {}
+            traefik:
+                interface_name: eth1
         labels:
             - 'traefik.enable=true'
             - 'traefik.http.routers.adguard.rule=Host(`adguard.$example.com$`)'
@@ -64,10 +72,6 @@ Modify the corresponding sections of your existing `wg-easy` compose file to mat
 File: `/etc/docker/containers/wg-easy/docker-compose.yml`
 
 ```yaml
-volumes:
-  etc_wireguard:
-    name: etc_wireguard
-
 services:
   wg-easy:
     ports:
@@ -75,12 +79,13 @@ services:
     ...
     networks:
       wg:
+        interface_name: eth0
         ...
-        interface_name: wgeth
+      traefik:
+        interface_name: eth1
       ...
     ...
     environment:
-      - WG_DEVICE=wgeth
       # Unattended Setup
       - INIT_ENABLED=true
       # Replace $username$ with your username
@@ -93,13 +98,6 @@ services:
       - INIT_DNS=10.42.42.43,fdcc:ad94:bacf:61a3::2b
       - INIT_IPV4_CIDR=10.8.0.0/24
       - INIT_IPV6_CIDR=fd42:42:42::/64
-      # NOTE: The UI Hooks will overwrite these env vars.
-      # To make the configuration permanent:
-      # 1. Paste these rules into the UI's "Hooks" section, replacing the defaults.
-      # 2. Save the settings in the UI.
-      # 3. Restart the wg-easy container.
-      - WG_POST_UP=iptables -t nat -A PREROUTING -i wgeth -p udp --dport 53 -j DNAT --to-destination 10.42.42.43; iptables -t nat -A PREROUTING -i wgeth -p tcp --dport 53 -j DNAT --to-destination 10.42.42.43; ip6tables -t nat -A PREROUTING -i wgeth -p udp --dport 53 -j DNAT --to-destination fdcc:ad94:bacf:61a3::2b; ip6tables -t nat -A PREROUTING -i wgeth -p tcp --dport 53 -j DNAT --to-destination fdcc:ad94:bacf:61a3::2b; iptables -A FORWARD -i wgeth -j ACCEPT; iptables -A FORWARD -o wgeth -j ACCEPT; ip6tables -A FORWARD -i wgeth -j ACCEPT; ip6tables -A FORWARD -o wgeth -j ACCEPT; iptables -t nat -A POSTROUTING -o wgeth -j MASQUERADE; ip6tables -t nat -A POSTROUTING -o wgeth -j MASQUERADE
-      - WG_POST_DOWN=iptables -t nat -D PREROUTING -i wgeth -p udp --dport 53 -j DNAT --to-destination 10.42.42.43 || true; iptables -t nat -D PREROUTING -i wgeth -p tcp --dport 53 -j DNAT --to-destination 10.42.42.43 || true; ip6tables -t nat -D PREROUTING -i wgeth -p udp --dport 53 -j DNAT --to-destination fdcc:ad94:bacf:61a3::2b || true; ip6tables -t nat -D PREROUTING -i wgeth -p tcp --dport 53 -j DNAT --to-destination fdcc:ad94:bacf:61a3::2b || true; iptables -D FORWARD -i wgeth -j ACCEPT || true; iptables -D FORWARD -o wgeth -j ACCEPT || true; ip6tables -D FORWARD -i wgeth -j ACCEPT || true; ip6tables -D FORWARD -o wgeth -j ACCEPT || true; iptables -t nat -D POSTROUTING -o wgeth -j MASQUERADE || true; ip6tables -t nat -D POSTROUTING -o wgeth -j MASQUERADE || true
     ...
 
 networks:
@@ -110,10 +108,9 @@ networks:
   ...
 ```
 
-## Start services
+## Setup Wireguard
 
-1. Restart `wg-easy` to apply changes:
-   _Previous settings and configurations will be restored to default_
+1. Restart `wg-easy`:
 
     ```shell
     cd /etc/docker/containers/wg-easy
@@ -121,14 +118,38 @@ networks:
     sudo docker compose up -d
     ```
 
-2. Start `AdGuardHome`:
+2. Edit Wireguard's Hooks.
+
+    In the Admin Panel of your WireGuard server, go to the Hooks tab and replace it with:
+
+    **_PostUp_**
+
+    ```shell
+    iptables -A INPUT -p udp -m udp --dport {{port}} -j ACCEPT; ip6tables -A INPUT -p udp -m udp --dport {{port}} -j ACCEPT; iptables -t nat -A PREROUTING -i wg0 -p udp --dport 53 -j DNAT --to-destination 10.42.42.43; iptables -t nat -A PREROUTING -i wg0 -p tcp --dport 53 -j DNAT --to-destination 10.42.42.43; ip6tables -t nat -A PREROUTING -i wg0 -p udp --dport 53 -j DNAT --to-destination fdcc:ad94:bacf:61a3::2b; ip6tables -t nat -A PREROUTING -i wg0 -p tcp --dport 53 -j DNAT --to-destination fdcc:ad94:bacf:61a3::2b; iptables -A FORWARD -i wg0 -j ACCEPT; iptables -A FORWARD -o wg0 -j ACCEPT; ip6tables -A FORWARD -i wg0 -j ACCEPT; ip6tables -A FORWARD -o wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -s {{ipv4Cidr}} -o {{device}} -j MASQUERADE; ip6tables -t nat -A POSTROUTING -s {{ipv6Cidr}} -o {{device}} -j MASQUERADE;
+    ```
+
+    **_PostDown_**
+
+    ```shell
+    iptables -D INPUT -p udp -m udp --dport {{port}} -j ACCEPT || true; ip6tables -D INPUT -p udp -m udp --dport {{port}} -j ACCEPT || true; iptables -t nat -D PREROUTING -i wg0 -p udp --dport 53 -j DNAT --to-destination 10.42.42.43 || true; iptables -t nat -D PREROUTING -i wg0 -p tcp --dport 53 -j DNAT --to-destination 10.42.42.43 || true; ip6tables -t nat -D PREROUTING -i wg0 -p udp --dport 53 -j DNAT --to-destination fdcc:ad94:bacf:61a3::2b || true; ip6tables -t nat -D PREROUTING -i wg0 -p tcp --dport 53 -j DNAT --to-destination fdcc:ad94:bacf:61a3::2b || true; iptables -D FORWARD -i wg0 -j ACCEPT || true; iptables -D FORWARD -o wg0 -j ACCEPT || true; ip6tables -D FORWARD -i wg0 -j ACCEPT || true; ip6tables -D FORWARD -o wg0 -j ACCEPT || true; iptables -t nat -D POSTROUTING -s {{ipv4Cidr}} -o {{device}} -j MASQUERADE || true; ip6tables -t nat -D POSTROUTING -s {{ipv6Cidr}} -o {{device}} -j MASQUERADE || true;
+    ```
+
+3. Restart `wg-easy` to apply changes:
+
+    ```shell
+    sudo docker restart wg-easy
+    ```
+
+## Setup Adguard Home
+
+1. Start `adguard` service:
 
     ```shell
     cd /etc/docker/containers/adguard
     sudo docker compose up -d
     ```
 
-3. Navigate to `https://adguard.$example.com$` to begin the AdGuard Home setup.
+2. Navigate to `https://adguard.$example.com$` to begin the AdGuard Home setup.
 
 /// warning | Important: Configure AdGuard Home Admin Web Interface Port
 During the initial AdGuard Home setup on the `Step 2/5` page, you **must** set the **Admin Web Interface Port** to **3000**. Do not use the default port 80, as it will not work with the Traefik configuration.
