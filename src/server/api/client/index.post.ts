@@ -9,8 +9,10 @@ export default definePermissionEventHandler(
       validateZod(ClientCreateSchema, event)
     );
 
-    await Database.clients.create({ name, expiresAt });
+    const result = await Database.clients.create({ name, expiresAt });
     await WireGuard.saveConfig();
-    return { success: true };
+
+    const clientId = result[0]!.clientId;
+    return { success: true, clientId };
   }
 );

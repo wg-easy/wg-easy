@@ -132,7 +132,7 @@ export class ClientService {
       const ipv6Cidr = parseCidr(clientInterface.ipv6Cidr);
       const ipv6Address = nextIP(6, ipv6Cidr, clients);
 
-      await tx
+      return await tx
         .insert(client)
         .values({
           name,
@@ -150,6 +150,7 @@ export class ClientService {
           serverAllowedIps: [],
           enabled: true,
         })
+        .returning({ clientId: client.id })
         .execute();
     });
   }
