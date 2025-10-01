@@ -61,11 +61,14 @@ class WireGuard {
     WG_DEBUG('Config synced successfully.');
   }
 
-  async getClientsForUser(userId: ID) {
+  async getClientsForUser(userId: ID, filter: string) {
     const wgInterface = await Database.interfaces.get();
-
-    const dbClients = await Database.clients.getForUser(userId);
-
+    let dbClients;
+    if (filter.trim()) {
+      dbClients = await Database.clients.getForUserFiltered(userId, filter);
+    } else {
+      dbClients = await Database.clients.getForUser(userId);
+    }
     const clients = dbClients.map((client) => ({
       ...client,
       latestHandshakeAt: null as Date | null,
@@ -104,9 +107,14 @@ class WireGuard {
     return clientDump;
   }
 
-  async getAllClients() {
+  async getAllClients(filter: string) {
     const wgInterface = await Database.interfaces.get();
-    const dbClients = await Database.clients.getAllPublic();
+    let dbClients;
+    if (filter.trim()) {
+      dbClients = await Database.clients.getAllPublicFiltered(filter);
+    } else {
+      dbClients = await Database.clients.getAllPublic();
+    }
     const clients = dbClients.map((client) => ({
       ...client,
       latestHandshakeAt: null as Date | null,
@@ -132,29 +140,6 @@ class WireGuard {
     );
 
     return clients;
-  }
-
-  async filterClients(userId: ID | null, filter: string) {
-    let clients;
-    if (userId != null) {
-      await this.getClientsForUser(userId);
-    } else {
-      clients = await this.getAllClients();
-    }
-
-    if (!clients) {
-      return [];
-    }
-
-    if (!filter.trim()) return clients;
-
-    const searchTerm = filter.toLowerCase().trim();
-    return clients?.filter((client) => {
-      const nameMatches = client.name.toLowerCase().includes(searchTerm);
-      const ipv4Matches = client.ipv4Address.toLowerCase().includes(searchTerm);
-      const ipv6Matches = client.ipv6Address.toLowerCase().includes(searchTerm);
-      return nameMatches || ipv4Matches || ipv6Matches;
-    });
   }
 
   async getClientConfiguration({ clientId }: { clientId: ID }) {
