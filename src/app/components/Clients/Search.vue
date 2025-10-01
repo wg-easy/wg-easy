@@ -14,8 +14,8 @@
       <button
         v-if="searchQuery"
         class="absolute right-2 flex h-5 w-5 items-center justify-center rounded-full bg-gray-200 text-gray-600 hover:bg-gray-300 hover:text-gray-800 dark:bg-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-600 dark:hover:text-neutral-100"
-        @click="clearSearch"
         aria-label="Clear search"
+        @click="clearSearch"
       >
         <IconsClose class="h-3 w-3" />
       </button>
@@ -24,10 +24,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { MagnifyingGlassIcon } from '@heroicons/vue/24/outline';
-import IconsClose from '../Icons/Close.vue';
-
 const clientsStore = useClientsStore();
 const searchQuery = ref('');
 

@@ -1,11 +1,17 @@
+import { ClientQuerySchema } from '#db/repositories/client/types';
+
 export default definePermissionEventHandler(
   'clients',
   'custom',
-  ({ event, user }) => {
-    const { filter } = getQuery(event);
+  async ({ event, user }) => {
+    const { filter } = await getValidatedQuery(
+      event,
+      validateZod(ClientQuerySchema, event)
+    );
+
     if (user.role === roles.ADMIN) {
-      return WireGuard.filterClients(null, filter as string);
+      return WireGuard.getAllClients(filter);
     }
-    return WireGuard.filterClients(user.id, filter as string);
+    return WireGuard.getClientsForUser(user.id, filter);
   }
 );
