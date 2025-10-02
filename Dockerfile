@@ -44,8 +44,7 @@ RUN git clone https://github.com/amnezia-vpn/amneziawg-linux-kernel-module.git
 
 # Build the kernel module
 WORKDIR /build/amneziawg-linux-kernel-module/src
-RUN KERNEL_VERSION=$(cat /build/kernel_version.txt) && \
-    make KERNELDIR="/usr/src/linux-headers-$KERNEL_VERSION" || \
+RUN make KERNELDIR="/usr/src/linux-headers-lts" || \
     echo "Kernel module build failed, will use userspace fallback"
 
 # Prepare module for installation
