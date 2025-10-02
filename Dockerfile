@@ -21,7 +21,7 @@ RUN apk add linux-headers build-base git && \
     make
 
 # Build amneziawg kernel module for Alpine linux-lts kernel (6.12.50)
-FROM alpine:3.20 AS kernel_module_builder
+FROM alpine:3.22 AS kernel_module_builder
 WORKDIR /build
 
 # Install linux-lts kernel headers and build dependencies
@@ -81,8 +81,8 @@ COPY --from=build /app/amneziawg-tools/src/wg-quick/linux.bash /usr/bin/awg-quic
 RUN chmod +x /usr/bin/awg /usr/bin/awg-quick
 
 # Copy pre-built kernel module if available
-COPY --from=kernel_module_builder /build/module/* /lib/modules/ 2>/dev/null || true
-COPY --from=kernel_module_builder /build/kernel_version.txt /etc/amneziawg-kernel-version.txt 2>/dev/null || true
+COPY --from=kernel_module_builder /build/module /lib/modules/
+COPY --from=kernel_module_builder /build/kernel_version.txt /etc/amneziawg-kernel-version.txt
 
 # Install Linux packages
 RUN apk add --no-cache \
