@@ -20,6 +20,43 @@ RUN apk add linux-headers build-base git && \
     cd amneziawg-tools/src && \
     make
 
+# Build amneziawg kernel module for Alpine linux-lts kernel (6.12.50)
+FROM alpine:3.20 AS kernel_module_builder
+WORKDIR /build
+
+# Install linux-lts kernel headers and build dependencies
+RUN apk add --no-cache \
+    git \
+    linux-lts-dev \
+    build-base \
+    bc \
+    elfutils-dev \
+    wget \
+    xz
+
+# Get the actual LTS kernel version
+RUN KERNEL_VERSION=$(apk info linux-lts-dev | grep 'linux-lts-dev-' | sed 's/linux-lts-dev-//;s/-r.*//' | head -1) && \
+    echo "Building for kernel: $KERNEL_VERSION" && \
+    echo "$KERNEL_VERSION" > /build/kernel_version.txt
+
+# Clone the kernel module source
+RUN git clone https://github.com/amnezia-vpn/amneziawg-linux-kernel-module.git
+
+# Build the kernel module
+WORKDIR /build/amneziawg-linux-kernel-module/src
+RUN KERNEL_VERSION=$(cat /build/kernel_version.txt) && \
+    make KERNELDIR="/usr/src/linux-headers-$KERNEL_VERSION" || \
+    echo "Kernel module build failed, will use userspace fallback"
+
+# Prepare module for installation
+RUN mkdir -p /build/module && \
+    if [ -f amneziawg.ko ]; then \
+        cp amneziawg.ko /build/module/ && \
+        echo "Kernel module built successfully"; \
+    else \
+        echo "No kernel module - will use userspace only"; \
+    fi
+
 # Copy build result to a new image.
 # This saves a lot of disk space.
 FROM docker.io/library/node:lts-alpine
@@ -42,6 +79,10 @@ RUN chmod +x /usr/local/bin/cli
 COPY --from=build /app/amneziawg-tools/src/wg /usr/bin/awg
 COPY --from=build /app/amneziawg-tools/src/wg-quick/linux.bash /usr/bin/awg-quick
 RUN chmod +x /usr/bin/awg /usr/bin/awg-quick
+
+# Copy pre-built kernel module if available
+COPY --from=kernel_module_builder /build/module/* /lib/modules/ 2>/dev/null || true
+COPY --from=kernel_module_builder /build/kernel_version.txt /etc/amneziawg-kernel-version.txt 2>/dev/null || true
 
 # Install Linux packages
 RUN apk add --no-cache \
