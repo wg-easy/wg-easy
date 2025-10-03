@@ -17,6 +17,11 @@ import id from './locales/id.json';
 export default defineI18nConfig(() => ({
   legacy: false,
   fallbackLocale: 'en',
+  // Disable strict mode to prevent deepCopy errors with locale merging
+  silentTranslationWarn: true,
+  silentFallbackWarn: true,
+  // Use shallow merging to avoid deepCopy issues
+  mergeFallbackMessage: true,
   messages: {
     en,
     pl,
