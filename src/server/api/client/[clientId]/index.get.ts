@@ -19,17 +19,12 @@ export default definePermissionEventHandler(
       });
     }
 
+    // data can be undefined if the client is disabled
     const data = await WireGuard.dumpByPublicKey(result.publicKey);
-    if (!data) {
-      throw createError({
-        statusCode: 500,
-        statusMessage: 'Failed to dump client data',
-      });
-    }
 
     return {
       ...result,
-      endpoint: data.endpoint,
+      endpoint: data?.endpoint,
     };
   }
 );
