@@ -50,6 +50,8 @@ These ports can be changed, so if you change them you have to update your firewa
 - To setup caddy follow the instructions here: [Caddy](./caddy.md)
 - If you do not want to use a reverse proxy follow the instructions here: [No Reverse Proxy](./reverse-proxyless.md)
 
+For other configurations, e.g. nginx, Kubernetes, Pi Hole, and more check the [wiki of the repository](https://github.com/wg-easy/wg-easy/wiki).
+
 ## Update `wg-easy`
 
 To update `wg-easy` to the latest version, run:
