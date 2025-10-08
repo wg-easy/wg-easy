@@ -12,6 +12,7 @@ import { UserConfigService } from './repositories/userConfig/service';
 import { InterfaceService } from './repositories/interface/service';
 import { HooksService } from './repositories/hooks/service';
 import { OneTimeLinkService } from './repositories/oneTimeLink/service';
+import { generateAwgObfuscationParams } from '#utils/awg-params';
 
 const DB_DEBUG = debug('Database');
 
@@ -21,6 +22,9 @@ const db = drizzle({ client, schema });
 export async function connect() {
   await migrate();
   const dbService = new DBService(db);
+
+  // Always generate random AWG params on first run (even without INIT_ENABLED)
+  await generateRandomAwgParams(dbService);
 
   if (WG_INITIAL_ENV.ENABLED) {
     await initialSetup(dbService);
@@ -60,14 +64,46 @@ export type DBServiceType = DBService;
 async function migrate() {
   try {
     DB_DEBUG('Migrating database...');
+    // Use absolute path to avoid issues with working directory
+    const path = await import('path');
+    const migrationsPath = path.join(process.cwd(), 'server', 'database', 'migrations');
+    DB_DEBUG('Using migrations path:', migrationsPath);
     await drizzleMigrate(db, {
-      migrationsFolder: './server/database/migrations',
+      migrationsFolder: migrationsPath,
     });
     DB_DEBUG('Migration complete');
   } catch (e) {
     if (e instanceof Error) {
       DB_DEBUG('Failed to migrate database:', e.message);
+      DB_DEBUG('Migration error details:', e);
+      // Don't silently fail - this is critical
+      throw e;
     }
+  }
+}
+
+async function generateRandomAwgParams(db: DBServiceType) {
+  // Generate random AmneziaWG obfuscation parameters on first run
+  // Check if interface is using default values (including magic headers)
+  const currentInterface = await db.interfaces.get();
+  const isUsingDefaults =
+    currentInterface.jc === 8 &&
+    currentInterface.jmin === 8 &&
+    currentInterface.jmax === 80 &&
+    currentInterface.s1 === 50 &&
+    currentInterface.s2 === 85 &&
+    currentInterface.h1 === 1376979037 &&
+    currentInterface.h2 === 1283620850 &&
+    currentInterface.h3 === 917053776 &&
+    currentInterface.h4 === 696394151;
+
+  if (isUsingDefaults) {
+    DB_DEBUG('Generating random AmneziaWG obfuscation parameters...');
+    const awgParams = generateAwgObfuscationParams();
+    DB_DEBUG('Generated AWG params:', awgParams);
+    await db.interfaces.update(awgParams);
+  } else {
+    DB_DEBUG('AWG params already customized, skipping generation');
   }
 }
 
