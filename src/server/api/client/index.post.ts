@@ -13,6 +13,7 @@ export default definePermissionEventHandler(
     await WireGuard.saveConfig();
 
     const clientId = result[0]!.clientId;
-    return { success: true, clientId };
+    const config = await WireGuard.getClientConfiguration({ clientId });
+    return { success: true, clientId, name, expiresAt, config };
   }
 );
