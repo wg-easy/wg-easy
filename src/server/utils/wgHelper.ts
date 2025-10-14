@@ -85,12 +85,9 @@ PostDown = ${iptablesTemplate(hooks.postDown, wgInterface)}`;
   ) => {
     const { enableIpv6 = true } = options;
 
-    const cidr4Block = parseCidr(wgInterface.ipv4Cidr).prefix;
-    const cidr6Block = parseCidr(wgInterface.ipv6Cidr).prefix;
-
     const address =
-      `${client.ipv4Address}/${cidr4Block}` +
-      (enableIpv6 ? `, ${client.ipv6Address}/${cidr6Block}` : '');
+      `${client.ipv4Address}/32` +
+      (enableIpv6 ? `, ${client.ipv6Address}/128` : '');
 
     const hookLines = [
       client.preUp ? `PreUp = ${client.preUp}` : null,
