@@ -125,7 +125,7 @@ export const useClientsStore = defineStore('Clients', () => {
       };
     });
 
-    // TODO: move search to backend
+    // TODO: move sort to backend
     if (transformedClients !== undefined) {
       transformedClients = sortByProperty(
         transformedClients,
