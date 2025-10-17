@@ -133,11 +133,8 @@ export class ClientService {
    * Get clients based on user ID and filter conditions
    */
   async getForUserFiltered(userId: ID, filter: string) {
-    if (!filter.trim()) {
-      return this.getForUser(userId);
-    }
-
     const filterPattern = `%${filter.toLowerCase()}%`;
+
     const result = await this.#statements.findByUserIdFiltered.execute({
       userId,
       filter: filterPattern,
@@ -151,14 +148,11 @@ export class ClientService {
   }
 
   /**
-   * Get all public clients based on filter conditions
+   * Get all clients based on filter conditions without sensitive data
    */
   async getAllPublicFiltered(filter: string) {
-    if (!filter.trim()) {
-      return this.getAllPublic();
-    }
-
     const filterPattern = `%${filter.toLowerCase()}%`;
+
     const result = await this.#statements.findAllPublicFiltered.execute({
       filter: filterPattern,
     });

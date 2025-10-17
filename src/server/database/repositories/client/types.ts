@@ -39,7 +39,7 @@ const address6 = z
   .min(1, { message: t('zod.client.address6') })
   .pipe(safeStringRefine);
 
-const filter = z.string().optional().default('');
+const filter = z.string().optional();
 
 const serverAllowedIps = z.array(AddressSchema, {
   message: t('zod.client.serverAllowedIps'),

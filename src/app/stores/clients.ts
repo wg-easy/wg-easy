@@ -32,7 +32,7 @@ export const useClientsStore = defineStore('Clients', () => {
   const clientsPersist = ref<Record<string, ClientPersist>>({});
 
   const searchParams = ref({
-    filter: '',
+    filter: undefined as string | undefined,
   });
 
   const { data: _clients, refresh: _refresh } = useFetch('/api/client', {
@@ -125,6 +125,7 @@ export const useClientsStore = defineStore('Clients', () => {
       };
     });
 
+    // TODO: move search to backend
     if (transformedClients !== undefined) {
       transformedClients = sortByProperty(
         transformedClients,
@@ -138,7 +139,7 @@ export const useClientsStore = defineStore('Clients', () => {
 
   function setSearchQuery(filter: string) {
     clients.value = null;
-    searchParams.value.filter = filter;
+    searchParams.value.filter = filter || undefined;
   }
 
   return { clients, clientsPersist, refresh, _clients, setSearchQuery };

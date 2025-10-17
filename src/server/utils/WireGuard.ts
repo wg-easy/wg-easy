@@ -61,14 +61,16 @@ class WireGuard {
     WG_DEBUG('Config synced successfully.');
   }
 
-  async getClientsForUser(userId: ID, filter: string) {
+  async getClientsForUser(userId: ID, filter?: string) {
     const wgInterface = await Database.interfaces.get();
+
     let dbClients;
-    if (filter.trim()) {
+    if (filter?.trim()) {
       dbClients = await Database.clients.getForUserFiltered(userId, filter);
     } else {
       dbClients = await Database.clients.getForUser(userId);
     }
+
     const clients = dbClients.map((client) => ({
       ...client,
       latestHandshakeAt: null as Date | null,
@@ -107,14 +109,16 @@ class WireGuard {
     return clientDump;
   }
 
-  async getAllClients(filter: string) {
+  async getAllClients(filter?: string) {
     const wgInterface = await Database.interfaces.get();
+
     let dbClients;
-    if (filter.trim()) {
+    if (filter?.trim()) {
       dbClients = await Database.clients.getAllPublicFiltered(filter);
     } else {
       dbClients = await Database.clients.getAllPublic();
     }
+
     const clients = dbClients.map((client) => ({
       ...client,
       latestHandshakeAt: null as Date | null,
