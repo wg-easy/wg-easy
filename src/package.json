@@ -28,6 +28,8 @@
     "@phc/format": "^1.0.0",
     "@pinia/nuxt": "^0.11.2",
     "@tailwindcss/forms": "^0.5.10",
+    "@vueuse/core": "^13.9.0",
+    "@vueuse/nuxt": "^13.9.0",
     "apexcharts": "^5.3.5",
     "argon2": "^0.44.0",
     "cidr-tools": "^11.0.3",

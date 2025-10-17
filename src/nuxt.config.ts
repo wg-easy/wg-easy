@@ -13,6 +13,7 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
     '@eschricht/nuxt-color-mode',
     'radix-vue/nuxt',
+    '@vueuse/nuxt',
     '@nuxt/eslint',
   ],
   colorMode: {
