@@ -82,6 +82,16 @@
               :label="$t('general.persistentKeepalive')"
             />
           </FormGroup>
+          <FormGroup v-if="globalStore.information?.isAwg">
+            <FormHeading>Amnezia</FormHeading>
+            <FormNumberField id="jC" v-model="data.jC" label="Jc" />
+            <FormNumberField id="Jmin" v-model="data.jMin" label="Jmin" />
+            <FormNumberField id="Jmax" v-model="data.jMax" label="Jmax" />
+            <FormTextField id="i1" v-model="data.i1" label="I1" />
+            <FormTextField id="i2" v-model="data.i2" label="I2" />
+            <FormTextField id="i3" v-model="data.i3" label="I3" />
+            <FormTextField id="i4" v-model="data.i4" label="I4" />
+          </FormGroup>
           <FormGroup>
             <FormHeading :description="$t('client.hooksDescription')">
               {{ $t('client.hooks') }}
@@ -140,6 +150,7 @@
 
 <script lang="ts" setup>
 const authStore = useAuthStore();
+const globalStore = useGlobalStore();
 authStore.update();
 
 const route = useRoute();

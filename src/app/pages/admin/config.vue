@@ -47,6 +47,16 @@
           :description="$t('admin.config.persistentKeepaliveDesc')"
         />
       </FormGroup>
+      <FormGroup v-if="globalStore.information?.isAwg">
+        <FormHeading>Amnezia</FormHeading>
+        <FormNumberField id="jC" v-model="data.defaultJC" label="Jc" />
+        <FormNumberField id="jMin" v-model="data.defaultJMin" label="Jmin" />
+        <FormNumberField id="jMax" v-model="data.defaultJMax" label="Jmax" />
+        <FormTextField id="i1" v-model="data.defaultI1" label="I1" />
+        <FormTextField id="i2" v-model="data.defaultI2" label="I2" />
+        <FormTextField id="i3" v-model="data.defaultI3" label="I3" />
+        <FormTextField id="i4" v-model="data.defaultI4" label="I4" />
+      </FormGroup>
       <FormGroup>
         <FormHeading>{{ $t('form.actions') }}</FormHeading>
         <FormPrimaryActionField type="submit" :label="$t('form.save')" />
@@ -57,6 +67,8 @@
 </template>
 
 <script lang="ts" setup>
+const globalStore = useGlobalStore();
+
 const { data: _data, refresh } = await useFetch(`/api/admin/userconfig`, {
   method: 'get',
 });

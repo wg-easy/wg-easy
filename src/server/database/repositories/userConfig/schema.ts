@@ -18,6 +18,13 @@ export const userConfig = sqliteTable('user_configs_table', {
   defaultAllowedIps: text('default_allowed_ips', { mode: 'json' })
     .$type<string[]>()
     .notNull(),
+  defaultJC: int('default_j_c').default(7),
+  defaultJMin: int('default_j_min').default(10),
+  defaultJMax: int('default_j_max').default(1000),
+  defaultI1: text('default_i1'),
+  defaultI2: text('default_i2'),
+  defaultI3: text('default_i3'),
+  defaultI4: text('default_i4'),
   host: text().notNull(),
   port: int().notNull(),
   createdAt: text('created_at')

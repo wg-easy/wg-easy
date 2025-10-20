@@ -21,6 +21,24 @@
           :description="$t('admin.interface.deviceDesc')"
         />
       </FormGroup>
+      <FormGroup v-if="globalStore.information?.isAwg">
+        <FormHeading>Amnezia</FormHeading>
+        <FormNumberField id="jC" v-model="data.jC" label="Jc" />
+        <FormNumberField id="jMin" v-model="data.jMin" label="Jmin" />
+        <FormNumberField id="jMax" v-model="data.jMax" label="Jmax" />
+        <FormNumberField id="s1" v-model="data.s1" label="S1" />
+        <FormNumberField id="s2" v-model="data.s2" label="S2" />
+        <FormNumberField id="s3" v-model="data.s3" label="S3" />
+        <FormNumberField id="s4" v-model="data.s4" label="S4" />
+        <FormTextField id="i1" v-model="data.i1" label="I1" />
+        <FormTextField id="i2" v-model="data.i2" label="I2" />
+        <FormTextField id="i3" v-model="data.i3" label="I3" />
+        <FormTextField id="i4" v-model="data.i4" label="I4" />
+        <FormNumberField id="h1" v-model="data.h1" label="H1" />
+        <FormNumberField id="h2" v-model="data.h2" label="H2" />
+        <FormNumberField id="h3" v-model="data.h3" label="H3" />
+        <FormNumberField id="h4" v-model="data.h4" label="H4" />
+      </FormGroup>
       <FormGroup>
         <FormHeading>{{ $t('form.actions') }}</FormHeading>
         <FormPrimaryActionField type="submit" :label="$t('form.save')" />
@@ -53,6 +71,8 @@
 </template>
 
 <script setup lang="ts">
+const globalStore = useGlobalStore();
+
 const { t } = useI18n();
 
 const { data: _data, refresh } = await useFetch(`/api/admin/interface`, {
