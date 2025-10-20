@@ -39,6 +39,8 @@ const address6 = z
   .min(1, { message: t('zod.client.address6') })
   .pipe(safeStringRefine);
 
+const filter = z.string().optional();
+
 const serverAllowedIps = z.array(AddressSchema, {
   message: t('zod.client.serverAllowedIps'),
 });
@@ -49,6 +51,12 @@ export const ClientCreateSchema = z.object({
 });
 
 export type ClientCreateType = z.infer<typeof ClientCreateSchema>;
+
+export const ClientQuerySchema = z.object({
+  filter: filter,
+});
+
+export type ClientQueryType = z.infer<typeof ClientQuerySchema>;
 
 export const ClientUpdateSchema = schemaForType<UpdateClientType>()(
   z.object({

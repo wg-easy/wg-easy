@@ -1,4 +1,4 @@
-import { eq, sql } from 'drizzle-orm';
+import { eq, sql, or, like, and } from 'drizzle-orm';
 import { containsCidr, parseCidr } from 'cidr-tools';
 import { client } from './schema';
 import type {
@@ -35,6 +35,39 @@ function createPreparedStatement(db: DBType) {
     findByUserId: db.query.client
       .findMany({
         where: eq(client.userId, sql.placeholder('userId')),
+        with: { oneTimeLink: true },
+        columns: {
+          privateKey: false,
+          preSharedKey: false,
+        },
+      })
+      .prepare(),
+    findAllPublicFiltered: db.query.client
+      .findMany({
+        where: or(
+          like(client.name, sql.placeholder('filter')),
+          like(client.ipv4Address, sql.placeholder('filter')),
+          like(client.ipv6Address, sql.placeholder('filter'))
+        ),
+        with: {
+          oneTimeLink: true,
+        },
+        columns: {
+          privateKey: false,
+          preSharedKey: false,
+        },
+      })
+      .prepare(),
+    findByUserIdFiltered: db.query.client
+      .findMany({
+        where: and(
+          eq(client.userId, sql.placeholder('userId')),
+          or(
+            like(client.name, sql.placeholder('filter')),
+            like(client.ipv4Address, sql.placeholder('filter')),
+            like(client.ipv6Address, sql.placeholder('filter'))
+          )
+        ),
         with: { oneTimeLink: true },
         columns: {
           privateKey: false,
@@ -89,6 +122,41 @@ export class ClientService {
    */
   async getAllPublic() {
     const result = await this.#statements.findAllPublic.execute();
+    return result.map((row) => ({
+      ...row,
+      createdAt: new Date(row.createdAt),
+      updatedAt: new Date(row.updatedAt),
+    }));
+  }
+
+  /**
+   * Get clients based on user ID and filter conditions
+   */
+  async getForUserFiltered(userId: ID, filter: string) {
+    const filterPattern = `%${filter.toLowerCase()}%`;
+
+    const result = await this.#statements.findByUserIdFiltered.execute({
+      userId,
+      filter: filterPattern,
+    });
+
+    return result.map((row) => ({
+      ...row,
+      createdAt: new Date(row.createdAt),
+      updatedAt: new Date(row.updatedAt),
+    }));
+  }
+
+  /**
+   * Get all clients based on filter conditions without sensitive data
+   */
+  async getAllPublicFiltered(filter: string) {
+    const filterPattern = `%${filter.toLowerCase()}%`;
+
+    const result = await this.#statements.findAllPublicFiltered.execute({
+      filter: filterPattern,
+    });
+
     return result.map((row) => ({
       ...row,
       createdAt: new Date(row.createdAt),
