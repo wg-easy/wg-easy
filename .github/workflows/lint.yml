@@ -22,7 +22,7 @@ jobs:
           run_install: false
 
       - name: Setup Node
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v6
         with:
           node-version: "lts/*"
           check-latest: true
@@ -55,7 +55,7 @@ jobs:
           run_install: false
 
       - name: Setup Node
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v6
         with:
           node-version: "lts/*"
           check-latest: true
