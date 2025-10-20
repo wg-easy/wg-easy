@@ -99,8 +99,8 @@ importers:
         specifier: latest
         version: 3.5.22(typescript@5.9.3)
       vue3-apexcharts:
-        specifier: ^1.8.0
-        version: 1.8.0(apexcharts@5.3.5)(vue@3.5.22(typescript@5.9.3))
+        specifier: ^1.9.0
+        version: 1.9.0(apexcharts@5.3.5)(vue@3.5.22(typescript@5.9.3))
       zod:
         specifier: ^4.1.12
         version: 4.1.12
@@ -5344,8 +5344,8 @@ packages:
     peerDependencies:
       typescript: '>=5.0.0'
 
-  vue3-apexcharts@1.8.0:
-    resolution: {integrity: sha512-5tSD4mXTBbIJ9ir+58qHE6oNtIe0RNgqIRYMKpcsIaxkKtwUww4JhvPkpUFlmiW4OJbbdklgjleXq1lfcM4gdA==}
+  vue3-apexcharts@1.9.0:
+    resolution: {integrity: sha512-oGbo4kUlV9QRbsvS/zz7s251+yTI9O82d61rSMKWHS5OFo05kO2j5DdTrZW4HcLNXm6iNBsq/s81iylTxWfl5g==}
     peerDependencies:
       apexcharts: '>=4.0.0'
       vue: '>=3.0.0'
@@ -10944,7 +10944,7 @@ snapshots:
       '@vue/language-core': 3.1.1(typescript@5.9.3)
       typescript: 5.9.3
 
-  vue3-apexcharts@1.8.0(apexcharts@5.3.5)(vue@3.5.22(typescript@5.9.3)):
+  vue3-apexcharts@1.9.0(apexcharts@5.3.5)(vue@3.5.22(typescript@5.9.3)):
     dependencies:
       apexcharts: 5.3.5
       vue: 3.5.22(typescript@5.9.3)

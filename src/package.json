@@ -49,7 +49,7 @@
     "tailwindcss": "^3.4.18",
     "timeago.js": "^4.0.2",
     "vue": "latest",
-    "vue3-apexcharts": "^1.8.0",
+    "vue3-apexcharts": "^1.9.0",
     "zod": "^4.1.12"
   },
   "devDependencies": {
