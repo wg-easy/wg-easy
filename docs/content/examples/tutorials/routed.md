@@ -2,7 +2,7 @@
 title: Routed setup (No NAT)
 ---
 
-This guide shows how to run **wg-easy** with a routed setup so packets are forwarded instead of NATed.
+This guide shows how to run **wg-easy** with a routed setup, so packets are forwarded instead of NATed.
 
 In a routed design, each WireGuard client keeps its own IPv4/IPv6 address. That means you can identify clients by their real addresses instead of seeing everything as the WireGuard server’s IP.
 
@@ -54,7 +54,7 @@ sysctl -n net.ipv4.ip_forward   # should print 1
 
 ## Add static routes on your router
 
-Pick an IPv4 and IPv6 subnet for your clients and add static routes on your router, pointing to the wireguard server's LAN addresses.
+Pick an IPv4 and IPv6 subnet for your clients and add static routes on your router, pointing to the WireGuard server's LAN addresses.
 
 ### Example
 
@@ -74,11 +74,11 @@ On your router:
 - Route `192.168.0.0/24` → next hop `192.168.10.118`
 - Route `2001:db8:abc:0::/64` → next hop `2001:db8:abc:10:216:3eff:fedb:949e`
 
-Don't forget to create the neccesary firewall rules to allow these subnets to travel across your LAN. Some routers like OPNSense/PFSense may require specific Outbound NAT rules for the chosen IPv4 subnet (And IPv6 if ULA).
+Don't forget to create the necessary firewall rules to allow these subnets to travel across your LAN. Some routers or servers may require specific Outbound NAT rules for the chosen IPv4 and IPv6 subnets to allow traffic to traverse your LAN.
 
-## Wireguard Easy configuration
+## `wg-easy` configuration
 
-In the web UI → Admin → Interface, click Change CIDR and set the IPv4/IPv6 routed subnets you chose above. Save.
+In the Web UI → Admin → Interface, click Change CIDR and set the IPv4/IPv6 routed subnets you chose above. Save.
 
 Then go to Admin → Hooks and add:
 
