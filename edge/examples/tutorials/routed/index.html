@@ -12,22 +12,28 @@
         <meta name="author" content="WireGuard Easy">
       
       
+        <link rel="canonical" href="https://wg-easy.github.io/wg-easy/edge/examples/tutorials/routed/">
       
       
+        <link rel="prev" href="../reverse-proxyless/">
       
-      <link rel="icon" href="/wg-easy/edge/assets/logo/favicon.png">
+      
+        <link rel="next" href="../traefik/">
+      
+      
+      <link rel="icon" href="../../../assets/logo/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.22">
     
     
       
-        <title>wg-easy</title>
+        <title>Routed setup (No NAT) - wg-easy</title>
       
     
     
-      <link rel="stylesheet" href="/wg-easy/edge/assets/stylesheets/main.84d31ad4.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.84d31ad4.min.css">
       
         
-        <link rel="stylesheet" href="/wg-easy/edge/assets/stylesheets/palette.06af60db.min.css">
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.06af60db.min.css">
       
       
 
@@ -46,7 +52,7 @@
       
     
     
-    <script>__md_scope=new URL("/wg-easy/edge",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -71,6 +77,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#requirements" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -85,9 +96,9 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="/wg-easy/edge/." title="wg-easy" class="md-header__button md-logo" aria-label="wg-easy" data-md-component="logo">
+    <a href="../../.." title="wg-easy" class="md-header__button md-logo" aria-label="wg-easy" data-md-component="logo">
       
-  <img src="/wg-easy/edge/assets/logo/logo.png" alt="logo">
+  <img src="../../../assets/logo/logo.png" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -104,7 +115,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              
+              Routed setup (No NAT)
             
           </span>
         </div>
@@ -215,7 +226,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="/wg-easy/edge/." class="md-tabs__link">
+      <a href="../../.." class="md-tabs__link">
         
   
   
@@ -234,7 +245,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="/wg-easy/edge/faq/" class="md-tabs__link">
+      <a href="../../../faq/" class="md-tabs__link">
         
   
   
@@ -253,7 +264,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="/wg-easy/edge/getting-started/" class="md-tabs__link">
+      <a href="../../../getting-started/" class="md-tabs__link">
         
   
   
@@ -274,7 +285,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="/wg-easy/edge/advanced/api/" class="md-tabs__link">
+        <a href="../../../advanced/api/" class="md-tabs__link">
           
   
   
@@ -294,7 +305,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="/wg-easy/edge/contributing/general/" class="md-tabs__link">
+        <a href="../../../contributing/general/" class="md-tabs__link">
           
   
   
@@ -310,6 +321,8 @@
   
   
   
+    
+  
   
     
     
@@ -317,11 +330,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="/wg-easy/edge/examples/tutorials/adguard/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../adguard/" class="md-tabs__link">
           
   
   
@@ -344,7 +359,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="/wg-easy/edge/guides/2fa/" class="md-tabs__link">
+        <a href="../../../guides/2fa/" class="md-tabs__link">
           
   
   
@@ -378,9 +393,9 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="/wg-easy/edge/." title="wg-easy" class="md-nav__button md-logo" aria-label="wg-easy" data-md-component="logo">
+    <a href="../../.." title="wg-easy" class="md-nav__button md-logo" aria-label="wg-easy" data-md-component="logo">
       
-  <img src="/wg-easy/edge/assets/logo/logo.png" alt="logo">
+  <img src="../../../assets/logo/logo.png" alt="logo">
 
     </a>
     wg-easy
@@ -407,7 +422,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/wg-easy/edge/." class="md-nav__link">
+      <a href="../../.." class="md-nav__link">
         
   
   
@@ -429,7 +444,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/wg-easy/edge/faq/" class="md-nav__link">
+      <a href="../../../faq/" class="md-nav__link">
         
   
   
@@ -451,7 +466,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/wg-easy/edge/getting-started/" class="md-nav__link">
+      <a href="../../../getting-started/" class="md-nav__link">
         
   
   
@@ -516,7 +531,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/wg-easy/edge/advanced/api/" class="md-nav__link">
+      <a href="../../../advanced/api/" class="md-nav__link">
         
   
   
@@ -582,7 +597,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/wg-easy/edge/advanced/config/amnezia/" class="md-nav__link">
+      <a href="../../../advanced/config/amnezia/" class="md-nav__link">
         
   
   
@@ -605,7 +620,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/wg-easy/edge/advanced/config/experimental-config/" class="md-nav__link">
+      <a href="../../../advanced/config/experimental-config/" class="md-nav__link">
         
   
   
@@ -628,7 +643,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/wg-easy/edge/advanced/config/optional-config/" class="md-nav__link">
+      <a href="../../../advanced/config/optional-config/" class="md-nav__link">
         
   
   
@@ -651,7 +666,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/wg-easy/edge/advanced/config/unattended-setup/" class="md-nav__link">
+      <a href="../../../advanced/config/unattended-setup/" class="md-nav__link">
         
   
   
@@ -725,7 +740,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/wg-easy/edge/advanced/metrics/prometheus/" class="md-nav__link">
+      <a href="../../../advanced/metrics/prometheus/" class="md-nav__link">
         
   
   
@@ -799,7 +814,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/wg-easy/edge/advanced/migrate/" class="md-nav__link">
+      <a href="../../../advanced/migrate/" class="md-nav__link">
         
   
   
@@ -822,7 +837,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/wg-easy/edge/advanced/migrate/from-14-to-15/" class="md-nav__link">
+      <a href="../../../advanced/migrate/from-14-to-15/" class="md-nav__link">
         
   
   
@@ -903,7 +918,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/wg-easy/edge/contributing/general/" class="md-nav__link">
+      <a href="../../../contributing/general/" class="md-nav__link">
         
   
   
@@ -926,7 +941,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/wg-easy/edge/contributing/issues-and-pull-requests/" class="md-nav__link">
+      <a href="../../../contributing/issues-and-pull-requests/" class="md-nav__link">
         
   
   
@@ -949,7 +964,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/wg-easy/edge/contributing/translation/" class="md-nav__link">
+      <a href="../../../contributing/translation/" class="md-nav__link">
         
   
   
@@ -976,26 +991,29 @@
       
   
   
+    
   
   
+  
     
     
     
     
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
       
         
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
         
           
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
-        
-          
-          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
             
   
   
@@ -1008,7 +1026,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_6">
             <span class="md-nav__icon md-icon"></span>
             Examples
@@ -1019,8 +1037,10 @@
                 
   
   
+    
   
   
+  
     
     
     
@@ -1029,13 +1049,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6_1" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6_1" checked>
         
           
           <label class="md-nav__link" for="__nav_6_1" id="__nav_6_1_label" tabindex="0">
@@ -1051,7 +1069,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_6_1_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_6_1_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_6_1">
             <span class="md-nav__icon md-icon"></span>
             Tutorials
@@ -1065,7 +1083,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/wg-easy/edge/examples/tutorials/adguard/" class="md-nav__link">
+      <a href="../adguard/" class="md-nav__link">
         
   
   
@@ -1088,7 +1106,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/wg-easy/edge/examples/tutorials/auto-updates/" class="md-nav__link">
+      <a href="../auto-updates/" class="md-nav__link">
         
   
   
@@ -1111,7 +1129,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/wg-easy/edge/examples/tutorials/basic-installation/" class="md-nav__link">
+      <a href="../basic-installation/" class="md-nav__link">
         
   
   
@@ -1134,7 +1152,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/wg-easy/edge/examples/tutorials/caddy/" class="md-nav__link">
+      <a href="../caddy/" class="md-nav__link">
         
   
   
@@ -1157,7 +1175,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/wg-easy/edge/examples/tutorials/docker-run/" class="md-nav__link">
+      <a href="../docker-run/" class="md-nav__link">
         
   
   
@@ -1180,7 +1198,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/wg-easy/edge/examples/tutorials/dockerless/" class="md-nav__link">
+      <a href="../dockerless/" class="md-nav__link">
         
   
   
@@ -1203,7 +1221,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/wg-easy/edge/examples/tutorials/podman-nft/" class="md-nav__link">
+      <a href="../podman-nft/" class="md-nav__link">
         
   
   
@@ -1226,7 +1244,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/wg-easy/edge/examples/tutorials/reverse-proxyless/" class="md-nav__link">
+      <a href="../reverse-proxyless/" class="md-nav__link">
         
   
   
@@ -1246,10 +1264,30 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="/wg-easy/edge/examples/tutorials/routed/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Routed setup (No NAT)
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1260,6 +1298,84 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      Requirements
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#docker-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      Docker setup
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kernel-parameters-on-the-host" class="md-nav__link">
+    <span class="md-ellipsis">
+      Kernel parameters (on the host)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-static-routes-on-your-router" class="md-nav__link">
+    <span class="md-ellipsis">
+      Add static routes on your router
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Add static routes on your router">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#wg-easy-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      wg-easy configuration
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1272,7 +1388,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/wg-easy/edge/examples/tutorials/traefik/" class="md-nav__link">
+      <a href="../traefik/" class="md-nav__link">
         
   
   
@@ -1353,7 +1469,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/wg-easy/edge/guides/2fa/" class="md-nav__link">
+      <a href="../../../guides/2fa/" class="md-nav__link">
         
   
   
@@ -1376,7 +1492,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/wg-easy/edge/guides/admin/" class="md-nav__link">
+      <a href="../../../guides/admin/" class="md-nav__link">
         
   
   
@@ -1399,7 +1515,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/wg-easy/edge/guides/cli/" class="md-nav__link">
+      <a href="../../../guides/cli/" class="md-nav__link">
         
   
   
@@ -1422,7 +1538,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/wg-easy/edge/guides/clients/" class="md-nav__link">
+      <a href="../../../guides/clients/" class="md-nav__link">
         
   
   
@@ -1445,7 +1561,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/wg-easy/edge/guides/setup/" class="md-nav__link">
+      <a href="../../../guides/setup/" class="md-nav__link">
         
   
   
@@ -1486,6 +1602,74 @@
   
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      Requirements
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#docker-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      Docker setup
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kernel-parameters-on-the-host" class="md-nav__link">
+    <span class="md-ellipsis">
+      Kernel parameters (on the host)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-static-routes-on-your-router" class="md-nav__link">
+    <span class="md-ellipsis">
+      Add static routes on your router
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Add static routes on your router">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#wg-easy-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      wg-easy configuration
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -1496,8 +1680,108 @@
             <div class="md-content" data-md-component="content">
               <article class="md-content__inner md-typeset">
                 
-  <h1>404 - Not found</h1>
+                  
 
+
+  
+    <a href="https://github.com/wg-easy/wg-easy/edit/master/docs/content/examples/tutorials/routed.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
+    </a>
+  
+  
+    
+      
+    
+    <a href="https://github.com/wg-easy/wg-easy/raw/master/docs/content/examples/tutorials/routed.md" title="View source of this page" class="md-content__button md-icon">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
+    </a>
+  
+
+
+  <h1>Routed setup (No NAT)</h1>
+
+<p>This guide shows how to run <strong>wg-easy</strong> with a routed setup, so packets are forwarded instead of NATed.</p>
+<p>In a routed design, each WireGuard client keeps its own IPv4/IPv6 address. That means you can identify clients by their real addresses instead of seeing everything as the WireGuard server’s IP.</p>
+<h2 id="requirements"><a class="toclink" href="#requirements">Requirements</a></h2>
+<ol>
+<li>You know how to add static routes on your router to the WireGuard server.</li>
+</ol>
+<h2 id="docker-setup"><a class="toclink" href="#docker-setup">Docker setup</a></h2>
+<p>To make use of our own IPv4/IPv6 addresses, run the container with the <code>network_mode: host</code> option.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">services</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">wg-easy</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ghcr.io/wg-easy/wg-easy:15</span>
+<span class="w">        </span><span class="nt">container_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wg-easy</span>
+<span class="w">        </span><span class="nt">network_mode</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;host&#39;</span>
+<span class="w">        </span><span class="nt">volumes</span><span class="p">:</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./config:/etc/wireguard</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/lib/modules:/lib/modules:ro</span>
+<span class="w">        </span><span class="nt">cap_add</span><span class="p">:</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">NET_ADMIN</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SYS_MODULE</span>
+<span class="w">        </span><span class="nt">devices</span><span class="p">:</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/dev/net/tun:/dev/net/tun</span>
+<span class="w">        </span><span class="nt">restart</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">unless-stopped</span>
+</code></pre></div>
+<p>Because we’re on the host network, remove any <code>ports:</code> and container <code>sysctls:</code> you might have had before.</p>
+<h2 id="kernel-parameters-on-the-host"><a class="toclink" href="#kernel-parameters-on-the-host">Kernel parameters (on the host)</a></h2>
+<p>With host networking, system sysctls must be set on the <strong>host</strong>. On your host, create <code>/etc/sysctl.d/90-wireguard.conf</code>:</p>
+<div class="highlight"><pre><span></span><code>net.ipv4.ip_forward=1
+net.ipv4.conf.all.src_valid_mark=1
+net.ipv6.conf.all.disable_ipv6=0
+net.ipv6.conf.all.forwarding=1
+net.ipv6.conf.default.forwarding=1
+</code></pre></div>
+<p>Apply and verify:</p>
+<div class="highlight"><pre><span></span><code>sysctl<span class="w"> </span>-p<span class="w"> </span>/etc/sysctl.d/90-wireguard.conf
+sysctl<span class="w"> </span>-n<span class="w"> </span>net.ipv4.ip_forward<span class="w">   </span><span class="c1"># should print 1</span>
+</code></pre></div>
+<h2 id="add-static-routes-on-your-router"><a class="toclink" href="#add-static-routes-on-your-router">Add static routes on your router</a></h2>
+<p>Pick an IPv4 and IPv6 subnet for your clients and add static routes on your router, pointing to the WireGuard server's LAN addresses.</p>
+<h3 id="example"><a class="toclink" href="#example">Example</a></h3>
+<div class="admonition note">
+<p class="admonition-title">2001:db8::/32</p>
+<p>The <em>documentation prefix</em> <code>2001:db8::/32</code> (RFC 3849) used in this example is not meant for production use, replace it with your own ISP-assigned IPv6 prefix (GUA) or local prefix (ULA)</p>
+</div>
+<p>I want my WireGuard clients in <code>192.168.0.0/24</code> and <code>2001:db8:abc:0::/64</code>.</p>
+<ul>
+<li>Routed IPv4 subnet: <code>192.168.0.0/24</code></li>
+<li>Routed IPv6 prefix: <code>2001:db8:abc:0::/64</code></li>
+<li>WireGuard server IPs: <code>192.168.10.118</code> and <code>2001:db8:abc:10:216:3eff:fedb:949e</code></li>
+</ul>
+<p>On your router:</p>
+<ul>
+<li>Route <code>192.168.0.0/24</code> → next hop <code>192.168.10.118</code></li>
+<li>Route <code>2001:db8:abc:0::/64</code> → next hop <code>2001:db8:abc:10:216:3eff:fedb:949e</code></li>
+</ul>
+<p>Don't forget to create the necessary firewall rules to allow these subnets to travel across your LAN. Some routers or servers may require specific Outbound NAT rules for the chosen IPv4 and IPv6 subnets to allow traffic to traverse your LAN.</p>
+<h2 id="wg-easy-configuration"><a class="toclink" href="#wg-easy-configuration"><code>wg-easy</code> configuration</a></h2>
+<p>In the Web UI → Admin → Interface, click Change CIDR and set the IPv4/IPv6 routed subnets you chose above. Save.</p>
+<p>Then go to Admin → Hooks and add:</p>
+<p>PostUp</p>
+<div class="highlight"><pre><span></span><code>iptables<span class="w"> </span>-A<span class="w"> </span>INPUT<span class="w"> </span>-p<span class="w"> </span>udp<span class="w"> </span>-m<span class="w"> </span>udp<span class="w"> </span>--dport<span class="w"> </span><span class="o">{{</span>port<span class="o">}}</span><span class="w"> </span>-j<span class="w"> </span>ACCEPT<span class="p">;</span><span class="w"> </span>iptables<span class="w"> </span>-A<span class="w"> </span>FORWARD<span class="w"> </span>-i<span class="w"> </span>wg0<span class="w"> </span>-j<span class="w"> </span>ACCEPT<span class="p">;</span><span class="w"> </span>iptables<span class="w"> </span>-A<span class="w"> </span>FORWARD<span class="w"> </span>-o<span class="w"> </span>wg0<span class="w"> </span>-j<span class="w"> </span>ACCEPT<span class="p">;</span><span class="w"> </span>ip6tables<span class="w"> </span>-A<span class="w"> </span>INPUT<span class="w"> </span>-p<span class="w"> </span>udp<span class="w"> </span>-m<span class="w"> </span>udp<span class="w"> </span>--dport<span class="w"> </span><span class="o">{{</span>port<span class="o">}}</span><span class="w"> </span>-j<span class="w"> </span>ACCEPT<span class="p">;</span><span class="w"> </span>ip6tables<span class="w"> </span>-A<span class="w"> </span>FORWARD<span class="w"> </span>-i<span class="w"> </span>wg0<span class="w"> </span>-j<span class="w"> </span>ACCEPT<span class="p">;</span><span class="w"> </span>ip6tables<span class="w"> </span>-A<span class="w"> </span>FORWARD<span class="w"> </span>-o<span class="w"> </span>wg0<span class="w"> </span>-j<span class="w"> </span>ACCEPT
+</code></pre></div>
+<p>PostDown</p>
+<div class="highlight"><pre><span></span><code>iptables<span class="w"> </span>-D<span class="w"> </span>INPUT<span class="w"> </span>-p<span class="w"> </span>udp<span class="w"> </span>-m<span class="w"> </span>udp<span class="w"> </span>--dport<span class="w"> </span><span class="o">{{</span>port<span class="o">}}</span><span class="w"> </span>-j<span class="w"> </span>ACCEPT<span class="p">;</span><span class="w"> </span>iptables<span class="w"> </span>-D<span class="w"> </span>FORWARD<span class="w"> </span>-i<span class="w"> </span>wg0<span class="w"> </span>-j<span class="w"> </span>ACCEPT<span class="p">;</span><span class="w"> </span>iptables<span class="w"> </span>-D<span class="w"> </span>FORWARD<span class="w"> </span>-o<span class="w"> </span>wg0<span class="w"> </span>-j<span class="w"> </span>ACCEPT<span class="p">;</span><span class="w"> </span>ip6tables<span class="w"> </span>-D<span class="w"> </span>INPUT<span class="w"> </span>-p<span class="w"> </span>udp<span class="w"> </span>-m<span class="w"> </span>udp<span class="w"> </span>--dport<span class="w"> </span><span class="o">{{</span>port<span class="o">}}</span><span class="w"> </span>-j<span class="w"> </span>ACCEPT<span class="p">;</span><span class="w"> </span>ip6tables<span class="w"> </span>-D<span class="w"> </span>FORWARD<span class="w"> </span>-i<span class="w"> </span>wg0<span class="w"> </span>-j<span class="w"> </span>ACCEPT<span class="p">;</span><span class="w"> </span>ip6tables<span class="w"> </span>-D<span class="w"> </span>FORWARD<span class="w"> </span>-o<span class="w"> </span>wg0<span class="w"> </span>-j<span class="w"> </span>ACCEPT
+</code></pre></div>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
               </article>
             </div>
           
@@ -1544,10 +1828,10 @@
     
     
       
-      <script id="__config" type="application/json">{"base": "/wg-easy/edge", "features": ["navigation.tabs", "navigation.top", "navigation.expand", "navigation.instant", "content.action.edit", "content.action.view", "content.code.annotate"], "search": "/wg-easy/edge/assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.tabs", "navigation.top", "navigation.expand", "navigation.instant", "content.action.edit", "content.action.view", "content.code.annotate"], "search": "../../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="/wg-easy/edge/assets/javascripts/bundle.f55a23d4.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.f55a23d4.min.js"></script>
       
     
   </body>
