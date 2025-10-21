@@ -11,10 +11,10 @@
 </template>
 
 <script setup lang="ts">
-import type { VueApexChartsComponent } from 'vue3-apexcharts';
+import type { VueApexChartsComponentProps } from 'vue3-apexcharts';
 
 defineProps<{
-  options: VueApexChartsComponent['options'];
-  series: VueApexChartsComponent['series'];
+  options: VueApexChartsComponentProps['options'];
+  series: VueApexChartsComponentProps['series'];
 }>();
 </script>
