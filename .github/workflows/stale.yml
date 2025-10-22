@@ -22,7 +22,9 @@ jobs:
     steps:
       - uses: actions/stale@v10
         with:
+          # Stale after 30 days of inactivity
           days-before-issue-stale: 30
+          # Close after 14 days of being stale
           days-before-issue-close: 14
           stale-issue-label: "stale"
           stale-issue-message: "This issue is stale because it has been open for 30 days with no activity."
@@ -33,3 +35,9 @@ jobs:
           close-pr-message: "This PR was closed because it has been inactive for 14 days since being marked as stale."
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           operations-per-run: 100
+          # Ignore Feature requests (https://github.com/actions/stale/issues/1293)
+          only-issue-types: "Bug"
+          # Ignore confirmed bugs
+          exempt-issue-labels: "status: confirmed"
+          # Ignore PRs with milestones
+          exempt-all-pr-milestones: true
