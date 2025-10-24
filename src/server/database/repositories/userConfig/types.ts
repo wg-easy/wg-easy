@@ -33,6 +33,7 @@ export const UserConfigUpdateSchema = schemaForType<UserConfigUpdateType>()(
     defaultI2: ISchema,
     defaultI3: ISchema,
     defaultI4: ISchema,
+    defaultI5: ISchema,
     host: host,
   })
 );

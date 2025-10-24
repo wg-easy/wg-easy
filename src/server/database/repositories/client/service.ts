@@ -221,6 +221,7 @@ export class ClientService {
           i2: clientConfig.defaultI2,
           i3: clientConfig.defaultI3,
           i4: clientConfig.defaultI4,
+          i5: clientConfig.defaultI5,
           persistentKeepalive: clientConfig.defaultPersistentKeepalive,
           serverAllowedIps: [],
           enabled: true,

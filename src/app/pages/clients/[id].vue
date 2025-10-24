@@ -83,14 +83,59 @@
             />
           </FormGroup>
           <FormGroup v-if="globalStore.information?.isAwg">
-            <FormHeading>Amnezia</FormHeading>
-            <FormNumberField id="jC" v-model="data.jC" label="Jc" />
-            <FormNumberField id="Jmin" v-model="data.jMin" label="Jmin" />
-            <FormNumberField id="Jmax" v-model="data.jMax" label="Jmax" />
-            <FormTextField id="i1" v-model="data.i1" label="I1" />
-            <FormTextField id="i2" v-model="data.i2" label="I2" />
-            <FormTextField id="i3" v-model="data.i3" label="I3" />
-            <FormTextField id="i4" v-model="data.i4" label="I4" />
+            <FormHeading>AmneziaWG Obfuscation Parameters</FormHeading>
+
+            <FormNumberField
+              id="jC"
+              v-model="data.jC"
+              :label="$t('awg.jCLabel')"
+              :description="$t('awg.jCDescription')"
+            />
+            <FormNumberField
+              id="Jmin"
+              v-model="data.jMin"
+              :label="$t('awg.jMinLabel')"
+              :description="$t('awg.jMinDescription')"
+            />
+            <FormNumberField
+              id="Jmax"
+              v-model="data.jMax"
+              :label="$t('awg.jMaxLabel')"
+              :description="$t('awg.jMaxDescription')"
+            />
+
+            <div class="col-span-full text-sm">* {{ $t('awg.*') }}</div>
+
+            <FormTextField
+              id="i1"
+              v-model="data.i1"
+              :label="$t('awg.i1Label')"
+              :description="$t('awg.i1Description')"
+            />
+            <FormTextField
+              id="i2"
+              v-model="data.i2"
+              :label="$t('awg.i2Label')"
+              :description="$t('awg.i2Description')"
+            />
+            <FormTextField
+              id="i3"
+              v-model="data.i3"
+              :label="$t('awg.i3Label')"
+              :description="$t('awg.i3Description')"
+            />
+            <FormTextField
+              id="i4"
+              v-model="data.i4"
+              :label="$t('awg.i4Label')"
+              :description="$t('awg.i4Description')"
+            />
+            <FormTextField
+              id="i5"
+              v-model="data.i5"
+              :label="$t('awg.i5Label')"
+              :description="$t('awg.i5Description')"
+            />
           </FormGroup>
           <FormGroup>
             <FormHeading :description="$t('client.hooksDescription')">

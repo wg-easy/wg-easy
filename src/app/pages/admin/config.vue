@@ -48,14 +48,59 @@
         />
       </FormGroup>
       <FormGroup v-if="globalStore.information?.isAwg">
-        <FormHeading>Amnezia</FormHeading>
-        <FormNumberField id="jC" v-model="data.defaultJC" label="Jc" />
-        <FormNumberField id="jMin" v-model="data.defaultJMin" label="Jmin" />
-        <FormNumberField id="jMax" v-model="data.defaultJMax" label="Jmax" />
-        <FormTextField id="i1" v-model="data.defaultI1" label="I1" />
-        <FormTextField id="i2" v-model="data.defaultI2" label="I2" />
-        <FormTextField id="i3" v-model="data.defaultI3" label="I3" />
-        <FormTextField id="i4" v-model="data.defaultI4" label="I4" />
+        <FormHeading>AmneziaWG Obfuscation Parameters</FormHeading>
+
+        <FormNumberField
+          id="jC"
+          v-model="data.defaultJC"
+          :label="$t('awg.jCLabel')"
+          :description="$t('awg.jCDescription')"
+        />
+        <FormNumberField
+          id="jMin"
+          v-model="data.defaultJMin"
+          :label="$t('awg.jMinLabel')"
+          :description="$t('awg.jMinDescription')"
+        />
+        <FormNumberField
+          id="jMax"
+          v-model="data.defaultJMax"
+          :label="$t('awg.jMaxLabel')"
+          :description="$t('awg.jMaxDescription')"
+        />
+
+        <div class="col-span-full text-sm">* {{ $t('awg.*') }}</div>
+
+        <FormTextField
+          id="i1"
+          v-model="data.defaultI1"
+          :label="$t('awg.i1Label')"
+          :description="$t('awg.i1Description')"
+        />
+        <FormTextField
+          id="i2"
+          v-model="data.defaultI2"
+          :label="$t('awg.i2Label')"
+          :description="$t('awg.i2Description')"
+        />
+        <FormTextField
+          id="i3"
+          v-model="data.defaultI3"
+          :label="$t('awg.i3Label')"
+          :description="$t('awg.i3Description')"
+        />
+        <FormTextField
+          id="i4"
+          v-model="data.defaultI4"
+          :label="$t('awg.i4Label')"
+          :description="$t('awg.i4Description')"
+        />
+        <FormTextField
+          id="i5"
+          v-model="data.defaultI5"
+          :label="$t('awg.i5Label')"
+          :description="$t('awg.i5Description')"
+        />
       </FormGroup>
       <FormGroup>
         <FormHeading>{{ $t('form.actions') }}</FormHeading>

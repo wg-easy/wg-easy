@@ -79,6 +79,7 @@ export const ClientUpdateSchema = schemaForType<UpdateClientType>()(
     i2: ISchema,
     i3: ISchema,
     i4: ISchema,
+    i5: ISchema,
     persistentKeepalive: PersistentKeepaliveSchema,
     serverEndpoint: AddressSchema.nullable(),
     dns: DnsSchema.nullable(),

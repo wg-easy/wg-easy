@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "56cf26d3-6178-4089-9d94-533d3ea09a26",
+  "id": "e09bc17a-dab6-45a3-a09c-57af222b08fb",
   "prevId": "78de2e52-c4a8-4900-86c5-92f34739623a",
   "tables": {
     "clients_table": {
@@ -181,6 +181,13 @@
         },
         "i4": {
           "name": "i4",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "i5": {
+          "name": "i5",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
@@ -564,33 +571,44 @@
           "notNull": false,
           "autoincrement": false
         },
+        "i5": {
+          "name": "i5",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
         "h1": {
           "name": "h1",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": 0
         },
         "h2": {
           "name": "h2",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": 0
         },
         "h3": {
           "name": "h3",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": 0
         },
         "h4": {
           "name": "h4",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": 0
         },
         "enabled": {
           "name": "enabled",
@@ -881,6 +899,13 @@
         },
         "default_i4": {
           "name": "default_i4",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "default_i5": {
+          "name": "default_i5",
           "type": "text",
           "primaryKey": false,
           "notNull": false,

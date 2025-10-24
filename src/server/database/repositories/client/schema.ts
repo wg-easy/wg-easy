@@ -43,6 +43,7 @@ export const client = sqliteTable('clients_table', {
   i2: text(),
   i3: text(),
   i4: text(),
+  i5: text(),
   dns: text({ mode: 'json' }).$type<string[]>(),
   serverEndpoint: text('server_endpoint'),
   enabled: int({ mode: 'boolean' }).notNull(),

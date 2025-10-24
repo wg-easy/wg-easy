@@ -42,6 +42,7 @@ export const InterfaceUpdateSchema = schemaForType<InterfaceUpdateType>()(
     i2: ISchema,
     i3: ISchema,
     i4: ISchema,
+    i5: ISchema,
     h1: HSchema,
     h2: HSchema,
     h3: HSchema,

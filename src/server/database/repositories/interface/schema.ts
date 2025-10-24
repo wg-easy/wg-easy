@@ -3,10 +3,6 @@ import { int, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 import { userConfig, hooks } from '../../schema';
 
-// H1/H2/H3/H4 — must be unique among each other; recommended range is from 5 to 2147483647 inclusive
-const generateRandomHeaderValue = () =>
-  Math.floor(Math.random() * 2147483642) + 5;
-
 // maybe support multiple interfaces in the future
 export const wgInterface = sqliteTable('interfaces_table', {
   name: text().primaryKey(),
@@ -28,10 +24,11 @@ export const wgInterface = sqliteTable('interfaces_table', {
   i2: text(),
   i3: text(),
   i4: text(),
-  h1: int().$defaultFn(generateRandomHeaderValue),
-  h2: int().$defaultFn(generateRandomHeaderValue),
-  h3: int().$defaultFn(generateRandomHeaderValue),
-  h4: int().$defaultFn(generateRandomHeaderValue),
+  i5: text(),
+  h1: int().default(0),
+  h2: int().default(0),
+  h3: int().default(0),
+  h4: int().default(0),
   // does nothing yet
   enabled: int({ mode: 'boolean' }).notNull(),
   createdAt: text('created_at')
