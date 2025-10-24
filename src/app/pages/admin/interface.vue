@@ -21,6 +21,109 @@
           :description="$t('admin.interface.deviceDesc')"
         />
       </FormGroup>
+      <FormGroup v-if="globalStore.information?.isAwg">
+        <FormHeading>AmneziaWG Obfuscation Parameters</FormHeading>
+
+        <FormNumberField
+          id="jC"
+          v-model="data.jC"
+          :label="$t('awg.jCLabel')"
+          :description="$t('awg.jCDescription')"
+        />
+        <FormNumberField
+          id="jMin"
+          v-model="data.jMin"
+          :label="$t('awg.jMinLabel')"
+          :description="$t('awg.jMinDescription')"
+        />
+        <FormNumberField
+          id="jMax"
+          v-model="data.jMax"
+          :label="$t('awg.jMaxLabel')"
+          :description="$t('awg.jMaxDescription')"
+        />
+        <FormNumberField
+          id="s1"
+          v-model="data.s1"
+          :label="$t('awg.s1Label')"
+          :description="$t('awg.s1Description')"
+        />
+        <FormNumberField
+          id="s2"
+          v-model="data.s2"
+          :label="$t('awg.s2Label')"
+          :description="$t('awg.s2Description')"
+        />
+
+        <div class="col-span-full text-sm">* {{ $t('awg.*') }}</div>
+
+        <FormNumberField
+          id="s3"
+          v-model="data.s3"
+          :label="$t('awg.s3Label')"
+          :description="$t('awg.s3Description')"
+        />
+        <FormNumberField
+          id="s4"
+          v-model="data.s4"
+          :label="$t('awg.s4Label')"
+          :description="$t('awg.s4Description')"
+        />
+        <FormTextField
+          id="i1"
+          v-model="data.i1"
+          :label="$t('awg.i1Label')"
+          :description="$t('awg.i1Description')"
+        />
+        <FormTextField
+          id="i2"
+          v-model="data.i2"
+          :label="$t('awg.i2Label')"
+          :description="$t('awg.i2Description')"
+        />
+        <FormTextField
+          id="i3"
+          v-model="data.i3"
+          :label="$t('awg.i3Label')"
+          :description="$t('awg.i3Description')"
+        />
+        <FormTextField
+          id="i4"
+          v-model="data.i4"
+          :label="$t('awg.i4Label')"
+          :description="$t('awg.i4Description')"
+        />
+        <FormTextField
+          id="i5"
+          v-model="data.i5"
+          :label="$t('awg.i5Label')"
+          :description="$t('awg.i5Description')"
+        />
+        <FormNumberField
+          id="h1"
+          v-model="data.h1"
+          :label="$t('awg.h1Label')"
+          :description="$t('awg.h1Description')"
+        />
+        <FormNumberField
+          id="h2"
+          v-model="data.h2"
+          :label="$t('awg.h2Label')"
+          :description="$t('awg.h2Description')"
+        />
+        <FormNumberField
+          id="h3"
+          v-model="data.h3"
+          :label="$t('awg.h3Label')"
+          :description="$t('awg.h3Description')"
+        />
+        <FormNumberField
+          id="h4"
+          v-model="data.h4"
+          :label="$t('awg.h4Label')"
+          :description="$t('awg.h4Description')"
+        />
+      </FormGroup>
       <FormGroup>
         <FormHeading>{{ $t('form.actions') }}</FormHeading>
         <FormPrimaryActionField type="submit" :label="$t('form.save')" />
@@ -53,6 +156,8 @@
 </template>
 
 <script setup lang="ts">
+const globalStore = useGlobalStore();
+
 const { t } = useI18n();
 
 const { data: _data, refresh } = await useFetch(`/api/admin/interface`, {

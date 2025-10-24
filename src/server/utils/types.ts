@@ -26,6 +26,18 @@ export const MtuSchema = z
   .min(1024, { message: t('zod.mtu') })
   .max(9000, { message: t('zod.mtu') });
 
+export const JcSchema = z.number().min(1).max(128).nullable();
+// TODO: more validation
+export const JminSchema = z.number().max(1279).nullable();
+
+export const JmaxSchema = z.number().max(1280).nullable();
+
+export const SSchema = z.number().max(1132).nullable();
+
+export const HSchema = z.number().min(5).max(2147483647).nullable();
+
+export const ISchema = z.string().nullable();
+
 export const PortSchema = z
   .number({ message: t('zod.port') })
   .min(1, { message: t('zod.port') })
