@@ -37,7 +37,7 @@
     "consola": "^3.4.2",
     "crc-32": "^1.2.2",
     "debug": "^4.4.3",
-    "drizzle-orm": "^0.44.6",
+    "drizzle-orm": "^0.44.7",
     "ip-bigint": "^8.2.2",
     "is-cidr": "^6.0.1",
     "is-ip": "^5.0.1",
