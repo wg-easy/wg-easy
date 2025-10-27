@@ -1,11 +1,21 @@
 import fs from 'node:fs/promises';
 import debug from 'debug';
 import { encodeQR } from 'qr';
+import type { NitroApp } from 'nitropack/types';
 import type { InterfaceType } from '#db/repositories/interface/types';
 
 const WG_DEBUG = debug('WireGuard');
 
 class WireGuard {
+  private _nitroApp: NitroApp | null = null;
+
+  private get nitroApp(): NitroApp {
+    if (!this._nitroApp) {
+      this._nitroApp = useNitroApp();
+    }
+    return this._nitroApp;
+  }
+  // 注册事件监听器，监听客户端配置保存后的事件
   /**
    * Save and sync config
    */
@@ -13,6 +23,7 @@ class WireGuard {
     const wgInterface = await Database.interfaces.get();
     await this.#saveWireguardConfig(wgInterface);
     await this.#syncWireguardConfig(wgInterface);
+    await this.nitroApp.hooks.callHook('wireguard:config');
   }
 
   /**
@@ -208,6 +219,7 @@ class WireGuard {
     await this.#syncWireguardConfig(wgInterface);
     WG_DEBUG(`Wireguard Interface ${wgInterface.name} started successfully.`);
 
+    await this.nitroApp.hooks.callHook('wireguard:start');
     WG_DEBUG('Starting Cron Job...');
     await this.startCronJob();
     WG_DEBUG('Cron Job started successfully.');
