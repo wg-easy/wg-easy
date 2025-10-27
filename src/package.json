@@ -23,13 +23,13 @@
     "@eschricht/nuxt-color-mode": "^1.2.0",
     "@heroicons/vue": "^2.2.0",
     "@libsql/client": "^0.15.15",
-    "@nuxtjs/i18n": "^10.1.1",
+    "@nuxtjs/i18n": "^10.1.2",
     "@nuxtjs/tailwindcss": "^6.14.0",
     "@phc/format": "^1.0.0",
     "@pinia/nuxt": "^0.11.2",
     "@tailwindcss/forms": "^0.5.10",
-    "@vueuse/core": "^13.9.0",
-    "@vueuse/nuxt": "^13.9.0",
+    "@vueuse/core": "^14.0.0",
+    "@vueuse/nuxt": "^14.0.0",
     "apexcharts": "^5.3.5",
     "argon2": "^0.44.0",
     "cidr-tools": "^11.0.3",
@@ -37,7 +37,7 @@
     "consola": "^3.4.2",
     "crc-32": "^1.2.2",
     "debug": "^4.4.3",
-    "drizzle-orm": "^0.44.6",
+    "drizzle-orm": "^0.44.7",
     "ip-bigint": "^8.2.2",
     "is-cidr": "^6.0.1",
     "is-ip": "^5.0.1",
@@ -67,9 +67,9 @@
     "prettier-plugin-tailwindcss": "^0.7.1",
     "tsx": "^4.20.6",
     "typescript": "^5.9.3",
-    "vue-tsc": "^3.1.1"
+    "vue-tsc": "^3.1.2"
   },
-  "packageManager": "pnpm@10.18.3",
+  "packageManager": "pnpm@10.19.0",
   "pnpm": {
     "overrides": {
       "rollup": "4.50.0"
