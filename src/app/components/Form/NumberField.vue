@@ -13,5 +13,5 @@
 <script lang="ts" setup>
 defineProps<{ id: string; label: string; description?: string }>();
 
-const data = defineModel<number>();
+const data = defineModel<number | null>();
 </script>
