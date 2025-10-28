@@ -10,13 +10,13 @@ jobs:
     name: Build & Deploy
     runs-on: ubuntu-latest
     if: |
-      github.repository_owner == 'wg-easy' &&
+      github.repository_owner == 'evoll' &&
       !contains(github.event.head_commit.message, '!skipci')
     permissions:
       packages: write
       contents: read
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
       with:
         ref: v14
 
@@ -24,10 +24,10 @@ jobs:
       uses: docker/setup-qemu-action@v3
 
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
+      uses: docker/setup-buildx-action@v3.11.1
 
     - name: Login to GitHub Container Registry
-      uses: docker/login-action@v3
+      uses: docker/login-action@v3.6.0
       with:
         registry: ghcr.io
         username: ${{ github.actor }}
@@ -38,4 +38,4 @@ jobs:
       with:
         push: true
         platforms: linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8
-        tags: ghcr.io/wg-easy/wg-easy:latest, ghcr.io/wg-easy/wg-easy:14
+        tags: ghcr.io/evoll/awg-easy:14

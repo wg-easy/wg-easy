@@ -2,6 +2,7 @@
 
 const bcrypt = require('bcryptjs');
 const crypto = require('node:crypto');
+const basicAuth = require('basic-auth');
 const { createServer } = require('node:http');
 const { stat, readFile } = require('node:fs/promises');
 const { resolve, sep } = require('node:path');
@@ -28,14 +29,22 @@ const {
   PORT,
   WEBUI_HOST,
   RELEASE,
-  PASSWORD,
   PASSWORD_HASH,
+  MAX_AGE,
   LANG,
   UI_TRAFFIC_STATS,
   UI_CHART_TYPE,
+  WG_ENABLE_ONE_TIME_LINKS,
+  UI_ENABLE_SORT_CLIENTS,
+  WG_ENABLE_EXPIRES_TIME,
+  ENABLE_PROMETHEUS_METRICS,
+  PROMETHEUS_METRICS_PASSWORD,
+  DICEBEAR_TYPE,
+  USE_GRAVATAR,
 } = require('../config');
 
 const requiresPassword = !!PASSWORD_HASH;
+const requiresPrometheusPassword = !!PROMETHEUS_METRICS_PASSWORD;
 
 /**
  * Checks if `password` matches the PASSWORD_HASH.
@@ -45,16 +54,20 @@ const requiresPassword = !!PASSWORD_HASH;
  * @param {string} password String to test
  * @returns {boolean} true if matching environment, otherwise false
  */
-const isPasswordValid = (password) => {
+const isPasswordValid = (password, hash) => {
   if (typeof password !== 'string') {
     return false;
   }
-
-  if (PASSWORD_HASH) {
-    return bcrypt.compareSync(password, PASSWORD_HASH);
+  if (hash) {
+    return bcrypt.compareSync(password, hash);
   }
 
   return false;
+};
+
+const cronJobEveryMinute = async () => {
+  await WireGuard.cronJobEveryMinute();
+  setTimeout(cronJobEveryMinute, 60 * 1000);
 };
 
 module.exports = class Server {
@@ -83,14 +96,42 @@ module.exports = class Server {
         return `"${LANG}"`;
       }))
 
+      .get('/api/remember-me', defineEventHandler((event) => {
+        setHeader(event, 'Content-Type', 'application/json');
+        return MAX_AGE > 0;
+      }))
+
       .get('/api/ui-traffic-stats', defineEventHandler((event) => {
         setHeader(event, 'Content-Type', 'application/json');
-        return `"${UI_TRAFFIC_STATS}"`;
+        return `${UI_TRAFFIC_STATS}`;
       }))
 
       .get('/api/ui-chart-type', defineEventHandler((event) => {
         setHeader(event, 'Content-Type', 'application/json');
         return `"${UI_CHART_TYPE}"`;
+      }))
+
+      .get('/api/wg-enable-one-time-links', defineEventHandler((event) => {
+        setHeader(event, 'Content-Type', 'application/json');
+        return `${WG_ENABLE_ONE_TIME_LINKS}`;
+      }))
+
+      .get('/api/ui-sort-clients', defineEventHandler((event) => {
+        setHeader(event, 'Content-Type', 'application/json');
+        return `${UI_ENABLE_SORT_CLIENTS}`;
+      }))
+
+      .get('/api/wg-enable-expire-time', defineEventHandler((event) => {
+        setHeader(event, 'Content-Type', 'application/json');
+        return `${WG_ENABLE_EXPIRES_TIME}`;
+      }))
+
+      .get('/api/ui-avatar-settings', defineEventHandler((event) => {
+        setHeader(event, 'Content-Type', 'application/json');
+        return {
+          dicebear: DICEBEAR_TYPE,
+          gravatar: USE_GRAVATAR,
+        };
       }))
 
       // Authentication
@@ -104,8 +145,26 @@ module.exports = class Server {
           authenticated,
         };
       }))
+      .get('/cnf/:clientOneTimeLink', defineEventHandler(async (event) => {
+        if (WG_ENABLE_ONE_TIME_LINKS === 'false') {
+          throw createError({
+            status: 404,
+            message: 'Invalid state',
+          });
+        }
+        const clientOneTimeLink = getRouterParam(event, 'clientOneTimeLink');
+        const clients = await WireGuard.getClients();
+        const client = clients.find((client) => client.oneTimeLink === clientOneTimeLink);
+        if (!client) return;
+        const clientId = client.id;
+        const config = await WireGuard.getClientConfiguration({ clientId });
+        await WireGuard.eraseOneTimeLink({ clientId });
+        setHeader(event, 'Content-Disposition', `attachment; filename="${clientOneTimeLink}.conf"`);
+        setHeader(event, 'Content-Type', 'text/plain');
+        return config;
+      }))
       .post('/api/session', defineEventHandler(async (event) => {
-        const { password } = await readBody(event);
+        const { password, remember } = await readBody(event);
 
         if (!requiresPassword) {
           // if no password is required, the API should never be called.
@@ -116,13 +175,16 @@ module.exports = class Server {
           });
         }
 
-        if (!isPasswordValid(password)) {
+        if (!isPasswordValid(password, PASSWORD_HASH)) {
           throw createError({
             status: 401,
             message: 'Incorrect Password',
           });
         }
 
+        if (MAX_AGE && remember) {
+          event.node.req.session.cookie.maxAge = MAX_AGE;
+        }
         event.node.req.session.authenticated = true;
         event.node.req.session.save();
 
@@ -143,7 +205,7 @@ module.exports = class Server {
         }
 
         if (req.url.startsWith('/api/') && req.headers['authorization']) {
-          if (isPasswordValid(req.headers['authorization'])) {
+          if (isPasswordValid(req.headers['authorization'], PASSWORD_HASH)) {
             return next();
           }
           return res.status(401).json({
@@ -193,7 +255,8 @@ module.exports = class Server {
       }))
       .post('/api/wireguard/client', defineEventHandler(async (event) => {
         const { name } = await readBody(event);
-        await WireGuard.createClient({ name });
+        const { expiredDate } = await readBody(event);
+        await WireGuard.createClient({ name, expiredDate });
         return { success: true };
       }))
       .delete('/api/wireguard/client/:clientId', defineEventHandler(async (event) => {
@@ -207,6 +270,20 @@ module.exports = class Server {
           throw createError({ status: 403 });
         }
         await WireGuard.enableClient({ clientId });
+        return { success: true };
+      }))
+      .post('/api/wireguard/client/:clientId/generateOneTimeLink', defineEventHandler(async (event) => {
+        if (WG_ENABLE_ONE_TIME_LINKS === 'false') {
+          throw createError({
+            status: 404,
+            message: 'Invalid state',
+          });
+        }
+        const clientId = getRouterParam(event, 'clientId');
+        if (clientId === '__proto__' || clientId === 'constructor' || clientId === 'prototype') {
+          throw createError({ status: 403 });
+        }
+        await WireGuard.generateOneTimeLink({ clientId });
         return { success: true };
       }))
       .post('/api/wireguard/client/:clientId/disable', defineEventHandler(async (event) => {
@@ -234,6 +311,15 @@ module.exports = class Server {
         const { address } = await readBody(event);
         await WireGuard.updateClientAddress({ clientId, address });
         return { success: true };
+      }))
+      .put('/api/wireguard/client/:clientId/expireDate', defineEventHandler(async (event) => {
+        const clientId = getRouterParam(event, 'clientId');
+        if (clientId === '__proto__' || clientId === 'constructor' || clientId === 'prototype') {
+          throw createError({ status: 403 });
+        }
+        const { expireDate } = await readBody(event);
+        await WireGuard.updateClientExpireDate({ clientId, expireDate });
+        return { success: true };
       }));
 
     const safePathJoin = (base, target) => {
@@ -258,6 +344,50 @@ module.exports = class Server {
         message: 'Bad Request',
       });
     };
+
+    // Check Prometheus credentials
+    app.use(
+      fromNodeMiddleware((req, res, next) => {
+        if (!requiresPrometheusPassword || !req.url.startsWith('/metrics')) {
+          return next();
+        }
+        const user = basicAuth(req);
+        if (!user) {
+          res.statusCode = 401;
+          return { error: 'Not Logged In' };
+        }
+        if (user.pass) {
+          if (isPasswordValid(user.pass, PROMETHEUS_METRICS_PASSWORD)) {
+            return next();
+          }
+          res.statusCode = 401;
+          return { error: 'Incorrect Password' };
+        }
+        res.statusCode = 401;
+        return { error: 'Not Logged In' };
+      }),
+    );
+
+    // Prometheus Metrics API
+    const routerPrometheusMetrics = createRouter();
+    app.use(routerPrometheusMetrics);
+
+    // Prometheus Routes
+    routerPrometheusMetrics
+      .get('/metrics', defineEventHandler(async (event) => {
+        setHeader(event, 'Content-Type', 'text/plain');
+        if (ENABLE_PROMETHEUS_METRICS === 'true') {
+          return WireGuard.getMetrics();
+        }
+        return '';
+      }))
+      .get('/metrics/json', defineEventHandler(async (event) => {
+        setHeader(event, 'Content-Type', 'application/json');
+        if (ENABLE_PROMETHEUS_METRICS === 'true') {
+          return WireGuard.getMetricsJSON();
+        }
+        return '';
+      }));
 
     // backup_restore
     const router3 = createRouter();
@@ -297,6 +427,7 @@ module.exports = class Server {
             if (id.endsWith('.json')) setHeader(event, 'Content-Type', 'application/json');
             if (id.endsWith('.css')) setHeader(event, 'Content-Type', 'text/css');
             if (id.endsWith('.png')) setHeader(event, 'Content-Type', 'image/png');
+            if (id.endsWith('.svg')) setHeader(event, 'Content-Type', 'image/svg+xml');
 
             return {
               size: stats.size,
@@ -307,12 +438,10 @@ module.exports = class Server {
       }),
     );
 
-    if (PASSWORD) {
-      throw new Error('DO NOT USE PASSWORD ENVIRONMENT VARIABLE. USE PASSWORD_HASH INSTEAD.\nSee https://github.com/wg-easy/wg-easy/blob/v14/How_to_generate_an_bcrypt_hash.md');
-    }
-
     createServer(toNodeListener(app)).listen(PORT, WEBUI_HOST);
     debug(`Listening on http://${WEBUI_HOST}:${PORT}`);
+
+    cronJobEveryMinute();
   }
 
 };

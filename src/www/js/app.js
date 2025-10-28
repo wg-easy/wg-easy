@@ -23,6 +23,22 @@ function bytes(bytes, decimals, kib, maxunit) {
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
 }
 
+/**
+ * Sorts an array of objects by a specified property in ascending or descending order.
+ *
+ * @param {Array} array - The array of objects to be sorted.
+ * @param {string} property - The property to sort the array by.
+ * @param {boolean} [sort=true] - Whether to sort the array in ascending (default) or descending order.
+ * @return {Array} - The sorted array of objects.
+ */
+function sortByProperty(array, property, sort = true) {
+  if (sort) {
+    return array.sort((a, b) => (typeof a[property] === 'string' ? a[property].localeCompare(b[property]) : a[property] - b[property]));
+  }
+
+  return array.sort((a, b) => (typeof a[property] === 'string' ? b[property].localeCompare(a[property]) : b[property] - a[property]));
+}
+
 const i18n = new VueI18n({
   locale: localStorage.getItem('lang') || 'en',
   fallbackLocale: 'en',
@@ -53,16 +69,21 @@ new Vue({
     authenticating: false,
     password: null,
     requiresPassword: null,
+    remember: false,
+    rememberMeEnabled: false,
 
     clients: null,
     clientsPersist: {},
     clientDelete: null,
     clientCreate: null,
     clientCreateName: '',
+    clientExpiredDate: '',
     clientEditName: null,
     clientEditNameId: null,
     clientEditAddress: null,
     clientEditAddressId: null,
+    clientEditExpireDate: null,
+    clientEditExpireDateId: null,
     qrcode: null,
 
     currentRelease: null,
@@ -71,6 +92,15 @@ new Vue({
     uiTrafficStats: false,
 
     uiChartType: 0,
+    avatarSettings: {
+      dicebear: null,
+      gravatar: false,
+    },
+    enableOneTimeLinks: false,
+    enableSortClient: false,
+    sortClient: true, // Sort clients by name, true = asc, false = desc
+    enableExpireTime: false,
+
     uiShowCharts: localStorage.getItem('uiShowCharts') === '1',
     uiTheme: localStorage.theme || 'auto',
     prefersDarkScheme: window.matchMedia('(prefers-color-scheme: dark)'),
@@ -155,6 +185,7 @@ new Vue({
         },
       },
     },
+
   },
   methods: {
     dateTime: (value) => {
@@ -173,8 +204,10 @@ new Vue({
 
       const clients = await this.api.getClients();
       this.clients = clients.map((client) => {
-        if (client.name.includes('@') && client.name.includes('.')) {
+        if (client.name.includes('@') && client.name.includes('.') && this.avatarSettings.gravatar) {
           client.avatar = `https://gravatar.com/avatar/${sha256(client.name.toLowerCase().trim())}.jpg`;
+        } else if (this.avatarSettings.dicebear) {
+          client.avatar = `https://api.dicebear.com/9.x/${this.avatarSettings.dicebear}/svg?seed=${sha256(client.name.toLowerCase().trim())}`;
         }
 
         if (!this.clientsPersist[client.id]) {
@@ -229,6 +262,10 @@ new Vue({
 
         return client;
       });
+
+      if (this.enableSortClient) {
+        this.clients = sortByProperty(this.clients, 'name', this.sortClient);
+      }
     },
     login(e) {
       e.preventDefault();
@@ -239,6 +276,7 @@ new Vue({
       this.authenticating = true;
       this.api.createSession({
         password: this.password,
+        remember: this.remember,
       })
         .then(async () => {
           const session = await this.api.getSession();
@@ -268,14 +306,20 @@ new Vue({
     },
     createClient() {
       const name = this.clientCreateName;
+      const expiredDate = this.clientExpiredDate;
       if (!name) return;
 
-      this.api.createClient({ name })
+      this.api.createClient({ name, expiredDate })
         .catch((err) => alert(err.message || err.toString()))
         .finally(() => this.refresh().catch(console.error));
     },
     deleteClient(client) {
       this.api.deleteClient({ clientId: client.id })
+        .catch((err) => alert(err.message || err.toString()))
+        .finally(() => this.refresh().catch(console.error));
+    },
+    showOneTimeLink(client) {
+      this.api.showOneTimeLink({ clientId: client.id })
         .catch((err) => alert(err.message || err.toString()))
         .finally(() => this.refresh().catch(console.error));
     },
@@ -296,6 +340,11 @@ new Vue({
     },
     updateClientAddress(client, address) {
       this.api.updateClientAddress({ clientId: client.id, address })
+        .catch((err) => alert(err.message || err.toString()))
+        .finally(() => this.refresh().catch(console.error));
+    },
+    updateClientExpireDate(client, expireDate) {
+      this.api.updateClientExpireDate({ clientId: client.id, expireDate })
         .catch((err) => alert(err.message || err.toString()))
         .finally(() => this.refresh().catch(console.error));
     },
@@ -342,6 +391,15 @@ new Vue({
     timeago: (value) => {
       return timeago.format(value, i18n.locale);
     },
+    expiredDateFormat: (value) => {
+      if (value === null) return i18n.t('Permanent');
+      const dateTime = new Date(value);
+      const options = { year: 'numeric', month: 'long', day: 'numeric' };
+      return dateTime.toLocaleDateString(i18n.locale, options);
+    },
+    expiredDateEditFormat: (value) => {
+      if (value === null) return 'yyyy-MM-dd';
+    },
   },
   mounted() {
     this.prefersDarkScheme.addListener(this.handlePrefersChange);
@@ -360,6 +418,11 @@ new Vue({
       })
       .catch((err) => {
         alert(err.message || err.toString());
+      });
+
+    this.api.getRememberMeEnabled()
+      .then((rememberMeEnabled) => {
+        this.rememberMeEnabled = rememberMeEnabled;
       });
 
     setInterval(() => {
@@ -384,6 +447,41 @@ new Vue({
         this.uiChartType = 0;
       });
 
+    this.api.getWGEnableOneTimeLinks()
+      .then((res) => {
+        this.enableOneTimeLinks = res;
+      })
+      .catch(() => {
+        this.enableOneTimeLinks = false;
+      });
+
+    this.api.getUiSortClients()
+      .then((res) => {
+        this.enableSortClient = res;
+      })
+      .catch(() => {
+        this.enableSortClient = false;
+      });
+
+    this.api.getWGEnableExpireTime()
+      .then((res) => {
+        this.enableExpireTime = res;
+      })
+      .catch(() => {
+        this.enableExpireTime = false;
+      });
+
+    this.api.getAvatarSettings()
+      .then((res) => {
+        this.avatarSettings = res;
+      })
+      .catch(() => {
+        this.avatarSettings = {
+          dicebear: null,
+          gravatar: false,
+        };
+      });
+
     Promise.resolve().then(async () => {
       const lang = await this.api.getLang();
       if (lang !== localStorage.getItem('lang') && i18n.availableLocales.includes(lang)) {
@@ -392,7 +490,7 @@ new Vue({
       }
 
       const currentRelease = await this.api.getRelease();
-      const latestRelease = await fetch('https://wg-easy.github.io/wg-easy/changelog.json')
+      const latestRelease = await fetch('https://evoll.github.io/awg-easy-14/changelog.json')
         .then((res) => res.json())
         .then((releases) => {
           const releasesArray = Object.entries(releases).map(([version, changelog]) => ({

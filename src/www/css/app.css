@@ -1,5 +1,5 @@
 /*
-! tailwindcss v3.4.9 | MIT License | https://tailwindcss.com
+! tailwindcss v3.4.10 | MIT License | https://tailwindcss.com
 */
 
 /*
@@ -714,6 +714,10 @@ video {
   margin-bottom: 2.5rem;
 }
 
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+
 .mb-4 {
   margin-bottom: 1rem;
 }
@@ -1160,6 +1164,10 @@ video {
   fill: #4b5563;
 }
 
+.p-0 {
+  padding: 0px;
+}
+
 .p-1 {
   padding: 0.25rem;
 }
@@ -1463,6 +1471,10 @@ video {
 .is-disabled {
   opacity: 0.25;
   cursor: default;
+}
+
+.p-0 {
+  padding: 0;
 }
 
 .last\:border-b-0:last-child {

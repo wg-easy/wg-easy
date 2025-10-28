@@ -10,10 +10,10 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
-    if: github.repository_owner == 'wg-easy'
+    if: github.repository_owner == 'evoll'
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Setup Node
         uses: actions/setup-node@v4
         with:

@@ -1,45 +1,42 @@
-# Generating bcrypt-hashed password
+# wg-password
 
-With version 14 of wg-easy, a password hashed with bcrypt is needed instead of the plain-text password string. This doc explains how to generate the hash based on a plain-text password.
+`wg-password` (wgpw) is a script that generates bcrypt password hashes for use with `awg-easy`, enhancing security by requiring passwords.
 
-## Using Docker + node
+## Features
 
-- You are using docker compose
+- Generate bcrypt password hashes.
+- Easily integrate with `awg-easy` to enforce password requirements.
 
-    The easiest way to generate a bcrypt password hash with wgpw is using docker and node:
+## Usage with Docker
 
-    ```sh
-    docker run ghcr.io/wg-easy/wg-easy:14 node -e 'const bcrypt = require("bcryptjs"); const hash = bcrypt.hashSync("YOUR_PASSWORD", 10); console.log(hash.replace(/\$/g, "$$$$"));'
-    ```
-
-    The hashed password will get printed on your terminal. Copy it and use on the `PASSWORD_HASH` environment variable in your docker compose.
-
-- You are using `docker run`
-
-    If you are using `docker run` for running wg-easy, you must enclose the hash string in single quotes (`'...'`). You can use this command:
-
-    ```sh
-    docker run --rm ghcr.io/wg-easy/wg-easy:14 node -e "const bcrypt = require('bcryptjs'); const hash = bcrypt.hashSync('YOUR_PASSWORD', 10); console.log('\'' + hash + '\'');"
-    ```
-
-    The hashed password will get printed on your terminal. Copy it and use on the `PASSWORD_HASH` environment variable in your docker run command.
-
-## Using Docker + wgpw
-
-`wg-password` (wgpw) is a script that generates bcrypt password hashes. You can use it with docker:
+To generate a bcrypt password hash using docker, run the following command :
 
 ```sh
-docker run ghcr.io/wg-easy/wg-easy:14 wgpw YOUR_PASSWORD
+docker run -it ghcr.io/evoll/awg-easy:14 wgpw YOUR_PASSWORD
+PASSWORD_HASH='$2b$12$coPqCsPtcFO.Ab99xylBNOW4.Iu7OOA2/ZIboHN6/oyxca3MWo7fW' // literally YOUR_PASSWORD
 ```
-
-You will see an output similar to this:
-
+If a password is not provided, the tool will prompt you for one :
 ```sh
+docker run -it ghcr.io/evoll/awg-easy:14 wgpw
+Enter your password:      // hidden prompt, type in your password
 PASSWORD_HASH='$2b$12$coPqCsPtcFO.Ab99xylBNOW4.Iu7OOA2/ZIboHN6/oyxca3MWo7fW'
 ```
 
-In this example, the `$2b$12$coPqCsPtcFO.Ab99xylBNOW4.Iu7OOA2/ZIboHN6/oyxca3MWo7fW` string is your hashed password. For using it with docker-compose, you need to escape each `$` characters by adding another `$` before them, or they will get interpreted as variables. The final password you can use in docker-compose will look like this:
+**Important** : make sure to enclose your password in **single quotes** when you run `docker run` command :
 
-```sh
-$$2b$$12$$coPqCsPtcFO.Ab99xylBNOW4.Iu7OOA2/ZIboHN6/oyxca3MWo7fW
+```bash
+$ echo $2b$12$coPqCsPtcF <-- not correct
+b2
+$ echo "$2b$12$coPqCsPtcF" <-- not correct
+b2
+$ echo '$2b$12$coPqCsPtcF' <-- correct
+$2b$12$coPqCsPtcF
 ```
+
+**Important** : Please note: don't wrap the generated hash password in single quotes when you use `docker-compose.yml`. Instead, replace each `$` symbol with two `$$` symbols. For example:
+
+``` yaml
+- PASSWORD_HASH=$$2y$$10$$hBCoykrB95WSzuV4fafBzOHWKu9sbyVa34GJr8VV5R/pIelfEMYyG
+```
+
+This hash is for the password 'foobar123', obtained using the command `docker run ghcr.io/evoll/awg-easy:14 wgpw foobar123` and then inserted an additional `$` before each existing `$` symbol.

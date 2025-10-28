@@ -2,6 +2,8 @@
 
 // Import needed libraries
 import bcrypt from 'bcryptjs';
+import { Writable } from 'stream';
+import readline from 'readline';
 
 // Function to generate hash
 const generateHash = async (password) => {
@@ -31,18 +33,44 @@ const comparePassword = async (password, hash) => {
   }
 };
 
+const readStdinPassword = () => {
+  return new Promise((resolve) => {
+    process.stdout.write('Enter your password: ');
+
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: new Writable({
+        write(_chunk, _encoding, callback) {
+          callback();
+        },
+      }),
+      terminal: true,
+    });
+
+    rl.question('', (answer) => {
+      rl.close();
+      // Print a new line after password prompt
+      process.stdout.write('\n');
+      resolve(answer);
+    });
+  });
+};
+
 (async () => {
   try {
     // Retrieve command line arguments
     const args = process.argv.slice(2); // Ignore the first two arguments
     if (args.length > 2) {
-      throw new Error('Usage : wgpw YOUR_PASSWORD [HASH]');
+      throw new Error('Usage : wgpw [YOUR_PASSWORD] [HASH]');
     }
 
     const [password, hash] = args;
     if (password && hash) {
       await comparePassword(password, hash);
     } else if (password) {
+      await generateHash(password);
+    } else {
+      const password = await readStdinPassword();
       await generateHash(password);
     }
   } catch (error) {

@@ -5,10 +5,9 @@ const { release: { version } } = require('./package.json');
 module.exports.RELEASE = version;
 module.exports.PORT = process.env.PORT || '51821';
 module.exports.WEBUI_HOST = process.env.WEBUI_HOST || '0.0.0.0';
-/** This is only kept for migration purpose. DO NOT USE! */
-module.exports.PASSWORD = process.env.PASSWORD;
 module.exports.PASSWORD_HASH = process.env.PASSWORD_HASH;
-module.exports.WG_PATH = process.env.WG_PATH || '/etc/wireguard/';
+module.exports.MAX_AGE = parseInt(process.env.MAX_AGE, 10) * 1000 * 60 || 0;
+module.exports.WG_PATH = process.env.WG_PATH || '/etc/amnezia/amneziawg/';
 module.exports.WG_DEVICE = process.env.WG_DEVICE || 'eth0';
 module.exports.WG_HOST = process.env.WG_HOST;
 module.exports.WG_PORT = process.env.WG_PORT || '51820';
@@ -39,3 +38,25 @@ iptables -D FORWARD -o wg0 -j ACCEPT;
 module.exports.LANG = process.env.LANG || 'en';
 module.exports.UI_TRAFFIC_STATS = process.env.UI_TRAFFIC_STATS || 'false';
 module.exports.UI_CHART_TYPE = process.env.UI_CHART_TYPE || 0;
+module.exports.WG_ENABLE_ONE_TIME_LINKS = process.env.WG_ENABLE_ONE_TIME_LINKS || 'false';
+module.exports.UI_ENABLE_SORT_CLIENTS = process.env.UI_ENABLE_SORT_CLIENTS || 'false';
+module.exports.WG_ENABLE_EXPIRES_TIME = process.env.WG_ENABLE_EXPIRES_TIME || 'false';
+module.exports.ENABLE_PROMETHEUS_METRICS = process.env.ENABLE_PROMETHEUS_METRICS || 'false';
+module.exports.PROMETHEUS_METRICS_PASSWORD = process.env.PROMETHEUS_METRICS_PASSWORD;
+
+module.exports.DICEBEAR_TYPE = process.env.DICEBEAR_TYPE || false;
+module.exports.USE_GRAVATAR = process.env.USE_GRAVATAR || false;
+
+const getRandomInt = (min, max) => min + Math.floor(Math.random() * (max - min));
+const getRandomJunkSize = () => getRandomInt(15, 150);
+const getRandomHeader = () => getRandomInt(1, 2_147_483_647);
+
+module.exports.JC = process.env.JC || getRandomInt(3, 10);
+module.exports.JMIN = process.env.JMIN || 50;
+module.exports.JMAX = process.env.JMAX || 1000;
+module.exports.S1 = process.env.S1 || getRandomJunkSize();
+module.exports.S2 = process.env.S2 || getRandomJunkSize();
+module.exports.H1 = process.env.H1 || getRandomHeader();
+module.exports.H2 = process.env.H2 || getRandomHeader();
+module.exports.H3 = process.env.H3 || getRandomHeader();
+module.exports.H4 = process.env.H4 || getRandomHeader();
