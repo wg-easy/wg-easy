@@ -271,6 +271,7 @@
     "h3Description": "Cookie reply packet header value (5-2147483647, must be unique from H1, H2, H4)",
     "h4Label": "Transport magic header (H4)",
     "h4Description": "Transport packet header value (5-2147483647, must be unique from H1-H3)",
-    "*": "Values depend on the MTU"
+    "mtuNote": "Values depend on the MTU",
+    "obfuscationParameters": "AmneziaWG Obfuscation Parameters"
   }
 }

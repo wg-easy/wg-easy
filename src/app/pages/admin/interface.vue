@@ -22,7 +22,7 @@
         />
       </FormGroup>
       <FormGroup v-if="globalStore.information?.isAwg">
-        <FormHeading>AmneziaWG Obfuscation Parameters</FormHeading>
+        <FormHeading>{{ $t('awg.obfuscationParameters') }}</FormHeading>
 
         <FormNumberField
           id="jC"
@@ -55,7 +55,7 @@
           :description="$t('awg.s2Description')"
         />
 
-        <div class="col-span-full text-sm">* {{ $t('awg.*') }}</div>
+        <div class="col-span-full text-sm">* {{ $t('awg.mtuNote') }}</div>
 
         <FormNumberField
           id="s3"
