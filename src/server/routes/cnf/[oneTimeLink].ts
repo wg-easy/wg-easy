@@ -27,16 +27,10 @@ export default defineEventHandler(async (event) => {
   });
   await Database.oneTimeLinks.erase(otl.id);
 
-  const configName = client.name
-    .replace(/[^a-zA-Z0-9_=+.-]/g, '-')
-    .replace(/(-{2,}|-$)/g, '-')
-    .replace(/-$/, '')
-    .substring(0, 32);
-
   setHeader(
     event,
     'Content-Disposition',
-    `attachment; filename="${configName || client.id}.conf"`
+    `attachment; filename="${WireGuard.cleanClientFilename(client.name) || client.id}.conf"`
   );
   setHeader(event, 'Content-Type', 'text/plain');
   return config;
