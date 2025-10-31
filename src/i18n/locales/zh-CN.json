@@ -233,5 +233,10 @@
     "postUp": "启动后脚本",
     "preDown": "停止前脚本",
     "postDown": "停止后脚本"
+  },
+  "copy": {
+    "no_support": "当前浏览器不支持复制",
+    "success": "复制成功",
+    "error": "复制失败"
   }
 }

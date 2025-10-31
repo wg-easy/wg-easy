@@ -237,5 +237,10 @@
     "postUp": "PostUp",
     "preDown": "PreDown",
     "postDown": "PostDown"
+  },
+  "copy": {
+    "noSupport": "Copy not supported",
+    "success": "Copied",
+    "error": "Copy failed"
   }
 }
