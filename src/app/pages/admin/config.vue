@@ -47,6 +47,61 @@
           :description="$t('admin.config.persistentKeepaliveDesc')"
         />
       </FormGroup>
+      <FormGroup v-if="globalStore.information?.isAwg">
+        <FormHeading>{{ $t('awg.obfuscationParameters') }}</FormHeading>
+
+        <FormNullNumberField
+          id="jC"
+          v-model="data.defaultJC"
+          :label="$t('awg.jCLabel')"
+          :description="$t('awg.jCDescription')"
+        />
+        <FormNullNumberField
+          id="jMin"
+          v-model="data.defaultJMin"
+          :label="$t('awg.jMinLabel')"
+          :description="$t('awg.jMinDescription')"
+        />
+        <FormNullNumberField
+          id="jMax"
+          v-model="data.defaultJMax"
+          :label="$t('awg.jMaxLabel')"
+          :description="$t('awg.jMaxDescription')"
+        />
+
+        <div class="col-span-full text-sm">* {{ $t('awg.mtuNote') }}</div>
+
+        <FormNullTextField
+          id="i1"
+          v-model="data.defaultI1"
+          :label="$t('awg.i1Label')"
+          :description="$t('awg.i1Description')"
+        />
+        <FormNullTextField
+          id="i2"
+          v-model="data.defaultI2"
+          :label="$t('awg.i2Label')"
+          :description="$t('awg.i2Description')"
+        />
+        <FormNullTextField
+          id="i3"
+          v-model="data.defaultI3"
+          :label="$t('awg.i3Label')"
+          :description="$t('awg.i3Description')"
+        />
+        <FormNullTextField
+          id="i4"
+          v-model="data.defaultI4"
+          :label="$t('awg.i4Label')"
+          :description="$t('awg.i4Description')"
+        />
+        <FormNullTextField
+          id="i5"
+          v-model="data.defaultI5"
+          :label="$t('awg.i5Label')"
+          :description="$t('awg.i5Description')"
+        />
+      </FormGroup>
       <FormGroup>
         <FormHeading>{{ $t('form.actions') }}</FormHeading>
         <FormPrimaryActionField type="submit" :label="$t('form.save')" />
@@ -57,6 +112,8 @@
 </template>
 
 <script lang="ts" setup>
+const globalStore = useGlobalStore();
+
 const { data: _data, refresh } = await useFetch(`/api/admin/userconfig`, {
   method: 'get',
 });
