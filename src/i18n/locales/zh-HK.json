@@ -234,5 +234,10 @@
     "postUp": "PostUp",
     "preDown": "PreDown",
     "postDown": "PostDown"
+  },
+  "copy": {
+    "noSupport": "目前瀏覽器不支援複製",
+    "success": "複製成功",
+    "error": "複製失敗"
   }
 }
