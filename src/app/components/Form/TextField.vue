@@ -26,5 +26,5 @@ defineProps<{
   disabled?: boolean;
 }>();
 
-const data = defineModel<string | null>();
+const data = defineModel<string>();
 </script>

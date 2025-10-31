@@ -24,31 +24,31 @@
       <FormGroup v-if="globalStore.information?.isAwg">
         <FormHeading>{{ $t('awg.obfuscationParameters') }}</FormHeading>
 
-        <FormNumberField
+        <FormNullNumberField
           id="jC"
           v-model="data.jC"
           :label="$t('awg.jCLabel')"
           :description="$t('awg.jCDescription')"
         />
-        <FormNumberField
+        <FormNullNumberField
           id="jMin"
           v-model="data.jMin"
           :label="$t('awg.jMinLabel')"
           :description="$t('awg.jMinDescription')"
         />
-        <FormNumberField
+        <FormNullNumberField
           id="jMax"
           v-model="data.jMax"
           :label="$t('awg.jMaxLabel')"
           :description="$t('awg.jMaxDescription')"
         />
-        <FormNumberField
+        <FormNullNumberField
           id="s1"
           v-model="data.s1"
           :label="$t('awg.s1Label')"
           :description="$t('awg.s1Description')"
         />
-        <FormNumberField
+        <FormNullNumberField
           id="s2"
           v-model="data.s2"
           :label="$t('awg.s2Label')"
@@ -57,67 +57,67 @@
 
         <div class="col-span-full text-sm">* {{ $t('awg.mtuNote') }}</div>
 
-        <FormNumberField
+        <FormNullNumberField
           id="s3"
           v-model="data.s3"
           :label="$t('awg.s3Label')"
           :description="$t('awg.s3Description')"
         />
-        <FormNumberField
+        <FormNullNumberField
           id="s4"
           v-model="data.s4"
           :label="$t('awg.s4Label')"
           :description="$t('awg.s4Description')"
         />
-        <FormTextField
+        <FormNullTextField
           id="i1"
           v-model="data.i1"
           :label="$t('awg.i1Label')"
           :description="$t('awg.i1Description')"
         />
-        <FormTextField
+        <FormNullTextField
           id="i2"
           v-model="data.i2"
           :label="$t('awg.i2Label')"
           :description="$t('awg.i2Description')"
         />
-        <FormTextField
+        <FormNullTextField
           id="i3"
           v-model="data.i3"
           :label="$t('awg.i3Label')"
           :description="$t('awg.i3Description')"
         />
-        <FormTextField
+        <FormNullTextField
           id="i4"
           v-model="data.i4"
           :label="$t('awg.i4Label')"
           :description="$t('awg.i4Description')"
         />
-        <FormTextField
+        <FormNullTextField
           id="i5"
           v-model="data.i5"
           :label="$t('awg.i5Label')"
           :description="$t('awg.i5Description')"
         />
-        <FormNumberField
+        <FormNullNumberField
           id="h1"
           v-model="data.h1"
           :label="$t('awg.h1Label')"
           :description="$t('awg.h1Description')"
         />
-        <FormNumberField
+        <FormNullNumberField
           id="h2"
           v-model="data.h2"
           :label="$t('awg.h2Label')"
           :description="$t('awg.h2Description')"
         />
-        <FormNumberField
+        <FormNullNumberField
           id="h3"
           v-model="data.h3"
           :label="$t('awg.h3Label')"
           :description="$t('awg.h3Description')"
         />
-        <FormNumberField
+        <FormNullNumberField
           id="h4"
           v-model="data.h4"
           :label="$t('awg.h4Label')"
