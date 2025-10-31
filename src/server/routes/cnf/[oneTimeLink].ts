@@ -30,7 +30,7 @@ export default defineEventHandler(async (event) => {
   setHeader(
     event,
     'Content-Disposition',
-    `attachment; filename="${client.name}.conf"`
+    `attachment; filename="${WireGuard.cleanClientFilename(client.name) || client.id}.conf"`
   );
   setHeader(event, 'Content-Type', 'text/plain');
   return config;

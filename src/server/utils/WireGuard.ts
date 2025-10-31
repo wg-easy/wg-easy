@@ -170,6 +170,14 @@ class WireGuard {
     });
   }
 
+  cleanClientFilename(name: string): string {
+    return name
+      .replace(/[^a-zA-Z0-9_=+.-]/g, '-')
+      .replace(/(-{2,}|-$)/g, '-')
+      .replace(/-$/, '')
+      .substring(0, 32);
+  }
+
   async Startup() {
     WG_DEBUG('Starting WireGuard...');
     // let as it has to refetch if keys change
