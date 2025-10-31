@@ -1,4 +1,4 @@
-FROM docker.io/library/node:lts-alpine
+FROM docker.io/library/node:jod-alpine
 WORKDIR /app
 
 # update corepack
