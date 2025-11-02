@@ -14,10 +14,6 @@ const props = defineProps<{ client: LocalClient }>();
 const clientsStore = useClientsStore();
 const toast = useToast();
 const { copy, copied, isSupported } = useClipboard();
-const oneTimeLink = computed(
-  () =>
-    `${document.location.protocol}//${document.location.host}/cnf/${props.client.oneTimeLink.oneTimeLink}`
-);
 
 const _showOneTimeLink = useSubmit(
   `/api/client/${props.client.id}/generateOneTimeLink`,
@@ -42,7 +38,17 @@ async function copyOneTimeLink() {
     return;
   }
   await nextTick();
-  await copy(oneTimeLink.value);
+
+  if (!props.client.oneTimeConfigUrl) {
+    toast.showToast({
+      type: 'error',
+      message: $t('copy.error'),
+    });
+    return;
+  }
+
+  await copy(props.client.oneTimeConfigUrl);
+
   if (!copied.value) {
     toast.showToast({
       type: 'error',
