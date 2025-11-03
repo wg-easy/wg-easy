@@ -39,15 +39,7 @@ async function copyOneTimeLink() {
   }
   await nextTick();
 
-  if (!props.client.oneTimeConfigUrl) {
-    toast.showToast({
-      type: 'error',
-      message: $t('copy.error'),
-    });
-    return;
-  }
-
-  await copy(props.client.oneTimeConfigUrl);
+  await copy(formatOneTimeLink(document.location, props.client.oneTimeLink));
 
   if (!copied.value) {
     toast.showToast({

@@ -15,7 +15,6 @@ export type LocalClient = WGClientReturn & {
 
 export type ClientPersist = {
   transferRxHistory: number[];
-  oneTimeConfigUrl?: string;
   transferRxPrevious: number;
   transferRxCurrent: number;
   transferRxSeries: { name: string; data: number[] }[];
@@ -60,7 +59,6 @@ export const useClientsStore = defineStore('Clients', () => {
           transferTxCurrent: 0,
           transferRxSeries: [],
           transferTxSeries: [],
-          oneTimeConfigUrl: '',
         };
       }
 
@@ -112,10 +110,6 @@ export const useClientsStore = defineStore('Clients', () => {
         );
       }
 
-      if (client.oneTimeLink !== null) {
-        clientPersist.oneTimeConfigUrl = `${document?.location?.protocol}//${document?.location?.host}/cnf/${client.oneTimeLink.oneTimeLink}`;
-      }
-
       return {
         ...client,
         avatar,
@@ -128,7 +122,6 @@ export const useClientsStore = defineStore('Clients', () => {
         transferRxCurrent: clientPersist.transferRxCurrent,
         hoverTx: clientPersist.hoverTx,
         hoverRx: clientPersist.hoverRx,
-        oneTimeConfigUrl: clientPersist.oneTimeConfigUrl,
       };
     });
 

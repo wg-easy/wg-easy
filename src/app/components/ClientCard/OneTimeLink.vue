@@ -22,7 +22,7 @@ onMounted(() => {
       new Date(props.client.oneTimeLink.expiresAt).getTime() - Date.now();
 
     if (timeLeft <= 0) {
-      path.value = `${props.client.oneTimeConfigUrl} (00:00)`;
+      path.value = `${formatOneTimeLink(document.location, props.client.oneTimeLink)} (00:00)`;
       return;
     }
 
@@ -39,7 +39,7 @@ onMounted(() => {
     date.setMinutes(minutes);
     date.setSeconds(seconds);
 
-    path.value = `${props.client.oneTimeConfigUrl} (${formatter.format(date)})`;
+    path.value = `${formatOneTimeLink(document.location, props.client.oneTimeLink)} (${formatter.format(date)})`;
   }, 1000);
 });
 
