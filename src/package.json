@@ -55,7 +55,7 @@
     "zod": "^4.1.12"
   },
   "devDependencies": {
-    "@nuxt/eslint": "^1.9.0",
+    "@nuxt/eslint": "^1.10.0",
     "@types/debug": "^4.1.12",
     "@types/phc__format": "^1.0.1",
     "@types/semver": "^7.7.1",
