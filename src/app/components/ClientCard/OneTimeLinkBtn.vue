@@ -14,6 +14,7 @@ const props = defineProps<{ client: LocalClient }>();
 const clientsStore = useClientsStore();
 const toast = useToast();
 const { copy, copied, isSupported } = useClipboard();
+const isFirstCopy = ref(true);
 
 const _showOneTimeLink = useSubmit(
   `/api/client/${props.client.id}/generateOneTimeLink`,
@@ -30,6 +31,18 @@ const _showOneTimeLink = useSubmit(
 );
 
 async function copyOneTimeLink() {
+  // only copy when using https, since the browser blocks clipboard access on http.
+  if (window.location.protocol !== 'https:') {
+    if (isFirstCopy.value) {
+      toast.showToast({
+        type: 'error',
+        message: $t('copy.onlyHttps'),
+      });
+      isFirstCopy.value = false;
+    }
+    return;
+  }
+
   if (!isSupported) {
     toast.showToast({
       type: 'error',
