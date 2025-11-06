@@ -66,3 +66,31 @@ jobs:
           cd src
           pnpm install
           pnpm ${{ matrix.command }}
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    needs: docs
+    if: github.repository_owner == 'wg-easy'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          run_install: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: "lts/jod"
+          check-latest: true
+          cache: "pnpm"
+
+      - name: Run tests
+        run: |
+          cd src
+          pnpm install
+          pnpm test:run
