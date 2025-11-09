@@ -26,7 +26,7 @@ export default definePermissionEventHandler(
       `attachment; filename="${WireGuard.cleanClientFilename(client.name) || clientId}.conf"`
     );
 
-    setHeader(event, 'Content-Type', 'text/plain');
+    setHeader(event, 'Content-Type', 'application/octet-stream');
     return config;
   }
 );
