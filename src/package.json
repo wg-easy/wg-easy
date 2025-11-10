@@ -60,7 +60,7 @@
     "@types/phc__format": "^1.0.1",
     "@types/semver": "^7.7.1",
     "drizzle-kit": "^0.31.6",
-    "esbuild": "^0.25.12",
+    "esbuild": "^0.27.0",
     "eslint": "^9.39.0",
     "eslint-config-prettier": "^10.1.8",
     "prettier": "^3.6.2",
