@@ -4,6 +4,7 @@ export const useGlobalStore = defineStore('Global', () => {
   });
 
   const sortClient = ref(true); // Sort clients by name, true = asc, false = desc
+  const isFirstCopyOneTimeLink = ref(true); // Flag to track if it's the first time the copy one-time link is clicked
 
   const uiShowCharts = useCookie<boolean>('uiShowCharts', {
     default: () => false,
@@ -12,6 +13,10 @@ export const useGlobalStore = defineStore('Global', () => {
 
   function toggleCharts() {
     uiShowCharts.value = !uiShowCharts.value;
+  }
+
+  function setFirstCopyOneTimeLink(value: boolean) {
+    isFirstCopyOneTimeLink.value = value;
   }
 
   const uiChartType = useCookie<'area' | 'bar' | 'line'>('uiChartType', {
@@ -25,5 +30,7 @@ export const useGlobalStore = defineStore('Global', () => {
     uiShowCharts,
     toggleCharts,
     uiChartType,
+    isFirstCopyOneTimeLink,
+    setFirstCopyOneTimeLink,
   };
 });

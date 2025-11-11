@@ -12,6 +12,9 @@
 const props = defineProps<{ client: LocalClient }>();
 
 const clientsStore = useClientsStore();
+const toast = useToast();
+const globalStore = useGlobalStore();
+const { copy, copied, isSupported } = useClipboard();
 
 const _showOneTimeLink = useSubmit(
   `/api/client/${props.client.id}/generateOneTimeLink`,
@@ -21,10 +24,49 @@ const _showOneTimeLink = useSubmit(
   {
     revert: async () => {
       await clientsStore.refresh();
+      await copyOneTimeLink();
     },
     noSuccessToast: true,
   }
 );
+
+async function copyOneTimeLink() {
+  // only copy when using https, since the browser blocks clipboard access on http.
+  if (window.location.protocol !== 'https:') {
+    if (globalStore.isFirstCopyOneTimeLink) {
+      toast.showToast({
+        type: 'error',
+        message: $t('copy.onlyHttps'),
+      });
+      globalStore.setFirstCopyOneTimeLink(false);
+    }
+    return;
+  }
+
+  if (!isSupported) {
+    toast.showToast({
+      type: 'error',
+      message: $t('copy.noSupport'),
+    });
+    return;
+  }
+  await nextTick();
+
+  await copy(formatOneTimeLink(document.location, props.client.oneTimeLink));
+
+  if (!copied.value) {
+    toast.showToast({
+      type: 'error',
+      message: $t('copy.error'),
+    });
+    return;
+  }
+
+  toast.showToast({
+    type: 'success',
+    message: $t('copy.success'),
+  });
+}
 
 function showOneTimeLink() {
   return _showOneTimeLink(undefined);
