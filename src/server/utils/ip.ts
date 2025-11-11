@@ -170,3 +170,44 @@ async function getIpInformation() {
 export const cachedGetIpInformation = cacheFunction(getIpInformation, {
   expiry: 15 * 60 * 1000,
 });
+
+// 检查IP地址是否为IPv6
+export const isIPv6 = (ip: string): boolean => {
+  return ip.startsWith('[') || ip.split(':').length > 2;
+};
+
+// 解析IP地址和端口
+export const parseIpAndPort = (
+  ipWithPort: string
+): { ip: string; port?: string } => {
+  if (ipWithPort.includes('/')) {
+    return { ip: ipWithPort };
+  }
+  const parts = ipWithPort.split(':');
+  // 如果是IPv6地址（包含多个冒号），则最后一个部分可能是端口
+  if (isIPv6(ipWithPort) && parts.length > 3) {
+    // 检查最后一部分是否是纯数字（端口）
+    const potentialPort = parts[parts.length - 1];
+    let ip = parts.slice(0, -1).join(':');
+    // remove [ ] if exist in ip
+    const matched = /^\[?([0-9a-f:]+)]?$/gi.exec(ip);
+    if (matched) {
+      ip = matched[1];
+    }
+
+    if (/^\d+$/.test(potentialPort)) {
+      return {
+        ip: ip,
+        port: potentialPort,
+      };
+    }
+  } else if (!isIPv6(ipWithPort) && parts.length === 2) {
+    // 对于IPv4地址，格式为 ip:port
+    return {
+      ip: parts[0],
+      port: parts[1],
+    };
+  }
+  // 如果没有端口，则返回原始IP
+  return { ip: ipWithPort };
+};
