@@ -32,6 +32,6 @@ export default defineEventHandler(async (event) => {
     'Content-Disposition',
     `attachment; filename="${WireGuard.cleanClientFilename(client.name) || client.id}.conf"`
   );
-  setHeader(event, 'Content-Type', 'text/plain');
+  setHeader(event, 'Content-Type', 'application/octet-stream');
   return config;
 });
