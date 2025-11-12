@@ -27,7 +27,7 @@ export const MtuSchema = z
   .max(9000, { message: t('zod.mtu') });
 
 export const JcSchema = z.number().min(1).max(128).nullable();
-// TODO: more validation
+
 export const JminSchema = z.number().max(1279).nullable();
 
 export const JmaxSchema = z.number().max(1280).nullable();
