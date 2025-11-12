@@ -26,6 +26,14 @@ export const UserConfigUpdateSchema = schemaForType<UserConfigUpdateType>()(
     defaultPersistentKeepalive: PersistentKeepaliveSchema,
     defaultDns: DnsSchema,
     defaultAllowedIps: AllowedIpsSchema,
+    defaultJC: JcSchema,
+    defaultJMin: JminSchema,
+    defaultJMax: JmaxSchema,
+    defaultI1: ISchema,
+    defaultI2: ISchema,
+    defaultI3: ISchema,
+    defaultI4: ISchema,
+    defaultI5: ISchema,
     host: host,
   })
 );

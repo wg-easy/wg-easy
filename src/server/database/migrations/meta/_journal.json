@@ -15,6 +15,13 @@
       "when": 1748427001203,
       "tag": "0001_classy_the_stranger",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1761298328460,
+      "tag": "0002_keen_sleepwalker",
+      "breakpoints": true
     }
   ]
 }

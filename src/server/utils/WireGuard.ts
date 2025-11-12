@@ -5,6 +5,9 @@ import type { InterfaceType } from '#db/repositories/interface/types';
 
 const WG_DEBUG = debug('WireGuard');
 
+const generateRandomHeaderValue = () =>
+  Math.floor(Math.random() * 2147483642) + 5;
+
 class WireGuard {
   /**
    * Save and sync config
@@ -196,6 +199,24 @@ class WireGuard {
       wgInterface = await Database.interfaces.get();
       WG_DEBUG('New Wireguard Keys generated successfully.');
     }
+
+    if (WG_ENV.WG_EXECUTABLE === 'awg' && wgInterface.h1 === 0) {
+      WG_DEBUG('Generating random AmneziaWG obfuscation parameters...');
+      const headers = new Set<number>();
+
+      while (headers.size < 4) {
+        headers.add(generateRandomHeaderValue());
+      }
+      const [h1, h2, h3, h4] = Array.from(headers);
+
+      wgInterface.h1 = h1!;
+      wgInterface.h2 = h2!;
+      wgInterface.h3 = h3!;
+      wgInterface.h4 = h4!;
+
+      Database.interfaces.update(wgInterface);
+    }
+
     WG_DEBUG(`Starting Wireguard Interface ${wgInterface.name}...`);
     await this.#saveWireguardConfig(wgInterface);
     await wg.down(wgInterface.name).catch(() => {});
