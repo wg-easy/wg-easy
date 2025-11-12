@@ -42,6 +42,7 @@ You have found the easiest way to install & manage WireGuard on any Linux host!
 - [Caddy](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/caddy/)
 - [Traefik](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/traefik/)
 - [Podman](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/podman-nft/)
+- [Kubernetes](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/kubernetes/)
 - [AdGuard Home](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/adguard/)
 
 > [!NOTE]
