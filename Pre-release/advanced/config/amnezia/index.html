@@ -12,13 +12,13 @@
         <meta name="author" content="WireGuard Easy">
       
       
-        <link rel="canonical" href="https://wg-easy.github.io/wg-easy/Pre-release/advanced/config/unattended-setup/">
+        <link rel="canonical" href="https://wg-easy.github.io/wg-easy/Pre-release/advanced/config/amnezia/">
       
       
-        <link rel="prev" href="../optional-config/">
+        <link rel="prev" href="../../api/">
       
       
-        <link rel="next" href="../../metrics/prometheus/">
+        <link rel="next" href="../experimental-config/">
       
       
         
@@ -29,7 +29,7 @@
     
     
       
-        <title>Unattended Setup - wg-easy</title>
+        <title>AmneziaWG - wg-easy</title>
       
     
     
@@ -112,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Unattended Setup
+              AmneziaWG
             
           </span>
         </div>
@@ -630,10 +630,17 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../amnezia/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -649,6 +656,7 @@
   
 
       </a>
+      
     </li>
   
 
@@ -714,17 +722,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../unattended-setup/" class="md-nav__link">
         
   
   
@@ -740,7 +741,6 @@
   
 
       </a>
-      
     </li>
   
 
@@ -1739,7 +1739,7 @@
 
 
   
-    <a href="https://github.com/wg-easy/wg-easy/edit/master/docs/content/advanced/config/unattended-setup.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/wg-easy/wg-easy/edit/master/docs/content/advanced/config/amnezia.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -1748,93 +1748,44 @@
     
       
     
-    <a href="https://github.com/wg-easy/wg-easy/raw/master/docs/content/advanced/config/unattended-setup.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/wg-easy/wg-easy/raw/master/docs/content/advanced/config/amnezia.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
     </a>
   
 
 
-  <h1>Unattended Setup</h1>
+  <h1>AmneziaWG</h1>
 
-<p>If you want to run the setup without any user interaction, e.g. with a tool like Ansible, you can use these environment variables to configure the setup.</p>
-<p>These will only be used during the first start of the container. After that, the setup will be disabled.</p>
-<table>
-<thead>
-<tr>
-<th>Env</th>
-<th>Example</th>
-<th>Description</th>
-<th>Group</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>INIT_ENABLED</code></td>
-<td><code>true</code></td>
-<td>Enables the below env vars</td>
-<td>0</td>
-</tr>
-<tr>
-<td><code>INIT_USERNAME</code></td>
-<td><code>admin</code></td>
-<td>Sets admin username</td>
-<td>1</td>
-</tr>
-<tr>
-<td><code>INIT_PASSWORD</code></td>
-<td><code>Se!ureP%ssw</code></td>
-<td>Sets admin password</td>
-<td>1</td>
-</tr>
-<tr>
-<td><code>INIT_HOST</code></td>
-<td><code>vpn.example.com</code></td>
-<td>Host clients will connect to</td>
-<td>1</td>
-</tr>
-<tr>
-<td><code>INIT_PORT</code></td>
-<td><code>51820</code></td>
-<td>Port clients will connect to and wireguard will listen on</td>
-<td>1</td>
-</tr>
-<tr>
-<td><code>INIT_DNS</code></td>
-<td><code>1.1.1.1,8.8.8.8</code></td>
-<td>Sets global dns setting</td>
-<td>2</td>
-</tr>
-<tr>
-<td><code>INIT_IPV4_CIDR</code></td>
-<td><code>10.8.0.0/24</code></td>
-<td>Sets IPv4 cidr</td>
-<td>3</td>
-</tr>
-<tr>
-<td><code>INIT_IPV6_CIDR</code></td>
-<td><code>2001:0DB8::/32</code></td>
-<td>Sets IPv6 cidr</td>
-<td>3</td>
-</tr>
-<tr>
-<td><code>INIT_ALLOWED_IPS</code></td>
-<td><code>10.8.0.0/24,2001:0DB8::/32</code></td>
-<td>Sets global Allowed IPs</td>
-<td>4</td>
-</tr>
-</tbody>
-</table>
-<div class="admonition warning">
-<p class="admonition-title">Variables have to be used together</p>
-<p>If variables are in the same group, you have to set all of them. For example, if you set <code>INIT_IPV4_CIDR</code>, you also have to set <code>INIT_IPV6_CIDR</code>.</p>
-<p>If you want to skip the setup process, you have to configure group <code>1</code></p>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Security</p>
-<p>The initial username and password is not checked for complexity. Make sure to set a long enough username and password. Otherwise, the user won't be able to log in.</p>
-<p>It's recommended to remove the variables after the setup is done to prevent the password from being exposed.</p>
-</div>
+<p>Experimental support for AmneziaWG can be enabled by setting the <code>EXPERIMENTAL_AWG</code> environment variable to <code>true</code>. This feature is still under development and may change in future releases.</p>
+<p>AmneziaWG adds multi-level transport-layer obfuscation by:</p>
+<ul>
+<li>Modifying packet headers</li>
+<li>Randomizing handshake message sizes</li>
+<li>Disguising traffic to resemble popular UDP protocols</li>
+</ul>
+<p>These measures make it harder for third parties to analyze or identify your traffic, enhancing both privacy and security.</p>
+<p>When enabled, wg-easy will automatically detect whether the AmneziaWG kernel module is available. If it is not, the system will fall back to the standard WireGuard module.</p>
+<p>To override this automatic detection, set the <code>OVERRIDE_AUTO_AWG</code> environment variable. By default, this variable is unset.</p>
+<p>Possible values:</p>
+<ul>
+<li><code>awg</code> — Force use of AmneziaWG</li>
+<li><code>wg</code> — Force use of standard WireGuard</li>
+</ul>
+<p>To be able to connect to wg-easy if AmneziaWG is enabled, you must have a AmneziaWG-compatible client.</p>
+<p>Android:</p>
+<ul>
+<li><a href="https://play.google.com/store/apps/details?id=org.amnezia.awg">AmneziaWG</a> - Official Client</li>
+<li><a href="https://play.google.com/store/apps/details?id=com.zaneschepke.wireguardautotunnel">WG Tunnel</a> - Third Party Client</li>
+</ul>
+<p>iOS and macOS:</p>
+<ul>
+<li><a href="https://apps.apple.com/us/app/amneziawg/id6478942365">AmneziaWG</a> - Official Client</li>
+</ul>
+<p>Windows:</p>
+<ul>
+<li><a href="https://github.com/amnezia-vpn/amneziawg-windows-client/releases">AmneziaWG</a> - Official Client</li>
+</ul>
 
 
 
