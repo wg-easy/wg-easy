@@ -5,6 +5,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+## Added
+
+- AmneziaWG integration (https://github.com/wg-easy/wg-easy/pull/2102, https://github.com/wg-easy/wg-easy/pull/2226)
+- Search / filter box (https://github.com/wg-easy/wg-easy/pull/2170)
+- `INIT_ALLOWED_IPS` env var (https://github.com/wg-easy/wg-easy/pull/2164)
+- Show client endpoint (https://github.com/wg-easy/wg-easy/pull/2058)
+
+## Fixed
+
+- Fix download as conf.txt (https://github.com/wg-easy/wg-easy/pull/2269)
+- Clean filename for OTL download (https://github.com/wg-easy/wg-easy/pull/2253)
+
+## Changed
+
+- Allow lower MTU (https://github.com/wg-easy/wg-easy/pull/2228)
+- Use /32 and /128 for client Cidr (https://github.com/wg-easy/wg-easy/pull/2217)
+- Return client id on create (https://github.com/wg-easy/wg-easy/pull/2190)
+- Publish on Codeberg (https://github.com/wg-easy/wg-easy/pull/2160)
+- Allow empty DNS (https://github.com/wg-easy/wg-easy/pull/2052, https://github.com/wg-easy/wg-easy/pull/2057)
+- Don't include keys in API responses (https://github.com/wg-easy/wg-easy/pull/2015)
+
+## Docs
+
+- Add AdGuard Home (https://github.com/wg-easy/wg-easy/pull/2175)
+- Add Routed (No NAT) docs (https://github.com/wg-easy/wg-easy/pull/2181)
+
 ## [15.1.0] - 2025-07-01
 
 ### Added
