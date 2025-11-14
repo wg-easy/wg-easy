@@ -97,6 +97,8 @@ export const WG_GENERAL_OVERRIDE_ENV = {
   SESSION_TIMEOUT: process.env.WG_SESSION_TIMEOUT
     ? Number.parseInt(process.env.WG_SESSION_TIMEOUT, 10)
     : undefined,
+  /** Override metrics password */
+  METRICS_PASSWORD: process.env.WG_METRICS_PASSWORD,
   /** Override metrics Prometheus enabled status */
   METRICS_PROMETHEUS: process.env.WG_METRICS_PROMETHEUS === 'true' ? true :
                        process.env.WG_METRICS_PROMETHEUS === 'false' ? false :
@@ -165,11 +167,12 @@ export function applyUserConfigOverrides<
  * Apply environment variable overrides to a general config object
  */
 export function applyGeneralOverrides<
-  T extends { sessionTimeout: number; metricsPrometheus: boolean; metricsJson: boolean },
+  T extends { sessionTimeout: number; metricsPassword: string | null; metricsPrometheus: boolean; metricsJson: boolean },
 >(generalConfig: T): T {
   return {
     ...generalConfig,
     sessionTimeout: WG_GENERAL_OVERRIDE_ENV.SESSION_TIMEOUT ?? generalConfig.sessionTimeout,
+    metricsPassword: WG_GENERAL_OVERRIDE_ENV.METRICS_PASSWORD ?? generalConfig.metricsPassword,
     metricsPrometheus: WG_GENERAL_OVERRIDE_ENV.METRICS_PROMETHEUS ?? generalConfig.metricsPrometheus,
     metricsJson: WG_GENERAL_OVERRIDE_ENV.METRICS_JSON ?? generalConfig.metricsJson,
   };

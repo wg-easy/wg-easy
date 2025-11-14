@@ -1,5 +1,9 @@
 <template>
   <div class="flex flex-col gap-2">
+    <div v-if="overridden" class="flex items-center gap-2 p-2 bg-amber-50 dark:bg-amber-900/20 rounded-lg text-amber-700 dark:text-amber-400 text-sm">
+      <IconsWarning class="size-4" />
+      <span>This field is overridden by an environment variable</span>
+    </div>
     <div v-if="data?.length === 0">
       {{ emptyText || $t('form.noItems') }}
     </div>
@@ -35,7 +39,11 @@
 
 <script lang="ts" setup>
 const data = defineModel<string[]>();
-defineProps<{ emptyText?: string[]; name: string }>();
+defineProps<{
+  emptyText?: string[];
+  name: string;
+  overridden?: boolean;
+}>();
 
 function update(e: Event, i: number) {
   const v = (e.target as HTMLInputElement).value;

@@ -51,6 +51,7 @@ These environment variables allow you to override settings that would normally b
 | Env                     | Example           | Description               |
 | ----------------------- | ----------------- | ------------------------- |
 | `WG_SESSION_TIMEOUT`    | `3600`            | Session timeout (seconds) |
+| `WG_METRICS_PASSWORD`   | `mypassword123`   | Metrics endpoint password |
 | `WG_METRICS_PROMETHEUS` | `true` or `false` | Enable Prometheus metrics |
 | `WG_METRICS_JSON`       | `true` or `false` | Enable JSON metrics       |
 

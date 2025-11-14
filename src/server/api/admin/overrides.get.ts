@@ -17,6 +17,7 @@ export default definePermissionEventHandler('admin', 'any', async () => {
     },
     general: {
       sessionTimeout: WG_GENERAL_OVERRIDE_ENV.SESSION_TIMEOUT !== undefined,
+      metricsPassword: WG_GENERAL_OVERRIDE_ENV.METRICS_PASSWORD !== undefined,
       metricsPrometheus: WG_GENERAL_OVERRIDE_ENV.METRICS_PROMETHEUS !== undefined,
       metricsJson: WG_GENERAL_OVERRIDE_ENV.METRICS_JSON !== undefined,
     },

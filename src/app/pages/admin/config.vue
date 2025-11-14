@@ -9,12 +9,14 @@
           :label="$t('general.host')"
           :description="$t('admin.config.hostDesc')"
           url="/api/admin/ip-info"
+          :overridden="overrides.host"
         />
         <FormNumberField
           id="port"
           v-model="data.port"
           :label="$t('general.port')"
           :description="$t('admin.config.portDesc')"
+          :overridden="overrides.port"
         />
       </FormGroup>
       <FormGroup>
@@ -24,13 +26,18 @@
         <FormArrayField
           v-model="data.defaultAllowedIps"
           name="defaultAllowedIps"
+          :overridden="overrides.defaultAllowedIps"
         />
       </FormGroup>
       <FormGroup>
         <FormHeading :description="$t('admin.config.dnsDesc')">
           {{ $t('general.dns') }}
         </FormHeading>
-        <FormArrayField v-model="data.defaultDns" name="defaultDns" />
+        <FormArrayField
+          v-model="data.defaultDns"
+          name="defaultDns"
+          :overridden="overrides.defaultDns"
+        />
       </FormGroup>
       <FormGroup>
         <FormHeading>{{ $t('form.sectionAdvanced') }}</FormHeading>
@@ -39,12 +46,14 @@
           v-model="data.defaultMtu"
           :label="$t('general.mtu')"
           :description="$t('admin.config.mtuDesc')"
+          :overridden="overrides.defaultMtu"
         />
         <FormNumberField
           id="defaultPersistentKeepalive"
           v-model="data.defaultPersistentKeepalive"
           :label="$t('general.persistentKeepalive')"
           :description="$t('admin.config.persistentKeepaliveDesc')"
+          :overridden="overrides.defaultPersistentKeepalive"
         />
       </FormGroup>
       <FormGroup v-if="globalStore.information?.isAwg">
@@ -117,6 +126,12 @@ const globalStore = useGlobalStore();
 const { data: _data, refresh } = await useFetch(`/api/admin/userconfig`, {
   method: 'get',
 });
+
+const { data: overridesData } = await useFetch(`/api/admin/overrides`, {
+  method: 'get',
+});
+
+const overrides = computed(() => overridesData.value?.userConfig || {});
 
 const data = toRef(_data.value);
 
