@@ -20,5 +20,11 @@ export default definePermissionEventHandler('admin', 'any', async () => {
       metricsPrometheus: WG_GENERAL_OVERRIDE_ENV.METRICS_PROMETHEUS !== undefined,
       metricsJson: WG_GENERAL_OVERRIDE_ENV.METRICS_JSON !== undefined,
     },
+    hooks: {
+      preUp: WG_HOOKS_OVERRIDE_ENV.PRE_UP !== undefined,
+      postUp: WG_HOOKS_OVERRIDE_ENV.POST_UP !== undefined,
+      preDown: WG_HOOKS_OVERRIDE_ENV.PRE_DOWN !== undefined,
+      postDown: WG_HOOKS_OVERRIDE_ENV.POST_DOWN !== undefined,
+    },
   };
 });

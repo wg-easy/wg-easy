@@ -54,6 +54,15 @@ These environment variables allow you to override settings that would normally b
 | `WG_METRICS_PROMETHEUS` | `true` or `false` | Enable Prometheus metrics |
 | `WG_METRICS_JSON`       | `true` or `false` | Enable JSON metrics       |
 
+### Hooks
+
+| Env            | Example                   | Description           |
+| -------------- | ------------------------- | --------------------- |
+| `WG_PRE_UP`    | `echo "Starting WG"`      | PreUp hook command    |
+| `WG_POST_UP`   | `iptables -A FORWARD ...` | PostUp hook command   |
+| `WG_PRE_DOWN`  | `echo "Stopping WG"`      | PreDown hook command  |
+| `WG_POST_DOWN` | `iptables -D FORWARD ...` | PostDown hook command |
+
 /// warning | Override Behavior
 
 When these override environment variables are set:

@@ -107,6 +107,17 @@ export const WG_GENERAL_OVERRIDE_ENV = {
                  undefined,
 };
 
+export const WG_HOOKS_OVERRIDE_ENV = {
+  /** Override PreUp hook */
+  PRE_UP: process.env.WG_PRE_UP,
+  /** Override PostUp hook */
+  POST_UP: process.env.WG_POST_UP,
+  /** Override PreDown hook */
+  PRE_DOWN: process.env.WG_PRE_DOWN,
+  /** Override PostDown hook */
+  POST_DOWN: process.env.WG_POST_DOWN,
+};
+
 function assertEnv<T extends string>(env: T) {
   const val = process.env[env];
 
@@ -161,5 +172,20 @@ export function applyGeneralOverrides<
     sessionTimeout: WG_GENERAL_OVERRIDE_ENV.SESSION_TIMEOUT ?? generalConfig.sessionTimeout,
     metricsPrometheus: WG_GENERAL_OVERRIDE_ENV.METRICS_PROMETHEUS ?? generalConfig.metricsPrometheus,
     metricsJson: WG_GENERAL_OVERRIDE_ENV.METRICS_JSON ?? generalConfig.metricsJson,
+  };
+}
+
+/**
+ * Apply environment variable overrides to a hooks object
+ */
+export function applyHooksOverrides<
+  T extends { preUp: string; postUp: string; preDown: string; postDown: string },
+>(hooks: T): T {
+  return {
+    ...hooks,
+    preUp: WG_HOOKS_OVERRIDE_ENV.PRE_UP ?? hooks.preUp,
+    postUp: WG_HOOKS_OVERRIDE_ENV.POST_UP ?? hooks.postUp,
+    preDown: WG_HOOKS_OVERRIDE_ENV.PRE_DOWN ?? hooks.preDown,
+    postDown: WG_HOOKS_OVERRIDE_ENV.POST_DOWN ?? hooks.postDown,
   };
 }

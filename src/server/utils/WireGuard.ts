@@ -27,10 +27,11 @@ class WireGuard {
   async #saveWireguardConfig(wgInterface: InterfaceType) {
     const clients = await Database.clients.getAll();
     const hooks = await Database.hooks.get();
+    const hooksWithOverrides = applyHooksOverrides(hooks);
 
     const result = [];
     result.push(
-      wg.generateServerInterface(wgInterface, hooks, {
+      wg.generateServerInterface(wgInterface, hooksWithOverrides, {
         enableIpv6: !WG_ENV.DISABLE_IPV6,
       })
     );
