@@ -9,28 +9,9 @@ export default definePermissionEventHandler(
       validateZod(InterfaceUpdateSchema, event)
     );
 
-    // Remove overridden fields from the update data
-    const updateData = { ...data };
-    if (WG_OVERRIDE_ENV.PORT !== undefined) {
-      delete updateData.port;
-    }
-    if (WG_OVERRIDE_ENV.DEVICE !== undefined) {
-      delete updateData.device;
-    }
-    if (WG_OVERRIDE_ENV.MTU !== undefined) {
-      delete updateData.mtu;
-    }
-    if (WG_OVERRIDE_ENV.IPV4_CIDR !== undefined) {
-      delete updateData.ipv4Cidr;
-    }
-    if (WG_OVERRIDE_ENV.IPV6_CIDR !== undefined) {
-      delete updateData.ipv6Cidr;
-    }
-    if (WG_OVERRIDE_ENV.ENABLED !== undefined) {
-      delete updateData.enabled;
-    }
-
-    await Database.interfaces.update(updateData);
+    // Allow all updates to be saved to database
+    // Overrides will be applied when reading/using the values
+    await Database.interfaces.update(data);
     await WireGuard.saveConfig();
     return { success: true };
   }

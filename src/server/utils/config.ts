@@ -69,10 +69,6 @@ export const WG_OVERRIDE_ENV = {
   IPV4_CIDR: process.env.WG_IPV4_CIDR,
   /** Override the IPv6 CIDR */
   IPV6_CIDR: process.env.WG_IPV6_CIDR,
-  /** Override the enabled status */
-  ENABLED: process.env.WG_ENABLED === 'true' ? true :
-           process.env.WG_ENABLED === 'false' ? false :
-           undefined,
 };
 
 export const WG_CLIENT_OVERRIDE_ENV = {
@@ -125,7 +121,7 @@ function assertEnv<T extends string>(env: T) {
  * Apply environment variable overrides to an interface object
  */
 export function applyInterfaceOverrides<
-  T extends { port: number; device: string; mtu: number; ipv4Cidr: string; ipv6Cidr: string; enabled: boolean },
+  T extends { port: number; device: string; mtu: number; ipv4Cidr: string; ipv6Cidr: string },
 >(wgInterface: T): T {
   return {
     ...wgInterface,
@@ -134,7 +130,6 @@ export function applyInterfaceOverrides<
     mtu: WG_OVERRIDE_ENV.MTU ?? wgInterface.mtu,
     ipv4Cidr: WG_OVERRIDE_ENV.IPV4_CIDR ?? wgInterface.ipv4Cidr,
     ipv6Cidr: WG_OVERRIDE_ENV.IPV6_CIDR ?? wgInterface.ipv6Cidr,
-    enabled: WG_OVERRIDE_ENV.ENABLED ?? wgInterface.enabled,
   };
 }
 
