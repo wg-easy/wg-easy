@@ -56,15 +56,59 @@ export const WG_INITIAL_ENV = {
 
 export const WG_OVERRIDE_ENV = {
   /** Override the WireGuard interface port */
-  INTERFACE_PORT: process.env.OVERRIDE_INTERFACE_PORT
-    ? Number.parseInt(process.env.OVERRIDE_INTERFACE_PORT, 10)
+  PORT: process.env.WG_PORT
+    ? Number.parseInt(process.env.WG_PORT, 10)
     : undefined,
   /** Override the network device/interface */
-  INTERFACE_DEVICE: process.env.OVERRIDE_INTERFACE_DEVICE,
+  DEVICE: process.env.WG_DEVICE,
   /** Override the MTU setting */
-  INTERFACE_MTU: process.env.OVERRIDE_INTERFACE_MTU
-    ? Number.parseInt(process.env.OVERRIDE_INTERFACE_MTU, 10)
+  MTU: process.env.WG_MTU
+    ? Number.parseInt(process.env.WG_MTU, 10)
     : undefined,
+  /** Override the IPv4 CIDR */
+  IPV4_CIDR: process.env.WG_IPV4_CIDR,
+  /** Override the IPv6 CIDR */
+  IPV6_CIDR: process.env.WG_IPV6_CIDR,
+  /** Override the enabled status */
+  ENABLED: process.env.WG_ENABLED === 'true' ? true :
+           process.env.WG_ENABLED === 'false' ? false :
+           undefined,
+};
+
+export const WG_CLIENT_OVERRIDE_ENV = {
+  /** Override the client connection host */
+  HOST: process.env.WG_HOST,
+  /** Override the client connection port (different from WG_PORT which is the interface port) */
+  CLIENT_PORT: process.env.WG_CLIENT_PORT
+    ? Number.parseInt(process.env.WG_CLIENT_PORT, 10)
+    : undefined,
+  /** Override default client DNS servers */
+  DEFAULT_DNS: process.env.WG_DEFAULT_DNS?.split(',').map((x) => x.trim()),
+  /** Override default client allowed IPs */
+  DEFAULT_ALLOWED_IPS: process.env.WG_DEFAULT_ALLOWED_IPS?.split(',').map((x) => x.trim()),
+  /** Override default client MTU */
+  DEFAULT_MTU: process.env.WG_DEFAULT_MTU
+    ? Number.parseInt(process.env.WG_DEFAULT_MTU, 10)
+    : undefined,
+  /** Override default client persistent keepalive */
+  DEFAULT_PERSISTENT_KEEPALIVE: process.env.WG_DEFAULT_PERSISTENT_KEEPALIVE
+    ? Number.parseInt(process.env.WG_DEFAULT_PERSISTENT_KEEPALIVE, 10)
+    : undefined,
+};
+
+export const WG_GENERAL_OVERRIDE_ENV = {
+  /** Override session timeout */
+  SESSION_TIMEOUT: process.env.WG_SESSION_TIMEOUT
+    ? Number.parseInt(process.env.WG_SESSION_TIMEOUT, 10)
+    : undefined,
+  /** Override metrics Prometheus enabled status */
+  METRICS_PROMETHEUS: process.env.WG_METRICS_PROMETHEUS === 'true' ? true :
+                       process.env.WG_METRICS_PROMETHEUS === 'false' ? false :
+                       undefined,
+  /** Override metrics JSON enabled status */
+  METRICS_JSON: process.env.WG_METRICS_JSON === 'true' ? true :
+                 process.env.WG_METRICS_JSON === 'false' ? false :
+                 undefined,
 };
 
 function assertEnv<T extends string>(env: T) {
@@ -81,12 +125,46 @@ function assertEnv<T extends string>(env: T) {
  * Apply environment variable overrides to an interface object
  */
 export function applyInterfaceOverrides<
-  T extends { port: number; device: string; mtu: number },
+  T extends { port: number; device: string; mtu: number; ipv4Cidr: string; ipv6Cidr: string; enabled: boolean },
 >(wgInterface: T): T {
   return {
     ...wgInterface,
-    port: WG_OVERRIDE_ENV.INTERFACE_PORT ?? wgInterface.port,
-    device: WG_OVERRIDE_ENV.INTERFACE_DEVICE ?? wgInterface.device,
-    mtu: WG_OVERRIDE_ENV.INTERFACE_MTU ?? wgInterface.mtu,
+    port: WG_OVERRIDE_ENV.PORT ?? wgInterface.port,
+    device: WG_OVERRIDE_ENV.DEVICE ?? wgInterface.device,
+    mtu: WG_OVERRIDE_ENV.MTU ?? wgInterface.mtu,
+    ipv4Cidr: WG_OVERRIDE_ENV.IPV4_CIDR ?? wgInterface.ipv4Cidr,
+    ipv6Cidr: WG_OVERRIDE_ENV.IPV6_CIDR ?? wgInterface.ipv6Cidr,
+    enabled: WG_OVERRIDE_ENV.ENABLED ?? wgInterface.enabled,
+  };
+}
+
+/**
+ * Apply environment variable overrides to a user config object
+ */
+export function applyUserConfigOverrides<
+  T extends { host: string; port: number; defaultDns: string[]; defaultAllowedIps: string[]; defaultMtu: number; defaultPersistentKeepalive: number },
+>(userConfig: T): T {
+  return {
+    ...userConfig,
+    host: WG_CLIENT_OVERRIDE_ENV.HOST ?? userConfig.host,
+    port: WG_CLIENT_OVERRIDE_ENV.CLIENT_PORT ?? userConfig.port,
+    defaultDns: WG_CLIENT_OVERRIDE_ENV.DEFAULT_DNS ?? userConfig.defaultDns,
+    defaultAllowedIps: WG_CLIENT_OVERRIDE_ENV.DEFAULT_ALLOWED_IPS ?? userConfig.defaultAllowedIps,
+    defaultMtu: WG_CLIENT_OVERRIDE_ENV.DEFAULT_MTU ?? userConfig.defaultMtu,
+    defaultPersistentKeepalive: WG_CLIENT_OVERRIDE_ENV.DEFAULT_PERSISTENT_KEEPALIVE ?? userConfig.defaultPersistentKeepalive,
+  };
+}
+
+/**
+ * Apply environment variable overrides to a general config object
+ */
+export function applyGeneralOverrides<
+  T extends { sessionTimeout: number; metricsPrometheus: boolean; metricsJson: boolean },
+>(generalConfig: T): T {
+  return {
+    ...generalConfig,
+    sessionTimeout: WG_GENERAL_OVERRIDE_ENV.SESSION_TIMEOUT ?? generalConfig.sessionTimeout,
+    metricsPrometheus: WG_GENERAL_OVERRIDE_ENV.METRICS_PROMETHEUS ?? generalConfig.metricsPrometheus,
+    metricsJson: WG_GENERAL_OVERRIDE_ENV.METRICS_JSON ?? generalConfig.metricsJson,
   };
 }

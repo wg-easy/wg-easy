@@ -154,6 +154,7 @@ class WireGuard {
     const wgInterface = await Database.interfaces.get();
     const wgInterfaceWithOverrides = applyInterfaceOverrides(wgInterface);
     const userConfig = await Database.userConfigs.get();
+    const userConfigWithOverrides = applyUserConfigOverrides(userConfig);
 
     const client = await Database.clients.get(clientId);
 
@@ -163,7 +164,7 @@ class WireGuard {
 
     return wg.generateClientConfig(
       wgInterfaceWithOverrides,
-      userConfig,
+      userConfigWithOverrides,
       client,
       {
         enableIpv6: !WG_ENV.DISABLE_IPV6,

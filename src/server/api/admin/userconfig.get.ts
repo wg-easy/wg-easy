@@ -1,4 +1,5 @@
 export default definePermissionEventHandler('admin', 'any', async () => {
   const userConfig = await Database.userConfigs.get();
-  return userConfig;
+  const userConfigWithOverrides = applyUserConfigOverrides(userConfig);
+  return userConfigWithOverrides;
 });
