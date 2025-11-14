@@ -1,8 +1,9 @@
 export default definePermissionEventHandler('admin', 'any', async () => {
   const wgInterface = await Database.interfaces.get();
+  const wgInterfaceWithOverrides = applyInterfaceOverrides(wgInterface);
 
   return {
-    ...wgInterface,
+    ...wgInterfaceWithOverrides,
     privateKey: undefined,
   };
 });

@@ -8,7 +8,20 @@ export default definePermissionEventHandler(
       event,
       validateZod(InterfaceUpdateSchema, event)
     );
-    await Database.interfaces.update(data);
+
+    // Remove overridden fields from the update data
+    const updateData = { ...data };
+    if (WG_OVERRIDE_ENV.INTERFACE_PORT !== undefined) {
+      delete updateData.port;
+    }
+    if (WG_OVERRIDE_ENV.INTERFACE_DEVICE !== undefined) {
+      delete updateData.device;
+    }
+    if (WG_OVERRIDE_ENV.INTERFACE_MTU !== undefined) {
+      delete updateData.mtu;
+    }
+
+    await Database.interfaces.update(updateData);
     await WireGuard.saveConfig();
     return { success: true };
   }

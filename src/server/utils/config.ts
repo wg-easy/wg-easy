@@ -54,6 +54,19 @@ export const WG_INITIAL_ENV = {
     : undefined,
 };
 
+export const WG_OVERRIDE_ENV = {
+  /** Override the WireGuard interface port */
+  INTERFACE_PORT: process.env.OVERRIDE_INTERFACE_PORT
+    ? Number.parseInt(process.env.OVERRIDE_INTERFACE_PORT, 10)
+    : undefined,
+  /** Override the network device/interface */
+  INTERFACE_DEVICE: process.env.OVERRIDE_INTERFACE_DEVICE,
+  /** Override the MTU setting */
+  INTERFACE_MTU: process.env.OVERRIDE_INTERFACE_MTU
+    ? Number.parseInt(process.env.OVERRIDE_INTERFACE_MTU, 10)
+    : undefined,
+};
+
 function assertEnv<T extends string>(env: T) {
   const val = process.env[env];
 
@@ -62,4 +75,18 @@ function assertEnv<T extends string>(env: T) {
   }
 
   return val;
+}
+
+/**
+ * Apply environment variable overrides to an interface object
+ */
+export function applyInterfaceOverrides<
+  T extends { port: number; device: string; mtu: number },
+>(wgInterface: T): T {
+  return {
+    ...wgInterface,
+    port: WG_OVERRIDE_ENV.INTERFACE_PORT ?? wgInterface.port,
+    device: WG_OVERRIDE_ENV.INTERFACE_DEVICE ?? wgInterface.device,
+    mtu: WG_OVERRIDE_ENV.INTERFACE_MTU ?? wgInterface.mtu,
+  };
 }
