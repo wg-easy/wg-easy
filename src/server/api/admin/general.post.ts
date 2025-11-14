@@ -8,9 +8,6 @@ export default definePermissionEventHandler(
       event,
       validateZod(GeneralUpdateSchema, event)
     );
-
-    // Allow all updates to be saved to database
-    // Overrides will be applied when reading/using the values
     await Database.general.update(data);
     return { success: true };
   }

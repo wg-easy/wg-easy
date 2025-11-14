@@ -8,9 +8,6 @@ export default definePermissionEventHandler(
       event,
       validateZod(InterfaceUpdateSchema, event)
     );
-
-    // Allow all updates to be saved to database
-    // Overrides will be applied when reading/using the values
     await Database.interfaces.update(data);
     await WireGuard.saveConfig();
     return { success: true };
