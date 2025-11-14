@@ -1,6 +1,9 @@
 <template>
   <div class="flex flex-col gap-2">
-    <div v-if="overridden" class="flex items-center gap-2 p-2 bg-amber-50 dark:bg-amber-900/20 rounded-lg text-amber-700 dark:text-amber-400 text-sm">
+    <div
+      v-if="overridden"
+      class="flex items-center gap-2 rounded-lg bg-amber-50 p-2 text-sm text-amber-700 dark:bg-amber-900/20 dark:text-amber-400"
+    >
       <IconsWarning class="size-4" />
       <span>This field is overridden by an environment variable</span>
     </div>

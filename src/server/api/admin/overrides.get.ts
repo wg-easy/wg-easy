@@ -11,14 +11,17 @@ export default definePermissionEventHandler('admin', 'any', async () => {
       host: WG_CLIENT_OVERRIDE_ENV.HOST !== undefined,
       port: WG_CLIENT_OVERRIDE_ENV.CLIENT_PORT !== undefined,
       defaultDns: WG_CLIENT_OVERRIDE_ENV.DEFAULT_DNS !== undefined,
-      defaultAllowedIps: WG_CLIENT_OVERRIDE_ENV.DEFAULT_ALLOWED_IPS !== undefined,
+      defaultAllowedIps:
+        WG_CLIENT_OVERRIDE_ENV.DEFAULT_ALLOWED_IPS !== undefined,
       defaultMtu: WG_CLIENT_OVERRIDE_ENV.DEFAULT_MTU !== undefined,
-      defaultPersistentKeepalive: WG_CLIENT_OVERRIDE_ENV.DEFAULT_PERSISTENT_KEEPALIVE !== undefined,
+      defaultPersistentKeepalive:
+        WG_CLIENT_OVERRIDE_ENV.DEFAULT_PERSISTENT_KEEPALIVE !== undefined,
     },
     general: {
       sessionTimeout: WG_GENERAL_OVERRIDE_ENV.SESSION_TIMEOUT !== undefined,
       metricsPassword: WG_GENERAL_OVERRIDE_ENV.METRICS_PASSWORD !== undefined,
-      metricsPrometheus: WG_GENERAL_OVERRIDE_ENV.METRICS_PROMETHEUS !== undefined,
+      metricsPrometheus:
+        WG_GENERAL_OVERRIDE_ENV.METRICS_PROMETHEUS !== undefined,
       metricsJson: WG_GENERAL_OVERRIDE_ENV.METRICS_JSON !== undefined,
     },
     hooks: {

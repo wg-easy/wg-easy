@@ -62,9 +62,7 @@ export const WG_OVERRIDE_ENV = {
   /** Override the network device/interface */
   DEVICE: process.env.WG_DEVICE,
   /** Override the MTU setting */
-  MTU: process.env.WG_MTU
-    ? Number.parseInt(process.env.WG_MTU, 10)
-    : undefined,
+  MTU: process.env.WG_MTU ? Number.parseInt(process.env.WG_MTU, 10) : undefined,
   /** Override the IPv4 CIDR */
   IPV4_CIDR: process.env.WG_IPV4_CIDR,
   /** Override the IPv6 CIDR */
@@ -81,7 +79,9 @@ export const WG_CLIENT_OVERRIDE_ENV = {
   /** Override default client DNS servers */
   DEFAULT_DNS: process.env.WG_DEFAULT_DNS?.split(',').map((x) => x.trim()),
   /** Override default client allowed IPs */
-  DEFAULT_ALLOWED_IPS: process.env.WG_DEFAULT_ALLOWED_IPS?.split(',').map((x) => x.trim()),
+  DEFAULT_ALLOWED_IPS: process.env.WG_DEFAULT_ALLOWED_IPS?.split(',').map((x) =>
+    x.trim()
+  ),
   /** Override default client MTU */
   DEFAULT_MTU: process.env.WG_DEFAULT_MTU
     ? Number.parseInt(process.env.WG_DEFAULT_MTU, 10)
@@ -100,13 +100,19 @@ export const WG_GENERAL_OVERRIDE_ENV = {
   /** Override metrics password */
   METRICS_PASSWORD: process.env.WG_METRICS_PASSWORD,
   /** Override metrics Prometheus enabled status */
-  METRICS_PROMETHEUS: process.env.WG_METRICS_PROMETHEUS === 'true' ? true :
-                       process.env.WG_METRICS_PROMETHEUS === 'false' ? false :
-                       undefined,
+  METRICS_PROMETHEUS:
+    process.env.WG_METRICS_PROMETHEUS === 'true'
+      ? true
+      : process.env.WG_METRICS_PROMETHEUS === 'false'
+        ? false
+        : undefined,
   /** Override metrics JSON enabled status */
-  METRICS_JSON: process.env.WG_METRICS_JSON === 'true' ? true :
-                 process.env.WG_METRICS_JSON === 'false' ? false :
-                 undefined,
+  METRICS_JSON:
+    process.env.WG_METRICS_JSON === 'true'
+      ? true
+      : process.env.WG_METRICS_JSON === 'false'
+        ? false
+        : undefined,
 };
 
 export const WG_HOOKS_OVERRIDE_ENV = {
@@ -134,7 +140,13 @@ function assertEnv<T extends string>(env: T) {
  * Apply environment variable overrides to an interface object
  */
 export function applyInterfaceOverrides<
-  T extends { port: number; device: string; mtu: number; ipv4Cidr: string; ipv6Cidr: string },
+  T extends {
+    port: number;
+    device: string;
+    mtu: number;
+    ipv4Cidr: string;
+    ipv6Cidr: string;
+  },
 >(wgInterface: T): T {
   return {
     ...wgInterface,
@@ -150,16 +162,27 @@ export function applyInterfaceOverrides<
  * Apply environment variable overrides to a user config object
  */
 export function applyUserConfigOverrides<
-  T extends { host: string; port: number; defaultDns: string[]; defaultAllowedIps: string[]; defaultMtu: number; defaultPersistentKeepalive: number },
+  T extends {
+    host: string;
+    port: number;
+    defaultDns: string[];
+    defaultAllowedIps: string[];
+    defaultMtu: number;
+    defaultPersistentKeepalive: number;
+  },
 >(userConfig: T): T {
   return {
     ...userConfig,
     host: WG_CLIENT_OVERRIDE_ENV.HOST ?? userConfig.host,
     port: WG_CLIENT_OVERRIDE_ENV.CLIENT_PORT ?? userConfig.port,
     defaultDns: WG_CLIENT_OVERRIDE_ENV.DEFAULT_DNS ?? userConfig.defaultDns,
-    defaultAllowedIps: WG_CLIENT_OVERRIDE_ENV.DEFAULT_ALLOWED_IPS ?? userConfig.defaultAllowedIps,
+    defaultAllowedIps:
+      WG_CLIENT_OVERRIDE_ENV.DEFAULT_ALLOWED_IPS ??
+      userConfig.defaultAllowedIps,
     defaultMtu: WG_CLIENT_OVERRIDE_ENV.DEFAULT_MTU ?? userConfig.defaultMtu,
-    defaultPersistentKeepalive: WG_CLIENT_OVERRIDE_ENV.DEFAULT_PERSISTENT_KEEPALIVE ?? userConfig.defaultPersistentKeepalive,
+    defaultPersistentKeepalive:
+      WG_CLIENT_OVERRIDE_ENV.DEFAULT_PERSISTENT_KEEPALIVE ??
+      userConfig.defaultPersistentKeepalive,
   };
 }
 
@@ -167,14 +190,24 @@ export function applyUserConfigOverrides<
  * Apply environment variable overrides to a general config object
  */
 export function applyGeneralOverrides<
-  T extends { sessionTimeout: number; metricsPassword: string | null; metricsPrometheus: boolean; metricsJson: boolean },
+  T extends {
+    sessionTimeout: number;
+    metricsPassword: string | null;
+    metricsPrometheus: boolean;
+    metricsJson: boolean;
+  },
 >(generalConfig: T): T {
   return {
     ...generalConfig,
-    sessionTimeout: WG_GENERAL_OVERRIDE_ENV.SESSION_TIMEOUT ?? generalConfig.sessionTimeout,
-    metricsPassword: WG_GENERAL_OVERRIDE_ENV.METRICS_PASSWORD ?? generalConfig.metricsPassword,
-    metricsPrometheus: WG_GENERAL_OVERRIDE_ENV.METRICS_PROMETHEUS ?? generalConfig.metricsPrometheus,
-    metricsJson: WG_GENERAL_OVERRIDE_ENV.METRICS_JSON ?? generalConfig.metricsJson,
+    sessionTimeout:
+      WG_GENERAL_OVERRIDE_ENV.SESSION_TIMEOUT ?? generalConfig.sessionTimeout,
+    metricsPassword:
+      WG_GENERAL_OVERRIDE_ENV.METRICS_PASSWORD ?? generalConfig.metricsPassword,
+    metricsPrometheus:
+      WG_GENERAL_OVERRIDE_ENV.METRICS_PROMETHEUS ??
+      generalConfig.metricsPrometheus,
+    metricsJson:
+      WG_GENERAL_OVERRIDE_ENV.METRICS_JSON ?? generalConfig.metricsJson,
   };
 }
 
@@ -182,7 +215,12 @@ export function applyGeneralOverrides<
  * Apply environment variable overrides to a hooks object
  */
 export function applyHooksOverrides<
-  T extends { preUp: string; postUp: string; preDown: string; postDown: string },
+  T extends {
+    preUp: string;
+    postUp: string;
+    preDown: string;
+    postDown: string;
+  },
 >(hooks: T): T {
   return {
     ...hooks,

@@ -6,8 +6,11 @@
     <BaseTooltip v-if="description" :text="description">
       <IconsInfo class="size-4" />
     </BaseTooltip>
-    <BaseTooltip v-if="overridden" text="This field is overridden by an environment variable">
-      <IconsWarning class="size-4 ml-1 text-amber-500" />
+    <BaseTooltip
+      v-if="overridden"
+      text="This field is overridden by an environment variable"
+    >
+      <IconsWarning class="ml-1 size-4 text-amber-500" />
     </BaseTooltip>
   </div>
   <BaseSwitch :id="id" v-model="data" />

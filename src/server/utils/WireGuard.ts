@@ -228,14 +228,18 @@ class WireGuard {
 
     const wgInterfaceWithOverrides = applyInterfaceOverrides(wgInterface);
 
-    WG_DEBUG(`Starting Wireguard Interface ${wgInterfaceWithOverrides.name}...`);
+    WG_DEBUG(
+      `Starting Wireguard Interface ${wgInterfaceWithOverrides.name}...`
+    );
     await this.#saveWireguardConfig(wgInterfaceWithOverrides);
     await wg.down(wgInterfaceWithOverrides.name).catch(() => {});
     await wg.up(wgInterfaceWithOverrides.name).catch((err) => {
       if (
         err &&
         err.message &&
-        err.message.includes(`Cannot find device "${wgInterfaceWithOverrides.name}"`)
+        err.message.includes(
+          `Cannot find device "${wgInterfaceWithOverrides.name}"`
+        )
       ) {
         throw new Error(
           `WireGuard exited with the error: Cannot find device "${wgInterfaceWithOverrides.name}"\nThis usually means that your host's kernel does not support WireGuard!`,
@@ -246,7 +250,9 @@ class WireGuard {
       throw err;
     });
     await this.#syncWireguardConfig(wgInterfaceWithOverrides);
-    WG_DEBUG(`Wireguard Interface ${wgInterfaceWithOverrides.name} started successfully.`);
+    WG_DEBUG(
+      `Wireguard Interface ${wgInterfaceWithOverrides.name} started successfully.`
+    );
 
     WG_DEBUG('Starting Cron Job...');
     await this.startCronJob();
