@@ -189,25 +189,32 @@ export function applyUserConfigOverrides<
 /**
  * Apply environment variable overrides to a general config object
  */
-export function applyGeneralOverrides<
+export function applySessionOverrides<
   T extends {
     sessionTimeout: number;
-    metricsPassword: string | null;
-    metricsPrometheus: boolean;
-    metricsJson: boolean;
   },
 >(generalConfig: T): T {
   return {
     ...generalConfig,
     sessionTimeout:
       WG_GENERAL_OVERRIDE_ENV.SESSION_TIMEOUT ?? generalConfig.sessionTimeout,
-    metricsPassword:
-      WG_GENERAL_OVERRIDE_ENV.METRICS_PASSWORD ?? generalConfig.metricsPassword,
-    metricsPrometheus:
-      WG_GENERAL_OVERRIDE_ENV.METRICS_PROMETHEUS ??
-      generalConfig.metricsPrometheus,
-    metricsJson:
-      WG_GENERAL_OVERRIDE_ENV.METRICS_JSON ?? generalConfig.metricsJson,
+  };
+}
+
+export function applyMetricsOverrides<
+  T extends {
+    password: string | null;
+    prometheus: boolean;
+    json: boolean;
+  },
+>(metricsConfig: T): T {
+  return {
+    ...metricsConfig,
+    password:
+      WG_GENERAL_OVERRIDE_ENV.METRICS_PASSWORD ?? metricsConfig.password,
+    prometheus:
+      WG_GENERAL_OVERRIDE_ENV.METRICS_PROMETHEUS ?? metricsConfig.prometheus,
+    json: WG_GENERAL_OVERRIDE_ENV.METRICS_JSON ?? metricsConfig.json,
   };
 }
 

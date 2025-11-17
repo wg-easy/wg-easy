@@ -7,21 +7,21 @@
           v-model="data.mtu"
           :label="$t('general.mtu')"
           :description="$t('admin.interface.mtuDesc')"
-          :overridden="overrides.mtu"
+          :overridden="overrides?.mtu"
         />
         <FormNumberField
           id="port"
           v-model="data.port"
           :label="$t('general.port')"
           :description="$t('admin.interface.portDesc')"
-          :overridden="overrides.port"
+          :overridden="overrides?.port"
         />
         <FormTextField
           id="device"
           v-model="data.device"
           :label="$t('admin.interface.device')"
           :description="$t('admin.interface.deviceDesc')"
-          :overridden="overrides.device"
+          :overridden="overrides?.device"
         />
       </FormGroup>
       <FormGroup v-if="globalStore.information?.isAwg">
@@ -171,7 +171,7 @@ const { data: overridesData } = await useFetch(`/api/admin/overrides`, {
   method: 'get',
 });
 
-const overrides = computed(() => overridesData.value?.interface || {});
+const overrides = computed(() => overridesData.value?.interface);
 
 const data = toRef(_data.value);
 

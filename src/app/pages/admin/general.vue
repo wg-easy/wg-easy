@@ -7,7 +7,7 @@
           v-model="data.sessionTimeout"
           :label="$t('admin.general.sessionTimeout')"
           :description="$t('admin.general.sessionTimeoutDesc')"
-          :overridden="overrides.sessionTimeout"
+          :overridden="overrides?.sessionTimeout"
         />
       </FormGroup>
       <FormGroup>
@@ -17,21 +17,21 @@
           v-model="data.metricsPassword"
           :label="$t('admin.general.metricsPassword')"
           :description="$t('admin.general.metricsPasswordDesc')"
-          :overridden="overrides.metricsPassword"
+          :overridden="overrides?.metricsPassword"
         />
         <FormSwitchField
           id="prometheus"
           v-model="data.metricsPrometheus"
           :label="$t('admin.general.prometheus')"
           :description="$t('admin.general.prometheusDesc')"
-          :overridden="overrides.metricsPrometheus"
+          :overridden="overrides?.metricsPrometheus"
         />
         <FormSwitchField
           id="json"
           v-model="data.metricsJson"
           :label="$t('admin.general.json')"
           :description="$t('admin.general.jsonDesc')"
-          :overridden="overrides.metricsJson"
+          :overridden="overrides?.metricsJson"
         />
       </FormGroup>
       <FormGroup>
@@ -52,7 +52,7 @@ const { data: overridesData } = await useFetch(`/api/admin/overrides`, {
   method: 'get',
 });
 
-const overrides = computed(() => overridesData.value?.general || {});
+const overrides = computed(() => overridesData.value?.general);
 
 const data = toRef(_data.value);
 

@@ -13,10 +13,12 @@ class WireGuard {
    * Save and sync config
    */
   async saveConfig() {
-    const wgInterface = await Database.interfaces.get();
-    const wgInterfaceWithOverrides = applyInterfaceOverrides(wgInterface);
-    await this.#saveWireguardConfig(wgInterfaceWithOverrides);
-    await this.#syncWireguardConfig(wgInterfaceWithOverrides);
+    const wgInterface = applyInterfaceOverrides(
+      await Database.interfaces.get()
+    );
+
+    await this.#saveWireguardConfig(wgInterface);
+    await this.#syncWireguardConfig(wgInterface);
   }
 
   /**
@@ -26,12 +28,11 @@ class WireGuard {
    */
   async #saveWireguardConfig(wgInterface: InterfaceType) {
     const clients = await Database.clients.getAll();
-    const hooks = await Database.hooks.get();
-    const hooksWithOverrides = applyHooksOverrides(hooks);
+    const hooks = applyHooksOverrides(await Database.hooks.get());
 
     const result = [];
     result.push(
-      wg.generateServerInterface(wgInterface, hooksWithOverrides, {
+      wg.generateServerInterface(wgInterface, hooks, {
         enableIpv6: !WG_ENV.DISABLE_IPV6,
       })
     );
@@ -152,10 +153,12 @@ class WireGuard {
   }
 
   async getClientConfiguration({ clientId }: { clientId: ID }) {
-    const wgInterface = await Database.interfaces.get();
-    const wgInterfaceWithOverrides = applyInterfaceOverrides(wgInterface);
-    const userConfig = await Database.userConfigs.get();
-    const userConfigWithOverrides = applyUserConfigOverrides(userConfig);
+    const wgInterface = applyInterfaceOverrides(
+      await Database.interfaces.get()
+    );
+    const userConfig = applyUserConfigOverrides(
+      await Database.userConfigs.get()
+    );
 
     const client = await Database.clients.get(clientId);
 
@@ -163,14 +166,9 @@ class WireGuard {
       throw new Error('Client not found');
     }
 
-    return wg.generateClientConfig(
-      wgInterfaceWithOverrides,
-      userConfigWithOverrides,
-      client,
-      {
-        enableIpv6: !WG_ENV.DISABLE_IPV6,
-      }
-    );
+    return wg.generateClientConfig(wgInterface, userConfig, client, {
+      enableIpv6: !WG_ENV.DISABLE_IPV6,
+    });
   }
 
   async getClientQRCodeSVG({ clientId }: { clientId: ID }) {
@@ -271,12 +269,16 @@ class WireGuard {
 
   // Shutdown wireguard
   async Shutdown() {
-    const wgInterface = await Database.interfaces.get();
+    const wgInterface = applyInterfaceOverrides(
+      await Database.interfaces.get()
+    );
     await wg.down(wgInterface.name).catch(() => {});
   }
 
   async Restart() {
-    const wgInterface = await Database.interfaces.get();
+    const wgInterface = applyInterfaceOverrides(
+      await Database.interfaces.get()
+    );
     await wg.restart(wgInterface.name);
   }
 
