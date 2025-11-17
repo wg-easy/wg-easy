@@ -57,7 +57,15 @@ const _submit = useSubmit(
   {
     revert: async (success) => {
       if (success) {
-        await navigateTo('/setup/3');
+        // Check if setup is complete (host/port were auto-set from overrides)
+        const setupStatus = await $fetch('/api/general/setup');
+        if (setupStatus.done) {
+          // Setup is complete, redirect to success page
+          await navigateTo('/setup/success');
+        } else {
+          // Continue to step 3
+          await navigateTo('/setup/3');
+        }
       }
     },
     noSuccessToast: true,

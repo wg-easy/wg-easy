@@ -8,6 +8,19 @@ export default defineSetupEventHandler(2, async ({ event }) => {
 
   await Database.users.create(username, password);
 
-  await Database.general.setSetupStep(3);
+  // If host and port are overridden by environment variables, skip step 4
+  const host = WG_CLIENT_OVERRIDE_ENV.HOST;
+  const port = WG_CLIENT_OVERRIDE_ENV.CLIENT_PORT;
+
+  if (host && port) {
+    // Set the host and port from override variables
+    await Database.userConfigs.updateHostPort(host, port);
+    // Skip to done
+    await Database.general.setSetupStep(0);
+  } else {
+    // Proceed to step 3 (which leads to step 4)
+    await Database.general.setSetupStep(3);
+  }
+
   return { success: true };
 });

@@ -9,11 +9,16 @@ export default defineEventHandler(async (event) => {
 
   const { step, done } = await Database.general.getSetupStep();
   if (!done) {
-    const parsedSetup = url.pathname.match(/\/setup\/(\d)/);
+    const parsedSetup = url.pathname.match(/\/setup\/(\d|migrate|success)/);
     if (!parsedSetup) {
       return sendRedirect(event, `/setup/1`, 302);
     }
     const [_, currentSetup] = parsedSetup;
+
+    // Allow access to success page during setup
+    if (currentSetup === 'success') {
+      return;
+    }
 
     if (step.toString() === currentSetup) {
       return;
