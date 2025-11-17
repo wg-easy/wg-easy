@@ -73,7 +73,10 @@ When these override environment variables are set:
 - However, the overridden values from environment variables will always take precedence at runtime
 - The Web UI will display the database values with warning indicators showing which fields are overridden
 
-These overrides are useful for containerized environments where configuration should be controlled externally.
+Some overrides will not be applied to existing clients until they are manually edited.
+
+- `WG_DEFAULT_*` settings will only apply to new clients
+- `WG_IPV4_CIDR` and `WG_IPV6_CIDR` changes will require clients to be manually edited to take effect
 
 ///
 

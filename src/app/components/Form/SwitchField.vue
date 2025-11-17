@@ -10,7 +10,7 @@
       v-if="overridden"
       text="This field is overridden by an environment variable"
     >
-      <IconsWarning class="ml-1 size-4 text-amber-500" />
+      <IconsWarning class="size-4 text-amber-500" />
     </BaseTooltip>
   </div>
   <BaseSwitch :id="id" v-model="data" />
