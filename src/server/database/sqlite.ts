@@ -79,41 +79,57 @@ async function initialSetup(db: DBServiceType) {
     return;
   }
 
-  if (WG_INITIAL_ENV.IPV4_CIDR && WG_INITIAL_ENV.IPV6_CIDR) {
+  // Use INIT vars or fall back to override vars for CIDR
+  const ipv4Cidr = WG_INITIAL_ENV.IPV4_CIDR ?? WG_OVERRIDE_ENV.IPV4_CIDR;
+  const ipv6Cidr = WG_INITIAL_ENV.IPV6_CIDR ?? WG_OVERRIDE_ENV.IPV6_CIDR;
+  
+  if (ipv4Cidr && ipv6Cidr) {
     DB_DEBUG('Setting initial CIDR...');
     await db.interfaces.updateCidr({
-      ipv4Cidr: WG_INITIAL_ENV.IPV4_CIDR,
-      ipv6Cidr: WG_INITIAL_ENV.IPV6_CIDR,
+      ipv4Cidr,
+      ipv6Cidr,
     });
   }
 
-  if (WG_INITIAL_ENV.DNS) {
+  // Use INIT vars or fall back to override vars for DNS
+  const dns = WG_INITIAL_ENV.DNS ?? WG_CLIENT_OVERRIDE_ENV.DEFAULT_DNS;
+  
+  if (dns) {
     DB_DEBUG('Setting initial DNS...');
     await db.userConfigs.update({
-      defaultDns: WG_INITIAL_ENV.DNS,
+      defaultDns: dns,
     });
   }
 
-  if (WG_INITIAL_ENV.ALLOWED_IPS) {
+  // Use INIT vars or fall back to override vars for Allowed IPs
+  const allowedIps = WG_INITIAL_ENV.ALLOWED_IPS ?? WG_CLIENT_OVERRIDE_ENV.DEFAULT_ALLOWED_IPS;
+  
+  if (allowedIps) {
     DB_DEBUG('Setting initial Allowed IPs...');
     await db.userConfigs.update({
-      defaultAllowedIps: WG_INITIAL_ENV.ALLOWED_IPS,
+      defaultAllowedIps: allowedIps,
     });
   }
 
+  // Use INIT vars or fall back to override vars for HOST and PORT
+  const host = WG_INITIAL_ENV.HOST ?? WG_CLIENT_OVERRIDE_ENV.HOST;
+  const port = WG_INITIAL_ENV.PORT ?? WG_CLIENT_OVERRIDE_ENV.CLIENT_PORT;
+
+  // Setup completion requires USERNAME and PASSWORD (no overrides for these)
+  // HOST and PORT can come from either INIT vars or override vars
   if (
     WG_INITIAL_ENV.USERNAME &&
     WG_INITIAL_ENV.PASSWORD &&
-    WG_INITIAL_ENV.HOST &&
-    WG_INITIAL_ENV.PORT
+    host &&
+    port
   ) {
     DB_DEBUG('Creating initial user...');
     await db.users.create(WG_INITIAL_ENV.USERNAME, WG_INITIAL_ENV.PASSWORD);
 
     DB_DEBUG('Setting initial host and port...');
     await db.userConfigs.updateHostPort(
-      WG_INITIAL_ENV.HOST,
-      WG_INITIAL_ENV.PORT
+      host,
+      port
     );
 
     await db.general.setSetupStep(0);
