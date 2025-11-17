@@ -84,7 +84,10 @@ Some overrides will not be applied to existing clients until they are manually e
 /// note | Note on Port Variables
 
 - `WG_PORT` - The port WireGuard listens on (interface port)
-- `WG_CLIENT_PORT` - The port clients connect to (endpoint port, usually same as `WG_PORT`)
+- `WG_CLIENT_PORT` - The port clients connect to (endpoint port, uses `WG_PORT` if not set)
 - `PORT` - The port the Web UI listens on (HTTP server port)
+
+In most cases you will only need to set `WG_PORT` to change the WireGuard port.
+Keep in mind that you have to adjust both sides of the port publish option in your docker setup.
 
 ///

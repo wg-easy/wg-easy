@@ -11,25 +11,20 @@ These will only be used during the first start of the container. After that, the
 | `INIT_ENABLED`     | `true`                       | Enables the below env vars   | 0     |
 | `INIT_USERNAME`    | `admin`                      | Sets admin username          | 1     |
 | `INIT_PASSWORD`    | `Se!ureP%ssw`                | Sets admin password          | 1     |
-| `INIT_HOST`        | `vpn.example.com`            | Host clients will connect to | 2     |
-| `INIT_PORT`        | `51820`                      | Port clients will connect to | 2     |
-| `INIT_DNS`         | `1.1.1.1,8.8.8.8`            | Sets global dns setting      | 3     |
-| `INIT_IPV4_CIDR`   | `10.8.0.0/24`                | Sets IPv4 cidr               | 4     |
-| `INIT_IPV6_CIDR`   | `2001:0DB8::/32`             | Sets IPv6 cidr               | 4     |
-| `INIT_ALLOWED_IPS` | `10.8.0.0/24,2001:0DB8::/32` | Sets global Allowed IPs      | 5     |
+| `INIT_HOST`        | `vpn.example.com`            | Host clients will connect to | 1\*   |
+| `INIT_PORT`        | `51820`                      | Port clients will connect to | 1\*   |
+| `INIT_DNS`         | `1.1.1.1,8.8.8.8`            | Sets global dns setting      | 2     |
+| `INIT_IPV4_CIDR`   | `10.8.0.0/24`                | Sets IPv4 cidr               | 3     |
+| `INIT_IPV6_CIDR`   | `2001:0DB8::/32`             | Sets IPv6 cidr               | 3     |
+| `INIT_ALLOWED_IPS` | `10.8.0.0/24,2001:0DB8::/32` | Sets global Allowed IPs      | 4     |
 
 /// warning | Variables have to be used together
 
 If variables are in the same group, you have to set all of them. For example, if you set `INIT_IPV4_CIDR`, you also have to set `INIT_IPV6_CIDR`.
 
-To skip the setup process, you must configure group `1` (username and password). Groups 2-5 can optionally use the corresponding `WG_*` override environment variables instead (see [Configuration Overrides](/advanced/config/optional-config#configuration-overrides)):
+To skip the setup process, you must configure group `1`. You can alternatively use `WG_HOST` and `WG_PORT` to set the host and port without using the `INIT_` variables.
 
-- **Group 2 (Host & Port):** Can use `WG_HOST` and `WG_CLIENT_PORT` instead of `INIT_HOST` and `INIT_PORT`
-- **Group 3 (DNS):** Can use `WG_DEFAULT_DNS` instead of `INIT_DNS`
-- **Group 4 (CIDR):** Can use `WG_IPV4_CIDR` and `WG_IPV6_CIDR` instead of `INIT_IPV4_CIDR` and `INIT_IPV6_CIDR`
-- **Group 5 (Allowed IPs):** Can use `WG_DEFAULT_ALLOWED_IPS` instead of `INIT_ALLOWED_IPS`
-
-This allows you to skip the initial setup while using override variables for runtime configuration.
+Avoid setting both `INIT_` and `WG_` variables for the same setting to prevent confusion.
 ///
 
 /// note | Security

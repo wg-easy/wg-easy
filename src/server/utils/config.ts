@@ -54,7 +54,7 @@ export const WG_INITIAL_ENV = {
     : undefined,
 };
 
-export const WG_OVERRIDE_ENV = {
+export const WG_INTERFACE_OVERRIDE_ENV = {
   /** Override the WireGuard interface port */
   PORT: process.env.WG_PORT
     ? Number.parseInt(process.env.WG_PORT, 10)
@@ -72,10 +72,10 @@ export const WG_OVERRIDE_ENV = {
 export const WG_CLIENT_OVERRIDE_ENV = {
   /** Override the client connection host */
   HOST: process.env.WG_HOST,
-  /** Override the client connection port (different from WG_PORT which is the interface port) */
+  /** Override the client connection port (falls back to Interface Port) */
   CLIENT_PORT: process.env.WG_CLIENT_PORT
     ? Number.parseInt(process.env.WG_CLIENT_PORT, 10)
-    : undefined,
+    : WG_INTERFACE_OVERRIDE_ENV.PORT,
   /** Override default client DNS servers */
   DEFAULT_DNS: process.env.WG_DEFAULT_DNS?.split(',').map((x) => x.trim()),
   /** Override default client allowed IPs */
@@ -150,11 +150,11 @@ export function applyInterfaceOverrides<
 >(wgInterface: T): T {
   return {
     ...wgInterface,
-    port: WG_OVERRIDE_ENV.PORT ?? wgInterface.port,
-    device: WG_OVERRIDE_ENV.DEVICE ?? wgInterface.device,
-    mtu: WG_OVERRIDE_ENV.MTU ?? wgInterface.mtu,
-    ipv4Cidr: WG_OVERRIDE_ENV.IPV4_CIDR ?? wgInterface.ipv4Cidr,
-    ipv6Cidr: WG_OVERRIDE_ENV.IPV6_CIDR ?? wgInterface.ipv6Cidr,
+    port: WG_INTERFACE_OVERRIDE_ENV.PORT ?? wgInterface.port,
+    device: WG_INTERFACE_OVERRIDE_ENV.DEVICE ?? wgInterface.device,
+    mtu: WG_INTERFACE_OVERRIDE_ENV.MTU ?? wgInterface.mtu,
+    ipv4Cidr: WG_INTERFACE_OVERRIDE_ENV.IPV4_CIDR ?? wgInterface.ipv4Cidr,
+    ipv6Cidr: WG_INTERFACE_OVERRIDE_ENV.IPV6_CIDR ?? wgInterface.ipv6Cidr,
   };
 }
 

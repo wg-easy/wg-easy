@@ -79,60 +79,48 @@ async function initialSetup(db: DBServiceType) {
     return;
   }
 
-  // Use INIT vars or fall back to override vars for CIDR
-  const ipv4Cidr = WG_INITIAL_ENV.IPV4_CIDR ?? WG_OVERRIDE_ENV.IPV4_CIDR;
-  const ipv6Cidr = WG_INITIAL_ENV.IPV6_CIDR ?? WG_OVERRIDE_ENV.IPV6_CIDR;
-  
-  if (ipv4Cidr && ipv6Cidr) {
+  if (WG_INITIAL_ENV.IPV4_CIDR && WG_INITIAL_ENV.IPV6_CIDR) {
     DB_DEBUG('Setting initial CIDR...');
     await db.interfaces.updateCidr({
-      ipv4Cidr,
-      ipv6Cidr,
+      ipv4Cidr: WG_INITIAL_ENV.IPV4_CIDR,
+      ipv6Cidr: WG_INITIAL_ENV.IPV6_CIDR,
     });
   }
 
-  // Use INIT vars or fall back to override vars for DNS
-  const dns = WG_INITIAL_ENV.DNS ?? WG_CLIENT_OVERRIDE_ENV.DEFAULT_DNS;
-  
-  if (dns) {
+  if (WG_INITIAL_ENV.DNS) {
     DB_DEBUG('Setting initial DNS...');
     await db.userConfigs.update({
-      defaultDns: dns,
+      defaultDns: WG_INITIAL_ENV.DNS,
     });
   }
 
-  // Use INIT vars or fall back to override vars for Allowed IPs
-  const allowedIps = WG_INITIAL_ENV.ALLOWED_IPS ?? WG_CLIENT_OVERRIDE_ENV.DEFAULT_ALLOWED_IPS;
-  
-  if (allowedIps) {
+  if (WG_INITIAL_ENV.ALLOWED_IPS) {
     DB_DEBUG('Setting initial Allowed IPs...');
     await db.userConfigs.update({
-      defaultAllowedIps: allowedIps,
+      defaultAllowedIps: WG_INITIAL_ENV.ALLOWED_IPS,
     });
+  }
+
+  if (WG_INITIAL_ENV.USERNAME && WG_INITIAL_ENV.PASSWORD) {
+    DB_DEBUG('Creating initial user...');
+    await db.users.create(WG_INITIAL_ENV.USERNAME, WG_INITIAL_ENV.PASSWORD);
+
+    await db.general.setSetupStep(3);
   }
 
   // Use INIT vars or fall back to override vars for HOST and PORT
   const host = WG_INITIAL_ENV.HOST ?? WG_CLIENT_OVERRIDE_ENV.HOST;
-  const port = WG_INITIAL_ENV.PORT ?? WG_CLIENT_OVERRIDE_ENV.CLIENT_PORT;
+  const port = WG_INITIAL_ENV.PORT ?? WG_INTERFACE_OVERRIDE_ENV.PORT;
 
-  // Setup completion requires USERNAME and PASSWORD (no overrides for these)
   // HOST and PORT can come from either INIT vars or override vars
-  if (
-    WG_INITIAL_ENV.USERNAME &&
-    WG_INITIAL_ENV.PASSWORD &&
-    host &&
-    port
-  ) {
-    DB_DEBUG('Creating initial user...');
-    await db.users.create(WG_INITIAL_ENV.USERNAME, WG_INITIAL_ENV.PASSWORD);
-
+  if (host && port) {
     DB_DEBUG('Setting initial host and port...');
-    await db.userConfigs.updateHostPort(
-      host,
-      port
-    );
+    await db.userConfigs.updateHostPort(host, port);
 
-    await db.general.setSetupStep(0);
+    // Setup completion requires USERNAME and PASSWORD (no overrides for these)
+    if (WG_INITIAL_ENV.USERNAME && WG_INITIAL_ENV.PASSWORD) {
+      await db.general.setSetupStep(0);
+    }
   }
 }
 
