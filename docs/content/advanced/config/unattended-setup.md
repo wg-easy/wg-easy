@@ -6,23 +6,23 @@ If you want to run the setup without any user interaction, e.g. with a tool like
 
 These will only be used during the first start of the container. After that, the setup will be disabled.
 
-| Env                | Example                      | Description                                               | Group |
-| ------------------ | ---------------------------- | --------------------------------------------------------- | ----- |
-| `INIT_ENABLED`     | `true`                       | Enables the below env vars                                | 0     |
-| `INIT_USERNAME`    | `admin`                      | Sets admin username                                       | 1     |
-| `INIT_PASSWORD`    | `Se!ureP%ssw`                | Sets admin password                                       | 1     |
-| `INIT_HOST`        | `vpn.example.com`            | Host clients will connect to                              | 1\*   |
-| `INIT_PORT`        | `51820`                      | Port clients will connect to and WireGuard will listen on | 1\*   |
-| `INIT_DNS`         | `1.1.1.1,8.8.8.8`            | Sets global dns setting                                   | 2     |
-| `INIT_IPV4_CIDR`   | `10.8.0.0/24`                | Sets IPv4 cidr                                            | 3     |
-| `INIT_IPV6_CIDR`   | `2001:0DB8::/32`             | Sets IPv6 cidr                                            | 3     |
-| `INIT_ALLOWED_IPS` | `10.8.0.0/24,2001:0DB8::/32` | Sets global Allowed IPs                                   | 4     |
+| Env                | Example                      | Description                                        | Group |
+| ------------------ | ---------------------------- | -------------------------------------------------- | ----- |
+| `INIT_ENABLED`     | `true`                       | Enables the below env vars                         | 0     |
+| `INIT_USERNAME`    | `admin`                      | Sets admin username                                | 1     |
+| `INIT_PASSWORD`    | `Se!ureP%ssw`                | Sets admin password                                | 1     |
+| `INIT_HOST`        | `vpn.example.com`            | Host clients will connect to                       | 2     |
+| `INIT_PORT`        | `51820`                      | Port clients will connect to (endpoint port)       | 2     |
+| `INIT_DNS`         | `1.1.1.1,8.8.8.8`            | Sets global dns setting                            | 3     |
+| `INIT_IPV4_CIDR`   | `10.8.0.0/24`                | Sets IPv4 cidr                                     | 4     |
+| `INIT_IPV6_CIDR`   | `2001:0DB8::/32`             | Sets IPv6 cidr                                     | 4     |
+| `INIT_ALLOWED_IPS` | `10.8.0.0/24,2001:0DB8::/32` | Sets global Allowed IPs                            | 5     |
 
 /// warning | Variables have to be used together
 
 If variables are in the same group, you have to set all of them. For example, if you set `INIT_IPV4_CIDR`, you also have to set `INIT_IPV6_CIDR`.
 
-To skip the setup process, you must configure group `1`. You can alternatively use `WG_HOST` and `WG_PORT` to set the host and port without using the `INIT_` variables.
+To skip the setup process, you must configure groups `1` and `2`. You can alternatively use `WG_HOST` and `WG_CLIENT_PORT` to set the host and port without using the `INIT_` variables.
 
 Avoid setting both `INIT_` and `WG_` variables for the same setting to prevent confusion.
 ///
