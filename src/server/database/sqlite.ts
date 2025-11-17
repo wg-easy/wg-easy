@@ -110,7 +110,7 @@ async function initialSetup(db: DBServiceType) {
 
   // Use INIT vars or fall back to override vars for HOST and PORT
   const host = WG_INITIAL_ENV.HOST ?? WG_CLIENT_OVERRIDE_ENV.HOST;
-  const port = WG_INITIAL_ENV.PORT ?? WG_CLIENT_OVERRIDE_ENV.CLIENT_PORT;
+  const port = WG_INITIAL_ENV.PORT ?? WG_INTERFACE_OVERRIDE_ENV.PORT;
 
   // HOST and PORT can come from either INIT vars or override vars
   if (host && port) {

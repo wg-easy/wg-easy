@@ -10,7 +10,7 @@ export default defineSetupEventHandler(2, async ({ event }) => {
 
   // If host and port are already set by environment variables, skip step 4
   const host = WG_INITIAL_ENV.HOST ?? WG_CLIENT_OVERRIDE_ENV.HOST;
-  const port = WG_INITIAL_ENV.PORT ?? WG_CLIENT_OVERRIDE_ENV.CLIENT_PORT;
+  const port = WG_INITIAL_ENV.PORT ?? WG_INTERFACE_OVERRIDE_ENV.PORT;
 
   const setupDone = host && port;
 
