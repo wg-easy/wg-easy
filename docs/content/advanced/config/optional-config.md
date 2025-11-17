@@ -70,8 +70,8 @@ When these override environment variables are set:
 
 - The specified values will be used at runtime instead of database settings
 - You can still update these fields through the Web UI and they will be saved to the database
-- However, the overridden values from environment variables will always take precedence
-- The Web UI will display the overridden (effective) values
+- However, the overridden values from environment variables will always take precedence at runtime
+- The Web UI will display the database values with warning indicators showing which fields are overridden
 
 These overrides are useful for containerized environments where configuration should be controlled externally.
 
