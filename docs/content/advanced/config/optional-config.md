@@ -72,6 +72,7 @@ When these override environment variables are set:
 - You can still update these fields through the Web UI and they will be saved to the database
 - However, the overridden values from environment variables will always take precedence at runtime
 - The Web UI will display the database values with warning indicators showing which fields are overridden
+- On first start, if no database values exist, some overridden values will be saved to the database
 
 Some overrides will not be applied to existing clients until they are manually edited.
 
