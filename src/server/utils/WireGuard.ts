@@ -166,11 +166,24 @@ class WireGuard {
 
   async getClientQRCodeSVG({ clientId }: { clientId: ID }) {
     const config = await this.getClientConfiguration({ clientId });
-    return encodeQR(config, 'svg', {
-      ecc: 'high',
-      scale: 2,
-      encoding: 'byte',
-    });
+    const ECMode = ['high', 'quartile', 'medium', 'low'] as const;
+    for (const ecc of ECMode) {
+      try {
+        return encodeQR(config, 'svg', {
+          ecc,
+          scale: 2,
+          encoding: 'byte',
+        });
+      } catch (err) {
+        if (!(err instanceof Error && err.message === 'Capacity overflow')) {
+          throw err;
+        }
+        // retry with lower ecc
+      }
+    }
+    throw new Error(
+      'Failed to generate QR code: Capacity overflow at all ECC levels'
+    );
   }
 
   cleanClientFilename(name: string): string {
