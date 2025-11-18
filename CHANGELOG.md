@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Search / filter box (https://github.com/wg-easy/wg-easy/pull/2170)
 - `INIT_ALLOWED_IPS` env var (https://github.com/wg-easy/wg-easy/pull/2164)
 - Show client endpoint (https://github.com/wg-easy/wg-easy/pull/2058)
+- Add option to view and copy config (https://github.com/wg-easy/wg-easy/pull/2289)
 
 ## Fixed
 
@@ -27,6 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Publish on Codeberg (https://github.com/wg-easy/wg-easy/pull/2160)
 - Allow empty DNS (https://github.com/wg-easy/wg-easy/pull/2052, https://github.com/wg-easy/wg-easy/pull/2057)
 - Don't include keys in API responses (https://github.com/wg-easy/wg-easy/pull/2015)
+- Try all QR ecc levels (https://github.com/wg-easy/wg-easy/pull/2288)
 
 ## Docs
 
