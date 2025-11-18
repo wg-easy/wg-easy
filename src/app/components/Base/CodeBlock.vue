@@ -15,6 +15,7 @@ defineProps<{
 const codeBlock = useTemplateRef('codeBlock');
 
 function selectCode() {
+  // TODO: keyboard support?
   if (codeBlock.value) {
     const range = document.createRange();
     range.selectNodeContents(codeBlock.value);
