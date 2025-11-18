@@ -9,7 +9,7 @@
       </div>
     </template>
     <template #actions>
-      <DialogClose>
+      <DialogClose as-child>
         <BaseSecondaryButton>{{ $t('dialog.cancel') }}</BaseSecondaryButton>
       </DialogClose>
     </template>

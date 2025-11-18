@@ -117,7 +117,9 @@
     "notConnected": "Client not connected",
     "endpoint": "Endpoint",
     "endpointDesc": "IP of the client from which the WireGuard connection is established",
-    "search": "Search clients..."
+    "search": "Search clients...",
+    "config": "Configuration",
+    "viewConfig": "View Configuration"
   },
   "dialog": {
     "change": "Change",
@@ -237,6 +239,12 @@
     "postUp": "PostUp",
     "preDown": "PreDown",
     "postDown": "PostDown"
+  },
+  "copy": {
+    "notSupported": "Copy is not supported",
+    "copied": "Copied!",
+    "failed": "Copy failed",
+    "copy": "Copy"
   },
   "awg": {
     "jCLabel": "Junk packet count (Jc)",
