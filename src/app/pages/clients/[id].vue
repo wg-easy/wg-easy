@@ -186,6 +186,18 @@
                 as="span"
               />
             </ClientsDeleteDialog>
+            <ClientsConfigDialog
+              trigger-class="col-span-2"
+              :client-id="data.id"
+            >
+              <FormSecondaryActionField
+                :label="$t('client.viewConfig')"
+                class="w-full"
+                type="button"
+                tabindex="-1"
+                as="span"
+              />
+            </ClientsConfigDialog>
           </FormGroup>
         </FormElement>
       </PanelBody>
