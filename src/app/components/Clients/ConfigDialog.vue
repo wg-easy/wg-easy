@@ -10,6 +10,9 @@
       <div v-if="status === 'success'">
         <BaseCodeBlock :code="config ?? ''" />
       </div>
+      <div v-else>
+        <span>{{ $t('general.loading') }}</span>
+      </div>
     </template>
     <template #actions>
       <DialogClose as-child>
@@ -37,6 +40,7 @@ const { data: config, status } = useFetch(
   `/api/client/${props.clientId}/configuration`,
   {
     responseType: 'text',
+    server: false,
   }
 );
 
