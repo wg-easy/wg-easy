@@ -117,7 +117,9 @@
     "notConnected": "Клієнт не підключений",
     "endpoint": "Кінцева точка",
     "endpointDesc": "IP-адреса клієнта, з якої встановлюється з’єднання WireGuard",
-    "search": "Пошук клієнтів..."
+    "search": "Пошук клієнтів...",
+    "config": "Конфігурація",
+    "viewConfig": "Переглянути конфігурацію"
   },
   "dialog": {
     "change": "Змінити",
@@ -237,6 +239,12 @@
     "postUp": "PostUp",
     "preDown": "PreDown",
     "postDown": "PostDown"
+  },
+  "copy": {
+    "notSupported": "Копіювання не підтримується",
+    "copied": "Скопійовано!",
+    "failed": "Не вдалося скопіювати",
+    "copy": "Копіювати"
   },
   "awg": {
     "jCLabel": "Кількість сміттєвих пакетів (Jc)",
