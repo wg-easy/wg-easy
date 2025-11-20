@@ -50,7 +50,7 @@ If a parameter is not set, it will not be added to the configuration. If all Amn
 
 ## Client Applications
 
-To be able to connect to wg-easy if AmneziaWG is enabled, you must have an AmneziaWG-compatible client. Currently, only WG Tunnel supports AmneziaWG 1.5/2.0! Other clients require building from source code.
+To be able to connect to wg-easy if AmneziaWG is enabled, you must have an AmneziaWG-compatible client. Currently, only WG Tunnel and Amnezia VPN supports AmneziaWG 1.5/2.0! AmneziaWG clients require building from source code.
 
 Android:
 
