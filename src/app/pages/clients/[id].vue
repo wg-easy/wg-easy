@@ -179,7 +179,7 @@
               @delete="deleteClient"
             >
               <FormSecondaryActionField
-                label="Delete"
+                :label="$t('client.delete')"
                 class="w-full"
                 type="button"
                 tabindex="-1"

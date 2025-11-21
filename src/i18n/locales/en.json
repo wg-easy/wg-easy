@@ -88,6 +88,7 @@
     "name": "Name",
     "expireDate": "Expire Date",
     "expireDateDesc": "Date the client will be disabled. Blank for permanent",
+    "delete": "Delete",
     "deleteClient": "Delete Client",
     "deleteDialog1": "Are you sure you want to delete",
     "deleteDialog2": "This action cannot be undone.",
