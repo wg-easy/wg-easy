@@ -17,6 +17,8 @@ $IPT -D INPUT -p tcp --dport 51821 -j ACCEPT      # for webui
 $IPT -t nat -D POSTROUTING -s $SUB_NET -o $IN_FACE -j MASQUERADE
 $IPT -D FORWARD -i $WG_FACE -j ACCEPT   #for internet
 $IPT -D FORWARD -o $WG_FACE -j ACCEPT   #for internet
+# MSS clamping IPv4
+$IPT -t mangle -D POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o $WG_FACE -j TCPMSS --clamp-mss-to-pmtu
 
 # IPv4 rules #
 $IPT6 -D INPUT -p udp --dport $WG_PORT -j ACCEPT   # for incoming connection
@@ -24,6 +26,8 @@ $IPT6 -D INPUT -p tcp --dport 51821 -j ACCEPT      # for webui
 $IPT6 -t nat -D POSTROUTING -s $SUB_NET_6 -o $IN_FACE -j MASQUERADE
 $IPT6 -D FORWARD -i $WG_FACE -j ACCEPT   #for internet
 $IPT6 -D FORWARD -o $WG_FACE -j ACCEPT   #for internet
+# MSS clamping IPv6
+$IPT6 -t mangle -D POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o $WG_FACE -j TCPMSS --clamp-mss-to-pmtu
 
 # $IPT -t nat -D POSTROUTING -s $SUB_NET -o $IN_FACE -j MASQUERADE
 # $IPT -D FORWARD -i $IN_FACE -o $WG_FACE -j ACCEPT

@@ -14,9 +14,11 @@ module.exports.WG_DEVICE = process.env.WG_DEVICE || 'ens3';
 module.exports.WG_HOST = process.env.WG_HOST || 'oracle-daily.duckdns.org';
 module.exports.WG_PORT = process.env.WG_PORT || '51820';
 module.exports.WG_CONFIG_PORT = process.env.WG_CONFIG_PORT || process.env.WG_PORT || '51820';
-module.exports.WG_MTU = process.env.WG_MTU || '1412';
+module.exports.WG_MTU = process.env.WG_MTU || '8920';
+// module.exports.WG_MTU = process.env.WG_MTU || '1296';
+// module.exports.WG_MTU = process.env.WG_MTU || '8064';
 module.exports.WG_PERSISTENT_KEEPALIVE = process.env.WG_PERSISTENT_KEEPALIVE || '25';
-module.exports.WG_DEFAULT_ADDRESS = process.env.WG_DEFAULT_ADDRESS || '10.8.0.x';
+module.exports.WG_DEFAULT_ADDRESS = process.env.WG_DEFAULT_ADDRESS || '10.250.1.x';
 module.exports.WG_DEFAULT_ADDRESS6 = process.env.WG_DEFAULT_ADDRESS6 || 'fd01:1:1::x';
 module.exports.WG_DEFAULT_DNS = typeof process.env.WG_DEFAULT_DNS === 'string'
   ? process.env.WG_DEFAULT_DNS
