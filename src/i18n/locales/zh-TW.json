@@ -88,6 +88,7 @@
     "name": "名稱",
     "expireDate": "到期日",
     "expireDateDesc": "用戶端將被停用的日期。留白表示永久有效",
+    "delete": "刪除",
     "deleteClient": "刪除用戶端",
     "deleteDialog1": "您確定要刪除",
     "deleteDialog2": "此動作無法復原。",
@@ -117,7 +118,9 @@
     "notConnected": "用戶端未連線",
     "endpoint": "端點",
     "endpointDesc": "用戶端建立 WireGuard 連線的來源 IP",
-    "search": "搜尋用戶端..."
+    "search": "搜尋用戶端...",
+    "config": "組態設定",
+    "viewConfig": "檢視組態設定"
   },
   "dialog": {
     "change": "變更",
@@ -237,6 +240,12 @@
     "postUp": "PostUp",
     "preDown": "PreDown",
     "postDown": "PostDown"
+  },
+  "copy": {
+    "notSupported": "無法複製",
+    "copied": "已複製!",
+    "failed": "複製失敗",
+    "copy": "複製"
   },
   "awg": {
     "jCLabel": "填充封包數量 (Jc)",
