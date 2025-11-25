@@ -13,11 +13,12 @@
               v-for="(item, index) in menuItems"
               :key="index"
               :to="`/admin/${item.id}`"
-              active-class="bg-red-800 rounded"
+              class="group rounded"
+              active-class="bg-red-800 active"
             >
               <BaseSecondaryButton
                 as="span"
-                class="w-full cursor-pointer rounded p-2 font-medium transition-colors duration-200 hover:bg-red-800 dark:text-neutral-200"
+                class="w-full rounded p-2 font-medium transition-colors duration-200 hover:bg-red-800 group-[.active]:text-white dark:text-neutral-200"
               >
                 {{ item.name }}
               </BaseSecondaryButton>
