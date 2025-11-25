@@ -18,7 +18,7 @@
             >
               <BaseSecondaryButton
                 as="span"
-                class="w-full rounded p-2 font-medium transition-colors duration-200 hover:bg-red-800 group-[.active]:text-white dark:text-neutral-200"
+                class="w-full font-medium group-[.active]:text-white"
               >
                 {{ item.name }}
               </BaseSecondaryButton>
