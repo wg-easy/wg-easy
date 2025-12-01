@@ -79,6 +79,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#introduction" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -640,6 +645,24 @@
       
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AmneziaWG
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -656,6 +679,84 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#introduction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Introduction
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#activating-amneziawg" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Activating AmneziaWG
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#amneziawg-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AmneziaWG Parameters
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="AmneziaWG Parameters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameter-compatibility-table" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameter Compatibility Table
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#client-applications" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Client Applications
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -1724,6 +1825,75 @@
   
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#introduction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Introduction
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#activating-amneziawg" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Activating AmneziaWG
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#amneziawg-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AmneziaWG Parameters
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="AmneziaWG Parameters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameter-compatibility-table" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameter Compatibility Table
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#client-applications" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Client Applications
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -1757,7 +1927,8 @@
 
   <h1>AmneziaWG</h1>
 
-<p>Experimental support for AmneziaWG can be enabled by setting the <code>EXPERIMENTAL_AWG</code> environment variable to <code>true</code>. This feature is still under development and may change in future releases.</p>
+<h2 id="introduction"><a class="toclink" href="#introduction">Introduction</a></h2>
+<p><strong>AmneziaWG</strong> is a modified version of the WireGuard protocol with enhanced traffic obfuscation capabilities. AmneziaWG's primary goal is to counter deep packet inspection (DPI) systems and bypass VPN blocking.</p>
 <p>AmneziaWG adds multi-level transport-layer obfuscation by:</p>
 <ul>
 <li>Modifying packet headers</li>
@@ -1765,6 +1936,9 @@
 <li>Disguising traffic to resemble popular UDP protocols</li>
 </ul>
 <p>These measures make it harder for third parties to analyze or identify your traffic, enhancing both privacy and security.</p>
+<h2 id="activating-amneziawg"><a class="toclink" href="#activating-amneziawg">Activating AmneziaWG</a></h2>
+<p>You must install the <a href="https://github.com/amnezia-vpn/amneziawg-linux-kernel-module">AmneziaWG kernel module</a> on the host system.</p>
+<p>Experimental support for AmneziaWG can be enabled by setting the <code>EXPERIMENTAL_AWG</code> environment variable to <code>true</code>. Starting from wg-easy version 16, this setting will be enabled by default. This feature is still under development and may change in future releases.</p>
 <p>When enabled, wg-easy will automatically detect whether the AmneziaWG kernel module is available. If it is not, the system will fall back to the standard WireGuard module.</p>
 <p>To override this automatic detection, set the <code>OVERRIDE_AUTO_AWG</code> environment variable. By default, this variable is unset.</p>
 <p>Possible values:</p>
@@ -1772,19 +1946,86 @@
 <li><code>awg</code> — Force use of AmneziaWG</li>
 <li><code>wg</code> — Force use of standard WireGuard</li>
 </ul>
-<p>To be able to connect to wg-easy if AmneziaWG is enabled, you must have a AmneziaWG-compatible client.</p>
+<h2 id="amneziawg-parameters"><a class="toclink" href="#amneziawg-parameters">AmneziaWG Parameters</a></h2>
+<p>Parameter descriptions can be found in the <a href="https://docs.amnezia.org/documentation/amnezia-wg">AmneziaWG documentation</a> and on the <a href="https://github.com/amnezia-vpn/amneziawg-linux-kernel-module">kernel module page</a>.</p>
+<p>All parameters except I1-I5 will be set at first startup. For information on how to set I1-I5 parameters, refer to the <a href="https://docs.amnezia.org/documentation/instructions/new-amneziawg-selfhosted/#how-to-extract-a-protocol-signature-for-amneziawg-15-manually">AmneziaWG documentation</a>.</p>
+<p>If a parameter is not set, it will not be added to the configuration. If all AmneziaWG-specific parameters are absent, AmneziaWG will be fully compatible with standard WireGuard.</p>
+<h3 id="parameter-compatibility-table"><a class="toclink" href="#parameter-compatibility-table">Parameter Compatibility Table</a></h3>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Can differ between server and client</th>
+<th>Configurable on server</th>
+<th>Configurable on client</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Jc</td>
+<td>✅ Yes</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Jmin</td>
+<td>✅ Yes</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Jmax</td>
+<td>✅ Yes</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>S1-S4</td>
+<td>❌ No, must match</td>
+<td>✅</td>
+<td>❌ (copied from server)</td>
+</tr>
+<tr>
+<td>H1-H4</td>
+<td>❌ No, must match</td>
+<td>✅</td>
+<td>❌ (copied from server)</td>
+</tr>
+<tr>
+<td>I1-I5</td>
+<td>✅ Yes</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<h2 id="client-applications"><a class="toclink" href="#client-applications">Client Applications</a></h2>
+<p>To be able to connect to wg-easy if AmneziaWG is enabled, you must have an AmneziaWG-compatible client. Currently, only WG Tunnel and Amnezia VPN supports AmneziaWG 1.5/2.0! AmneziaWG clients require building from source code.</p>
 <p>Android:</p>
 <ul>
-<li><a href="https://play.google.com/store/apps/details?id=org.amnezia.awg">AmneziaWG</a> - Official Client</li>
+<li><a href="https://play.google.com/store/apps/details?id=org.amnezia.vpn">Amnezia VPN</a> - Amnezia VPN Official Client</li>
+<li><a href="https://play.google.com/store/apps/details?id=org.amnezia.awg">AmneziaWG</a> - AmneziaWG Official Client</li>
 <li><a href="https://play.google.com/store/apps/details?id=com.zaneschepke.wireguardautotunnel">WG Tunnel</a> - Third Party Client</li>
 </ul>
 <p>iOS and macOS:</p>
 <ul>
-<li><a href="https://apps.apple.com/us/app/amneziawg/id6478942365">AmneziaWG</a> - Official Client</li>
+<li><a href="https://apps.apple.com/us/app/amneziavpn/id1600529900">Amnezia VPN</a> - Amnezia VPN Official Client</li>
+<li><a href="https://apps.apple.com/us/app/amneziawg/id6478942365">AmneziaWG</a> - AmneziaWG Official Client</li>
 </ul>
 <p>Windows:</p>
 <ul>
-<li><a href="https://github.com/amnezia-vpn/amneziawg-windows-client/releases">AmneziaWG</a> - Official Client</li>
+<li><a href="https://amnezia.org/downloads">Amnezia VPN</a> - Amnezia VPN Official Client</li>
+<li><a href="https://github.com/amnezia-vpn/amneziawg-windows-client/releases">AmneziaWG</a> - AmneziaWG Official Client</li>
+</ul>
+<p>Linux:</p>
+<ul>
+<li><a href="https://amnezia.org/downloads">Amnezia VPN</a> - Amnezia VPN Official Client</li>
+<li><a href="https://github.com/amnezia-vpn/amneziawg-tools">amneziawg-tools</a> - AmneziaWG Tools</li>
+</ul>
+<p>OpenWRT:</p>
+<ul>
+<li><a href="https://github.com/Slava-Shchipunov/awg-openwrt">AmneziaWG OpenWRT</a> - AmneziaWG OpenWRT Packages</li>
+<li><a href="https://github.com/lolo6oT/awg-openwrt">AmneziaWG OpenWRT</a> - AmneziaWG OpenWRT Packages</li>
 </ul>
 
 

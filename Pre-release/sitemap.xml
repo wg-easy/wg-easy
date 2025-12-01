@@ -2,118 +2,118 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://wg-easy.github.io/wg-easy/Pre-release/</loc>
-         <lastmod>2025-11-18</lastmod>
+         <lastmod>2025-12-01</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/Pre-release/faq/</loc>
-         <lastmod>2025-11-18</lastmod>
+         <lastmod>2025-12-01</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/Pre-release/getting-started/</loc>
-         <lastmod>2025-11-18</lastmod>
+         <lastmod>2025-12-01</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/Pre-release/advanced/api/</loc>
-         <lastmod>2025-11-18</lastmod>
+         <lastmod>2025-12-01</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/Pre-release/advanced/config/amnezia/</loc>
-         <lastmod>2025-11-18</lastmod>
+         <lastmod>2025-12-01</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/Pre-release/advanced/config/experimental-config/</loc>
-         <lastmod>2025-11-18</lastmod>
+         <lastmod>2025-12-01</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/Pre-release/advanced/config/optional-config/</loc>
-         <lastmod>2025-11-18</lastmod>
+         <lastmod>2025-12-01</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/Pre-release/advanced/config/unattended-setup/</loc>
-         <lastmod>2025-11-18</lastmod>
+         <lastmod>2025-12-01</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/Pre-release/advanced/metrics/prometheus/</loc>
-         <lastmod>2025-11-18</lastmod>
+         <lastmod>2025-12-01</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/Pre-release/advanced/migrate/</loc>
-         <lastmod>2025-11-18</lastmod>
+         <lastmod>2025-12-01</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/Pre-release/advanced/migrate/from-14-to-15/</loc>
-         <lastmod>2025-11-18</lastmod>
+         <lastmod>2025-12-01</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/Pre-release/contributing/general/</loc>
-         <lastmod>2025-11-18</lastmod>
+         <lastmod>2025-12-01</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/Pre-release/contributing/issues-and-pull-requests/</loc>
-         <lastmod>2025-11-18</lastmod>
+         <lastmod>2025-12-01</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/Pre-release/contributing/translation/</loc>
-         <lastmod>2025-11-18</lastmod>
+         <lastmod>2025-12-01</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/Pre-release/examples/tutorials/adguard/</loc>
-         <lastmod>2025-11-18</lastmod>
+         <lastmod>2025-12-01</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/Pre-release/examples/tutorials/auto-updates/</loc>
-         <lastmod>2025-11-18</lastmod>
+         <lastmod>2025-12-01</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/Pre-release/examples/tutorials/basic-installation/</loc>
-         <lastmod>2025-11-18</lastmod>
+         <lastmod>2025-12-01</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/Pre-release/examples/tutorials/caddy/</loc>
-         <lastmod>2025-11-18</lastmod>
+         <lastmod>2025-12-01</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/Pre-release/examples/tutorials/docker-run/</loc>
-         <lastmod>2025-11-18</lastmod>
+         <lastmod>2025-12-01</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/Pre-release/examples/tutorials/dockerless/</loc>
-         <lastmod>2025-11-18</lastmod>
+         <lastmod>2025-12-01</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/Pre-release/examples/tutorials/podman-nft/</loc>
-         <lastmod>2025-11-18</lastmod>
+         <lastmod>2025-12-01</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/Pre-release/examples/tutorials/reverse-proxyless/</loc>
-         <lastmod>2025-11-18</lastmod>
+         <lastmod>2025-12-01</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/Pre-release/examples/tutorials/routed/</loc>
-         <lastmod>2025-11-18</lastmod>
+         <lastmod>2025-12-01</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/Pre-release/examples/tutorials/traefik/</loc>
-         <lastmod>2025-11-18</lastmod>
+         <lastmod>2025-12-01</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/Pre-release/guides/2fa/</loc>
-         <lastmod>2025-11-18</lastmod>
+         <lastmod>2025-12-01</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/Pre-release/guides/admin/</loc>
-         <lastmod>2025-11-18</lastmod>
+         <lastmod>2025-12-01</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/Pre-release/guides/cli/</loc>
-         <lastmod>2025-11-18</lastmod>
+         <lastmod>2025-12-01</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/Pre-release/guides/clients/</loc>
-         <lastmod>2025-11-18</lastmod>
+         <lastmod>2025-12-01</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/Pre-release/guides/setup/</loc>
-         <lastmod>2025-11-18</lastmod>
+         <lastmod>2025-12-01</lastmod>
     </url>
 </urlset>
