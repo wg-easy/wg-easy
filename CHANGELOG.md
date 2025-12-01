@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fix download as conf.txt (https://github.com/wg-easy/wg-easy/pull/2269)
 - Clean filename for OTL download (https://github.com/wg-easy/wg-easy/pull/2253)
+- Text color in admin menu in light mode (https://github.com/wg-easy/wg-easy/pull/2307)
 
 ## Changed
 
@@ -34,6 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add AdGuard Home (https://github.com/wg-easy/wg-easy/pull/2175)
 - Add Routed (No NAT) docs (https://github.com/wg-easy/wg-easy/pull/2181)
+- Add AmneziaWG docs (https://github.com/wg-easy/wg-easy/pull/2108, https://github.com/wg-easy/wg-easy/pull/2292)
 
 ## [15.1.0] - 2025-07-01
 
