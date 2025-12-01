@@ -28,8 +28,8 @@
     "@phc/format": "^1.0.0",
     "@pinia/nuxt": "^0.11.3",
     "@tailwindcss/forms": "^0.5.10",
-    "@vueuse/core": "^14.0.0",
-    "@vueuse/nuxt": "^14.0.0",
+    "@vueuse/core": "^14.1.0",
+    "@vueuse/nuxt": "^14.1.0",
     "apexcharts": "^5.3.6",
     "argon2": "^0.44.0",
     "cidr-tools": "^11.0.3",
@@ -45,7 +45,7 @@
     "nuxt": "^3.20.1",
     "otpauth": "^9.4.1",
     "pinia": "^3.0.4",
-    "qr": "^0.5.2",
+    "qr": "^0.5.3",
     "radix-vue": "^1.9.17",
     "semver": "^7.7.3",
     "tailwindcss": "^3.4.18",
@@ -55,7 +55,7 @@
     "zod": "^4.1.13"
   },
   "devDependencies": {
-    "@nuxt/eslint": "^1.10.0",
+    "@nuxt/eslint": "^1.11.0",
     "@types/debug": "^4.1.12",
     "@types/phc__format": "^1.0.1",
     "@types/semver": "^7.7.1",
@@ -63,11 +63,11 @@
     "esbuild": "^0.27.0",
     "eslint": "^9.39.1",
     "eslint-config-prettier": "^10.1.8",
-    "prettier": "^3.6.2",
+    "prettier": "^3.7.3",
     "prettier-plugin-tailwindcss": "^0.7.1",
-    "tsx": "^4.20.6",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "vue-tsc": "^3.1.5"
   },
-  "packageManager": "pnpm@10.23.0"
+  "packageManager": "pnpm@10.24.0"
 }
