@@ -32,7 +32,7 @@
     "allowedIps": "Разрешённые IP‑адреса",
     "dns": "DNS",
     "persistentKeepalive": "Постоянное поддержание соединения",
-    "logout": "Выход",
+    "logout": "Выйти",
     "continue": "Продолжить",
     "host": "Хост",
     "port": "Порт",
