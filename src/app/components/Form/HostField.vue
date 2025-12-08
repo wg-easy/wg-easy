@@ -6,6 +6,12 @@
     <BaseTooltip v-if="description" :text="description">
       <IconsInfo class="size-4" />
     </BaseTooltip>
+    <BaseTooltip
+      v-if="overridden"
+      text="This field is overridden by an environment variable"
+    >
+      <IconsWarning class="size-4 text-amber-500" />
+    </BaseTooltip>
   </div>
   <div class="flex gap-1">
     <BaseInput
@@ -38,6 +44,7 @@ defineProps<{
   description?: string;
   placeholder?: string;
   url: '/api/admin/ip-info' | '/api/setup/4';
+  overridden?: boolean;
 }>();
 
 const data = defineModel<string | null>({

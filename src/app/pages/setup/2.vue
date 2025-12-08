@@ -55,9 +55,15 @@ const _submit = useSubmit(
     method: 'post',
   },
   {
-    revert: async (success) => {
+    revert: async (success, data) => {
       if (success) {
-        await navigateTo('/setup/3');
+        if (data?.setupDone) {
+          // Setup is complete, redirect to success page
+          await navigateTo('/setup/success');
+        } else {
+          // Continue to step 3
+          await navigateTo('/setup/3');
+        }
       }
     },
     noSuccessToast: true,
