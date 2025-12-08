@@ -37,7 +37,7 @@
     "consola": "^3.4.2",
     "crc-32": "^1.2.2",
     "debug": "^4.4.3",
-    "drizzle-orm": "^0.44.7",
+    "drizzle-orm": "^0.45.0",
     "ip-bigint": "^8.2.2",
     "is-cidr": "^6.0.1",
     "is-ip": "^5.0.1",
@@ -59,15 +59,15 @@
     "@types/debug": "^4.1.12",
     "@types/phc__format": "^1.0.1",
     "@types/semver": "^7.7.1",
-    "drizzle-kit": "^0.31.7",
-    "esbuild": "^0.27.0",
+    "drizzle-kit": "^0.31.8",
+    "esbuild": "^0.27.1",
     "eslint": "^9.39.1",
     "eslint-config-prettier": "^10.1.8",
-    "prettier": "^3.7.3",
-    "prettier-plugin-tailwindcss": "^0.7.1",
+    "prettier": "^3.7.4",
+    "prettier-plugin-tailwindcss": "^0.7.2",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
-    "vue-tsc": "^3.1.5"
+    "vue-tsc": "^3.1.7"
   },
   "packageManager": "pnpm@10.24.0"
 }
