@@ -67,7 +67,7 @@
     "prettier-plugin-tailwindcss": "^0.7.1",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
-    "vue-tsc": "^3.1.5"
+    "vue-tsc": "^3.1.7"
   },
   "packageManager": "pnpm@10.24.0"
 }
