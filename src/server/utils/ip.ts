@@ -170,3 +170,12 @@ async function getIpInformation() {
 export const cachedGetIpInformation = cacheFunction(getIpInformation, {
   expiry: 15 * 60 * 1000,
 });
+
+/**
+ * Get current public IPv4 address (non-cached)
+ * Used for auto-refresh feature
+ */
+export async function getCurrentPublicIpv4(): Promise<string | null> {
+  const ip = await getPublicIpv4();
+  return ip ?? null;
+}

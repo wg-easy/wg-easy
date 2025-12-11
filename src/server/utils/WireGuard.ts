@@ -1,6 +1,8 @@
 import fs from 'node:fs/promises';
 import debug from 'debug';
 import { encodeQR } from 'qr';
+import { getCurrentPublicIpv4 } from './ip';
+import { WG_AUTO_REFRESH_ENV } from './config';
 import type { InterfaceType } from '#db/repositories/interface/types';
 
 const WG_DEBUG = debug('WireGuard');
@@ -9,6 +11,8 @@ const generateRandomHeaderValue = () =>
   Math.floor(Math.random() * 2147483642) + 5;
 
 class WireGuard {
+  private lastIpCheck = 0;
+
   /**
    * Save and sync config
    */
@@ -305,6 +309,41 @@ class WireGuard {
 
     if (needsSave) {
       await this.saveConfig();
+    }
+
+    // Auto-refresh IP Feature
+    if (WG_AUTO_REFRESH_ENV.ENABLED) {
+      await this.checkAndUpdatePublicIp();
+    }
+  }
+
+  private async checkAndUpdatePublicIp() {
+    const now = Date.now();
+
+    // Only check at configured interval (default 5m)
+    if (now - this.lastIpCheck < WG_AUTO_REFRESH_ENV.INTERVAL) {
+      return;
+    }
+    this.lastIpCheck = now;
+
+    try {
+      const currentIp = await getCurrentPublicIpv4();
+      if (!currentIp) {
+        WG_DEBUG('Auto-refresh: Could not detect public IP');
+        return;
+      }
+
+      const userConfig = await Database.userConfigs.get();
+      if (userConfig.host !== currentIp) {
+        WG_DEBUG(
+          `Auto-refresh: IP changed from ${userConfig.host} to ${currentIp}`
+        );
+        await Database.userConfigs.updateHostPort(currentIp, userConfig.port);
+        WG_DEBUG('Auto-refresh: Database updated with new IP');
+      }
+    } catch (err) {
+      WG_DEBUG('Auto-refresh: Failed to check/update IP');
+      console.error(err);
     }
   }
 }

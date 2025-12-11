@@ -54,6 +54,15 @@ export const WG_INITIAL_ENV = {
     : undefined,
 };
 
+export const WG_AUTO_REFRESH_ENV = {
+  /** Enable automatic IP refresh when host was set to auto-detected IP */
+  ENABLED: process.env.SERVERURL_AUTO_REFRESH === 'true',
+  /** Interval in milliseconds between IP checks (default: 300000 = 5 minutes) */
+  INTERVAL: process.env.SERVERURL_AUTO_REFRESH_INTERVAL
+    ? Number.parseInt(process.env.SERVERURL_AUTO_REFRESH_INTERVAL, 10) * 1000
+    : 300 * 1000,
+};
+
 function assertEnv<T extends string>(env: T) {
   const val = process.env[env];
 
