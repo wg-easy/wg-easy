@@ -61,7 +61,7 @@
     "@types/semver": "^7.7.1",
     "drizzle-kit": "^0.31.8",
     "esbuild": "^0.27.1",
-    "eslint": "^9.39.1",
+    "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
     "prettier": "^3.7.4",
     "prettier-plugin-tailwindcss": "^0.7.2",
