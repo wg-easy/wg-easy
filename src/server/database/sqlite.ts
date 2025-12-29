@@ -101,22 +101,26 @@ async function initialSetup(db: DBServiceType) {
     });
   }
 
-  if (
-    WG_INITIAL_ENV.USERNAME &&
-    WG_INITIAL_ENV.PASSWORD &&
-    WG_INITIAL_ENV.HOST &&
-    WG_INITIAL_ENV.PORT
-  ) {
+  if (WG_INITIAL_ENV.USERNAME && WG_INITIAL_ENV.PASSWORD) {
     DB_DEBUG('Creating initial user...');
     await db.users.create(WG_INITIAL_ENV.USERNAME, WG_INITIAL_ENV.PASSWORD);
 
-    DB_DEBUG('Setting initial host and port...');
-    await db.userConfigs.updateHostPort(
-      WG_INITIAL_ENV.HOST,
-      WG_INITIAL_ENV.PORT
-    );
+    await db.general.setSetupStep(3);
+  }
 
-    await db.general.setSetupStep(0);
+  // Use INIT vars or fall back to override vars for HOST and PORT
+  const host = WG_INITIAL_ENV.HOST ?? WG_CLIENT_OVERRIDE_ENV.HOST;
+  const port = WG_INITIAL_ENV.PORT ?? WG_INTERFACE_OVERRIDE_ENV.PORT;
+
+  // HOST and PORT can come from either INIT vars or override vars
+  if (host && port) {
+    DB_DEBUG('Setting initial host and port...');
+    await db.userConfigs.updateHostPort(host, port);
+
+    // Setup completion requires USERNAME and PASSWORD (no overrides for these)
+    if (WG_INITIAL_ENV.USERNAME && WG_INITIAL_ENV.PASSWORD) {
+      await db.general.setSetupStep(0);
+    }
   }
 }
 

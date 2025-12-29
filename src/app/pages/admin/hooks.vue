@@ -6,21 +6,25 @@
           id="PreUp"
           v-model="data.preUp"
           :label="$t('hooks.preUp')"
+          :overridden="overrides?.preUp"
         />
         <FormTextField
           id="PostUp"
           v-model="data.postUp"
           :label="$t('hooks.postUp')"
+          :overridden="overrides?.postUp"
         />
         <FormTextField
           id="PreDown"
           v-model="data.preDown"
           :label="$t('hooks.preDown')"
+          :overridden="overrides?.preDown"
         />
         <FormTextField
           id="PostDown"
           v-model="data.postDown"
           :label="$t('hooks.postDown')"
+          :overridden="overrides?.postDown"
         />
       </FormGroup>
       <FormGroup>
@@ -36,6 +40,12 @@
 const { data: _data, refresh } = await useFetch(`/api/admin/hooks`, {
   method: 'get',
 });
+
+const { data: overridesData } = await useFetch(`/api/admin/overrides`, {
+  method: 'get',
+});
+
+const overrides = computed(() => overridesData.value?.hooks);
 
 const data = toRef(_data.value);
 
