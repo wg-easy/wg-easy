@@ -16,6 +16,12 @@ function createPreparedStatement(db: DBType) {
         oneTimeLink: sql.placeholder('oneTimeLink'),
         expiresAt: sql.placeholder('expiresAt'),
       })
+      .onConflictDoUpdate({
+        target: oneTimeLink.id,
+        set: {
+          expiresAt: sql.placeholder('expiresAt') as never as string,
+        },
+      })
       .prepare(),
     erase: db
       .update(oneTimeLink)

@@ -30,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Allow empty DNS (https://github.com/wg-easy/wg-easy/pull/2052, https://github.com/wg-easy/wg-easy/pull/2057)
 - Don't include keys in API responses (https://github.com/wg-easy/wg-easy/pull/2015)
 - Try all QR ecc levels (https://github.com/wg-easy/wg-easy/pull/2288)
+- Update OnetimeLink expiry on reuse (https://github.com/wg-easy/wg-easy/pull/2370)
 - Removed ARMv7 support (https://github.com/wg-easy/wg-easy/pull/2369)
 
 ## Docs
