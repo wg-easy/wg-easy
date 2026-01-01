@@ -148,7 +148,15 @@
       "json": "JSON",
       "jsonDesc": "Rute untuk metrik dalam format JSON",
       "prometheus": "Prometheus",
-      "prometheusDesc": "Rute untuk metrik Prometheus"
+      "prometheusDesc": "Rute untuk metrik Prometheus",
+      "bandwidth": "Pembatasan Bandwidth",
+      "bandwidthEnabled": "Aktifkan Pembatasan Bandwidth",
+      "bandwidthEnabledDesc": "Terapkan batas bandwidth global ke semua lalu lintas VPN",
+      "downloadLimit": "Batas Unduhan (Mbps)",
+      "downloadLimitDesc": "Kecepatan unduhan maksimum untuk klien (0 = tidak terbatas)",
+      "uploadLimit": "Batas Unggahan (Mbps)",
+      "uploadLimitDesc": "Kecepatan unggahan maksimum dari klien (0 = tidak terbatas)",
+      "ifbWarning": "Pembatasan unggahan memerlukan modul kernel IFB yang tidak tersedia di host ini"
     },
     "config": {
       "connection": "Koneksi",
@@ -211,7 +219,9 @@
     "general": {
       "sessionTimeout": "Waktu Sesi Habis",
       "metricsEnabled": "Metrik",
-      "metricsPassword": "Kata Sandi Metrik"
+      "metricsPassword": "Kata Sandi Metrik",
+      "bandwidthEnabled": "Pembatasan Bandwidth",
+      "bandwidthLimit": "Batas Bandwidth"
     },
     "interface": {
       "cidr": "CIDR",

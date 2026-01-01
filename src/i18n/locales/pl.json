@@ -148,7 +148,15 @@
       "json": "JSON",
       "jsonDesc": "Ścieżka dla metryk w formacie JSON",
       "prometheus": "Prometheus",
-      "prometheusDesc": "Ścieżka dla metryk Prometheus"
+      "prometheusDesc": "Ścieżka dla metryk Prometheus",
+      "bandwidth": "Ograniczanie przepustowości",
+      "bandwidthEnabled": "Włącz ograniczanie przepustowości",
+      "bandwidthEnabledDesc": "Zastosuj globalne limity przepustowości do całego ruchu VPN",
+      "downloadLimit": "Limit pobierania (Mbps)",
+      "downloadLimitDesc": "Maksymalna prędkość pobierania dla klientów (0 = bez limitu)",
+      "uploadLimit": "Limit wysyłania (Mbps)",
+      "uploadLimitDesc": "Maksymalna prędkość wysyłania od klientów (0 = bez limitu)",
+      "ifbWarning": "Ograniczanie wysyłania wymaga modułu jądra IFB, który nie jest dostępny na tym hoście"
     },
     "config": {
       "connection": "Połączenie",
@@ -211,7 +219,9 @@
     "general": {
       "sessionTimeout": "Limit czasu sesji",
       "metricsEnabled": "Metryki",
-      "metricsPassword": "Hasło do metryk"
+      "metricsPassword": "Hasło do metryk",
+      "bandwidthEnabled": "Ograniczanie przepustowości",
+      "bandwidthLimit": "Limit przepustowości"
     },
     "interface": {
       "cidr": "CIDR",

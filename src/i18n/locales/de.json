@@ -145,7 +145,15 @@
       "json": "JSON",
       "jsonDesc": "Pfad zu den Statistiken als JSON",
       "prometheus": "Prometheus",
-      "prometheusDesc": "Pfad zu den Prometheus-Statistiken"
+      "prometheusDesc": "Pfad zu den Prometheus-Statistiken",
+      "bandwidth": "Bandbreitenbegrenzung",
+      "bandwidthEnabled": "Bandbreitenbegrenzung aktivieren",
+      "bandwidthEnabledDesc": "Globale Bandbreitenlimits auf den gesamten VPN-Datenverkehr anwenden",
+      "downloadLimit": "Download-Limit (Mbps)",
+      "downloadLimitDesc": "Maximale Download-Geschwindigkeit für Clients (0 = unbegrenzt)",
+      "uploadLimit": "Upload-Limit (Mbps)",
+      "uploadLimitDesc": "Maximale Upload-Geschwindigkeit von Clients (0 = unbegrenzt)",
+      "ifbWarning": "Upload-Begrenzung erfordert das IFB-Kernelmodul, das auf diesem Host nicht verfügbar ist"
     },
     "config": {
       "connection": "Verbindung",
@@ -208,7 +216,9 @@
     "general": {
       "sessionTimeout": "Sitzungszeitüberschreitung",
       "metricsEnabled": "Statistiken",
-      "metricsPassword": "Passwort für Statistiken"
+      "metricsPassword": "Passwort für Statistiken",
+      "bandwidthEnabled": "Bandbreitenbegrenzung",
+      "bandwidthLimit": "Bandbreitenlimit"
     },
     "interface": {
       "cidr": "CIDR",

@@ -148,7 +148,15 @@
       "json": "JSON",
       "jsonDesc": "JSON 형식의 메트릭 경로",
       "prometheus": "프로메테우스",
-      "prometheusDesc": "Prometheus 메트릭을 위한 경로"
+      "prometheusDesc": "Prometheus 메트릭을 위한 경로",
+      "bandwidth": "대역폭 제한",
+      "bandwidthEnabled": "대역폭 제한 활성화",
+      "bandwidthEnabledDesc": "모든 VPN 트래픽에 전역 대역폭 제한 적용",
+      "downloadLimit": "다운로드 제한 (Mbps)",
+      "downloadLimitDesc": "클라이언트의 최대 다운로드 속도 (0 = 무제한)",
+      "uploadLimit": "업로드 제한 (Mbps)",
+      "uploadLimitDesc": "클라이언트의 최대 업로드 속도 (0 = 무제한)",
+      "ifbWarning": "업로드 제한은 IFB 커널 모듈이 필요하지만 이 호스트에서 사용할 수 없습니다"
     },
     "config": {
       "connection": "연결",
@@ -211,7 +219,9 @@
     "general": {
       "sessionTimeout": "세션 타임아웃",
       "metricsEnabled": "메트릭",
-      "metricsPassword": "메트릭 비밀번호"
+      "metricsPassword": "메트릭 비밀번호",
+      "bandwidthEnabled": "대역폭 제한 활성화",
+      "bandwidthLimit": "대역폭 제한"
     },
     "interface": {
       "cidr": "CIDR",

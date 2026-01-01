@@ -52,7 +52,8 @@ RUN apk add --no-cache \
     nftables \
     kmod \
     iptables-legacy \
-    wireguard-tools
+    wireguard-tools \
+    iproute2
 
 RUN mkdir -p /etc/amnezia
 RUN ln -s /etc/wireguard /etc/amnezia/amneziawg
