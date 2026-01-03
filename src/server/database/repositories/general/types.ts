@@ -13,11 +13,21 @@ const metricsPassword = z
   .min(1, { message: t('zod.general.metricsPassword') })
   .nullable();
 
+const bandwidthEnabled = z.boolean({
+  message: t('zod.general.bandwidthEnabled'),
+});
+const bandwidthLimit = z
+  .number({ message: t('zod.general.bandwidthLimit') })
+  .min(0);
+
 export const GeneralUpdateSchema = z.object({
   sessionTimeout: sessionTimeout,
   metricsPrometheus: metricsEnabled,
   metricsJson: metricsEnabled,
   metricsPassword: metricsPassword,
+  bandwidthEnabled: bandwidthEnabled,
+  downloadLimitMbps: bandwidthLimit,
+  uploadLimitMbps: bandwidthLimit,
 });
 
 export type GeneralUpdateType = z.infer<typeof GeneralUpdateSchema>;
