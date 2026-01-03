@@ -25,7 +25,7 @@ RUN apk add linux-headers build-base git && \
 FROM docker.io/library/node:jod-alpine
 WORKDIR /app
 
-HEALTHCHECK --interval=1m --timeout=5s --retries=3 CMD /usr/bin/timeout 5s /bin/sh -c "/usr/bin/wg show | /bin/grep -q interface || exit 1"
+HEALTHCHECK --interval=1m --timeout=5s --retries=3 CMD /usr/bin/timeout 5s /bin/sh -c "/usr/bin/wg show | /bin/grep -q interface || /usr/bin/awg show | /bin/grep -q interface || exit 1"
 
 # Copy build
 COPY --from=build /app/.output /app
