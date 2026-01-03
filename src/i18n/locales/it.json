@@ -148,15 +148,7 @@
       "json": "JSON",
       "jsonDesc": "Percorso per metriche in formato JSON",
       "prometheus": "Prometheus",
-      "prometheusDesc": "Percorso per metriche Prometheus",
-      "bandwidth": "Limitazione della larghezza di banda",
-      "bandwidthEnabled": "Abilita limitazione della larghezza di banda",
-      "bandwidthEnabledDesc": "Applica limiti globali di larghezza di banda a tutto il traffico VPN",
-      "downloadLimit": "Limite di download (Mbps)",
-      "downloadLimitDesc": "Velocità massima di download per i client (0 = illimitato)",
-      "uploadLimit": "Limite di upload (Mbps)",
-      "uploadLimitDesc": "Velocità massima di upload dai client (0 = illimitato)",
-      "ifbWarning": "La limitazione dell'upload richiede il modulo kernel IFB, non disponibile su questo host"
+      "prometheusDesc": "Percorso per metriche Prometheus"
     },
     "config": {
       "connection": "Connessione",
@@ -219,9 +211,7 @@
     "general": {
       "sessionTimeout": "Timeout Sessione",
       "metricsEnabled": "Metriche",
-      "metricsPassword": "Password Metriche",
-      "bandwidthEnabled": "Limitazione larghezza di banda",
-      "bandwidthLimit": "Limite larghezza di banda"
+      "metricsPassword": "Password Metriche"
     },
     "interface": {
       "cidr": "CIDR",

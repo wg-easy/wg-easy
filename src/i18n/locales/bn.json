@@ -148,15 +148,7 @@
       "json": "JSON",
       "jsonDesc": "JSON ফরম্যাটে মেট্রিক্সের রুট",
       "prometheus": "Prometheus",
-      "prometheusDesc": "Prometheus মেট্রিক্সের রুট",
-      "bandwidth": "ব্যান্ডউইথ সীমাবদ্ধকরণ",
-      "bandwidthEnabled": "ব্যান্ডউইথ সীমাবদ্ধকরণ সক্রিয় করুন",
-      "bandwidthEnabledDesc": "সমস্ত VPN ট্রাফিকে গ্লোবাল ব্যান্ডউইথ সীমা প্রয়োগ করুন",
-      "downloadLimit": "ডাউনলোড সীমা (Mbps)",
-      "downloadLimitDesc": "ক্লায়েন্টদের জন্য সর্বোচ্চ ডাউনলোড গতি (0 = সীমাহীন)",
-      "uploadLimit": "আপলোড সীমা (Mbps)",
-      "uploadLimitDesc": "ক্লায়েন্টদের থেকে সর্বোচ্চ আপলোড গতি (0 = সীমাহীন)",
-      "ifbWarning": "আপলোড সীমাবদ্ধকরণের জন্য IFB kernel module প্রয়োজন, যা এই হোস্টে উপলব্ধ নয়"
+      "prometheusDesc": "Prometheus মেট্রিক্সের রুট"
     },
     "config": {
       "connection": "সংযোগ",
@@ -219,9 +211,7 @@
     "general": {
       "sessionTimeout": "সেশন টাইমআউট",
       "metricsEnabled": "মেট্রিক্স",
-      "metricsPassword": "মেট্রিক্স পাসওয়ার্ড",
-      "bandwidthEnabled": "ব্যান্ডউইথ সীমাবদ্ধকরণ",
-      "bandwidthLimit": "ব্যান্ডউইথ সীমা"
+      "metricsPassword": "মেট্রিক্স পাসওয়ার্ড"
     },
     "interface": {
       "cidr": "CIDR",

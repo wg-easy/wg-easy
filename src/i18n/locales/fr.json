@@ -152,15 +152,7 @@
       "json": "JSON",
       "jsonDesc": "Route pour les métriques au format JSON",
       "prometheus": "Prometheus",
-      "prometheusDesc": "Route pour les métriques Prometheus",
-      "bandwidth": "Limitation de bande passante",
-      "bandwidthEnabled": "Activer la limitation de bande passante",
-      "bandwidthEnabledDesc": "Appliquer des limites globales de bande passante à tout le trafic VPN",
-      "downloadLimit": "Limite de téléchargement (Mbps)",
-      "downloadLimitDesc": "Vitesse de téléchargement maximale pour les clients (0 = illimité)",
-      "uploadLimit": "Limite d’envoi (Mbps)",
-      "uploadLimitDesc": "Vitesse d’envoi maximale depuis les clients (0 = illimité)",
-      "ifbWarning": "La limitation d’envoi nécessite le module kernel IFB, non disponible sur cet hôte"
+      "prometheusDesc": "Route pour les métriques Prometheus"
     },
     "config": {
       "connection": "Connexion",
@@ -223,9 +215,7 @@
     "general": {
       "sessionTimeout": "Délai d'expiration de la session",
       "metricsEnabled": "Métriques",
-      "metricsPassword": "Mot de passe métriques",
-      "bandwidthEnabled": "Limitation de bande passante",
-      "bandwidthLimit": "Limite de bande passante"
+      "metricsPassword": "Mot de passe métriques"
     },
     "interface": {
       "cidr": "CIDR",

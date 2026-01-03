@@ -146,15 +146,7 @@
       "json": "JSON",
       "jsonDesc": "JSON格式指標的路由",
       "prometheus": "Prometheus",
-      "prometheusDesc": "Prometheus指標的路由",
-      "bandwidth": "頻寬限制",
-      "bandwidthEnabled": "啟用頻寬限制",
-      "bandwidthEnabledDesc": "對所有VPN流量應用全局頻寬限制",
-      "downloadLimit": "下載限制 (Mbps)",
-      "downloadLimitDesc": "客戶端最大下載速度（0 = 不限制）",
-      "uploadLimit": "上傳限制 (Mbps)",
-      "uploadLimitDesc": "客戶端最大上傳速度（0 = 不限制）",
-      "ifbWarning": "上傳限制需要IFB核心模組，但此主機上未能使用"
+      "prometheusDesc": "Prometheus指標的路由"
     },
     "config": {
       "connection": "連線",
@@ -217,9 +209,7 @@
     "general": {
       "sessionTimeout": "工作階段逾時",
       "metricsEnabled": "指標",
-      "metricsPassword": "指標密碼",
-      "bandwidthEnabled": "啟用頻寬限制",
-      "bandwidthLimit": "頻寬限制值"
+      "metricsPassword": "指標密碼"
     },
     "interface": {
       "cidr": "CIDR",

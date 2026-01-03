@@ -152,15 +152,7 @@
       "json": "JSON",
       "jsonDesc": "Путь для метрик в формате JSON",
       "prometheus": "Prometheus",
-      "prometheusDesc": "Путь для метрик Prometheus",
-      "bandwidth": "Ограничение пропускной способности",
-      "bandwidthEnabled": "Включить ограничение пропускной способности",
-      "bandwidthEnabledDesc": "Применить глобальные ограничения пропускной способности ко всему VPN-трафику",
-      "downloadLimit": "Лимит загрузки (Mbps)",
-      "downloadLimitDesc": "Максимальная скорость загрузки для клиентов (0 = без ограничений)",
-      "uploadLimit": "Лимит выгрузки (Mbps)",
-      "uploadLimitDesc": "Максимальная скорость выгрузки от клиентов (0 = без ограничений)",
-      "ifbWarning": "Ограничение выгрузки требует модуль ядра IFB, который недоступен на этом хосте"
+      "prometheusDesc": "Путь для метрик Prometheus"
     },
     "config": {
       "connection": "Соединение",
@@ -223,9 +215,7 @@
     "general": {
       "sessionTimeout": "Время жизни сессии",
       "metricsEnabled": "Метрики",
-      "metricsPassword": "Пароль для метрик",
-      "bandwidthEnabled": "Ограничение пропускной способности",
-      "bandwidthLimit": "Лимит пропускной способности"
+      "metricsPassword": "Пароль для метрик"
     },
     "interface": {
       "cidr": "CIDR",

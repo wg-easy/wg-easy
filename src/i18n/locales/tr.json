@@ -148,15 +148,7 @@
       "json": "JSON",
       "jsonDesc": "JSON formatında metrikler için rota",
       "prometheus": "Prometheus",
-      "prometheusDesc": "Prometheus metrikleri için rota",
-      "bandwidth": "Bant Genişliği Sınırlaması",
-      "bandwidthEnabled": "Bant Genişliği Sınırlamasını Etkinleştir",
-      "bandwidthEnabledDesc": "Tüm VPN trafiğine global bant genişliği limitleri uygula",
-      "downloadLimit": "İndirme Limiti (Mbps)",
-      "downloadLimitDesc": "İstemciler için maksimum indirme hızı (0 = sınırsız)",
-      "uploadLimit": "Yükleme Limiti (Mbps)",
-      "uploadLimitDesc": "İstemcilerden maksimum yükleme hızı (0 = sınırsız)",
-      "ifbWarning": "Yükleme sınırlaması IFB çekirdek modülü gerektirir ve bu ana makinede mevcut değildir"
+      "prometheusDesc": "Prometheus metrikleri için rota"
     },
     "config": {
       "connection": "Bağlantı",
@@ -219,9 +211,7 @@
     "general": {
       "sessionTimeout": "Oturum Zaman Aşımı",
       "metricsEnabled": "Metrikler",
-      "metricsPassword": "Metrik Şifresi",
-      "bandwidthEnabled": "Bant Genişliği Sınırlaması",
-      "bandwidthLimit": "Bant Genişliği Limiti"
+      "metricsPassword": "Metrik Şifresi"
     },
     "interface": {
       "cidr": "CIDR",

@@ -152,15 +152,7 @@
       "json": "JSON格式",
       "jsonDesc": "获取JSON格式的监控数据路由",
       "prometheus": "Prometheus格式",
-      "prometheusDesc": "获取Prometheus格式监控数据的路由",
-      "bandwidth": "带宽限制",
-      "bandwidthEnabled": "启用带宽限制",
-      "bandwidthEnabledDesc": "对所有VPN流量应用全局带宽限制",
-      "downloadLimit": "下载限制 (Mbps)",
-      "downloadLimitDesc": "客户端最大下载速度（0 = 不限制）",
-      "uploadLimit": "上传限制 (Mbps)",
-      "uploadLimitDesc": "客户端最大上传速度（0 = 不限制）",
-      "ifbWarning": "上传限制需要IFB内核模块，但该模块在此主机上不可用"
+      "prometheusDesc": "获取Prometheus格式监控数据的路由"
     },
     "config": {
       "connection": "连接设置",
@@ -223,9 +215,7 @@
     "general": {
       "sessionTimeout": "会话超时",
       "metricsEnabled": "启用监控",
-      "metricsPassword": "监控密码",
-      "bandwidthEnabled": "启用带宽限制",
-      "bandwidthLimit": "带宽限制值"
+      "metricsPassword": "监控密码"
     },
     "interface": {
       "cidr": "CIDR",
