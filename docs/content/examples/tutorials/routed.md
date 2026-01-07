@@ -95,6 +95,7 @@ iptables -D INPUT -p udp -m udp --dport {{port}} -j ACCEPT; iptables -D FORWARD 
 ```
 
 /// warning | Important: When using nftables use the following hooks instead.
+
 PostUp
 
 ```shell
