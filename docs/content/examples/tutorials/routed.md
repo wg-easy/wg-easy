@@ -94,7 +94,7 @@ PostDown
 iptables -D INPUT -p udp -m udp --dport {{port}} -j ACCEPT; iptables -D FORWARD -i wg0 -j ACCEPT; iptables -D FORWARD -o wg0 -j ACCEPT; ip6tables -D INPUT -p udp -m udp --dport {{port}} -j ACCEPT; ip6tables -D FORWARD -i wg0 -j ACCEPT; ip6tables -D FORWARD -o wg0 -j ACCEPT
 ```
 
-/// warning | Important: When using [nftables](./podman-nft.md) use the following hooks instead.
+/// warning | Important: When using nftables use the following hooks instead.
 PostUp
 
 ```shell
