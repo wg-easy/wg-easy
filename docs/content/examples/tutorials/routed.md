@@ -106,4 +106,5 @@ PostDown
 ```shell
 nft delete rule ip filter DOCKER-USER handle $(nft -a list chain ip filter DOCKER-USER | awk '/jump WG_EASY/ {print $NF}'); nft flush chain ip filter WG_EASY; nft delete chain ip filter WG_EASY; nft delete rule ip6 filter DOCKER-USER handle $(nft -a list chain ip6 filter DOCKER-USER | awk '/jump WG_EASY/ {print $NF}'); nft flush chain ip6 filter WG_EASY; nft delete chain ip6 filter WG_EASY
 ```
+
 ///
