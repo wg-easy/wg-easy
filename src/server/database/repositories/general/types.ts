@@ -18,7 +18,8 @@ const bandwidthEnabled = z.boolean({
 });
 const bandwidthLimit = z
   .number({ message: t('zod.general.bandwidthLimit') })
-  .min(0);
+  .min(0)
+  .max(10000);
 
 export const GeneralUpdateSchema = z.object({
   sessionTimeout: sessionTimeout,
