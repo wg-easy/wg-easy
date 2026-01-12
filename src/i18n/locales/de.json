@@ -58,7 +58,7 @@
     "portDesc": "Öffentlicher UDP-Port an dem sich die Clients verbinden und auf dem WireGuard läuft"
   },
   "update": {
-    "updateAvailable": "Ein neues Update ist verfügbar.",
+    "updateAvailable": "Ein neues Update ist verfügbar!",
     "update": "Aktualisieren"
   },
   "theme": {
