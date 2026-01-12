@@ -113,7 +113,14 @@
     "hooks": "Hooks",
     "hooksDescription": "Hooks funktionieren nur mit wg-quick",
     "hooksLeaveEmpty": "Nur für wg-quick. Sonst leer lassen",
-    "dnsDesc": "DNS-Server, den die Clients benutzen (überschreibt die globale Konfiguration)"
+    "dnsDesc": "DNS-Server, den die Clients benutzen (überschreibt die globale Konfiguration)",
+    "delete": "Löschen",
+    "notConnected": "Client ist nicht verbunden",
+    "endpoint": "Endpunkt",
+    "endpointDesc": "IP-Adresse des Clients, von dem aus die WireGuard-Verbindung hergestellt wird",
+    "search": "Suche Clients...",
+    "config": "Konfiguration",
+    "viewConfig": "Konfiguration anzeigen"
   },
   "dialog": {
     "change": "Ändern",
@@ -233,5 +240,47 @@
     "postUp": "PostUp",
     "preDown": "PreDown",
     "postDown": "PostDown"
+  },
+  "copy": {
+    "notSupported": "Kopieren ist nicht unterstützt",
+    "copied": "Kopiert!",
+    "failed": "Kopieren fehlgeschlagen",
+    "copy": "Kopieren"
+  },
+  "awg": {
+    "jCLabel": "Anzahl der Junk-Pakete (Jc)",
+    "jCDescription": "Anzahl der zu sendenden Junk-Pakete (1-128, empfohlen: 4-12)",
+    "jMinLabel": "Minimale Junk-Paketgröße (Jmin)",
+    "jMinDescription": "Mindestgröße von Junk-Paketen (0-1279*, empfohlen: 8, muss < Jmax sein)",
+    "jMaxLabel": "Maximale Junk-Paketgröße (Jmax)",
+    "jMaxDescription": "Maximalgröße von Junk-Paketen (1-1280*, empfohlen: 80, muss > Jmin sein)",
+    "s1Label": "Junk-Paketgröße des Init-Pakets (S1)",
+    "s1Description": "Junk-Paketgröße des Init-Pakets (0-1132[1280* - 148 = 1132], empfohlen: 15-150, S1+56 ≠ S2)",
+    "s2Label": "Junk-Paketgröße des Antwort-Pakets (S2)",
+    "s2Description": "Junk-Paketgröße des Antwort-Pakets (0-1188[1280* - 92 = 1188], empfohlen: 15-150)",
+    "s3Label": "Junk-Paketgröße des Cookie-Antwort-Pakets (S3)",
+    "s3Description": "Junk-Paketgröße des Cookie-Antwort-Pakets",
+    "s4Label": "Junk-Paketgröße des Transport-Pakets (S4)",
+    "s4Description": "Junk-Paketgröße des Transport-Pakets",
+    "i1Label": "Spezial-Junk-Paket 1 (I1)",
+    "i1Description": "Protokoll-Nachahmungspaket im Hex-Format: <b 0x...>",
+    "i2Label": "Spezial-Junk-Paket 2 (I2)",
+    "i2Description": "Protokoll-Nachahmungspaket im Hex-Format:: <b 0x...>",
+    "i3Label": "Spezial-Junk-Paket 3 (I3)",
+    "i3Description": "Protokoll-Nachahmungspaket im Hex-Format:: <b 0x...>",
+    "i4Label": "Spezial-Junk-Paket 4 (I4)",
+    "i4Description": "Protokoll-Nachahmungspaket im Hex-Format:: <b 0x...>",
+    "i5Label": "Spezial-Junk-Paket 5 (I5)",
+    "i5Description": "Protokoll-Nachahmungspaket im Hex-Format:: <b 0x...>",
+    "h1Label": "Init-Magic-Header (H1)",
+    "h1Description": "Wert des Init-Paket-Headers (5-2147483647, muss eindeutig zu H2-H4 sein)",
+    "h2Label": "Antwort-Magic-Header (H2)",
+    "h2Description": "Wert des Antwort-Paket-Headers (5-2147483647, muss eindeutig zu H1, H3, H4 sein)",
+    "h3Label": "Cookie-Antwort-Magic-Header (H3)",
+    "h3Description": "Wert des Cookie-Antwort-Paket-Headers (5-2147483647, muss eindeutig zu H1, H2, H4 sein)",
+    "h4Label": "Transport-Magic-Header (H4)",
+    "h4Description": "Wert des Transport-Paket-Headers (5-2147483647, muss eindeutig zu H1-H3 sein)",
+    "mtuNote": "Werte hängen vom MTU ab",
+    "obfuscationParameters": "AmneziaWG Verschleierungsparameter"
   }
 }
