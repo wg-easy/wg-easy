@@ -22,7 +22,7 @@
   "dependencies": {
     "@eschricht/nuxt-color-mode": "^1.2.0",
     "@heroicons/vue": "^2.2.0",
-    "@libsql/client": "^0.15.15",
+    "@libsql/client": "^0.17.0",
     "@nuxtjs/i18n": "^10.2.1",
     "@nuxtjs/tailwindcss": "^6.14.0",
     "@phc/format": "^1.0.0",
@@ -45,14 +45,14 @@
     "nuxt": "^3.20.2",
     "otpauth": "^9.4.1",
     "pinia": "^3.0.4",
-    "qr": "^0.5.3",
+    "qr": "^0.5.4",
     "radix-vue": "^1.9.17",
     "semver": "^7.7.3",
     "tailwindcss": "^3.4.19",
     "timeago.js": "^4.0.2",
     "vue": "latest",
     "vue3-apexcharts": "^1.10.0",
-    "zod": "^4.2.1"
+    "zod": "^4.3.5"
   },
   "devDependencies": {
     "@nuxt/eslint": "^1.12.1",
@@ -67,7 +67,7 @@
     "prettier-plugin-tailwindcss": "^0.7.2",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
-    "vue-tsc": "^3.2.1"
+    "vue-tsc": "^3.2.2"
   },
-  "packageManager": "pnpm@10.26.2"
+  "packageManager": "pnpm@10.28.0"
 }
