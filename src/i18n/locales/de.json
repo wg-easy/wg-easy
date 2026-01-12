@@ -64,7 +64,7 @@
   "theme": {
     "dark": "Dunkles Thema",
     "light": "Helles Thema",
-    "system": "System-Thema"
+    "system": "System Thema"
   },
   "layout": {
     "toggleCharts": "Statistiken ein-/ausblenden",
@@ -195,7 +195,7 @@
       "expiresAt": "Läuft ab am",
       "address4": "IPv4-Adresse",
       "address6": "IPv6-Adresse",
-      "serverAllowedIps": "serverseitig erlaubte IP-Adressen"
+      "serverAllowedIps": "Serverseitig erlaubte IP-Adressen"
     },
     "user": {
       "username": "Benutzername",
