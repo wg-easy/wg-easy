@@ -11,7 +11,7 @@
 
     <SelectPortal>
       <SelectContent
-        class="min-w-28 rounded bg-gray-300 dark:bg-neutral-500"
+        class="min-w-28 rounded bg-gray-300 dark:bg-neutral-500 z-10"
         position="popper"
       >
         <SelectViewport class="p-2">
