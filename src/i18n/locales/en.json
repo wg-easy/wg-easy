@@ -187,7 +187,9 @@
       "validBoolean": "{0} must be a valid boolean",
       "validArray": "{0} must be a valid array",
       "stringMin": "{0} must be at least {1} Character",
-      "numberMin": "{0} must be at least {1}"
+      "stringMax": "{0} must be at most {1} Character",
+      "numberMin": "{0} must be at least {1}",
+      "numberMax": "{0} must be at most {1}"
     },
     "client": {
       "id": "Client ID",
