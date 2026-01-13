@@ -3,7 +3,7 @@ export default defineEventHandler(async (event) => {
   const url = getRequestURL(event);
 
   // User can't be logged in, and public routes can be accessed whenever
-  if (url.pathname.startsWith('/api/')) {
+  if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/_i18n/')) {
     return;
   }
 
