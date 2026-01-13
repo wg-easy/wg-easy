@@ -213,7 +213,7 @@ class WireGuard {
       WG_DEBUG('New Wireguard Keys generated successfully.');
     }
 
-    if (WG_ENV.WG_EXECUTABLE === 'awg' && wgInterface.h1 === 0) {
+    if (wgInterface.h1 === 0) {
       WG_DEBUG('Generating random AmneziaWG obfuscation parameters...');
       const headers = new Set<number>();
 
