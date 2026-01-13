@@ -50,7 +50,8 @@
     "semver": "^7.7.3",
     "tailwindcss": "^3.4.19",
     "timeago.js": "^4.0.2",
-    "vue": "latest",
+    "vue": "^3.5.26",
+    "vue-router": "^4.6.4",
     "vue3-apexcharts": "^1.10.0",
     "zod": "^4.3.5"
   },

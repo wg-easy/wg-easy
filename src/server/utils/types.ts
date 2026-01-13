@@ -90,8 +90,6 @@ export function validateZod<T>(
           .map((v) => {
             let m = v.message;
 
-            console.log(v);
-
             if (t) {
               let newMessage = null;
               if (v.message.startsWith('zod.')) {
