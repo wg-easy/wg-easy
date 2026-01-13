@@ -1,5 +1,3 @@
-import type { SharedPublicUser } from '~~/shared/utils/permissions';
-
 export default defineNuxtRouteMiddleware(async (to) => {
   // api & setup handled server side
   if (to.path.startsWith('/api/') || to.path.startsWith('/setup')) {
@@ -8,27 +6,25 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
   const event = useRequestEvent();
 
-  const userData = useState<SharedPublicUser | null>('user-data');
-
   const authStore = useAuthStore();
-  userData.value = await authStore.getSession(event);
+  authStore.userData = await authStore.getSession(event);
 
   // skip login if already logged in
   if (to.path === '/login') {
-    if (userData.value?.username) {
+    if (authStore.userData?.username) {
       return navigateTo('/', { redirectCode: 302 });
     }
     return;
   }
 
   // Require auth for every page other than Login
-  if (!userData.value?.username) {
+  if (!authStore.userData?.username) {
     return navigateTo('/login', { redirectCode: 302 });
   }
 
   // Check for admin access
   if (to.path.startsWith('/admin')) {
-    if (!hasPermissions(userData.value, 'admin', 'any')) {
+    if (!hasPermissions(authStore.userData, 'admin', 'any')) {
       return abortNavigation('Not allowed to access Admin Panel');
     }
   }
