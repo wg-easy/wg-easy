@@ -1,22 +1,22 @@
 {
   "editor.tabSize": 2,
   "editor.useTabStops": false,
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.defaultFormatter": "prettier.prettier-vscode",
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "always"
   },
   "[vue]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "prettier.prettier-vscode"
   },
   "[typescript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "prettier.prettier-vscode"
   },
   "[json]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "prettier.prettier-vscode"
   },
   "[markdown]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.defaultFormatter": "prettier.prettier-vscode",
     "editor.tabSize": 4,
     "editor.useTabStops": false
   },
