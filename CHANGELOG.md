@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [15.2.1] - 2026-01-14
+
+### Fixed
+
+- Icon in Searchbar (https://github.com/wg-easy/wg-easy/commit/458f66818a400f181e2c6326ede077c8793d71f2)
+- Interface save not working (https://github.com/wg-easy/wg-easy/commit/48f3fbd715a889e2425702a8a46332f2752aef91)
+- Error Messages in Setup (https://github.com/wg-easy/wg-easy/commit/32a055093a76342c40858d8dcf563b0700a8bd48)
+
 ## [15.2.0] - 2026-01-12
 
 ### Added
