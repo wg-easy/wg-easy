@@ -11,12 +11,12 @@
     }
   },
   "user": {
-    "email": "Email"
+    "email": "E-Mail"
   },
   "me": {
     "currentPassword": "Aktuelles Passwort",
-    "enable2fa": "Zwei-Faktor-Authentifizierunng aktivieren",
-    "enable2faDesc": "Scannen Sie den QR-Code mit ihrer Authentifizierungs-App oder geben Sie den Schlüssel manuell ein.",
+    "enable2fa": "Zwei-Faktor-Authentifizierung aktivieren",
+    "enable2faDesc": "Scannen Sie den QR-Code mit Ihrer Authentifizierungs-App oder geben Sie den Schlüssel manuell ein.",
     "2faKey": "TOTP-Schlüssel",
     "2faCodeDesc": "Geben Sie den Code aus Ihrer Authentifizierungs-App ein.",
     "disable2fa": "Zwei-Faktor-Authentifizierung deaktivieren",
@@ -45,26 +45,26 @@
   },
   "setup": {
     "welcome": "Willkommen zur Ersteinrichtung von wg-easy",
-    "welcomeDesc": "Das ist der einfachste Weg, um Wireguard auf jedem Linux-Server zu installieren und zu betreiben.",
+    "welcomeDesc": "Sie haben den einfachsten Weg gefunden, WireGuard auf jedem Linux-Server zu installieren und zu verwalten.",
     "existingSetup": "Haben Sie eine bestehende Einrichtung?",
-    "createAdminDesc": "Bitte geben Sie zuerst einen Admin-Benutzernamen sowie ein starkes, sicheres Passwort ein. Diese Anmeldedaten benötigen Sie, um sich im Admin-Panel anzumelden.",
+    "createAdminDesc": "Bitte geben Sie zuerst einen Admin-Benutzernamen sowie ein starkes, sicheres Passwort ein. Diese Anmeldedaten benötigen Sie, um sich in der Admin-Konsole anzumelden.",
     "setupConfigDesc": "Bitte geben Sie die Host- und Portinformationen ein. Diese werden für die Client-Konfiguration verwendet, wenn Sie WireGuard auf Ihren Geräten einrichten.",
     "setupMigrationDesc": "Bitte halten Sie die Sicherungsdatei bereit, wenn Sie Ihre Daten von Ihrer vorherigen wg-easy Version auf ihre neue Einrichtung migrieren möchten.",
     "upload": "Hochladen",
-    "migration": "Sicherung wiederherstellen:",
+    "migration": "Backup wiederherstellen:",
     "createAccount": "Konto erstellen",
     "successful": "Einrichtung erfolgreich",
     "hostDesc": "Öffentlicher Hostname mit dem sich die Clients verbinden",
-    "portDesc": "Öffentlicher UDP-Port an dem sich die Clients verbinden und auf dem Wireguard läuft"
+    "portDesc": "Öffentlicher UDP-Port an dem sich die Clients verbinden und auf dem WireGuard läuft"
   },
   "update": {
-    "updateAvailable": "Es ist ein neue Aktualisierung verfügbar!",
+    "updateAvailable": "Ein neues Update ist verfügbar!",
     "update": "Aktualisieren"
   },
   "theme": {
     "dark": "Dunkles Thema",
     "light": "Helles Thema",
-    "system": "System-Thema"
+    "system": "System Thema"
   },
   "layout": {
     "toggleCharts": "Statistiken ein-/ausblenden",
@@ -84,16 +84,16 @@
     "sort": "Sortieren",
     "create": "Client erstellen",
     "created": "Client wurde erstellt",
-    "new": "Neuer client",
+    "new": "Neuer Client",
     "name": "Name",
     "expireDate": "Ablaufdatum",
-    "expireDateDesc": "Datum, an dem der Client deaktiviert wird. Leer lassen, damit dies nie passiert.",
+    "expireDateDesc": "Datum, an dem der Client deaktiviert wird. Leer lassen für dauerhaft aktiv.",
     "deleteClient": "Client löschen",
-    "deleteDialog1": "Sind Sie sicher, dass Sie diesen Client löschen wollen",
+    "deleteDialog1": "Sind Sie sicher, dass Sie diesen Client löschen möchten",
     "deleteDialog2": "Diese Aktion kann nicht rückgängig gemacht werden.",
     "enabled": "Aktiviert",
     "address": "Adresse",
-    "serverAllowedIps": "serverseitig erlaubte IP-Adressen",
+    "serverAllowedIps": "Serverseitig erlaubte IP-Adressen",
     "otlDesc": "Einen kurzen Einmal-Link erzeugen",
     "permanent": "Dauerhaft",
     "createdOn": "Angelegt am ",
@@ -112,8 +112,15 @@
     "persistentKeepaliveDesc": "Legt das Intervall (in Sekunden) für Keepalive-Pakete fest. 0 deaktiviert es",
     "hooks": "Hooks",
     "hooksDescription": "Hooks funktionieren nur mit wg-quick",
-    "hooksLeaveEmpty": "Nur für wg-quick. Sonst leer lassen",
-    "dnsDesc": "DNS-Server, den die Clients benutzen (überschreibt die globale Konfiguration)"
+    "hooksLeaveEmpty": "Nur für wg-quick. Andernfalls leer lassen",
+    "dnsDesc": "DNS-Server, den die Clients benutzen (überschreibt die globale Konfiguration)",
+    "delete": "Löschen",
+    "notConnected": "Client nicht verbunden",
+    "endpoint": "Endpunkt",
+    "endpointDesc": "IP-Adresse des Clients, von dem aus die WireGuard-Verbindung hergestellt wird",
+    "search": "Suche Clients...",
+    "config": "Konfiguration",
+    "viewConfig": "Konfiguration anzeigen"
   },
   "dialog": {
     "change": "Ändern",
@@ -150,24 +157,24 @@
     "config": {
       "connection": "Verbindung",
       "hostDesc": "Öffentlicher Hostname mit dem sich die Clients verbinden (überschreibt die Konfiguration)",
-      "portDesc": "Öffentlicher UDP-Port an dem sich die Clients verbinden (überschreibt die Konfiguration, vermutlich wollen Sie ebenfalls den Port der Weboberfläche ändern)",
+      "portDesc": "Öffentlicher UDP-Port an dem sich die Clients verbinden (überschreibt die Konfiguration, vermutlich wollen Sie auch den Interface-Port ändern)",
       "allowedIpsDesc": "Erlaubte IP-Adressen, die die Clients nutzen werden (Globale Konfiguration)",
       "dnsDesc": "DNS-Server, den die Clients nutzen werden (Globale Konfiguration)",
       "mtuDesc": "MTU, den die Clients benutzen werden (nur für neue Clients)",
-      "persistentKeepaliveDesc": "Intervall in Sekunden, in dem Keepalive-Packete an den Server gesendet werden. 0 = deaktiviert (nur für neue Clients)",
+      "persistentKeepaliveDesc": "Intervall in Sekunden, in dem Keepalive-Pakete an den Server gesendet werden. 0 = deaktiviert (nur für neue Clients)",
       "suggest": "Vorschlagen",
       "suggestDesc": "Wählen Sie eine IP-Adresse oder einen Hostnamen für das Host-Feld aus"
     },
     "interface": {
       "cidrSuccess": "CIDR wurde geändert",
       "device": "Gerät",
-      "deviceDesc": "Ethernet-Gerät, durch das der Wireguard-Datenverkehr geleitet werden soll",
+      "deviceDesc": "Ethernet-Gerät, durch das der WireGuard-Datenverkehr geleitet werden soll",
       "mtuDesc": "MTU, den WireGuard benutzen wird",
-      "portDesc": "UDP Port, auf dem WireGuard lauschen wird (Sie wollen wahrscheinlich auch den Config-Port ändern)",
+      "portDesc": "UDP-Port, auf dem WireGuard lauschen wird (Sie wollen wahrscheinlich auch den Interface-Port ändern)",
       "changeCidr": "CIDR ändern",
       "restart": "Interface neu starten",
       "restartDesc": "Das WireGuard-Interface neu starten",
-      "restartWarn": "Sind Sie sicher, dass Sie das Interface neu starten wollen? Dies wird die Verbindungen aller Clients trennen.",
+      "restartWarn": "Sind Sie sicher, dass Sie das Interface neu starten möchten? Dies wird die Verbindungen aller Clients trennen.",
       "restartSuccess": "Interface neu gestartet"
     },
     "introText": "Willkommen in der Admin-Konsole.\n\nHier können Sie die allgemeinen Einstellungen, die Konfiguration, die Schnittstelleneinstellungen und die Hooks verwalten.\n\nBeginnen Sie, indem Sie einen der Bereiche in der Seitenleiste auswählen."
@@ -188,15 +195,15 @@
       "expiresAt": "Läuft ab am",
       "address4": "IPv4-Adresse",
       "address6": "IPv6-Adresse",
-      "serverAllowedIps": "serverseitig erlaubte IP-Adressen"
+      "serverAllowedIps": "Serverseitig erlaubte IP-Adressen"
     },
     "user": {
       "username": "Benutzername",
       "password": "Passwort",
       "remember": "Merken",
       "name": "Name",
-      "email": "Email",
-      "emailInvalid": "Die Email-Adresse muss valide sein",
+      "email": "E-Mail",
+      "emailInvalid": "Die E-Mail-Adresse muss gültig sein",
       "passwordMatch": "Die Passwörter müssen übereinstimmen",
       "totpEnable": "TOTP aktivieren",
       "totpEnableTrue": "\"TOTP aktivieren\" muss ausgewählt sein",
@@ -212,8 +219,8 @@
     },
     "interface": {
       "cidr": "CIDR",
-      "device": "Geräte",
-      "cidrValid": "CIDR muss valide sein"
+      "device": "Gerät",
+      "cidrValid": "CIDR muss gültig sein"
     },
     "otl": "Einmal-Link",
     "stringMalformed": "Zeichenkette ist fehlerhaft",
@@ -233,5 +240,47 @@
     "postUp": "PostUp",
     "preDown": "PreDown",
     "postDown": "PostDown"
+  },
+  "copy": {
+    "notSupported": "Kopieren ist nicht unterstützt",
+    "copied": "Kopiert!",
+    "failed": "Kopieren fehlgeschlagen",
+    "copy": "Kopieren"
+  },
+  "awg": {
+    "jCLabel": "Anzahl der Junk-Pakete (Jc)",
+    "jCDescription": "Anzahl der zu sendenden Junk-Pakete (1-128, empfohlen: 4-12)",
+    "jMinLabel": "Minimale Junk-Paketgröße (Jmin)",
+    "jMinDescription": "Mindestgröße von Junk-Paketen (0-1279*, empfohlen: 8, muss < Jmax sein)",
+    "jMaxLabel": "Maximale Junk-Paketgröße (Jmax)",
+    "jMaxDescription": "Maximalgröße von Junk-Paketen (1-1280*, empfohlen: 80, muss > Jmin sein)",
+    "s1Label": "Junk-Paketgröße des Init-Pakets (S1)",
+    "s1Description": "Junk-Paketgröße des Init-Pakets (0-1132[1280* - 148 = 1132], empfohlen: 15-150, S1+56 ≠ S2)",
+    "s2Label": "Junk-Paketgröße des Antwort-Pakets (S2)",
+    "s2Description": "Junk-Paketgröße des Antwort-Pakets (0-1188[1280* - 92 = 1188], empfohlen: 15-150)",
+    "s3Label": "Junk-Paketgröße des Cookie-Antwort-Pakets (S3)",
+    "s3Description": "Junk-Paketgröße des Cookie-Antwort-Pakets",
+    "s4Label": "Junk-Paketgröße des Transport-Pakets (S4)",
+    "s4Description": "Junk-Paketgröße des Transport-Pakets",
+    "i1Label": "Spezial-Junk-Paket 1 (I1)",
+    "i1Description": "Protokoll-Nachahmungspaket im Hex-Format: <b 0x...>",
+    "i2Label": "Spezial-Junk-Paket 2 (I2)",
+    "i2Description": "Protokoll-Nachahmungspaket im Hex-Format: <b 0x...>",
+    "i3Label": "Spezial-Junk-Paket 3 (I3)",
+    "i3Description": "Protokoll-Nachahmungspaket im Hex-Format: <b 0x...>",
+    "i4Label": "Spezial-Junk-Paket 4 (I4)",
+    "i4Description": "Protokoll-Nachahmungspaket im Hex-Format: <b 0x...>",
+    "i5Label": "Spezial-Junk-Paket 5 (I5)",
+    "i5Description": "Protokoll-Nachahmungspaket im Hex-Format: <b 0x...>",
+    "h1Label": "Init-Magic-Header (H1)",
+    "h1Description": "Wert des Init-Paket-Headers (5-2147483647, muss eindeutig zu H2-H4 sein)",
+    "h2Label": "Antwort-Magic-Header (H2)",
+    "h2Description": "Wert des Antwort-Paket-Headers (5-2147483647, muss eindeutig zu H1, H3, H4 sein)",
+    "h3Label": "Cookie-Antwort-Magic-Header (H3)",
+    "h3Description": "Wert des Cookie-Antwort-Paket-Headers (5-2147483647, muss eindeutig zu H1, H2, H4 sein)",
+    "h4Label": "Transport-Magic-Header (H4)",
+    "h4Description": "Wert des Transport-Paket-Headers (5-2147483647, muss eindeutig zu H1-H3 sein)",
+    "mtuNote": "Werte hängen von der MTU ab",
+    "obfuscationParameters": "AmneziaWG Verschleierungsparameter"
   }
 }

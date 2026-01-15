@@ -206,9 +206,7 @@
 </template>
 
 <script lang="ts" setup>
-const authStore = useAuthStore();
 const globalStore = useGlobalStore();
-authStore.update();
 
 const route = useRoute();
 const id = route.params.id as string;

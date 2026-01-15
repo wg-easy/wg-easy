@@ -30,6 +30,7 @@ echo "Updated package.json to version $new_version"
 
 echo "----"
 echo "If you changed the major version, remember to update the docker-compose.yml file and docs (search for: ref: major version)"
+echo "Make sure to stage any changes before proceeding (e.g. Changelog updates)."
 echo "----"
 
 echo "If you did everything press 'y' to commit the changes and create a new tag"
