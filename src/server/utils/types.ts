@@ -1,4 +1,4 @@
-import type { ZodSchema } from 'zod';
+import type { ZodType } from 'zod';
 import z from 'zod';
 import type { H3Event, EventHandlerRequest } from 'h3';
 
@@ -75,7 +75,7 @@ export const schemaForType =
   };
 
 export function validateZod<T>(
-  schema: ZodSchema<T>,
+  schema: ZodType<T>,
   event: H3Event<EventHandlerRequest>
 ) {
   return async (data: unknown) => {
@@ -106,6 +106,22 @@ export function validateZod<T>(
                         newMessage = t('zod.generic.numberMin', [
                           t(v.message),
                           v.minimum,
+                        ]);
+                        break;
+                    }
+                    break;
+                  case 'too_big':
+                    switch (v.origin) {
+                      case 'string':
+                        newMessage = t('zod.generic.stringMax', [
+                          t(v.message),
+                          v.maximum,
+                        ]);
+                        break;
+                      case 'number':
+                        newMessage = t('zod.generic.numberMax', [
+                          t(v.message),
+                          v.maximum,
                         ]);
                         break;
                     }
