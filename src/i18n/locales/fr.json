@@ -15,12 +15,12 @@
   },
   "me": {
     "currentPassword": "Mot de passe actuel",
-    "enable2fa": "Activer l'authentification à double facteur",
+    "enable2fa": "Activer l'authentification à deux facteurs",
     "enable2faDesc": "Scannez le code QR avec votre application d'authentification ou saisissez la clé manuellement.",
     "2faKey": "Clé TOTP",
     "2faCodeDesc": "Saisissez le code de votre application d'authentification.",
-    "disable2fa": "Désactiver l'authentification à double facteur",
-    "disable2faDesc": "Saisissez votre mot de passe pour désactiver l'authentification à double facteur"
+    "disable2fa": "Désactiver l'authentification à deux facteurs",
+    "disable2faDesc": "Saisissez votre mot de passe pour désactiver l'authentification à deux facteurs."
   },
   "general": {
     "name": "Nom",
@@ -40,7 +40,7 @@
     "no": "Non",
     "confirmPassword": "Confirmer le mot de passe",
     "loading": "Chargement...",
-    "2fa": "Authentification à double facteur",
+    "2fa": "Authentification à deux facteurs",
     "2faCode": "Code TOTP"
   },
   "setup": {
@@ -75,8 +75,8 @@
     "rememberMe": "Se souvenir de moi",
     "rememberMeDesc": "Rester connecté après avoir fermé le navigateur",
     "insecure": "Vous ne pouvez pas vous connecter avec une connexion non sécurisée. Utilisez HTTPS.",
-    "2faRequired": "Une authentification à double facteur est requise",
-    "2faWrong": "L'authentification à double facteur est incorrecte"
+    "2faRequired": "L'authentification à deux facteurs est requise",
+    "2faWrong": "Le code d'authentification à deux facteurs est incorrect"
   },
   "client": {
     "empty": "Il n'y a pas encore de clients.",
@@ -108,7 +108,7 @@
     "downloadConfig": "Télécharger la configuration",
     "allowedIpsDesc": "Quelles IPs seront acheminées par le VPN (remplace la configuration globale)",
     "serverAllowedIpsDesc": "Les IPs que le serveur acheminera vers le client",
-    "mtuDesc": "Définit le nombre maximum d'unités de transmission (taille des paquets) pour le tunnel VPN.",
+    "mtuDesc": "Définit l'unité de transmission maximale (taille des paquets) pour le tunnel VPN",
     "persistentKeepaliveDesc": "Définit l'intervalle (en secondes) pour les paquets keep-alive. 0 le désactive",
     "hooks": "Hooks",
     "hooksDescription": "Les hooks ne fonctionnent qu'avec wg-quick",
@@ -116,7 +116,11 @@
     "dnsDesc": "Serveur DNS que les clients utiliseront (remplace la configuration globale)",
     "notConnected": "Client non connecté",
     "endpoint": "Endpoint",
-    "endpointDesc": "Adresse IP du client à partir duquel la connexion WireGuard est établie"
+    "endpointDesc": "Adresse IP du client à partir duquel la connexion WireGuard est établie",
+    "search": "Rechercher des clients...",
+    "config": "Configuration",
+    "viewConfig": "Voir la configuration",
+    "delete": "Supprimer"
   },
   "dialog": {
     "change": "Modifier",
@@ -146,9 +150,9 @@
       "metricsPassword": "Mot de passe",
       "metricsPasswordDesc": "Mot de passe Bearer pour le endpoint des métriques (mot de passe ou argon2 hash)",
       "json": "JSON",
-      "jsonDesc": "Acheminement pour les métriques au format JSON",
+      "jsonDesc": "Route pour les métriques au format JSON",
       "prometheus": "Prometheus",
-      "prometheusDesc": "Acheminement pour les métriques de Prometheus"
+      "prometheusDesc": "Route pour les métriques Prometheus"
     },
     "config": {
       "connection": "Connexion",
@@ -180,13 +184,13 @@
       "required": "{0} est requis",
       "validNumber": "{0} doit être un nombre valide",
       "validString": "{0} doit être une chaîne de caractères valide",
-      "validBoolean": "{0} doit être une variable valide",
+      "validBoolean": "{0} doit être un booléen valide",
       "validArray": "{0} doit être un tableau valide",
-      "stringMin": "{0} doit être d'au moins {1} Caractère",
+      "stringMin": "{0} doit comporter au moins {1} caractère(s)",
       "numberMin": "{0} doit être d'au moins {1}"
     },
     "client": {
-      "id": "Client ID",
+      "id": "ID du client",
       "name": "Nom",
       "expiresAt": "Expire le",
       "address4": "Adresse IPv4",
@@ -236,5 +240,47 @@
     "postUp": "PostUp",
     "preDown": "PreDown",
     "postDown": "PostDown"
+  },
+  "copy": {
+    "notSupported": "La copie n'est pas prise en charge",
+    "copied": "Copié !",
+    "failed": "Échec de la copie",
+    "copy": "Copier"
+  },
+  "awg": {
+    "jCLabel": "Nombre de paquets parasites (Jc)",
+    "jCDescription": "Nombre de paquets parasites à envoyer (1-128, recommandé : 4-12)",
+    "jMinLabel": "Taille min des paquets parasites (Jmin)",
+    "jMinDescription": "Taille minimale des paquets parasites (0-1279*, recommandé : 8, doit être < Jmax)",
+    "jMaxLabel": "Taille max des paquets parasites (Jmax)",
+    "jMaxDescription": "Taille maximale des paquets parasites (1-1280*, recommandé : 80, doit être > Jmin)",
+    "s1Label": "Taille parasite du paquet init (S1)",
+    "s1Description": "Taille parasite du paquet d'initialisation (0-1132[1280* - 148 = 1132], recommandé : 15-150, S1+56 ≠ S2)",
+    "s2Label": "Taille parasite du paquet réponse (S2)",
+    "s2Description": "Taille parasite du paquet de réponse (0-1188[1280* - 92 = 1188], recommandé : 15-150)",
+    "s3Label": "Taille parasite du paquet cookie reply (S3)",
+    "s3Description": "Taille parasite du paquet de réponse cookie",
+    "s4Label": "Taille parasite du paquet transport (S4)",
+    "s4Description": "Taille parasite du paquet de transport",
+    "i1Label": "Paquet parasite spécial 1 (I1)",
+    "i1Description": "Paquet de simulation de protocole en format hexadécimal : <b 0x...>",
+    "i2Label": "Paquet parasite spécial 2 (I2)",
+    "i2Description": "Paquet de simulation de protocole en format hexadécimal : <b 0x...>",
+    "i3Label": "Paquet parasite spécial 3 (I3)",
+    "i3Description": "Paquet de simulation de protocole en format hexadécimal : <b 0x...>",
+    "i4Label": "Paquet parasite spécial 4 (I4)",
+    "i4Description": "Paquet de simulation de protocole en format hexadécimal : <b 0x...>",
+    "i5Label": "Paquet parasite spécial 5 (I5)",
+    "i5Description": "Paquet de simulation de protocole en format hexadécimal : <b 0x...>",
+    "h1Label": "En-tête magique init (H1)",
+    "h1Description": "Valeur d'en-tête du paquet init (5-2147483647, doit être unique par rapport à H2-H4)",
+    "h2Label": "En-tête magique réponse (H2)",
+    "h2Description": "Valeur d'en-tête du paquet réponse (5-2147483647, doit être unique par rapport à H1, H3, H4)",
+    "h3Label": "En-tête magique cookie reply (H3)",
+    "h3Description": "Valeur d'en-tête du paquet cookie reply (5-2147483647, doit être unique par rapport à H1, H2, H4)",
+    "h4Label": "En-tête magique transport (H4)",
+    "h4Description": "Valeur d'en-tête du paquet transport (5-2147483647, doit être unique par rapport à H1-H3)",
+    "mtuNote": "Les valeurs dépendent du MTU",
+    "obfuscationParameters": "Paramètres d'obfuscation AmneziaWG"
   }
 }

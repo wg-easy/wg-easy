@@ -1,0 +1,286 @@
+{
+  "pages": {
+    "me": "帳戶",
+    "clients": "用戶端",
+    "admin": {
+      "panel": "管理面板",
+      "general": "一般設定",
+      "config": "組態設定",
+      "interface": "介面設定",
+      "hooks": "Hook 設定"
+    }
+  },
+  "user": {
+    "email": "電子郵件"
+  },
+  "me": {
+    "currentPassword": "目前密碼",
+    "enable2fa": "啟用兩步驟驗證",
+    "enable2faDesc": "請使用您的驗證碼應用程式掃描 QR Code，或手動輸入金鑰。",
+    "2faKey": "TOTP 金鑰",
+    "2faCodeDesc": "請輸入驗證碼應用程式提供的驗證碼。",
+    "disable2fa": "停用兩步驟驗證",
+    "disable2faDesc": "請輸入您的密碼以停用兩步驟驗證。"
+  },
+  "general": {
+    "name": "名稱",
+    "username": "使用者名稱",
+    "password": "密碼",
+    "newPassword": "新密碼",
+    "updatePassword": "更新密碼",
+    "mtu": "MTU",
+    "allowedIps": "允許的 IP",
+    "dns": "DNS",
+    "persistentKeepalive": "保持連線",
+    "logout": "登出",
+    "continue": "繼續",
+    "host": "主機",
+    "port": "連接埠",
+    "yes": "是",
+    "no": "否",
+    "confirmPassword": "確認密碼",
+    "loading": "正在載入...",
+    "2fa": "兩步驟驗證",
+    "2faCode": "TOTP 驗證碼"
+  },
+  "setup": {
+    "welcome": "歡迎首次設定您的 wg-easy",
+    "welcomeDesc": "這是您在任何 Linux 主機上安裝與管理 WireGuard 最簡單的方式",
+    "existingSetup": "您已有現存的設定了嗎?",
+    "createAdminDesc": "請先輸入管理員使用者名稱與高強度密碼。此資訊將用於登入管理面板。",
+    "setupConfigDesc": "請輸入主機與連接埠資訊。此資訊將用於設定用戶端的 WireGuard 連線。",
+    "setupMigrationDesc": "若要從先前的 wg-easy 版本移轉資料，請提供備份檔案。",
+    "upload": "上傳",
+    "migration": "還原備份:",
+    "createAccount": "建立帳戶",
+    "successful": "設定成功",
+    "hostDesc": "用戶端將連線的公開主機名稱",
+    "portDesc": "用戶端將連線的公開 UDP 連接埠，且 WireGuard 會在此監聽"
+  },
+  "update": {
+    "updateAvailable": "已有更新可供使用!",
+    "update": "更新"
+  },
+  "theme": {
+    "dark": "深色佈景主題",
+    "light": "淺色佈景主題",
+    "system": "系統佈景主題"
+  },
+  "layout": {
+    "toggleCharts": "顯示/隱藏圖表",
+    "donate": "贊助"
+  },
+  "login": {
+    "signIn": "登入",
+    "rememberMe": "記住我",
+    "rememberMeDesc": "關閉瀏覽器後仍保持登入狀態",
+    "insecure": "您無法在不安全的連線下登入。請使用 HTTPS。",
+    "2faRequired": "需要兩步驟驗證",
+    "2faWrong": "兩步驟驗證碼不正確"
+  },
+  "client": {
+    "empty": "尚無用戶端。",
+    "newShort": "新增",
+    "sort": "排序",
+    "create": "建立用戶端",
+    "created": "已建立用戶端",
+    "new": "新增用戶端",
+    "name": "名稱",
+    "expireDate": "到期日",
+    "expireDateDesc": "用戶端將被停用的日期。留白表示永久有效",
+    "delete": "刪除",
+    "deleteClient": "刪除用戶端",
+    "deleteDialog1": "您確定要刪除",
+    "deleteDialog2": "此動作無法復原。",
+    "enabled": "啟用",
+    "address": "位址",
+    "serverAllowedIps": "伺服器允許的 IP",
+    "otlDesc": "產生暫時性單次連結",
+    "permanent": "永久",
+    "createdOn": "建立於 ",
+    "lastSeen": "上次連線於 ",
+    "totalDownload": "總下載量: ",
+    "totalUpload": "總上傳量: ",
+    "newClient": "新增用戶端",
+    "disableClient": "停用用戶端",
+    "enableClient": "啟用用戶端",
+    "noPrivKey": "此用戶端沒有已知的私密金鑰，無法建立設定。",
+    "showQR": "顯示 QR Code",
+    "downloadConfig": "下載組態設定檔",
+    "allowedIpsDesc": "將透過 VPN 路由的 IP (會覆寫全域設定)",
+    "serverAllowedIpsDesc": "伺服器將路由至用戶端的 IP",
+    "mtuDesc": "設定 VPN 通道的最大傳輸單位 (封包大小)",
+    "persistentKeepaliveDesc": "Keep-alive 封包的間隔秒數。0 表示停用",
+    "hooks": "Hook 設定",
+    "hooksDescription": "Hook 設定僅適用於 wg-quick",
+    "hooksLeaveEmpty": "僅適用於 wg-quick，否則請保持空白",
+    "dnsDesc": "用戶端使用的 DNS 伺服器 (會覆寫全域設定)",
+    "notConnected": "用戶端未連線",
+    "endpoint": "端點",
+    "endpointDesc": "用戶端建立 WireGuard 連線的來源 IP",
+    "search": "搜尋用戶端...",
+    "config": "組態設定",
+    "viewConfig": "檢視組態設定"
+  },
+  "dialog": {
+    "change": "變更",
+    "cancel": "取消",
+    "create": "建立"
+  },
+  "toast": {
+    "success": "成功",
+    "saved": "已儲存",
+    "error": "錯誤"
+  },
+  "form": {
+    "actions": "操作",
+    "save": "儲存",
+    "revert": "還原",
+    "sectionGeneral": "一般設定",
+    "sectionAdvanced": "進階設定",
+    "noItems": "沒有項目",
+    "nullNoItems": "沒有項目。使用全域設定",
+    "add": "新增"
+  },
+  "admin": {
+    "general": {
+      "sessionTimeout": "工作階段逾時",
+      "sessionTimeoutDesc": "「記住我」的工作階段持續時間 (秒)",
+      "metrics": "計量",
+      "metricsPassword": "密碼",
+      "metricsPasswordDesc": "計量端點的 Bearer 密碼 (密碼或 argon2 雜湊)",
+      "json": "JSON",
+      "jsonDesc": "提供 JSON 格式計量的路由",
+      "prometheus": "Prometheus",
+      "prometheusDesc": "提供 Prometheus 計量的路由"
+    },
+    "config": {
+      "connection": "連線",
+      "hostDesc": "用戶端將連線的公開主機名稱 (變更後會使目前組態設定檔失效)",
+      "portDesc": "用戶端將連線的公開 UDP 連接埠 (變更後會使目前組態設定檔失效，您可能也需要變更介面連接埠)",
+      "allowedIpsDesc": "用戶端將使用的允許 IP (全域設定)",
+      "dnsDesc": "用戶端將使用的 DNS 伺服器 (全域設定)",
+      "mtuDesc": "用戶端使用的 MTU (僅適用於新用戶端)",
+      "persistentKeepaliveDesc": "傳送 keepalive 的間隔秒數。以 0 表示停用 (僅適用於新用戶端)",
+      "suggest": "建議",
+      "suggestDesc": "為主機欄位選擇 IP 位址或主機名稱"
+    },
+    "interface": {
+      "cidrSuccess": "已變更 CIDR",
+      "device": "裝置",
+      "deviceDesc": "用於轉送 WireGuard 流量的乙太網路裝置",
+      "mtuDesc": "WireGuard 將使用的 MTU",
+      "portDesc": "WireGuard 監聽的 UDP 連接埠 (您可能也需要變更連接埠組態設定檔)",
+      "changeCidr": "變更 CIDR",
+      "restart": "重新啟動介面",
+      "restartDesc": "重新啟動 WireGuard 介面",
+      "restartWarn": "您確定要重新啟動介面嗎? 所有用戶端將被中斷連線。",
+      "restartSuccess": "介面已重新啟動"
+    },
+    "introText": "歡迎使用管理面板。\n\n您可在此管理一般、組態、介面與 Hook 設定。\n\n請從側邊欄選擇任一項目開始。"
+  },
+  "zod": {
+    "generic": {
+      "required": "{0} 為必填項目",
+      "validNumber": "{0} 必須為有效的數字",
+      "validString": "{0} 必須為有效的字串",
+      "validBoolean": "{0} 必須為有效的布林值",
+      "validArray": "{0} 必須為有效的陣列",
+      "stringMin": "{0} 至少需要 {1} 個字元",
+      "numberMin": "{0} 不能小於 {1}"
+    },
+    "client": {
+      "id": "用戶端 ID",
+      "name": "名稱",
+      "expiresAt": "到期時間",
+      "address4": "IPv4 位址",
+      "address6": "IPv6 位址",
+      "serverAllowedIps": "伺服器允許的 IP"
+    },
+    "user": {
+      "username": "使用者名稱",
+      "password": "密碼",
+      "remember": "記住我",
+      "name": "名稱",
+      "email": "電子郵件",
+      "emailInvalid": "電子郵件格式無效",
+      "passwordMatch": "密碼必須一致",
+      "totpEnable": "啟用 TOTP",
+      "totpEnableTrue": "必須啟用 TOTP",
+      "totpCode": "TOTP 驗證碼"
+    },
+    "userConfig": {
+      "host": "主機"
+    },
+    "general": {
+      "sessionTimeout": "工作階段逾時",
+      "metricsEnabled": "計量",
+      "metricsPassword": "計量密碼"
+    },
+    "interface": {
+      "cidr": "CIDR",
+      "device": "裝置",
+      "cidrValid": "CIDR 格式無效"
+    },
+    "otl": "單次連結",
+    "stringMalformed": "字串格式錯誤",
+    "body": "Body 必須為有效的物件",
+    "hook": "Hook",
+    "enabled": "啟用",
+    "mtu": "MTU",
+    "port": "連接埠",
+    "persistentKeepalive": "保持連線",
+    "address": "IP 位址",
+    "dns": "DNS",
+    "allowedIps": "允許的 IP",
+    "file": "檔案"
+  },
+  "hooks": {
+    "preUp": "PreUp",
+    "postUp": "PostUp",
+    "preDown": "PreDown",
+    "postDown": "PostDown"
+  },
+  "copy": {
+    "notSupported": "無法複製",
+    "copied": "已複製!",
+    "failed": "複製失敗",
+    "copy": "複製"
+  },
+  "awg": {
+    "jCLabel": "填充封包數量 (Jc)",
+    "jCDescription": "要傳送的填充封包數量 (1-128，建議: 4-12)",
+    "jMinLabel": "填充封包最小大小 (Jmin)",
+    "jMinDescription": "填充封包的最小大小 (0-1279*，建議: 8，必須小於 Jmax)",
+    "jMaxLabel": "填充封包最大大小 (Jmax)",
+    "jMaxDescription": "填充封包的最大大小 (1-1280*，建議: 80，必須大於 Jmin)",
+    "s1Label": "初始封包填充大小 (S1)",
+    "s1Description": "初始封包填充大小 (0-1132 [1280* - 148 = 1132]，建議: 15-150，S1+56 ≠ S2)",
+    "s2Label": "回應封包填充大小 (S2)",
+    "s2Description": "回應封包填充大小 (0-1188 [1280* - 92 = 1188]，建議: 15-150)",
+    "s3Label": "Cookie 回覆封包填充大小 (S3)",
+    "s3Description": "Cookie 回覆封包填充大小",
+    "s4Label": "傳輸封包填充大小 (S4)",
+    "s4Description": "傳輸封包填充大小",
+    "i1Label": "特殊填充封包 1 (I1)",
+    "i1Description": "協定模仿封包 (16 進位格式): <b 0x...>",
+    "i2Label": "特殊填充封包 2 (I2)",
+    "i2Description": "協定模仿封包 (16 進位格式): <b 0x...>",
+    "i3Label": "特殊填充封包 3 (I3)",
+    "i3Description": "協定模仿封包 (16 進位格式): <b 0x...>",
+    "i4Label": "特殊填充封包 4 (I4)",
+    "i4Description": "協定模仿封包 (16 進位格式): <b 0x...>",
+    "i5Label": "特殊填充封包 5 (I5)",
+    "i5Description": "協定模仿封包 (16 進位格式): <b 0x...>",
+    "h1Label": "初始特徵標頭 (H1)",
+    "h1Description": "初始封包標頭值 (5-2147483647，必須與 H2-H4 不同)",
+    "h2Label": "回應特徵標頭 (H2)",
+    "h2Description": "回應封包標頭值 (5-2147483647，必須與 H1、H3、H4 不同)",
+    "h3Label": "Cookie 回覆特徵標頭 (H3)",
+    "h3Description": "Cookie 回覆封包標頭值 (5-2147483647，必須與 H1、H2、H4 不同)",
+    "h4Label": "傳輸特徵標頭 (H4)",
+    "h4Description": "傳輸封包標頭值 (5-2147483647，必須與 H1-H3 不同)",
+    "mtuNote": "數值取決於 MTU",
+    "obfuscationParameters": "AmneziaWG 混淆參數"
+  }
+}

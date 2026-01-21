@@ -45,6 +45,11 @@ type SharedUserType =
   | Pick<UserType, 'id' | 'role'>
   | (Pick<UserType, 'id'> & { role: BrandedNumber });
 
+export type SharedPublicUser = Pick<
+  UserType,
+  'id' | 'username' | 'name' | 'email' | 'totpVerified'
+> & { role: BrandedNumber };
+
 type PermissionCheck<Key extends keyof Permissions> =
   | boolean
   | ((user: SharedUserType, data: Permissions[Key]['dataType']) => boolean);

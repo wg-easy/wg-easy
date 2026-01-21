@@ -13,11 +13,12 @@
               v-for="(item, index) in menuItems"
               :key="index"
               :to="`/admin/${item.id}`"
-              active-class="bg-red-800 rounded"
+              class="group rounded"
+              active-class="bg-red-800 active"
             >
               <BaseSecondaryButton
                 as="span"
-                class="w-full cursor-pointer rounded p-2 font-medium transition-colors duration-200 hover:bg-red-800 dark:text-neutral-200"
+                class="w-full font-medium group-[.active]:text-white"
               >
                 {{ item.name }}
               </BaseSecondaryButton>
@@ -37,9 +38,6 @@
 </template>
 
 <script setup lang="ts">
-const authStore = useAuthStore();
-authStore.update();
-
 const { t } = useI18n();
 
 const route = useRoute();

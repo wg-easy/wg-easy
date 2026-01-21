@@ -82,6 +82,61 @@
               :label="$t('general.persistentKeepalive')"
             />
           </FormGroup>
+          <FormGroup v-if="globalStore.information?.isAwg">
+            <FormHeading>{{ $t('awg.obfuscationParameters') }}</FormHeading>
+
+            <FormNullNumberField
+              id="jC"
+              v-model="data.jC"
+              :label="$t('awg.jCLabel')"
+              :description="$t('awg.jCDescription')"
+            />
+            <FormNullNumberField
+              id="Jmin"
+              v-model="data.jMin"
+              :label="$t('awg.jMinLabel')"
+              :description="$t('awg.jMinDescription')"
+            />
+            <FormNullNumberField
+              id="Jmax"
+              v-model="data.jMax"
+              :label="$t('awg.jMaxLabel')"
+              :description="$t('awg.jMaxDescription')"
+            />
+
+            <div class="col-span-full text-sm">* {{ $t('awg.mtuNote') }}</div>
+
+            <FormNullTextField
+              id="i1"
+              v-model="data.i1"
+              :label="$t('awg.i1Label')"
+              :description="$t('awg.i1Description')"
+            />
+            <FormNullTextField
+              id="i2"
+              v-model="data.i2"
+              :label="$t('awg.i2Label')"
+              :description="$t('awg.i2Description')"
+            />
+            <FormNullTextField
+              id="i3"
+              v-model="data.i3"
+              :label="$t('awg.i3Label')"
+              :description="$t('awg.i3Description')"
+            />
+            <FormNullTextField
+              id="i4"
+              v-model="data.i4"
+              :label="$t('awg.i4Label')"
+              :description="$t('awg.i4Description')"
+            />
+            <FormNullTextField
+              id="i5"
+              v-model="data.i5"
+              :label="$t('awg.i5Label')"
+              :description="$t('awg.i5Description')"
+            />
+          </FormGroup>
           <FormGroup>
             <FormHeading :description="$t('client.hooksDescription')">
               {{ $t('client.hooks') }}
@@ -124,13 +179,25 @@
               @delete="deleteClient"
             >
               <FormSecondaryActionField
-                label="Delete"
+                :label="$t('client.delete')"
                 class="w-full"
                 type="button"
                 tabindex="-1"
                 as="span"
               />
             </ClientsDeleteDialog>
+            <ClientsConfigDialog
+              trigger-class="col-span-2"
+              :client-id="data.id"
+            >
+              <FormSecondaryActionField
+                :label="$t('client.viewConfig')"
+                class="w-full"
+                type="button"
+                tabindex="-1"
+                as="span"
+              />
+            </ClientsConfigDialog>
           </FormGroup>
         </FormElement>
       </PanelBody>
@@ -139,8 +206,7 @@
 </template>
 
 <script lang="ts" setup>
-const authStore = useAuthStore();
-authStore.update();
+const globalStore = useGlobalStore();
 
 const route = useRoute();
 const id = route.params.id as string;

@@ -7,10 +7,11 @@
     "build": "docker build -t wg-easy .",
     "docs:preview": "docker run --rm -it -p 8080:8080 -v ./docs:/docs squidfunk/mkdocs-material serve -a 0.0.0.0:8080",
     "scripts:version": "bash scripts/version.sh",
+    "scripts:i18n": "bash scripts/i18n.sh",
     "format:check:docs": "prettier --check docs"
   },
   "devDependencies": {
-    "prettier": "^3.6.2"
+    "prettier": "^3.8.0"
   },
-  "packageManager": "pnpm@10.18.3"
+  "packageManager": "pnpm@10.28.1"
 }
