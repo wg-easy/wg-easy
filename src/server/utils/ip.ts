@@ -1,6 +1,7 @@
 import { Resolver } from 'node:dns/promises';
 import { networkInterfaces } from 'node:os';
 import { stringifyIp } from 'ip-bigint';
+import { isIPv4, isIPv6 } from 'is-ip';
 import type { parseCidr } from 'cidr-tools';
 
 import type { ClientNextIpType } from '#db/repositories/client/types';
@@ -171,43 +172,61 @@ export const cachedGetIpInformation = cacheFunction(getIpInformation, {
   expiry: 15 * 60 * 1000,
 });
 
-// 检查IP地址是否为IPv6
-export const isIPv6 = (ip: string): boolean => {
-  return ip.startsWith('[') || ip.split(':').length > 2;
-};
-
-// 解析IP地址和端口
+/**
+ * Parses an IP address with optional port into its components.
+ * Supports IPv4, IPv6 (with or without brackets), and CIDR notation.
+ *
+ * @param ipWithPort - IP address that may include a port, e.g.:
+ *   - '192.168.1.1:8080' (IPv4 with port)
+ *   - '[2001:db8::1]:8080' (IPv6 with brackets and port)
+ *   - '2001:db8::1:8080' (IPv6 without brackets and port)
+ *   - '10.0.0.1/24' (CIDR notation, returned as-is)
+ * @returns Object containing the IP address and optional port
+ */
 export const parseIpAndPort = (
   ipWithPort: string
 ): { ip: string; port?: string } => {
+  // CIDR notation: return as-is
   if (ipWithPort.includes('/')) {
     return { ip: ipWithPort };
   }
-  const parts = ipWithPort.split(':');
-  // 如果是IPv6地址（包含多个冒号），则最后一个部分可能是端口
-  if (isIPv6(ipWithPort) && parts.length > 3) {
-    // 检查最后一部分是否是纯数字（端口）
-    const potentialPort = parts[parts.length - 1];
-    let ip = parts.slice(0, -1).join(':');
-    // remove [ ] if exist in ip
-    const matched = /^\[?([0-9a-f:]+)]?$/gi.exec(ip);
-    if (matched) {
-      ip = matched[1];
-    }
 
-    if (/^\d+$/.test(potentialPort)) {
-      return {
-        ip: ip,
-        port: potentialPort,
-      };
-    }
-  } else if (!isIPv6(ipWithPort) && parts.length === 2) {
-    // 对于IPv4地址，格式为 ip:port
+  const parts = ipWithPort.split(':');
+
+  // Single part: pure IP address without port
+  if (parts.length === 1) {
+    return { ip: ipWithPort };
+  }
+
+  const potentialPort = parts[parts.length - 1];
+
+  // IPv4 with port: exactly 2 parts (ip:port)
+  if (parts.length === 2 && isIPv4(parts[0])) {
     return {
       ip: parts[0],
-      port: parts[1],
+      port: potentialPort,
     };
   }
-  // 如果没有端口，则返回原始IP
+
+  // IPv6 with port: more than 2 parts when split by ':'
+  if (parts.length > 3) {
+    const ip = parts.slice(0, -1).join(':');
+
+    if (isIPv6(ip)) {
+      // Extract IP, removing brackets if present
+      const matched = /^\[?([0-9a-fA-F:]+)]?$/.exec(ip);
+      const cleanIp = matched ? matched[1] : ip;
+
+      // Validate port is numeric
+      if (/^\d+$/.test(potentialPort)) {
+        return {
+          ip: cleanIp,
+          port: potentialPort,
+        };
+      }
+    }
+  }
+
+  // Unrecognized format: return original input
   return { ip: ipWithPort };
 };

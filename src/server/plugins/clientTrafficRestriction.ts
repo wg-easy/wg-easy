@@ -1,7 +1,8 @@
 import { exec } from '../utils/cmd';
 import { WG_ENV } from '../utils/config';
-import { isIPv6, parseIpAndPort } from '../utils/ip';
+import { parseIpAndPort } from '../utils/ip';
 import type { ClientType } from '#db/repositories/client/types';
+import { isIPv6 } from 'is-ip';
 
 declare module 'nitropack/types' {
   interface NitroRuntimeHooks {
@@ -10,39 +11,47 @@ declare module 'nitropack/types' {
   }
 }
 
-// 客户端流量限制插件
+/**
+ * Client Traffic Restriction Plugin
+ *
+ * This plugin manages iptables/ip6tables rules to restrict client traffic
+ * based on configured allowed IPs. It integrates with wireguard lifecycle hooks.
+ */
 export default defineNitroPlugin(async (nitroApp) => {
   console.log('Client Traffic Restriction Plugin loaded');
 
-  // 生成客户端特定的iptables规则
+  /**
+   * Generates iptables rules for a specific client based on their allowed IPs.
+   *
+   * @param client - The client configuration
+   * @returns Array of iptables command strings
+   */
   const generateClientIptablesRules = (
     client: Omit<ClientType, 'createdAt' | 'updatedAt'>
   ): string[] => {
     const rules: string[] = [];
 
-    // 从客户端IP地址中提取IP（去掉CIDR部分）
+    // Extract IP addresses from client configuration (remove CIDR prefix)
     const clientIp = client.ipv4Address.split('/')[0];
     const clientIpv6 = client.ipv6Address?.split('/')[0];
 
-    // 如果客户端有allowedIps配置，为每个允许的IP生成规则
+    // Generate rules for each allowed IP if configured
     if (client.allowedIps && client.allowedIps.length > 0) {
       client.allowedIps.forEach((allowedIpWithPort) => {
-        // 解析IP地址和端口
         const { ip: allowedIp, port } = parseIpAndPort(allowedIpWithPort);
 
-        // 根据IP版本选择合适的防火墙命令
         if (isIPv6(allowedIp)) {
-          // 仅为IPv6地址生成ip6tables规则
+          // IPv6: generate ip6tables rules
           if (!WG_ENV.DISABLE_IPV6 && clientIpv6) {
             if (port) {
-              // 对于TCP端口
+              // TCP port rules
               rules.push(
                 `ip6tables -A FORWARD -s ${clientIpv6} -d ${allowedIp} -p tcp --dport ${port} -j ACCEPT`
               );
               rules.push(
                 `ip6tables -A FORWARD -d ${clientIpv6} -s ${allowedIp} -p tcp --sport ${port} -j ACCEPT`
               );
-              // 对于UDP端口
+              // UDP port rules
               rules.push(
                 `ip6tables -A FORWARD -s ${clientIpv6} -d ${allowedIp} -p udp --dport ${port} -j ACCEPT`
               );
@@ -50,7 +59,7 @@ export default defineNitroPlugin(async (nitroApp) => {
                 `ip6tables -A FORWARD -d ${clientIpv6} -s ${allowedIp} -p udp --sport ${port} -j ACCEPT`
               );
             } else {
-              // 没有端口限制时的规则
+              // No port restriction - allow all traffic
               rules.push(
                 `ip6tables -A FORWARD -s ${clientIpv6} -d ${allowedIp} -j ACCEPT`
               );
@@ -60,16 +69,16 @@ export default defineNitroPlugin(async (nitroApp) => {
             }
           }
         } else {
-          // 为IPv4地址生成iptables规则
+          // IPv4: generate iptables rules
           if (port) {
-            // 对于TCP端口
+            // TCP port rules
             rules.push(
               `iptables -A FORWARD -s ${clientIp} -d ${allowedIp} -p tcp --dport ${port} -j ACCEPT`
             );
             rules.push(
               `iptables -A FORWARD -d ${clientIp} -s ${allowedIp} -p tcp --sport ${port} -j ACCEPT`
             );
-            // 对于UDP端口
+            // UDP port rules
             rules.push(
               `iptables -A FORWARD -s ${clientIp} -d ${allowedIp} -p udp --dport ${port} -j ACCEPT`
             );
@@ -77,7 +86,7 @@ export default defineNitroPlugin(async (nitroApp) => {
               `iptables -A FORWARD -d ${clientIp} -s ${allowedIp} -p udp --sport ${port} -j ACCEPT`
             );
           } else {
-            // 没有端口限制时的规则
+            // No port restriction - allow all traffic
             rules.push(
               `iptables -A FORWARD -s ${clientIp} -d ${allowedIp} -j ACCEPT`
             );
@@ -88,10 +97,9 @@ export default defineNitroPlugin(async (nitroApp) => {
         }
       });
     } else {
-      // 如果没有配置allowedIps，默认允许访问服务器
+      // Default: allow access to server only when no allowed IPs configured
       const serverIps = ['10.8.0.1/32'];
       serverIps.forEach((serverIp) => {
-        // 这些都是IPv4地址，只生成iptables规则
         rules.push(
           `iptables -A FORWARD -s ${clientIp} -d ${serverIp} -j ACCEPT`
         );
@@ -104,27 +112,30 @@ export default defineNitroPlugin(async (nitroApp) => {
     return rules;
   };
 
-  // 应用客户端iptables规则
+  /**
+   * Applies all client-specific iptables rules.
+   * Clears existing rules and sets up new ones based on current client configuration.
+   */
   const applyClientIptablesRules = async () => {
     try {
       console.log('Applying client-specific iptables rules...');
 
-      // 获取所有客户端
+      // Fetch all clients from database
       const clients = await Database.clients.getAll();
 
-      // 清空现有的FORWARD链规则
+      // Flush existing FORWARD chain rules
       await exec('iptables -F FORWARD');
       if (!WG_ENV.DISABLE_IPV6) {
         await exec('ip6tables -F FORWARD');
       }
 
-      // 设置FORWARD链默认策略为DROP（阻止所有流量）
+      // Set default FORWARD policy to DROP (block all traffic by default)
       await exec('iptables -P FORWARD DROP');
       if (!WG_ENV.DISABLE_IPV6) {
         await exec('ip6tables -P FORWARD DROP');
       }
 
-      // 为每个启用的客户端生成并应用规则
+      // Generate and apply rules for each enabled client
       const includedClients: string[] = [];
       for (const client of clients) {
         if (!client.enabled) {
@@ -148,6 +159,12 @@ export default defineNitroPlugin(async (nitroApp) => {
     }
   };
 
+  /**
+   * Removes FORWARD chain rules from hook commands.
+   *
+   * @param rule - The hook rule string
+   * @returns Filtered rule string without FORWARD rules
+   */
   const remove_forward_rule = async (rule: string) => {
     try {
       const filteredRules = rule.split(';').filter((line) => {
@@ -160,19 +177,22 @@ export default defineNitroPlugin(async (nitroApp) => {
     return rule;
   };
 
-  // 初始化：移除hooks中的默认FORWARD允许规则
+  /**
+   * Initializes traffic restriction by removing default FORWARD allow rules
+   * from hook commands.
+   */
   const initializeTrafficRestriction = async () => {
     try {
       const hooks = await Database.hooks.get();
 
-      // 移除hooks中的默认FORWARD允许规则
+      // Remove default FORWARD allow rules from hooks
       const updatedHooks = {
         ...hooks,
         postUp: await remove_forward_rule(hooks.postUp),
         postDown: await remove_forward_rule(hooks.postDown),
       };
 
-      // 更新hooks到数据库
+      // Update hooks in database
       await Database.hooks.update(updatedHooks);
       console.log('Removed default FORWARD rules from hooks');
     } catch (error) {
@@ -180,9 +200,8 @@ export default defineNitroPlugin(async (nitroApp) => {
     }
   };
 
-  // 注册事件监听器，监听客户端配置保存后的事件
+  // Register event listeners for wireguard lifecycle hooks
   nitroApp.hooks.hook('wireguard:config', applyClientIptablesRules);
-  // 注册启动事件
   nitroApp.hooks.hook('wireguard:start', async () => {
     await initializeTrafficRestriction();
     await applyClientIptablesRules();
