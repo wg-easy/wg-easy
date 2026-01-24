@@ -71,7 +71,7 @@ export const ClientUpdateSchema = schemaForType<UpdateClientType>()(
     postDown: HookSchema,
     allowedIps: AllowedIpsSchema.nullable(),
     serverAllowedIps: serverAllowedIps,
-    firewallIps: AllowedIpsSchema.nullable(),
+    firewallIps: FirewallIpsSchema.nullable(),
     mtu: MtuSchema,
     jC: JcSchema,
     jMin: JminSchema,

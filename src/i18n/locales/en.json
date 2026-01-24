@@ -201,7 +201,8 @@
       "address4": "IPv4 Address",
       "address6": "IPv6 Address",
       "serverAllowedIps": "Server Allowed IPs",
-      "firewallIps": "Firewall Allowed IPs"
+      "firewallIps": "Firewall Allowed IPs",
+      "firewallIpsInvalid": "Invalid firewall IP entry. Must be: IP (10.0.0.1), CIDR (10.0.0.0/24), IP:port (10.0.0.1:443), or IP:port/protocol (10.0.0.1:443/tcp)"
     },
     "user": {
       "username": "Username",
