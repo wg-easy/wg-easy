@@ -31,6 +31,10 @@ export const wgInterface = sqliteTable('interfaces_table', {
   h4: int().default(0),
   // does nothing yet
   enabled: int({ mode: 'boolean' }).notNull(),
+  // Enable per-client firewall filtering via iptables
+  firewallEnabled: int('firewall_enabled', { mode: 'boolean' })
+    .notNull()
+    .default(false),
   createdAt: text('created_at')
     .notNull()
     .default(sql`(CURRENT_TIMESTAMP)`),

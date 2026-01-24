@@ -125,6 +125,15 @@
         />
       </FormGroup>
       <FormGroup>
+        <FormHeading>{{ $t('admin.interface.firewall') }}</FormHeading>
+        <FormSwitchField
+          id="firewallEnabled"
+          v-model="data.firewallEnabled"
+          :label="$t('admin.interface.firewallEnabled')"
+          :description="$t('admin.interface.firewallEnabledDesc')"
+        />
+      </FormGroup>
+      <FormGroup>
         <FormHeading>{{ $t('form.actions') }}</FormHeading>
         <FormPrimaryActionField type="submit" :label="$t('form.save')" />
         <FormSecondaryActionField :label="$t('form.revert')" @click="revert" />
@@ -171,7 +180,15 @@ const _submit = useSubmit(
   {
     method: 'post',
   },
-  { revert }
+  {
+    revert: async (success) => {
+      await revert();
+      if (success) {
+        // Refresh global store information after successful save
+        await refreshNuxtData('/api/information');
+      }
+    },
+  }
 );
 
 function submit() {

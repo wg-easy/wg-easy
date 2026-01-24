@@ -120,7 +120,9 @@
     "endpointDesc": "IP of the client from which the WireGuard connection is established",
     "search": "Search clients...",
     "config": "Configuration",
-    "viewConfig": "View Configuration"
+    "viewConfig": "View Configuration",
+    "firewallIps": "Firewall Allowed IPs",
+    "firewallIpsDesc": "Destination IPs/CIDRs this client can access (server-side enforcement). Leave empty to use Allowed IPs. Supports port filtering: 10.0.0.1:443 or 10.0.0.1:443/tcp"
   },
   "dialog": {
     "change": "Change",
@@ -175,7 +177,10 @@
       "restart": "Restart Interface",
       "restartDesc": "Restart the WireGuard interface",
       "restartWarn": "Are you sure to restart the interface? This will disconnect all clients.",
-      "restartSuccess": "Interface restarted"
+      "restartSuccess": "Interface restarted",
+      "firewall": "Traffic Filtering",
+      "firewallEnabled": "Enable Per-Client Firewall",
+      "firewallEnabledDesc": "Restrict client traffic to specific destination IPs using iptables. When enabled, each client can be configured with allowed destinations."
     },
     "introText": "Welcome to the admin panel.\n\nHere you can manage the general settings, the configuration, the interface settings and the hooks.\n\nStart by choosing one of the sections in the sidebar."
   },
@@ -195,7 +200,8 @@
       "expiresAt": "Expires At",
       "address4": "IPv4 Address",
       "address6": "IPv6 Address",
-      "serverAllowedIps": "Server Allowed IPs"
+      "serverAllowedIps": "Server Allowed IPs",
+      "firewallIps": "Firewall Allowed IPs"
     },
     "user": {
       "username": "Username",

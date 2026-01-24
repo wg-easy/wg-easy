@@ -61,6 +61,12 @@
               name="serverAllowedIps"
             />
           </FormGroup>
+          <FormGroup v-if="globalStore.information?.firewallEnabled">
+            <FormHeading :description="$t('client.firewallIpsDesc')">
+              {{ $t('client.firewallIps') }}
+            </FormHeading>
+            <FormNullArrayField v-model="data.firewallIps" name="firewallIps" />
+          </FormGroup>
           <FormGroup>
             <FormHeading :description="$t('client.dnsDesc')">
               {{ $t('general.dns') }}

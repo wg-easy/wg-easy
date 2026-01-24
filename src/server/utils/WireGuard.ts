@@ -2,6 +2,7 @@ import fs from 'node:fs/promises';
 import debug from 'debug';
 import { encodeQR } from 'qr';
 import type { InterfaceType } from '#db/repositories/interface/types';
+import { firewall } from './firewall';
 
 const WG_DEBUG = debug('WireGuard');
 
@@ -16,6 +17,21 @@ class WireGuard {
     const wgInterface = await Database.interfaces.get();
     await this.#saveWireguardConfig(wgInterface);
     await this.#syncWireguardConfig(wgInterface);
+    await this.#applyFirewallRules(wgInterface);
+  }
+
+  /**
+   * Apply firewall rules based on current config
+   */
+  async #applyFirewallRules(wgInterface: InterfaceType) {
+    const clients = await Database.clients.getAll();
+    const userConfig = await Database.userConfigs.get();
+    await firewall.rebuildRules(
+      wgInterface,
+      clients,
+      userConfig,
+      !WG_ENV.DISABLE_IPV6
+    );
   }
 
   /**
@@ -249,6 +265,10 @@ class WireGuard {
     });
     await this.#syncWireguardConfig(wgInterface);
     WG_DEBUG(`Wireguard Interface ${wgInterface.name} started successfully.`);
+
+    WG_DEBUG('Applying firewall rules...');
+    await this.#applyFirewallRules(wgInterface);
+    WG_DEBUG('Firewall rules applied successfully.');
 
     WG_DEBUG('Starting Cron Job...');
     await this.startCronJob();

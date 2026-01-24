@@ -34,6 +34,8 @@ export const client = sqliteTable('clients_table', {
   serverAllowedIps: text('server_allowed_ips', { mode: 'json' })
     .$type<string[]>()
     .notNull(),
+  // Firewall-enforced allowed IPs (null = use allowedIps)
+  firewallIps: text('firewall_ips', { mode: 'json' }).$type<string[] | null>(),
   persistentKeepalive: int('persistent_keepalive').notNull(),
   mtu: int().notNull(),
   jC: int('j_c'),
