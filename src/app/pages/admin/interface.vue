@@ -185,7 +185,7 @@ const _submit = useSubmit(
       await revert();
       if (success) {
         // Refresh global store information after successful save
-        await refreshNuxtData('/api/information');
+        await globalStore.refreshInformation();
       }
     },
   }
