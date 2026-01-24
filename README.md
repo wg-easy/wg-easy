@@ -33,6 +33,7 @@ You have found the easiest way to install & manage WireGuard on any Linux host!
 - IPv6 support
 - CIDR support
 - 2FA support
+- Per-client firewall filtering
 
 > [!NOTE]
 > To better manage documentation for this project, it has its own site here: [https://wg-easy.github.io/wg-easy/latest](https://wg-easy.github.io/wg-easy/latest)
