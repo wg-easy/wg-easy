@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "68c43b7a-772d-4c34-8278-e9fce5b53df1",
+  "id": "ceca9c04-d49e-45a2-a700-9a59816ab73b",
   "prevId": "e09bc17a-dab6-45a3-a09c-57af222b08fb",
   "tables": {
     "clients_table": {
@@ -229,6 +229,13 @@
           "notNull": true,
           "autoincrement": false,
           "default": "(CURRENT_TIMESTAMP)"
+        },
+        "firewall_ips": {
+          "name": "firewall_ips",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         }
       },
       "indexes": {
@@ -543,34 +550,6 @@
           "notNull": false,
           "autoincrement": false
         },
-        "h1": {
-          "name": "h1",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "h2": {
-          "name": "h2",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "h3": {
-          "name": "h3",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "h4": {
-          "name": "h4",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
         "i1": {
           "name": "i1",
           "type": "text",
@@ -606,6 +585,38 @@
           "notNull": false,
           "autoincrement": false
         },
+        "h1": {
+          "name": "h1",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": 0
+        },
+        "h2": {
+          "name": "h2",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": 0
+        },
+        "h3": {
+          "name": "h3",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": 0
+        },
+        "h4": {
+          "name": "h4",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": 0
+        },
         "enabled": {
           "name": "enabled",
           "type": "integer",
@@ -628,6 +639,14 @@
           "notNull": true,
           "autoincrement": false,
           "default": "(CURRENT_TIMESTAMP)"
+        },
+        "firewall_enabled": {
+          "name": "firewall_enabled",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
         }
       },
       "indexes": {
