@@ -116,7 +116,10 @@
     "dnsDesc": "Server DNS che i client useranno (sovrascrive la config globale)",
     "notConnected": "Client non connesso",
     "endpoint": "Endpoint",
-    "endpointDesc": "IP del client da cui viene stabilita la connessione WireGuard"
+    "endpointDesc": "IP del client da cui viene stabilita la connessione WireGuard",
+    "amneziaVpn": "AmneziaVPN",
+    "showAmneziaVpnQR": "Mostra codice QR in formato AmneziaVPN",
+    "showWireGuardQR": "Mostra codice QR in formato WireGuard"
   },
   "dialog": {
     "change": "Modifica",

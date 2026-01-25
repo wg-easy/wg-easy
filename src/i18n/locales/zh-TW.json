@@ -120,7 +120,10 @@
     "endpointDesc": "用戶端建立 WireGuard 連線的來源 IP",
     "search": "搜尋用戶端...",
     "config": "組態設定",
-    "viewConfig": "檢視組態設定"
+    "viewConfig": "檢視組態設定",
+    "amneziaVpn": "AmneziaVPN",
+    "showAmneziaVpnQR": "以 AmneziaVPN 格式顯示 QR 碼",
+    "showWireGuardQR": "以 WireGuard 格式顯示 QR 碼"
   },
   "dialog": {
     "change": "變更",

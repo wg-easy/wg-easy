@@ -1,3 +1,4 @@
+import { deflateSync as zlibDeflateSync } from 'node:zlib';
 import { parseCidr } from 'cidr-tools';
 import { stringifyIp } from 'ip-bigint';
 import type { ClientType } from '#db/repositories/client/types';
@@ -162,6 +163,112 @@ PresharedKey = ${client.preSharedKey}
 AllowedIPs = ${(client.allowedIps ?? userConfig.defaultAllowedIps).join(', ')}
 PersistentKeepalive = ${client.persistentKeepalive}
 Endpoint = ${userConfig.host}:${userConfig.port}`;
+  },
+
+  generateAmneziaVPNClientConfig: (
+    wgInterface: InterfaceType,
+    userConfig: UserConfigType,
+    client: ClientType,
+    configText: string,
+    options: Options = {}
+  ) => {
+    const { enableIpv6 = true } = options;
+
+    const address =
+      `${client.ipv4Address}/32` +
+      (enableIpv6 ? `, ${client.ipv6Address}/128` : '');
+
+    // ip6 DNS servers are not supported by AmneziaVPN app
+    const [dns1 = '', dns2 = ''] = (client.dns ?? userConfig.defaultDns ?? []).filter(
+      (value) => /^\d{1,3}(?:\.\d{1,3}){3}$/.test(value)
+    );
+
+    let awgExtras: Record<string, string> = {};
+    let containerType = 'wireguard';
+
+    if (wgExecutable === 'awg') {
+      containerType = 'awg';
+      // S3, S4, i1, i2, i3, i4, i5 are not supported by AmneziaVPN app for now
+      const awgParams = {
+        Jc: client.jC,
+        Jmin: client.jMin,
+        Jmax: client.jMax,
+        S1: wgInterface.s1,
+        S2: wgInterface.s2,
+        // S3: wgInterface.s3,
+        // S4: wgInterface.s4,
+        // i1: client.i1,
+        // i2: client.i2,
+        // i3: client.i3,
+        // i4: client.i4,
+        // i5: client.i5,
+        H1: wgInterface.h1,
+        H2: wgInterface.h2,
+        H3: wgInterface.h3,
+        H4: wgInterface.h4,
+      } as const;
+
+      awgExtras = Object.fromEntries(
+        Object.entries(awgParams)
+          .filter(
+            ([_, value]) => value !== null && value !== undefined && value !== ''
+          )
+          .map(([key, value]) => [key, `${value}`])
+      );
+    }
+
+    const lastConfigObj = {
+      ...awgExtras,
+      allowed_ips: client.allowedIps ?? userConfig.defaultAllowedIps ?? [],
+      client_ip: address,
+      client_priv_key: client.privateKey,
+      config: configText,
+      hostName: userConfig.host,
+      mtu: `${client.mtu}`,
+      persistent_keep_alive: `${client.persistentKeepalive}`,
+      port: +userConfig.port,
+      psk_key: client.preSharedKey,
+      server_pub_key: wgInterface.publicKey,
+    };
+
+    return {
+      containers: [
+        {
+          [containerType]: {
+            isThirdPartyConfig: true,
+            last_config: JSON.stringify(lastConfigObj),
+            port: `${userConfig.port}`,
+            transport_proto: 'udp',
+          },
+          container: `amnezia-${containerType}`,
+        },
+      ],
+      defaultContainer: `amnezia-${containerType}`,
+      description: client.name,
+      dns1: dns1,
+      dns2: dns2,
+      hostName: `${userConfig.host}`,
+    };
+  },
+
+  buildAmneziaQrPack: (amneziaConfigJSON: string) => {
+    // Observed working QR wrapper:
+    // [0..3]  magic/version (0x07C00100)
+    // [4..7]  zlib_len + 4
+    // [8..11] uncompressed_len
+    // [12..]  zlib(deflate) bytes (starts with 78 DA typically)
+    const plain = Buffer.from(amneziaConfigJSON, 'utf8');
+    const z = zlibDeflateSync(plain);
+
+    const MAGIC = 0x07c00100;
+    const header = Buffer.allocUnsafe(12);
+    header.writeUInt32BE(MAGIC, 0);
+    header.writeUInt32BE(z.length + 4, 4);
+    header.writeUInt32BE(plain.length, 8);
+
+    const packed = Buffer.concat([header, z]);
+
+    return packed.toString('base64url');
   },
 
   generatePrivateKey: () => {

@@ -116,7 +116,10 @@
     "dnsDesc": "DNS সার্ভার ক্লায়েন্টরা ব্যবহার করবে (গ্লোবাল কনফিগ ওভাররাইড করবে)",
     "notConnected": "ক্লায়েন্ট সংযুক্ত নয়",
     "endpoint": "এন্ডপয়েন্ট",
-    "endpointDesc": "ক্লায়েন্টের IP যেখান থেকে WireGuard সংযোগ স্থাপন করা হয়েছে"
+    "endpointDesc": "ক্লায়েন্টের IP যেখান থেকে WireGuard সংযোগ স্থাপন করা হয়েছে",
+    "amneziaVpn": "AmneziaVPN",
+    "showAmneziaVpnQR": "AmneziaVPN ফরম্যাটে QR কোড দেখান",
+    "showWireGuardQR": "WireGuard ফরম্যাটে QR কোড দেখান"
   },
   "dialog": {
     "change": "পরিবর্তন করুন",
