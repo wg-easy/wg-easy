@@ -149,7 +149,7 @@ class WireGuard {
     return clients;
   }
 
-  async getClientConfiguration({ clientId }: { clientId: ID }) {
+  async getClientConfiguration({ clientId, type }: { clientId: ID, type?: 'amnezia-vpn' }) {
     const wgInterface = await Database.interfaces.get();
     const userConfig = await Database.userConfigs.get();
 
@@ -159,13 +159,22 @@ class WireGuard {
       throw new Error('Client not found');
     }
 
-    return wg.generateClientConfig(wgInterface, userConfig, client, {
+    const configText = wg.generateClientConfig(wgInterface, userConfig, client, {
       enableIpv6: !WG_ENV.DISABLE_IPV6,
     });
+
+    if (type === 'amnezia-vpn') {
+      const amneziaVPNClientConfig = wg.generateAmneziaVPNClientConfig(wgInterface, userConfig, client, configText, {
+        enableIpv6: !WG_ENV.DISABLE_IPV6,
+      });
+      return wg.buildAmneziaQrPack(JSON.stringify(amneziaVPNClientConfig));
+    }
+
+    return configText;
   }
 
-  async getClientQRCodeSVG({ clientId }: { clientId: ID }) {
-    const config = await this.getClientConfiguration({ clientId });
+  async getClientQRCodeSVG({ clientId, type }: { clientId: ID, type?: 'amnezia-vpn' }) {
+    const config = await this.getClientConfiguration({ clientId, type });
     const ECMode = ['high', 'quartile', 'medium', 'low'] as const;
     for (const ecc of ECMode) {
       try {

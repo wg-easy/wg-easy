@@ -116,7 +116,10 @@
     "dnsDesc": "클라이언트가 사용할 DNS 서버(전역 구성 무시)",
     "notConnected": "클라이언트가 연결되지 않음",
     "endpoint": "엔드포인트",
-    "endpointDesc": "WireGuard에 연결된 클라이언트의 IP 주소"
+    "endpointDesc": "WireGuard에 연결된 클라이언트의 IP 주소",
+    "amneziaVpn": "AmneziaVPN",
+    "showAmneziaVpnQR": "AmneziaVPN 형식의 QR 코드 표시",
+    "showWireGuardQR": "WireGuard 형식의 QR 코드 표시"
   },
   "dialog": {
     "change": "변경",

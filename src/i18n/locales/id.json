@@ -116,7 +116,10 @@
     "dnsDesc": "Server DNS yang akan digunakan klien (menggantikan konfigurasi global)",
     "notConnected": "Klien tidak terhubung",
     "endpoint": "Titik Akhir (Endpoint)",
-    "endpointDesc": "IP klien dari mana koneksi WireGuard dibuat"
+    "endpointDesc": "IP klien dari mana koneksi WireGuard dibuat",
+    "amneziaVpn": "AmneziaVPN",
+    "showAmneziaVpnQR": "Tampilkan Kode QR dalam format AmneziaVPN",
+    "showWireGuardQR": "Tampilkan Kode QR dalam format WireGuard"
   },
   "dialog": {
     "change": "Ubah",

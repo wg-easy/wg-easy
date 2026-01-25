@@ -1,4 +1,4 @@
-import { ClientGetSchema } from '#db/repositories/client/types';
+import { ClientGetSchema, ClientQrSchema } from '#db/repositories/client/types';
 
 export default definePermissionEventHandler(
   'clients',
@@ -8,11 +8,15 @@ export default definePermissionEventHandler(
       event,
       validateZod(ClientGetSchema, event)
     );
+    const { type } = await getValidatedQuery(
+      event,
+      validateZod(ClientQrSchema, event)
+    );
 
     const client = await Database.clients.get(clientId);
     checkPermissions(client);
 
-    const svg = await WireGuard.getClientQRCodeSVG({ clientId });
+    const svg = await WireGuard.getClientQRCodeSVG({ clientId, type });
     setHeader(event, 'Content-Type', 'image/svg+xml');
     return svg;
   }
