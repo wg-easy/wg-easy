@@ -2,6 +2,7 @@ import fs from 'node:fs/promises';
 import debug from 'debug';
 import { encodeQR } from 'qr';
 import type { InterfaceType } from '#db/repositories/interface/types';
+import { checkIfbAvailable } from './bandwidth';
 
 const WG_DEBUG = debug('WireGuard');
 
@@ -9,6 +10,15 @@ const generateRandomHeaderValue = () =>
   Math.floor(Math.random() * 2147483642) + 5;
 
 class WireGuard {
+  #ifbAvailable: boolean = true;
+
+  /**
+   * Get IFB availability status for upload limiting
+   */
+  getIfbAvailable(): boolean {
+    return this.#ifbAvailable;
+  }
+
   /**
    * Save and sync config
    */
@@ -26,11 +36,18 @@ class WireGuard {
   async #saveWireguardConfig(wgInterface: InterfaceType) {
     const clients = await Database.clients.getAll();
     const hooks = await Database.hooks.get();
+    const bandwidthConfig = await Database.general.getBandwidthConfig();
 
     const result = [];
     result.push(
       wg.generateServerInterface(wgInterface, hooks, {
         enableIpv6: !WG_ENV.DISABLE_IPV6,
+        bandwidth: {
+          enabled: bandwidthConfig.bandwidthEnabled,
+          downloadMbps: bandwidthConfig.downloadLimitMbps,
+          uploadMbps: bandwidthConfig.uploadLimitMbps,
+        },
+        ifbAvailable: this.#ifbAvailable,
       })
     );
 
@@ -198,6 +215,12 @@ class WireGuard {
     WG_DEBUG('Starting WireGuard...');
     // let as it has to refetch if keys change
     let wgInterface = await Database.interfaces.get();
+
+    // Check IFB availability for upload limiting
+    this.#ifbAvailable = await checkIfbAvailable();
+    if (!this.#ifbAvailable) {
+      WG_DEBUG('IFB module not available - upload limiting disabled');
+    }
 
     // default interface has no keys
     if (

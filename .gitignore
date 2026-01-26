@@ -1,3 +1,7 @@
 .DS_Store
 *.swp
 node_modules
+# Claude Code local settings
+.claude/
+test_output.txt
+repomix-output.xml

@@ -13,6 +13,12 @@ export const general = sqliteTable('general_table', {
   metricsJson: int('metrics_json', { mode: 'boolean' }).notNull(),
   metricsPassword: text('metrics_password'),
 
+  bandwidthEnabled: int('bandwidth_enabled', { mode: 'boolean' })
+    .notNull()
+    .default(false),
+  downloadLimitMbps: int('download_limit_mbps').notNull().default(0),
+  uploadLimitMbps: int('upload_limit_mbps').notNull().default(0),
+
   createdAt: text('created_at')
     .notNull()
     .default(sql`(CURRENT_TIMESTAMP)`),

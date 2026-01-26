@@ -36,6 +36,18 @@ function createPreparedStatement(db: DBType) {
           metricsPrometheus: true,
           metricsJson: true,
           metricsPassword: true,
+          bandwidthEnabled: true,
+          downloadLimitMbps: true,
+          uploadLimitMbps: true,
+        },
+      })
+      .prepare(),
+    getBandwidthConfig: db.query.general
+      .findFirst({
+        columns: {
+          bandwidthEnabled: true,
+          downloadLimitMbps: true,
+          uploadLimitMbps: true,
         },
       })
       .prepare(),
@@ -121,6 +133,16 @@ export class GeneralService {
 
   async getConfig() {
     const result = await this.#statements.getConfig.execute();
+
+    if (!result) {
+      throw new Error('General Config not found');
+    }
+
+    return result;
+  }
+
+  async getBandwidthConfig() {
+    const result = await this.#statements.getBandwidthConfig.execute();
 
     if (!result) {
       throw new Error('General Config not found');
