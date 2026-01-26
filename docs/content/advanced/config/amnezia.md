@@ -65,7 +65,7 @@ iOS and macOS:
 
 Windows:
 
-- [AmneziaWG](https://github.com/amnezia-vpn/amneziawg-windows-client/releases) - AmneziaWG Official Client(Requires building from source code)
+- [AmneziaWG](https://github.com/amnezia-vpn/amneziawg-windows-client/releases) - AmneziaWG Official Client (Requires building from source code)
 - [Amnezia VPN](https://amnezia.org/downloads) - Amnezia VPN Official Client
 
 Linux:
