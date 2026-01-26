@@ -50,7 +50,7 @@ If a parameter is not set, it will not be added to the configuration. If all Amn
 
 ## Client Applications
 
-To be able to connect to wg-easy if AmneziaWG is enabled, you must have an AmneziaWG-compatible client. It is recommended to use the AmneziaWG app rather than AmneziaVPN.
+To be able to connect to wg-easy if AmneziaWG is enabled, you must have an AmneziaWG-compatible client. Where an AmneziaWG app is available for your platform, it is recommended to use it rather than Amnezia VPN.
 
 Android:
 
