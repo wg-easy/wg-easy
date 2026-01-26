@@ -50,23 +50,23 @@ If a parameter is not set, it will not be added to the configuration. If all Amn
 
 ## Client Applications
 
-To be able to connect to wg-easy if AmneziaWG is enabled, you must have an AmneziaWG-compatible client. Currently, only WG Tunnel and Amnezia VPN supports AmneziaWG 1.5/2.0! AmneziaWG clients require building from source code.
+To be able to connect to wg-easy if AmneziaWG is enabled, you must have an AmneziaWG-compatible client. Where an AmneziaWG app is available for your platform, it is recommended to use it rather than Amnezia VPN.
 
 Android:
 
-- [Amnezia VPN](https://play.google.com/store/apps/details?id=org.amnezia.vpn) - Amnezia VPN Official Client
 - [AmneziaWG](https://play.google.com/store/apps/details?id=org.amnezia.awg) - AmneziaWG Official Client
 - [WG Tunnel](https://play.google.com/store/apps/details?id=com.zaneschepke.wireguardautotunnel) - Third Party Client
+- [Amnezia VPN](https://play.google.com/store/apps/details?id=org.amnezia.vpn) - Amnezia VPN Official Client
 
 iOS and macOS:
 
-- [Amnezia VPN](https://apps.apple.com/us/app/amneziavpn/id1600529900) - Amnezia VPN Official Client
 - [AmneziaWG](https://apps.apple.com/us/app/amneziawg/id6478942365) - AmneziaWG Official Client
+- [Amnezia VPN](https://apps.apple.com/us/app/amneziavpn/id1600529900) - Amnezia VPN Official Client
 
 Windows:
 
+- [AmneziaWG](https://github.com/amnezia-vpn/amneziawg-windows-client/releases) - AmneziaWG Official Client (Requires building from source code)
 - [Amnezia VPN](https://amnezia.org/downloads) - Amnezia VPN Official Client
-- [AmneziaWG](https://github.com/amnezia-vpn/amneziawg-windows-client/releases) - AmneziaWG Official Client
 
 Linux:
 
