@@ -15,6 +15,11 @@
           v-if="clientsStore.clients && clientsStore.clients.length > 0"
         />
       </div>
+      <div>
+        <ClientsPagination
+          v-if="clientsStore.totalPages > 1"
+         />
+      </div>
       <ClientsEmpty
         v-if="clientsStore.clients && clientsStore.clients.length === 0"
       />

@@ -1,7 +1,7 @@
 <template>
   <BasePrimaryButton @click="toggleSort">
     <IconsArrowDown
-      v-if="globalStore.sortClient === true"
+      v-if="clientsStore.sortClient === true"
       class="w-4 md:mr-2"
     />
     <IconsArrowUp v-else class="w-4 md:mr-2" />
@@ -10,11 +10,9 @@
 </template>
 
 <script setup lang="ts">
-const globalStore = useGlobalStore();
 const clientsStore = useClientsStore();
 
 function toggleSort() {
-  globalStore.sortClient = !globalStore.sortClient;
-  clientsStore.refresh().catch(console.error);
+  clientsStore.setSortClientQuery(!clientsStore.sortClient)
 }
 </script>
