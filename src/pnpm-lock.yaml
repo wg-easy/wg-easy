@@ -66,8 +66,8 @@ importers:
         specifier: ^8.2.2
         version: 8.2.2
       is-cidr:
-        specifier: ^6.0.1
-        version: 6.0.1
+        specifier: ^6.0.2
+        version: 6.0.2
       is-ip:
         specifier: ^5.0.1
         version: 5.0.1
@@ -3697,8 +3697,8 @@ packages:
     resolution: {integrity: sha512-f4RqJKBUe5rQkJ2eJEJBXSticB3hGbN9j0yxxMQFqIW89Jp9WYFtzfTcRlstDKVUTRzSOTLKRfO9vIztenwtxA==}
     engines: {node: '>=18.20'}
 
-  is-cidr@6.0.1:
-    resolution: {integrity: sha512-JIJlvXodfsoWFAvvjB7Elqu8qQcys2SZjkIJCLdk4XherUqZ6+zH7WIpXkp4B3ZxMH0Fz7zIsZwyvs6JfM0csw==}
+  is-cidr@6.0.2:
+    resolution: {integrity: sha512-a4SY0KixgRXn67zSCooPNO4YRHZd1z6BIxrEBQUVNPteeajzrJLhZKnn81GVQO51uiCljTtGY+J3o6O3/DZpzg==}
     engines: {node: '>=20'}
 
   is-core-module@2.16.1:
@@ -9256,7 +9256,7 @@ snapshots:
     dependencies:
       builtin-modules: 5.0.0
 
-  is-cidr@6.0.1:
+  is-cidr@6.0.2:
     dependencies:
       cidr-regex: 5.0.1
 
