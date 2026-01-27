@@ -13,6 +13,9 @@ const CHAIN_NAME = 'WG_CLIENTS';
 let rebuildInProgress = false;
 let rebuildQueued = false;
 
+// Cache iptables availability check result
+let iptablesAvailable: boolean | null = null;
+
 type ParsedEntry = {
   ip: string;
   port?: number;
@@ -248,5 +251,44 @@ export const firewall = {
     await exec(`ip6tables -F ${CHAIN_NAME} 2>/dev/null || true`);
     await exec(`iptables -X ${CHAIN_NAME} 2>/dev/null || true`);
     await exec(`ip6tables -X ${CHAIN_NAME} 2>/dev/null || true`);
+  },
+
+  /**
+   * Check if iptables (and optionally ip6tables) are available on the system.
+   * @param enableIpv6 - If true, also check for ip6tables. Defaults to true.
+   */
+  async isAvailable(enableIpv6: boolean = true): Promise<boolean> {
+    // Return cached result if we've already checked
+    if (iptablesAvailable !== null) {
+      return iptablesAvailable;
+    }
+
+    try {
+      // Check for iptables (always required)
+      await exec('iptables --version');
+      FW_DEBUG('iptables is available');
+
+      // Check for ip6tables (only if IPv6 is enabled)
+      if (enableIpv6) {
+        await exec('ip6tables --version');
+        FW_DEBUG('ip6tables is available');
+      } else {
+        FW_DEBUG('IPv6 disabled, skipping ip6tables check');
+      }
+
+      iptablesAvailable = true;
+      return true;
+    } catch (error) {
+      iptablesAvailable = false;
+      FW_DEBUG('iptables/ip6tables is not available:', error);
+      return false;
+    }
+  },
+
+  /**
+   * Clear the availability cache to force a re-check
+   */
+  clearAvailabilityCache(): void {
+    iptablesAvailable = null;
   },
 };
