@@ -15,11 +15,6 @@
           v-if="clientsStore.clients && clientsStore.clients.length > 0"
         />
       </div>
-      <div>
-        <ClientsPagination
-          v-if="clientsStore.totalPages > 1"
-         />
-      </div>
       <ClientsEmpty
         v-if="clientsStore.clients && clientsStore.clients.length === 0"
       />
@@ -28,6 +23,11 @@
         class="p-5 text-gray-200 dark:text-red-300"
       >
         <IconsLoading class="mx-auto w-5 animate-spin" />
+      </div>
+      <div>
+        <ClientsPagination
+          v-if="clientsStore.total > clientsStore.limit"
+         />
       </div>
     </Panel>
   </main>

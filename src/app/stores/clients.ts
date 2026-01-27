@@ -33,7 +33,7 @@ export const useClientsStore = defineStore('Clients', () => {
   const sortClient = ref<boolean>(true)
   const page = ref<number>(1);
   const limit = ref<number>(10);
-  const totalPages = ref<number>(1);
+  const total = ref<number>(0);
 
   const searchParams = ref({
     filter: undefined as string | undefined,
@@ -133,14 +133,13 @@ export const useClientsStore = defineStore('Clients', () => {
     });
 
     clients.value = transformedClients ?? null;
-    if (_clients.value){
-      let total = (_clients.value?.total ?? _clients.value?.clients?.length) ?? 0;
-      totalPages.value = total <= limit.value ? 1 : Math.ceil(total / limit.value);
-    }
+    total.value = (_clients.value?.total ?? _clients.value?.clients?.length) ?? 0;
   }
 
   function setSearchQuery(filter: string) {
     clients.value = null;
+    total.value = 0;
+    setPageQuery(1);
     searchParams.value.filter = filter || undefined;
   }
 
@@ -156,5 +155,5 @@ export const useClientsStore = defineStore('Clients', () => {
     searchParams.value.sortClient = value;
   }
 
-  return { clients, clientsPersist, sortClient, page, totalPages, refresh, _clients, setSearchQuery, setPageQuery, setSortClientQuery };
+  return { clients, clientsPersist, sortClient, page, total, limit, refresh, _clients, setSearchQuery, setPageQuery, setSortClientQuery };
 });
