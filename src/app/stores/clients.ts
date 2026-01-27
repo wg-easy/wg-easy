@@ -66,10 +66,11 @@ export const useClientsStore = defineStore('Clients', () => {
       const clientPersist = clientsPersist.value[client.id]!;
 
       // Debug
-      // client.transferRx = this.clientsPersist[client.id].transferRxPrevious + Math.random() * 1000;
-      // client.transferTx = this.clientsPersist[client.id].transferTxPrevious + Math.random() * 1000;
-      // client.latestHandshakeAt = new Date();
-      // this.requiresPassword = true;
+      /* client.transferRx =
+        clientPersist.transferRxPrevious + Math.random() * 1000;
+      client.transferTx =
+        clientPersist.transferTxPrevious + Math.random() * 1000;
+      client.latestHandshakeAt = new Date().toISOString(); */
 
       clientPersist.transferRxCurrent =
         (client.transferRx ?? 0) - clientPersist.transferRxPrevious;
