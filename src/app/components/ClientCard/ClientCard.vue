@@ -1,7 +1,7 @@
 <template>
   <ClientCardCharts :client="client" />
   <div
-    class="relative z-10 flex flex-col justify-between gap-3 px-3 py-3 sm:flex-row md:py-5"
+    class="relative flex flex-col justify-between gap-3 px-3 py-3 sm:flex-row md:py-5"
   >
     <div class="flex w-full items-center gap-3 md:gap-4">
       <ClientCardAvatar :client="client" />
