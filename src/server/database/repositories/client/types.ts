@@ -104,7 +104,7 @@ export type ClientCreateFromExistingType = Pick<
   | 'enabled'
 >;
 
-const qrType = z.enum(['amnezia-vpn', 'wireguard']).catch('wireguard');
+const qrType = z.enum(['amnezia-vpn', 'wireguard']).optional().default('wireguard');
 
 export const ClientQrSchema = z.object({
   type: qrType,
