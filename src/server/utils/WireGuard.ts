@@ -2,6 +2,7 @@ import fs from 'node:fs/promises';
 import debug from 'debug';
 import { encodeQR } from 'qr';
 import type { InterfaceType } from '#db/repositories/interface/types';
+import type { QrType } from '#db/repositories/client/types';
 
 const WG_DEBUG = debug('WireGuard');
 
@@ -149,7 +150,7 @@ class WireGuard {
     return clients;
   }
 
-  async getClientConfiguration({ clientId, type }: { clientId: ID, type?: 'amnezia-vpn' }) {
+  async getClientConfiguration({ clientId, type }: { clientId: ID, type?: QrType }) {
     const wgInterface = await Database.interfaces.get();
     const userConfig = await Database.userConfigs.get();
 
@@ -167,13 +168,15 @@ class WireGuard {
       const amneziaVPNClientConfig = wg.generateAmneziaVPNClientConfig(wgInterface, userConfig, client, configText, {
         enableIpv6: !WG_ENV.DISABLE_IPV6,
       });
-      return wg.buildAmneziaQrPack(JSON.stringify(amneziaVPNClientConfig));
+      const qrConfigPack = await wg.buildAmneziaQrPack(JSON.stringify(amneziaVPNClientConfig));
+      
+      return qrConfigPack;
     }
 
     return configText;
   }
 
-  async getClientQRCodeSVG({ clientId, type }: { clientId: ID, type?: 'amnezia-vpn' }) {
+  async getClientQRCodeSVG({ clientId, type }: { clientId: ID, type?: QrType }) {
     const config = await this.getClientConfiguration({ clientId, type });
     const ECMode = ['high', 'quartile', 'medium', 'low'] as const;
     for (const ecc of ECMode) {
