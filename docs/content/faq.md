@@ -10,6 +10,8 @@ Here are some frequently asked questions or errors about `wg-easy`. If you have 
 
 Use the **Per-Client Firewall** feature to enforce server-side restrictions on what each client can access.
 
+**Requirements:** This feature requires `iptables` (and `ip6tables` for IPv6) to be installed on the host system.
+
 1. Enable "Per-Client Firewall" in **Admin Panel → Interface**
 2. Edit a client and configure "Firewall Allowed IPs"
 3. Specify which destinations the client should be allowed to access
