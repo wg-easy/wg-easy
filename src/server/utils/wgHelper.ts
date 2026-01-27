@@ -1,10 +1,13 @@
-import { deflateSync as zlibDeflateSync } from 'node:zlib';
+import { deflate } from 'node:zlib';
+import { promisify } from 'node:util';
 import { parseCidr } from 'cidr-tools';
 import { stringifyIp } from 'ip-bigint';
 import type { ClientType } from '#db/repositories/client/types';
 import type { InterfaceType } from '#db/repositories/interface/types';
 import type { UserConfigType } from '#db/repositories/userConfig/types';
 import type { HooksType } from '#db/repositories/hooks/types';
+
+const zlibDeflate = promisify(deflate);
 
 type Options = {
   enableIpv6?: boolean;
@@ -188,20 +191,14 @@ Endpoint = ${userConfig.host}:${userConfig.port}`;
 
     if (wgExecutable === 'awg') {
       containerType = 'awg';
-      // S3, S4, i1, i2, i3, i4, i5 are not supported by AmneziaVPN app for now
       const awgParams = {
         Jc: client.jC,
         Jmin: client.jMin,
         Jmax: client.jMax,
         S1: wgInterface.s1,
         S2: wgInterface.s2,
-        // S3: wgInterface.s3,
-        // S4: wgInterface.s4,
-        // i1: client.i1,
-        // i2: client.i2,
-        // i3: client.i3,
-        // i4: client.i4,
-        // i5: client.i5,
+        S3: wgInterface.s3,
+        S4: wgInterface.s4,
         H1: wgInterface.h1,
         H2: wgInterface.h2,
         H3: wgInterface.h3,
@@ -215,6 +212,12 @@ Endpoint = ${userConfig.host}:${userConfig.port}`;
           )
           .map(([key, value]) => [key, `${value}`])
       );
+    }
+
+    const protocolInfo: { protocol_version?: string } = {};
+    
+    if (awgExtras.hasOwnProperty('S3') && awgExtras.hasOwnProperty('S4')) {
+      protocolInfo.protocol_version = '2';
     }
 
     const lastConfigObj = {
@@ -238,6 +241,7 @@ Endpoint = ${userConfig.host}:${userConfig.port}`;
             isThirdPartyConfig: true,
             last_config: JSON.stringify(lastConfigObj),
             port: `${userConfig.port}`,
+            ...protocolInfo,
             transport_proto: 'udp',
           },
           container: `amnezia-${containerType}`,
@@ -251,14 +255,14 @@ Endpoint = ${userConfig.host}:${userConfig.port}`;
     };
   },
 
-  buildAmneziaQrPack: (amneziaConfigJSON: string) => {
+  buildAmneziaQrPack: async (amneziaConfigJSON: string) => {
     // Observed working QR wrapper:
     // [0..3]  magic/version (0x07C00100)
     // [4..7]  zlib_len + 4
     // [8..11] uncompressed_len
     // [12..]  zlib(deflate) bytes (starts with 78 DA typically)
     const plain = Buffer.from(amneziaConfigJSON, 'utf8');
-    const z = zlibDeflateSync(plain);
+    const z = await zlibDeflate(plain);
 
     const MAGIC = 0x07c00100;
     const header = Buffer.allocUnsafe(12);

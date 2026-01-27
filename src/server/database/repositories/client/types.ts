@@ -104,11 +104,10 @@ export type ClientCreateFromExistingType = Pick<
   | 'enabled'
 >;
 
-const qrType = z.preprocess(
-  (val) => (val === 'amnezia-vpn' ? val : undefined),
-  z.enum(['amnezia-vpn']).optional()
-);
+const qrType = z.enum(['amnezia-vpn', 'wireguard']).catch('wireguard');
 
 export const ClientQrSchema = z.object({
   type: qrType,
 });
+
+export type QrType = z.infer<typeof qrType>;
