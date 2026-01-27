@@ -116,10 +116,7 @@
     "dnsDesc": "İstemcilerin kullanacağı DNS sunucusu (genel yapılandırmayı geçersiz kılar)",
     "notConnected": "İstemci bağlı değil",
     "endpoint": "Uç Nokta",
-    "endpointDesc": "WireGuard bağlantısının kurulduğu istemcinin IP'si",
-    "amneziaVpn": "AmneziaVPN",
-    "showAmneziaVpnQR": "AmneziaVPN formatında QR kodu göster",
-    "showWireGuardQR": "WireGuard formatında QR kodu göster"
+    "endpointDesc": "WireGuard bağlantısının kurulduğu istemcinin IP'si"
   },
   "dialog": {
     "change": "Değiştir",

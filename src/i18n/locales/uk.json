@@ -120,10 +120,7 @@
     "endpointDesc": "IP-адреса клієнта, з якої встановлюється з’єднання WireGuard",
     "search": "Пошук клієнтів...",
     "config": "Конфігурація",
-    "viewConfig": "Переглянути конфігурацію",
-    "amneziaVpn": "AmneziaVPN",
-    "showAmneziaVpnQR": "Показати QR-код у форматі AmneziaVPN",
-    "showWireGuardQR": "Показати QR-код у форматі WireGuard"
+    "viewConfig": "Переглянути конфігурацію"
   },
   "dialog": {
     "change": "Змінити",

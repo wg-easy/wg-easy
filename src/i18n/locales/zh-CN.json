@@ -120,10 +120,7 @@
     "endpointDesc": "建立 WireGuard 连接时客户端的 IP 地址",
     "search": "搜索客户端...",
     "config": "配置",
-    "viewConfig": "查看配置文本",
-    "amneziaVpn": "AmneziaVPN",
-    "showAmneziaVpnQR": "以 AmneziaVPN 格式显示二维码",
-    "showWireGuardQR": "以 WireGuard 格式显示二维码"
+    "viewConfig": "查看配置文本"
   },
   "dialog": {
     "change": "确认修改",
