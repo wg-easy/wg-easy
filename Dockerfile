@@ -15,9 +15,12 @@ COPY src ./
 RUN pnpm build
 
 # Build amneziawg-tools
-RUN apk add linux-headers build-base git && \
+RUN apk add linux-headers build-base go git && \
     git clone https://github.com/amnezia-vpn/amneziawg-tools.git && \
-    cd amneziawg-tools/src && \
+    git clone https://github.com/amnezia-vpn/amneziawg-go && \
+    cd amneziawg-go && \
+    make && \
+    cd ../amneziawg-tools/src && \
     make
 
 # Copy build result to a new image.
@@ -38,6 +41,9 @@ RUN cd /app/server && \
 # cli
 COPY --from=build /app/cli/cli.sh /usr/local/bin/cli
 RUN chmod +x /usr/local/bin/cli
+# Copy amneziawg-go
+COPY --from=build /app/amneziawg-go/amneziawg-go /usr/bin/amneziawg-go
+RUN chmod +x /usr/bin/amneziawg-go
 # Copy amneziawg-tools
 COPY --from=build /app/amneziawg-tools/src/wg /usr/bin/awg
 COPY --from=build /app/amneziawg-tools/src/wg-quick/linux.bash /usr/bin/awg-quick
@@ -52,6 +58,7 @@ RUN apk add --no-cache \
     nftables \
     kmod \
     iptables-legacy \
+    wireguard-go \
     wireguard-tools
 
 RUN mkdir -p /etc/amnezia
