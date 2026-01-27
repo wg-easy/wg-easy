@@ -120,10 +120,7 @@
     "search": "Rechercher des clients...",
     "config": "Configuration",
     "viewConfig": "Voir la configuration",
-    "delete": "Supprimer",
-    "amneziaVpn": "AmneziaVPN",
-    "showAmneziaVpnQR": "Afficher le code QR au format AmneziaVPN",
-    "showWireGuardQR": "Afficher le code QR au format WireGuard"
+    "delete": "Supprimer"
   },
   "dialog": {
     "change": "Modifier",
