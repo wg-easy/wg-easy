@@ -6,42 +6,26 @@ RUN npm install --global corepack@latest
 # Install pnpm
 RUN corepack enable pnpm
 
+# Build amneziawg-tools
+ARG AMNEZIAWG_VERSION=v1.0.20250903
+RUN apk add linux-headers build-base git && \
+    git clone --branch ${AMNEZIAWG_VERSION} --depth 1 https://github.com/amnezia-vpn/amneziawg-tools.git && \
+    cd amneziawg-tools/src && \
+    make
+
 # Copy Web UI
 COPY src/package.json src/pnpm-lock.yaml ./
-RUN pnpm install
+RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
+    pnpm install
 
 # Build UI
 COPY src ./
 RUN pnpm build
 
-# Build amneziawg-tools
-RUN apk add linux-headers build-base git && \
-    git clone https://github.com/amnezia-vpn/amneziawg-tools.git && \
-    cd amneziawg-tools/src && \
-    make
-
 # Copy build result to a new image.
 # This saves a lot of disk space.
 FROM docker.io/library/node:jod-alpine
 WORKDIR /app
-
-HEALTHCHECK --interval=1m --timeout=5s --retries=3 CMD /usr/bin/timeout 5s /bin/sh -c "/usr/bin/wg show | /bin/grep -q interface || exit 1"
-
-# Copy build
-COPY --from=build /app/.output /app
-# Copy migrations
-COPY --from=build /app/server/database/migrations /app/server/database/migrations
-# libsql (https://github.com/nitrojs/nitro/issues/3328)
-RUN cd /app/server && \
-    npm install --no-save libsql && \
-    npm cache clean --force
-# cli
-COPY --from=build /app/cli/cli.sh /usr/local/bin/cli
-RUN chmod +x /usr/local/bin/cli
-# Copy amneziawg-tools
-COPY --from=build /app/amneziawg-tools/src/wg /usr/bin/awg
-COPY --from=build /app/amneziawg-tools/src/wg-quick/linux.bash /usr/bin/awg-quick
-RUN chmod +x /usr/bin/awg /usr/bin/awg-quick
 
 # Install Linux packages
 RUN apk add --no-cache \
@@ -54,12 +38,30 @@ RUN apk add --no-cache \
     iptables-legacy \
     wireguard-tools
 
-RUN mkdir -p /etc/amnezia
-RUN ln -s /etc/wireguard /etc/amnezia/amneziawg
-
 # Use iptables-legacy
 RUN update-alternatives --install /usr/sbin/iptables iptables /usr/sbin/iptables-legacy 10 --slave /usr/sbin/iptables-restore iptables-restore /usr/sbin/iptables-legacy-restore --slave /usr/sbin/iptables-save iptables-save /usr/sbin/iptables-legacy-save
 RUN update-alternatives --install /usr/sbin/ip6tables ip6tables /usr/sbin/ip6tables-legacy 10 --slave /usr/sbin/ip6tables-restore ip6tables-restore /usr/sbin/ip6tables-legacy-restore --slave /usr/sbin/ip6tables-save ip6tables-save /usr/sbin/ip6tables-legacy-save
+
+# Copy amneziawg-tools
+RUN mkdir -p /etc/amnezia
+RUN ln -s /etc/wireguard /etc/amnezia/amneziawg
+COPY --from=build /app/amneziawg-tools/src/wg /usr/bin/awg
+COPY --from=build /app/amneziawg-tools/src/wg-quick/linux.bash /usr/bin/awg-quick
+RUN chmod +x /usr/bin/awg /usr/bin/awg-quick
+
+# Copy build
+COPY --from=build /app/.output /app
+# Copy migrations
+COPY --from=build /app/server/database/migrations /app/server/database/migrations
+# libsql (https://github.com/nitrojs/nitro/issues/3328)
+RUN --mount=type=cache,id=npm,target=/root/.npm \
+    cd /app/server && \
+    npm install --no-save libsql
+# cli
+COPY --from=build /app/cli/cli.sh /usr/local/bin/cli
+RUN chmod +x /usr/local/bin/cli
+
+HEALTHCHECK --interval=1m --timeout=5s --retries=3 CMD /usr/bin/timeout 5s /bin/sh -c "/usr/bin/wg show | /bin/grep -q interface || exit 1"
 
 # Set Environment
 ENV DEBUG=Server,WireGuard,Database,CMD
