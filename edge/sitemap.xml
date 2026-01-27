@@ -2,118 +2,118 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://wg-easy.github.io/wg-easy/edge/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-27</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/edge/faq/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-27</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/edge/getting-started/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-27</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/edge/advanced/api/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-27</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/edge/advanced/config/amnezia/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-27</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/edge/advanced/config/experimental-config/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-27</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/edge/advanced/config/optional-config/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-27</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/edge/advanced/config/unattended-setup/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-27</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/edge/advanced/metrics/prometheus/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-27</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/edge/advanced/migrate/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-27</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/edge/advanced/migrate/from-14-to-15/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-27</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/edge/contributing/general/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-27</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/edge/contributing/issues-and-pull-requests/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-27</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/edge/contributing/translation/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-27</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/edge/examples/tutorials/adguard/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-27</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/edge/examples/tutorials/auto-updates/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-27</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/edge/examples/tutorials/basic-installation/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-27</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/edge/examples/tutorials/caddy/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-27</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/edge/examples/tutorials/docker-run/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-27</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/edge/examples/tutorials/dockerless/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-27</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/edge/examples/tutorials/podman-nft/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-27</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/edge/examples/tutorials/reverse-proxyless/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-27</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/edge/examples/tutorials/routed/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-27</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/edge/examples/tutorials/traefik/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-27</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/edge/guides/2fa/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-27</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/edge/guides/admin/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-27</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/edge/guides/cli/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-27</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/edge/guides/clients/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-27</lastmod>
     </url>
     <url>
          <loc>https://wg-easy.github.io/wg-easy/edge/guides/setup/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-27</lastmod>
     </url>
 </urlset>
