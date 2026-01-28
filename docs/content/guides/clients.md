@@ -59,7 +59,9 @@ Protocol specifiers (`/tcp` or `/udp`) require a port number. The following form
 
 - **Empty**: Falls back to the client's "Allowed IPs" setting
 - **Specified**: Only listed destinations are accessible (allow-only, everything else is blocked)
-- **Use Case Examples**:
+- **Disable for specific client**: To disable firewall filtering for a single client while keeping it enabled for others, add `0.0.0.0/0, ::/0` to allow all traffic
+
+**Use Case Examples**:
     - Allow only specific servers: `10.10.0.5`
     - Allow only internal network: `10.10.0.0/24, 192.168.1.0/24`
     - Allow only web browsing: `0.0.0.0/0:80, 0.0.0.0/0:443, ::/0:80, ::/0:443`
