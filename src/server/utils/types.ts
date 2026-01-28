@@ -2,7 +2,7 @@ import type { ZodSchema } from 'zod';
 import z from 'zod';
 import type { H3Event, EventHandlerRequest } from 'h3';
 import { isIP } from 'is-ip';
-import { default as isCidr } from 'is-cidr';
+import isCidr from 'is-cidr';
 
 export type ID = number;
 
