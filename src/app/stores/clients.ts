@@ -6,7 +6,7 @@ type WGClientReturn = TypedInternalResponse<
   '/api/client',
   unknown,
   'get'
->[number];
+>['clients'][number];
 
 export type LocalClient = WGClientReturn & {
   avatar?: string;
@@ -30,9 +30,16 @@ export const useClientsStore = defineStore('Clients', () => {
   const globalStore = useGlobalStore();
   const clients = ref<null | LocalClient[]>(null);
   const clientsPersist = ref<Record<string, ClientPersist>>({});
+  const sortClient = ref<boolean>(true)
+  const page = ref<number>(1);
+  const limit = ref<number>(10);
+  const total = ref<number>(0);
 
   const searchParams = ref({
     filter: undefined as string | undefined,
+    page: page,
+    limit: limit,
+    sortClient: sortClient
   });
 
   const { data: _clients, refresh: _refresh } = useFetch('/api/client', {
@@ -43,7 +50,7 @@ export const useClientsStore = defineStore('Clients', () => {
   // TODO: rewrite
   async function refresh({ updateCharts = false } = {}) {
     await _refresh();
-    let transformedClients = _clients.value?.map((client) => {
+    let transformedClients = _clients.value?.clients.map((client) => {
       let avatar = undefined;
       if (client.name.includes('@') && client.name.includes('.')) {
         avatar = `https://gravatar.com/avatar/${sha256(client.name.toLowerCase().trim())}.jpg`;
@@ -126,22 +133,28 @@ export const useClientsStore = defineStore('Clients', () => {
       };
     });
 
-    // TODO: move sort to backend
-    if (transformedClients !== undefined) {
-      transformedClients = sortByProperty(
-        transformedClients,
-        'name',
-        globalStore.sortClient
-      );
-    }
-
     clients.value = transformedClients ?? null;
+    total.value = (_clients.value?.total ?? _clients.value?.clients?.length) ?? 0;
   }
 
   function setSearchQuery(filter: string) {
     clients.value = null;
+    total.value = 0;
+    setPageQuery(1);
     searchParams.value.filter = filter || undefined;
   }
 
-  return { clients, clientsPersist, refresh, _clients, setSearchQuery };
+  function setPageQuery(value: number) {
+    clients.value = null;
+    page.value = value;
+    searchParams.value.page = value;
+  }
+
+  function setSortClientQuery(value: boolean) {
+    clients.value = null;
+    sortClient.value = value;
+    searchParams.value.sortClient = value;
+  }
+
+  return { clients, clientsPersist, sortClient, page, total, limit, refresh, _clients, setSearchQuery, setPageQuery, setSortClientQuery };
 });

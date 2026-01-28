@@ -12,7 +12,7 @@ async function getPrometheusResponse() {
   const wireguardSentBytes = [];
   const wireguardReceivedBytes = [];
   const wireguardLatestHandshakeSeconds = [];
-  for (const client of clients) {
+  for (const client of clients.clients) {
     wireguardPeerCount++;
     if (client.enabled === true) {
       wireguardEnabledPeersCount++;
