@@ -1,5 +1,6 @@
 import { parseCidr } from 'cidr-tools';
 import { stringifyIp } from 'ip-bigint';
+import { parseIpAndPort } from './ip';
 import type { ClientType } from '#db/repositories/client/types';
 import type { InterfaceType } from '#db/repositories/interface/types';
 import type { UserConfigType } from '#db/repositories/userConfig/types';
@@ -151,6 +152,10 @@ PostDown = ${iptablesTemplate(hooks.postDown, wgInterface)}`;
       (v) => v !== null
     );
 
+    const allowIps = (client.allowedIps ?? userConfig.defaultAllowedIps).map(
+      (ip) => parseIpAndPort(ip).ip
+    );
+
     return `[Interface]
 PrivateKey = ${client.privateKey}
 Address = ${address}
@@ -159,7 +164,7 @@ ${extraLines.length ? `${extraLines.join('\n')}\n` : ''}
 [Peer]
 PublicKey = ${wgInterface.publicKey}
 PresharedKey = ${client.preSharedKey}
-AllowedIPs = ${(client.allowedIps ?? userConfig.defaultAllowedIps).join(', ')}
+AllowedIPs = ${allowIps.join(', ')}
 PersistentKeepalive = ${client.persistentKeepalive}
 Endpoint = ${userConfig.host}:${userConfig.port}`;
   },

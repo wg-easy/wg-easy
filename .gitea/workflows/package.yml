@@ -1,0 +1,59 @@
+name: Build and Deploy to k3s
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: |
+            env.http_proxy=${{ secrets.HTTP_PROXY }}
+            env.https_proxy=${{ secrets.HTTP_PROXY }}
+            "env.no_proxy=/run/buildkit/buildkitd.sock,/var/run/docker.sock,${{ secrets.NO_PROXY }}"
+
+      - name: Login to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ vars.REGISTRY_URL }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ vars.REGISTRY_URL }}/${{ env.GITHUB_REPOSITORY }}
+          tags: |
+            # dynamically set the branch name as a prefix
+            type=sha,prefix={{branch}}-
+            
+            # set latest tag for default branch
+#            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        env:
+          HTTP_PROXY: ${{ secrets.HTTP_PROXY }}
+          HTTPS_PROXY: ${{ secrets.HTTP_PROXY }}
+          NO_PROXY: ${{ secrets.NO_PROXY }}
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+
