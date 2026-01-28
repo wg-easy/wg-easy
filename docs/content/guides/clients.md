@@ -19,7 +19,53 @@ Which IPs will be routed through the VPN.
 
 This will not prevent the user from modifying it locally and accessing IP ranges that they should not be able to access.
 
-Use firewall rules to prevent access to IP ranges that the user should not be able to access.
+Use the Firewall Allowed IPs feature to prevent access to IP ranges that the user should not be able to access.
+
+## Firewall Allowed IPs
+
+/// note | Attention
+
+This field only appears when **Per-Client Firewall** is enabled in the Admin Panel → Interface settings.
+
+///
+
+Server-side firewall rules that restrict which destinations the client can access, regardless of their local configuration.
+
+Unlike "Allowed IPs" which only controls routing on the client side, these rules are enforced by the server using iptables/ip6tables and cannot be bypassed by the client.
+
+**Supported Formats:**
+
+- `10.10.0.3` - Allow access to a single IP address
+- `10.10.0.0/24` - Allow access to an entire subnet
+- `192.168.1.5:443` - Allow access to specific port (TCP+UDP)
+- `192.168.1.5:443/tcp` - Allow access to specific port (TCP only)
+- `192.168.1.5:443/udp` - Allow access to specific port (UDP only)
+- `10.10.0.0/24:443` - Allow access to an entire subnet on a specific port (TCP+UDP)
+- `10.10.0.0/24:443/tcp` - Allow access to an entire subnet on a specific port (TCP only)
+- `10.10.0.0/24:443/udp` - Allow access to an entire subnet on a specific port (UDP only)
+- `[2001:db8::1]:443` - IPv6 address with port (brackets required)
+- `[2001:db8::/32]:443/tcp` - IPv6 CIDR with port and protocol
+
+/// warning | Invalid Formats
+
+Protocol specifiers (`/tcp` or `/udp`) require a port number. The following formats are **not supported** and will result in an error:
+
+- `10.10.0.3/tcp` (use `10.10.0.3:443/tcp` instead)
+- `10.10.0.0/24/udp` (use `10.10.0.0/24:53/udp` instead)
+
+///
+
+**Behavior:**
+
+- **Empty**: Falls back to the client's "Allowed IPs" setting
+- **Specified**: Only listed destinations are accessible (allow-only, everything else is blocked)
+- **Disable for specific client**: To disable firewall filtering for a single client while keeping it enabled for others, add `0.0.0.0/0, ::/0` to allow all traffic
+
+**Use Case Examples**:
+    - Allow only specific servers: `10.10.0.5`
+    - Allow only internal network: `10.10.0.0/24, 192.168.1.0/24`
+    - Allow only web browsing: `0.0.0.0/0:80, 0.0.0.0/0:443, ::/0:80, ::/0:443`
+    - Block internet, allow LAN: Leave "Allowed IPs" as `0.0.0.0/0, ::/0` but set Firewall IPs to `10.0.0.0/8, 192.168.0.0/16`
 
 ## Server Allowed IPs
 

@@ -16,6 +16,21 @@ class WireGuard {
     const wgInterface = await Database.interfaces.get();
     await this.#saveWireguardConfig(wgInterface);
     await this.#syncWireguardConfig(wgInterface);
+    await this.#applyFirewallRules(wgInterface);
+  }
+
+  /**
+   * Apply firewall rules based on current config
+   */
+  async #applyFirewallRules(wgInterface: InterfaceType) {
+    const clients = await Database.clients.getAll();
+    const userConfig = await Database.userConfigs.get();
+    await firewall.rebuildRules(
+      wgInterface,
+      clients,
+      userConfig,
+      !WG_ENV.DISABLE_IPV6
+    );
   }
 
   /**
@@ -249,6 +264,26 @@ class WireGuard {
     });
     await this.#syncWireguardConfig(wgInterface);
     WG_DEBUG(`Wireguard Interface ${wgInterface.name} started successfully.`);
+
+    // Check if firewall was enabled but iptables isn't available
+    if (wgInterface.firewallEnabled) {
+      const enableIpv6 = !WG_ENV.DISABLE_IPV6;
+      const iptablesAvailable = await firewall.isAvailable(enableIpv6);
+      if (!iptablesAvailable) {
+        const requiredTools = enableIpv6
+          ? 'iptables/ip6tables'
+          : 'iptables';
+        console.warn(
+          `WARNING: Per-Client Firewall is enabled but ${requiredTools} is not available. Disabling firewall feature. Please install ${requiredTools} to use this feature.`
+        );
+        await Database.interfaces.update({ firewallEnabled: false });
+        wgInterface.firewallEnabled = false; // Update local copy
+      }
+    }
+
+    WG_DEBUG('Applying firewall rules...');
+    await this.#applyFirewallRules(wgInterface);
+    WG_DEBUG('Firewall rules applied successfully.');
 
     WG_DEBUG('Starting Cron Job...');
     await this.startCronJob();

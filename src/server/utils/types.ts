@@ -1,6 +1,8 @@
 import type { ZodSchema } from 'zod';
 import z from 'zod';
 import type { H3Event, EventHandlerRequest } from 'h3';
+import { isIP } from 'is-ip';
+import isCidr from 'is-cidr';
 
 export type ID = number;
 
@@ -58,6 +60,46 @@ export const DnsSchema = z.array(AddressSchema, { message: t('zod.dns') });
 export const AllowedIpsSchema = z
   .array(AddressSchema, { message: t('zod.allowedIps') })
   .min(1, { message: t('zod.allowedIps') });
+
+// Validation for firewall IP entries
+const FirewallIpEntrySchema = z
+  .string({ message: t('zod.client.firewallIps') })
+  .min(1, { message: t('zod.client.firewallIps') })
+  .refine(
+    (entry) => {
+      // Check if protocol suffix is present
+      const hasProto = /\/(tcp|udp)$/i.test(entry);
+      const entryWithoutProto = entry.replace(/\/(tcp|udp)$/i, '');
+
+      // Check if it's IP:port format
+      const portMatch = entryWithoutProto.match(/^(.+):(\d+)$/);
+      if (portMatch) {
+        const [, ipPart, portPart] = portMatch;
+        const port = parseInt(portPart, 10);
+
+        // Remove IPv6 brackets if present
+        const cleanIp = ipPart.replace(/^\[|\]$/g, '');
+
+        // Validate IP and port
+        return (isIP(cleanIp) || isCidr(cleanIp)) && port >= 1 && port <= 65535;
+      }
+
+      // If protocol was specified without a port, it's invalid
+      if (hasProto) {
+        return false;
+      }
+
+      // Check if it's just IP or CIDR
+      return isIP(entryWithoutProto) || isCidr(entryWithoutProto);
+    },
+    {
+      message: t('zod.client.firewallIpsInvalid'),
+    }
+  );
+
+export const FirewallIpsSchema = z.array(FirewallIpEntrySchema, {
+  message: t('zod.client.firewallIps'),
+});
 
 export const FileSchema = z.object({
   file: z.string({ message: t('zod.file') }),
