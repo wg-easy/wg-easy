@@ -2,7 +2,6 @@ import fs from 'node:fs/promises';
 import debug from 'debug';
 import { encodeQR } from 'qr';
 import type { InterfaceType } from '#db/repositories/interface/types';
-import { firewall } from './firewall';
 
 const WG_DEBUG = debug('WireGuard');
 
