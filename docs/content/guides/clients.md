@@ -23,8 +23,11 @@ Use the Firewall Allowed IPs feature to prevent access to IP ranges that the use
 
 ## Firewall Allowed IPs
 
-!!! note
-    This field only appears when **Per-Client Firewall** is enabled in the Admin Panel → Interface settings.
+/// note | Attention
+
+This field only appears when **Per-Client Firewall** is enabled in the Admin Panel → Interface settings.
+
+///
 
 Server-side firewall rules that restrict which destinations the client can access, regardless of their local configuration.
 
@@ -37,7 +40,20 @@ Unlike "Allowed IPs" which only controls routing on the client side, these rules
 - `192.168.1.5:443` - Allow access to specific port (TCP+UDP)
 - `192.168.1.5:443/tcp` - Allow access to specific port (TCP only)
 - `192.168.1.5:443/udp` - Allow access to specific port (UDP only)
+- `10.10.0.0/24:443` - Allow access to an entire subnet on a specific port (TCP+UDP)
+- `10.10.0.0/24:443/tcp` - Allow access to an entire subnet on a specific port (TCP only)
+- `10.10.0.0/24:443/udp` - Allow access to an entire subnet on a specific port (UDP only)
 - `[2001:db8::1]:443` - IPv6 address with port (brackets required)
+- `[2001:db8::/32]:443/tcp` - IPv6 CIDR with port and protocol
+
+/// warning | Invalid Formats
+
+Protocol specifiers (`/tcp` or `/udp`) require a port number. The following formats are **not supported** and will result in an error:
+
+- `10.10.0.3/tcp` (use `10.10.0.3:443/tcp` instead)
+- `10.10.0.0/24/udp` (use `10.10.0.0/24:53/udp` instead)
+
+///
 
 **Behavior:**
 

@@ -67,7 +67,8 @@ const FirewallIpEntrySchema = z
   .min(1, { message: t('zod.client.firewallIps') })
   .refine(
     (entry) => {
-      // Remove protocol suffix if present (/tcp, /udp)
+      // Check if protocol suffix is present
+      const hasProto = /\/(tcp|udp)$/i.test(entry);
       const entryWithoutProto = entry.replace(/\/(tcp|udp)$/i, '');
 
       // Check if it's IP:port format
@@ -81,6 +82,11 @@ const FirewallIpEntrySchema = z
 
         // Validate IP and port
         return (isIP(cleanIp) || isCidr(cleanIp)) && port >= 1 && port <= 65535;
+      }
+
+      // If protocol was specified without a port, it's invalid
+      if (hasProto) {
+        return false;
       }
 
       // Check if it's just IP or CIDR
