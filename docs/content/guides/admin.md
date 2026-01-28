@@ -10,6 +10,12 @@ Enable server-side firewall filtering to enforce network access restrictions per
 
 When enabled, each client can have custom "Firewall Allowed IPs" configured that restrict which destinations they can access through the VPN. These restrictions are enforced by the server using iptables/ip6tables and cannot be bypassed by the client.
 
+/// warning | Experimental Feature
+
+This feature is currently experimental. While functional, it should be thoroughly tested in your environment before relying on it for production security requirements. Always verify that firewall rules are working as expected using test traffic or by manually inspecting the rules.
+
+///
+
 **Requirements:**
 
 - `iptables` must be installed on the host system
