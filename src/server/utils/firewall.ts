@@ -29,6 +29,13 @@ type ParsedEntry = {
  * - CIDR: "10.0.0.0/24" or "2001:db8::/32"
  * - IP:port: "10.0.0.1:443" or "[2001:db8::1]:443"
  * - IP:port/proto: "10.0.0.1:443/tcp" or "10.0.0.1:53/udp"
+ * - CIDR:port: "10.0.0.0/24:443"
+ * - CIDR:port/proto: "10.0.0.0/24:443/tcp" or "10.0.0.0/24:53/udp"
+ *
+ * Note: Protocol (/tcp or /udp) requires a port. "IP/tcp" or "CIDR/tcp" without
+ * a port is invalid and will throw an error.
+ *
+ * @throws {Error} If protocol is specified without a port
  */
 function parseFirewallEntry(entry: string): ParsedEntry {
   // Extract protocol suffix first: /tcp or /udp
@@ -52,7 +59,17 @@ function parseFirewallEntry(entry: string): ParsedEntry {
     // Just bracketed IPv6 without port
     const ipMatch = remaining.match(/^\[(.+)\]$/);
     if (ipMatch) {
+      if (proto) {
+        throw new Error(
+          `Invalid firewall entry "${entry}": Protocol (/${proto}) requires a port. Use format like "[${ipMatch[1]}]:443/${proto}"`
+        );
+      }
       return { ip: ipMatch[1] };
+    }
+    if (proto) {
+      throw new Error(
+        `Invalid firewall entry "${entry}": Protocol (/${proto}) requires a port`
+      );
     }
     return { ip: remaining };
   }
@@ -75,6 +92,11 @@ function parseFirewallEntry(entry: string): ParsedEntry {
   }
 
   // Plain IP or CIDR (IPv4 or IPv6)
+  if (proto) {
+    throw new Error(
+      `Invalid firewall entry "${entry}": Protocol (/${proto}) requires a port. Use format like "${remaining}:443/${proto}"`
+    );
+  }
   return { ip: remaining };
 }
 
