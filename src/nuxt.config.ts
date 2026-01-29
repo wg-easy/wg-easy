@@ -134,6 +134,5 @@ export default defineNuxtConfig({
   alias: {
     // for typecheck reasons (https://github.com/nuxt/cli/issues/323)
     '#db': fileURLToPath(new URL('./server/database/', import.meta.url)),
-    '#utils': fileURLToPath(new URL('./server/utils/', import.meta.url)),
   },
 });
