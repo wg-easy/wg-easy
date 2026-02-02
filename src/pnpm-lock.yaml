@@ -63,8 +63,8 @@ importers:
         specifier: ^0.45.1
         version: 0.45.1(@libsql/client@0.17.0)
       ip-bigint:
-        specifier: ^8.2.2
-        version: 8.2.2
+        specifier: ^8.2.3
+        version: 8.2.3
       is-cidr:
         specifier: ^6.0.2
         version: 6.0.2
@@ -3775,8 +3775,8 @@ packages:
     resolution: {integrity: sha512-tAAg/72/VxOUW7RQSX1pIxJVucYKcjFjfvj60L57jrZpYCHC3XN0WCQ3sNYL4Gmvv+7GPvTAjc+KSdeNuE8oWQ==}
     engines: {node: '>=12.22.0'}
 
-  ip-bigint@8.2.2:
-    resolution: {integrity: sha512-wPoOpHigOtoY29UCFA0L82cJVFcT7M+TsrgipUVpFw7HV9LpLEuNXCymt3623jzHPlIZzFaCyaVf9VACssFYew==}
+  ip-bigint@8.2.3:
+    resolution: {integrity: sha512-/+cJJZHXY1ajGe0ALRADOt0wLNbEy9zRXDs72HJmCZfLB34gUYeeaWkBm1lM8B/q6SDtWOLJ7FDUEV5hRblUXw==}
     engines: {node: '>=18'}
 
   ip-regex@5.0.0:
@@ -5227,6 +5227,7 @@ packages:
   tar@7.5.6:
     resolution: {integrity: sha512-xqUeu2JAIJpXyvskvU3uvQW8PAmHrtXp2KDuMJwQqW8Sqq0CaZBAQ+dKS3RBXVhU4wC5NjAdKrmh84241gO9cA==}
     engines: {node: '>=18'}
+    deprecated: Old versions of tar are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exhorbitant rates) by contacting i@izs.me
 
   terser@5.46.0:
     resolution: {integrity: sha512-jTwoImyr/QbOWFFso3YoU3ik0jBBDJ6JTOQiy/J2YxVJdZCc+5u7skhNwiOR3FQIygFqVUPHl7qbbxtjW2K3Qg==}
@@ -8359,7 +8360,7 @@ snapshots:
 
   cidr-tools@11.0.3:
     dependencies:
-      ip-bigint: 8.2.2
+      ip-bigint: 8.2.3
 
   citty@0.1.6:
     dependencies:
@@ -9392,7 +9393,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  ip-bigint@8.2.2: {}
+  ip-bigint@8.2.3: {}
 
   ip-regex@5.0.0: {}
 
