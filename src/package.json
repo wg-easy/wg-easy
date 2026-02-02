@@ -32,7 +32,7 @@
     "@vueuse/nuxt": "^14.1.0",
     "apexcharts": "^5.3.6",
     "argon2": "^0.44.0",
-    "cidr-tools": "^11.0.3",
+    "cidr-tools": "^11.0.5",
     "citty": "^0.2.0",
     "consola": "^3.4.2",
     "crc-32": "^1.2.2",

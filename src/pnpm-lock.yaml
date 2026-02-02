@@ -45,8 +45,8 @@ importers:
         specifier: ^0.44.0
         version: 0.44.0
       cidr-tools:
-        specifier: ^11.0.3
-        version: 11.0.3
+        specifier: ^11.0.5
+        version: 11.0.5
       citty:
         specifier: ^0.2.0
         version: 0.2.0
@@ -2740,8 +2740,8 @@ packages:
     resolution: {integrity: sha512-2Apfc6qH9uwF3QHmlYBA8ExB9VHq+1/Doj9sEMY55TVBcpQ3y/+gmMpcNIBBtfb5k54Vphmta+1IxjMqPlWWAA==}
     engines: {node: '>=20'}
 
-  cidr-tools@11.0.3:
-    resolution: {integrity: sha512-7p0rp7B2P+nZfBkJlrQzUMDyUHeYK2h/XCJY80VUl1v5oxwLxQjZMy39BXVOXugwAX67l0oJ/QQ6OhANgUtUbw==}
+  cidr-tools@11.0.5:
+    resolution: {integrity: sha512-41Lp0H80eP+QQ39CKR3uQsQcUtvBye5MyYN5otiKhf+IGy791gLREB70FcjHU5hZYhQe6IKBrwPIBsAHGZmIRw==}
     engines: {node: '>=18'}
 
   citty@0.1.6:
@@ -3777,6 +3777,10 @@ packages:
 
   ip-bigint@8.2.2:
     resolution: {integrity: sha512-wPoOpHigOtoY29UCFA0L82cJVFcT7M+TsrgipUVpFw7HV9LpLEuNXCymt3623jzHPlIZzFaCyaVf9VACssFYew==}
+    engines: {node: '>=18'}
+
+  ip-bigint@8.2.3:
+    resolution: {integrity: sha512-/+cJJZHXY1ajGe0ALRADOt0wLNbEy9zRXDs72HJmCZfLB34gUYeeaWkBm1lM8B/q6SDtWOLJ7FDUEV5hRblUXw==}
     engines: {node: '>=18'}
 
   ip-regex@5.0.0:
@@ -5227,6 +5231,7 @@ packages:
   tar@7.5.6:
     resolution: {integrity: sha512-xqUeu2JAIJpXyvskvU3uvQW8PAmHrtXp2KDuMJwQqW8Sqq0CaZBAQ+dKS3RBXVhU4wC5NjAdKrmh84241gO9cA==}
     engines: {node: '>=18'}
+    deprecated: Old versions of tar are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exhorbitant rates) by contacting i@izs.me
 
   terser@5.46.0:
     resolution: {integrity: sha512-jTwoImyr/QbOWFFso3YoU3ik0jBBDJ6JTOQiy/J2YxVJdZCc+5u7skhNwiOR3FQIygFqVUPHl7qbbxtjW2K3Qg==}
@@ -8357,9 +8362,9 @@ snapshots:
     dependencies:
       ip-regex: 5.0.0
 
-  cidr-tools@11.0.3:
+  cidr-tools@11.0.5:
     dependencies:
-      ip-bigint: 8.2.2
+      ip-bigint: 8.2.3
 
   citty@0.1.6:
     dependencies:
@@ -9393,6 +9398,8 @@ snapshots:
       - supports-color
 
   ip-bigint@8.2.2: {}
+
+  ip-bigint@8.2.3: {}
 
   ip-regex@5.0.0: {}
 
