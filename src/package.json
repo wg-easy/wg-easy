@@ -28,17 +28,17 @@
     "@phc/format": "^1.0.0",
     "@pinia/nuxt": "^0.11.3",
     "@tailwindcss/forms": "^0.5.11",
-    "@vueuse/core": "^14.1.0",
-    "@vueuse/nuxt": "^14.1.0",
+    "@vueuse/core": "^14.2.0",
+    "@vueuse/nuxt": "^14.2.0",
     "apexcharts": "^5.3.6",
     "argon2": "^0.44.0",
-    "cidr-tools": "^11.0.3",
+    "cidr-tools": "^11.0.5",
     "citty": "^0.2.0",
     "consola": "^3.4.2",
     "crc-32": "^1.2.2",
     "debug": "^4.4.3",
     "drizzle-orm": "^0.45.1",
-    "ip-bigint": "^8.2.2",
+    "ip-bigint": "^8.2.3",
     "is-cidr": "^6.0.2",
     "is-ip": "^5.0.1",
     "js-sha256": "^0.11.1",
@@ -69,5 +69,5 @@
     "typescript": "^5.9.3",
     "vue-tsc": "^3.2.4"
   },
-  "packageManager": "pnpm@10.28.1"
+  "packageManager": "pnpm@10.28.2"
 }
