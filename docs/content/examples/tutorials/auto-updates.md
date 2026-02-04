@@ -20,7 +20,7 @@ File: `/etc/docker/containers/watchtower/docker-compose.yml`
 ```yaml
 services:
     watchtower:
-        image: containrrr/watchtower:latest
+        image: nickfedor/watchtower:latest
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock
         env_file:
