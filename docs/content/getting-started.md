@@ -45,15 +45,15 @@ All workflows are using the tagging convention listed below. It is subsequently 
 | tag           | Type                            | Example                                                       | Description                                                                   |
 | ------------- | ------------------------------- | ------------------------------------------------------------- | ----------------------------------------------------------------------------- |
 | `15`          | latest minor for that major tag | `ghcr.io/wg-easy/wg-easy:15`                                  | latest features for specific major versions, no breaking changes, recommended |
-| `latest`      | latest tag                      | `ghcr.io/wg-easy/wg-easy:latest` or `ghcr.io/wg-easy/wg-easy` | points to latest release, can include breaking changes                        |
 | `15.0`        | latest patch for that minor tag | `ghcr.io/wg-easy/wg-easy:15.0`                                | latest patches for specific minor version                                     |
 | `15.0.0`      | specific tag                    | `ghcr.io/wg-easy/wg-easy:15.0.0`                              | specific release, no updates                                                  |
 | `edge`        | push to `master`                | `ghcr.io/wg-easy/wg-easy:edge`                                | mostly unstable, gets frequent package and code updates                       |
 | `development` | pull requests                   | `ghcr.io/wg-easy/wg-easy:development`                         | used for development, testing code from PRs                                   |
+| `latest`      | latest tag                      | `ghcr.io/wg-easy/wg-easy:latest` or `ghcr.io/wg-easy/wg-easy` | points to the v14 release, should be avoided                                  |
 
 <!-- ref: major version (check links too) -->
 
-When publishing a tag we follow the [Semantic Versioning][semver] specification. The `latest` tag is always pointing to the latest stable release. If you want to avoid breaking changes, use the major version tag (e.g. `15`).
+When publishing a tag we follow the [Semantic Versioning][semver] specification. Pin to the latest major version to avoid breaking changes (e.g. `15`), avoid using the `latest` tag.
 
 [github-ci]: https://github.com/wg-easy/wg-easy/actions
 [ghcr-image]: https://github.com/wg-easy/wg-easy/pkgs/container/wg-easy
