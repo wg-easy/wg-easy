@@ -10,7 +10,7 @@ These will only be used during the first start of the container. After that, the
 | ------------------ | ---------------------------- | --------------------------------------------------------- | ----- |
 | `INIT_ENABLED`     | `true`                       | Enables the below env vars                                | 0     |
 | `INIT_USERNAME`    | `admin`                      | Sets admin username                                       | 1     |
-| `INIT_PASSWORD`    | `Se!ureP%ssw`                | Sets admin password                                       | 1     |
+| `INIT_PASSWORD`    | `Se!ureP%ssw`                | Sets admin password (or `INIT_PASSWORD_FILE`)             | 1     |
 | `INIT_HOST`        | `vpn.example.com`            | Host clients will connect to                              | 1     |
 | `INIT_PORT`        | `51820`                      | Port clients will connect to and wireguard will listen on | 1     |
 | `INIT_DNS`         | `1.1.1.1,8.8.8.8`            | Sets global dns setting                                   | 2     |

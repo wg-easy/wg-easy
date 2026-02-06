@@ -1,5 +1,6 @@
 import debug from 'debug';
 import packageJson from '@@/package.json';
+import fs from 'fs';
 
 export const RELEASE = 'v' + packageJson.version;
 
@@ -40,10 +41,14 @@ export const WG_ENV = {
   WG_EXECUTABLE: await detectAwg(),
 };
 
+const PASSWORD = process.env.INIT_PASSWORD_FILE?.length > 0 ?
+  fs.readFileSync(process.env.INIT_PASSWORD_FILE, 'utf-8').trim() :
+  process.env.INIT_PASSWORD;
+
 export const WG_INITIAL_ENV = {
   ENABLED: process.env.INIT_ENABLED === 'true',
   USERNAME: process.env.INIT_USERNAME,
-  PASSWORD: process.env.INIT_PASSWORD,
+  PASSWORD,
   DNS: process.env.INIT_DNS?.split(',').map((x) => x.trim()),
   IPV4_CIDR: process.env.INIT_IPV4_CIDR,
   IPV6_CIDR: process.env.INIT_IPV6_CIDR,
