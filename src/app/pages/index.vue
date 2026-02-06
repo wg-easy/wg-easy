@@ -24,6 +24,11 @@
       >
         <IconsLoading class="mx-auto w-5 animate-spin" />
       </div>
+      <div>
+        <ClientsPagination
+          v-if="clientsStore.total > clientsStore.limit"
+         />
+      </div>
     </Panel>
   </main>
 </template>

@@ -7,7 +7,7 @@ async function getMetricsJSON() {
   let wireguardPeerCount = 0;
   let wireguardEnabledPeersCount = 0;
   let wireguardConnectedPeersCount = 0;
-  for (const client of clients) {
+  for (const client of clients.clients) {
     wireguardPeerCount++;
     if (client.enabled === true) {
       wireguardEnabledPeersCount++;
@@ -20,7 +20,7 @@ async function getMetricsJSON() {
     wireguard_configured_peers: wireguardPeerCount,
     wireguard_enabled_peers: wireguardEnabledPeersCount,
     wireguard_connected_peers: wireguardConnectedPeersCount,
-    clients: clients.map((client) => ({
+    clients: clients.clients.map((client) => ({
       name: client.name,
       enabled: client.enabled,
       ipv4Address: client.ipv4Address,

@@ -24,7 +24,7 @@ class WireGuard {
    * Make sure to pass an updated InterfaceType object
    */
   async #saveWireguardConfig(wgInterface: InterfaceType) {
-    const clients = await Database.clients.getAll();
+    const clients = await Database.clients.getAll(true);
     const hooks = await Database.hooks.get();
 
     const result = [];
@@ -64,14 +64,28 @@ class WireGuard {
     WG_DEBUG('Config synced successfully.');
   }
 
-  async getClientsForUser(userId: ID, filter?: string) {
+  async getClientsForUser(userId: ID, options?: { filter?: string; page?: number; limit?: number, sortClient?: boolean }) {
+    const { filter, page, limit } = options || {};
+    const sortClient = options?.sortClient ?? true;
+
     const wgInterface = await Database.interfaces.get();
 
     let dbClients;
-    if (filter?.trim()) {
-      dbClients = await Database.clients.getForUserFiltered(userId, filter);
+    let total: number = 0;
+    if (page && limit && filter?.trim()){
+      dbClients = await Database.clients.getPaginatedListForUserFiltered(userId, filter, page, limit, sortClient);
+      total = await Database.clients.countForUserFiltered(userId, filter);
+    }
+    else if (page && limit){
+      dbClients = await Database.clients.getPaginatedListForUser(userId, page, limit, sortClient);
+      total = await Database.clients.countForUser(userId);
+    }
+    else if (filter?.trim()) {
+      dbClients = await Database.clients.getForUserFiltered(userId, filter, sortClient);
+      total = dbClients.length;
     } else {
-      dbClients = await Database.clients.getForUser(userId);
+      dbClients = await Database.clients.getForUser(userId, sortClient);
+      total = dbClients.length;
     }
 
     const clients = dbClients.map((client) => ({
@@ -98,7 +112,10 @@ class WireGuard {
       }
     );
 
-    return clients;
+    return {
+      total: 1,
+      clients: clients
+    };
   }
 
   async dumpByPublicKey(publicKey: string) {
@@ -112,14 +129,28 @@ class WireGuard {
     return clientDump;
   }
 
-  async getAllClients(filter?: string) {
+  async getAllClients(options?: { filter?: string; page?: number; limit?: number, sortClient?: boolean }) {
+    const { filter, page, limit } = options || {};
+    const sortClient = options?.sortClient ?? true;
+
     const wgInterface = await Database.interfaces.get();
 
     let dbClients;
-    if (filter?.trim()) {
-      dbClients = await Database.clients.getAllPublicFiltered(filter);
+    let total: number = 0;
+    if (page && limit && filter?.trim()){
+      dbClients = await Database.clients.getPaginatedListPublicFiltered(filter, page, limit, sortClient);
+      total = await Database.clients.countAllFiltered(filter);
+    }
+    else if (page && limit){
+      dbClients = await Database.clients.getPaginatedListPublic(page, limit, sortClient);
+      total = await Database.clients.countAll();
+    }
+    else if (filter?.trim()) {
+      dbClients = await Database.clients.getAllPublicFiltered(filter, sortClient);
+      total = dbClients.length;
     } else {
-      dbClients = await Database.clients.getAllPublic();
+      dbClients = await Database.clients.getAllPublic(sortClient);
+      total = dbClients.length;
     }
 
     const clients = dbClients.map((client) => ({
@@ -146,7 +177,10 @@ class WireGuard {
       }
     );
 
-    return clients;
+    return {
+      total: total,
+      clients: clients
+    };
   }
 
   async getClientConfiguration({ clientId }: { clientId: ID }) {
@@ -277,7 +311,7 @@ class WireGuard {
   }
 
   async cronJob() {
-    const clients = await Database.clients.getAll();
+    const clients = await Database.clients.getAll(true);
     let needsSave = false;
     // Expires Feature
     for (const client of clients) {
