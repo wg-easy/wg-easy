@@ -7,7 +7,7 @@
         href="https://github.com/wg-easy/wg-easy"
         >WireGuard Easy</a
       >
-      ({{ globalStore.information?.currentRelease }}) © 2021-2025 by
+      ({{ globalStore.information?.currentRelease }}) © 2021-2026 by
       <a
         class="hover:underline"
         target="_blank"

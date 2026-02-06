@@ -5,7 +5,7 @@ export default defineNuxtConfig({
   future: {
     compatibilityVersion: 4,
   },
-  compatibilityDate: '2025-02-04',
+  compatibilityDate: '2026-02-06',
   devtools: { enabled: true },
   modules: [
     '@nuxtjs/i18n',
