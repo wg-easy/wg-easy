@@ -50,6 +50,7 @@ export const InterfaceUpdateSchema = schemaForType<InterfaceUpdateType>()(
     port: PortSchema,
     device: device,
     enabled: EnabledSchema,
+    firewallEnabled: EnabledSchema,
   })
 );
 

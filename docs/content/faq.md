@@ -6,6 +6,20 @@ hide:
 
 Here are some frequently asked questions or errors about `wg-easy`. If you have a question that is not answered here, please feel free to open a discussion on GitHub.
 
+## How do I restrict client access to specific networks or servers?
+
+Use the **Per-Client Firewall** feature to enforce server-side restrictions on what each client can access.
+
+**Requirements:** This feature requires `iptables` (and `ip6tables` for IPv6) to be installed on the host system.
+
+1. Enable "Per-Client Firewall" in **Admin Panel → Interface**
+2. Edit a client and configure "Firewall Allowed IPs"
+3. Specify which destinations the client should be allowed to access
+
+Unlike "Allowed IPs" which only controls client-side routing, firewall rules are enforced by the server and cannot be bypassed.
+
+See the [Admin Panel Guide](guides/admin/#per-client-firewall) and [Client Guide](guides/clients/#firewall-allowed-ips) for detailed configuration.
+
 ## Error: WireGuard exited with the error: Cannot find device "wg0"
 
 This error indicates that the WireGuard interface `wg0` does not exist. This can happen if the WireGuard kernel module is not loaded or if the interface was not created properly.

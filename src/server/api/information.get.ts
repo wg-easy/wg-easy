@@ -5,6 +5,7 @@ export default defineEventHandler(async () => {
   const updateAvailable = gt(latestRelease.version, RELEASE);
   const insecure = WG_ENV.INSECURE;
   const isAwg = WG_ENV.WG_EXECUTABLE === 'awg';
+  const wgInterface = await Database.interfaces.get();
 
   return {
     currentRelease: RELEASE,
@@ -12,5 +13,6 @@ export default defineEventHandler(async () => {
     updateAvailable,
     insecure,
     isAwg,
+    firewallEnabled: wgInterface.firewallEnabled,
   };
 });
