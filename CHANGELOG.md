@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [15.2.2] - 2026-02-06
+
+### Added
+
+- Added Userspace WireGuard support (https://github.com/wg-easy/wg-easy/pull/2419)
+
+### Fixed
+
+- LangSelector overlapping with Buttons (https://github.com/wg-easy/wg-easy/pull/2434)
+- AmnzeziaWG config parameters (https://github.com/wg-easy/wg-easy/pull/2440)
+- OpenMetrics help string format (https://github.com/wg-easy/wg-easy/pull/2453)
+- Reset 2fa when resetting admin password (https://github.com/wg-easy/wg-easy/pull/2461)
+
+### Docs
+
+- Replace Watchtower with maintained fork (https://github.com/wg-easy/wg-easy/pull/2456)
+
 ## [15.2.1] - 2026-01-14
 
 ### Fixed
