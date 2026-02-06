@@ -18,7 +18,7 @@ const db = drizzle({ client, schema });
 const dbAdminReset = defineCommand({
   meta: {
     name: 'db:admin:reset',
-    description: 'Reset the admin user',
+    description: 'Reset the admin user password and TOTP settings',
   },
   args: {
     password: {
@@ -61,6 +61,8 @@ const dbAdminReset = defineCommand({
         .update(schema.user)
         .set({
           password: hash,
+          totpVerified: false,
+          totpKey: null,
         })
         .where(eq(schema.user.id, 1));
 
