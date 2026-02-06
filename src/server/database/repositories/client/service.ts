@@ -175,25 +175,29 @@ export class ClientService {
 
     return this.#db.transaction(async (tx) => {
       const clients = await tx.query.client.findMany().execute();
-      const clientInterface = await tx.query.wgInterface
+      const _clientInterface = await tx.query.wgInterface
         .findFirst({
           where: eq(wgInterface.name, 'wg0'),
         })
         .execute();
 
-      if (!clientInterface) {
+      if (!_clientInterface) {
         throw new Error('WireGuard interface not found');
       }
 
-      const clientConfig = await tx.query.userConfig
+      const clientInterface = applyInterfaceOverrides(_clientInterface);
+
+      const _clientConfig = await tx.query.userConfig
         .findFirst({
           where: eq(userConfig.id, clientInterface.name),
         })
         .execute();
 
-      if (!clientConfig) {
+      if (!_clientConfig) {
         throw new Error('WireGuard interface configuration not found');
       }
+
+      const clientConfig = applyUserConfigOverrides(_clientConfig);
 
       const ipv4Cidr = parseCidr(clientInterface.ipv4Cidr);
       const ipv4Address = nextIP(4, ipv4Cidr, clients);
@@ -241,15 +245,17 @@ export class ClientService {
 
   update(id: ID, data: UpdateClientType) {
     return this.#db.transaction(async (tx) => {
-      const clientInterface = await tx.query.wgInterface
+      const _clientInterface = await tx.query.wgInterface
         .findFirst({
           where: eq(wgInterface.name, 'wg0'),
         })
         .execute();
 
-      if (!clientInterface) {
+      if (!_clientInterface) {
         throw new Error('WireGuard interface not found');
       }
+
+      const clientInterface = applyInterfaceOverrides(_clientInterface);
 
       if (!containsCidr(clientInterface.ipv4Cidr, data.ipv4Address)) {
         throw new Error('IPv4 address is not within the CIDR range');
@@ -272,7 +278,8 @@ export class ClientService {
     privateKey,
     publicKey,
   }: ClientCreateFromExistingType) {
-    const clientConfig = await Database.userConfigs.get();
+    const _clientConfig = await Database.userConfigs.get();
+    const clientConfig = applyUserConfigOverrides(_clientConfig);
 
     return this.#db
       .insert(client)
