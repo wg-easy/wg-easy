@@ -1985,12 +1985,6 @@ If you're using podman, make sure to read the related <a href="../examples/tutor
 <td>latest features for specific major versions, no breaking changes, recommended</td>
 </tr>
 <tr>
-<td><code>latest</code></td>
-<td>latest tag</td>
-<td><code>ghcr.io/wg-easy/wg-easy:latest</code> or <code>ghcr.io/wg-easy/wg-easy</code></td>
-<td>points to latest release, can include breaking changes</td>
-</tr>
-<tr>
 <td><code>15.0</code></td>
 <td>latest patch for that minor tag</td>
 <td><code>ghcr.io/wg-easy/wg-easy:15.0</code></td>
@@ -2014,11 +2008,17 @@ If you're using podman, make sure to read the related <a href="../examples/tutor
 <td><code>ghcr.io/wg-easy/wg-easy:development</code></td>
 <td>used for development, testing code from PRs</td>
 </tr>
+<tr>
+<td><code>latest</code></td>
+<td>latest tag</td>
+<td><code>ghcr.io/wg-easy/wg-easy:latest</code> or <code>ghcr.io/wg-easy/wg-easy</code></td>
+<td>points to the v14 release, should be avoided</td>
+</tr>
 </tbody>
 </table>
 <!-- ref: major version (check links too) -->
 
-<p>When publishing a tag we follow the <a href="https://semver.org/">Semantic Versioning</a> specification. The <code>latest</code> tag is always pointing to the latest stable release. If you want to avoid breaking changes, use the major version tag (e.g. <code>15</code>).</p>
+<p>When publishing a tag we follow the <a href="https://semver.org/">Semantic Versioning</a> specification. Pin to the latest major version to avoid breaking changes (e.g. <code>15</code>), avoid using the <code>latest</code> tag.</p>
 <h3 id="follow-tutorials"><a class="toclink" href="#follow-tutorials">Follow tutorials</a></h3>
 <ul>
 <li><a href="../examples/tutorials/basic-installation/">Basic Installation with Docker Compose (Recommended)</a></li>
