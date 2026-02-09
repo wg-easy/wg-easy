@@ -45,8 +45,8 @@ importers:
         specifier: ^0.44.0
         version: 0.44.0
       cidr-tools:
-        specifier: ^11.0.5
-        version: 11.0.5
+        specifier: ^11.0.6
+        version: 11.0.6
       citty:
         specifier: ^0.2.0
         version: 0.2.0
@@ -2803,8 +2803,8 @@ packages:
     resolution: {integrity: sha512-2Apfc6qH9uwF3QHmlYBA8ExB9VHq+1/Doj9sEMY55TVBcpQ3y/+gmMpcNIBBtfb5k54Vphmta+1IxjMqPlWWAA==}
     engines: {node: '>=20'}
 
-  cidr-tools@11.0.5:
-    resolution: {integrity: sha512-41Lp0H80eP+QQ39CKR3uQsQcUtvBye5MyYN5otiKhf+IGy791gLREB70FcjHU5hZYhQe6IKBrwPIBsAHGZmIRw==}
+  cidr-tools@11.0.6:
+    resolution: {integrity: sha512-RV6FaTXxvf3fzS7xkQ2sJXTwM/Q0YWA97+aUOKZ3RcB4jbV34ThcVo+mnMfBnkLbGOVl0sSt/Z9MJDYm8a3bwA==}
     engines: {node: '>=18'}
 
   citty@0.1.6:
@@ -3687,6 +3687,7 @@ packages:
 
   glob@10.5.0:
     resolution: {integrity: sha512-DfXN8DfhJ7NH3Oe7cFmu3NCu1wKbkReJ8TorzSAFbSKrlNaQSKfIzqYqVY8zlbs2NLBbWpRiU52GX2PbaBVNkg==}
+    deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
     hasBin: true
 
   glob@13.0.0:
@@ -3695,7 +3696,7 @@ packages:
 
   glob@7.2.3:
     resolution: {integrity: sha512-nFR0zLpU2YCaRxwoCJvL6UvCH2JFyFVIvwTLsIf21AuHlMskA1hhTdk+LlYJtOlYt9v6dvszD2BGRqBL+iQK9Q==}
-    deprecated: Glob versions prior to v9 are no longer supported
+    deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
 
   global-directory@4.0.1:
     resolution: {integrity: sha512-wHTUcDUoZ1H5/0iVqEudYW4/kAlN5cZ3j/bXn0Dpbizl9iaUVeWSHqiOjsgk6OW2bkLclbBjzewBz6weQ1zA2Q==}
@@ -3840,6 +3841,10 @@ packages:
 
   ip-bigint@8.2.3:
     resolution: {integrity: sha512-/+cJJZHXY1ajGe0ALRADOt0wLNbEy9zRXDs72HJmCZfLB34gUYeeaWkBm1lM8B/q6SDtWOLJ7FDUEV5hRblUXw==}
+    engines: {node: '>=18'}
+
+  ip-bigint@8.2.4:
+    resolution: {integrity: sha512-uLnCfRdjiqRSX36+sKW3PBsotx58qEXSfbRWqdy1N5w6LtlIDCQnxuVce5OIBD50WA9VX2DWixtiBVtalWb1fA==}
     engines: {node: '>=18'}
 
   ip-regex@5.0.0:
@@ -8420,9 +8425,9 @@ snapshots:
     dependencies:
       ip-regex: 5.0.0
 
-  cidr-tools@11.0.5:
+  cidr-tools@11.0.6:
     dependencies:
-      ip-bigint: 8.2.3
+      ip-bigint: 8.2.4
 
   citty@0.1.6:
     dependencies:
@@ -9456,6 +9461,8 @@ snapshots:
       - supports-color
 
   ip-bigint@8.2.3: {}
+
+  ip-bigint@8.2.4: {}
 
   ip-regex@5.0.0: {}
 
