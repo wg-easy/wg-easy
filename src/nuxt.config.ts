@@ -124,6 +124,11 @@ export default defineNuxtConfig({
         language: 'bg-BG',
         name: 'Български',
       },
+      {
+        code: 'gl',
+        language: 'gl-ES',
+        name: 'Galego',
+      },
     ],
     defaultLocale: 'en',
     vueI18n: './i18n.config.ts',
