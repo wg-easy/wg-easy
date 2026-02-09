@@ -63,8 +63,8 @@ importers:
         specifier: ^0.45.1
         version: 0.45.1(@libsql/client@0.17.0)
       ip-bigint:
-        specifier: ^8.2.3
-        version: 8.2.3
+        specifier: ^8.2.4
+        version: 8.2.4
       is-cidr:
         specifier: ^6.0.2
         version: 6.0.2
@@ -3687,6 +3687,7 @@ packages:
 
   glob@10.5.0:
     resolution: {integrity: sha512-DfXN8DfhJ7NH3Oe7cFmu3NCu1wKbkReJ8TorzSAFbSKrlNaQSKfIzqYqVY8zlbs2NLBbWpRiU52GX2PbaBVNkg==}
+    deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
     hasBin: true
 
   glob@13.0.0:
@@ -3695,7 +3696,7 @@ packages:
 
   glob@7.2.3:
     resolution: {integrity: sha512-nFR0zLpU2YCaRxwoCJvL6UvCH2JFyFVIvwTLsIf21AuHlMskA1hhTdk+LlYJtOlYt9v6dvszD2BGRqBL+iQK9Q==}
-    deprecated: Glob versions prior to v9 are no longer supported
+    deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
 
   global-directory@4.0.1:
     resolution: {integrity: sha512-wHTUcDUoZ1H5/0iVqEudYW4/kAlN5cZ3j/bXn0Dpbizl9iaUVeWSHqiOjsgk6OW2bkLclbBjzewBz6weQ1zA2Q==}
@@ -3838,8 +3839,8 @@ packages:
     resolution: {integrity: sha512-tAAg/72/VxOUW7RQSX1pIxJVucYKcjFjfvj60L57jrZpYCHC3XN0WCQ3sNYL4Gmvv+7GPvTAjc+KSdeNuE8oWQ==}
     engines: {node: '>=12.22.0'}
 
-  ip-bigint@8.2.3:
-    resolution: {integrity: sha512-/+cJJZHXY1ajGe0ALRADOt0wLNbEy9zRXDs72HJmCZfLB34gUYeeaWkBm1lM8B/q6SDtWOLJ7FDUEV5hRblUXw==}
+  ip-bigint@8.2.4:
+    resolution: {integrity: sha512-uLnCfRdjiqRSX36+sKW3PBsotx58qEXSfbRWqdy1N5w6LtlIDCQnxuVce5OIBD50WA9VX2DWixtiBVtalWb1fA==}
     engines: {node: '>=18'}
 
   ip-regex@5.0.0:
@@ -8422,7 +8423,7 @@ snapshots:
 
   cidr-tools@11.0.5:
     dependencies:
-      ip-bigint: 8.2.3
+      ip-bigint: 8.2.4
 
   citty@0.1.6:
     dependencies:
@@ -9455,7 +9456,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  ip-bigint@8.2.3: {}
+  ip-bigint@8.2.4: {}
 
   ip-regex@5.0.0: {}
 
