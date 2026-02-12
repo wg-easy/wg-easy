@@ -53,7 +53,11 @@ function parseFirewallEntry(entry: string): ParsedEntry {
   if (remaining.startsWith('[')) {
     const match = remaining.match(/^\[(.+)\]:(\d+)$/);
     if (match) {
-      return { ip: match[1], port: parseInt(match[2], 10), proto: proto ?? 'both' };
+      return {
+        ip: match[1],
+        port: parseInt(match[2], 10),
+        proto: proto ?? 'both',
+      };
     }
     // Just bracketed IPv6 without port
     const ipMatch = remaining.match(/^\[(.+)\]$/);
@@ -131,7 +135,9 @@ export const firewall = {
    * Initialize the custom chain if it doesn't exist
    */
   async initChain(interfaceName: string): Promise<void> {
-    FW_DEBUG(`Initializing firewall chain ${CHAIN_NAME} for interface ${interfaceName}`);
+    FW_DEBUG(
+      `Initializing firewall chain ${CHAIN_NAME} for interface ${interfaceName}`
+    );
 
     // Create chain if not exists (iptables returns error if exists, so we ignore)
     await exec(`iptables -N ${CHAIN_NAME} 2>/dev/null || true`);
@@ -169,7 +175,7 @@ export const firewall = {
     const effectiveIps =
       client.firewallIps && client.firewallIps.length > 0
         ? client.firewallIps
-        : client.allowedIps ?? defaultAllowedIps;
+        : (client.allowedIps ?? defaultAllowedIps);
 
     FW_DEBUG(
       `Applying firewall rules for client ${client.name} (${client.id}): ${effectiveIps.join(', ')}`
@@ -231,7 +237,11 @@ export const firewall = {
       // Apply rules for each enabled client
       for (const client of clients) {
         if (!client.enabled) continue;
-        await this.applyClientRules(client, userConfig.defaultAllowedIps, enableIpv6);
+        await this.applyClientRules(
+          client,
+          userConfig.defaultAllowedIps,
+          enableIpv6
+        );
       }
 
       // Add final DROP for any traffic not explicitly allowed
@@ -312,4 +322,9 @@ export const firewall = {
   clearAvailabilityCache(): void {
     iptablesAvailable = null;
   },
+};
+
+export const testExports = {
+  parseFirewallEntry,
+  generateRuleArgs,
 };
