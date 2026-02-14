@@ -22,6 +22,18 @@ type ParsedEntry = {
 };
 
 /**
+ * Sanitize a client identifier for use in an iptables comment.
+ * Strips all characters except ASCII alphanumeric, space, underscore, hyphen, and dot.
+ * Combines with client ID for a safe, identifiable comment.
+ * Truncates to 256 bytes (iptables comment module limit).
+ */
+function sanitizeComment(clientId: number, clientName: string): string {
+  const safe = clientName.replace(/[^a-zA-Z0-9 _.-]/g, '');
+  const comment = `client ${clientId}: ${safe}`;
+  return comment.slice(0, 256);
+}
+
+/**
  * Parse a firewall entry string into its components.
  * Supports formats:
  * - IP: "10.0.0.1" or "2001:db8::1"
@@ -109,22 +121,28 @@ function parseFirewallEntry(entry: string): ParsedEntry {
 function generateRuleArgs(
   clientIp: string,
   entry: ParsedEntry,
+  comment?: string,
   action: 'A' | 'D' = 'A'
 ): string[] {
   const rules: string[] = [];
+  const commentArg = comment ? ` -m comment --comment "${comment}"` : '';
   const baseArgs = `-${action} ${CHAIN_NAME} -s ${clientIp} -d ${entry.ip}`;
 
   if (entry.port) {
     // Port-specific rules
     if (entry.proto === 'tcp' || entry.proto === 'both') {
-      rules.push(`${baseArgs} -p tcp --dport ${entry.port} -j ACCEPT`);
+      rules.push(
+        `${baseArgs} -p tcp --dport ${entry.port}${commentArg} -j ACCEPT`
+      );
     }
     if (entry.proto === 'udp' || entry.proto === 'both') {
-      rules.push(`${baseArgs} -p udp --dport ${entry.port} -j ACCEPT`);
+      rules.push(
+        `${baseArgs} -p udp --dport ${entry.port}${commentArg} -j ACCEPT`
+      );
     }
   } else {
     // No port - allow all traffic to destination
-    rules.push(`${baseArgs} -j ACCEPT`);
+    rules.push(`${baseArgs}${commentArg} -j ACCEPT`);
   }
 
   return rules;
@@ -181,19 +199,21 @@ export const firewall = {
       `Applying firewall rules for client ${client.name} (${client.id}): ${effectiveIps.join(', ')}`
     );
 
+    const comment = sanitizeComment(client.id, client.name);
+
     for (const ipEntry of effectiveIps) {
       const parsed = parseFirewallEntry(ipEntry);
       const destIsIpv6 = isIPv6(parsed.ip.split('/')[0]); // Handle CIDR by checking base IP
 
       if (destIsIpv6) {
         if (enableIpv6) {
-          const rules = generateRuleArgs(client.ipv6Address, parsed);
+          const rules = generateRuleArgs(client.ipv6Address, parsed, comment);
           for (const rule of rules) {
             await exec(`ip6tables ${rule}`);
           }
         }
       } else {
-        const rules = generateRuleArgs(client.ipv4Address, parsed);
+        const rules = generateRuleArgs(client.ipv4Address, parsed, comment);
         for (const rule of rules) {
           await exec(`iptables ${rule}`);
         }
@@ -324,7 +344,8 @@ export const firewall = {
   },
 };
 
-export const testExports = {
+export const firewallTestExports = {
   parseFirewallEntry,
   generateRuleArgs,
+  sanitizeComment,
 };
