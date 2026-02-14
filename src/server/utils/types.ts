@@ -103,7 +103,32 @@ const FirewallIpEntrySchema = z
       const hasProto = /\/(tcp|udp)$/i.test(entry);
       const entryWithoutProto = entry.replace(/\/(tcp|udp)$/i, '');
 
-      // Check if it's IP:port format
+      // If protocol was specified without a port, it's invalid
+      if (hasProto) {
+        // Protocol requires port, so check for IP:port format
+        const portMatch = entryWithoutProto.match(/^(.+):(\d+)$/);
+        if (!portMatch) {
+          return false;
+        }
+        const [, ipPart, portPart] = portMatch;
+        const port = parseInt(portPart, 10);
+        const cleanIp = ipPart.replace(/^\[|\]$/g, '');
+        return (isIP(cleanIp) || isCidr(cleanIp)) && port >= 1 && port <= 65535;
+      }
+
+      // Check if it's just IP or CIDR first (handles IPv6 addresses)
+      if (isIP(entryWithoutProto) || isCidr(entryWithoutProto)) {
+        return true;
+      }
+
+      // Check if it's bracketed IPv6 without port: [::1]
+      const bracketedMatch = entryWithoutProto.match(/^\[(.+)\]$/);
+      if (bracketedMatch) {
+        const innerIp = bracketedMatch[1];
+        return isIP(innerIp) || isCidr(innerIp);
+      }
+
+      // Check if it's IP:port format (IPv4:port or [IPv6]:port)
       const portMatch = entryWithoutProto.match(/^(.+):(\d+)$/);
       if (portMatch) {
         const [, ipPart, portPart] = portMatch;
@@ -116,13 +141,7 @@ const FirewallIpEntrySchema = z
         return (isIP(cleanIp) || isCidr(cleanIp)) && port >= 1 && port <= 65535;
       }
 
-      // If protocol was specified without a port, it's invalid
-      if (hasProto) {
-        return false;
-      }
-
-      // Check if it's just IP or CIDR
-      return isIP(entryWithoutProto) || isCidr(entryWithoutProto);
+      return false;
     },
     {
       message: t('zod.client.firewallIpsInvalid'),

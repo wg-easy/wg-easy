@@ -72,8 +72,11 @@ describe('firewall', () => {
       expect(
         typesTextExports.FirewallIpEntrySchema.parse('2001:db8::1/32')
       ).toBe('2001:db8::1/32');
-      expect(typesTextExports.FirewallIpEntrySchema.parse('[::1]')).toEqual({
-        ip: '[::1]',
+      expect(typesTextExports.FirewallIpEntrySchema.parse('[::1]')).toBe(
+        '[::1]'
+      );
+      expect(testExports.parseFirewallEntry('[::1]')).toEqual({
+        ip: '::1',
       });
     });
   });
