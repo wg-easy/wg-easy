@@ -1,5 +1,4 @@
 import { InterfaceUpdateSchema } from '#db/repositories/interface/types';
-import { firewall } from '#utils/firewall';
 
 export default definePermissionEventHandler(
   'admin',
