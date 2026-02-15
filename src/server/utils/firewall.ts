@@ -64,7 +64,7 @@ function parseFirewallEntry(entry: string): ParsedEntry {
   // Handle IPv6 with port: [2001:db8::1]:443
   if (remaining.startsWith('[')) {
     const match = remaining.match(/^\[(.+)\]:(\d+)$/);
-    if (match) {
+    if (match && match[1] && match[2]) {
       return {
         ip: match[1],
         port: parseInt(match[2], 10),
@@ -73,7 +73,7 @@ function parseFirewallEntry(entry: string): ParsedEntry {
     }
     // Just bracketed IPv6 without port
     const ipMatch = remaining.match(/^\[(.+)\]$/);
-    if (ipMatch) {
+    if (ipMatch && ipMatch[1]) {
       if (proto) {
         throw new Error(
           `Invalid firewall entry "${entry}": Protocol (/${proto}) requires a port. Use format like "[${ipMatch[1]}]:443/${proto}"`
@@ -203,7 +203,8 @@ export const firewall = {
 
     for (const ipEntry of effectiveIps) {
       const parsed = parseFirewallEntry(ipEntry);
-      const destIsIpv6 = isIPv6(parsed.ip.split('/')[0]); // Handle CIDR by checking base IP
+      const baseIp = parsed.ip.split('/')[0] ?? parsed.ip; // Handle CIDR by checking base IP
+      const destIsIpv6 = isIPv6(baseIp);
 
       if (destIsIpv6) {
         if (enableIpv6) {
