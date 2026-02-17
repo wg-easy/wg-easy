@@ -1,8 +1,8 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "68c43b7a-772d-4c34-8278-e9fce5b53df1",
-  "prevId": "e09bc17a-dab6-45a3-a09c-57af222b08fb",
+  "id": "0f072f91-cd10-4702-ae7b-245255d69d1e",
+  "prevId": "68c43b7a-772d-4c34-8278-e9fce5b53df1",
   "tables": {
     "clients_table": {
       "name": "clients_table",
@@ -121,6 +121,13 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
+          "autoincrement": false
+        },
+        "firewall_ips": {
+          "name": "firewall_ips",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
           "autoincrement": false
         },
         "persistent_keepalive": {
@@ -612,6 +619,14 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
+        },
+        "firewall_enabled": {
+          "name": "firewall_enabled",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
         },
         "created_at": {
           "name": "created_at",
