@@ -111,8 +111,8 @@ const FirewallIpEntrySchema = z
           return false;
         }
         const [, ipPart, portPart] = portMatch;
-        const port = parseInt(portPart, 10);
-        const cleanIp = ipPart.replace(/^\[|\]$/g, '');
+        const port = parseInt(portPart!, 10);
+        const cleanIp = ipPart!.replace(/^\[|\]$/g, '');
         return (isIP(cleanIp) || isCidr(cleanIp)) && port >= 1 && port <= 65535;
       }
 
@@ -125,17 +125,17 @@ const FirewallIpEntrySchema = z
       const bracketedMatch = entryWithoutProto.match(/^\[(.+)\]$/);
       if (bracketedMatch) {
         const innerIp = bracketedMatch[1];
-        return isIP(innerIp) || isCidr(innerIp);
+        return isIP(innerIp!) || isCidr(innerIp!);
       }
 
       // Check if it's IP:port format (IPv4:port or [IPv6]:port)
       const portMatch = entryWithoutProto.match(/^(.+):(\d+)$/);
       if (portMatch) {
         const [, ipPart, portPart] = portMatch;
-        const port = parseInt(portPart, 10);
+        const port = parseInt(portPart!, 10);
 
         // Remove IPv6 brackets if present
-        const cleanIp = ipPart.replace(/^\[|\]$/g, '');
+        const cleanIp = ipPart!.replace(/^\[|\]$/g, '');
 
         // Validate IP and port
         return (isIP(cleanIp) || isCidr(cleanIp)) && port >= 1 && port <= 65535;

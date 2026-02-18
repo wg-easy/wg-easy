@@ -35,8 +35,8 @@ Unlike "Allowed IPs" which only controls routing on the client side, these rules
 
 **Supported Formats:**
 
-- `10.10.0.3` - Allow access to a single IP address
-- `10.10.0.0/24` - Allow access to an entire subnet
+- `10.10.0.3`, `2001:db8::1` - Allow access to a single IP address
+- `10.10.0.0/24`, `2001:db8::/32` - Allow access to an entire subnet
 - `192.168.1.5:443` - Allow access to specific port (TCP+UDP)
 - `192.168.1.5:443/tcp` - Allow access to specific port (TCP only)
 - `192.168.1.5:443/udp` - Allow access to specific port (UDP only)
@@ -62,10 +62,11 @@ Protocol specifiers (`/tcp` or `/udp`) require a port number. The following form
 - **Disable for specific client**: To disable firewall filtering for a single client while keeping it enabled for others, add `0.0.0.0/0, ::/0` to allow all traffic
 
 **Use Case Examples**:
-    - Allow only specific servers: `10.10.0.5`
-    - Allow only internal network: `10.10.0.0/24, 192.168.1.0/24`
-    - Allow only web browsing: `0.0.0.0/0:80, 0.0.0.0/0:443, ::/0:80, ::/0:443`
-    - Block internet, allow LAN: Leave "Allowed IPs" as `0.0.0.0/0, ::/0` but set Firewall IPs to `10.0.0.0/8, 192.168.0.0/16`
+
+- Allow only specific servers: `10.10.0.5`
+- Allow only internal network: `10.10.0.0/24, 192.168.1.0/24`
+- Allow only web browsing: `0.0.0.0/0:80, 0.0.0.0/0:443, [::/0]:80, [::/0]:443`
+- Block internet, allow LAN: Leave "Allowed IPs" as `0.0.0.0/0, ::/0` but set Firewall IPs to `10.0.0.0/8, 192.168.0.0/16`
 
 ## Server Allowed IPs
 
