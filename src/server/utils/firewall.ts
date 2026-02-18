@@ -1,7 +1,6 @@
 import debug from 'debug';
 import { isIPv6 } from 'is-ip';
 
-import type { ClientType } from '#db/repositories/client/types';
 import type { InterfaceType } from '#db/repositories/interface/types';
 import type { UserConfigType } from '#db/repositories/userConfig/types';
 
@@ -19,6 +18,16 @@ type ParsedEntry = {
   ip: string;
   port?: number;
   proto?: 'tcp' | 'udp' | 'both';
+};
+
+type FirewallClient = {
+  id: number;
+  name: string;
+  ipv4Address: string;
+  ipv6Address: string;
+  firewallIps: string[] | null;
+  allowedIps: string[] | null;
+  enabled: boolean;
 };
 
 /**
@@ -184,7 +193,7 @@ export const firewall = {
    * Apply firewall rules for a single client
    */
   async applyClientRules(
-    client: ClientType,
+    client: FirewallClient,
     defaultAllowedIps: string[],
     enableIpv6: boolean
   ): Promise<void> {
@@ -227,7 +236,7 @@ export const firewall = {
    */
   async rebuildRules(
     wgInterface: InterfaceType,
-    clients: ClientType[],
+    clients: FirewallClient[],
     userConfig: UserConfigType,
     enableIpv6: boolean
   ): Promise<void> {

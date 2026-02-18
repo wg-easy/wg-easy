@@ -14,7 +14,9 @@ export default definePermissionEventHandler(
       // Clear cache to force fresh check
       firewall.clearAvailabilityCache();
 
-      const iptablesAvailable = await firewall.isAvailable(!WG_ENV.DISABLE_IPV6);
+      const iptablesAvailable = await firewall.isAvailable(
+        !WG_ENV.DISABLE_IPV6
+      );
       if (!iptablesAvailable) {
         const requiredTools = WG_ENV.DISABLE_IPV6
           ? 'iptables'

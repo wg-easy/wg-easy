@@ -1,7 +1,10 @@
 export const useGlobalStore = defineStore('Global', () => {
-  const { data: information, refresh: refreshInformation } = useFetch('/api/information', {
-    method: 'get',
-  });
+  const { data: information, refresh: refreshInformation } = useFetch(
+    '/api/information',
+    {
+      method: 'get',
+    }
+  );
 
   const sortClient = ref(true); // Sort clients by name, true = asc, false = desc
 
