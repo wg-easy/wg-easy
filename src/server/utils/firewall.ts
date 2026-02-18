@@ -1,6 +1,7 @@
 import debug from 'debug';
 import { isIPv6 } from 'is-ip';
 
+import type { ClientType } from '#db/repositories/client/types';
 import type { InterfaceType } from '#db/repositories/interface/types';
 import type { UserConfigType } from '#db/repositories/userConfig/types';
 
@@ -20,15 +21,16 @@ type ParsedEntry = {
   proto?: 'tcp' | 'udp' | 'both';
 };
 
-type FirewallClient = {
-  id: number;
-  name: string;
-  ipv4Address: string;
-  ipv6Address: string;
-  firewallIps: string[] | null;
-  allowedIps: string[] | null;
-  enabled: boolean;
-};
+type FirewallClient = Pick<
+  ClientType,
+  | 'id'
+  | 'name'
+  | 'ipv4Address'
+  | 'ipv6Address'
+  | 'allowedIps'
+  | 'firewallIps'
+  | 'enabled'
+>;
 
 /**
  * Sanitize a client identifier for use in an iptables comment.
