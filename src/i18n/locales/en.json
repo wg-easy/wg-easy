@@ -122,7 +122,7 @@
     "config": "Configuration",
     "viewConfig": "View Configuration",
     "firewallIps": "Firewall Allowed IPs",
-    "firewallIpsDesc": "Destination IPs/CIDRs this client can access (server-side enforcement). Leave empty to use Allowed IPs. Supports port filtering: 10.0.0.1:443 or 10.0.0.1:443/tcp"
+    "firewallIpsDesc": "Destination IPs/CIDRs this client can access (server-side enforcement). Leave empty to use Allowed IPs. Supports port and protocol filtering: 10.0.0.1:443, 10.0.0.0/24:443/tcp, [::1]:443/udp"
   },
   "dialog": {
     "change": "Change",
