@@ -182,7 +182,8 @@
   "zod": {
     "generic": {
       "required": "{0} is vereist",
-      "validNumber": "{0} moet een geldig nummer zijn",
+      "validNumber": "{0} moet een geldig getal zijn",
+      "validNumberRange": "{0} moet een geldig getal of bereik zijn",
       "validString": "{0} moet een geldige tekenreeks zijn",
       "validBoolean": "{0} moet een geldige boolean zijn",
       "validArray": "{0} moet een geldige array zijn",
