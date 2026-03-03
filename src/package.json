@@ -31,15 +31,15 @@
     "@tailwindcss/forms": "^0.5.11",
     "@vueuse/core": "^14.2.1",
     "@vueuse/nuxt": "^14.2.1",
-    "apexcharts": "^5.4.0",
+    "apexcharts": "^5.7.0",
     "argon2": "^0.44.0",
-    "cidr-tools": "^11.0.10",
+    "cidr-tools": "^11.0.11",
     "citty": "^0.2.1",
     "consola": "^3.4.2",
     "crc-32": "^1.2.2",
     "debug": "^4.4.3",
     "drizzle-orm": "^0.45.1",
-    "ip-bigint": "^8.2.6",
+    "ip-bigint": "^8.2.7",
     "is-cidr": "^6.0.3",
     "is-ip": "^5.0.1",
     "js-sha256": "^0.11.1",
@@ -56,8 +56,8 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@nuxt/eslint": "^1.15.1",
-    "@nuxt/test-utils": "^3.23.0",
+    "@nuxt/eslint": "^1.15.2",
+    "@nuxt/test-utils": "^4.0.0",
     "@types/debug": "^4.1.12",
     "@types/phc__format": "^1.0.1",
     "@types/semver": "^7.7.1",
@@ -65,14 +65,14 @@
     "@vitest/ui": "4.0.18",
     "drizzle-kit": "^0.31.9",
     "esbuild": "^0.27.3",
-    "eslint": "^9.39.2",
+    "eslint": "^9.39.3",
     "eslint-config-prettier": "^10.1.8",
     "prettier": "^3.8.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "vitest": "^4.0.18",
-    "vue-tsc": "^3.2.4"
+    "vue-tsc": "^3.2.5"
   },
-  "packageManager": "pnpm@10.29.3"
+  "packageManager": "pnpm@10.30.3"
 }
