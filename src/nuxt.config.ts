@@ -91,6 +91,11 @@ export default defineNuxtConfig({
         name: 'Polski',
       },
       {
+        code: 'cs',
+        language: 'cs-CZ',
+        name: 'Čeština',
+      },
+      {
         code: 'pt-BR',
         language: 'pt-BR',
         name: 'Português (Brasil)',
