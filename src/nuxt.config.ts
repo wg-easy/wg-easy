@@ -23,6 +23,7 @@ export default defineNuxtConfig({
     classSuffix: '',
     cookieName: 'theme',
   },
+  css: ['~/app.css'],
   i18n: {
     // https://i18n.nuxtjs.org/docs/guide/server-side-translations
     experimental: {
