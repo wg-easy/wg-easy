@@ -18,6 +18,13 @@ function createPreparedStatement(db: DBType) {
       })
       .where(eq(wgInterface.name, sql.placeholder('interface')))
       .prepare(),
+    setFirewallEnabled: db
+      .update(wgInterface)
+      .set({
+        firewallEnabled: sql.placeholder('firewallEnabled') as never as boolean,
+      })
+      .where(eq(wgInterface.name, sql.placeholder('interface')))
+      .prepare(),
   };
 }
 
@@ -54,6 +61,13 @@ export class InterfaceService {
       .set(data)
       .where(eq(wgInterface.name, 'wg0'))
       .execute();
+  }
+
+  setFirewallEnabled(firewallEnabled: boolean) {
+    return this.#statements.setFirewallEnabled.execute({
+      interface: 'wg0',
+      firewallEnabled,
+    });
   }
 
   updateCidr(data: InterfaceCidrUpdateType) {
