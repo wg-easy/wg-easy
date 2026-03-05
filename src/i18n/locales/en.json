@@ -134,7 +134,8 @@
   "toast": {
     "success": "Success",
     "saved": "Saved",
-    "error": "Error"
+    "error": "Error",
+    "unknown": "Unknown error. See console for more details"
   },
   "form": {
     "actions": "Actions",

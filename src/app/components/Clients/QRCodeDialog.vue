@@ -33,6 +33,7 @@
 <script setup lang="ts">
 defineProps<{ qrCode: string }>();
 
+const toast = useToast();
 const img = useTemplateRef('img');
 
 async function svgToPng() {
@@ -63,35 +64,52 @@ async function svgToPng() {
 }
 
 async function downloadPng() {
-  const blob = await svgToPng();
-
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'client-config.png';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-}
-
-async function copyPng() {
   try {
     const blob = await svgToPng();
 
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'client-config.png';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  } catch (e) {
+    console.error('failed to download png', e);
+    toast.showToast({
+      type: 'error',
+      message: $t('toast.unknown'),
+    });
+  }
+}
+
+async function copyPng() {
+  const blob = await svgToPng().catch((e) => {
+    console.error('failed to convert svg to png', e);
+    toast.showToast({
+      type: 'error',
+      message: $t('toast.unknown'),
+    });
+  });
+  if (!blob) {
+    return;
+  }
+
+  try {
     await navigator.clipboard.write([
       new ClipboardItem({
         [blob.type]: blob,
       }),
     ]);
 
-    useToast().showToast({
+    toast.showToast({
       type: 'success',
       message: $t('copy.copied'),
     });
   } catch (e) {
     console.error('failed to copy png', e);
-    useToast().showToast({
+    toast.showToast({
       type: 'error',
       message: $t('copy.failed'),
     });
