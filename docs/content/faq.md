@@ -18,7 +18,7 @@ Use the **Per-Client Firewall** feature to enforce server-side restrictions on w
 
 Unlike "Allowed IPs" which only controls client-side routing, firewall rules are enforced by the server and cannot be bypassed.
 
-See the [Admin Panel Guide](guides/admin/#per-client-firewall) and [Client Guide](guides/clients/#firewall-allowed-ips) for detailed configuration.
+See the [Admin Panel Guide](./guides/admin.md#per-client-firewall) and [Client Guide](./guides/clients.md#firewall-allowed-ips) for detailed configuration.
 
 ## Error: WireGuard exited with the error: Cannot find device "wg0"
 

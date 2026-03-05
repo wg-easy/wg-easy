@@ -40,4 +40,4 @@ Most Linux distributions include iptables by default. If you're running in a min
 3. Specify allowed destinations (IPs, subnets, ports) for that client
 4. Server enforces these rules automatically
 
-See [Edit Client → Firewall Allowed IPs](../clients/#firewall-allowed-ips) for detailed configuration syntax and examples.
+See [Edit Client → Firewall Allowed IPs](./clients.md#firewall-allowed-ips) for detailed configuration syntax and examples.
