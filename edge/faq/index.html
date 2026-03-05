@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="../assets/logo/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.3">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.4">
     
     
       
@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#error-wireguard-exited-with-the-error-cannot-find-device-wg0" class="md-skip">
+        <a href="#how-do-i-restrict-client-access-to-specific-networks-or-servers" class="md-skip">
           Skip to content
         </a>
       
@@ -505,6 +505,17 @@
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#how-do-i-restrict-client-access-to-specific-networks-or-servers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How do I restrict client access to specific networks or servers?
+      
+    </span>
+  </a>
+  
+</li>
       
         <li class="md-nav__item">
   <a href="#error-wireguard-exited-with-the-error-cannot-find-device-wg0" class="md-nav__link">
@@ -1827,6 +1838,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#how-do-i-restrict-client-access-to-specific-networks-or-servers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How do I restrict client access to specific networks or servers?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#error-wireguard-exited-with-the-error-cannot-find-device-wg0" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1919,6 +1941,16 @@
   <h1>FAQ</h1>
 
 <p>Here are some frequently asked questions or errors about <code>wg-easy</code>. If you have a question that is not answered here, please feel free to open a discussion on GitHub.</p>
+<h2 id="how-do-i-restrict-client-access-to-specific-networks-or-servers"><a class="toclink" href="#how-do-i-restrict-client-access-to-specific-networks-or-servers">How do I restrict client access to specific networks or servers?</a></h2>
+<p>Use the <strong>Per-Client Firewall</strong> feature to enforce server-side restrictions on what each client can access.</p>
+<p><strong>Requirements:</strong> This feature requires <code>iptables</code> (and <code>ip6tables</code> for IPv6) to be installed on the host system.</p>
+<ol>
+<li>Enable "Per-Client Firewall" in <strong>Admin Panel → Interface</strong></li>
+<li>Edit a client and configure "Firewall Allowed IPs"</li>
+<li>Specify which destinations the client should be allowed to access</li>
+</ol>
+<p>Unlike "Allowed IPs" which only controls client-side routing, firewall rules are enforced by the server and cannot be bypassed.</p>
+<p>See the <a href="guides/admin/#per-client-firewall">Admin Panel Guide</a> and <a href="guides/clients/#firewall-allowed-ips">Client Guide</a> for detailed configuration.</p>
 <h2 id="error-wireguard-exited-with-the-error-cannot-find-device-wg0"><a class="toclink" href="#error-wireguard-exited-with-the-error-cannot-find-device-wg0">Error: WireGuard exited with the error: Cannot find device "wg0"</a></h2>
 <p>This error indicates that the WireGuard interface <code>wg0</code> does not exist. This can happen if the WireGuard kernel module is not loaded or if the interface was not created properly.</p>
 <p>To resolve this issue, you can try the following steps:</p>

@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="../../assets/logo/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.3">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.4">
     
     
       
@@ -78,6 +78,11 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
+      
+        
+        <a href="#interface-settings" class="md-skip">
+          Skip to content
+        </a>
       
     </div>
     <div data-md-component="announce">
@@ -1593,6 +1598,24 @@
       
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Admin Panel
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -1609,6 +1632,51 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#interface-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interface Settings
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Interface Settings">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#per-client-firewall" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Per-Client Firewall
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -1724,6 +1792,42 @@
   
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#interface-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interface Settings
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Interface Settings">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#per-client-firewall" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Per-Client Firewall
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -1757,7 +1861,39 @@
 
   <h1>Admin Panel</h1>
 
-<p>TODO</p>
+<h2 id="interface-settings"><a class="toclink" href="#interface-settings">Interface Settings</a></h2>
+<h3 id="per-client-firewall"><a class="toclink" href="#per-client-firewall">Per-Client Firewall</a></h3>
+<p>Enable server-side firewall filtering to enforce network access restrictions per client.</p>
+<p>When enabled, each client can have custom "Firewall Allowed IPs" configured that restrict which destinations they can access through the VPN. These restrictions are enforced by the server using iptables/ip6tables and cannot be bypassed by the client.</p>
+<div class="admonition warning">
+<p class="admonition-title">Experimental Feature</p>
+<p>This feature is currently experimental. While functional, it should be thoroughly tested in your environment before relying on it for production security requirements. Always verify that firewall rules are working as expected using test traffic or by manually inspecting the rules.</p>
+</div>
+<p><strong>Requirements:</strong></p>
+<ul>
+<li><code>iptables</code> must be installed on the host system</li>
+<li><code>ip6tables</code> must be installed if IPv6 is enabled (default)</li>
+<li>The feature cannot be enabled if these tools are not available</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Most Linux distributions include iptables by default. If you're running in a minimal container environment, you may need to install the <code>iptables</code> package on the host system.</p>
+</div>
+<p><strong>Enable this feature if you want to:</strong></p>
+<ul>
+<li>Restrict certain clients to only access specific servers or networks</li>
+<li>Prevent clients from accessing the internet while allowing LAN access</li>
+<li>Enforce port-based restrictions (e.g., only allow HTTP/HTTPS)</li>
+<li>Separate routing configuration from security enforcement</li>
+</ul>
+<p><strong>How it works:</strong></p>
+<ol>
+<li>Enable "Per-Client Firewall" in Admin Panel → Interface</li>
+<li>Edit any client to see the new "Firewall Allowed IPs" field</li>
+<li>Specify allowed destinations (IPs, subnets, ports) for that client</li>
+<li>Server enforces these rules automatically</li>
+</ol>
+<p>See <a href="../clients/#firewall-allowed-ips">Edit Client → Firewall Allowed IPs</a> for detailed configuration syntax and examples.</p>
 
 
 
