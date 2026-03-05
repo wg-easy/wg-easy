@@ -1,3 +1,5 @@
+// ! Auto Imports are not supported in this file
+
 import type { InterfaceType } from '#db/repositories/interface/types';
 
 /**
