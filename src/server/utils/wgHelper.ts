@@ -9,7 +9,9 @@ type Options = {
   enableIpv6?: boolean;
 };
 
-const wgExecutable = WG_ENV.WG_EXECUTABLE;
+// needed to support cli
+const wgExecutable =
+  typeof WG_ENV !== 'undefined' ? WG_ENV.WG_EXECUTABLE : 'dev';
 
 export const wg = {
   generateServerPeer: (
