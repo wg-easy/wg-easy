@@ -1,5 +1,5 @@
 import { defineCommand } from 'citty';
-import consola from 'consola';
+import { consola } from 'consola';
 import { eq } from 'drizzle-orm';
 
 import { wg } from '../../server/utils/wgHelper';
