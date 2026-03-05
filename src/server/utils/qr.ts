@@ -1,7 +1,7 @@
 // ! Auto Imports are not supported in this file
 
 import type { ErrorCorrection } from 'qr';
-import { encodeQR, ECMode } from 'qr';
+import { encodeQR } from 'qr';
 
 export function encodeQRCode(config: string): string {
   return tryECCModes((ecc) => {
@@ -23,6 +23,8 @@ export function encodeQRCodeTerm(config: string): string {
 }
 
 function tryECCModes<T>(callback: (ecc: ErrorCorrection) => T): T {
+  // defined manually, as qr's ECMode is in wrong order
+  const ECMode = ['high', 'quartile', 'medium', 'low'] as const;
   for (const ecc of ECMode) {
     try {
       return callback(ecc);
