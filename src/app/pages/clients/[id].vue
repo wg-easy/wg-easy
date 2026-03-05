@@ -147,25 +147,25 @@
             <FormHeading :description="$t('client.hooksDescription')">
               {{ $t('client.hooks') }}
             </FormHeading>
-            <FormTextField
+            <FormTextArea
               id="PreUp"
               v-model="data.preUp"
               :description="$t('client.hooksLeaveEmpty')"
               :label="$t('hooks.preUp')"
             />
-            <FormTextField
+            <FormTextArea
               id="PostUp"
               v-model="data.postUp"
               :description="$t('client.hooksLeaveEmpty')"
               :label="$t('hooks.postUp')"
             />
-            <FormTextField
+            <FormTextArea
               id="PreDown"
               v-model="data.preDown"
               :description="$t('client.hooksLeaveEmpty')"
               :label="$t('hooks.preDown')"
             />
-            <FormTextField
+            <FormTextArea
               id="PostDown"
               v-model="data.postDown"
               :description="$t('client.hooksLeaveEmpty')"

@@ -9,6 +9,10 @@ export function template(templ: string, values: Record<string, string>) {
   });
 }
 
+export function removeNewlines(templ: string) {
+  return templ.replace(/\r\n|\r|\n/g, ' ');
+}
+
 /**
  * Available keys:
  * - ipv4Cidr: IPv4 CIDR
@@ -18,7 +22,7 @@ export function template(templ: string, values: Record<string, string>) {
  * - uiPort: UI port number
  */
 export function iptablesTemplate(templ: string, wgInterface: InterfaceType) {
-  return template(templ, {
+  return template(removeNewlines(templ), {
     ipv4Cidr: wgInterface.ipv4Cidr,
     ipv6Cidr: wgInterface.ipv6Cidr,
     device: wgInterface.device,
