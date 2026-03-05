@@ -1,5 +1,9 @@
+// ! Auto Imports are not supported in this file
+
 import { parseCidr } from 'cidr-tools';
 import { stringifyIp } from 'ip-bigint';
+import { removeNewlines } from './template';
+
 import type { ClientType } from '#db/repositories/client/types';
 import type { InterfaceType } from '#db/repositories/interface/types';
 import type { UserConfigType } from '#db/repositories/userConfig/types';
@@ -112,10 +116,10 @@ PostDown = ${iptablesTemplate(hooks.postDown, wgInterface)}`;
       (enableIpv6 ? `, ${client.ipv6Address}/128` : '');
 
     const hookLines = [
-      client.preUp ? `PreUp = ${client.preUp}` : null,
-      client.postUp ? `PostUp = ${client.postUp}` : null,
-      client.preDown ? `PreDown = ${client.preDown}` : null,
-      client.postDown ? `PostDown = ${client.postDown}` : null,
+      client.preUp ? `PreUp = ${removeNewlines(client.preUp)}` : null,
+      client.postUp ? `PostUp = ${removeNewlines(client.postUp)}` : null,
+      client.preDown ? `PreDown = ${removeNewlines(client.preDown)}` : null,
+      client.postDown ? `PostDown = ${removeNewlines(client.postDown)}` : null,
     ];
 
     const dnsServers = client.dns ?? userConfig.defaultDns;
