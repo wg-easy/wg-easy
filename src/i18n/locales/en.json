@@ -122,7 +122,9 @@
     "config": "Configuration",
     "viewConfig": "View Configuration",
     "firewallIps": "Firewall Allowed IPs",
-    "firewallIpsDesc": "Destination IPs/CIDRs this client can access (server-side enforcement). Leave empty to use Allowed IPs. Supports optional port and protocol filtering. See docs for syntax."
+    "firewallIpsDesc": "Destination IPs/CIDRs this client can access (server-side enforcement). Leave empty to use Allowed IPs. Supports optional port and protocol filtering. See docs for syntax.",
+    "downloadPng": "Download PNG",
+    "copyPng": "Copy PNG"
   },
   "dialog": {
     "change": "Change",
@@ -132,7 +134,8 @@
   "toast": {
     "success": "Success",
     "saved": "Saved",
-    "error": "Error"
+    "error": "Error",
+    "unknown": "Unknown error. See console for more details"
   },
   "form": {
     "actions": "Actions",
