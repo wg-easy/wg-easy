@@ -9,10 +9,18 @@
       </div>
     </template>
     <template #actions>
-      <BaseSecondaryButton class="flex items-center gap-2" @click="copyPng">
+      <BaseSecondaryButton
+        class="flex items-center gap-2"
+        :title="$t('client.copyPng')"
+        @click="copyPng"
+      >
         <IconsCopy class="size-5" /> PNG
       </BaseSecondaryButton>
-      <BaseSecondaryButton class="flex items-center gap-2" @click="downloadPng">
+      <BaseSecondaryButton
+        class="flex items-center gap-2"
+        :title="$t('client.downloadPng')"
+        @click="downloadPng"
+      >
         <IconsDownload class="size-5" /> PNG
       </BaseSecondaryButton>
       <DialogClose as-child>
@@ -68,9 +76,9 @@ async function downloadPng() {
 }
 
 async function copyPng() {
-  const blob = await svgToPng();
-
   try {
+    const blob = await svgToPng();
+
     await navigator.clipboard.write([
       new ClipboardItem({
         [blob.type]: blob,
