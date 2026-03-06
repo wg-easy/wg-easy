@@ -12,7 +12,10 @@ class WireGuard {
    * Save and sync config
    */
   async saveConfig() {
-    const wgInterface = await Database.interfaces.get();
+    const wgInterface = applyInterfaceOverrides(
+      await Database.interfaces.get()
+    );
+
     await this.#saveWireguardConfig(wgInterface);
     await this.#syncWireguardConfig(wgInterface);
     await this.#applyFirewallRules(wgInterface);
@@ -39,7 +42,7 @@ class WireGuard {
    */
   async #saveWireguardConfig(wgInterface: InterfaceType) {
     const clients = await Database.clients.getAll();
-    const hooks = await Database.hooks.get();
+    const hooks = applyHooksOverrides(await Database.hooks.get());
 
     const result = [];
     result.push(
@@ -164,8 +167,12 @@ class WireGuard {
   }
 
   async getClientConfiguration({ clientId }: { clientId: ID }) {
-    const wgInterface = await Database.interfaces.get();
-    const userConfig = await Database.userConfigs.get();
+    const wgInterface = applyInterfaceOverrides(
+      await Database.interfaces.get()
+    );
+    const userConfig = applyUserConfigOverrides(
+      await Database.userConfigs.get()
+    );
 
     const client = await Database.clients.get(clientId);
 
@@ -227,25 +234,33 @@ class WireGuard {
       Database.interfaces.update(wgInterface);
     }
 
-    WG_DEBUG(`Starting Wireguard Interface ${wgInterface.name}...`);
-    await this.#saveWireguardConfig(wgInterface);
-    await wg.down(wgInterface.name).catch(() => {});
-    await wg.up(wgInterface.name).catch((err) => {
+    const wgInterfaceWithOverrides = applyInterfaceOverrides(wgInterface);
+
+    WG_DEBUG(
+      `Starting Wireguard Interface ${wgInterfaceWithOverrides.name}...`
+    );
+    await this.#saveWireguardConfig(wgInterfaceWithOverrides);
+    await wg.down(wgInterfaceWithOverrides.name).catch(() => {});
+    await wg.up(wgInterfaceWithOverrides.name).catch((err) => {
       if (
         err &&
         err.message &&
-        err.message.includes(`Cannot find device "${wgInterface.name}"`)
+        err.message.includes(
+          `Cannot find device "${wgInterfaceWithOverrides.name}"`
+        )
       ) {
         throw new Error(
-          `WireGuard exited with the error: Cannot find device "${wgInterface.name}"\nThis usually means that your host's kernel does not support WireGuard!`,
+          `WireGuard exited with the error: Cannot find device "${wgInterfaceWithOverrides.name}"\nThis usually means that your host's kernel does not support WireGuard!`,
           { cause: err.message }
         );
       }
 
       throw err;
     });
-    await this.#syncWireguardConfig(wgInterface);
-    WG_DEBUG(`Wireguard Interface ${wgInterface.name} started successfully.`);
+    await this.#syncWireguardConfig(wgInterfaceWithOverrides);
+    WG_DEBUG(
+      `Wireguard Interface ${wgInterfaceWithOverrides.name} started successfully.`
+    );
 
     // Check if firewall was enabled but iptables isn't available
     if (wgInterface.firewallEnabled) {
@@ -282,12 +297,16 @@ class WireGuard {
 
   // Shutdown wireguard
   async Shutdown() {
-    const wgInterface = await Database.interfaces.get();
+    const wgInterface = applyInterfaceOverrides(
+      await Database.interfaces.get()
+    );
     await wg.down(wgInterface.name).catch(() => {});
   }
 
   async Restart() {
-    const wgInterface = await Database.interfaces.get();
+    const wgInterface = applyInterfaceOverrides(
+      await Database.interfaces.get()
+    );
     await wg.restart(wgInterface.name);
   }
 
