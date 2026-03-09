@@ -206,7 +206,7 @@
       "address6": "IPv6 Adresi",
       "serverAllowedIps": "Server Allowed IPs",
       "firewallIps": "Firewall Allowed IPs",
-      "firewallIpsInvalid": "Geçersiz Firewall IP formatı."
+      "firewallIpsInvalid": "Geçersiz Firewall IP formatı. Desteklenen söz dizimi için dokümantasyona bakın. See docs for supported syntax."
     },
     "user": {
       "username": "Kullanıcı Adı",
