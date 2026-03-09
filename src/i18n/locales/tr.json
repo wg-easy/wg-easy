@@ -162,8 +162,8 @@
     "config": {
       "connection": "Bağlantı",
       "hostDesc": "İstemcilerin bağlanacağı Host (configleri etkiler)",
-      "portDesc": "İstemcilerin bağlanacağı UDP Portu",
-      "allowedIpsDesc": "Global Allowed IPs",
+      "portDesc": "İstemcilerin bağlanacağı UDP portu. Bunu değiştirmek mevcut istemci yapılandırmalarını geçersiz kılabilir ve WireGuard Arayüz Portu ile eşleşmelidir.",
+      "allowedIpsDesc": "Genel Allowed IPs (izin verilen IP'ler)",
       "dnsDesc": "Global DNS",
       "mtuDesc": "Varsayılan MTU (yeni istemciler için)",
       "persistentKeepaliveDesc": "Varsayılan Keepalive (yeni istemciler için)",
