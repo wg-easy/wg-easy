@@ -38,7 +38,7 @@ jobs:
             latest=false
 
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -92,14 +92,14 @@ jobs:
           merge-multiple: true
 
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Login to Codeberg
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: codeberg.org
           username: ${{ secrets.CODEBERG_USER }}
