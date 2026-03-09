@@ -122,7 +122,7 @@
     "config": "Config",
     "viewConfig": "Config Görüntüle",
     "firewallIps": "Firewall Allowed IPs",
-    "firewallIpsDesc": "İstemcinin erişebileceği hedef IP/CIDR'ler. Boş bırakılırsa Allowed IPs kullanılır.",
+    "firewallIpsDesc": "İstemcinin erişebileceği hedef IP/CIDR'ler (isteğe bağlı port/protokol filtreleme ile). Boş bırakılırsa Allowed IPs kullanılır. Ayrıntılı söz dizimi için dokümantasyona bakın.",
     "downloadPng": "PNG İndir",
     "copyPng": "PNG Kopyala"
   },
