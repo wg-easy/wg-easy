@@ -1,4 +1,4 @@
-FROM docker.io/library/node:jod-alpine AS build
+FROM docker.io/library/node:krypton-alpine AS build
 WORKDIR /app
 
 # update corepack
@@ -25,7 +25,7 @@ RUN apk add linux-headers build-base go git && \
 
 # Copy build result to a new image.
 # This saves a lot of disk space.
-FROM docker.io/library/node:jod-alpine
+FROM docker.io/library/node:krypton-alpine
 WORKDIR /app
 
 HEALTHCHECK --interval=1m --timeout=5s --retries=3 CMD /usr/bin/timeout 5s /bin/sh -c "/usr/bin/wg show | /bin/grep -q interface || exit 1"

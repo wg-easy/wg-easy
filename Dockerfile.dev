@@ -1,4 +1,4 @@
-FROM docker.io/library/node:jod-alpine
+FROM docker.io/library/node:krypton-alpine
 WORKDIR /app
 
 # update corepack
