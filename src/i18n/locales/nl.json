@@ -120,7 +120,7 @@
     "endpointDesc": "IP van de cliënt vanaf welke de WireGuard-verbinding tot stand wordt gebracht",
     "search": "Cliënten zoeken...",
     "config": "Configuratie",
-    "viewConfig": "Configuratie weergeven"
+    "viewConfig": "Configuratie weergeven",
     "firewallIps": "Firewall-toegestane IPs",
     "firewallIpsDesc": "Bestemmings-IP's/CIDR's waartoe deze client toegang heeft (handhaving aan de serverzijde). Laat leeg om Toegestane IP's te gebruiken. Ondersteunt optionele poort - en protocolfiltering. Zie documentatie voor syntaxis.",
     "downloadPng": "PNG downloaden",
@@ -134,7 +134,7 @@
   "toast": {
     "success": "Succes",
     "saved": "Opgeslagen",
-    "error": "Fout"
+    "error": "Fout",
     "unknown": "Onbekende fout. Zie console voor meer details"
   },
   "form": {
@@ -180,7 +180,7 @@
       "restart": "Interface opnieuw starten",
       "restartDesc": "WireGuard-interface opnieuw starten",
       "restartWarn": "Weet u zeker dat u de interface wilt herstarten? Dit zal alle cliënten loskoppelen.",
-      "restartSuccess": "Interface opnieuw gestart"
+      "restartSuccess": "Interface opnieuw gestart",
       "firewall": "Traffic-filtering",
       "firewallEnabled": "Per-Client Firewall inschakelen",
       "firewallEnabledDesc": "Beperk het cliëntverkeer tot specifieke bestemmings-IP's met behulp van iptables. Indien ingeschakeld, kan elke cliënt worden geconfigureerd met toegestane bestemmingen."
@@ -204,8 +204,8 @@
       "expiresAt": "Verloopt op",
       "address4": "IPv4-adres",
       "address6": "IPv6-adres",
-      "serverAllowedIps": "Toegestane IP's van de server"
-      "firewallIps": "Firewall-toegestane IP'ss",
+      "serverAllowedIps": "Toegestane IP's van de server",
+      "firewallIps": "Firewall-toegestane IPs",
       "firewallIpsInvalid": "Ongeldige IP-invoer van firewall. Zie documentatie voor ondersteunde syntaxis."
     },
     "user": {
