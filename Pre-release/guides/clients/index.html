@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="../../assets/logo/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.0">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.5">
     
     
       
@@ -33,7 +33,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.618322db.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -1736,6 +1736,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#firewall-allowed-ips" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Firewall Allowed IPs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#server-allowed-ips" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1892,6 +1903,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#firewall-allowed-ips" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Firewall Allowed IPs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#server-allowed-ips" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1995,7 +2017,52 @@
 <h2 id="allowed-ips"><a class="toclink" href="#allowed-ips">Allowed IPs</a></h2>
 <p>Which IPs will be routed through the VPN.</p>
 <p>This will not prevent the user from modifying it locally and accessing IP ranges that they should not be able to access.</p>
-<p>Use firewall rules to prevent access to IP ranges that the user should not be able to access.</p>
+<p>Use the Firewall Allowed IPs feature to prevent access to IP ranges that the user should not be able to access.</p>
+<h2 id="firewall-allowed-ips"><a class="toclink" href="#firewall-allowed-ips">Firewall Allowed IPs</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Attention</p>
+<p>This field only appears when <strong>Per-Client Firewall</strong> is enabled in the Admin Panel → Interface settings.</p>
+</div>
+<p>Server-side firewall rules that restrict which destinations the client can access, regardless of their local configuration.</p>
+<p>Unlike "Allowed IPs" which only controls routing on the client side, these rules are enforced by the server using iptables/ip6tables and cannot be bypassed by the client.</p>
+<p><strong>Supported Formats:</strong></p>
+<ul>
+<li><code>10.10.0.3</code>, <code>2001:db8::1</code> - Allow access to a single IP address</li>
+<li><code>10.10.0.0/24</code>, <code>2001:db8::/32</code> - Allow access to an entire subnet</li>
+<li><code>192.168.1.5:443</code> - Allow access to specific port (TCP+UDP)</li>
+<li><code>192.168.1.5:443/tcp</code> - Allow access to specific port (TCP only)</li>
+<li><code>192.168.1.5:443/udp</code> - Allow access to specific port (UDP only)</li>
+<li><code>10.10.0.0/24:443</code> - Allow access to an entire subnet on a specific port (TCP+UDP)</li>
+<li><code>10.10.0.0/24:443/tcp</code> - Allow access to an entire subnet on a specific port (TCP only)</li>
+<li><code>10.10.0.0/24:443/udp</code> - Allow access to an entire subnet on a specific port (UDP only)</li>
+<li><code>[2001:db8::1]:443</code> - IPv6 address with port (brackets required)</li>
+<li><code>[2001:db8::/32]:443/tcp</code> - IPv6 CIDR with port and protocol</li>
+</ul>
+<div class="admonition warning">
+<p class="admonition-title">Invalid Formats</p>
+<p>Protocol specifiers (<code>/tcp</code> or <code>/udp</code>) require a port number. The following formats are <strong>not supported</strong> and will result in an error:</p>
+<ul>
+<li><code>10.10.0.3/tcp</code> (use <code>10.10.0.3:443/tcp</code> instead)</li>
+<li><code>10.10.0.0/24/udp</code> (use <code>10.10.0.0/24:53/udp</code> instead)</li>
+</ul>
+</div>
+<p><strong>Behavior:</strong></p>
+<ul>
+<li><strong>Empty</strong>: Falls back to the client's "Allowed IPs" setting</li>
+<li><strong>Specified</strong>: Only listed destinations are accessible (allow-only, everything else is blocked)</li>
+<li><strong>Disable for specific client</strong>: To disable firewall filtering for a single client while keeping it enabled for others, add <code>0.0.0.0/0, ::/0</code> to allow all traffic</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To allow clients to reach the VPN server itself (e.g. for DNS), include the server's VPN address in the firewall allowed IPs.</p>
+</div>
+<p><strong>Use Case Examples</strong>:</p>
+<ul>
+<li>Allow only specific servers: <code>10.10.0.5</code></li>
+<li>Allow only internal network: <code>10.10.0.0/24, 192.168.1.0/24</code></li>
+<li>Allow only web browsing: <code>0.0.0.0/0:80, 0.0.0.0/0:443, [::/0]:80, [::/0]:443</code></li>
+<li>Block internet, allow LAN: Leave "Allowed IPs" as <code>0.0.0.0/0, ::/0</code> but set Firewall IPs to <code>10.0.0.0/8, 192.168.0.0/16</code></li>
+</ul>
 <h2 id="server-allowed-ips"><a class="toclink" href="#server-allowed-ips">Server Allowed IPs</a></h2>
 <p>Which IPs will be routed to the client.</p>
 <h2 id="dns"><a class="toclink" href="#dns">DNS</a></h2>
@@ -2082,10 +2149,10 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.top", "navigation.expand", "navigation.instant", "content.action.edit", "content.action.view", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.7a47a382.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.top", "navigation.expand", "navigation.instant", "content.action.edit", "content.action.view", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
       
     
   </body>
