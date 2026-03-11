@@ -116,7 +116,14 @@
     "dnsDesc": "Servidor DNS que usarán los clientes (anula la configuración global)",
     "notConnected": "Cliente no conectado",
     "endpoint": "Punto de conexión",
-    "endpointDesc": "IP del cliente desde donde se establece la conexión WireGuard"
+    "endpointDesc": "IP del cliente desde donde se establece la conexión WireGuard",
+    "search": "Buscar clientes...",
+    "config": "Configuración",
+    "viewConfig": "Ver configuración",
+    "firewallIps": "IPs permitidas del cortafuegos",
+    "firewallIpsDesc": "IPs/CIDRs de destino a las que este cliente puede acceder (aplicado en el servidor). Deja vacío para usar IPs permitidas. Admite filtrado opcional de puertos y protocolos. Consulta la documentación para la sintaxis.",
+    "downloadPng": "Descargar PNG",
+    "copyPng": "Copiar PNG"
   },
   "dialog": {
     "change": "Cambiar",
@@ -126,7 +133,8 @@
   "toast": {
     "success": "Éxito",
     "saved": "Guardado",
-    "error": "Error"
+    "error": "Error",
+    "unknown": "Error desconocido. Revisa la consola para más detalles"
   },
   "form": {
     "actions": "Acciones",
@@ -171,7 +179,10 @@
       "restart": "Reiniciar interfaz",
       "restartDesc": "Reiniciar la interfaz de WireGuard",
       "restartWarn": "¿Estás seguro de reiniciar la interfaz? Esto desconectará a todos los clientes.",
-      "restartSuccess": "Interfaz reiniciada"
+      "restartSuccess": "Interfaz reiniciada",
+      "firewall": "Filtrado de tráfico",
+      "firewallEnabled": "Habilitar cortafuegos por cliente",
+      "firewallEnabledDesc": "Restringe el tráfico del cliente a IPs de destino específicas usando iptables. Cuando está activado, cada cliente puede configurarse con destinos permitidos."
     },
     "introText": "Bienvenido al panel de administración.\n\nAquí puedes gestionar los ajustes generales, la configuración, la interfaz y los hooks.\n\nEmpieza eligiendo una de las secciones en la barra lateral."
   },
@@ -179,6 +190,7 @@
     "generic": {
       "required": "{0} es obligatorio",
       "validNumber": "{0} debe ser un número válido",
+      "validNumberRange": "{0} debe ser un número válido o un rango de números",
       "validString": "{0} debe ser una cadena válida",
       "validBoolean": "{0} debe ser un booleano válido",
       "validArray": "{0} debe ser una lista válida",
@@ -191,7 +203,9 @@
       "expiresAt": "Expira el",
       "address4": "Dirección IPv4",
       "address6": "Dirección IPv6",
-      "serverAllowedIps": "IPs permitidas del servidor"
+      "serverAllowedIps": "IPs permitidas del servidor",
+      "firewallIps": "IPs permitidas del cortafuegos",
+      "firewallIpsInvalid": "Entrada de IP de cortafuegos no válida. Consulta la documentación para la sintaxis compatible."
     },
     "user": {
       "username": "Usuario",
@@ -236,5 +250,47 @@
     "postUp": "PostUp",
     "preDown": "PreDown",
     "postDown": "PostDown"
+  },
+  "copy": {
+    "notSupported": "La copia no es compatible",
+    "copied": "¡Copiado!",
+    "failed": "Error al copiar",
+    "copy": "Copiar"
+  },
+  "awg": {
+    "jCLabel": "Número de paquetes basura (Jc)",
+    "jCDescription": "Número de paquetes basura a enviar (1-128, recomendado: 4-12)",
+    "jMinLabel": "Tamaño mínimo de paquete basura (Jmin)",
+    "jMinDescription": "Tamaño mínimo de los paquetes basura (0-1279*, recomendado: 8, debe ser < Jmax)",
+    "jMaxLabel": "Tamaño máximo de paquete basura (Jmax)",
+    "jMaxDescription": "Tamaño máximo de los paquetes basura (1-1280*, recomendado: 80, debe ser > Jmin)",
+    "s1Label": "Tamaño de basura del paquete Init (S1)",
+    "s1Description": "Tamaño de basura del paquete Init (0-1132[1280* - 148 = 1132], recomendado: 15-150, S1+56 ≠ S2)",
+    "s2Label": "Tamaño de basura del paquete de respuesta (S2)",
+    "s2Description": "Tamaño de basura del paquete de respuesta (0-1188[1280* - 92 = 1188], recomendado: 15-150)",
+    "s3Label": "Tamaño de basura del paquete de respuesta de cookie (S3)",
+    "s3Description": "Tamaño de basura del paquete de respuesta de cookie",
+    "s4Label": "Tamaño de basura del paquete de transporte (S4)",
+    "s4Description": "Tamaño de basura del paquete de transporte",
+    "h1Label": "Cabecera mágica Init (H1)",
+    "h1Description": "Valor o rango de cabecera del paquete Init (X o X-Y, donde X<Y. Mín 5, máx 2147483647. El valor o rango no debe solaparse con otras cabeceras)",
+    "h2Label": "Cabecera mágica de respuesta (H2)",
+    "h2Description": "Valor o rango de cabecera del paquete de respuesta (X o X-Y, donde X<Y. Mín 5, máx 2147483647. El valor o rango no debe solaparse con otras cabeceras)",
+    "h3Label": "Cabecera mágica de respuesta de cookie (H3)",
+    "h3Description": "Valor o rango de cabecera del paquete de respuesta de cookie (X o X-Y, donde X<Y. Mín 5, máx 2147483647. El valor o rango no debe solaparse con otras cabeceras)",
+    "h4Label": "Cabecera mágica de transporte (H4)",
+    "h4Description": "Valor o rango de cabecera del paquete de transporte (X o X-Y, donde X<Y. Mín 5, máx 2147483647. El valor o rango no debe solaparse con otras cabeceras)",
+    "i1Label": "Paquete basura especial 1 (I1)",
+    "i1Description": "Paquete que imita protocolo en formato hex: <b 0x...>",
+    "i2Label": "Paquete basura especial 2 (I2)",
+    "i2Description": "Paquete que imita protocolo en formato hex: <b 0x...>",
+    "i3Label": "Paquete basura especial 3 (I3)",
+    "i3Description": "Paquete que imita protocolo en formato hex: <b 0x...>",
+    "i4Label": "Paquete basura especial 4 (I4)",
+    "i4Description": "Paquete que imita protocolo en formato hex: <b 0x...>",
+    "i5Label": "Paquete basura especial 5 (I5)",
+    "i5Description": "Paquete que imita protocolo en formato hex: <b 0x...>",
+    "mtuNote": "Los valores dependen de la MTU",
+    "obfuscationParameters": "Parámetros de ofuscación AmneziaWG"
   }
 }
