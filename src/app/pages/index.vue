@@ -29,9 +29,6 @@
 </template>
 
 <script setup lang="ts">
-const authStore = useAuthStore();
-authStore.update();
-
 const globalStore = useGlobalStore();
 const clientsStore = useClientsStore();
 

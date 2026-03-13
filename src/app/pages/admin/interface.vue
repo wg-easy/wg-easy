@@ -70,6 +70,30 @@
           :description="$t('awg.s4Description')"
         />
         <FormNullTextField
+          id="h1"
+          v-model="data.h1"
+          :label="$t('awg.h1Label')"
+          :description="$t('awg.h1Description')"
+        />
+        <FormNullTextField
+          id="h2"
+          v-model="data.h2"
+          :label="$t('awg.h2Label')"
+          :description="$t('awg.h2Description')"
+        />
+        <FormNullTextField
+          id="h3"
+          v-model="data.h3"
+          :label="$t('awg.h3Label')"
+          :description="$t('awg.h3Description')"
+        />
+        <FormNullTextField
+          id="h4"
+          v-model="data.h4"
+          :label="$t('awg.h4Label')"
+          :description="$t('awg.h4Description')"
+        />
+        <FormNullTextField
           id="i1"
           v-model="data.i1"
           :label="$t('awg.i1Label')"
@@ -99,29 +123,14 @@
           :label="$t('awg.i5Label')"
           :description="$t('awg.i5Description')"
         />
-        <FormNullNumberField
-          id="h1"
-          v-model="data.h1"
-          :label="$t('awg.h1Label')"
-          :description="$t('awg.h1Description')"
-        />
-        <FormNullNumberField
-          id="h2"
-          v-model="data.h2"
-          :label="$t('awg.h2Label')"
-          :description="$t('awg.h2Description')"
-        />
-        <FormNullNumberField
-          id="h3"
-          v-model="data.h3"
-          :label="$t('awg.h3Label')"
-          :description="$t('awg.h3Description')"
-        />
-        <FormNullNumberField
-          id="h4"
-          v-model="data.h4"
-          :label="$t('awg.h4Label')"
-          :description="$t('awg.h4Description')"
+      </FormGroup>
+      <FormGroup>
+        <FormHeading>{{ $t('admin.interface.firewall') }}</FormHeading>
+        <FormSwitchField
+          id="firewallEnabled"
+          v-model="data.firewallEnabled"
+          :label="$t('admin.interface.firewallEnabled')"
+          :description="$t('admin.interface.firewallEnabledDesc')"
         />
       </FormGroup>
       <FormGroup>
@@ -171,7 +180,15 @@ const _submit = useSubmit(
   {
     method: 'post',
   },
-  { revert }
+  {
+    revert: async (success) => {
+      await revert();
+      if (success) {
+        // Refresh global store information after successful save
+        await globalStore.refreshInformation();
+      }
+    },
+  }
 );
 
 function submit() {

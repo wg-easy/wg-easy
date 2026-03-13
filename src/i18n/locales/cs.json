@@ -1,0 +1,287 @@
+{
+  "pages": {
+    "me": "Účet",
+    "clients": "Klienti",
+    "admin": {
+      "panel": "Administrace",
+      "general": "Obecné",
+      "config": "Konfigurace",
+      "interface": "Rozhraní",
+      "hooks": "Nastavení reakcí"
+    }
+  },
+  "user": {
+    "email": "E-mail"
+  },
+  "me": {
+    "currentPassword": "Aktuální heslo",
+    "enable2fa": "Zapnout dvoufázové ověření (2FA)",
+    "enable2faDesc": "Naskenujte QR kód ve své autentizační aplikaci nebo zadejte klíč ručně.",
+    "2faKey": "TOTP klíč",
+    "2faCodeDesc": "Zadejte kód z vaší autentizační aplikace.",
+    "disable2fa": "Vypnout dvoufázové ověření",
+    "disable2faDesc": "Pro vypnutí dvoufázového ověření zadejte své heslo."
+  },
+  "general": {
+    "name": "Jméno",
+    "username": "Uživatelské jméno",
+    "password": "Heslo",
+    "newPassword": "Nové heslo",
+    "updatePassword": "Aktualizovat heslo",
+    "mtu": "MTU",
+    "allowedIps": "Povolené IP adresy",
+    "dns": "DNS",
+    "persistentKeepalive": "Persistent Keepalive",
+    "logout": "Odhlásit se",
+    "continue": "Pokračovat",
+    "host": "Hostitel",
+    "port": "Port",
+    "yes": "Ano",
+    "no": "Ne",
+    "confirmPassword": "Potvrdit heslo",
+    "loading": "Načítání...",
+    "2fa": "Dvoufázové ověření",
+    "2faCode": "TOTP kód"
+  },
+  "setup": {
+    "welcome": "Vítejte u první instalace wg-easy",
+    "welcomeDesc": "Našli jste nejjednodušší způsob, jak instalovat a spravovat WireGuard na jakémkoliv Linuxovém hostiteli",
+    "existingSetup": "Máte již existující nastavení?",
+    "createAdminDesc": "Nejprve zadejte uživatelské jméno administrátora a silné heslo. Tyto údaje budou použity pro přihlášení do administrace.",
+    "setupConfigDesc": "Zadejte údaje o hostiteli a portu. Tyto informace budou použity pro konfiguraci klientů při nastavování WireGuard na jejich zařízeních.",
+    "setupMigrationDesc": "Pokud chcete migrovat data z předchozí verze wg-easy do nové instalace, nahrajte soubor se zálohou.",
+    "upload": "Nahrát",
+    "migration": "Obnovit zálohu:",
+    "createAccount": "Vytvořit účet",
+    "successful": "Nastavení bylo úspěšné",
+    "hostDesc": "Veřejný název hostitele, ke kterému se budou klienti připojovat",
+    "portDesc": "Veřejný UDP port, ke kterému se budou klienti připojovat a na kterém bude WireGuard naslouchat"
+  },
+  "update": {
+    "updateAvailable": "Je k dispozici aktualizace!",
+    "update": "Aktualizovat"
+  },
+  "theme": {
+    "dark": "Tmavý režim",
+    "light": "Světlý režim",
+    "system": "Systémové nastavení"
+  },
+  "layout": {
+    "toggleCharts": "Zobrazit/skrýt grafy",
+    "donate": "Přispět"
+  },
+  "login": {
+    "signIn": "Přihlásit se",
+    "rememberMe": "Zapamatovat si mě",
+    "rememberMeDesc": "Zůstat přihlášen i po zavření prohlížeče",
+    "insecure": "Nemůžete se přihlásit přes nezabezpečené připojení. Použijte HTTPS.",
+    "2faRequired": "Je vyžadováno dvoufázové ověření",
+    "2faWrong": "Neplatný kód dvoufázového ověření"
+  },
+  "client": {
+    "empty": "Zatím zde nejsou žádní klienti.",
+    "newShort": "Nový",
+    "sort": "Seřadit",
+    "create": "Vytvořit klienta",
+    "created": "Klient vytvořen",
+    "new": "Nový klient",
+    "name": "Jméno",
+    "expireDate": "Datum vypršení",
+    "expireDateDesc": "Datum, kdy bude klient deaktivován. Ponechte prázdné pro trvalý přístup.",
+    "delete": "Smazat",
+    "deleteClient": "Smazat klienta",
+    "deleteDialog1": "Opravdu chcete smazat uživatele",
+    "deleteDialog2": "Tuto akci nelze vzít zpět.",
+    "enabled": "Aktivní",
+    "address": "Adresa",
+    "serverAllowedIps": "Povolené IP adresy serveru",
+    "otlDesc": "Generovat krátký jednorázový odkaz",
+    "permanent": "Trvalý",
+    "createdOn": "Vytvořeno dne ",
+    "lastSeen": "Naposledy viděn ",
+    "totalDownload": "Celkem staženo: ",
+    "totalUpload": "Celkem nahráno: ",
+    "newClient": "Nový klient",
+    "disableClient": "Deaktivovat klienta",
+    "enableClient": "Aktivovat klienta",
+    "noPrivKey": "Tento klient nemá známý soukromý klíč. Nelze vytvořit konfiguraci.",
+    "showQR": "Zobrazit QR kód",
+    "downloadConfig": "Stáhnout konfiguraci",
+    "allowedIpsDesc": "Které IP adresy budou směrovány přes VPN (přebíjí globální nastavení)",
+    "serverAllowedIpsDesc": "Které IP adresy bude server směrovat ke klientovi",
+    "mtuDesc": "Nastavuje maximální velikost přenášeného paketu (MTU) pro VPN tunel",
+    "persistentKeepaliveDesc": "Nastavuje interval (v sekundách) pro udržovací pakety. 0 pro vypnutí",
+    "hooks": "Hooky",
+    "hooksDescription": "Hooky fungují pouze s wg-quick",
+    "hooksLeaveEmpty": "Pouze pro wg-quick. Jinak ponechte prázdné",
+    "dnsDesc": "DNS server, který budou klienti používat (přebíjí globální nastavení)",
+    "notConnected": "Klient není připojen",
+    "endpoint": "Koncový bod",
+    "endpointDesc": "IP adresa klienta, ze které je navázáno spojení WireGuard",
+    "search": "Hledat klienty...",
+    "config": "Konfigurace",
+    "viewConfig": "Zobrazit konfiguraci"
+  },
+  "dialog": {
+    "change": "Změnit",
+    "cancel": "Zrušit",
+    "create": "Vytvořit"
+  },
+  "toast": {
+    "success": "Úspěch",
+    "saved": "Uloženo",
+    "error": "Chyba"
+  },
+  "form": {
+    "actions": "Akce",
+    "save": "Uložit",
+    "revert": "Vrátit změny",
+    "sectionGeneral": "Obecné",
+    "sectionAdvanced": "Pokročilé",
+    "noItems": "Žádné položky",
+    "nullNoItems": "Žádné položky. Používá se globální konfigurace",
+    "add": "Přidat"
+  },
+  "admin": {
+    "general": {
+      "sessionTimeout": "Vypršení relace",
+      "sessionTimeoutDesc": "Doba trvání relace pro 'Zapamatovat si mě' (sekundy)",
+      "metrics": "Metriky",
+      "metricsPassword": "Heslo",
+      "metricsPasswordDesc": "Bearer heslo pro koncový bod metrik (heslo nebo argon2 hash)",
+      "json": "JSON",
+      "jsonDesc": "Cesta pro metriky ve formátu JSON",
+      "prometheus": "Prometheus",
+      "prometheusDesc": "Cesta pro metriky Prometheus"
+    },
+    "config": {
+      "connection": "Připojení",
+      "hostDesc": "Veřejný název hostitele, ke kterému se klienti připojují (zneplatní stávající konfigurace)",
+      "portDesc": "Veřejný UDP port, ke kterému se klienti připojují (zneplatní stávající konfigurace, pravděpodobně budete chtít změnit i Port rozhraní)",
+      "allowedIpsDesc": "Povolené IP adresy, které budou klienti používat (globální nastavení)",
+      "dnsDesc": "DNS server, který budou klienti používat (globální nastavení)",
+      "mtuDesc": "MTU, které budou klienti používat (pouze pro nové klienty)",
+      "persistentKeepaliveDesc": "Interval v sekundách pro odesílání udržovacích paketů na server. 0 = vypnuto (pouze pro nové klienty)",
+      "suggest": "Navrhnout",
+      "suggestDesc": "Vyberte IP adresu nebo název hostitele pro pole Hostitel"
+    },
+    "interface": {
+      "cidrSuccess": "CIDR změněn",
+      "device": "Zařízení",
+      "deviceDesc": "Ethernetové zařízení, přes které má být provoz WireGuard přeposílán",
+      "mtuDesc": "MTU, které bude WireGuard používat",
+      "portDesc": "UDP port, na kterém bude WireGuard naslouchat (pravděpodobně budete chtít změnit i Konfigurační port)",
+      "changeCidr": "Změnit CIDR",
+      "restart": "Restartovat rozhraní",
+      "restartDesc": "Restartovat rozhraní WireGuard",
+      "restartWarn": "Opravdu chcete restartovat rozhraní? Dojde k odpojení všech klientů.",
+      "restartSuccess": "Rozhraní bylo restartováno"
+    },
+    "introText": "Vítejte v administraci.\n\nZde můžete spravovat obecná nastavení, konfiguraci, nastavení rozhraní a hooky.\n\nZačněte výběrem jedné ze sekcí v bočním panelu."
+  },
+  "zod": {
+    "generic": {
+      "required": "Pole {0} je povinné",
+      "validNumber": "{0} musí být platné číslo",
+      "validNumberRange": "{0} musí být platné číslo nebo rozsah čísel",
+      "validString": "{0} musí být platný řetězec",
+      "validBoolean": "{0} musí být platná logická hodnota",
+      "validArray": "{0} musí být platné pole",
+      "stringMin": "{0} musí mít alespoň {1} znak(ů)",
+      "numberMin": "{0} musí být alespoň {1}"
+    },
+    "client": {
+      "id": "ID klienta",
+      "name": "Jméno",
+      "expiresAt": "Vyprší dne",
+      "address4": "IPv4 adresa",
+      "address6": "IPv6 adresa",
+      "serverAllowedIps": "Povolené IP adresy serveru"
+    },
+    "user": {
+      "username": "Uživatelské jméno",
+      "password": "Heslo",
+      "remember": "Pamatovat si",
+      "name": "Jméno",
+      "email": "E-mail",
+      "emailInvalid": "E-mail musí být platná e-mailová adresa",
+      "passwordMatch": "Hesla se musí shodovat",
+      "totpEnable": "Zapnout TOTP",
+      "totpEnableTrue": "Zapnutí TOTP musí být potvrzeno",
+      "totpCode": "TOTP kód"
+    },
+    "userConfig": {
+      "host": "Hostitel"
+    },
+    "general": {
+      "sessionTimeout": "Vypršení relace",
+      "metricsEnabled": "Metriky",
+      "metricsPassword": "Heslo k metrikám"
+    },
+    "interface": {
+      "cidr": "CIDR",
+      "device": "Zařízení",
+      "cidrValid": "CIDR musí být platný"
+    },
+    "otl": "Jednorázový odkaz",
+    "stringMalformed": "Řetězec má nesprávný formát",
+    "body": "Tělo požadavku musí být platný objekt",
+    "hook": "Hook",
+    "enabled": "Aktivní",
+    "mtu": "MTU",
+    "port": "Port",
+    "persistentKeepalive": "Persistent Keepalive",
+    "address": "IP adresa",
+    "dns": "DNS",
+    "allowedIps": "Povolené IP adresy",
+    "file": "Soubor"
+  },
+  "hooks": {
+    "preUp": "PreUp",
+    "postUp": "PostUp",
+    "preDown": "PreDown",
+    "postDown": "PostDown"
+  },
+  "copy": {
+    "notSupported": "Kopírování není podporováno",
+    "copied": "Zkopírováno!",
+    "failed": "Kopírování selhalo",
+    "copy": "Kopírovat"
+  },
+  "awg": {
+    "jCLabel": "Počet junk paketů (Jc)",
+    "jCDescription": "Počet odesílaných junk paketů (1-128, doporučeno: 4-12)",
+    "jMinLabel": "Min. velikost junk paketu (Jmin)",
+    "jMinDescription": "Minimální velikost junk paketů (0-1279*, doporučeno: 8, musí být < Jmax)",
+    "jMaxLabel": "Max. velikost junk paketu (Jmax)",
+    "jMaxDescription": "Maximální velikost junk paketů (1-1280*, doporučeno: 80, musí být > Jmin)",
+    "s1Label": "Velikost junk dat u Init paketu (S1)",
+    "s1Description": "Velikost junk dat u Init paketu (0-1132, doporučeno: 15-150, S1+56 ≠ S2)",
+    "s2Label": "Velikost junk dat u Response paketu (S2)",
+    "s2Description": "Velikost junk dat u Response paketu (0-1188, doporučeno: 15-150)",
+    "s3Label": "Velikost junk dat u Cookie reply paketu (S3)",
+    "s3Description": "Velikost junk dat u paketu s odpovědí na cookie",
+    "s4Label": "Velikost junk dat u Transport paketu (S4)",
+    "s4Description": "Velikost junk dat u transportního paketu",
+    "h1Label": "Init magic header (H1)",
+    "h1Description": "Hodnota nebo rozsah hlavičky Init paketu (X nebo X-Y, kde X<Y. Min 5, max 2147483647. Nesmí se překrývat s ostatními hlavičkami)",
+    "h2Label": "Response magic header (H2)",
+    "h2Description": "Hodnota nebo rozsah hlavičky Response paketu (X nebo X-Y, kde X<Y. Min 5, max 2147483647. Nesmí se překrývat s ostatními hlavičkami)",
+    "h3Label": "Cookie reply magic header (H3)",
+    "h3Description": "Hodnota nebo rozsah hlavičky Cookie reply paketu (X nebo X-Y, kde X<Y. Min 5, max 2147483647. Nesmí se překrývat s ostatními hlavičkami)",
+    "h4Label": "Transport magic header (H4)",
+    "h4Description": "Hodnota nebo rozsah hlavičky Transport paketu (X nebo X-Y, kde X<Y. Min 5, max 2147483647. Nesmí se překrývat s ostatními hlavičkami)",
+    "i1Label": "Speciální junk paket 1 (I1)",
+    "i1Description": "Paket pro napodobení protokolu v hex formátu: <b 0x...>",
+    "i2Label": "Speciální junk paket 2 (I2)",
+    "i2Description": "Paket pro napodobení protokolu v hex formátu: <b 0x...>",
+    "i3Label": "Speciální junk paket 3 (I3)",
+    "i3Description": "Paket pro napodobení protokolu v hex formátu: <b 0x...>",
+    "i4Label": "Speciální junk paket 4 (I4)",
+    "i4Description": "Paket pro napodobení protokolu v hex formátu: <b 0x...>",
+    "i5Label": "Speciální junk paket 5 (I5)",
+    "i5Description": "Paket pro napodobení protokolu v hex formátu: <b 0x...>",
+    "mtuNote": "Hodnoty závisí na nastavení MTU",
+    "obfuscationParameters": "AmneziaWG parametry obfuskace"
+  }
+}

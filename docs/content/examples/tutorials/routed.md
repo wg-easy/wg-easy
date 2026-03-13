@@ -93,3 +93,19 @@ PostDown
 ```shell
 iptables -D INPUT -p udp -m udp --dport {{port}} -j ACCEPT; iptables -D FORWARD -i wg0 -j ACCEPT; iptables -D FORWARD -o wg0 -j ACCEPT; ip6tables -D INPUT -p udp -m udp --dport {{port}} -j ACCEPT; ip6tables -D FORWARD -i wg0 -j ACCEPT; ip6tables -D FORWARD -o wg0 -j ACCEPT
 ```
+
+/// warning | Important: When using nftables use the following hooks instead.
+
+PostUp
+
+```shell
+nft add chain ip filter WG_EASY; nft add rule ip filter DOCKER-USER jump WG_EASY; nft add rule ip filter WG_EASY iifname {{device}} accept; nft add rule ip filter WG_EASY oifname {{device}} accept; nft add chain ip6 filter WG_EASY; nft add rule ip6 filter DOCKER-USER jump WG_EASY; nft add rule ip6 filter WG_EASY iifname {{device}} accept; nft add rule ip6 filter WG_EASY oifname {{device}} accept;
+```
+
+PostDown
+
+```shell
+nft delete rule ip filter DOCKER-USER handle $(nft -a list chain ip filter DOCKER-USER | awk '/jump WG_EASY/ {print $NF}'); nft flush chain ip filter WG_EASY; nft delete chain ip filter WG_EASY; nft delete rule ip6 filter DOCKER-USER handle $(nft -a list chain ip6 filter DOCKER-USER | awk '/jump WG_EASY/ {print $NF}'); nft flush chain ip6 filter WG_EASY; nft delete chain ip6 filter WG_EASY
+```
+
+///

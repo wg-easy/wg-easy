@@ -22,6 +22,20 @@
       "when": 1761298328460,
       "tag": "0002_keen_sleepwalker",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1770902426367,
+      "tag": "0003_breezy_colossus",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1771352889394,
+      "tag": "0004_optimal_mandrill",
+      "breakpoints": true
     }
   ]
 }

@@ -120,7 +120,11 @@
     "endpointDesc": "IP of the client from which the WireGuard connection is established",
     "search": "Search clients...",
     "config": "Configuration",
-    "viewConfig": "View Configuration"
+    "viewConfig": "View Configuration",
+    "firewallIps": "Firewall Allowed IPs",
+    "firewallIpsDesc": "Destination IPs/CIDRs this client can access (server-side enforcement). Leave empty to use Allowed IPs. Supports optional port and protocol filtering. See docs for syntax.",
+    "downloadPng": "Download PNG",
+    "copyPng": "Copy PNG"
   },
   "dialog": {
     "change": "Change",
@@ -130,7 +134,8 @@
   "toast": {
     "success": "Success",
     "saved": "Saved",
-    "error": "Error"
+    "error": "Error",
+    "unknown": "Unknown error. See console for more details"
   },
   "form": {
     "actions": "Actions",
@@ -175,7 +180,10 @@
       "restart": "Restart Interface",
       "restartDesc": "Restart the WireGuard interface",
       "restartWarn": "Are you sure to restart the interface? This will disconnect all clients.",
-      "restartSuccess": "Interface restarted"
+      "restartSuccess": "Interface restarted",
+      "firewall": "Traffic Filtering",
+      "firewallEnabled": "Enable Per-Client Firewall",
+      "firewallEnabledDesc": "Restrict client traffic to specific destination IPs using iptables. When enabled, each client can be configured with allowed destinations."
     },
     "introText": "Welcome to the admin panel.\n\nHere you can manage the general settings, the configuration, the interface settings and the hooks.\n\nStart by choosing one of the sections in the sidebar."
   },
@@ -183,6 +191,7 @@
     "generic": {
       "required": "{0} is required",
       "validNumber": "{0} must be a valid number",
+      "validNumberRange": "{0} must be a valid number or number range",
       "validString": "{0} must be a valid string",
       "validBoolean": "{0} must be a valid boolean",
       "validArray": "{0} must be a valid array",
@@ -195,7 +204,9 @@
       "expiresAt": "Expires At",
       "address4": "IPv4 Address",
       "address6": "IPv6 Address",
-      "serverAllowedIps": "Server Allowed IPs"
+      "serverAllowedIps": "Server Allowed IPs",
+      "firewallIps": "Firewall Allowed IPs",
+      "firewallIpsInvalid": "Invalid firewall IP entry. See docs for supported syntax."
     },
     "user": {
       "username": "Username",
@@ -262,6 +273,14 @@
     "s3Description": "Cookie reply packet junk size",
     "s4Label": "Transport packet junk size (S4)",
     "s4Description": "Transport packet junk size",
+    "h1Label": "Init magic header (H1)",
+    "h1Description": "Init packet header value or range (X or X-Y, where X<Y. Min 5, max 2147483647. Value or range must not overlap with other headers)",
+    "h2Label": "Response magic header (H2)",
+    "h2Description": "Response packet header value or range (X or X-Y, where X<Y. Min 5, max 2147483647. Value or range must not overlap with other headers)",
+    "h3Label": "Cookie reply magic header (H3)",
+    "h3Description": "Cookie reply packet header value or range (X or X-Y, where X<Y. Min 5, max 2147483647. Value or range must not overlap with other headers)",
+    "h4Label": "Transport magic header (H4)",
+    "h4Description": "Transport packet header value or range (X or X-Y, where X<Y. Min 5, max 2147483647. Value or range must not overlap with other headers)",
     "i1Label": "Special junk packet 1 (I1)",
     "i1Description": "Protocol mimic packet in hex format: <b 0x...>",
     "i2Label": "Special junk packet 2 (I2)",
@@ -272,14 +291,6 @@
     "i4Description": "Protocol mimic packet in hex format: <b 0x...>",
     "i5Label": "Special junk packet 5 (I5)",
     "i5Description": "Protocol mimic packet in hex format: <b 0x...>",
-    "h1Label": "Init magic header (H1)",
-    "h1Description": "Init packet header value (5-2147483647, must be unique from H2-H4)",
-    "h2Label": "Response magic header (H2)",
-    "h2Description": "Response packet header value (5-2147483647, must be unique from H1, H3, H4)",
-    "h3Label": "Cookie reply magic header (H3)",
-    "h3Description": "Cookie reply packet header value (5-2147483647, must be unique from H1, H2, H4)",
-    "h4Label": "Transport magic header (H4)",
-    "h4Description": "Transport packet header value (5-2147483647, must be unique from H1-H3)",
     "mtuNote": "Values depend on the MTU",
     "obfuscationParameters": "AmneziaWG Obfuscation Parameters"
   }

@@ -1,5 +1,9 @@
+// ! Auto Imports are not supported in this file
+
 import { parseCidr } from 'cidr-tools';
 import { stringifyIp } from 'ip-bigint';
+import { removeNewlines } from './template';
+
 import type { ClientType } from '#db/repositories/client/types';
 import type { InterfaceType } from '#db/repositories/interface/types';
 import type { UserConfigType } from '#db/repositories/userConfig/types';
@@ -9,7 +13,9 @@ type Options = {
   enableIpv6?: boolean;
 };
 
-const wgExecutable = WG_ENV.WG_EXECUTABLE;
+// needed to support cli
+const wgExecutable =
+  typeof WG_ENV !== 'undefined' ? WG_ENV.WG_EXECUTABLE : 'dev';
 
 export const wg = {
   generateServerPeer: (
@@ -63,15 +69,15 @@ AllowedIPs = ${allowedIps.join(', ')}${extraLines.length ? `\n${extraLines.join(
         S2: wgInterface.s2,
         S3: wgInterface.s3,
         S4: wgInterface.s4,
-        i1: wgInterface.i1,
-        i2: wgInterface.i2,
-        i3: wgInterface.i3,
-        i4: wgInterface.i4,
-        i5: wgInterface.i5,
         H1: wgInterface.h1,
         H2: wgInterface.h2,
         H3: wgInterface.h3,
         H4: wgInterface.h4,
+        I1: wgInterface.i1,
+        I2: wgInterface.i2,
+        I3: wgInterface.i3,
+        I4: wgInterface.i4,
+        I5: wgInterface.i5,
       } as const;
 
       awgLines = Object.entries(parameters)
@@ -110,10 +116,10 @@ PostDown = ${iptablesTemplate(hooks.postDown, wgInterface)}`;
       (enableIpv6 ? `, ${client.ipv6Address}/128` : '');
 
     const hookLines = [
-      client.preUp ? `PreUp = ${client.preUp}` : null,
-      client.postUp ? `PostUp = ${client.postUp}` : null,
-      client.preDown ? `PreDown = ${client.preDown}` : null,
-      client.postDown ? `PostDown = ${client.postDown}` : null,
+      client.preUp ? `PreUp = ${removeNewlines(client.preUp)}` : null,
+      client.postUp ? `PostUp = ${removeNewlines(client.postUp)}` : null,
+      client.preDown ? `PreDown = ${removeNewlines(client.preDown)}` : null,
+      client.postDown ? `PostDown = ${removeNewlines(client.postDown)}` : null,
     ];
 
     const dnsServers = client.dns ?? userConfig.defaultDns;
@@ -131,15 +137,15 @@ PostDown = ${iptablesTemplate(hooks.postDown, wgInterface)}`;
         S2: wgInterface.s2,
         S3: wgInterface.s3,
         S4: wgInterface.s4,
-        i1: client.i1,
-        i2: client.i2,
-        i3: client.i3,
-        i4: client.i4,
-        i5: client.i5,
         H1: wgInterface.h1,
         H2: wgInterface.h2,
         H3: wgInterface.h3,
         H4: wgInterface.h4,
+        I1: client.i1,
+        I2: client.i2,
+        I3: client.i3,
+        I4: client.i4,
+        I5: client.i5,
       } as const;
 
       awgLines = Object.entries(parameters)

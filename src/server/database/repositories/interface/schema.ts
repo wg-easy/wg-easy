@@ -20,17 +20,21 @@ export const wgInterface = sqliteTable('interfaces_table', {
   s2: int().default(56),
   s3: int(),
   s4: int(),
+  h1: text(),
+  h2: text(),
+  h3: text(),
+  h4: text(),
   i1: text(),
   i2: text(),
   i3: text(),
   i4: text(),
   i5: text(),
-  h1: int().default(0),
-  h2: int().default(0),
-  h3: int().default(0),
-  h4: int().default(0),
   // does nothing yet
   enabled: int({ mode: 'boolean' }).notNull(),
+  // Enable per-client firewall filtering via iptables
+  firewallEnabled: int('firewall_enabled', { mode: 'boolean' })
+    .notNull()
+    .default(false),
   createdAt: text('created_at')
     .notNull()
     .default(sql`(CURRENT_TIMESTAMP)`),

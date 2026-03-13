@@ -7,7 +7,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## Added
+### Added
+
+- AWG: support for H1-H4 ranges (https://github.com/wg-easy/wg-easy/pull/2480)
+- Client Firewall (https://github.com/wg-easy/wg-easy/pull/2418)
+- CLI: Show QR code (https://github.com/wg-easy/wg-easy/pull/2518)
+- Copy QR code to clipboard / save as png (https://github.com/wg-easy/wg-easy/pull/2521)
+
+### Changed
+
+- Hooks are now Textareas (https://github.com/wg-easy/wg-easy/pull/2522)
+- Update to Node Krypton (24) (https://github.com/wg-easy/wg-easy/pull/2536)
+
+## [15.2.2] - 2026-02-06
+
+### Added
+
+- Added Userspace WireGuard support (https://github.com/wg-easy/wg-easy/pull/2419)
+
+### Fixed
+
+- LangSelector overlapping with Buttons (https://github.com/wg-easy/wg-easy/pull/2434)
+- AmnzeziaWG config parameters (https://github.com/wg-easy/wg-easy/pull/2440)
+- OpenMetrics help string format (https://github.com/wg-easy/wg-easy/pull/2453)
+- Reset 2fa when resetting admin password (https://github.com/wg-easy/wg-easy/pull/2461)
+
+### Docs
+
+- Replace Watchtower with maintained fork (https://github.com/wg-easy/wg-easy/pull/2456)
+
+## [15.2.1] - 2026-01-14
+
+### Fixed
+
+- Icon in Searchbar (https://github.com/wg-easy/wg-easy/commit/458f66818a400f181e2c6326ede077c8793d71f2)
+- Interface save not working (https://github.com/wg-easy/wg-easy/commit/48f3fbd715a889e2425702a8a46332f2752aef91)
+- Error Messages in Setup (https://github.com/wg-easy/wg-easy/commit/32a055093a76342c40858d8dcf563b0700a8bd48)
+
+## [15.2.0] - 2026-01-12
+
+### Added
 
 - AmneziaWG integration (https://github.com/wg-easy/wg-easy/pull/2102, https://github.com/wg-easy/wg-easy/pull/2226)
 - Search / filter box (https://github.com/wg-easy/wg-easy/pull/2170)
@@ -15,12 +54,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Show client endpoint (https://github.com/wg-easy/wg-easy/pull/2058)
 - Add option to view and copy config (https://github.com/wg-easy/wg-easy/pull/2289)
 
-## Fixed
+### Fixed
 
 - Fix download as conf.txt (https://github.com/wg-easy/wg-easy/pull/2269)
 - Clean filename for OTL download (https://github.com/wg-easy/wg-easy/pull/2253)
+- Text color in admin menu in light mode (https://github.com/wg-easy/wg-easy/pull/2307)
 
-## Changed
+### Changed
 
 - Allow lower MTU (https://github.com/wg-easy/wg-easy/pull/2228)
 - Use /32 and /128 for client Cidr (https://github.com/wg-easy/wg-easy/pull/2217)
@@ -29,11 +69,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Allow empty DNS (https://github.com/wg-easy/wg-easy/pull/2052, https://github.com/wg-easy/wg-easy/pull/2057)
 - Don't include keys in API responses (https://github.com/wg-easy/wg-easy/pull/2015)
 - Try all QR ecc levels (https://github.com/wg-easy/wg-easy/pull/2288)
+- Update OneTimeLink expiry on reuse (https://github.com/wg-easy/wg-easy/pull/2370)
+- Removed ARMv7 support (https://github.com/wg-easy/wg-easy/pull/2369)
 
-## Docs
+### Docs
 
 - Add AdGuard Home (https://github.com/wg-easy/wg-easy/pull/2175)
-- Add Routed (No NAT) docs (https://github.com/wg-easy/wg-easy/pull/2181)
+- Add Routed (No NAT) docs (https://github.com/wg-easy/wg-easy/pull/2181, https://github.com/wg-easy/wg-easy/pull/2380)
+- Add AmneziaWG docs (https://github.com/wg-easy/wg-easy/pull/2108, https://github.com/wg-easy/wg-easy/pull/2292)
 
 ## [15.1.0] - 2025-07-01
 

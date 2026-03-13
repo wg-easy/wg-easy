@@ -23,4 +23,6 @@ logs
 .env.*
 !.env.example
 
+coverage/
+
 wg-easy.db

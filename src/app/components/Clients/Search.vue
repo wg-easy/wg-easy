@@ -1,14 +1,14 @@
 <template>
   <div class="relative w-60 md:mr-2">
     <div class="relative flex h-full items-center">
-      <MagnifyingGlassIcon
+      <IconsMagnifyingGlass
         class="absolute left-2.5 h-4 w-4 text-gray-400 dark:text-neutral-500"
       />
       <input
         v-model="searchQuery"
         type="text"
         :placeholder="$t('client.search')"
-        class="w-full rounded bg-white py-2 pr-8 text-sm text-gray-900 shadow-sm ring-1 ring-gray-300 transition-all placeholder:text-gray-400 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-red-600 dark:bg-neutral-800 dark:text-white dark:ring-neutral-700 dark:placeholder:text-neutral-500 dark:focus:ring-red-700"
+        class="w-full rounded bg-white px-8 py-2 text-sm text-gray-900 shadow-sm ring-1 ring-gray-300 transition-all placeholder:text-gray-400 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-red-600 dark:bg-neutral-800 dark:text-white dark:ring-neutral-700 dark:placeholder:text-neutral-500 dark:focus:ring-red-700"
         @input="updateSearch"
       />
       <button

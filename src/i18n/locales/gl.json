@@ -1,0 +1,145 @@
+{
+  "pages": {
+    "me": "Conta",
+    "clients": "Clientes",
+    "admin": {
+      "panel": "Panel de administración",
+      "general": "Xeral",
+      "config": "Configuración",
+      "interface": "Interface",
+      "hooks": "Hooks"
+    }
+  },
+  "user": {
+    "email": "Correo electrónico"
+  },
+  "me": {
+    "currentPassword": "Contrasinal actual",
+    "enable2fa": "Activar a autenticación de dobre factor",
+    "enable2faDesc": "Escanea o código QR coa túa aplicación de autenticación ou introduce a chave manualmente.",
+    "2faKey": "Chave TOTP",
+    "2faCodeDesc": "Introduce o código da túa aplicación de autenticación.",
+    "disable2fa": "Desactivar a autenticación de dobre factor",
+    "disable2faDesc": "Introduce o teu contrasinal para desactivar a autenticación de dobre factor."
+  },
+  "general": {
+    "name": "Nome",
+    "username": "Nome de usuario",
+    "password": "Contrasinal",
+    "newPassword": "Novo contrasinal",
+    "updatePassword": "Actualizar contrasinal",
+    "mtu": "MTU",
+    "allowedIps": "IP permitidas",
+    "dns": "DNS",
+    "persistentKeepalive": "Keepalive persistente",
+    "logout": "Pechar sesión",
+    "continue": "Continuar",
+    "host": "Host",
+    "port": "Porto",
+    "yes": "Si",
+    "no": "Non",
+    "confirmPassword": "Confirmar o contrasinal",
+    "loading": "Cargando...",
+    "2fa": "Autenticación de dobre factor",
+    "2faCode": "Código TOTP"
+  },
+  "setup": {
+    "welcome": "Benvido á túa primeira configuración de wg-easy",
+    "welcomeDesc": "Atopaches a forma máis doada de instalar e xestionar WireGuard en calquera sistema Linux",
+    "existingSetup": "Tes unha configuración existente?",
+    "createAdminDesc": "Por favor, introduce primeiro un usuario administrador cun contrasinal seguro. Esta información empregarase para acceder ao panel de administración.",
+    "setupConfigDesc": "Por favor, introduce a información do host e do porto. Isto empregarase para a configuración dos clientes ao configurar WireGuard nos seus dispositivos.",
+    "setupMigrationDesc": "Por favor, fornece o ficheiro da copia de seguridade se queres migrar os datos da túa versión anterior de wg-easy á nova configuración.",
+    "upload": "Subir",
+    "migration": "Recuperar a copia de seguridade:",
+    "createAccount": "Crear conta",
+    "successful": "Configuración completada con éxito",
+    "hostDesc": "Nome de host público ao que se conectarán os clientes",
+    "portDesc": "Porto UDP público ao que se conectarán os clientes e no que escoitará WireGuard"
+  },
+  "update": {
+    "updateAvailable": "Hai unha actualización dispoñible!",
+    "update": "Actualizar"
+  },
+  "theme": {
+    "dark": "Tema escuro",
+    "light": "Tema claro",
+    "system": "Tema do sistema"
+  },
+  "layout": {
+    "toggleCharts": "Amosar/Ocultar gráficas",
+    "donate": "Doar"
+  },
+  "login": {
+    "signIn": "Iniciar sesión",
+    "rememberMe": "Lembrarme",
+    "rememberMeDesc": "Manter a sesión iniciada ao pechar o navegador",
+    "insecure": "Non podes iniciar sesión cunha conexión insegura. Usa HTTPS.",
+    "2faRequired": "É necesaria a autenticación de dobre factor",
+    "2faWrong": "A autenticación de dobre factor é incorrecta"
+  },
+  "client": {
+    "empty": "Aínda non hai clientes.",
+    "newShort": "Novo",
+    "sort": "Ordenar",
+    "create": "Crear cliente",
+    "created": "Cliente creado",
+    "new": "Novo cliente",
+    "name": "Nome",
+    "expireDate": "Data de caducidade",
+    "expireDateDesc": "Data na que o cliente será desactivado. Déixao en branco para permanente",
+    "delete": "Eliminar",
+    "deleteClient": "Eliminar cliente",
+    "deleteDialog1": "Seguro que queres eliminar",
+    "deleteDialog2": "Esta acción non se pode desfacer.",
+    "enabled": "Activado",
+    "address": "Enderezo",
+    "serverAllowedIps": "IP permitidas polo servidor",
+    "otlDesc": "Xerar ligazón curta dun só uso",
+    "permanent": "Permanente",
+    "createdOn": "Creado o ",
+    "lastSeen": "Visto por última vez o ",
+    "totalDownload": "Descarga total: ",
+    "totalUpload": "Subida total: ",
+    "newClient": "Novo cliente",
+    "disableClient": "Desactivar cliente",
+    "enableClient": "Activar cliente",
+    "noPrivKey": "Este cliente non ten unha chave privada coñecida. Non se pode crear a configuración.",
+    "showQR": "Amosar código QR",
+    "downloadConfig": "Descargar configuración",
+    "allowedIpsDesc": "IP que se encamiñarán a través da VPN (sobrescribe a configuración global)",
+    "serverAllowedIpsDesc": "IP que o servidor encamiñará ao cliente",
+    "mtuDesc": "Define a unidade máxima de transmisión (tamaño do paquete) para o túnel VPN",
+    "persistentKeepaliveDesc": "Define o intervalo (en segundos) para os paquetes keep-alive. 0 desactívaos",
+    "hooks": "Hooks",
+    "hooksDescription": "Os hooks só funcionan con wg-quick",
+    "hooksLeaveEmpty": "Só para wg-quick. Noutro caso, déixao baleiro",
+    "dnsDesc": "Servidor DNS que empregarán os clientes (sobrescribe a configuración global)",
+    "notConnected": "Cliente non conectado",
+    "endpoint": "Punto final",
+    "endpointDesc": "IP do cliente desde a que se establece a conexión WireGuard",
+    "search": "Buscar clientes...",
+    "config": "Configuración",
+    "viewConfig": "Ver configuración"
+  },
+  "dialog": {
+    "change": "Cambiar",
+    "cancel": "Cancelar",
+    "create": "Crear"
+  },
+  "toast": {
+    "success": "Éxito",
+    "saved": "Gardado",
+    "error": "Erro"
+  },
+  "form": {
+    "actions": "Accións",
+    "save": "Gardar",
+    "revert": "Reverter",
+    "sectionGeneral": "Xeral",
+    "sectionAdvanced": "Avanzado",
+    "noItems": "Sen elementos",
+    "nullNoItems": "Sen elementos. Usando a configuración global",
+    "add": "Engadir"
+  }
+}

@@ -1,9 +1,14 @@
+import type { SharedPublicUser } from '~~/shared/utils/permissions';
+
 export default defineEventHandler(async (event) => {
   const session = await useWGSession(event);
 
   if (!session.data.userId) {
     // not logged in
-    return null;
+    throw createError({
+      statusCode: 401,
+      statusMessage: 'Not authenticated',
+    });
   }
 
   const user = await Database.users.get(session.data.userId);
@@ -21,5 +26,5 @@ export default defineEventHandler(async (event) => {
     name: user.name,
     email: user.email,
     totpVerified: user.totpVerified,
-  };
+  } satisfies SharedPublicUser;
 });

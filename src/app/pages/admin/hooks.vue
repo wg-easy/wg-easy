@@ -2,22 +2,22 @@
   <main v-if="data">
     <FormElement @submit.prevent="submit">
       <FormGroup>
-        <FormTextField
+        <FormTextArea
           id="PreUp"
           v-model="data.preUp"
           :label="$t('hooks.preUp')"
         />
-        <FormTextField
+        <FormTextArea
           id="PostUp"
           v-model="data.postUp"
           :label="$t('hooks.postUp')"
         />
-        <FormTextField
+        <FormTextArea
           id="PreDown"
           v-model="data.preDown"
           :label="$t('hooks.preDown')"
         />
-        <FormTextField
+        <FormTextArea
           id="PostDown"
           v-model="data.postDown"
           :label="$t('hooks.postDown')"

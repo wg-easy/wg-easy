@@ -7,7 +7,7 @@ This guide will help you migrate from `v14` to version `v15` of `wg-easy`.
 ## Changes
 
 - This is a complete rewrite of the `wg-easy` project, therefore the configuration files and the way you interact with the project have changed.
-- If you use armv6, you unfortunately won't be able to migrate to `v15`.
+- If you use armv6 or armv7, you unfortunately won't be able to migrate to `v15`.
 - If you are connecting to the Web UI via HTTP, you need to set the `INSECURE` environment variable to `true` in the new container.
 
 ## Migration

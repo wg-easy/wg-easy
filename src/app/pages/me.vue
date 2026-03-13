@@ -120,7 +120,6 @@
 import { encodeQR } from 'qr';
 
 const authStore = useAuthStore();
-authStore.update();
 
 const name = ref(authStore.userData?.name);
 const email = ref(authStore.userData?.email);
