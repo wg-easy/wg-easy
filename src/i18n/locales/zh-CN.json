@@ -120,17 +120,22 @@
     "endpointDesc": "建立 WireGuard 连接时客户端的 IP 地址",
     "search": "搜索客户端...",
     "config": "配置",
-    "viewConfig": "查看配置文本"
+    "viewConfig": "查看配置文本",
+    "firewallIps": "防火墙允许的IP",
+    "firewallIpsDesc": "客户端可访问的目标 IP/CIDR 范围（由服务器端进行限制）。留空时将使用 服务端允许的IP 设置。支持按 端口 和 协议 进行过滤。具体语法请查看文档。",
+    "downloadPng": "下载图片",
+    "copyPng": "复制图片"
   },
   "dialog": {
-    "change": "确认修改",
+    "change": "修改",
     "cancel": "取消",
     "create": "创建"
   },
   "toast": {
     "success": "操作成功",
     "saved": "保存成功",
-    "error": "发生错误"
+    "error": "发生错误",
+    "unknown": "未知错误。查看控制台获取更详细信息"
   },
   "form": {
     "actions": "操作",
@@ -175,7 +180,10 @@
       "restart": "重启接口",
       "restartDesc": "重新启动WireGuard接口",
       "restartWarn": "确定要重启接口吗？这将断开所有客户端的连接。",
-      "restartSuccess": "接口重启成功"
+      "restartSuccess": "接口重启成功",
+      "firewall": "流量过滤",
+      "firewallEnabled": "启用客户端防火墙",
+      "firewallEnabledDesc": "通过 iptables 限制客户端只能访问指定的目标 IP。启用后，可以为每个客户端单独配置允许访问的目标地址列表。"
     },
     "introText": "欢迎使用管理控制台。\n\n您可以在这里管理通用设置、网络配置、接口配置和钩子脚本。\n\n请从侧边栏选择一个功能模块开始。"
   },
@@ -183,6 +191,7 @@
     "generic": {
       "required": "{0}是必填项",
       "validNumber": "{0}必须是有效数字",
+      "validNumberRange": "{0}必须是有效的数字或数字范围",
       "validString": "{0}必须是有效文本",
       "validBoolean": "{0}必须是是/否选项",
       "validArray": "{0}必须是有效数组",
@@ -195,7 +204,9 @@
       "expiresAt": "过期时间",
       "address4": "IPv4地址",
       "address6": "IPv6地址",
-      "serverAllowedIps": "服务端允许的IP"
+      "serverAllowedIps": "服务端允许的IP",
+      "firewallIps": "防火墙允许的IP",
+      "firewallIpsInvalid": "IP格式错误。请查看相关文档获取支持的写法。"
     },
     "user": {
       "username": "用户名",
