@@ -88,6 +88,7 @@
     "name": "Name",
     "expireDate": "Ablaufdatum",
     "expireDateDesc": "Datum, an dem der Client deaktiviert wird. Leer lassen für dauerhaft aktiv.",
+    "delete": "Löschen",    
     "deleteClient": "Client löschen",
     "deleteDialog1": "Sind Sie sicher, dass Sie diesen Client löschen möchten",
     "deleteDialog2": "Diese Aktion kann nicht rückgängig gemacht werden.",
@@ -114,13 +115,16 @@
     "hooksDescription": "Hooks funktionieren nur mit wg-quick",
     "hooksLeaveEmpty": "Nur für wg-quick. Andernfalls leer lassen",
     "dnsDesc": "DNS-Server, den die Clients benutzen (überschreibt die globale Konfiguration)",
-    "delete": "Löschen",
     "notConnected": "Client nicht verbunden",
     "endpoint": "Endpunkt",
     "endpointDesc": "IP-Adresse des Clients, von dem aus die WireGuard-Verbindung hergestellt wird",
     "search": "Suche Clients...",
     "config": "Konfiguration",
     "viewConfig": "Konfiguration anzeigen"
+    "firewallIps": "Firewall erlaubte IPs",
+    "firewallIpsDesc": "Ziel-IPs/CIDRs, auf die dieser Client zugreifen darf (serverseitige erzwingen). Lassen Sie das Feld leer, um die Liste der zugelassenen IPs zu verwenden. Unterstützt optionale Port- und Protokollfilterung. Die Syntax finden Sie in der Dokumentation."
+    "downloadPng": "Herunterladen PNG",
+    "copyPng": "Kopieren PNG"    
   },
   "dialog": {
     "change": "Ändern",
@@ -131,6 +135,7 @@
     "success": "Erfolg",
     "saved": "Gespeichert",
     "error": "Fehler"
+    "unknown": "Unbekannter Fehler. Weitere Informationen finden Sie in der Konsole."    
   },
   "form": {
     "actions": "Aktionen",
@@ -176,6 +181,9 @@
       "restartDesc": "Das WireGuard-Interface neu starten",
       "restartWarn": "Sind Sie sicher, dass Sie das Interface neu starten möchten? Dies wird die Verbindungen aller Clients trennen.",
       "restartSuccess": "Interface neu gestartet"
+      "firewall": "Datenverkehr Filterung",
+      "firewallEnabled": "Firewall pro Client aktivieren",
+      "firewallEnabledDesc": "Beschränken Sie den Client-Datenverkehr mithilfe von iptables auf bestimmte Ziel-IP-Adressen. Bei Aktivierung kann für jeden Client eine Liste der zulässigen Ziele konfiguriert werden."      
     },
     "introText": "Willkommen in der Admin-Konsole.\n\nHier können Sie die allgemeinen Einstellungen, die Konfiguration, die Schnittstelleneinstellungen und die Hooks verwalten.\n\nBeginnen Sie, indem Sie einen der Bereiche in der Seitenleiste auswählen."
   },
@@ -183,6 +191,7 @@
     "generic": {
       "required": "{0} ist erforderlich",
       "validNumber": "{0} muss eine Zahl sein",
+      "validNumberRange": "{0} muss eine gültige Zahl oder ein gültiger Zahlenbereich sein",     
       "validString": "{0} muss eine Zeichenkette sein",
       "validBoolean": "{0} muss ein Wahrheitswert sein",
       "validArray": "{0} muss eine Liste sein",
@@ -196,6 +205,8 @@
       "address4": "IPv4-Adresse",
       "address6": "IPv6-Adresse",
       "serverAllowedIps": "Serverseitig erlaubte IP-Adressen"
+      "firewallIps": "Von der Firewall zugelassene IP-Adressen",
+      "firewallIpsInvalid": "Ungültiger IP-Eintrag in der Firewall. Informationen zur unterstützten Syntax finden Sie in der Dokumentation."      
     },
     "user": {
       "username": "Benutzername",
