@@ -120,9 +120,9 @@
     "endpointDesc": "IP-Adresse des Clients, von dem aus die WireGuard-Verbindung hergestellt wird",
     "search": "Suche Clients...",
     "config": "Konfiguration",
-    "viewConfig": "Konfiguration anzeigen"
+    "viewConfig": "Konfiguration anzeigen",
     "firewallIps": "Firewall erlaubte IPs",
-    "firewallIpsDesc": "Ziel-IPs/CIDRs, auf die dieser Client zugreifen darf (serverseitige erzwingen). Lassen Sie das Feld leer, um die Liste der zugelassenen IPs zu verwenden. Unterstützt optionale Port- und Protokollfilterung. Die Syntax finden Sie in der Dokumentation."
+    "firewallIpsDesc": "Ziel-IPs/CIDRs, auf die dieser Client zugreifen darf (serverseitige erzwingen). Lassen Sie das Feld leer, um die Liste der zugelassenen IPs zu verwenden. Unterstützt optionale Port- und Protokollfilterung. Die Syntax finden Sie in der Dokumentation.",
     "downloadPng": "Herunterladen PNG",
     "copyPng": "Kopieren PNG"    
   },
@@ -134,7 +134,7 @@
   "toast": {
     "success": "Erfolg",
     "saved": "Gespeichert",
-    "error": "Fehler"
+    "error": "Fehler",
     "unknown": "Unbekannter Fehler. Weitere Informationen finden Sie in der Konsole."    
   },
   "form": {
@@ -180,7 +180,7 @@
       "restart": "Interface neu starten",
       "restartDesc": "Das WireGuard-Interface neu starten",
       "restartWarn": "Sind Sie sicher, dass Sie das Interface neu starten möchten? Dies wird die Verbindungen aller Clients trennen.",
-      "restartSuccess": "Interface neu gestartet"
+      "restartSuccess": "Interface neu gestartet",
       "firewall": "Datenverkehr Filterung",
       "firewallEnabled": "Firewall pro Client aktivieren",
       "firewallEnabledDesc": "Beschränken Sie den Client-Datenverkehr mithilfe von iptables auf bestimmte Ziel-IP-Adressen. Bei Aktivierung kann für jeden Client eine Liste der zulässigen Ziele konfiguriert werden."      
@@ -204,7 +204,7 @@
       "expiresAt": "Läuft ab am",
       "address4": "IPv4-Adresse",
       "address6": "IPv6-Adresse",
-      "serverAllowedIps": "Serverseitig erlaubte IP-Adressen"
+      "serverAllowedIps": "Serverseitig erlaubte IP-Adressen",
       "firewallIps": "Von der Firewall zugelassene IP-Adressen",
       "firewallIpsInvalid": "Ungültiger IP-Eintrag in der Firewall. Informationen zur unterstützten Syntax finden Sie in der Dokumentation."      
     },
