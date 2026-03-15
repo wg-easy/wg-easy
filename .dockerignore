@@ -1,3 +1,22 @@
+# --- Node / build artifacts ---
 /src/node_modules
 /src/.nuxt
 /src/.output
+
+# --- Git history (never needed in build context) ---
+.git
+.gitignore
+
+# --- Documentation & assets (not needed in image) ---
+docs
+assets
+*.md
+CHANGELOG.md
+LICENSE
+
+# --- CI / GitHub metadata ---
+.github
+.vscode
+
+# --- Dev Dockerfile (not needed inside build context) ---
+Dockerfile.dev
