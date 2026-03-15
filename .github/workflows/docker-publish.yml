@@ -1,0 +1,62 @@
+name: Build and push to ghcr.io
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/platon47/wg-easy-ip-tls
+          tags: |
+            type=raw,value=latest
+            type=sha,prefix=sha-,format=short
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Tag current latest as stable (backup before new build)
+        run: |
+          # Pull the current :latest image and re-tag it as :stable
+          # This serves as a rollback point before every new release
+          if docker pull ghcr.io/platon47/wg-easy-ip-tls:latest 2>/dev/null; then
+            docker tag ghcr.io/platon47/wg-easy-ip-tls:latest ghcr.io/platon47/wg-easy-ip-tls:stable
+            docker push ghcr.io/platon47/wg-easy-ip-tls:stable
+            echo "Stable tag updated successfully"
+          else
+            echo "No existing :latest image found, skipping stable tag (first build)"
+          fi
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
