@@ -41,8 +41,6 @@ RUN ARCH=$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/') && \
 FROM docker.io/library/node:jod-alpine
 WORKDIR /app
 
-RUN apk add --no-cache dumb-init
-
 HEALTHCHECK --interval=1m --timeout=5s --retries=3 CMD /usr/bin/timeout 5s /bin/sh -c "/usr/bin/wg show | /bin/grep -q interface || exit 1"
 
 # Copy build
@@ -83,8 +81,8 @@ RUN apk add --no-cache \
     iptables-legacy \
     netcat-openbsd \
     wireguard-tools && \
-    mkdir -p /etc/amnesia && \
-    ln -s /etc/wireguard /etc/amnesia/amneziawg && \
+    mkdir -p /etc/amnezia && \
+    ln -s /etc/wireguard /etc/amnezia/amneziawg && \
     update-alternatives --install /usr/sbin/iptables iptables /usr/sbin/iptables-legacy 10 \
     --slave /usr/sbin/iptables-restore iptables-restore /usr/sbin/iptables-legacy-restore \
     --slave /usr/sbin/iptables-save iptables-save /usr/sbin/iptables-legacy-save && \
