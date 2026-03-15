@@ -2,16 +2,16 @@
 #===
 # wg-easy-ip-tls entrypoint
 # Architecture:
-# - dumb-init is PID 1 and spawns this script for proper
-#   signal forwarding and zombie reaping
-# - Nitro (wg-easy) runs on HTTP internally on NITRO_PORT
-# - If LEGO_ENABLED=true and INSECURE!=true: a Node.js TLS
-#   reverse proxy wraps Nitro on PORT (HTTPS termination)
-#   Certs are re-read from disk on every TLS handshake so
-#   renewed certs take effect without restart
-# - If INSECURE=true: Nitro listens directly on PORT (HTTP)
-# - A background renewal loop re-runs lego-renew.sh every
-#   LEGO_RENEW_INTERVAL seconds (default: 5 days)
+#  - dumb-init is PID 1 and spawns this script for proper
+#    signal forwarding and zombie reaping
+#  - Nitro (wg-easy) runs on HTTP internally on NITRO_PORT
+#  - If LEGO_ENABLED=true and INSECURE!=true: a Node.js TLS
+#    reverse proxy wraps Nitro on PORT (HTTPS termination)
+#    Certs are loaded at startup; renewed certs are applied
+#    via server.setSecureContext() without restart
+#  - If INSECURE=true: Nitro listens directly on PORT (HTTP)
+#  - A background renewal loop re-runs lego-renew.sh every
+#    LEGO_RENEW_INTERVAL seconds (default: 5 days)
 #===
 set -eu
 
@@ -48,7 +48,7 @@ cleanup() {
 trap cleanup TERM INT
 
 if [ "$LEGO_ENABLED" = "true" ] && [ "$INSECURE" != "true" ]; then
-  # ── TLS mode ───
+  # -- TLS mode ---
   /usr/local/bin/lego-renew.sh
 
   # Start background cert renewal loop
@@ -79,67 +79,72 @@ if [ "$LEGO_ENABLED" = "true" ] && [ "$INSECURE" != "true" ]; then
   done
 
   echo "[entrypoint] Starting TLS proxy on port $PORT..."
-  # Certs are read from disk on every handshake so renewed certs take effect immediately
+  # Use setSecureContext for cert hot-reload (works with IP certs - no SNI needed)
   node -e "
-  const https = require('https');
-  const http = require('http');
-  const net = require('net');
-  const fs = require('fs');
-  const CERT_FILE = '$CERT_FILE';
-  const KEY_FILE = '$KEY_FILE';
-  const NITRO_PORT = $NITRO_PORT;
-  const server = https.createServer({
-    SNICallback: (servername, cb) => {
-      try {
-        cb(null, require('tls').createSecureContext({
-          cert: fs.readFileSync(CERT_FILE),
-          key: fs.readFileSync(KEY_FILE),
-        }));
-      } catch (e) {
-        cb(e);
+    const https = require('https');
+    const http = require('http');
+    const net = require('net');
+    const fs = require('fs');
+    const CERT_FILE = '$CERT_FILE';
+    const KEY_FILE = '$KEY_FILE';
+    const NITRO_PORT = $NITRO_PORT;
+    const loadCreds = () => ({
+      cert: fs.readFileSync(CERT_FILE),
+      key: fs.readFileSync(KEY_FILE),
+    });
+    const server = https.createServer(loadCreds(), (req, res) => {
+      const proxy = http.request({
+        hostname: '127.0.0.1',
+        port: NITRO_PORT,
+        path: req.url,
+        method: req.method,
+        headers: req.headers,
+      }, (proxyRes) => {
+        res.writeHead(proxyRes.statusCode, proxyRes.headers);
+        proxyRes.pipe(res);
+      });
+      proxy.on('error', (e) => {
+        console.error('[tls-proxy] error:', e.message);
+        if (!res.headersSent) { res.writeHead(502); }
+        res.end('Bad Gateway');
+      });
+      req.pipe(proxy);
+    });
+    server.on('upgrade', (req, socket, head) => {
+      const conn = net.connect(NITRO_PORT, '127.0.0.1', () => {
+        conn.write('GET ' + req.url + ' HTTP/1.1\\r\\n' +
+          Object.entries(req.headers).map(([k,v]) => k + ': ' + v).join('\\r\\n') +
+          '\\r\\n\\r\\n');
+        if (head && head.length) conn.write(head);
+        socket.pipe(conn);
+        conn.pipe(socket);
+      });
+      conn.on('error', (e) => {
+        console.error('[tls-proxy] ws error:', e.message);
+        socket.destroy();
+      });
+    });
+    // Hot-reload certs when lego-renew.sh updates them
+    fs.watchFile(CERT_FILE, { interval: 60000, persistent: true }, (curr, prev) => {
+      if (curr.mtime !== prev.mtime) {
+        try {
+          server.setSecureContext(loadCreds());
+          console.log('[tls-proxy] Certificate reloaded at ' + curr.mtime.toISOString());
+        } catch (e) {
+          console.error('[tls-proxy] Failed to reload cert:', e.message);
+        }
       }
-    }
-  }, (req, res) => {
-    const proxy = http.request({
-      hostname: '127.0.0.1',
-      port: NITRO_PORT,
-      path: req.url,
-      method: req.method,
-      headers: req.headers,
-    }, (proxyRes) => {
-      res.writeHead(proxyRes.statusCode, proxyRes.headers);
-      proxyRes.pipe(res);
     });
-    proxy.on('error', (e) => {
-      console.error('[tls-proxy] error:', e.message);
-      if (!res.headersSent) { res.writeHead(502); }
-      res.end('Bad Gateway');
+    server.listen($PORT, '0.0.0.0', () => {
+      console.log('[tls-proxy] HTTPS listening on 0.0.0.0:$PORT -> http://127.0.0.1:$NITRO_PORT');
     });
-    req.pipe(proxy);
-  });
-  server.on('upgrade', (req, socket, head) => {
-    const conn = net.connect(NITRO_PORT, '127.0.0.1', () => {
-      conn.write('GET ' + req.url + ' HTTP/1.1\\r\\n' +
-        Object.entries(req.headers).map(([k,v]) => k + ': ' + v).join('\\r\\n') +
-        '\\r\\n\\r\\n');
-      if (head && head.length) conn.write(head);
-      socket.pipe(conn);
-      conn.pipe(socket);
-    });
-    conn.on('error', (e) => {
-      console.error('[tls-proxy] ws error:', e.message);
-      socket.destroy();
-    });
-  });
-  server.listen($PORT, '0.0.0.0', () => {
-    console.log('[tls-proxy] HTTPS listening on 0.0.0.0:$PORT -> http://127.0.0.1:$NITRO_PORT');
-  });
   " &
   echo $! > "$PROXY_PID_FILE"
 else
-  # ── HTTP mode (INSECURE=true or LEGO_ENABLED=false) ───
+  # -- HTTP mode (INSECURE=true or LEGO_ENABLED=false) ---
   echo "[entrypoint] Starting wg-easy in HTTP mode on port $PORT..."
   PORT="$PORT" HOST="0.0.0.0" node /app/server/index.mjs &
   echo $! > "$SERVER_PID_FILE"
 fi
+
 wait
