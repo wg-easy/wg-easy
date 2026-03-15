@@ -28,17 +28,17 @@ services:
       # Uncomment and fill in to enable automatic cert issuance:
       # - LEGO_EMAIL=you@example.com
       # - LEGO_IP=YOUR_SERVER_PUBLIC_IP
-      # - LEGO_CHALLENGE=http # or: tls-alpn (needs port 443)
-      # - LEGO_DATA_DIR=/root/lego-data # default
-      # - LEGO_RENEW_INTERVAL=432000 # renewal check in seconds (5 days)
+      # - LEGO_CHALLENGE=http  # or: tls-alpn (needs port 443)
+      # - LEGO_DATA_DIR=/root/lego-data  # default
+      # - LEGO_RENEW_INTERVAL=432000  # renewal check in seconds (5 days)
 
       # -- MANUAL cert mode (mount certs from host) ---
       # Pre-provision certs: chmod 600 /root/cert/ip/privkey.pem
       # Then mount: /root/cert/ip:/root/cert/ip:ro (see volumes below)
 
       # -- Optional: WireGuard settings ---
-      # - WG_HOST=111.22.3.4 # set via Web UI (v15+)
-      # - PASSWORD_HASH= # set via Web UI (v15+)
+      # - WG_HOST=111.22.3.4  # set via Web UI (v15+)
+      # - PASSWORD_HASH=  # set via Web UI (v15+)
       # - WG_DEFAULT_DNS=1.1.1.1
       # - WG_DEFAULT_ADDRESS=10.8.0.x
       # - WG_MTU=1420
@@ -54,9 +54,9 @@ services:
       # AUTO mode: persist lego account and cert data
       - lego_data:/root/lego-data
     ports:
-      - "51820:51820/udp"  # WireGuard VPN
-      - "51821:51821/tcp"  # wg-easy admin UI (HTTPS)
-      - "80:80/tcp"        # Required for LEGO http-01 challenge (AUTO mode)
+      - "51820:51820/udp"   # WireGuard VPN
+      - "51821:51821/tcp"   # wg-easy admin UI (HTTPS)
+      # - "80:80/tcp"       # Uncomment ONLY for LEGO http-01 challenge (AUTO mode)
     restart: unless-stopped
     cap_add:
       - NET_ADMIN
