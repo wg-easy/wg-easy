@@ -1,16 +1,47 @@
+#---
+# wg-easy-ip-tls - docker-compose.yml
+# TLS certificate modes:
+#   AUTO: Set LEGO_EMAIL + LEGO_IP to have lego obtain certs
+#         automatically inside the container.
+#   MANUAL: Pre-provision certs on the host and mount them.
+#   Add a lego_data volume for cert persistence (AUTO).
+#   See README.md for full usage instructions.
+#---
 volumes:
   etc_wireguard:
+  lego_data:  # Persists lego account + cert data across restarts
 
 services:
   wg-easy:
-    #environment:
-    #  Optional:
-    #  - PORT=51821
-    #  - HOST=0.0.0.0
-    #  - INSECURE=false
-
-    image: ghcr.io/wg-easy/wg-easy:15
+    image: ghcr.io/platon47/wg-easy-ip-tls:latest
+    # build: . # uncomment to build locally instead
+    # image: ghcr.io/platon47/wg-easy-ip-tls:stable # use stable tag as rollback
     container_name: wg-easy
+    environment:
+      # -- Core settings ---
+      - PORT=51821
+      - HOST=0.0.0.0
+      - INSECURE=false
+      - LEGO_ENABLED=true  # enables TLS
+
+      # -- AUTO cert mode (lego obtains cert inside container) ---
+      # Uncomment and fill in to enable automatic cert issuance:
+      # - LEGO_EMAIL=you@example.com
+      # - LEGO_IP=YOUR_SERVER_PUBLIC_IP
+      # - LEGO_CHALLENGE=http # or: tls-alpn (needs port 443)
+      # - LEGO_DATA_DIR=/root/lego-data # default
+      # - LEGO_RENEW_INTERVAL=432000 # renewal check in seconds (5 days)
+
+      # -- MANUAL cert mode (mount certs from host) ---
+      # Pre-provision certs: chmod 600 /root/cert/ip/privkey.pem
+      # Then mount: /root/cert/ip:/root/cert/ip:ro (see volumes below)
+
+      # -- Optional: WireGuard settings ---
+      # - WG_HOST=111.22.3.4 # set via Web UI (v15+)
+      # - PASSWORD_HASH= # set via Web UI (v15+)
+      # - WG_DEFAULT_DNS=1.1.1.1
+      # - WG_DEFAULT_ADDRESS=10.8.0.x
+      # - WG_MTU=1420
     networks:
       wg:
         ipv4_address: 10.42.42.42
@@ -18,14 +49,18 @@ services:
     volumes:
       - etc_wireguard:/etc/wireguard
       - /lib/modules:/lib/modules:ro
+      # MANUAL mode: mount pre-provisioned cert (read-only)
+      # - /root/cert/ip:/root/cert/ip:ro
+      # AUTO mode: persist lego account and cert data
+      - lego_data:/root/lego-data
     ports:
-      - "51820:51820/udp"
-      - "51821:51821/tcp"
+      - "51820:51820/udp"  # WireGuard VPN
+      - "51821:51821/tcp"  # wg-easy admin UI (HTTPS)
+      - "80:80/tcp"        # Required for LEGO http-01 challenge (AUTO mode)
     restart: unless-stopped
     cap_add:
       - NET_ADMIN
       - SYS_MODULE
-      # - NET_RAW # ⚠️ Uncomment if using Podman
     sysctls:
       - net.ipv4.ip_forward=1
       - net.ipv4.conf.all.src_valid_mark=1
@@ -35,10 +70,9 @@ services:
 
 networks:
   wg:
-    driver: bridge
     enable_ipv6: true
+    driver: bridge
     ipam:
-      driver: default
       config:
         - subnet: 10.42.42.0/24
         - subnet: fdcc:ad94:bacf:61a3::/64
