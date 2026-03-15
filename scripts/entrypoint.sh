@@ -7,11 +7,13 @@
 # - Nitro (wg-easy) runs on HTTP internally on NITRO_PORT
 # - If LEGO_ENABLED=true and INSECURE!=true: a Node.js TLS
 #   reverse proxy wraps Nitro on PORT (HTTPS termination)
+#   Certs are re-read from disk on every TLS handshake so
+#   renewed certs take effect without restart
 # - If INSECURE=true: Nitro listens directly on PORT (HTTP)
 # - A background renewal loop re-runs lego-renew.sh every
 #   LEGO_RENEW_INTERVAL seconds (default: 5 days)
 #===
-set -e
+set -eu
 
 CERT_FILE="/root/cert/ip/fullchain.pem"
 KEY_FILE="/root/cert/ip/privkey.pem"
@@ -30,15 +32,15 @@ RENEWAL_PID_FILE="/tmp/lego-renewal.pid"
 cleanup() {
   echo "[entrypoint] Shutting down..."
   if [ -f "$RENEWAL_PID_FILE" ]; then
-    PID=$(cat "$RENEWAL_PID_FILE" 2>/dev/null)
+    PID=$(cat "$RENEWAL_PID_FILE" 2>/dev/null || true)
     [ -n "$PID" ] && kill "$PID" 2>/dev/null || true
   fi
   if [ -f "$PROXY_PID_FILE" ]; then
-    PID=$(cat "$PROXY_PID_FILE" 2>/dev/null)
+    PID=$(cat "$PROXY_PID_FILE" 2>/dev/null || true)
     [ -n "$PID" ] && kill "$PID" 2>/dev/null || true
   fi
   if [ -f "$SERVER_PID_FILE" ]; then
-    PID=$(cat "$SERVER_PID_FILE" 2>/dev/null)
+    PID=$(cat "$SERVER_PID_FILE" 2>/dev/null || true)
     [ -n "$PID" ] && kill "$PID" 2>/dev/null || true
   fi
   exit 0
@@ -77,17 +79,30 @@ if [ "$LEGO_ENABLED" = "true" ] && [ "$INSECURE" != "true" ]; then
   done
 
   echo "[entrypoint] Starting TLS proxy on port $PORT..."
+  # Certs are read from disk on every handshake so renewed certs take effect immediately
   node -e "
   const https = require('https');
   const http = require('http');
   const net = require('net');
   const fs = require('fs');
-  const cert = fs.readFileSync('$CERT_FILE');
-  const key = fs.readFileSync('$KEY_FILE');
-  const server = https.createServer({ cert, key }, (req, res) => {
+  const CERT_FILE = '$CERT_FILE';
+  const KEY_FILE = '$KEY_FILE';
+  const NITRO_PORT = $NITRO_PORT;
+  const server = https.createServer({
+    SNICallback: (servername, cb) => {
+      try {
+        cb(null, require('tls').createSecureContext({
+          cert: fs.readFileSync(CERT_FILE),
+          key: fs.readFileSync(KEY_FILE),
+        }));
+      } catch (e) {
+        cb(e);
+      }
+    }
+  }, (req, res) => {
     const proxy = http.request({
       hostname: '127.0.0.1',
-      port: $NITRO_PORT,
+      port: NITRO_PORT,
       path: req.url,
       method: req.method,
       headers: req.headers,
@@ -103,7 +118,7 @@ if [ "$LEGO_ENABLED" = "true" ] && [ "$INSECURE" != "true" ]; then
     req.pipe(proxy);
   });
   server.on('upgrade', (req, socket, head) => {
-    const conn = net.connect($NITRO_PORT, '127.0.0.1', () => {
+    const conn = net.connect(NITRO_PORT, '127.0.0.1', () => {
       conn.write('GET ' + req.url + ' HTTP/1.1\\r\\n' +
         Object.entries(req.headers).map(([k,v]) => k + ': ' + v).join('\\r\\n') +
         '\\r\\n\\r\\n');
