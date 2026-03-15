@@ -1,3 +1,27 @@
+# OS artifacts
 .DS_Store
+Thumbs.db
 *.swp
+*.swo
+
+# Node
 node_modules
+
+# Build outputs
+src/.nuxt
+src/.output
+
+# Env files (may contain secrets)
+.env
+.env.*
+!.env.example
+
+# Editor directories
+.vscode
+.idea
+
+# Test coverage
+coverage
+
+# pnpm
+.pnpm-store
