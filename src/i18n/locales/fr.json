@@ -51,7 +51,7 @@
     "setupConfigDesc": "Veuillez saisir les informations relatives à l'hôte et au port. Ceci sera utilisé pour la configuration du client lors de la mise en place de WireGuard sur les appareils.",
     "setupMigrationDesc": "Veuillez fournir le fichier de sauvegarde si vous souhaitez migrer vos données de la version précédente de wg-easy vers votre nouvelle installation.",
     "upload": "Téléverser",
-    "migration": "Restaurer la sauvegarde:",
+    "migration": "Restaurer la sauvegarde :",
     "createAccount": "Créer un compte",
     "successful": "Installation réussie",
     "hostDesc": "Nom d'hôte public auquel les clients se connecteront",
@@ -88,18 +88,19 @@
     "name": "Nom",
     "expireDate": "Date d'expiration",
     "expireDateDesc": "Date à laquelle le client sera désactivé. Vide pour permanent",
+    "delete": "Supprimer",
     "deleteClient": "Supprimer le client",
     "deleteDialog1": "Êtes-vous sûr de vouloir supprimer",
     "deleteDialog2": "Cette action ne peut être annulée.",
     "enabled": "Activé",
     "address": "Adresse",
-    "serverAllowedIps": "Serveur IPs autorisées",
+    "serverAllowedIps": "IPs autorisées par le serveur",
     "otlDesc": "Générer un lien court et unique",
     "permanent": "Permanent",
     "createdOn": "Créé le ",
     "lastSeen": "Dernière visite le ",
-    "totalDownload": "Téléchargement total: ",
-    "totalUpload": "Téléversement total: ",
+    "totalDownload": "Téléchargement total : ",
+    "totalUpload": "Téléversement total : ",
     "newClient": "Nouveau client",
     "disableClient": "Désactiver le client",
     "enableClient": "Activer le client",
@@ -120,7 +121,10 @@
     "search": "Rechercher des clients...",
     "config": "Configuration",
     "viewConfig": "Voir la configuration",
-    "delete": "Supprimer"
+    "firewallIps": "IPs autorisées par le pare-feu",
+    "firewallIpsDesc": "IPs/CIDRs de destination auxquels ce client peut accéder (application côté serveur). Laissez vide pour utiliser les IPs autorisées. Prend en charge le filtrage optionnel par port et protocole. Voir la documentation pour la syntaxe.",
+    "downloadPng": "Télécharger le PNG",
+    "copyPng": "Copier le PNG"
   },
   "dialog": {
     "change": "Modifier",
@@ -130,7 +134,8 @@
   "toast": {
     "success": "Réussite",
     "saved": "Sauvegardé",
-    "error": "Erreur"
+    "error": "Erreur",
+    "unknown": "Erreur inconnue. Consultez la console pour plus de détails"
   },
   "form": {
     "actions": "Actions",
@@ -175,7 +180,10 @@
       "restart": "Redémarrer l'interface",
       "restartDesc": "Redémarre l'interface WireGuard",
       "restartWarn": "Êtes-vous sûr de redémarrer l'interface ? Cela déconnectera tous les clients.",
-      "restartSuccess": "Interface redémarrée"
+      "restartSuccess": "Interface redémarrée",
+      "firewall": "Filtrage du trafic",
+      "firewallEnabled": "Activer le pare-feu par client",
+      "firewallEnabledDesc": "Restreindre le trafic des clients à des IPs de destination spécifiques via iptables. Lorsqu'il est activé, chaque client peut être configuré avec des destinations autorisées."
     },
     "introText": "Bienvenue dans le panel d'administration.\n\nVous pouvez y gérer les paramètres généraux, la configuration, les paramètres de l'interface et les hooks.\n\nCommencez par choisir l'une des sections de la barre latérale."
   },
@@ -183,6 +191,7 @@
     "generic": {
       "required": "{0} est requis",
       "validNumber": "{0} doit être un nombre valide",
+      "validNumberRange": "{0} doit être un nombre ou une plage de nombres valide",
       "validString": "{0} doit être une chaîne de caractères valide",
       "validBoolean": "{0} doit être un booléen valide",
       "validArray": "{0} doit être un tableau valide",
@@ -195,7 +204,9 @@
       "expiresAt": "Expire le",
       "address4": "Adresse IPv4",
       "address6": "Adresse IPv6",
-      "serverAllowedIps": "Serveur IPs autorisées"
+      "serverAllowedIps": "IPs autorisées par le serveur",
+      "firewallIps": "IPs autorisées par le pare-feu",
+      "firewallIpsInvalid": "Entrée d'IP de pare-feu invalide. Voir la documentation pour la syntaxe supportée."
     },
     "user": {
       "username": "Nom d'utilisateur",
@@ -263,13 +274,13 @@
     "s4Label": "Taille parasite du paquet transport (S4)",
     "s4Description": "Taille parasite du paquet de transport",
     "h1Label": "En-tête magique init (H1)",
-    "h1Description": "Valeur d'en-tête du paquet init (5-2147483647, doit être unique par rapport à H2-H4)",
+    "h1Description": "Valeur ou plage de l'en-tête du paquet init (X ou X-Y, où X<Y. Min 5, max 2147483647. La valeur ou la plage ne doit pas chevaucher les autres en-têtes)",
     "h2Label": "En-tête magique réponse (H2)",
-    "h2Description": "Valeur d'en-tête du paquet réponse (5-2147483647, doit être unique par rapport à H1, H3, H4)",
+    "h2Description": "Valeur ou plage de l'en-tête du paquet réponse (X ou X-Y, où X<Y. Min 5, max 2147483647. La valeur ou la plage ne doit pas chevaucher les autres en-têtes)",
     "h3Label": "En-tête magique cookie reply (H3)",
-    "h3Description": "Valeur d'en-tête du paquet cookie reply (5-2147483647, doit être unique par rapport à H1, H2, H4)",
+    "h3Description": "Valeur ou plage de l'en-tête du paquet cookie reply (X ou X-Y, où X<Y. Min 5, max 2147483647. La valeur ou la plage ne doit pas chevaucher les autres en-têtes)",
     "h4Label": "En-tête magique transport (H4)",
-    "h4Description": "Valeur d'en-tête du paquet transport (5-2147483647, doit être unique par rapport à H1-H3)",
+    "h4Description": "Valeur ou plage de l'en-tête du paquet transport (X ou X-Y, où X<Y. Min 5, max 2147483647. La valeur ou la plage ne doit pas chevaucher les autres en-têtes)",
     "i1Label": "Paquet parasite spécial 1 (I1)",
     "i1Description": "Paquet de simulation de protocole en format hexadécimal : <b 0x...>",
     "i2Label": "Paquet parasite spécial 2 (I2)",
