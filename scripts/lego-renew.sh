@@ -22,20 +22,27 @@ if [ -n "$LEGO_EMAIL" ] && [ -n "$LEGO_IP" ]; then
   echo "[tls] AUTO mode: running lego to obtain/renew cert for IP $LEGO_IP..."
   mkdir -p "$LEGO_DATA_DIR" "$CERT_DIR"
 
-  # Run lego - supports http-01 (port 80) and tls-alpn-01 (port 443)
+  # Build challenge flag: --http (port 80) or --tls (port 443 tls-alpn-01)
+  if [ "$LEGO_CHALLENGE" = "tls-alpn" ]; then
+    CHALLENGE_FLAG="--tls"
+  else
+    CHALLENGE_FLAG="--http"
+  fi
+
+  # Try run (initial obtain), fall back to renew if cert already exists
   lego \
     --email="$LEGO_EMAIL" \
     --domains="$LEGO_IP" \
-    --http="${LEGO_CHALLENGE}" \
+    $CHALLENGE_FLAG \
     --path="$LEGO_DATA_DIR" \
     run 2>&1 || lego \
     --email="$LEGO_EMAIL" \
     --domains="$LEGO_IP" \
-    --http="${LEGO_CHALLENGE}" \
+    $CHALLENGE_FLAG \
     --path="$LEGO_DATA_DIR" \
     renew --days 5 2>&1
 
-  # Symlink/copy cert to expected location
+  # Copy cert to expected location
   LEGO_CERT="${LEGO_DATA_DIR}/certificates/${LEGO_IP}.crt"
   LEGO_KEY="${LEGO_DATA_DIR}/certificates/${LEGO_IP}.key"
   if [ -f "$LEGO_CERT" ] && [ -f "$LEGO_KEY" ]; then
