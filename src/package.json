@@ -64,7 +64,7 @@
     "@vitest/coverage-v8": "^4.0.18",
     "@vitest/ui": "4.0.18",
     "drizzle-kit": "^0.31.9",
-    "esbuild": "^0.27.3",
+    "esbuild": "^0.27.4",
     "eslint": "^9.39.4",
     "eslint-config-prettier": "^10.1.8",
     "prettier": "^3.8.1",
