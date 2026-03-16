@@ -94,6 +94,43 @@ export const ClientGetSchema = z.object({
   clientId: clientId,
 });
 
+export const ClientDuplicateSchema = z.object({
+  name: name,
+});
+
+export type ClientCreateFromExistingIdType = Pick<
+  ClientType,
+  | 'userId'
+  | 'interfaceId'
+  | 'name'
+  | 'ipv4Address'
+  | 'ipv6Address'
+  | 'preUp'
+  | 'postUp'
+  | 'preDown'
+  | 'postDown'
+  | 'privateKey'
+  | 'publicKey'
+  | 'preSharedKey'
+  | 'expiresAt'
+  | 'allowedIps'
+  | 'serverAllowedIps'
+  | 'firewallIps'
+  | 'persistentKeepalive'
+  | 'mtu'
+  | 'jC'
+  | 'jMin'
+  | 'jMax'
+  | 'i1'
+  | 'i2'
+  | 'i3'
+  | 'i4'
+  | 'i5'
+  | 'dns'
+  | 'serverEndpoint'
+  | 'enabled'
+>;
+
 export type ClientCreateFromExistingType = Pick<
   ClientType,
   | 'name'

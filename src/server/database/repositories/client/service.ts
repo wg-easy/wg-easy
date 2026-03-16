@@ -3,6 +3,7 @@ import { containsCidr, parseCidr } from 'cidr-tools';
 import { client } from './schema';
 import type {
   ClientCreateFromExistingType,
+  ClientCreateFromExistingIdType,
   ClientCreateType,
   UpdateClientType,
 } from './types';
@@ -300,5 +301,76 @@ export class ClientService {
         enabled,
       })
       .execute();
+  }
+
+  async createFromExistingId({ name, clientId }: ClientCreateFromExistingIdType) {
+    const privateKey = await wg.generatePrivateKey();
+    const publicKey = await wg.getPublicKey(privateKey);
+    const preSharedKey = await wg.generatePreSharedKey();
+
+    return this.#db.transaction(async (tx) => {
+      const clients = await tx.query.client.findMany().execute();
+      
+      const sourceClient = await tx.query.client.findFirst({
+        where: eq(client.id, clientId),
+        })
+        .execute();
+
+      if (!sourceClient) {
+        throw new Error('No Client with provided Id found');
+      }
+
+      const clientInterface = await tx.query.wgInterface
+        .findFirst({
+          where: eq(wgInterface.name, sourceClient.interfaceId),
+        })
+        .execute();
+
+      if (!clientInterface) {
+        throw new Error('WireGuard interface not found');
+      }
+      
+      const ipv4Cidr = parseCidr(clientInterface.ipv4Cidr);
+      const ipv4Address = nextIP(4, ipv4Cidr, clients);
+      const ipv6Cidr = parseCidr(clientInterface.ipv6Cidr);
+      const ipv6Address = nextIP(6, ipv6Cidr, clients);
+
+      return await tx
+      .insert(client)
+        .values({
+          userId: sourceClient.userId,
+          interfaceId: sourceClient.interfaceId,
+          name: name,
+          ipv4Address: ipv4Address,
+          ipv6Address: ipv6Address,
+          preUp: sourceClient.preUp,
+          postUp: sourceClient.postUp,
+          preDown: sourceClient.preDown,
+          postDown: sourceClient.postDown,
+          privateKey: privateKey,
+          publicKey: publicKey,
+          preSharedKey: preSharedKey,
+          expiresAt: sourceClient.expiresAt,
+          allowedIps: sourceClient.allowedIps,
+          serverAllowedIps: sourceClient.serverAllowedIps,
+          firewallIps: sourceClient.firewallIps,
+          persistentKeepalive: sourceClient.persistentKeepalive,
+          mtu: sourceClient.mtu,
+          jC: sourceClient.jC,
+          jMin: sourceClient.jMin,
+          jMax: sourceClient.jMax,
+          i1: sourceClient.i1,
+          i2: sourceClient.i2,
+          i3: sourceClient.i3,
+          i4: sourceClient.i4,
+          i5: sourceClient.i5,
+          dns: sourceClient.dns,
+          serverEndpoint: sourceClient.serverEndpoint,
+          enabled: sourceClient.enabled,
+        })
+        .returning({ clientId: client.id })
+        .execute();
+    
+    });
   }
 }
