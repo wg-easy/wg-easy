@@ -27,14 +27,18 @@ RUN apk add linux-headers build-base go git && \
     make
 
 # Download lego (ACME client for IP TLS certs) - pinned version for reproducibility
+# To verify: sha256sum lego.tar.gz against https://github.com/go-acme/lego/releases
 ARG LEGO_VERSION=v4.23.1
 RUN ARCH=$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/') && \
     wget -qO /tmp/lego.tar.gz \
     "https://github.com/go-acme/lego/releases/download/${LEGO_VERSION}/lego_${LEGO_VERSION}_linux_${ARCH}.tar.gz" && \
+    wget -qO /tmp/lego.tar.gz.sha256 \
+    "https://github.com/go-acme/lego/releases/download/${LEGO_VERSION}/lego_${LEGO_VERSION}_checksums.txt" && \
+    grep "lego_${LEGO_VERSION}_linux_${ARCH}.tar.gz" /tmp/lego.tar.gz.sha256 | sha256sum -c - && \
     tar -xzf /tmp/lego.tar.gz -C /tmp lego && \
     mv /tmp/lego /usr/local/bin/lego && \
     chmod +x /usr/local/bin/lego && \
-    rm /tmp/lego.tar.gz
+    rm /tmp/lego.tar.gz /tmp/lego.tar.gz.sha256
 
 # Copy build result to a new image.
 # This saves a lot of disk space.
@@ -45,7 +49,6 @@ HEALTHCHECK --interval=1m --timeout=5s --retries=3 CMD /usr/bin/timeout 5s /bin/
 
 # Copy build
 COPY --from=build /app/.output /app
-
 # Copy migrations
 COPY --from=build /app/server/database/migrations /app/server/database/migrations
 
@@ -93,6 +96,8 @@ RUN apk add --no-cache \
 # Copy cert-management scripts
 COPY scripts/lego-renew.sh /usr/local/bin/lego-renew.sh
 COPY scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
+# Copy TLS proxy (standalone JS - no shell injection risk)
+COPY scripts/tls-proxy.js /usr/local/bin/tls-proxy.js
 RUN chmod +x /usr/local/bin/lego-renew.sh /usr/local/bin/entrypoint.sh
 
 # Set Environment
