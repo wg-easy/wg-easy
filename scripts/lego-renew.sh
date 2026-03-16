@@ -33,27 +33,34 @@ if [ -n "$LEGO_EMAIL" ] && [ -n "$LEGO_IP" ]; then
   lego \
     --email="$LEGO_EMAIL" \
     --domains="$LEGO_IP" \
-    $CHALLENGE_FLAG \
+    "$CHALLENGE_FLAG" \
     --path="$LEGO_DATA_DIR" \
     run 2>&1 || lego \
     --email="$LEGO_EMAIL" \
     --domains="$LEGO_IP" \
-    $CHALLENGE_FLAG \
+    "$CHALLENGE_FLAG" \
     --path="$LEGO_DATA_DIR" \
     renew --days 5 2>&1
 
-  # Copy cert to expected location
+  # Verify cert files exist before copying
   LEGO_CERT="${LEGO_DATA_DIR}/certificates/${LEGO_IP}.crt"
   LEGO_KEY="${LEGO_DATA_DIR}/certificates/${LEGO_IP}.key"
-  if [ -f "$LEGO_CERT" ] && [ -f "$LEGO_KEY" ]; then
-    cp "$LEGO_CERT" "$CERT_FILE"
-    cp "$LEGO_KEY" "$KEY_FILE"
-    echo "[tls] Cert obtained and placed at $CERT_DIR/"
-  else
+
+  if [ ! -f "$LEGO_CERT" ] || [ ! -f "$LEGO_KEY" ]; then
     echo "[tls] ERROR: lego ran but cert not found at expected path"
     echo "[tls] Expected: $LEGO_CERT"
     exit 1
   fi
+
+  # Atomic replacement: copy to temp files first, then move into place
+  # This prevents tls-proxy from reading a partially-written cert
+  cp "$LEGO_CERT" "${CERT_FILE}.tmp"
+  cp "$LEGO_KEY"  "${KEY_FILE}.tmp"
+  chmod 600 "${KEY_FILE}.tmp"
+  mv "${CERT_FILE}.tmp" "$CERT_FILE"
+  mv "${KEY_FILE}.tmp"  "$KEY_FILE"
+
+  echo "[tls] Cert obtained and placed at $CERT_DIR/"
 else
   echo "[tls] MANUAL mode: validating pre-provisioned certs at $CERT_DIR/"
   # Validate both certificate files exist
