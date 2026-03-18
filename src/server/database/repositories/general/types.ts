@@ -18,6 +18,14 @@ export const GeneralUpdateSchema = z.object({
   metricsPrometheus: metricsEnabled,
   metricsJson: metricsEnabled,
   metricsPassword: metricsPassword,
+}).superRefine((data, ctx) => {
+  if ((data.metricsPrometheus || data.metricsJson) && !data.metricsPassword) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['metricsPassword'],
+      message: t('zod.general.metricsPassword'),
+    });
+  }
 });
 
 export type GeneralUpdateType = z.infer<typeof GeneralUpdateSchema>;

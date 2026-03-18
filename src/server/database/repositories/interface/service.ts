@@ -92,19 +92,19 @@ export class InterfaceService {
       const clients = await tx.query.client.findMany().execute();
 
       for (const client of clients) {
-        // TODO: optimize
-        const clients = await tx.query.client.findMany().execute();
+        const index = clients.findIndex(({ id }) => id === client.id);
+        const nextClients = clients.slice();
 
         // only calculate ip if cidr has changed
 
         let nextIpv4 = client.ipv4Address;
         if (data.ipv4Cidr !== oldCidr.ipv4Cidr) {
-          nextIpv4 = nextIP(4, parseCidr(data.ipv4Cidr), clients);
+          nextIpv4 = nextIP(4, parseCidr(data.ipv4Cidr), nextClients);
         }
 
         let nextIpv6 = client.ipv6Address;
         if (data.ipv6Cidr !== oldCidr.ipv6Cidr) {
-          nextIpv6 = nextIP(6, parseCidr(data.ipv6Cidr), clients);
+          nextIpv6 = nextIP(6, parseCidr(data.ipv6Cidr), nextClients);
         }
 
         await tx
@@ -115,6 +115,14 @@ export class InterfaceService {
           })
           .where(eq(clientSchema.id, client.id))
           .execute();
+
+        if (index !== -1) {
+          clients[index] = {
+            ...client,
+            ipv4Address: nextIpv4,
+            ipv6Address: nextIpv6,
+          };
+        }
       }
     });
   }

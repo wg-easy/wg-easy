@@ -2,6 +2,9 @@ name: Pull Request
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - ci/**
   pull_request:
 
 concurrency:
@@ -12,7 +15,6 @@ jobs:
   docker:
     name: Build Docker
     runs-on: ${{ matrix.arch.os }}
-    if: github.repository_owner == 'wg-easy'
     strategy:
       fail-fast: false
       matrix:

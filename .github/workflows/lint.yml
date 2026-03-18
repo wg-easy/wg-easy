@@ -4,13 +4,13 @@ on:
   push:
     branches:
       - master
+      - ci/**
   pull_request:
 
 jobs:
   docs:
     name: Check Docs
     runs-on: ubuntu-latest
-    if: github.repository_owner == 'wg-easy'
 
     steps:
       - name: Checkout repository
@@ -37,7 +37,6 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     needs: docs
-    if: github.repository_owner == 'wg-easy'
 
     strategy:
       fail-fast: false

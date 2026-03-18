@@ -34,7 +34,8 @@ RUN ARCH=$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/') && \
     "https://github.com/go-acme/lego/releases/download/${LEGO_VERSION}/lego_${LEGO_VERSION}_linux_${ARCH}.tar.gz" && \
     wget -qO /tmp/lego.tar.gz.sha256 \
         "https://github.com/go-acme/lego/releases/download/${LEGO_VERSION}/lego_${LEGO_VERSION#v}_checksums.txt" && \
-    grep "lego_${LEGO_VERSION}_linux_${ARCH}.tar.gz" /tmp/lego.tar.gz.sha256 | sha256sum -c - && \
+    grep "lego_${LEGO_VERSION}_linux_${ARCH}.tar.gz" /tmp/lego.tar.gz.sha256 | \
+    awk '{ print $1 "  /tmp/lego.tar.gz" }' | sha256sum -c - && \
     tar -xzf /tmp/lego.tar.gz -C /tmp lego && \
     mv /tmp/lego /usr/local/bin/lego && \
     chmod +x /usr/local/bin/lego && \
