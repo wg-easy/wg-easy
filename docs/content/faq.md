@@ -109,3 +109,30 @@ To resolve this issue, you can try the following steps:
     ```shell
      echo "ip6table_filter" | sudo tee -a /etc/modules
     ```
+
+## clients lose connectivity after restarting the container when using multiple networks?
+
+When you attach multiple Docker networks (e.g., `wg` and a reverse proxy network like `traefik` or `nginx`) to the `wg-easy` container, Docker might assign the network interfaces randomly (e.g., swapping `eth0` and `eth1`). Since `wg-easy` expects the wireguard interface to act as `eth0` and configures `POSTROUTING` rules for it, connectivity will break if the interfaces are swapped upon container restart.
+
+To solve this, specify the `interface_name` and `gw_priority` explicitly in your `docker-compose.yml` file to guarantee that the `wg` network always binds to `eth0` and acts as the default gateway.
+
+**Example `docker-compose.yml`:**
+```yaml
+services:
+  wg-easy:
+    # ... other configuration ...
+    networks:
+      wg:
+        interface_name: eth0
+        gw_priority: 1
+        ipv4_address: 10.42.42.42
+      nginx:
+        interface_name: eth1
+        gw_priority: 0
+
+networks:
+  wg:
+    # ... wg network config ...
+  nginx:
+    external: true
+```
