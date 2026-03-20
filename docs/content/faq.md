@@ -117,22 +117,23 @@ When you attach multiple Docker networks (e.g., `wg` and a reverse proxy network
 To solve this, specify the `interface_name` and `gw_priority` explicitly in your `docker-compose.yml` file to guarantee that the `wg` network always binds to `eth0` and acts as the default gateway.
 
 **Example `docker-compose.yml`:**
+
 ```yaml
 services:
-  wg-easy:
-    # ... other configuration ...
-    networks:
-      wg:
-        interface_name: eth0
-        gw_priority: 1
-        ipv4_address: 10.42.42.42
-      nginx:
-        interface_name: eth1
-        gw_priority: 0
+    wg-easy:
+        # ... other configuration ...
+        networks:
+            wg:
+                interface_name: eth0
+                gw_priority: 1
+                ipv4_address: 10.42.42.42
+            nginx:
+                interface_name: eth1
+                gw_priority: 0
 
 networks:
-  wg:
-    # ... wg network config ...
-  nginx:
-    external: true
+    wg:
+        # ... wg network config ...
+    nginx:
+        external: true
 ```
