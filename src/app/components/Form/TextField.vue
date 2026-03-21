@@ -14,6 +14,7 @@
     type="text"
     :autocomplete="autocomplete"
     :disabled="disabled"
+    :placeholder="placeholder"
   />
 </template>
 
@@ -24,6 +25,7 @@ defineProps<{
   description?: string;
   autocomplete?: string;
   disabled?: boolean;
+  placeholder?: string;
 }>();
 
 const data = defineModel<string>();

@@ -28,6 +28,12 @@ const expiresAt = z
   .min(1, t('zod.client.expiresAt'))
   .pipe(safeStringRefine)
   .nullable();
+ 
+const publicKey = z
+  .string({ message: t('zod.client.publicKey') })
+  .min(1, t('zod.client.publicKey'))
+  .pipe(safeStringRefine)
+  .optional();
 
 const address4 = z
   .string({ message: t('zod.client.address4') })
@@ -48,6 +54,7 @@ const serverAllowedIps = z.array(AddressSchema, {
 export const ClientCreateSchema = z.object({
   name: name,
   expiresAt: expiresAt,
+  publicKey: publicKey
 });
 
 export type ClientCreateType = z.infer<typeof ClientCreateSchema>;
