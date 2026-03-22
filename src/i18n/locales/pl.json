@@ -44,39 +44,39 @@
     "2faCode": "Kod TOTP"
   },
   "setup": {
-    "welcome": "Witamy w pierwszej konfiguracji wg-easy",
-    "welcomeDesc": "Znalazłeś najprostszy sposób na instalację i zarządzanie WireGuard na dowolnym serwerze Linux",
-    "existingSetup": "Masz już istniejącą konfigurację?",
-    "createAdminDesc": "Podaj nazwę użytkownika administratora oraz silne, bezpieczne hasło. Informacje te będą używane do logowania w panelu administracyjnym.",
-    "setupConfigDesc": "Podaj informacje o hoście i porcie. Będą one używane w konfiguracji klienta podczas uruchamiania WireGuard na jego urządzeniach.",
-    "setupMigrationDesc": "Podaj plik kopii zapasowej, jeśli chcesz przenieść dane ze starszej wersji wg-easy do nowej instalacji.",
-    "upload": "Prześlij",
-    "migration": "Przywróć kopię zapasową:",
-    "createAccount": "Utwórz konto",
-    "successful": "Konfiguracja zakończona sukcesem",
-    "hostDesc": "Publiczny host, do którego będą łączyć się klienci",
-    "portDesc": "Publiczny port UDP, na którym WireGuard będzie nasłuchiwał i do którego będą łączyć się klienci"
+    "welcome": "Welcome to your first setup of wg-easy",
+    "welcomeDesc": "You have found the easiest way to install and manage WireGuard on any Linux host",
+    "existingSetup": "Do you have an existing setup?",
+    "createAdminDesc": "Please first enter an admin username and a strong secure password. This information will be used to log in to your administration panel.",
+    "setupConfigDesc": "Please enter the host and port information. This will be used for the client configuration when setting up WireGuard on their devices.",
+    "setupMigrationDesc": "Please provide the backup file if you want to migrate your data from your previous wg-easy version to your new setup.",
+    "upload": "Upload",
+    "migration": "Restore the backup:",
+    "createAccount": "Create Account",
+    "successful": "Setup successful",
+    "hostDesc": "Public hostname clients will connect to",
+    "portDesc": "Public UDP port clients will connect to and WireGuard will listen on"
   },
   "update": {
-    "updateAvailable": "Dostępna jest aktualizacja!",
-    "update": "Aktualizuj"
+    "updateAvailable": "There is an update available!",
+    "update": "Update"
   },
   "theme": {
-    "dark": "Motyw ciemny",
-    "light": "Motyw jasny",
-    "system": "Motyw systemowy"
+    "dark": "Dark theme",
+    "light": "Light theme",
+    "system": "System theme"
   },
   "layout": {
-    "toggleCharts": "Pokaż/ukryj wykresy",
-    "donate": "Wesprzyj"
+    "toggleCharts": "Show/hide Charts",
+    "donate": "Donate"
   },
   "login": {
-    "signIn": "Zaloguj się",
-    "rememberMe": "Zapamiętaj mnie",
-    "rememberMeDesc": "Pozostań zalogowany po zamknięciu przeglądarki",
-    "insecure": "Nie możesz się zalogować przez niezabezpieczone połączenie. Użyj HTTPS.",
-    "2faRequired": "Wymagane uwierzytelnianie dwuskładnikowe",
-    "2faWrong": "Nieprawidłowy kod uwierzytelniania dwuskładnikowego"
+    "signIn": "Sign In",
+    "rememberMe": "Remember me",
+    "rememberMeDesc": "Stay logged after closing the browser",
+    "insecure": "You can't log in with an insecure connection. Use HTTPS.",
+    "2faRequired": "Two Factor Authentication is required",
+    "2faWrong": "Two Factor Authentication is wrong"
   },
   "client": {
     "empty": "Brak klientów.",
@@ -117,6 +117,13 @@
     "notConnected": "Klient nie jest połączony",
     "endpoint": "Punkt końcowy",
     "endpointDesc": "Adres IP klienta, z którego ustanawiane jest połączenie WireGuard"
+    "search": "Wyszukaj klientów...",
+    "config": "Konfiguracja",
+    "viewConfig": "Wyświetl konfigurację",
+    "firewallIps": "Zapora sieciowa zezwala na adresy IP",
+    "firewallIpsDesc": "Docelowe adresy IP/CIDR, do których ten klient ma dostęp (egzekwowanie po stronie serwera). Pozostaw puste, aby użyć dozwolonych adresów IP. Obsługuje opcjonalne filtrowanie portów i protokołów. Szczegóły dotyczące składni znajdują się w dokumentacji.",
+    "downloadPng": "Pobierz PNG",
+    "copyPng": "Kopiuj PNG"
   },
   "dialog": {
     "change": "Zmień",
@@ -127,6 +134,7 @@
     "success": "Sukces",
     "saved": "Zapisano",
     "error": "Błąd"
+    "unknown": "Nieznany błąd. Więcej szczegółów w konsoli."
   },
   "form": {
     "actions": "Akcje",
@@ -172,6 +180,9 @@
       "restartDesc": "Zrestartuj interfejs WireGuard",
       "restartWarn": "Czy na pewno chcesz zrestartować interfejs? Wszyscy klienci zostaną rozłączeni.",
       "restartSuccess": "Interfejs zrestartowany"
+      "firewall": "Filtrowanie ruchu",
+      "firewallEnabled": "Włącz zaporę dla każdego klienta",
+      "firewallEnabledDesc": "Ogranicz ruch klienta do określonych docelowych adresów IP za pomocą iptables. Po włączeniu, każdemu klientowi można skonfigurować dozwolone miejsca docelowe."
     },
     "introText": "Witamy w panelu administracyjnym.\n\nTutaj możesz zarządzać ustawieniami ogólnymi, konfiguracją, interfejsem i hookami.\n\nZacznij od wybrania jednej z sekcji w pasku bocznym."
   },
@@ -179,6 +190,7 @@
     "generic": {
       "required": "{0} jest wymagane",
       "validNumber": "{0} musi być prawidłową liczbą",
+      "validNumberRange": "{0} musi to być prawidłowa liczba lub zakres liczb",
       "validString": "{0} musi być prawidłowym tekstem",
       "validBoolean": "{0} musi być prawidłową wartością logiczną",
       "validArray": "{0} musi być prawidłową tablicą",
@@ -192,6 +204,8 @@
       "address4": "Adres IPv4",
       "address6": "Adres IPv6",
       "serverAllowedIps": "Dozwolone adresy IP serwera"
+      "firewallIps": "Zapora sieciowa zezwala na adresy IP",
+      "firewallIpsInvalid": "Nieprawidłowy wpis adresu IP zapory. Obsługiwaną składnię znajdziesz w dokumentacji."
     },
     "user": {
       "username": "Nazwa użytkownika",
@@ -236,5 +250,47 @@
     "postUp": "PostUp",
     "preDown": "PreDown",
     "postDown": "PostDown"
+  },
+  "copy": {
+    "notSupported": "Kopiowanie nie jest obsługiwane",
+    "copied": "Skopiowano!",
+    "failed": "Kopiowanie nie powiodło się",
+    "copy": "Kopia"
+  },
+  "awg": {
+"jCLabel": "Liczba pakietów śmieciowych (Jc)",
+    "jCDescription": "Liczba pakietów śmieciowych do wysłania (1-128, zalecane: 4-12)",
+    "jMinLabel": "Minimalny rozmiar pakietu śmieciowego (Jmin)",
+    "jMinDescription": "Minimalny rozmiar pakietów śmieciowych (0-1279*, zalecane: 8, musi być < Jmax)",
+    "jMaxLabel": "Maksymalny rozmiar pakietu śmieciowego (Jmax)",
+    "jMaxDescription": "Maksymalny rozmiar pakietów śmieciowych (1-1280*, zalecane: 80, musi być > Jmin)",
+    "s1Label": "Rozmiar śmieci w pakiecie inicjującym (S1)",
+    "s1Description": "Rozmiar śmieci w pakiecie inicjującym (0-1132[1280* - 148 = 1132], zalecane: 15-150, S1+56 ≠ S2)",
+    "s2Label": "Rozmiar śmieci w pakiecie odpowiedzi (S2)",
+    "s2Description": "Rozmiar śmieci w pakiecie odpowiedzi (0-1188[1280* - 92 = 1188], zalecane: 15-150)",
+    "s3Label": "Rozmiar śmieci w pakiecie odpowiedzi Cookie (S3)",
+    "s3Description": "Rozmiar śmieci w pakiecie odpowiedzi Cookie",
+    "s4Label": "Rozmiar śmieci w pakiecie transportowym (S4)",
+    "s4Description": "Rozmiar śmieci w pakiecie transportowym",
+    "h1Label": "Nagłówek Magic pakietu inicjującego (H1)",
+    "h1Description": "Wartość lub zakres nagłówka pakietu inicjującego (X lub X-Y, gdzie X<Y. Min 5, max 2147483647. Wartość lub zakres nie mogą pokrywać się z innymi nagłówkami)",
+    "h2Label": "Nagłówek Magic pakietu odpowiedzi (H2)",
+    "h2Description": "Wartość lub zakres nagłówka pakietu odpowiedzi (X lub X-Y, gdzie X<Y. Min 5, max 2147483647. Wartość lub zakres nie mogą pokrywać się z innymi nagłówkami)",
+    "h3Label": "Nagłówek Magic odpowiedzi Cookie (H3)",
+    "h3Description": "Wartość lub zakres nagłówka pakietu odpowiedzi Cookie (X lub X-Y, gdzie X<Y. Min 5, max 2147483647. Wartość lub zakres nie mogą pokrywać się z innymi nagłówkami)",
+    "h4Label": "Nagłówek Magic pakietu transportowego (H4)",
+    "h4Description": "Wartość lub zakres nagłówka pakietu transportowego (X lub X-Y, gdzie X<Y. Min 5, max 2147483647. Wartość lub zakres nie mogą pokrywać się z innymi nagłówkami)",
+    "i1Label": "Specjalny pakiet śmieciowy 1 (I1)",
+    "i1Description": "Pakiet imitujący protokół w formacie hex: <b 0x...>",
+    "i2Label": "Specjalny pakiet śmieciowy 2 (I2)",
+    "i2Description": "Pakiet imitujący protokół w formacie hex: <b 0x...>",
+    "i3Label": "Specjalny pakiet śmieciowy 3 (I3)",
+    "i3Description": "Pakiet imitujący protokół w formacie hex: <b 0x...>",
+    "i4Label": "Specjalny pakiet śmieciowy 4 (I4)",
+    "i4Description": "Pakiet imitujący protokół w formacie hex: <b 0x...>",
+    "i5Label": "Specjalny pakiet śmieciowy 5 (I5)",
+    "i5Description": "Pakiet imitujący protokół w formacie hex: <b 0x...>",
+    "mtuNote": "Wartości zależą od MTU",
+    "obfuscationParameters": "Parametry maskowania (obfuskacji) AmneziaWG"
   }
 }
