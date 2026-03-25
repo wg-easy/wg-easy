@@ -1,6 +1,6 @@
 import { eq, sql } from 'drizzle-orm';
-import CRC32 from 'crc-32';
 import { oneTimeLink } from './schema';
+import { generateOtlToken } from './token';
 import type { DBType } from '#db/sqlite';
 
 function createPreparedStatement(db: DBType) {
@@ -19,6 +19,7 @@ function createPreparedStatement(db: DBType) {
       .onConflictDoUpdate({
         target: oneTimeLink.id,
         set: {
+          oneTimeLink: sql.placeholder('oneTimeLink') as never as string,
           expiresAt: sql.placeholder('expiresAt') as never as string,
         },
       })
@@ -52,8 +53,7 @@ export class OneTimeLinkService {
   }
 
   generate(id: ID) {
-    const key = `${id}-${Math.floor(Math.random() * 1000)}`;
-    const oneTimeLink = Math.abs(CRC32.str(key)).toString(16);
+    const oneTimeLink = generateOtlToken();
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString();
 
     return this.#statements.create.execute({ id, oneTimeLink, expiresAt });
