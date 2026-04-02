@@ -1,5 +1,5 @@
 <template>
-  <h2 class="flex-1 text-2xl font-medium">
+  <h2 class="flex-1 break-all text-2xl font-medium">
     {{ text }}
   </h2>
 </template>
