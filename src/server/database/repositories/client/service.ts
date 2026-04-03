@@ -9,13 +9,14 @@ import type {
 import type { DBType } from '#db/sqlite';
 import { wgInterface, userConfig } from '#db/schema';
 
-function createPreparedStatement(db: DBType) {
+function createPreparedStatement(db: DBType, direction: 'ASC' | 'DESC') {
   return {
     findAll: db.query.client
       .findMany({
         with: {
           oneTimeLink: true,
         },
+        orderBy: sql`${client.name} ${sql.raw(direction)}`,
       })
       .prepare(),
     findAllPublic: db.query.client
@@ -27,6 +28,27 @@ function createPreparedStatement(db: DBType) {
           privateKey: false,
           preSharedKey: false,
         },
+        orderBy: sql`${client.name} ${sql.raw(direction)}`,
+      })
+      .prepare(),
+    countAll: db
+      .select({
+        total: sql<number>`count(*)`
+      })
+      .from(client)
+      .prepare(),
+    findPaginatedListPublic: db.query.client
+      .findMany({
+        with: {
+          oneTimeLink: true,
+        },
+        columns: {
+          privateKey: false,
+          preSharedKey: false,
+        },
+        limit: sql.placeholder('limit'),
+        offset: sql.placeholder('offset'),
+        orderBy: sql`${client.name} ${sql.raw(direction)}`,
       })
       .prepare(),
     findById: db.query.client
@@ -40,6 +62,31 @@ function createPreparedStatement(db: DBType) {
           privateKey: false,
           preSharedKey: false,
         },
+        orderBy: sql`${client.name} ${sql.raw(direction)}`,
+      })
+      .prepare(),
+    countByUserId: db
+      .select({
+        total: sql<number>`count(*)`
+      })
+      .from(client)
+      .where(
+        and(
+          eq(client.userId, sql.placeholder('userId'))
+        )
+      )
+      .prepare(),
+    findPaginatedListByUserId: db.query.client
+      .findMany({
+        where: eq(client.userId, sql.placeholder('userId')),
+        with: { oneTimeLink: true },
+        columns: {
+          privateKey: false,
+          preSharedKey: false,
+        },
+        limit: sql.placeholder('limit'),
+        offset: sql.placeholder('offset'),
+        orderBy: sql`${client.name} ${sql.raw(direction)}`,
       })
       .prepare(),
     findAllPublicFiltered: db.query.client
@@ -56,6 +103,41 @@ function createPreparedStatement(db: DBType) {
           privateKey: false,
           preSharedKey: false,
         },
+        orderBy: sql`${client.name} ${sql.raw(direction)}`,
+      })
+      .prepare(),
+    countAllFiltered: db
+      .select({
+        total: sql<number>`count(*)`
+      })
+      .from(client)
+      .where(
+        and(
+          or(
+            like(client.name, sql.placeholder('filter')),
+            like(client.ipv4Address, sql.placeholder('filter')),
+            like(client.ipv6Address, sql.placeholder('filter'))
+          )
+        )
+      )
+      .prepare(),
+    findPaginatedListPublicFiltered: db.query.client
+      .findMany({
+        where: or(
+          like(client.name, sql.placeholder('filter')),
+          like(client.ipv4Address, sql.placeholder('filter')),
+          like(client.ipv6Address, sql.placeholder('filter'))
+        ),
+        with: {
+          oneTimeLink: true,
+        },
+        columns: {
+          privateKey: false,
+          preSharedKey: false,
+        },
+        limit: sql.placeholder('limit'),
+        offset: sql.placeholder('offset'),
+        orderBy: sql`${client.name} ${sql.raw(direction)}`,
       })
       .prepare(),
     findByUserIdFiltered: db.query.client
@@ -73,6 +155,43 @@ function createPreparedStatement(db: DBType) {
           privateKey: false,
           preSharedKey: false,
         },
+        orderBy: sql`${client.name} ${sql.raw(direction)}`,
+      })
+      .prepare(),
+    countByUserIdFiltered: db
+      .select({
+        total: sql<number>`count(*)`
+      })
+      .from(client)
+      .where(
+        and(
+          eq(client.userId, sql.placeholder('userId')),
+          or(
+            like(client.name, sql.placeholder('filter')),
+            like(client.ipv4Address, sql.placeholder('filter')),
+            like(client.ipv6Address, sql.placeholder('filter'))
+          )
+        )
+      )
+      .prepare(),
+    findPaginatedListByUserIdFiltered: db.query.client
+      .findMany({
+        where: and(
+          eq(client.userId, sql.placeholder('userId')),
+          or(
+            like(client.name, sql.placeholder('filter')),
+            like(client.ipv4Address, sql.placeholder('filter')),
+            like(client.ipv6Address, sql.placeholder('filter'))
+          )
+        ),
+        with: { oneTimeLink: true },
+        columns: {
+          privateKey: false,
+          preSharedKey: false,
+        },
+        limit: sql.placeholder('limit'),
+        offset: sql.placeholder('offset'),
+        orderBy: sql`${client.name} ${sql.raw(direction)}`,
       })
       .prepare(),
     toggle: db
@@ -89,15 +208,39 @@ function createPreparedStatement(db: DBType) {
 
 export class ClientService {
   #db: DBType;
-  #statements: ReturnType<typeof createPreparedStatement>;
 
   constructor(db: DBType) {
     this.#db = db;
-    this.#statements = createPreparedStatement(db);
   }
 
-  async getForUser(userId: ID) {
-    const result = await this.#statements.findByUserId.execute({ userId });
+  getStatements(direction?: 'ASC' | 'DESC'){
+    return createPreparedStatement(this.#db, direction ?? "ASC");
+  }
+
+  async getForUser(userId: ID, sortClient: boolean) {
+    const direction = sortClient ? 'ASC' : 'DESC';
+    const result = await this.getStatements(direction).findByUserId.execute({ userId });
+    return result.map((row) => ({
+      ...row,
+      createdAt: new Date(row.createdAt),
+      updatedAt: new Date(row.updatedAt),
+    }));
+  }
+
+  async countForUser(userId: ID) {
+    const result = await this.getStatements().countByUserId.execute({ userId });
+
+    return result?.at(0)?.total ?? 0;
+  }
+
+  async getPaginatedListForUser(userId: ID, page: number, limit: number, sortClient: boolean) {
+    const direction = sortClient ? 'ASC' : 'DESC';
+    const offset = (page - 1) * limit;
+
+    const result = await this.getStatements(direction).findPaginatedListByUserId.execute({ 
+      userId,
+      limit,
+      offset });
     return result.map((row) => ({
       ...row,
       createdAt: new Date(row.createdAt),
@@ -108,8 +251,9 @@ export class ClientService {
   /**
    * Never return values directly from this function. Use {@link getAllPublic} instead.
    */
-  async getAll() {
-    const result = await this.#statements.findAll.execute();
+  async getAll(sortClient: boolean) {
+    const direction = sortClient ? 'ASC' : 'DESC';
+    const result = await this.getStatements(direction).findAll.execute();
     return result.map((row) => ({
       ...row,
       createdAt: new Date(row.createdAt),
@@ -120,8 +264,38 @@ export class ClientService {
   /**
    * Returns all clients without sensitive data
    */
-  async getAllPublic() {
-    const result = await this.#statements.findAllPublic.execute();
+  async getAllPublic(sortClient: boolean) {
+    const direction = sortClient ? 'ASC' : 'DESC';
+
+    const result = await this.getStatements(direction).findAllPublic.execute();
+    return result.map((row) => ({
+      ...row,
+      createdAt: new Date(row.createdAt),
+      updatedAt: new Date(row.updatedAt),
+    }));
+  }
+
+  /**
+   * Returns count all clients
+   */
+  async countAll() {
+    const result = await this.getStatements().countAll.execute();
+
+    return result?.at(0)?.total ?? 0;
+  }
+
+  /**
+   * Get a paginated list of clients without sensitive data
+   */
+  async getPaginatedListPublic(page: number, limit: number, sortClient: boolean) {
+    const direction = sortClient ? 'ASC' : 'DESC';
+    const offset = (page - 1) * limit;
+
+    const result = await this.getStatements(direction).findPaginatedListPublic.execute({
+      limit,
+      offset,
+    });
+
     return result.map((row) => ({
       ...row,
       createdAt: new Date(row.createdAt),
@@ -132,10 +306,11 @@ export class ClientService {
   /**
    * Get clients based on user ID and filter conditions
    */
-  async getForUserFiltered(userId: ID, filter: string) {
+  async getForUserFiltered(userId: ID, filter: string, sortClient: boolean) {
+    const direction = sortClient ? 'ASC' : 'DESC';
     const filterPattern = `%${filter.toLowerCase()}%`;
 
-    const result = await this.#statements.findByUserIdFiltered.execute({
+    const result = await this.getStatements(direction).findByUserIdFiltered.execute({
       userId,
       filter: filterPattern,
     });
@@ -148,12 +323,49 @@ export class ClientService {
   }
 
   /**
-   * Get all clients based on filter conditions without sensitive data
+   * Get count clients based on user ID and filter conditions
    */
-  async getAllPublicFiltered(filter: string) {
+  async countForUserFiltered(userId: ID, filter: string) {
     const filterPattern = `%${filter.toLowerCase()}%`;
 
-    const result = await this.#statements.findAllPublicFiltered.execute({
+    const result = await this.getStatements().countByUserIdFiltered.execute({
+      userId,
+      filter: filterPattern,
+    });
+
+    return result?.at(0)?.total ?? 0;
+  }
+
+  /**
+   * Get a paginated list of clients based on user ID and filter conditions
+   */
+  async getPaginatedListForUserFiltered(userId: ID, filter: string, page: number, limit: number, sortClient: boolean) {
+    const direction = sortClient ? 'ASC' : 'DESC';
+    const filterPattern = `%${filter.toLowerCase()}%`;
+    const offset = (page - 1) * limit;
+
+    const result = await this.getStatements(direction).findPaginatedListByUserIdFiltered.execute({
+      userId,
+      filter: filterPattern,
+      limit,
+      offset
+    });
+
+    return result.map((row) => ({
+      ...row,
+      createdAt: new Date(row.createdAt),
+      updatedAt: new Date(row.updatedAt),
+    }));
+  }
+
+  /**
+   * Get all clients based on filter conditions without sensitive data
+   */
+  async getAllPublicFiltered(filter: string, sortClient: boolean) {
+    const direction = sortClient ? 'ASC' : 'DESC';
+    const filterPattern = `%${filter.toLowerCase()}%`;
+
+    const result = await this.getStatements(direction).findAllPublicFiltered.execute({
       filter: filterPattern,
     });
 
@@ -164,8 +376,44 @@ export class ClientService {
     }));
   }
 
+  /**
+   * Get count all clients based on filter conditions
+   */
+  async countAllFiltered(filter: string) {
+    const filterPattern = `%${filter.toLowerCase()}%`;
+
+    const result = await this.getStatements().countAllFiltered.execute({
+      filter: filterPattern,
+    });
+
+    return result?.at(0)?.total ?? 0;
+  }
+
+  /**
+   * Get a paginated list of clients based on filter conditions without sensitive data.
+   */
+  async getPaginatedListPublicFiltered(filter: string, page: number, limit: number, sortClient: boolean) {
+    const direction = sortClient ? 'ASC' : 'DESC';
+    const filterPattern = `%${filter.toLowerCase()}%`;
+
+    const offset = (page - 1) * limit;
+
+    const result = await this.getStatements(direction).findPaginatedListPublicFiltered.execute({
+      filter: filterPattern,
+      limit,
+      offset,
+      sortClient
+    });
+
+    return result.map((row) => ({
+      ...row,
+      createdAt: new Date(row.createdAt),
+      updatedAt: new Date(row.updatedAt),
+    }));
+  }
+
   get(id: ID) {
-    return this.#statements.findById.execute({ id });
+    return this.getStatements().findById.execute({ id });
   }
 
   async create({ name, expiresAt }: ClientCreateType) {
@@ -232,11 +480,11 @@ export class ClientService {
   }
 
   toggle(id: ID, enabled: boolean) {
-    return this.#statements.toggle.execute({ id, enabled });
+    return this.getStatements().toggle.execute({ id, enabled });
   }
 
   delete(id: ID) {
-    return this.#statements.delete.execute({ id });
+    return this.getStatements().delete.execute({ id });
   }
 
   update(id: ID, data: UpdateClientType) {
