@@ -136,6 +136,11 @@ export default defineNuxtConfig({
         language: 'gl-ES',
         name: 'Galego',
       },
+      {
+        code: 'vi',
+        language: 'vi-VN',
+        name: 'Tiếng Việt',
+      },
     ],
     defaultLocale: 'en',
     vueI18n: './i18n.config.ts',
