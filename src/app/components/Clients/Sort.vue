@@ -2,7 +2,7 @@
   <BasePrimaryButton @click="toggleSort">
     <IconsArrowDown v-if="globalStore.sortClient === true" class="mr-2 w-4" />
     <IconsArrowUp v-else class="mr-2 w-4" />
-    <span class="text-sm"> {{ $t('client.sort') }}</span>
+    <span class="text-sm">{{ $t('client.sort') }}</span>
   </BasePrimaryButton>
 </template>
 

@@ -12,22 +12,24 @@
               </NuxtLink>
             </PanelHeadTitle>
           </PanelHead>
-          <div class="flex flex-col space-y-2 p-4">
-            <NuxtLink
-              v-for="(item, index) in menuItems"
-              :key="index"
-              :to="`/admin/${item.id}`"
-              class="group rounded"
-              active-class="bg-red-800 active"
-            >
-              <BaseSecondaryButton
-                as="span"
-                class="w-full font-medium group-[.active]:text-white"
+          <PanelBody>
+            <nav class="flex flex-col gap-2">
+              <NuxtLink
+                v-for="(item, index) in menuItems"
+                :key="index"
+                :to="`/admin/${item.id}`"
+                class="group rounded"
+                active-class="bg-red-800 active"
               >
-                {{ item.name }}
-              </BaseSecondaryButton>
-            </NuxtLink>
-          </div>
+                <BaseSecondaryButton
+                  as="span"
+                  class="w-full font-medium group-[.active]:text-white"
+                >
+                  {{ item.name }}
+                </BaseSecondaryButton>
+              </NuxtLink>
+            </nav>
+          </PanelBody>
         </div>
 
         <div
@@ -38,9 +40,9 @@
               {{ activeMenuItem.name }}
             </PanelHeadTitle>
           </PanelHead>
-          <section class="p-6">
+          <PanelBody>
             <NuxtPage />
-          </section>
+          </PanelBody>
         </div>
       </div>
     </div>

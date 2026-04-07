@@ -5,7 +5,7 @@
       authStore.userData &&
       hasPermissions(authStore.userData, 'admin', 'any')
     "
-    class="font-small mb-10 rounded-md bg-red-800 p-4 text-sm text-white shadow-lg dark:bg-red-100 dark:text-red-600"
+    class="font-small rounded-md bg-red-800 p-4 text-sm text-white shadow-lg dark:bg-red-100 dark:text-red-600"
     :title="`v${globalStore.information.currentRelease} → v${globalStore.information.latestRelease.version}`"
   >
     <div class="container mx-auto flex flex-auto flex-row items-center">
