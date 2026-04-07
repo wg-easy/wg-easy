@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="../assets/logo/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.5">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
@@ -566,6 +566,17 @@
     <span class="md-ellipsis">
       
         can't initialize ip6tables table `filter': Permission denied
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#clients-lose-connectivity-after-restarting-the-container-when-using-multiple-networks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Clients lose connectivity after restarting the container when using multiple networks?
       
     </span>
   </a>
@@ -1903,6 +1914,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#clients-lose-connectivity-after-restarting-the-container-when-using-multiple-networks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Clients lose connectivity after restarting the container when using multiple networks?
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2026,6 +2048,28 @@
 </code></pre></div>
 </li>
 </ol>
+<h2 id="clients-lose-connectivity-after-restarting-the-container-when-using-multiple-networks"><a class="toclink" href="#clients-lose-connectivity-after-restarting-the-container-when-using-multiple-networks">Clients lose connectivity after restarting the container when using multiple networks?</a></h2>
+<p>When you attach multiple Docker networks (e.g., <code>wg</code> and a reverse proxy network like <code>traefik</code> or <code>nginx</code>) to the <code>wg-easy</code> container, Docker might assign the network interfaces randomly (e.g., swapping <code>eth0</code> and <code>eth1</code>). Since <code>wg-easy</code> expects the wireguard interface to act as <code>eth0</code> and configures <code>POSTROUTING</code> rules for it, connectivity will break if the interfaces are swapped upon container restart.</p>
+<p>To solve this, specify the <code>interface_name</code> and <code>gw_priority</code> explicitly in your <code>docker-compose.yml</code> file to guarantee that the <code>wg</code> network always binds to <code>eth0</code> and acts as the default gateway.</p>
+<p><strong>Example <code>docker-compose.yml</code>:</strong></p>
+<div class="highlight"><pre><span></span><code><span class="nt">services</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">wg-easy</span><span class="p">:</span>
+<span class="w">        </span><span class="c1"># ... other configuration ...</span>
+<span class="w">        </span><span class="nt">networks</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">wg</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">interface_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">eth0</span>
+<span class="w">                </span><span class="nt">gw_priority</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<span class="w">                </span><span class="nt">ipv4_address</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10.42.42.42</span>
+<span class="w">            </span><span class="nt">nginx</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">interface_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">eth1</span>
+<span class="w">                </span><span class="nt">gw_priority</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
+
+<span class="nt">networks</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">wg</span><span class="p">:</span>
+<span class="w">        </span><span class="c1"># ... wg network config ...</span>
+<span class="w">    </span><span class="nt">nginx</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">external</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</code></pre></div>
 
 
 
