@@ -46,6 +46,6 @@ export default defineI18nConfig(() => ({
     bg,
     gl,
     cs,
-    vi
+    vi,
   },
 }));
