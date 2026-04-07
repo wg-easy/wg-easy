@@ -1,5 +1,5 @@
 <template>
-  <div class="relative w-60 md:mr-2">
+  <div class="relative">
     <div class="relative flex h-full items-center">
       <IconsMagnifyingGlass
         class="absolute left-2.5 h-4 w-4 text-gray-400 dark:text-neutral-500"

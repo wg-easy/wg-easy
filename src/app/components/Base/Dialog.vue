@@ -18,7 +18,7 @@
         >
           <slot name="description" />
         </DialogDescription>
-        <div class="mt-6 flex justify-end gap-2">
+        <div class="mt-6 flex flex-wrap justify-end gap-2">
           <slot name="actions" />
         </div>
       </DialogContent>

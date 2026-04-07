@@ -1,11 +1,8 @@
 <template>
   <BasePrimaryButton @click="toggleSort">
-    <IconsArrowDown
-      v-if="globalStore.sortClient === true"
-      class="w-4 md:mr-2"
-    />
-    <IconsArrowUp v-else class="w-4 md:mr-2" />
-    <span class="text-sm max-md:hidden"> {{ $t('client.sort') }}</span>
+    <IconsArrowDown v-if="globalStore.sortClient === true" class="mr-2 w-4" />
+    <IconsArrowUp v-else class="mr-2 w-4" />
+    <span class="text-sm">{{ $t('client.sort') }}</span>
   </BasePrimaryButton>
 </template>
 

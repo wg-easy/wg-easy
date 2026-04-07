@@ -1,6 +1,8 @@
 <template>
   <div>
-    <header class="mx-auto mt-4 flex max-w-3xl flex-col justify-center">
+    <header
+      class="mx-auto my-4 flex max-w-3xl flex-col justify-center max-md:px-3"
+    >
       <div
         class="mb-5 w-full"
         :class="
@@ -17,7 +19,7 @@
           <UiUserMenu v-if="loggedIn" />
         </div>
       </div>
-      <HeaderUpdate class="mt-4" />
+      <HeaderUpdate class="my-4" />
     </header>
     <slot />
     <UiFooter />
