@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Hooks are now Textareas (https://github.com/wg-easy/wg-easy/pull/2522)
 - Update to Node Krypton (24) (https://github.com/wg-easy/wg-easy/pull/2536)
+- Mobile UI (https://github.com/wg-easy/wg-easy/pull/2569)
 
 ## [15.2.2] - 2026-02-06
 
