@@ -2,7 +2,9 @@
   <main>
     <Panel>
       <PanelHead>
-        <PanelHeadTitle :text="$t('pages.me')" />
+        <PanelHeadTitle>
+          {{ $t('pages.me') }}
+        </PanelHeadTitle>
       </PanelHead>
       <PanelBody class="dark:text-neutral-200">
         <FormElement @submit.prevent="submit">

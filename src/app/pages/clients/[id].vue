@@ -2,7 +2,9 @@
   <main v-if="data">
     <Panel>
       <PanelHead>
-        <PanelHeadTitle :text="data.name" />
+        <PanelHeadTitle>
+          {{ data.name }}
+        </PanelHeadTitle>
       </PanelHead>
       <PanelBody>
         <FormElement @submit.prevent="submit">

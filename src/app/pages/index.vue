@@ -2,7 +2,9 @@
   <main>
     <Panel>
       <PanelHead>
-        <PanelHeadTitle :text="$t('pages.clients')" />
+        <PanelHeadTitle>
+          {{ $t('pages.clients') }}
+        </PanelHeadTitle>
         <PanelHeadBoat>
           <ClientsSearch />
           <div class="flex gap-2">
