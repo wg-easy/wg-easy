@@ -16,7 +16,7 @@
 </template>
 
 <script setup lang="ts">
-import type { ApexOptions } from 'apexcharts';
+import type { ApexChart, ApexOptions } from 'apexcharts';
 
 defineProps<{
   client: LocalClient;
