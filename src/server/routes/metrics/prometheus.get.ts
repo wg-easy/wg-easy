@@ -62,6 +62,7 @@ async function getPrometheusResponse() {
     '# HELP wireguard_latest_handshake_seconds UNIX timestamp seconds of the last handshake',
     '# TYPE wireguard_latest_handshake_seconds gauge',
     `${wireguardLatestHandshakeSeconds.join('\n')}`,
+    '',
   ];
 
   return returnText.join('\n');
