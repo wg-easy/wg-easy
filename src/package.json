@@ -76,7 +76,7 @@
   },
   "pnpm": {
     "overrides": {
-      "@nuxt/test-utils": "4.0.0"
+      "@nuxt/test-utils": "4.0.2"
     }
   },
   "packageManager": "pnpm@10.33.0"
