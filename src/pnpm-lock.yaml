@@ -48,8 +48,8 @@ importers:
         specifier: ^0.44.0
         version: 0.44.0
       cidr-tools:
-        specifier: ^11.3.2
-        version: 11.3.2
+        specifier: ^11.3.3
+        version: 11.3.3
       citty:
         specifier: ^0.2.2
         version: 0.2.2
@@ -3196,8 +3196,8 @@ packages:
     resolution: {integrity: sha512-zfPT2uurEroxXqefaL2L7/fT5ED2XTutC6UwFbSZfqSOk1vk5VFY6xa6/R6pBxB4Uc8MNPbRW5ykqutFG5P5ww==}
     engines: {node: '>=20'}
 
-  cidr-tools@11.3.2:
-    resolution: {integrity: sha512-yCtb8tB3CngbbzGUsEz8koyxHDxEA3VUOOldXFeLqQREWl1HK/FZxLzxxWQgPDPMwuvMF7q9kyIsFLmmBPaN6A==}
+  cidr-tools@11.3.3:
+    resolution: {integrity: sha512-3fHQpk8DxUjO/nuoo9gTDpOKQDHoHarCxU3b7bkAq/nMHm54ADqoSQRF3l/GVbnOEtt5wfo/3vTEp4imLb7BZQ==}
     engines: {node: '>=18'}
 
   citty@0.1.6:
@@ -4268,6 +4268,10 @@ packages:
 
   ip-bigint@8.3.3:
     resolution: {integrity: sha512-r1bCRPxLv4PcyIB95FbsxaVvymNhFfbsIxrFdHqgZhWOBvfEPnzIHDGLAP+85cBozVf+XGaM00em4ZoJHm9EHw==}
+    engines: {node: '>=18'}
+
+  ip-bigint@8.3.4:
+    resolution: {integrity: sha512-W34SH99LpEuCGlX+pv5EM8m57EMfm01o19Os2oQEHsmQVkHcIHtAU/YfpGFTAzUqM65e3GKA1JK/bHhNL1Ag4Q==}
     engines: {node: '>=18'}
 
   ip-regex@5.0.0:
@@ -9229,9 +9233,9 @@ snapshots:
 
   cidr-regex@5.0.3: {}
 
-  cidr-tools@11.3.2:
+  cidr-tools@11.3.3:
     dependencies:
-      ip-bigint: 8.3.3
+      ip-bigint: 8.3.4
 
   citty@0.1.6:
     dependencies:
@@ -10298,6 +10302,8 @@ snapshots:
       - supports-color
 
   ip-bigint@8.3.3: {}
+
+  ip-bigint@8.3.4: {}
 
   ip-regex@5.0.0: {}
 
