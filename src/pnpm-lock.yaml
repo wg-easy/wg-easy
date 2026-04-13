@@ -42,8 +42,8 @@ importers:
         specifier: ^14.2.1
         version: 14.2.1(magicast@0.5.2)(nuxt@3.21.2(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@libsql/client@0.17.2)(@parcel/watcher@2.5.6)(@types/node@25.5.2)(@vue/compiler-sfc@3.5.32)(cac@6.7.14)(db0@0.3.4(@libsql/client@0.17.2)(drizzle-orm@0.45.2(@libsql/client@0.17.2)))(drizzle-orm@0.45.2(@libsql/client@0.17.2))(eslint@9.39.4(jiti@1.21.7))(ioredis@5.10.1)(magicast@0.5.2)(optionator@0.9.4)(rollup-plugin-visualizer@7.0.1(rollup@4.60.1))(rollup@4.60.1)(srvx@0.11.15)(terser@5.46.1)(tsx@4.21.0)(typescript@6.0.2)(vite@7.3.2(@types/node@25.5.2)(jiti@1.21.7)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3))(vue-tsc@3.2.6(typescript@6.0.2))(yaml@2.8.3))(vue@3.5.32(typescript@6.0.2))
       apexcharts:
-        specifier: ^5.10.5
-        version: 5.10.5
+        specifier: ^5.10.6
+        version: 5.10.6
       argon2:
         specifier: ^0.44.0
         version: 0.44.0
@@ -106,7 +106,7 @@ importers:
         version: 3.5.32(typescript@6.0.2)
       vue3-apexcharts:
         specifier: ^1.11.1
-        version: 1.11.1(apexcharts@5.10.5)(vue@3.5.32(typescript@6.0.2))
+        version: 1.11.1(apexcharts@5.10.6)(vue@3.5.32(typescript@6.0.2))
       zod:
         specifier: ^4.3.6
         version: 4.3.6
@@ -2935,8 +2935,8 @@ packages:
     resolution: {integrity: sha512-KMReFUr0B4t+D+OBkjR3KYqvocp2XaSzO55UcB6mgQMd3KbcE+mWTyvVV7D/zsdEbNnV6acZUutkiHQXvTr1Rw==}
     engines: {node: '>= 8'}
 
-  apexcharts@5.10.5:
-    resolution: {integrity: sha512-RirosfLQLqYpWBdn4Pdv9B1M0M2FepzVxPRpcuXQPTilvuZvKt02vgVlEexhCVu2p4fApDIV/3yC9voAIK+qjw==}
+  apexcharts@5.10.6:
+    resolution: {integrity: sha512-FJQGbso3iRuOwUYnj0yUhkWeKeJE6aboVol+ae09lsc+lbLMWZqSRbrAWVa/qishLiaeG2icxdvmVkm+9n6kOQ==}
 
   archiver-utils@5.0.2:
     resolution: {integrity: sha512-wuLJMmIBQYCsGZgYLTy5FIB2pF6Lfb6cXMSF8Qywwk3t20zWnAi7zLcQFdKQmIB8wyZpY5ER38x08GbwtR2cLA==}
@@ -8970,7 +8970,7 @@ snapshots:
       normalize-path: 3.0.0
       picomatch: 2.3.2
 
-  apexcharts@5.10.5: {}
+  apexcharts@5.10.6: {}
 
   archiver-utils@5.0.2:
     dependencies:
@@ -12534,9 +12534,9 @@ snapshots:
       '@vue/language-core': 3.2.6
       typescript: 6.0.2
 
-  vue3-apexcharts@1.11.1(apexcharts@5.10.5)(vue@3.5.32(typescript@6.0.2)):
+  vue3-apexcharts@1.11.1(apexcharts@5.10.6)(vue@3.5.32(typescript@6.0.2)):
     dependencies:
-      apexcharts: 5.10.5
+      apexcharts: 5.10.6
       vue: 3.5.32(typescript@6.0.2)
 
   vue@3.5.32(typescript@6.0.2):
