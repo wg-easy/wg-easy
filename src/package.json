@@ -74,10 +74,5 @@
     "vitest": "^4.1.4",
     "vue-tsc": "^3.2.6"
   },
-  "pnpm": {
-    "overrides": {
-      "@nuxt/test-utils": "4.0.0"
-    }
-  },
   "packageManager": "pnpm@10.33.0"
 }
