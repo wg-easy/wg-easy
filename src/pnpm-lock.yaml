@@ -66,8 +66,8 @@ importers:
         specifier: ^0.45.2
         version: 0.45.2(@libsql/client@0.17.2)
       ip-bigint:
-        specifier: ^8.3.3
-        version: 8.3.3
+        specifier: ^8.3.4
+        version: 8.3.4
       is-cidr:
         specifier: ^6.0.3
         version: 6.0.3
@@ -4266,8 +4266,8 @@ packages:
     resolution: {integrity: sha512-HuEDBTI70aYdx1v6U97SbNx9F1+svQKBDo30o0b9fw055LMepzpOOd0Ccg9Q6tbqmBSJaMuY0fB7yw9/vjBYCA==}
     engines: {node: '>=12.22.0'}
 
-  ip-bigint@8.3.3:
-    resolution: {integrity: sha512-r1bCRPxLv4PcyIB95FbsxaVvymNhFfbsIxrFdHqgZhWOBvfEPnzIHDGLAP+85cBozVf+XGaM00em4ZoJHm9EHw==}
+  ip-bigint@8.3.4:
+    resolution: {integrity: sha512-W34SH99LpEuCGlX+pv5EM8m57EMfm01o19Os2oQEHsmQVkHcIHtAU/YfpGFTAzUqM65e3GKA1JK/bHhNL1Ag4Q==}
     engines: {node: '>=18'}
 
   ip-regex@5.0.0:
@@ -9231,7 +9231,7 @@ snapshots:
 
   cidr-tools@11.3.2:
     dependencies:
-      ip-bigint: 8.3.3
+      ip-bigint: 8.3.4
 
   citty@0.1.6:
     dependencies:
@@ -10297,7 +10297,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  ip-bigint@8.3.3: {}
+  ip-bigint@8.3.4: {}
 
   ip-regex@5.0.0: {}
 
