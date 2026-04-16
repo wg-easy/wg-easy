@@ -20,6 +20,7 @@ const db = drizzle({ client, schema });
 
 export async function connect() {
   await migrate();
+  await normalizeInterfaceName(db);
   const dbService = new DBService(db);
 
   if (WG_INITIAL_ENV.ENABLED) {
@@ -120,12 +121,46 @@ async function initialSetup(db: DBServiceType) {
   }
 }
 
+/**
+ * Replaces hardcoded 'wg0' in the stored iptables hook commands with the
+ * actual WG_INTERFACE name. Runs after migration so fresh installs that use a
+ * non-default interface (e.g. wg1) get the correct interface name in their
+ * PostUp/PostDown rules. Idempotent when WG_INTERFACE=wg0.
+ */
+async function normalizeInterfaceName(db: DBType) {
+  const iface = WG_ENV.WG_INTERFACE;
+  if (iface === 'wg0') return;
+
+  DB_DEBUG(`Normalizing interface name 'wg0' -> '${iface}' in hooks...`);
+
+  await db.transaction(async (tx) => {
+    const hooks = await tx.query.hooks
+      .findFirst({ where: eq(schema.hooks.id, 'wg0') });
+
+    if (!hooks) return;
+
+    const needsUpdate =
+      hooks.postUp.includes('wg0') || hooks.postDown.includes('wg0');
+
+    if (needsUpdate) {
+      await tx
+        .update(schema.hooks)
+        .set({
+          postUp: hooks.postUp.replaceAll('wg0', iface),
+          postDown: hooks.postDown.replaceAll('wg0', iface),
+        })
+        .where(eq(schema.hooks.id, 'wg0'))
+        .execute();
+      DB_DEBUG(`Interface name normalized to '${iface}' in hooks.`);
+    }
+  });
+}
+
 async function disableIpv6(db: DBType) {
-  // This should match the initial value migration
-  const postUpMatch =
-    ' ip6tables -t nat -A POSTROUTING -s {{ipv6Cidr}} -o {{device}} -j MASQUERADE; ip6tables -A INPUT -p udp -m udp --dport {{port}} -j ACCEPT; ip6tables -A FORWARD -i wg0 -j ACCEPT; ip6tables -A FORWARD -o wg0 -j ACCEPT;';
-  const postDownMatch =
-    ' ip6tables -t nat -D POSTROUTING -s {{ipv6Cidr}} -o {{device}} -j MASQUERADE; ip6tables -D INPUT -p udp -m udp --dport {{port}} -j ACCEPT; ip6tables -D FORWARD -i wg0 -j ACCEPT; ip6tables -D FORWARD -o wg0 -j ACCEPT;';
+  const iface = WG_ENV.WG_INTERFACE;
+  // This should match the initial value migration (after normalizeInterfaceName runs)
+  const postUpMatch = ` ip6tables -t nat -A POSTROUTING -s {{ipv6Cidr}} -o {{device}} -j MASQUERADE; ip6tables -A INPUT -p udp -m udp --dport {{port}} -j ACCEPT; ip6tables -A FORWARD -i ${iface} -j ACCEPT; ip6tables -A FORWARD -o ${iface} -j ACCEPT;`;
+  const postDownMatch = ` ip6tables -t nat -D POSTROUTING -s {{ipv6Cidr}} -o {{device}} -j MASQUERADE; ip6tables -D INPUT -p udp -m udp --dport {{port}} -j ACCEPT; ip6tables -D FORWARD -i ${iface} -j ACCEPT; ip6tables -D FORWARD -o ${iface} -j ACCEPT;`;
 
   await db.transaction(async (tx) => {
     const hooks = await tx.query.hooks.findFirst({
