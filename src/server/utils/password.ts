@@ -28,11 +28,7 @@ export function isValidPasswordHash(hash: string): boolean {
   try {
     const obj = deserialize(hash);
 
-    if (obj.id !== 'argon2i' && obj.id !== 'argon2d' && obj.id !== 'argon2id') {
-      return false;
-    }
-
-    return true;
+    return obj.id === 'argon2i' || obj.id === 'argon2d' || obj.id === 'argon2id';
   } catch {
     return false;
   }
