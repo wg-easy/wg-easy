@@ -12,6 +12,14 @@ export default definePermissionEventHandler(
     const client = await Database.clients.get(clientId);
     checkPermissions(client);
 
+    if (client.expiresAt !== null && new Date() > new Date(client.expiresAt)) {
+      throw createError({
+        statusCode: 422,
+        statusMessage: 'Client is expired. Please update the expiration date first.',
+        message: 'Client is expired. Please update the expiration date first.',
+      });
+    }
+
     await Database.clients.toggle(clientId, true);
     await WireGuard.saveConfig();
     return { success: true };
