@@ -15,7 +15,8 @@ export default definePermissionEventHandler(
     if (client.expiresAt !== null && new Date() > new Date(client.expiresAt)) {
       throw createError({
         statusCode: 422,
-        statusMessage: 'Client is expired. Please update the expiration date first.',
+        statusMessage:
+          'Client is expired. Please update the expiration date first.',
         message: 'Client is expired. Please update the expiration date first.',
       });
     }
