@@ -12,7 +12,7 @@ export default definePermissionEventHandler(
     const client = await Database.clients.get(clientId);
     checkPermissions(client);
 
-    if (client.expiresAt !== null && new Date() > new Date(client.expiresAt)) {
+    if (client && client.expiresAt !== null && new Date() > new Date(client.expiresAt)) {
       throw createError({
         statusCode: 422,
         statusMessage:
