@@ -118,7 +118,7 @@
     "search": "搜尋客戶端...",
     "notConnected": "客户端尚未連接",
     "endpoint": "端點",
-    "endpointDesc": "建立WireGuard連線的客戶端 IP 地址",
+    "endpointDesc": "建立WireGuard連線的客戶端IP地址",
     "search": "搜尋客户端...",
     "config": "配置",
     "viewConfig": "檢視配置",
