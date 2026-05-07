@@ -14,6 +14,7 @@
           v-model="expiresAt"
           :label="$t('client.expireDate')"
         />
+        <FormTextField id="publicKey" v-model="publicKey" :label="$t('client.publicKey')" placeholder="AAAAAAAAAA=" />
       </div>
     </template>
     <template #actions>
@@ -32,6 +33,7 @@
 <script lang="ts" setup>
 const name = ref<string>('');
 const expiresAt = ref<string | null>(null);
+const publicKey = ref<string | null>(null);
 const clientsStore = useClientsStore();
 
 const { t } = useI18n();
@@ -39,7 +41,7 @@ const { t } = useI18n();
 defineProps<{ triggerClass?: string }>();
 
 function createClient() {
-  return _createClient({ name: name.value, expiresAt: expiresAt.value });
+  return _createClient({ name: name.value, expiresAt: expiresAt.value, publicKey: publicKey.value || undefined });
 }
 
 const _createClient = useSubmit(
