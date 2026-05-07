@@ -138,7 +138,9 @@ export const defineMetricsHandler = <
   handler: MetricsHandler<TReq, TRes>
 ) => {
   return defineEventHandler(async (event) => {
-    const metricsConfig = await Database.general.getMetricsConfig();
+    const metricsConfig = applyMetricsOverrides(
+      await Database.general.getMetricsConfig()
+    );
 
     if (metricsConfig.password) {
       const auth = getHeader(event, 'Authorization');
