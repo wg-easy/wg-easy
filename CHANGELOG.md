@@ -14,11 +14,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CLI: Show QR code (https://github.com/wg-easy/wg-easy/pull/2518)
 - Copy QR code to clipboard / save as png (https://github.com/wg-easy/wg-easy/pull/2521)
 
+### Fixed
+
+- Add trailing newline to Prometheus metrics output (https://github.com/wg-easy/wg-easy/pull/2573)
+
 ### Changed
 
 - Hooks are now Textareas (https://github.com/wg-easy/wg-easy/pull/2522)
 - Update to Node Krypton (24) (https://github.com/wg-easy/wg-easy/pull/2536)
 - Mobile UI (https://github.com/wg-easy/wg-easy/pull/2569)
+- Prevent enabling client when expired (https://github.com/wg-easy/wg-easy/pull/2594)
 
 ## [15.2.2] - 2026-02-06
 
