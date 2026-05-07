@@ -115,7 +115,6 @@
     "hooksDescription": "掛鉤僅適用於wg-quick",
     "hooksLeaveEmpty": "僅適用於wg-quick，否則請留空",
     "dnsDesc": "客戶端使用的域名系統伺服器（取代全局配置）",
-    "search": "搜尋客戶端...",
     "notConnected": "客户端尚未連接",
     "endpoint": "端點",
     "endpointDesc": "建立WireGuard連線的客戶端IP地址",
