@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Add trailing newline to Prometheus metrics output (https://github.com/wg-easy/wg-easy/pull/2573)
+- Correctly use DEBUG env var (https://github.com/wg-easy/wg-easy/pull/2619)
 
 ### Changed
 
