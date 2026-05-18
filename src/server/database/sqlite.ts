@@ -1,7 +1,7 @@
 import { drizzle } from 'drizzle-orm/libsql';
 import { migrate as drizzleMigrate } from 'drizzle-orm/libsql/migrator';
 import { createClient } from '@libsql/client';
-import debug from 'debug';
+import { createDebug } from 'obug';
 import { eq } from 'drizzle-orm';
 
 import * as schema from './schema';
@@ -13,7 +13,7 @@ import { InterfaceService } from './repositories/interface/service';
 import { HooksService } from './repositories/hooks/service';
 import { OneTimeLinkService } from './repositories/oneTimeLink/service';
 
-const DB_DEBUG = debug('Database');
+const DB_DEBUG = createDebug('Database');
 
 const client = createClient({ url: 'file:/etc/wireguard/wg-easy.db' });
 const db = drizzle({ client, schema });
