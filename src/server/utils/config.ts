@@ -1,9 +1,9 @@
-import debug from 'debug';
+import { createDebug } from 'obug';
 import packageJson from '@@/package.json';
 
 export const RELEASE = 'v' + packageJson.version;
 
-export const SERVER_DEBUG = debug('Server');
+export const SERVER_DEBUG = createDebug('Server');
 
 export const OLD_ENV = {
   /** @deprecated Only for migration purposes */

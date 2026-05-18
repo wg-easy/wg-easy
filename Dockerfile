@@ -8,7 +8,6 @@ RUN corepack enable pnpm
 
 # Copy Web UI
 COPY src/package.json src/pnpm-lock.yaml src/pnpm-workspace.yaml ./
-COPY src/patches ./patches
 RUN pnpm install
 
 # Build UI

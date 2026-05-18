@@ -1,8 +1,8 @@
 import fs from 'node:fs/promises';
-import debug from 'debug';
+import { createDebug } from 'obug';
 import type { InterfaceType } from '#db/repositories/interface/types';
 
-const WG_DEBUG = debug('WireGuard');
+const WG_DEBUG = createDebug('WireGuard');
 
 const generateRandomHeaderValue = () =>
   Math.floor(Math.random() * 2147483642) + 5;

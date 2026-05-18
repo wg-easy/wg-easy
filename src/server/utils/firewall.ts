@@ -1,11 +1,11 @@
-import debug from 'debug';
+import { createDebug } from 'obug';
 import { isIPv6 } from 'is-ip';
 
 import type { ClientType } from '#db/repositories/client/types';
 import type { InterfaceType } from '#db/repositories/interface/types';
 import type { UserConfigType } from '#db/repositories/userConfig/types';
 
-const FW_DEBUG = debug('Firewall');
+const FW_DEBUG = createDebug('Firewall');
 const CHAIN_NAME = 'WG_CLIENTS';
 
 // Mutex to prevent concurrent rule rebuilds

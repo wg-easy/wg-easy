@@ -33,7 +33,6 @@ ENV DISABLE_IPV6=false
 
 # Install Dependencies
 COPY src/package.json src/pnpm-lock.yaml src/pnpm-workspace.yaml ./
-COPY src/patches ./patches
 RUN pnpm install
 
 # Copy Project

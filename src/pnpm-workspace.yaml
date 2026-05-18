@@ -4,5 +4,3 @@ allowBuilds:
   esbuild: false
   unrs-resolver: false
   vue-demi: false
-patchedDependencies:
-  unenv: patches/unenv.patch
