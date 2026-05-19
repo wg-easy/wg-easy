@@ -84,6 +84,7 @@
     "sort": "Sort",
     "create": "Create Client",
     "created": "Client created",
+    "duplicate": "Duplicate Client",
     "new": "New Client",
     "name": "Name",
     "expireDate": "Expire Date",
