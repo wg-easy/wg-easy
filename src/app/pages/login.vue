@@ -40,10 +40,7 @@
       </a>
 
       <!-- Divider -->
-      <div
-        v-if="authMethods?.google"
-        class="flex items-center gap-2"
-      >
+      <div v-if="authMethods?.google" class="flex items-center gap-2">
         <div class="h-px flex-1 bg-gray-300 dark:bg-neutral-600"></div>
         <span class="text-xs text-gray-500 dark:text-neutral-400">{{
           $t('login.or')
