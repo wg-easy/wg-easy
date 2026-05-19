@@ -113,7 +113,6 @@ export class UserService {
     }
 
     // Create new user with Google account
-    const userCount = await this.#db.$count(user);
     const randomPassword = crypto.randomUUID();
     const hash = await hashPassword(randomPassword);
 
@@ -122,7 +121,7 @@ export class UserService {
       password: hash,
       email,
       name,
-      role: userCount === 0 ? roles.ADMIN : roles.CLIENT,
+      role: roles.ADMIN,
       totpVerified: false,
       enabled: true,
       googleId,

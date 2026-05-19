@@ -15,7 +15,11 @@ services:
     #  - OAUTH_GOOGLE_ALLOWED_DOMAIN=example.com
 
     image: ghcr.io/wg-easy/wg-easy:15
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: wg-easy
+    platform: linux/amd64
     networks:
       wg:
         ipv4_address: 10.42.42.42

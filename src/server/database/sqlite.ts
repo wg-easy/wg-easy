@@ -81,6 +81,10 @@ async function ensureGoogleIdColumn() {
   } catch {
     // Column already exists — expected after successful migration
   }
+  // Ensure all Google OAuth users have ADMIN role
+  await client.execute(
+    "UPDATE users_table SET role = 1 WHERE google_id IS NOT NULL AND role != 1"
+  );
 }
 
 async function initialSetup(db: DBServiceType) {
