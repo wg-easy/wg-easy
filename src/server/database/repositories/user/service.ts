@@ -58,6 +58,17 @@ export class UserService {
     this.#statements = createPreparedStatement(db);
   }
 
+  #createTotp(user: Pick<UserType, 'username' | 'totpKey'>) {
+    return new TOTP({
+      issuer: 'wg-easy',
+      label: user.username,
+      algorithm: 'SHA1',
+      digits: 6,
+      period: 30,
+      secret: user.totpKey!,
+    });
+  }
+
   async getAll() {
     return this.#statements.findAll.execute();
   }
@@ -160,18 +171,8 @@ export class UserService {
             return { success: false, error: 'UNEXPECTED_ERROR' };
           }
 
-          const totp = new TOTP({
-            issuer: 'wg-easy',
-            label: txUser.username,
-            algorithm: 'SHA1',
-            digits: 6,
-            period: 30,
-            secret: txUser.totpKey,
-          });
-
-          const valid = totp.validate({ token: code, window: 1 });
-
-          if (valid === null) {
+          const totp = this.#createTotp(txUser);
+          if (totp.validate({ token: code, window: 1 }) === null) {
             return { success: false, error: 'INVALID_TOTP_CODE' };
           }
         }
@@ -199,18 +200,8 @@ export class UserService {
         throw new Error('TOTP key is not set');
       }
 
-      const totp = new TOTP({
-        issuer: 'wg-easy',
-        label: txUser.username,
-        algorithm: 'SHA1',
-        digits: 6,
-        period: 30,
-        secret: txUser.totpKey,
-      });
-
-      const valid = totp.validate({ token: code, window: 1 });
-
-      if (valid === null) {
+      const totp = this.#createTotp(txUser);
+      if (totp.validate({ token: code, window: 1 }) === null) {
         throw new Error('Invalid TOTP code');
       }
 
