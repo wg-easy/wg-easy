@@ -168,9 +168,18 @@ export class ClientService {
     return this.#statements.findById.execute({ id });
   }
 
-  async create({ name, expiresAt }: ClientCreateType) {
-    const privateKey = await wg.generatePrivateKey();
-    const publicKey = await wg.getPublicKey(privateKey);
+  async create({ name, expiresAt, publicKey: providedPublicKey }: ClientCreateType) {
+    let privateKey: string | undefined;
+    let publicKey: string;
+
+    if (providedPublicKey) {
+      publicKey = providedPublicKey;
+      privateKey = 'REDACTED';
+    } else {
+      privateKey = await wg.generatePrivateKey();
+      publicKey = await wg.getPublicKey(privateKey);
+    }
+    
     const preSharedKey = await wg.generatePreSharedKey();
 
     return this.#db.transaction(async (tx) => {
