@@ -120,7 +120,11 @@
     "endpointDesc": "IP do cliente desde a que se establece a conexión WireGuard",
     "search": "Buscar clientes...",
     "config": "Configuración",
-    "viewConfig": "Ver configuración"
+    "viewConfig": "Ver configuración",
+    "firewallIps": "IPs permitidas do cortalumes",
+    "firewallIpsDesc": "IPs/CIDRs de destino aos que este cliente pode acceder (aplicado no lado do servidor). Déixao baleiro para usar as IPs permitidas. Admite filtrado opcional por porto e protocolo. Consulta a documentación para a sintaxe.",
+    "downloadPng": "Descargar PNG",
+    "copyPng": "Copiar PNG"
   },
   "dialog": {
     "change": "Cambiar",
@@ -141,5 +145,152 @@
     "noItems": "Sen elementos",
     "nullNoItems": "Sen elementos. Usando a configuración global",
     "add": "Engadir"
+  },
+  "admin": {
+    "general": {
+      "sessionTimeout": "Tempo límite da sesión",
+      "sessionTimeoutDesc": "Duración da sesión para Lembrarme (segundos)",
+      "metrics": "Métricas",
+      "metricsPassword": "Contrasinal",
+      "metricsPasswordDesc": "Contrasinal Bearer para o endpoint de métricas (contrasinal ou hash argon2)",
+      "json": "JSON",
+      "jsonDesc": "Ruta para as métricas en formato JSON",
+      "prometheus": "Prometheus",
+      "prometheusDesc": "Ruta para as métricas de Prometheus"
+    },
+    "config": {
+      "connection": "Conexión",
+      "hostDesc": "Nome de host público ao que se conectarán os clientes (invalida a configuración)",
+      "portDesc": "Porto UDP público ao que se conectarán os clientes (invalida a configuración; probablemente tamén queiras cambiar o Porto da interface)",
+      "allowedIpsDesc": "IPs permitidas que usarán os clientes (configuración global)",
+      "dnsDesc": "Servidor DNS que usarán os clientes (configuración global)",
+      "mtuDesc": "MTU que usarán os clientes (só para clientes novos)",
+      "persistentKeepaliveDesc": "Intervalo en segundos para enviar keepalives ao servidor. 0 = desactivado (só para clientes novos)",
+      "suggest": "Suxerir",
+      "suggestDesc": "Escolle un enderezo IP ou nome de host para o campo Host"
+    },
+    "interface": {
+      "cidrSuccess": "CIDR cambiado",
+      "device": "Dispositivo",
+      "deviceDesc": "Dispositivo Ethernet polo que se redirixirá o tráfico de WireGuard",
+      "mtuDesc": "MTU que usará WireGuard",
+      "portDesc": "Porto UDP no que WireGuard escoitará (probablemente tamén queiras cambiar o Porto da configuración)",
+      "changeCidr": "Cambiar CIDR",
+      "restart": "Reiniciar interface",
+      "restartDesc": "Reiniciar a interface de WireGuard",
+      "restartWarn": "Seguro que queres reiniciar a interface? Isto desconectará todos os clientes.",
+      "restartSuccess": "Interface reiniciada",
+      "firewall": "Filtrado de tráfico",
+      "firewallEnabled": "Activar devasa por cliente",
+      "firewallEnabledDesc": "Restrinxir o tráfico dos clientes a IPs de destino específicas usando iptables. Cando está activado, cada cliente pode configurarse con destinos permitidos."
+    },
+    "introText": "Benvido ao panel de administración.\n\nAquí podes xestionar a configuración xeral, a configuración, os axustes da interface e os hooks.\n\nComeza escollendo unha das seccións na barra lateral."
+  },
+  "zod": {
+    "generic": {
+      "required": "{0} é obrigatorio",
+      "validNumber": "{0} debe ser un número válido",
+      "validNumberRange": "{0} debe ser un número válido ou un rango de números",
+      "validString": "{0} debe ser unha cadea válida",
+      "validBoolean": "{0} debe ser un booleano válido",
+      "validArray": "{0} debe ser un array válido",
+      "stringMin": "{0} debe ter polo menos {1} carácter",
+      "numberMin": "{0} debe ser polo menos {1}"
+    },
+    "client": {
+      "id": "ID do cliente",
+      "name": "Nome",
+      "expiresAt": "Caduca o",
+      "address4": "Enderezo IPv4",
+      "address6": "Enderezo IPv6",
+      "serverAllowedIps": "IPs permitidas do servidor",
+      "firewallIps": "IPs permitidas da devasa",
+      "firewallIpsInvalid": "Entrada de IP da devasa non válida. Consulta a documentación para a sintaxe admitida."
+    },
+    "user": {
+      "username": "Nome de usuario",
+      "password": "Contrasinal",
+      "remember": "Lembrar",
+      "name": "Nome",
+      "email": "Correo electrónico",
+      "emailInvalid": "O correo electrónico debe ser válido",
+      "passwordMatch": "Os contrasinais deben coincidir",
+      "totpEnable": "Activar TOTP",
+      "totpEnableTrue": "Activar TOTP debe ser verdadeiro",
+      "totpCode": "Código TOTP"
+    },
+    "userConfig": {
+      "host": "Host"
+    },
+    "general": {
+      "sessionTimeout": "Tempo límite da sesión",
+      "metricsEnabled": "Métricas",
+      "metricsPassword": "Contrasinal das métricas"
+    },
+    "interface": {
+      "cidr": "CIDR",
+      "device": "Dispositivo",
+      "cidrValid": "O CIDR debe ser válido"
+    },
+    "otl": "Ligazón dun só uso",
+    "stringMalformed": "A cadea está mal formada",
+    "body": "O corpo debe ser un obxecto válido",
+    "hook": "Hook",
+    "enabled": "Activado",
+    "mtu": "MTU",
+    "port": "Porto",
+    "persistentKeepalive": "Keepalive persistente",
+    "address": "Enderezo IP",
+    "dns": "DNS",
+    "allowedIps": "IPs permitidas",
+    "file": "Ficheiro"
+  },
+  "hooks": {
+    "preUp": "PreUp",
+    "postUp": "PostUp",
+    "preDown": "PreDown",
+    "postDown": "PostDown"
+  },
+  "copy": {
+    "notSupported": "Copiar non é compatible",
+    "copied": "Copiado!",
+    "failed": "Erro ao copiar",
+    "copy": "Copiar"
+  },
+  "awg": {
+    "jCLabel": "Número de paquetes lixo (Jc)",
+    "jCDescription": "Número de paquetes lixo para enviar (1-128, recomendado: 4-12)",
+    "jMinLabel": "Tamaño mínimo dos paquetes lixo (Jmin)",
+    "jMinDescription": "Tamaño mínimo dos paquetes lixo (0-1279*, recomendado: 8, debe ser < Jmax)",
+    "jMaxLabel": "Tamaño máximo dos paquetes lixo (Jmax)",
+    "jMaxDescription": "Tamaño máximo dos paquetes lixo (1-1280*, recomendado: 80, debe ser > Jmin)",
+    "s1Label": "Tamaño lixo do paquete de inicio (S1)",
+    "s1Description": "Tamaño lixo do paquete de inicio (0-1132[1280* - 148 = 1132], recomendado: 15-150, S1+56 ≠ S2)",
+    "s2Label": "Tamaño lixo do paquete de resposta (S2)",
+    "s2Description": "Tamaño lixo do paquete de resposta (0-1188[1280* - 92 = 1188], recomendado: 15-150)",
+    "s3Label": "Tamaño lixo do paquete de resposta cookie (S3)",
+    "s3Description": "Tamaño lixo do paquete de resposta cookie",
+    "s4Label": "Tamaño lixo do paquete de transporte (S4)",
+    "s4Description": "Tamaño lixo do paquete de transporte",
+    "h1Label": "Cabeceira máxica de inicio (H1)",
+    "h1Description": "Valor ou rango da cabeceira do paquete de inicio (X ou X-Y, onde X<Y. Mín 5, máx 2147483647. O valor ou rango non debe solaparse con outras cabeceiras)",
+    "h2Label": "Cabeceira máxica de resposta (H2)",
+    "h2Description": "Valor ou rango da cabeceira do paquete de resposta (X ou X-Y, onde X<Y. Mín 5, máx 2147483647. O valor ou rango non debe solaparse con outras cabeceiras)",
+    "h3Label": "Cabeceira máxica da resposta cookie (H3)",
+    "h3Description": "Valor ou rango da cabeceira do paquete de resposta cookie (X ou X-Y, onde X<Y. Mín 5, máx 2147483647. O valor ou rango non debe solaparse con outras cabeceiras)",
+    "h4Label": "Cabeceira máxica de transporte (H4)",
+    "h4Description": "Valor ou rango da cabeceira do paquete de transporte (X ou X-Y, onde X<Y. Mín 5, máx 2147483647. O valor ou rango non debe solaparse con outras cabeceiras)",
+    "i1Label": "Paquete lixo especial 1 (I1)",
+    "i1Description": "Paquete de simulación de protocolo en formato hexadecimal: <b 0x...>",
+    "i2Label": "Paquete lixo especial 2 (I2)",
+    "i2Description": "Paquete de simulación de protocolo en formato hexadecimal: <b 0x...>",
+    "i3Label": "Paquete lixo especial 3 (I3)",
+    "i3Description": "Paquete de simulación de protocolo en formato hexadecimal: <b 0x...>",
+    "i4Label": "Paquete lixo especial 4 (I4)",
+    "i4Description": "Paquete de simulación de protocolo en formato hexadecimal: <b 0x...>",
+    "i5Label": "Paquete lixo especial 5 (I5)",
+    "i5Description": "Paquete de simulación de protocolo en formato hexadecimal: <b 0x...>",
+    "mtuNote": "Os valores dependen da MTU",
+    "obfuscationParameters": "Parámetros de ofuscación de AmneziaWG"
   }
 }
