@@ -3,20 +3,18 @@ volumes:
 
 services:
   wg-easy:
-    environment:
+    # environment:
     #  Optional:
-      - PORT=51821
-      - HOST=0.0.0.0
-      - INSECURE=false
+    #  - PORT=51821
+    #  - HOST=0.0.0.0
+    #  - INSECURE=false
     #  Google OAuth (optional):
-      - OAUTH_GOOGLE_ENABLED=true
-      - OAUTH_GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
-      - OAUTH_GOOGLE_CLIENT_SECRET=your-client-secret
-      - OAUTH_GOOGLE_ALLOWED_DOMAIN=example.com
+    #  - OAUTH_GOOGLE_ENABLED=true
+    #  - OAUTH_GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
+    #  - OAUTH_GOOGLE_CLIENT_SECRET=your-client-secret
+    #  - OAUTH_GOOGLE_ALLOWED_DOMAIN=example.com
 
-    build:
-      dockerfile: ./Dockerfile
-    platform: linux/amd64
+    image: ghcr.io/wg-easy/wg-easy:15
     container_name: wg-easy
     networks:
       wg:
