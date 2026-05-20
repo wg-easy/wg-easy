@@ -20,7 +20,6 @@ const db = drizzle({ client, schema });
 
 export async function connect() {
   await migrate();
-  await ensureGoogleIdColumn();
   const dbService = new DBService(db);
 
   if (WG_INITIAL_ENV.ENABLED) {
@@ -70,21 +69,6 @@ async function migrate() {
       DB_DEBUG('Failed to migrate database:', e.message);
     }
   }
-}
-
-async function ensureGoogleIdColumn() {
-  try {
-    await client.execute(
-      'ALTER TABLE users_table ADD COLUMN google_id TEXT'
-    );
-    DB_DEBUG('Added missing google_id column');
-  } catch {
-    // Column already exists — expected after successful migration
-  }
-  // Ensure all Google OAuth users have ADMIN role
-  await client.execute(
-    "UPDATE users_table SET role = 1 WHERE google_id IS NOT NULL AND role != 1"
-  );
 }
 
 async function initialSetup(db: DBServiceType) {
