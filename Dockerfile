@@ -21,7 +21,8 @@ RUN apk add linux-headers build-base go git && \
     cd amneziawg-go && \
     make && \
     cd ../amneziawg-tools/src && \
-    make
+    make && \
+    sed -i 's|\[\[ $proto == -4 \]\] && cmd sysctl -q net\.ipv4\.conf\.all\.src_valid_mark=1|[[ $proto == -4 ]] \&\& [[ $(sysctl -n net.ipv4.conf.all.src_valid_mark) != 1 ]] \&\& cmd sysctl -q net.ipv4.conf.all.src_valid_mark=1|' ./wg-quick/linux.bash
 
 FROM docker.io/library/node:krypton-alpine AS build-libsql
 WORKDIR /app
@@ -62,7 +63,8 @@ RUN apk add --no-cache \
     kmod \
     iptables-legacy \
     wireguard-go \
-    wireguard-tools
+    wireguard-tools && \
+    sed -i 's|\[\[ $proto == -4 \]\] && cmd sysctl -q net\.ipv4\.conf\.all\.src_valid_mark=1|[[ $proto == -4 ]] \&\& [[ $(sysctl -n net.ipv4.conf.all.src_valid_mark) != 1 ]] \&\& cmd sysctl -q net.ipv4.conf.all.src_valid_mark=1|' /usr/bin/wg-quick
 
 RUN mkdir -p /etc/amnezia
 RUN ln -s /etc/wireguard /etc/amnezia/amneziawg
