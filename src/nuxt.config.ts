@@ -132,6 +132,11 @@ export default defineNuxtConfig({
         name: 'Български',
       },
       {
+        code: 'hi',
+        language: 'hi-IN',
+        name: 'हिन्दी',
+      },
+      {
         code: 'gl',
         language: 'gl-ES',
         name: 'Galego',
