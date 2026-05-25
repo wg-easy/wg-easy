@@ -48,7 +48,7 @@
     "pinia": "^3.0.4",
     "qr": "^0.6.0",
     "radix-vue": "^1.9.17",
-    "semver": "^7.8.0",
+    "semver": "^7.8.1",
     "tailwindcss": "^3.4.19",
     "timeago.js": "^4.0.2",
     "vue": "latest",
