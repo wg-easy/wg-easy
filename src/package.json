@@ -61,7 +61,7 @@
     "@types/phc__format": "^1.0.1",
     "@types/semver": "^7.7.1",
     "@vitest/coverage-v8": "^4.1.6",
-    "@vitest/ui": "^4.1.6",
+    "@vitest/ui": "^4.1.7",
     "drizzle-kit": "^0.31.10",
     "esbuild": "^0.28.0",
     "eslint": "^9.39.4",
