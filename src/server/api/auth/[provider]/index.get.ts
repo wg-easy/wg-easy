@@ -13,6 +13,7 @@ export default defineEventHandler(async (event) => {
   const state = client.randomState();
 
   const parameters: Record<string, string> = {
+    ...providerConfig.params,
     redirect_uri: redirectUri,
     scope: providerConfig.scope,
     code_challenge: codeChallenge,

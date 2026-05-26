@@ -28,7 +28,7 @@ export default defineEventHandler(async (event) => {
   if (!subject) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Cant get subject',
+      statusMessage: "Can't get subject",
     });
   }
 
@@ -56,7 +56,7 @@ export default defineEventHandler(async (event) => {
     provider,
     userInfo.sub,
     userInfo.email,
-    userInfo.name || userInfo.email
+    userInfo.preferred_username || userInfo.name || userInfo.email
   );
 
   if (!result.success) {
@@ -66,6 +66,12 @@ export default defineEventHandler(async (event) => {
         statusMessage: 'User disabled',
       });
     }
+    if (result.error === 'USER_ALREADY_LINKED') {
+      throw createError({
+        statusCode: 401,
+        statusMessage: 'User already linked with different account or provider',
+      });
+    }
     throw createError({
       statusCode: 500,
       statusMessage: 'Unexpected error',
@@ -73,7 +79,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // Create session
-  await session.update({
+  const data = await session.update({
     userId: result.user.id,
     oauth_nonce: undefined,
     oauth_state: undefined,
@@ -81,7 +87,7 @@ export default defineEventHandler(async (event) => {
   });
 
   SERVER_DEBUG(
-    `New OAuth Session for ${provider} ${result.user.id} (${result.user.username})`
+    `New OAuth Session: ${data.id} for ${result.user.id} (${result.user.username}) with ${provider}`
   );
 
   return sendRedirect(event, '/');

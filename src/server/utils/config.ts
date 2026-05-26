@@ -39,17 +39,10 @@ export const WG_ENV = {
   DISABLE_IPV6: process.env.DISABLE_IPV6 === 'true',
   WG_EXECUTABLE: await detectAwg(),
   DISABLE_VERSION_CHECK: process.env.DISABLE_VERSION_CHECK === 'true',
-};
-
-export const OAUTH_GOOGLE_ENV = {
-  /** Enable Google OAuth login */
-  ENABLED: process.env.OAUTH_GOOGLE_ENABLED === 'true',
-  /** Google OAuth Client ID */
-  CLIENT_ID: process.env.OAUTH_GOOGLE_CLIENT_ID || '',
-  /** Google OAuth Client Secret */
-  CLIENT_SECRET: process.env.OAUTH_GOOGLE_CLIENT_SECRET || '',
-  /** Allowed email domain (optional, e.g. "example.com") */
-  ALLOWED_DOMAIN: process.env.OAUTH_GOOGLE_ALLOWED_DOMAIN || '',
+  OAUTH_PROVIDERS: process.env.OAUTH_PROVIDERS?.split(',')
+    .map((v) => v.trim())
+    .filter((v) => isValidOauthProvider(v))
+    .filter((v) => isConfiguredOauthProvider(OAUTH_PROVIDERS[v])),
 };
 
 export const WG_INITIAL_ENV = {

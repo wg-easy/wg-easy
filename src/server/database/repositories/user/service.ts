@@ -127,6 +127,12 @@ export class UserService {
       if (!existingUser.enabled) {
         return { success: false as const, error: 'USER_DISABLED' as const };
       }
+      if (existingUser.oauthProvider && existingUser.oauthId) {
+        return {
+          success: false as const,
+          error: 'USER_ALREADY_LINKED' as const,
+        };
+      }
       await this.#db
         .update(user)
         .set({ oauthProvider: provider, oauthId: oauthId })
