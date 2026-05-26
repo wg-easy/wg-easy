@@ -12,16 +12,26 @@ You can set these environment variables to configure the container. They are not
 | `DISABLE_IPV6`          | `false`   | `true`      | If IPv6 support should be disabled      |
 | `DISABLE_VERSION_CHECK` | `false`   | `true`      | If wg-easy should check for new updates |
 
+/// note | IPv6 Caveats
+
+Disabling IPv6 will disable the creation of the default IPv6 firewall rules and won't add a IPv6 address to the interface and clients.
+
+You will however still see a IPv6 address in the Web UI, but it won't be used.
+
+This option can be removed in the future, as more devices support IPv6.
+
+///
+
 ## Google OAuth
 
 You can enable Google OAuth login alongside classic username/password authentication. When enabled, a "Sign in with Google" button appears on the login page.
 
-| Env                           | Default | Example                                      | Description                                      |
-| ----------------------------- | ------- | -------------------------------------------- | ------------------------------------------------ |
-| `OAUTH_GOOGLE_ENABLED`        | `false` | `true`                                       | Enable Google OAuth login                        |
-| `OAUTH_GOOGLE_CLIENT_ID`      | -       | `123.apps.googleusercontent.com`             | Google OAuth 2.0 Client ID                       |
-| `OAUTH_GOOGLE_CLIENT_SECRET`  | -       | `GOCSPX-xxx`                                 | Google OAuth 2.0 Client Secret                   |
-| `OAUTH_GOOGLE_ALLOWED_DOMAIN` | -       | `example.com`                                | Restrict login to a specific email domain        |
+| Env                           | Default | Example                          | Description                               |
+| ----------------------------- | ------- | -------------------------------- | ----------------------------------------- |
+| `OAUTH_GOOGLE_ENABLED`        | `false` | `true`                           | Enable Google OAuth login                 |
+| `OAUTH_GOOGLE_CLIENT_ID`      | -       | `123.apps.googleusercontent.com` | Google OAuth 2.0 Client ID                |
+| `OAUTH_GOOGLE_CLIENT_SECRET`  | -       | `GOCSPX-xxx`                     | Google OAuth 2.0 Client Secret            |
+| `OAUTH_GOOGLE_ALLOWED_DOMAIN` | -       | `example.com`                    | Restrict login to a specific email domain |
 
 /// note | Google Cloud Console Setup
 
@@ -31,15 +41,5 @@ You can enable Google OAuth login alongside classic username/password authentica
 4. Copy the Client ID and Client Secret to the environment variables
 
 If a user logs in with Google and their email matches an existing account, the accounts are automatically linked.
-
-///
-
-/// note | IPv6 Caveats
-
-Disabling IPv6 will disable the creation of the default IPv6 firewall rules and won't add a IPv6 address to the interface and clients.
-
-You will however still see a IPv6 address in the Web UI, but it won't be used.
-
-This option can be removed in the future, as more devices support IPv6.
 
 ///
