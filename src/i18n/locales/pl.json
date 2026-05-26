@@ -72,7 +72,6 @@
   },
   "login": {
     "signIn": "Zaloguj się",
-    "signInWithGoogle": "Zaloguj się przez Google",
     "or": "lub",
     "rememberMe": "Zapamiętaj mnie",
     "rememberMeDesc": "Pozostań zalogowany po zamknięciu przeglądarki",

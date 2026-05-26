@@ -72,7 +72,7 @@
   },
   "login": {
     "signIn": "Sign In",
-    "signInWithGoogle": "Sign in with Google",
+    "signInWith": "Sign In with {0}",
     "or": "or",
     "rememberMe": "Remember me",
     "rememberMeDesc": "Stay logged after closing the browser",

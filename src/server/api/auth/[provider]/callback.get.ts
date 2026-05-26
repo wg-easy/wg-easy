@@ -1,7 +1,7 @@
 import * as client from 'openid-client';
 
 export default defineEventHandler(async (event) => {
-  const { config, provider } = await buildOauthConfig(event);
+  const { config, provider, providerConfig } = await buildOauthConfig(event);
 
   const session = await useWGSession(event);
   if (
@@ -19,12 +19,18 @@ export default defineEventHandler(async (event) => {
 
   const tokens = await client.authorizationCodeGrant(config, currentUrl, {
     pkceCodeVerifier: session.data.oauth_verifier,
-    expectedNonce: session.data.oauth_nonce,
+    expectedNonce:
+      providerConfig.isOIDC === false ? undefined : session.data.oauth_nonce,
     expectedState: session.data.oauth_state,
-    idTokenExpected: true,
+    idTokenExpected: providerConfig.isOIDC,
   });
 
-  const subject = tokens.claims()?.sub;
+  type SubjectType = string | undefined | typeof client.skipSubjectCheck;
+  let subject: SubjectType = tokens.claims()?.sub;
+  if (providerConfig.isOIDC === false) {
+    subject = client.skipSubjectCheck;
+  }
+
   if (!subject) {
     throw createError({
       statusCode: 400,
@@ -32,11 +38,21 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const userInfo = await client.fetchUserInfo(
-    config,
-    tokens.access_token,
-    subject
-  );
+  let userInfo;
+  if (providerConfig.userInfoFlow === 'github') {
+    userInfo = await githubUserInfoFlow(tokens.access_token);
+  } else {
+    userInfo = await client.fetchUserInfo(config, tokens.access_token, subject);
+  }
+
+  console.log(userInfo);
+
+  if (!userInfo.sub) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'No sub set',
+    });
+  }
 
   if (!userInfo.email) {
     throw createError({
@@ -55,8 +71,9 @@ export default defineEventHandler(async (event) => {
   const result = await Database.users.findOrCreateByProvider(
     provider,
     userInfo.sub,
+    userInfo.preferred_username || userInfo.email,
     userInfo.email,
-    userInfo.preferred_username || userInfo.name || userInfo.email
+    userInfo.name || 'User'
   );
 
   if (!result.success) {

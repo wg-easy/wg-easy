@@ -108,6 +108,7 @@ export class UserService {
   async findOrCreateByProvider(
     provider: OAUTH_PROVIDER,
     oauthId: string,
+    username: string,
     email: string,
     name: string
   ) {
@@ -142,7 +143,7 @@ export class UserService {
 
     // Create new user
     await this.#db.insert(user).values({
-      username: email,
+      username,
       password: '--- no password ---',
       email,
       name,

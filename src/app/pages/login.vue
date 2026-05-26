@@ -19,8 +19,17 @@
           href="/api/auth/google"
           class="flex cursor-pointer items-center justify-center gap-2 rounded border border-gray-300 bg-white py-2 text-sm text-gray-700 shadow-sm transition hover:bg-gray-50 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700"
         >
-          <IconsGoogle class="h-4 w-4" />
-          <span>{{ $t('login.signInWithGoogle') }}</span>
+          <IconsBrandsGoogle class="h-4 w-4" />
+          <span>{{ $t('login.signInWith', ['Google']) }}</span>
+        </a>
+        <!-- GitHub OAuth Button -->
+        <a
+          v-if="authMethods.providers?.github"
+          href="/api/auth/github"
+          class="flex cursor-pointer items-center justify-center gap-2 rounded border border-gray-300 bg-white py-2 text-sm text-gray-700 shadow-sm transition hover:bg-gray-50 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700"
+        >
+          <IconsBrandsGitHub class="h-4 w-4" />
+          <span>{{ $t('login.signInWith', ['GitHub']) }}</span>
         </a>
 
         <!-- Divider -->
