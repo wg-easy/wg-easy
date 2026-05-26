@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+  "id": "1d6d806f-441e-4f18-b84b-3e9232e45359",
   "prevId": "0f072f91-cd10-4702-ae7b-245255d69d1e",
   "tables": {
     "clients_table": {
@@ -794,8 +794,15 @@
           "notNull": true,
           "autoincrement": false
         },
-        "google_id": {
-          "name": "google_id",
+        "oauth_provider": {
+          "name": "oauth_provider",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "oauth_id": {
+          "name": "oauth_id",
           "type": "text",
           "primaryKey": false,
           "notNull": false,

@@ -13,7 +13,8 @@ export const user = sqliteTable('users_table', {
   totpKey: text('totp_key'),
   totpVerified: int('totp_verified', { mode: 'boolean' }).notNull(),
   enabled: int({ mode: 'boolean' }).notNull(),
-  googleId: text('google_id'),
+  oauthProvider: text('oauth_provider').$type<OAUTH_PROVIDER>(),
+  oauthId: text('oauth_id'),
   createdAt: text('created_at')
     .notNull()
     .default(sql`(CURRENT_TIMESTAMP)`),

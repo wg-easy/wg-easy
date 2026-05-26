@@ -1,1 +1,0 @@
-ALTER TABLE `users_table` ADD `google_id` text;

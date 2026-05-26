@@ -3,7 +3,9 @@ import type { UserType } from '#db/repositories/user/types';
 
 export type WGSession = Partial<{
   userId: ID;
-  oauthState: string;
+  oauth_verifier: string;
+  oauth_nonce: string;
+  oauth_state: string;
 }>;
 
 const name = 'wg-easy';

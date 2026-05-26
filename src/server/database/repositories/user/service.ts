@@ -1,8 +1,9 @@
-import { eq, sql } from 'drizzle-orm';
+import { eq, sql, and } from 'drizzle-orm';
 import { TOTP } from 'otpauth';
 import { user } from './schema';
 import type { UserType } from './types';
 import type { DBType } from '#db/sqlite';
+import type { OAUTH_PROVIDER } from '~~/server/utils/oauth';
 
 type LoginResult =
   | {
@@ -30,9 +31,12 @@ function createPreparedStatement(db: DBType) {
         where: eq(user.username, sql.placeholder('username')),
       })
       .prepare(),
-    findByGoogleId: db.query.user
+    findByProviderId: db.query.user
       .findFirst({
-        where: eq(user.googleId, sql.placeholder('googleId')),
+        where: and(
+          eq(user.oauthProvider, sql.placeholder('oauthProvider')),
+          eq(user.oauthId, sql.placeholder('oauthId'))
+        ),
       })
       .prepare(),
     findByEmail: db.query.user
@@ -91,17 +95,25 @@ export class UserService {
     return this.#statements.findByUsername.execute({ username });
   }
 
-  async getByGoogleId(googleId: string) {
-    return this.#statements.findByGoogleId.execute({ googleId });
+  async getByProviderId(provider: OAUTH_PROVIDER, oauthId: string) {
+    return this.#statements.findByProviderId.execute({
+      oauthProvider: provider,
+      oauthId,
+    });
   }
 
   async getByEmail(email: string) {
     return this.#statements.findByEmail.execute({ email });
   }
 
-  async findOrCreateByGoogle(googleId: string, email: string, name: string) {
-    // First try to find by googleId
-    let existingUser = await this.getByGoogleId(googleId);
+  async findOrCreateByProvider(
+    provider: OAUTH_PROVIDER,
+    oauthId: string,
+    email: string,
+    name: string
+  ) {
+    // Try to find by id
+    let existingUser = await this.getByProviderId(provider, oauthId);
     if (existingUser) {
       if (!existingUser.enabled) {
         return { success: false as const, error: 'USER_DISABLED' as const };
@@ -109,7 +121,7 @@ export class UserService {
       return { success: true as const, user: existingUser };
     }
 
-    // Try to find by email and link the Google account
+    // Try to find by email
     existingUser = await this.getByEmail(email);
     if (existingUser) {
       if (!existingUser.enabled) {
@@ -117,28 +129,26 @@ export class UserService {
       }
       await this.#db
         .update(user)
-        .set({ googleId })
+        .set({ oauthProvider: provider, oauthId: oauthId })
         .where(eq(user.id, existingUser.id))
         .execute();
       return { success: true as const, user: existingUser };
     }
 
-    // Create new user with Google account
-    const randomPassword = crypto.randomUUID();
-    const hash = await hashPassword(randomPassword);
-
+    // Create new user
     await this.#db.insert(user).values({
       username: email,
-      password: hash,
+      password: '--- no password ---',
       email,
       name,
       role: roles.ADMIN,
       totpVerified: false,
       enabled: true,
-      googleId,
+      oauthProvider: provider,
+      oauthId,
     });
 
-    const newUser = await this.getByGoogleId(googleId);
+    const newUser = await this.getByProviderId(provider, oauthId);
     if (!newUser) {
       return { success: false as const, error: 'UNEXPECTED_ERROR' as const };
     }
