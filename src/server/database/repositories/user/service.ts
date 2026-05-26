@@ -3,7 +3,6 @@ import { TOTP } from 'otpauth';
 import { user } from './schema';
 import type { UserType } from './types';
 import type { DBType } from '#db/sqlite';
-import type { OAUTH_PROVIDER } from '~~/server/utils/oauth';
 
 type LoginResult =
   | {
