@@ -5,13 +5,3 @@ updates:
     schedule:
       interval: "weekly"
     rebase-strategy: "auto"
-  - package-ecosystem: "npm"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-    rebase-strategy: "auto"
-  - package-ecosystem: "npm"
-    directory: "/src/"
-    schedule:
-      interval: "weekly"
-    rebase-strategy: "auto"
