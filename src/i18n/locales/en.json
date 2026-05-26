@@ -72,6 +72,8 @@
   },
   "login": {
     "signIn": "Sign In",
+    "signInWithGoogle": "Sign in with Google",
+    "or": "or",
     "rememberMe": "Remember me",
     "rememberMeDesc": "Stay logged after closing the browser",
     "insecure": "You can't log in with an insecure connection. Use HTTPS.",

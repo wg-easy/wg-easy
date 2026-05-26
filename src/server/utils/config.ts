@@ -41,6 +41,17 @@ export const WG_ENV = {
   DISABLE_VERSION_CHECK: process.env.DISABLE_VERSION_CHECK === 'true',
 };
 
+export const OAUTH_GOOGLE_ENV = {
+  /** Enable Google OAuth login */
+  ENABLED: process.env.OAUTH_GOOGLE_ENABLED === 'true',
+  /** Google OAuth Client ID */
+  CLIENT_ID: process.env.OAUTH_GOOGLE_CLIENT_ID || '',
+  /** Google OAuth Client Secret */
+  CLIENT_SECRET: process.env.OAUTH_GOOGLE_CLIENT_SECRET || '',
+  /** Allowed email domain (optional, e.g. "example.com") */
+  ALLOWED_DOMAIN: process.env.OAUTH_GOOGLE_ALLOWED_DOMAIN || '',
+};
+
 export const WG_INITIAL_ENV = {
   ENABLED: process.env.INIT_ENABLED === 'true',
   USERNAME: process.env.INIT_USERNAME,

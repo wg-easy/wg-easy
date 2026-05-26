@@ -30,6 +30,16 @@ function createPreparedStatement(db: DBType) {
         where: eq(user.username, sql.placeholder('username')),
       })
       .prepare(),
+    findByGoogleId: db.query.user
+      .findFirst({
+        where: eq(user.googleId, sql.placeholder('googleId')),
+      })
+      .prepare(),
+    findByEmail: db.query.user
+      .findFirst({
+        where: eq(user.email, sql.placeholder('email')),
+      })
+      .prepare(),
     update: db
       .update(user)
       .set({
@@ -79,6 +89,60 @@ export class UserService {
 
   async getByUsername(username: string) {
     return this.#statements.findByUsername.execute({ username });
+  }
+
+  async getByGoogleId(googleId: string) {
+    return this.#statements.findByGoogleId.execute({ googleId });
+  }
+
+  async getByEmail(email: string) {
+    return this.#statements.findByEmail.execute({ email });
+  }
+
+  async findOrCreateByGoogle(googleId: string, email: string, name: string) {
+    // First try to find by googleId
+    let existingUser = await this.getByGoogleId(googleId);
+    if (existingUser) {
+      if (!existingUser.enabled) {
+        return { success: false as const, error: 'USER_DISABLED' as const };
+      }
+      return { success: true as const, user: existingUser };
+    }
+
+    // Try to find by email and link the Google account
+    existingUser = await this.getByEmail(email);
+    if (existingUser) {
+      if (!existingUser.enabled) {
+        return { success: false as const, error: 'USER_DISABLED' as const };
+      }
+      await this.#db
+        .update(user)
+        .set({ googleId })
+        .where(eq(user.id, existingUser.id))
+        .execute();
+      return { success: true as const, user: existingUser };
+    }
+
+    // Create new user with Google account
+    const randomPassword = crypto.randomUUID();
+    const hash = await hashPassword(randomPassword);
+
+    await this.#db.insert(user).values({
+      username: email,
+      password: hash,
+      email,
+      name,
+      role: roles.ADMIN,
+      totpVerified: false,
+      enabled: true,
+      googleId,
+    });
+
+    const newUser = await this.getByGoogleId(googleId);
+    if (!newUser) {
+      return { success: false as const, error: 'UNEXPECTED_ERROR' as const };
+    }
+    return { success: true as const, user: newUser };
   }
 
   async create(username: string, password: string) {
