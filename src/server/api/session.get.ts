@@ -26,5 +26,6 @@ export default defineEventHandler(async (event) => {
     name: user.name,
     email: user.email,
     totpVerified: user.totpVerified,
+    hasPassword: user.password !== null,
   } satisfies SharedPublicUser;
 });

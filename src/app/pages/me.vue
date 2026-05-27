@@ -27,6 +27,7 @@
           <FormGroup>
             <FormHeading>{{ $t('general.password') }}</FormHeading>
             <FormPasswordField
+              v-if="hasPassword"
               id="current-password"
               v-model="currentPassword"
               autocomplete="current-password"
@@ -46,7 +47,11 @@
             />
             <FormSecondaryActionField
               type="submit"
-              :label="$t('general.updatePassword')"
+              :label="
+                hasPassword
+                  ? $t('general.updatePassword')
+                  : $t('general.addPassword')
+              "
             />
           </FormGroup>
         </FormElement>
@@ -125,6 +130,7 @@ const authStore = useAuthStore();
 
 const name = ref(authStore.userData?.name);
 const email = ref(authStore.userData?.email);
+const hasPassword = computed(() => authStore.userData?.hasPassword);
 
 const _submit = useSubmit(
   (data) =>
@@ -158,13 +164,14 @@ const _updatePassword = useSubmit(
       currentPassword.value = '';
       newPassword.value = '';
       confirmPassword.value = '';
+      return authStore.update();
     },
   }
 );
 
 function updatePassword() {
   return _updatePassword({
-    currentPassword: currentPassword.value,
+    currentPassword: hasPassword.value ? currentPassword.value : null,
     newPassword: newPassword.value,
     confirmPassword: confirmPassword.value,
   });

@@ -193,7 +193,11 @@ export class UserService {
     return this.#statements.update.execute({ id, name, email });
   }
 
-  async updatePassword(id: ID, currentPassword: string, newPassword: string) {
+  async updatePassword(
+    id: ID,
+    currentPassword: string | null,
+    newPassword: string
+  ) {
     const hash = await hashPassword(newPassword);
 
     return this.#db.transaction(async (tx) => {
@@ -206,13 +210,20 @@ export class UserService {
         throw new Error('User not found');
       }
 
-      const passwordValid = await isPasswordValid(
-        currentPassword,
-        txUser.password
-      );
+      // only check password if already set
+      if (txUser.password !== null) {
+        if (!currentPassword) {
+          throw new Error('Invalid password');
+        }
 
-      if (!passwordValid) {
-        throw new Error('Invalid password');
+        const passwordValid = await isPasswordValid(
+          currentPassword,
+          txUser.password
+        );
+
+        if (!passwordValid) {
+          throw new Error('Invalid password');
+        }
       }
 
       await tx

@@ -57,7 +57,7 @@ export const UserUpdateSchema = z.object({
 
 export const UserUpdatePasswordSchema = z
   .object({
-    currentPassword: password,
+    currentPassword: password.nullable(),
     newPassword: password,
     confirmPassword: password,
   })

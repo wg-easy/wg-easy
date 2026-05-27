@@ -28,6 +28,7 @@
     "password": "Password",
     "newPassword": "New Password",
     "updatePassword": "Update Password",
+    "addPassword": "Add Password",
     "mtu": "MTU",
     "allowedIps": "Allowed IPs",
     "dns": "DNS",
