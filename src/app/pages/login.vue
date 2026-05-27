@@ -140,7 +140,7 @@ const { data: authMethods } = await useFetch('/api/auth/methods');
 
 const _submit = useSubmit(
   (data) =>
-    $fetch('/api/session', {
+    $fetch('/api/auth/password', {
       method: 'post',
       body: data,
     }),
