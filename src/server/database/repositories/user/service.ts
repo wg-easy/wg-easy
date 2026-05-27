@@ -144,7 +144,7 @@ export class UserService {
     // Create new user
     await this.#db.insert(user).values({
       username,
-      password: '--- no password ---',
+      password: null,
       email,
       name,
       role: roles.ADMIN,
@@ -233,13 +233,11 @@ export class UserService {
         .findFirst({ where: eq(user.username, username) })
         .execute();
 
-      if (!txUser) {
-        return { success: false, error: 'INCORRECT_CREDENTIALS' };
-      }
+      // always check to avoid timing attack
+      const userHashPassword = txUser?.password ?? null;
+      const passwordValid = await isPasswordValid(password, userHashPassword);
 
-      const passwordValid = await isPasswordValid(password, txUser.password);
-
-      if (!passwordValid) {
+      if (!txUser || !passwordValid) {
         return { success: false, error: 'INCORRECT_CREDENTIALS' };
       }
 

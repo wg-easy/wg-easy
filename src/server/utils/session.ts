@@ -73,21 +73,14 @@ export async function getCurrentUser(event: H3Event) {
       });
     }
 
-    // TODO: timing can be used to enumerate usernames
-
     const foundUser = await Database.users.getByUsername(username);
 
-    if (!foundUser) {
-      throw createError({
-        statusCode: 401,
-        statusMessage: 'Session failed',
-      });
-    }
-
-    const userHashPassword = foundUser.password;
+    // always check to avoid timing attack
+    const userHashPassword = foundUser?.password ?? null;
     const passwordValid = await isPasswordValid(password, userHashPassword);
 
-    if (!passwordValid) {
+    // can't login through basic auth if 2fa enabled
+    if (!foundUser || !passwordValid || foundUser.totpVerified) {
       throw createError({
         statusCode: 401,
         statusMessage: 'Session failed',

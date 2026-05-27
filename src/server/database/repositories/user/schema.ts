@@ -6,7 +6,8 @@ import { client } from '../../schema';
 export const user = sqliteTable('users_table', {
   id: int().primaryKey({ autoIncrement: true }),
   username: text().notNull().unique(),
-  password: text().notNull(),
+  /** `password == null` means password login disabled */
+  password: text(),
   email: text(),
   name: text().notNull(),
   role: int().$type<Role>().notNull(),
