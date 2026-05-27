@@ -2,6 +2,7 @@ import type { H3Event } from 'h3';
 import { discovery } from 'openid-client';
 
 type OAuthConfig = {
+  friendlyName: string;
   server: string;
   scope: string;
   clientId: string | undefined;
@@ -12,6 +13,7 @@ type OAuthConfig = {
 };
 
 const GoogleConfig: OAuthConfig = {
+  friendlyName: 'Google',
   server: 'https://accounts.google.com',
   scope: 'openid email profile',
   clientId: process.env.OAUTH_GOOGLE_CLIENT_ID,
@@ -22,6 +24,7 @@ const GoogleConfig: OAuthConfig = {
   },
 };
 const GithubConfig: OAuthConfig = {
+  friendlyName: 'GitHub',
   server: 'https://github.com/login/oauth',
   scope: 'read:user user:email',
   clientId: process.env.OAUTH_GITHUB_CLIENT_ID,
@@ -33,10 +36,19 @@ const GithubConfig: OAuthConfig = {
   isOIDC: false,
   userInfoFlow: 'github',
 };
+const OidcConfig: OAuthConfig = {
+  friendlyName: process.env.OAUTH_OIDC_NAME ?? 'OIDC',
+  server: process.env.OAUTH_OIDC_SERVER ?? '',
+  scope: 'openid email profile',
+  clientId: process.env.OAUTH_OIDC_CLIENT_ID,
+  clientSecret: process.env.OAUTH_OIDC_CLIENT_SECRET,
+  params: {},
+};
 
 export const OAUTH_PROVIDERS = {
   google: GoogleConfig,
   github: GithubConfig,
+  oidc: OidcConfig,
 };
 
 export type OAUTH_PROVIDER = keyof typeof OAUTH_PROVIDERS;
@@ -62,12 +74,24 @@ export function isConfiguredOauthProvider(
   return true;
 }
 
+function isEnabledProvider(provider: OAUTH_PROVIDER) {
+  return WG_ENV.OAUTH_PROVIDERS?.includes(provider);
+}
+
+// TODO: simplify logic between WG_ENV.OAUTH_PROVIDERS and buildOauthConfig
 export async function buildOauthConfig(event: H3Event) {
   const provider = getRouterParam(event, 'provider');
   if (!provider || !isValidOauthProvider(provider)) {
     throw createError({
       statusCode: 400,
       statusMessage: 'Invalid provider',
+    });
+  }
+
+  if (!isEnabledProvider(provider)) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Disabled provider',
     });
   }
 

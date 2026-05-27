@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
     expectedNonce:
       providerConfig.isOIDC === false ? undefined : session.data.oauth_nonce,
     expectedState: session.data.oauth_state,
-    idTokenExpected: providerConfig.isOIDC,
+    idTokenExpected: providerConfig.isOIDC ?? true,
   });
 
   type SubjectType = string | undefined | typeof client.skipSubjectCheck;
@@ -44,8 +44,6 @@ export default defineEventHandler(async (event) => {
   } else {
     userInfo = await client.fetchUserInfo(config, tokens.access_token, subject);
   }
-
-  console.log(userInfo);
 
   if (!userInfo.sub) {
     throw createError({

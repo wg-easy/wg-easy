@@ -2,10 +2,15 @@ export default defineEventHandler(() => {
   return {
     providers: WG_ENV.OAUTH_PROVIDERS?.reduce(
       (acc, curr) => {
-        acc[curr] = true;
+        acc[curr] = {
+          enabled: true,
+          friendlyName: OAUTH_PROVIDERS[curr].friendlyName,
+        };
         return acc;
       },
-      {} as Record<OAUTH_PROVIDER, boolean>
+      {} as Partial<
+        Record<OAUTH_PROVIDER, { enabled: true; friendlyName: string }>
+      >
     ),
     oauthEnabled:
       WG_ENV.OAUTH_PROVIDERS !== undefined && WG_ENV.OAUTH_PROVIDERS.length > 0,

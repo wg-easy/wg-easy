@@ -15,7 +15,7 @@ CREATE TABLE `__new_users_table` (
 	`updated_at` text DEFAULT (CURRENT_TIMESTAMP) NOT NULL
 );
 --> statement-breakpoint
-INSERT INTO `__new_users_table`("id", "username", "password", "email", "name", "role", "totp_key", "totp_verified", "enabled", "oauth_provider", "oauth_id", "created_at", "updated_at") SELECT "id", "username", "password", "email", "name", "role", "totp_key", "totp_verified", "enabled", "oauth_provider", "oauth_id", "created_at", "updated_at" FROM `users_table`;--> statement-breakpoint
+INSERT INTO `__new_users_table`("id", "username", "password", "email", "name", "role", "totp_key", "totp_verified", "enabled", "created_at", "updated_at") SELECT "id", "username", "password", "email", "name", "role", "totp_key", "totp_verified", "enabled", "created_at", "updated_at" FROM `users_table`;--> statement-breakpoint
 DROP TABLE `users_table`;--> statement-breakpoint
 ALTER TABLE `__new_users_table` RENAME TO `users_table`;--> statement-breakpoint
 PRAGMA foreign_keys=ON;--> statement-breakpoint

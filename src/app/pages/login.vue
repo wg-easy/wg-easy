@@ -15,29 +15,53 @@
       <div v-if="authMethods" class="flex flex-col gap-5">
         <!-- Google OAuth Button -->
         <a
-          v-if="authMethods.providers?.google"
+          v-if="authMethods.providers?.google?.enabled"
           href="/api/auth/google"
           class="flex cursor-pointer items-center justify-center gap-2 rounded border border-gray-300 bg-white py-2 text-sm text-gray-700 shadow-sm transition hover:bg-gray-50 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700"
         >
           <IconsBrandsGoogle class="h-4 w-4" />
-          <span>{{ $t('login.signInWith', ['Google']) }}</span>
+          <span>
+            {{
+              $t('login.signInWith', [
+                authMethods.providers.google.friendlyName,
+              ])
+            }}
+          </span>
         </a>
         <!-- GitHub OAuth Button -->
         <a
-          v-if="authMethods.providers?.github"
+          v-if="authMethods.providers?.github?.enabled"
           href="/api/auth/github"
           class="flex cursor-pointer items-center justify-center gap-2 rounded border border-gray-300 bg-white py-2 text-sm text-gray-700 shadow-sm transition hover:bg-gray-50 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700"
         >
           <IconsBrandsGitHub class="h-4 w-4" />
-          <span>{{ $t('login.signInWith', ['GitHub']) }}</span>
+          <span>
+            {{
+              $t('login.signInWith', [
+                authMethods.providers.github.friendlyName,
+              ])
+            }}
+          </span>
+        </a>
+        <!-- OIDC OAuth Button -->
+        <a
+          v-if="authMethods.providers?.oidc?.enabled"
+          href="/api/auth/oidc"
+          class="flex cursor-pointer items-center justify-center rounded border border-gray-300 bg-white py-2 text-sm text-gray-700 shadow-sm transition hover:bg-gray-50 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700"
+        >
+          <span>
+            {{
+              $t('login.signInWith', [authMethods.providers.oidc.friendlyName])
+            }}
+          </span>
         </a>
 
         <!-- Divider -->
         <div v-if="authMethods.oauthEnabled" class="flex items-center gap-2">
           <div class="h-px flex-1 bg-gray-300 dark:bg-neutral-600"></div>
-          <span class="text-xs text-gray-500 dark:text-neutral-400">{{
-            $t('login.or')
-          }}</span>
+          <span class="text-xs text-gray-500 dark:text-neutral-400">
+            {{ $t('login.or') }}
+          </span>
           <div class="h-px flex-1 bg-gray-300 dark:bg-neutral-600"></div>
         </div>
       </div>
