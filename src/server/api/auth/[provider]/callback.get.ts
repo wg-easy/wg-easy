@@ -1,5 +1,3 @@
-import * as client from 'openid-client';
-
 export default defineEventHandler(async (event) => {
   const { config, provider, providerConfig } = await buildOauthConfig(event);
 
@@ -15,35 +13,16 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const currentUrl = getRequestURL(event);
-
-  const tokens = await client.authorizationCodeGrant(config, currentUrl, {
-    pkceCodeVerifier: session.data.oauth_verifier,
-    expectedNonce:
-      providerConfig.isOIDC === false ? undefined : session.data.oauth_nonce,
-    expectedState: session.data.oauth_state,
-    idTokenExpected: providerConfig.isOIDC ?? true,
-  });
-
-  type SubjectType = string | undefined | typeof client.skipSubjectCheck;
-  let subject: SubjectType = tokens.claims()?.sub;
-  if (providerConfig.isOIDC === false) {
-    subject = client.skipSubjectCheck;
-  }
-
-  if (!subject) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "Can't get subject",
-    });
-  }
-
-  let userInfo;
-  if (providerConfig.userInfoFlow === 'github') {
-    userInfo = await githubUserInfoFlow(tokens.access_token);
-  } else {
-    userInfo = await client.fetchUserInfo(config, tokens.access_token, subject);
-  }
+  const userInfo = await getUserInfo(
+    event,
+    config,
+    {
+      oauth_nonce: session.data.oauth_nonce,
+      oauth_verifier: session.data.oauth_verifier,
+      oauth_state: session.data.oauth_state,
+    },
+    providerConfig
+  );
 
   if (!userInfo.sub) {
     throw createError({

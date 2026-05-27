@@ -1,5 +1,4 @@
 import type { H3Event } from 'h3';
-import type { SharedPublicUser } from '~~/shared/utils/permissions';
 
 export const useAuthStore = defineStore('Auth', () => {
   const userData = useState<SharedPublicUser | null>('user-data', () => null);

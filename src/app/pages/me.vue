@@ -58,17 +58,14 @@
         <FormElement @submit.prevent>
           <FormGroup>
             <FormHeading>{{ $t('general.2fa') }}</FormHeading>
-            <div
-              v-if="!authStore.userData?.totpVerified && !twofa"
-              class="col-span-2 flex flex-col"
-            >
+            <template v-if="!authStore.userData?.totpVerified && !twofa">
               <FormSecondaryActionField
                 :label="$t('me.enable2fa')"
                 @click="setup2fa"
               />
-            </div>
+            </template>
             <div
-              v-if="!authStore.userData?.totpVerified && twofa"
+              v-else-if="!authStore.userData?.totpVerified && twofa"
               class="col-span-2"
             >
               <p class="text-sm text-gray-500 dark:text-gray-400">
@@ -98,7 +95,7 @@
               </div>
             </div>
             <div
-              v-if="authStore.userData?.totpVerified"
+              v-else-if="authStore.userData?.totpVerified"
               class="col-span-2 flex flex-col gap-2"
             >
               <p class="text-sm text-gray-500 dark:text-gray-400">
@@ -118,6 +115,59 @@
             </div>
           </FormGroup>
         </FormElement>
+        <FormElement v-if="authMethods?.oauthEnabled" @submit.prevent>
+          <FormGroup>
+            <FormHeading>{{ $t('general.externalAuth') }}</FormHeading>
+            <template v-if="oauthProvider && oauthProviderInfo?.enabled">
+              <div class="flex items-center gap-2">
+                <IconsBrandsProvider
+                  :provider="oauthProvider"
+                  class="h-4 w-4"
+                />
+                <span>
+                  {{ $t('me.linkedWith', [oauthProviderInfo.friendlyName]) }}
+                </span>
+              </div>
+              <div>
+                <FormSecondaryActionField
+                  :label="$t('me.unlinkOauth')"
+                  class="w-full"
+                  :disabled="!hasPassword"
+                  @click="unlinkOauth"
+                />
+              </div>
+            </template>
+            <template v-else-if="oauthProvider && !oauthProviderInfo?.enabled">
+              <span class="flex items-center">
+                {{ $t('me.providerDisabled') }}
+              </span>
+              <div>
+                <FormSecondaryActionField
+                  :label="$t('me.unlinkOauth')"
+                  class="w-full"
+                  :disabled="!hasPassword"
+                  @click="unlinkOauth"
+                />
+              </div>
+            </template>
+            <template v-else>
+              <div class="flex items-center">
+                <span>{{ $t('me.linkOauth') }}</span>
+              </div>
+              <div class="flex flex-col gap-2">
+                <BaseFormSecondaryButton
+                  v-for="(info, provider) in authMethods.providers"
+                  :key="provider"
+                  class="flex items-center gap-2 p-2"
+                  :href="`/api/auth/${provider}?link=true`"
+                >
+                  <IconsBrandsProvider :provider="provider" class="h-4 w-4" />
+                  <span>{{ info.friendlyName }}</span>
+                </BaseFormSecondaryButton>
+              </div>
+            </template>
+          </FormGroup>
+        </FormElement>
       </PanelBody>
     </Panel>
   </main>
@@ -128,9 +178,21 @@ import { encodeQR } from 'qr';
 
 const authStore = useAuthStore();
 
+const { data: authMethods } = await useFetch('/api/auth/methods');
+
 const name = ref(authStore.userData?.name);
 const email = ref(authStore.userData?.email);
 const hasPassword = computed(() => authStore.userData?.hasPassword);
+const oauthProvider = computed(() => authStore.userData?.oauthProvider);
+const oauthProviderInfo = computed(() => {
+  if (!authStore.userData?.oauthProvider) {
+    return null;
+  }
+  return {
+    ...authMethods.value?.providers?.[authStore.userData.oauthProvider],
+    provider: authStore.userData.oauthProvider,
+  };
+});
 
 const _submit = useSubmit(
   (data) =>
@@ -255,5 +317,27 @@ async function disable2fa() {
     type: 'delete',
     currentPassword: disable2faPassword.value,
   });
+}
+
+async function linkOauth() {
+  await navigateTo(`/api/auth/google?link=true`, {
+    external: true,
+  });
+}
+
+const _unlinkOauth = useSubmit(
+  `/api/auth/unlink`,
+  {
+    method: 'post',
+  },
+  {
+    revert: async () => {
+      return authStore.update();
+    },
+  }
+);
+
+async function unlinkOauth() {
+  return _unlinkOauth({});
 }
 </script>

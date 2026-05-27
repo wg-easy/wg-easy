@@ -1,5 +1,6 @@
 import type { H3Event } from 'h3';
-import { discovery } from 'openid-client';
+import type { Configuration } from 'openid-client';
+import * as client from 'openid-client';
 
 type OAuthConfig = {
   friendlyName: string;
@@ -91,7 +92,7 @@ export async function buildOauthConfig(event: H3Event) {
   if (!isEnabledProvider(provider)) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Disabled provider',
+      statusMessage: 'Provider is not enabled',
     });
   }
 
@@ -104,7 +105,7 @@ export async function buildOauthConfig(event: H3Event) {
     });
   }
 
-  const config = await discovery(
+  const config = await client.discovery(
     new URL(oauthProvider.server),
     oauthProvider.clientId,
     {
@@ -158,9 +159,54 @@ export async function githubUserInfoFlow(accessToken: string) {
   }
   return {
     sub: response.id.toString(),
-    email: response.email,
+    email: response.email ?? undefined,
     email_verified: true,
     preferred_username: response.login,
     name: response.name || response.login,
   };
+}
+
+type OauthState = {
+  oauth_nonce: string;
+  oauth_verifier: string;
+  oauth_state: string;
+};
+
+export async function getUserInfo(
+  event: H3Event,
+  config: Configuration,
+  state: OauthState,
+  providerConfig: OAuthConfig
+) {
+  const currentUrl = getRequestURL(event);
+
+  const tokens = await client.authorizationCodeGrant(config, currentUrl, {
+    pkceCodeVerifier: state.oauth_verifier,
+    expectedNonce:
+      providerConfig.isOIDC === false ? undefined : state.oauth_nonce,
+    expectedState: state.oauth_state,
+    idTokenExpected: providerConfig.isOIDC ?? true,
+  });
+
+  type SubjectType = string | undefined | typeof client.skipSubjectCheck;
+  let subject: SubjectType = tokens.claims()?.sub;
+  if (providerConfig.isOIDC === false) {
+    subject = client.skipSubjectCheck;
+  }
+
+  if (!subject) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Can't get subject",
+    });
+  }
+
+  let userInfo: client.UserInfoResponse;
+  if (providerConfig.userInfoFlow === 'github') {
+    userInfo = await githubUserInfoFlow(tokens.access_token);
+  } else {
+    userInfo = await client.fetchUserInfo(config, tokens.access_token, subject);
+  }
+
+  return userInfo;
 }

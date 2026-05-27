@@ -1,5 +1,3 @@
-import type { SharedPublicUser } from '~~/shared/utils/permissions';
-
 export default defineEventHandler(async (event) => {
   const session = await useWGSession(event);
 
@@ -26,6 +24,7 @@ export default defineEventHandler(async (event) => {
     name: user.name,
     email: user.email,
     totpVerified: user.totpVerified,
+    oauthProvider: user.oauthProvider,
     hasPassword: user.password !== null,
   } satisfies SharedPublicUser;
 });

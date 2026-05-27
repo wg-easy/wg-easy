@@ -8,9 +8,7 @@ export default defineEventHandler(() => {
         };
         return acc;
       },
-      {} as Partial<
-        Record<OAUTH_PROVIDER, { enabled: true; friendlyName: string }>
-      >
+      {} as Record<OAUTH_PROVIDER, { enabled: true; friendlyName: string }>
     ),
     oauthEnabled:
       WG_ENV.OAUTH_PROVIDERS !== undefined && WG_ENV.OAUTH_PROVIDERS.length > 0,

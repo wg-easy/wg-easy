@@ -20,7 +20,11 @@
     "2faKey": "TOTP Key",
     "2faCodeDesc": "Enter the code from your authenticator app.",
     "disable2fa": "Disable Two Factor Authentication",
-    "disable2faDesc": "Enter your password to disable Two Factor Authentication."
+    "disable2faDesc": "Enter your password to disable Two Factor Authentication.",
+    "linkOauth": "Link your account with an external provider",
+    "unlinkOauth": "Unlink",
+    "linkedWith": "Linked with {0}",
+    "providerDisabled": "Your currently linked provider is not enabled"
   },
   "general": {
     "name": "Name",
@@ -42,7 +46,8 @@
     "confirmPassword": "Confirm Password",
     "loading": "Loading...",
     "2fa": "Two Factor Authentication",
-    "2faCode": "TOTP Code"
+    "2faCode": "TOTP Code",
+    "externalAuth": "External Authentication"
   },
   "setup": {
     "welcome": "Welcome to your first setup of wg-easy",
@@ -73,7 +78,7 @@
   },
   "login": {
     "signIn": "Sign In",
-    "signInWith": "Sign In with {0}",
+    "signInWith": "Sign in with {0}",
     "or": "or",
     "rememberMe": "Remember me",
     "rememberMeDesc": "Stay logged after closing the browser",

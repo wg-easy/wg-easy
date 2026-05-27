@@ -1,11 +1,26 @@
 import * as client from 'openid-client';
+import { z } from 'zod';
+
+const OauthQuerySchema = z.object({
+  link: z.coerce.boolean().optional(),
+});
 
 export default defineEventHandler(async (event) => {
+  const params = await getValidatedQuery(
+    event,
+    validateZod(OauthQuerySchema, event)
+  );
+
   const { config, provider, providerConfig } = await buildOauthConfig(event);
 
   const host = getRequestHost(event);
   const protocol = WG_ENV.INSECURE ? 'http' : 'https';
-  const redirectUri = `${protocol}://${host}/api/auth/${provider}/callback`;
+  const baseUri = `${protocol}://${host}/api/auth/${provider}`;
+
+  let redirectUri = `${baseUri}/callback`;
+  if (params.link) {
+    redirectUri = `${baseUri}/link`;
+  }
 
   const codeVerifier = client.randomPKCECodeVerifier();
   const codeChallenge = await client.calculatePKCECodeChallenge(codeVerifier);

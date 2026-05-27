@@ -18,21 +18,34 @@ You can enable multiple providers by separating them with a comma:
 
 e.g. `google,github`
 
+### Redirect URIs
+
+You have to configure the following redirect URIs in your OAuth provider:
+
+- `https://<your-domain>/api/auth/<provider>/callback`
+  Used to log in to with the provider
+- `https://<your-domain>/api/auth/<provider>/link`
+  Used to link an existing account to the provider
+
+If your provider does not support multiple redirect URIs (e.g. GitHub) but allows multiple URIs under the same base, then configure:
+
+- `https://<your-domain>/api/auth/<provider>/`
+
 ### Google
 
 <!-- TODO support allowed domain -->
 
-| Env                           | Required | Example                          | Description                               |
-| ----------------------------- | -------- | -------------------------------- | ----------------------------------------- |
-| `OAUTH_GOOGLE_CLIENT_ID`      | ✔️       | `123.apps.googleusercontent.com` | Google Client ID                          |
-| `OAUTH_GOOGLE_CLIENT_SECRET`  | ✔️       | `GOCSPX-xxx`                     | Google Client Secret                      |
-| `OAUTH_GOOGLE_ALLOWED_DOMAIN` | ✖️       | `example.com`                    | Restrict login to a specific email domain |
+| Env                           | Required | Example       | Description                               |
+| ----------------------------- | -------- | ------------- | ----------------------------------------- |
+| `OAUTH_GOOGLE_CLIENT_ID`      | ✔️       | -             | Google Client ID                          |
+| `OAUTH_GOOGLE_CLIENT_SECRET`  | ✔️       | -             | Google Client Secret                      |
+| `OAUTH_GOOGLE_ALLOWED_DOMAIN` | ✖️       | `example.com` | Restrict login to a specific email domain |
 
 #### Setup
 
 1. Go to [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
 2. Create an OAuth 2.0 Client ID (Web application)
-3. Add Authorized redirect URI: `https://<your-domain>/api/auth/google/callback`
+3. Add Authorized redirect URI: See [Redirect URIs](#redirect-uris)
 4. Copy the Client ID and Client Secret to the environment variables
 
 ### GitHub
@@ -52,14 +65,15 @@ The provider needs to support:
 
 - PKCE
 - default scopes: `openid email profile`
-- Valid HTTPS
 - Client Secret Authentication `client_secret_post`
+
+The provider needs to be available with HTTPS and have a valid certificate.
 
 | Env                        | Required | Default | Example                    | Description        |
 | -------------------------- | -------- | ------- | -------------------------- | ------------------ |
 | `OAUTH_OIDC_SERVER`        | ✔️       | -       | `https://auth.example.com` | OIDC Server        |
-| `OAUTH_OIDC_CLIENT_ID`     | ✔️       | -       | `xxx`                      | OIDC Client ID     |
-| `OAUTH_OIDC_CLIENT_SECRET` | ✔️       | -       | `xxx`                      | OIDC Client Secret |
+| `OAUTH_OIDC_CLIENT_ID`     | ✔️       | -       | -                          | OIDC Client ID     |
+| `OAUTH_OIDC_CLIENT_SECRET` | ✔️       | -       | -                          | OIDC Client Secret |
 | `OAUTH_OIDC_NAME`          | ✖️       | OIDC    | `Authelia`                 | Provider Name      |
 
 #### Authelia Setup
@@ -79,6 +93,7 @@ docker run --rm authelia/authelia:latest authelia crypto hash generate pbkdf2 --
   client_secret: '$pbkdf2-...'
   redirect_uris:
       - https://<your-domain>/api/auth/oidc/callback
+      - https://<your-domain>/api/auth/oidc/link
   scopes:
       - openid
       - profile

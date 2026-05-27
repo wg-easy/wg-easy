@@ -47,7 +47,7 @@ type SharedUserType =
 
 export type SharedPublicUser = Pick<
   UserType,
-  'id' | 'username' | 'name' | 'email' | 'totpVerified'
+  'id' | 'username' | 'name' | 'email' | 'totpVerified' | 'oauthProvider'
 > & { role: BrandedNumber; hasPassword: boolean };
 
 type PermissionCheck<Key extends keyof Permissions> =

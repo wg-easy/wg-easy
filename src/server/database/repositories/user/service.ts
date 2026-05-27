@@ -105,6 +105,7 @@ export class UserService {
     return this.#statements.findByEmail.execute({ email });
   }
 
+  // TODO: improve, use transaction
   async findOrCreateByProvider(
     provider: OAUTH_PROVIDER,
     oauthId: string,
@@ -326,6 +327,64 @@ export class UserService {
       await tx
         .update(user)
         .set({ totpKey: null, totpVerified: false })
+        .where(eq(user.id, id))
+        .execute();
+    });
+  }
+
+  unlinkOauth(id: ID) {
+    return this.#db.transaction(async (tx) => {
+      const txUser = await tx.query.user
+        .findFirst({ where: eq(user.id, id) })
+        .execute();
+
+      if (!txUser) {
+        throw new Error('User not found');
+      }
+
+      // can't unlink if no way to log back in
+      if (!txUser.password) {
+        throw new Error('Password login not enabled');
+      }
+
+      await tx
+        .update(user)
+        .set({ oauthProvider: null, oauthId: null })
+        .where(eq(user.id, id))
+        .execute();
+    });
+  }
+
+  async linkOauth(id: ID, provider: OAUTH_PROVIDER, oauthId: string) {
+    return this.#db.transaction(async (tx) => {
+      const txUser = await tx.query.user
+        .findFirst({ where: eq(user.id, id) })
+        .execute();
+
+      if (!txUser) {
+        throw new Error('User not found');
+      }
+
+      if (txUser.oauthProvider || txUser.oauthId) {
+        throw new Error('User already linked with an OAuth provider');
+      }
+
+      const existingUser = await tx.query.user
+        .findFirst({
+          where: and(
+            eq(user.oauthProvider, provider),
+            eq(user.oauthId, oauthId)
+          ),
+        })
+        .execute();
+
+      if (existingUser) {
+        throw new Error('OAuth account already linked with another user');
+      }
+
+      await tx
+        .update(user)
+        .set({ oauthProvider: provider, oauthId: oauthId })
         .where(eq(user.id, id))
         .execute();
     });
