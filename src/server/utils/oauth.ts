@@ -208,5 +208,59 @@ export async function getUserInfo(
     userInfo = await client.fetchUserInfo(config, tokens.access_token, subject);
   }
 
+  if (!hasOauthProps(userInfo)) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Invalid user info',
+    });
+  }
+
+  if (!isAllowedDomain(userInfo.email)) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: 'Email domain not allowed',
+    });
+  }
+
   return userInfo;
+}
+
+function hasOauthProps<
+  T extends { sub?: string; email?: string; email_verified?: boolean },
+>(
+  userInfo: T
+): userInfo is T & { sub: string; email: string; email_verified: boolean } {
+  if (!userInfo.sub) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'No sub set',
+    });
+  }
+
+  if (!userInfo.email) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'No email set',
+    });
+  }
+
+  if (!userInfo.email_verified) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: 'Email is not verified',
+    });
+  }
+
+  return true;
+}
+
+function isAllowedDomain(email: string) {
+  const emailDomain = email.slice(email.lastIndexOf('@') + 1);
+  if (
+    WG_ENV.OAUTH_ALLOWED_DOMAINS &&
+    !WG_ENV.OAUTH_ALLOWED_DOMAINS.includes(emailDomain)
+  ) {
+    return false;
+  }
+  return true;
 }

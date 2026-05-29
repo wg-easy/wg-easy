@@ -24,27 +24,6 @@ export default defineEventHandler(async (event) => {
     providerConfig
   );
 
-  if (!userInfo.sub) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'No sub set',
-    });
-  }
-
-  if (!userInfo.email) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'No email set',
-    });
-  }
-
-  if (!userInfo.email_verified) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: 'Email is not verified',
-    });
-  }
-
   const result = await Database.users.findOrCreateByProvider(
     provider,
     userInfo.sub,

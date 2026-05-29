@@ -45,8 +45,6 @@ Use [Allowed Domains](#allowed-domains) to restrict which users can log in.
 
 ///
 
-<!-- TODO support allowed domain -->
-
 ### Allowed Domains
 
 To only allow users with an email address from a specific domain to log in, set the env var `OAUTH_ALLOWED_DOMAINS` to the allowed domain.

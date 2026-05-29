@@ -43,7 +43,16 @@ export const WG_ENV = {
     .map((v) => v.trim())
     .filter((v) => isValidOauthProvider(v))
     .filter((v) => isConfiguredOauthProvider(OAUTH_PROVIDERS[v])),
+  OAUTH_ALLOWED_DOMAINS: process.env.OAUTH_ALLOWED_DOMAINS?.split(',').map(
+    (v) => v.trim()
+  ),
 };
+
+if (WG_ENV.OAUTH_PROVIDERS && WG_ENV.OAUTH_PROVIDERS.length > 1) {
+  SERVER_DEBUG(`
+Enabled OAuth providers: ${WG_ENV.OAUTH_PROVIDERS.join(', ')}
+Allowed OAuth domains: ${WG_ENV.OAUTH_ALLOWED_DOMAINS?.join(', ') ?? 'All'}`);
+}
 
 export const WG_INITIAL_ENV = {
   ENABLED: process.env.INIT_ENABLED === 'true',

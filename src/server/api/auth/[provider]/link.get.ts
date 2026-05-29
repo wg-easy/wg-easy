@@ -29,13 +29,6 @@ export default definePermissionEventHandler(
       providerConfig
     );
 
-    if (!userInfo.sub) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'No sub set',
-      });
-    }
-
     await Database.users.linkOauth(user.id, provider, userInfo.sub);
 
     return sendRedirect(event, '/me');
