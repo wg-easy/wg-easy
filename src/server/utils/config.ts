@@ -55,7 +55,8 @@ export const WG_ENV = {
 if (WG_ENV.OAUTH_PROVIDERS && WG_ENV.OAUTH_PROVIDERS.length > 1) {
   SERVER_DEBUG(`
 Enabled OAuth providers: ${WG_ENV.OAUTH_PROVIDERS.join(', ')}
-Allowed OAuth domains: ${WG_ENV.OAUTH_ALLOWED_DOMAINS?.join(', ') ?? 'All'}`);
+Allowed OAuth domains: ${WG_ENV.OAUTH_ALLOWED_DOMAINS?.join(', ') ?? 'All'}
+OAuth auto register: ${WG_ENV.OAUTH_AUTO_REGISTER ? 'Enabled' : 'Disabled'}`);
 }
 
 export const WG_INITIAL_ENV = {

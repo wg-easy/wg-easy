@@ -188,10 +188,7 @@ const oauthProviderInfo = computed(() => {
   if (!authStore.userData?.oauthProvider) {
     return null;
   }
-  return {
-    ...authMethods.value?.providers?.[authStore.userData.oauthProvider],
-    provider: authStore.userData.oauthProvider,
-  };
+  return authMethods.value?.providers?.[authStore.userData.oauthProvider];
 });
 
 const _submit = useSubmit(
@@ -316,12 +313,6 @@ async function disable2fa() {
   return _disable2fa({
     type: 'delete',
     currentPassword: disable2faPassword.value,
-  });
-}
-
-async function linkOauth() {
-  await navigateTo(`/api/auth/google?link=true`, {
-    external: true,
   });
 }
 
