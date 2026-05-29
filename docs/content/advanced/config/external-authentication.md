@@ -31,15 +31,36 @@ If your provider does not support multiple redirect URIs (e.g. GitHub) but allow
 
 - `https://<your-domain>/api/auth/<provider>/`
 
-### Google
+<!-- TODO support auto register -->
+
+### Auto Register
+
+To automatically register users that log in with an OAuth provider, set the env var `OAUTH_AUTO_REGISTER` to `true`.
+
+/// warning | Security
+
+Users will be created with Admin Permissions, as the permissions system is not yet implemented. Only enable this if you trust all users that can log in with the OAuth provider.
+
+Use [Allowed Domains](#allowed-domains) to restrict which users can log in.
+
+///
 
 <!-- TODO support allowed domain -->
 
-| Env                           | Required | Example       | Description                               |
-| ----------------------------- | -------- | ------------- | ----------------------------------------- |
-| `OAUTH_GOOGLE_CLIENT_ID`      | ✔️       | -             | Google Client ID                          |
-| `OAUTH_GOOGLE_CLIENT_SECRET`  | ✔️       | -             | Google Client Secret                      |
-| `OAUTH_GOOGLE_ALLOWED_DOMAIN` | ✖️       | `example.com` | Restrict login to a specific email domain |
+### Allowed Domains
+
+To only allow users with an email address from a specific domain to log in, set the env var `OAUTH_ALLOWED_DOMAINS` to the allowed domain.
+
+You can allow multiple domains by separating them with a comma:
+
+e.g. `example.com,example.org`
+
+### Google
+
+| Env                          | Required | Description          |
+| ---------------------------- | -------- | -------------------- |
+| `OAUTH_GOOGLE_CLIENT_ID`     | ✔️       | Google Client ID     |
+| `OAUTH_GOOGLE_CLIENT_SECRET` | ✔️       | Google Client Secret |
 
 #### Setup
 
@@ -50,12 +71,18 @@ If your provider does not support multiple redirect URIs (e.g. GitHub) but allow
 
 ### GitHub
 
-| Env                          | Required | Example | Description          |
-| ---------------------------- | -------- | ------- | -------------------- |
-| `OAUTH_GITHUB_CLIENT_ID`     | ✔️       | `xxx`   | GitHub Client ID     |
-| `OAUTH_GITHUB_CLIENT_SECRET` | ✔️       | `xxx`   | GitHub Client Secret |
+| Env                          | Required | Description          |
+| ---------------------------- | -------- | -------------------- |
+| `OAUTH_GITHUB_CLIENT_ID`     | ✔️       | GitHub Client ID     |
+| `OAUTH_GITHUB_CLIENT_SECRET` | ✔️       | GitHub Client Secret |
 
-<!-- TODO Github Setup -->
+#### Setup
+
+1. Go to [GitHub Developer Settings](https://github.com/settings/developers)
+2. Create a new OAuth App
+3. Add Authorization callback URL: See [Redirect URIs](#redirect-uris)
+4. Create a new client secret
+5. Copy the Client ID and Client Secret to the environment variables
 
 ### Generic OIDC
 
@@ -106,4 +133,4 @@ docker run --rm authelia/authelia:latest authelia crypto hash generate pbkdf2 --
 
 ### Generic OAuth
 
-TODO
+Not currently supported
