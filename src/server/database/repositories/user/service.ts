@@ -19,6 +19,20 @@ type LoginResult =
         | 'UNEXPECTED_ERROR';
     };
 
+type LoginWithOAuthResult =
+  | {
+      success: true;
+      user: UserType;
+    }
+  | {
+      success: false;
+      error:
+        | 'USER_DISABLED'
+        | 'USER_ALREADY_LINKED'
+        | 'UNEXPECTED_ERROR'
+        | 'AUTO_REGISTER_DISABLED';
+    };
+
 function createPreparedStatement(db: DBType) {
   return {
     findAll: db.query.user.findMany().prepare(),
@@ -28,19 +42,6 @@ function createPreparedStatement(db: DBType) {
     findByUsername: db.query.user
       .findFirst({
         where: eq(user.username, sql.placeholder('username')),
-      })
-      .prepare(),
-    findByProviderId: db.query.user
-      .findFirst({
-        where: and(
-          eq(user.oauthProvider, sql.placeholder('oauthProvider')),
-          eq(user.oauthId, sql.placeholder('oauthId'))
-        ),
-      })
-      .prepare(),
-    findByEmail: db.query.user
-      .findFirst({
-        where: eq(user.email, sql.placeholder('email')),
       })
       .prepare(),
     update: db
@@ -92,74 +93,6 @@ export class UserService {
 
   async getByUsername(username: string) {
     return this.#statements.findByUsername.execute({ username });
-  }
-
-  async getByProviderId(provider: OAUTH_PROVIDER, oauthId: string) {
-    return this.#statements.findByProviderId.execute({
-      oauthProvider: provider,
-      oauthId,
-    });
-  }
-
-  async getByEmail(email: string) {
-    return this.#statements.findByEmail.execute({ email });
-  }
-
-  // TODO: improve, use transaction
-  async findOrCreateByProvider(
-    provider: OAUTH_PROVIDER,
-    oauthId: string,
-    username: string,
-    email: string,
-    name: string
-  ) {
-    // Try to find by id
-    let existingUser = await this.getByProviderId(provider, oauthId);
-    if (existingUser) {
-      if (!existingUser.enabled) {
-        return { success: false as const, error: 'USER_DISABLED' as const };
-      }
-      return { success: true as const, user: existingUser };
-    }
-
-    // Try to find by email
-    existingUser = await this.getByEmail(email);
-    if (existingUser) {
-      if (!existingUser.enabled) {
-        return { success: false as const, error: 'USER_DISABLED' as const };
-      }
-      if (existingUser.oauthProvider && existingUser.oauthId) {
-        return {
-          success: false as const,
-          error: 'USER_ALREADY_LINKED' as const,
-        };
-      }
-      await this.#db
-        .update(user)
-        .set({ oauthProvider: provider, oauthId: oauthId })
-        .where(eq(user.id, existingUser.id))
-        .execute();
-      return { success: true as const, user: existingUser };
-    }
-
-    // Create new user
-    await this.#db.insert(user).values({
-      username,
-      password: null,
-      email,
-      name,
-      role: roles.ADMIN,
-      totpVerified: false,
-      enabled: true,
-      oauthProvider: provider,
-      oauthId,
-    });
-
-    const newUser = await this.getByProviderId(provider, oauthId);
-    if (!newUser) {
-      return { success: false as const, error: 'UNEXPECTED_ERROR' as const };
-    }
-    return { success: true as const, user: newUser };
   }
 
   async create(username: string, password: string) {
@@ -329,6 +262,90 @@ export class UserService {
         .set({ totpKey: null, totpVerified: false })
         .where(eq(user.id, id))
         .execute();
+    });
+  }
+
+  /**
+   * Login or register user with OAuth provider.
+   * If user with the same email already exists, link account with OAuth provider.
+   * Otherwise, create new user.
+   */
+  async loginWithOAuth(
+    provider: OAUTH_PROVIDER,
+    oauthId: string,
+    username: string,
+    email: string,
+    name: string
+  ): Promise<LoginWithOAuthResult> {
+    return this.#db.transaction(async (tx) => {
+      const userById = await tx.query.user
+        .findFirst({
+          where: and(
+            eq(user.oauthProvider, provider),
+            eq(user.oauthId, oauthId)
+          ),
+        })
+        .execute();
+
+      if (userById) {
+        if (!userById.enabled) {
+          return { success: false, error: 'USER_DISABLED' };
+        }
+        return { success: true, user: userById };
+      }
+
+      const userByEmail = await tx.query.user
+        .findFirst({
+          where: eq(user.email, email),
+        })
+        .execute();
+
+      if (userByEmail) {
+        if (!userByEmail.enabled) {
+          return { success: false, error: 'USER_DISABLED' };
+        }
+        if (userByEmail.oauthProvider && userByEmail.oauthId) {
+          return {
+            success: false,
+            error: 'USER_ALREADY_LINKED',
+          };
+        }
+
+        await tx
+          .update(user)
+          .set({ oauthProvider: provider, oauthId: oauthId })
+          .where(eq(user.id, userByEmail.id))
+          .execute();
+
+        // TODO: return updated user
+        return { success: true, user: userByEmail };
+      }
+
+      if (!WG_ENV.OAUTH_AUTO_REGISTER) {
+        return { success: false, error: 'AUTO_REGISTER_DISABLED' };
+      }
+
+      // Create new user
+      const newUsers = await tx
+        .insert(user)
+        .values({
+          username,
+          password: null,
+          email,
+          name,
+          role: roles.ADMIN,
+          totpVerified: false,
+          enabled: true,
+          oauthProvider: provider,
+          oauthId,
+        })
+        .returning();
+      const newUser = newUsers[0];
+
+      if (!newUser) {
+        return { success: false as const, error: 'UNEXPECTED_ERROR' as const };
+      }
+      return { success: true as const, user: newUser };
     });
   }
 

@@ -39,13 +39,17 @@ export const WG_ENV = {
   DISABLE_IPV6: process.env.DISABLE_IPV6 === 'true',
   WG_EXECUTABLE: await detectAwg(),
   DISABLE_VERSION_CHECK: process.env.DISABLE_VERSION_CHECK === 'true',
+  /** List of enabled OAuth providers */
   OAUTH_PROVIDERS: process.env.OAUTH_PROVIDERS?.split(',')
     .map((v) => v.trim())
     .filter((v) => isValidOauthProvider(v))
     .filter((v) => isConfiguredOauthProvider(OAUTH_PROVIDERS[v])),
+  /** List of allowed OAuth domains */
   OAUTH_ALLOWED_DOMAINS: process.env.OAUTH_ALLOWED_DOMAINS?.split(',').map(
     (v) => v.trim()
   ),
+  /** Automatically register users that log in with an OAuth provider */
+  OAUTH_AUTO_REGISTER: process.env.OAUTH_AUTO_REGISTER === 'true',
 };
 
 if (WG_ENV.OAUTH_PROVIDERS && WG_ENV.OAUTH_PROVIDERS.length > 1) {

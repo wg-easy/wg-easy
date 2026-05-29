@@ -24,7 +24,7 @@ export default defineEventHandler(async (event) => {
     providerConfig
   );
 
-  const result = await Database.users.findOrCreateByProvider(
+  const result = await Database.users.loginWithOAuth(
     provider,
     userInfo.sub,
     userInfo.preferred_username || userInfo.email,
@@ -33,22 +33,30 @@ export default defineEventHandler(async (event) => {
   );
 
   if (!result.success) {
-    if (result.error === 'USER_DISABLED') {
-      throw createError({
-        statusCode: 401,
-        statusMessage: 'User disabled',
-      });
+    switch (result.error) {
+      case 'USER_DISABLED':
+        throw createError({
+          statusCode: 401,
+          statusMessage: 'User disabled',
+        });
+      case 'USER_ALREADY_LINKED':
+        throw createError({
+          statusCode: 401,
+          statusMessage:
+            'User already linked with different account or provider',
+        });
+      case 'AUTO_REGISTER_DISABLED':
+        throw createError({
+          statusCode: 401,
+          statusMessage: 'Auto registration is disabled',
+        });
+      case 'UNEXPECTED_ERROR':
+        throw createError({
+          statusCode: 500,
+          statusMessage: 'Unexpected error',
+        });
     }
-    if (result.error === 'USER_ALREADY_LINKED') {
-      throw createError({
-        statusCode: 401,
-        statusMessage: 'User already linked with different account or provider',
-      });
-    }
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Unexpected error',
-    });
+    assertUnreachable(result.error);
   }
 
   // Create session

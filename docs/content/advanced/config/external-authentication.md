@@ -31,11 +31,13 @@ If your provider does not support multiple redirect URIs (e.g. GitHub) but allow
 
 - `https://<your-domain>/api/auth/<provider>/`
 
-<!-- TODO support auto register -->
-
 ### Auto Register
 
 To automatically register users that log in with an OAuth provider, set the env var `OAUTH_AUTO_REGISTER` to `true`.
+
+If a user logs in with an email address that is not yet registered, a new account will be created for them.
+
+If a user logs in with an email address that is already registered, their account will be linked to the OAuth provider (if not already linked), regardless of the value of `OAUTH_AUTO_REGISTER`.
 
 /// warning | Security
 

@@ -1,5 +1,4 @@
 import type { H3Event } from 'h3';
-import type { Configuration } from 'openid-client';
 import * as client from 'openid-client';
 
 type OAuthConfig = {
@@ -174,7 +173,7 @@ type OauthState = {
 
 export async function getUserInfo(
   event: H3Event,
-  config: Configuration,
+  config: client.Configuration,
   state: OauthState,
   providerConfig: OAuthConfig
 ) {
@@ -208,12 +207,7 @@ export async function getUserInfo(
     userInfo = await client.fetchUserInfo(config, tokens.access_token, subject);
   }
 
-  if (!hasOauthProps(userInfo)) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Invalid user info',
-    });
-  }
+  assertHasOauthProps(userInfo);
 
   if (!isAllowedDomain(userInfo.email)) {
     throw createError({
@@ -225,11 +219,11 @@ export async function getUserInfo(
   return userInfo;
 }
 
-function hasOauthProps<
-  T extends { sub?: string; email?: string; email_verified?: boolean },
->(
+type RequireKeys<T extends object, K extends keyof T> = Required<Pick<T, K>>;
+
+function assertHasOauthProps<T extends client.UserInfoResponse>(
   userInfo: T
-): userInfo is T & { sub: string; email: string; email_verified: boolean } {
+): asserts userInfo is T & RequireKeys<T, 'sub' | 'email' | 'email_verified'> {
   if (!userInfo.sub) {
     throw createError({
       statusCode: 400,
@@ -250,8 +244,6 @@ function hasOauthProps<
       statusMessage: 'Email is not verified',
     });
   }
-
-  return true;
 }
 
 function isAllowedDomain(email: string) {
