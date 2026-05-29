@@ -19,4 +19,5 @@ INSERT INTO `__new_users_table`("id", "username", "password", "email", "name", "
 DROP TABLE `users_table`;--> statement-breakpoint
 ALTER TABLE `__new_users_table` RENAME TO `users_table`;--> statement-breakpoint
 PRAGMA foreign_keys=ON;--> statement-breakpoint
-CREATE UNIQUE INDEX `users_table_username_unique` ON `users_table` (`username`);
+CREATE UNIQUE INDEX `users_table_username_unique` ON `users_table` (`username`);--> statement-breakpoint
+CREATE UNIQUE INDEX `oauth_provider_id_unique` ON `users_table` (`oauth_provider`,`oauth_id`);

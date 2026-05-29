@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "8cfd2b7c-5483-4b98-b95e-f9c741f32821",
+  "id": "d41b21e2-3977-4e94-8250-d26a26678703",
   "prevId": "0f072f91-cd10-4702-ae7b-245255d69d1e",
   "tables": {
     "clients_table": {
@@ -830,6 +830,14 @@
           "name": "users_table_username_unique",
           "columns": [
             "username"
+          ],
+          "isUnique": true
+        },
+        "oauth_provider_id_unique": {
+          "name": "oauth_provider_id_unique",
+          "columns": [
+            "oauth_provider",
+            "oauth_id"
           ],
           "isUnique": true
         }
