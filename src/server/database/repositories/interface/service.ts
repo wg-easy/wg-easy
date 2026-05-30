@@ -39,7 +39,7 @@ export class InterfaceService {
 
   async get() {
     const wgInterface = await this.#statements.get.execute({
-      interface: 'wg0',
+      interface: WG_ENV.INTERFACE_NAME,
     });
     if (!wgInterface) {
       throw new Error('Interface not found');
@@ -49,7 +49,7 @@ export class InterfaceService {
 
   updateKeyPair(privateKey: string, publicKey: string) {
     return this.#statements.updateKeyPair.execute({
-      interface: 'wg0',
+      interface: WG_ENV.INTERFACE_NAME,
       privateKey,
       publicKey,
     });
@@ -59,13 +59,13 @@ export class InterfaceService {
     return this.#db
       .update(wgInterface)
       .set(data)
-      .where(eq(wgInterface.name, 'wg0'))
+      .where(eq(wgInterface.name, WG_ENV.INTERFACE_NAME))
       .execute();
   }
 
   setFirewallEnabled(firewallEnabled: boolean) {
     return this.#statements.setFirewallEnabled.execute({
-      interface: 'wg0',
+      interface: WG_ENV.INTERFACE_NAME,
       firewallEnabled,
     });
   }
@@ -74,7 +74,7 @@ export class InterfaceService {
     return this.#db.transaction(async (tx) => {
       const oldCidr = await tx.query.wgInterface
         .findFirst({
-          where: eq(wgInterface.name, 'wg0'),
+          where: eq(wgInterface.name, WG_ENV.INTERFACE_NAME),
           columns: { ipv4Cidr: true, ipv6Cidr: true },
         })
         .execute();
@@ -86,7 +86,7 @@ export class InterfaceService {
       await tx
         .update(wgInterface)
         .set(data)
-        .where(eq(wgInterface.name, 'wg0'))
+        .where(eq(wgInterface.name, WG_ENV.INTERFACE_NAME))
         .execute();
 
       const clients = await tx.query.client.findMany().execute();

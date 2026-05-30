@@ -9,6 +9,31 @@ import type {
 import type { DBType } from '#db/sqlite';
 import { wgInterface, userConfig } from '#db/schema';
 
+function nixManagedClientDefaults(fallback?: {
+  allowedIps?: string[];
+  dns?: string[];
+}) {
+  return {
+    ...(WG_CLIENT_DEFAULTS.ALLOWED_IPS !== undefined
+      ? { allowedIps: WG_CLIENT_DEFAULTS.ALLOWED_IPS }
+      : fallback?.allowedIps !== undefined
+        ? { allowedIps: fallback.allowedIps }
+        : {}),
+    ...(WG_CLIENT_DEFAULTS.DNS !== undefined
+      ? { dns: WG_CLIENT_DEFAULTS.DNS }
+      : fallback?.dns !== undefined
+        ? { dns: fallback.dns }
+        : {}),
+    serverAllowedIps: WG_CLIENT_DEFAULTS.SERVER_ALLOWED_IPS ?? [],
+    ...(WG_CLIENT_DEFAULTS.FIREWALL_ALLOWED_IPS !== undefined
+      ? { firewallIps: WG_CLIENT_DEFAULTS.FIREWALL_ALLOWED_IPS }
+      : {}),
+    ...(WG_CLIENT_DEFAULTS.PERSISTENT_KEEPALIVE !== undefined
+      ? { persistentKeepalive: WG_CLIENT_DEFAULTS.PERSISTENT_KEEPALIVE }
+      : {}),
+  };
+}
+
 function createPreparedStatement(db: DBType) {
   return {
     findAll: db.query.client
@@ -177,7 +202,7 @@ export class ClientService {
       const clients = await tx.query.client.findMany().execute();
       const clientInterface = await tx.query.wgInterface
         .findFirst({
-          where: eq(wgInterface.name, 'wg0'),
+          where: eq(wgInterface.name, WG_ENV.INTERFACE_NAME),
         })
         .execute();
 
@@ -206,7 +231,7 @@ export class ClientService {
           name,
           // TODO: properly assign user id
           userId: 1,
-          interfaceId: 'wg0',
+          interfaceId: WG_ENV.INTERFACE_NAME,
           expiresAt,
           privateKey,
           publicKey,
@@ -223,7 +248,7 @@ export class ClientService {
           i4: clientConfig.defaultI4,
           i5: clientConfig.defaultI5,
           persistentKeepalive: clientConfig.defaultPersistentKeepalive,
-          serverAllowedIps: [],
+          ...nixManagedClientDefaults(),
           enabled: true,
         })
         .returning({ clientId: client.id })
@@ -243,7 +268,7 @@ export class ClientService {
     return this.#db.transaction(async (tx) => {
       const clientInterface = await tx.query.wgInterface
         .findFirst({
-          where: eq(wgInterface.name, 'wg0'),
+          where: eq(wgInterface.name, WG_ENV.INTERFACE_NAME),
         })
         .execute();
 
@@ -279,7 +304,7 @@ export class ClientService {
       .values({
         name,
         userId: 1,
-        interfaceId: 'wg0',
+        interfaceId: WG_ENV.INTERFACE_NAME,
         privateKey,
         publicKey,
         preSharedKey,
@@ -296,7 +321,10 @@ export class ClientService {
         allowedIps: clientConfig.defaultAllowedIps,
         dns: clientConfig.defaultDns,
         persistentKeepalive: clientConfig.defaultPersistentKeepalive,
-        serverAllowedIps: [],
+        ...nixManagedClientDefaults({
+          allowedIps: clientConfig.defaultAllowedIps,
+          dns: clientConfig.defaultDns,
+        }),
         enabled,
       })
       .execute();

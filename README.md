@@ -52,6 +52,49 @@ This is a quick start guide to get you up and running with WireGuard Easy.
 
 For a more detailed installation guide, please refer to the [Getting Started](https://wg-easy.github.io/wg-easy/latest/getting-started/) page.
 
+### NixOS
+
+This repository exposes a NixOS module through `nixosModules.default`:
+
+```nix
+{
+  inputs.wg-easy.url = "github:<owner>/wg-easy-nix";
+
+  outputs = { nixpkgs, wg-easy, ... }: {
+    nixosConfigurations.server = nixpkgs.lib.nixosSystem {
+      system = "x86_64-linux";
+      modules = [
+        wg-easy.nixosModules.default
+        {
+          services.wg-easy = {
+            enable = true;
+            interfaceName = "wg0";
+            wireguardPort = 51820;
+            uiPort = 51821;
+            stateDir = "/var/lib/wg-easy";
+            enableIPv6 = false;
+            defaultDns = [ "10.8.0.1" ];
+            defaultAllowedIps = [ "10.8.0.1/32" ];
+            defaultPersistentKeepalive = 25;
+            firewallEnabled = true;
+            defaultServerAllowedIps = [ ];
+            defaultFirewallAllowedIps = [ "10.8.0.1/32" ];
+            forceUpdateClients = false;
+            openFirewall = true;
+          };
+        }
+      ];
+    };
+  };
+}
+```
+
+WireGuard's conventional default port is `51820`. Set `wireguardPort = 51280;` if you want that port instead.
+
+The `defaultDns`, `defaultAllowedIps`, `defaultPersistentKeepalive`, `defaultServerAllowedIps`, and `defaultFirewallAllowedIps` settings are stamped onto new clients when they are created. Existing clients keep their previous values unless `forceUpdateClients = true;` is set.
+
+`defaultAllowedIps` goes into generated client configs and controls what each client routes through the tunnel. `defaultServerAllowedIps` adds extra server-side peer routes for subnets behind a client; leave it empty for normal clients. `defaultFirewallAllowedIps` is the per-client destination allowlist used by wg-easy firewall filtering. Per-client firewall filtering currently applies to forwarded traffic, not local `INPUT` traffic to the server's own `10.8.0.1` address.
+
 ### 1. Install Docker
 
 If you haven't installed Docker yet, install it by running as root:

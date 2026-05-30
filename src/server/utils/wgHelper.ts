@@ -16,6 +16,16 @@ type Options = {
 // needed to support cli
 const wgExecutable =
   typeof WG_ENV !== 'undefined' ? WG_ENV.WG_EXECUTABLE : 'dev';
+const wgStateDir =
+  typeof WG_ENV !== 'undefined' ? WG_ENV.STATE_DIR : '/etc/wireguard';
+
+function shellArg(value: string) {
+  return `'${value.replace(/'/g, `'\\''`)}'`;
+}
+
+function wgQuickTarget(infName: string) {
+  return shellArg(`${wgStateDir}/${infName}.conf`);
+}
 
 export const wg = {
   generateServerPeer: (
@@ -185,29 +195,33 @@ Endpoint = ${userConfig.host}:${userConfig.port}`;
   },
 
   up: (infName: string) => {
-    return exec(`${wgExecutable}-quick up ${infName}`);
+    return exec(`${wgExecutable}-quick up ${wgQuickTarget(infName)}`);
   },
 
   down: (infName: string) => {
-    return exec(`${wgExecutable}-quick down ${infName}`);
+    return exec(`${wgExecutable}-quick down ${wgQuickTarget(infName)}`);
   },
 
   restart: (infName: string) => {
+    const target = wgQuickTarget(infName);
     return exec(
-      `${wgExecutable}-quick down ${infName}; ${wgExecutable}-quick up ${infName}`
+      `${wgExecutable}-quick down ${target}; ${wgExecutable}-quick up ${target}`
     );
   },
 
   sync: (infName: string) => {
     return exec(
-      `${wgExecutable} syncconf ${infName} <(${wgExecutable}-quick strip ${infName})`
+      `${wgExecutable} syncconf ${shellArg(infName)} <(${wgExecutable}-quick strip ${wgQuickTarget(infName)})`
     );
   },
 
   dump: async (infName: string) => {
-    const rawDump = await exec(`${wgExecutable} show ${infName} dump`, {
-      log: false,
-    });
+    const rawDump = await exec(
+      `${wgExecutable} show ${shellArg(infName)} dump`,
+      {
+        log: false,
+      }
+    );
 
     type wgDumpLine = [
       string,

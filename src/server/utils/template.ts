@@ -19,6 +19,7 @@ export function removeNewlines(templ: string) {
  * Available keys:
  * - ipv4Cidr: IPv4 CIDR
  * - ipv6Cidr: IPv6 CIDR
+ * - name: WireGuard interface name
  * - device: Network device
  * - port: Port number
  * - uiPort: UI port number
@@ -27,6 +28,7 @@ export function iptablesTemplate(templ: string, wgInterface: InterfaceType) {
   return template(removeNewlines(templ), {
     ipv4Cidr: wgInterface.ipv4Cidr,
     ipv6Cidr: wgInterface.ipv6Cidr,
+    name: wgInterface.name,
     device: wgInterface.device,
     port: wgInterface.port.toString(),
     uiPort: WG_ENV.PORT,

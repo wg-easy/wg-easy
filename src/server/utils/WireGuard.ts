@@ -62,8 +62,9 @@ class WireGuard {
     result.push('');
 
     WG_DEBUG('Saving Config...');
+    await fs.mkdir(WG_ENV.STATE_DIR, { recursive: true, mode: 0o700 });
     await fs.writeFile(
-      `/etc/wireguard/${wgInterface.name}.conf`,
+      `${WG_ENV.STATE_DIR}/${wgInterface.name}.conf`,
       result.join('\n\n'),
       {
         mode: 0o600,

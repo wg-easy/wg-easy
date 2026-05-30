@@ -177,7 +177,7 @@ const _setup2fa = useSubmit(
   },
   {
     revert: async (success, data) => {
-      if (success && data?.type === 'setup') {
+      if (success && data?.type === 'setup' && data.uri && data.key) {
         const qrcode = encodeQR(data.uri, 'svg', {
           ecc: 'high',
           scale: 4,

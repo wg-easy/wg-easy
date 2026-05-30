@@ -6,6 +6,8 @@ import { wg } from '../../server/utils/wgHelper';
 import { encodeQRCodeTerm } from '../../server/utils/qr';
 import { db, schema } from '../db';
 
+const interfaceName = process.env.WG_INTERFACE_NAME?.trim() || 'wg0';
+
 export default defineCommand({
   meta: {
     name: 'clients:qr',
@@ -34,7 +36,7 @@ export default defineCommand({
     consola.info('Generating QR code for client...');
 
     const wgInterface = await db.query.wgInterface.findFirst({
-      where: eq(schema.wgInterface.name, 'wg0'),
+      where: eq(schema.wgInterface.name, interfaceName),
     });
     if (!wgInterface) {
       consola.error('WireGuard interface not found');
@@ -42,7 +44,7 @@ export default defineCommand({
     }
 
     const userConfig = await db.query.userConfig.findFirst({
-      where: eq(schema.userConfig.id, 'wg0'),
+      where: eq(schema.userConfig.id, interfaceName),
     });
     if (!userConfig) {
       consola.error('User config not found');

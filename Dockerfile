@@ -80,6 +80,9 @@ ENV HOST=0.0.0.0
 ENV INSECURE=false
 ENV INIT_ENABLED=false
 ENV DISABLE_IPV6=false
+ENV WG_INTERFACE_NAME=wg0
+ENV WG_PORT=51820
+ENV WG_STATE_DIR=/etc/wireguard
 
 LABEL org.opencontainers.image.source=https://github.com/wg-easy/wg-easy
 

@@ -21,7 +21,9 @@ export class HooksService {
   }
 
   async get() {
-    const hooks = await this.#statements.get.execute({ interface: 'wg0' });
+    const hooks = await this.#statements.get.execute({
+      interface: WG_ENV.INTERFACE_NAME,
+    });
     if (!hooks) {
       throw new Error('Hooks not found');
     }
@@ -32,7 +34,7 @@ export class HooksService {
     return this.#db
       .update(hooks)
       .set(data)
-      .where(eq(hooks.id, 'wg0'))
+      .where(eq(hooks.id, WG_ENV.INTERFACE_NAME))
       .execute();
   }
 }
