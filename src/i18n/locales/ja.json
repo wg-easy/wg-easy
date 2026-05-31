@@ -1,0 +1,297 @@
+{
+  "pages": {
+    "me": "アカウント",
+    "clients": "クライアント",
+    "admin": {
+      "panel": "管理パネル",
+      "general": "一般",
+      "config": "構成",
+      "interface": "インターフェイス",
+      "hooks": "フック"
+    }
+  },
+  "user": {
+    "email": "メール"
+  },
+  "me": {
+    "currentPassword": "現在のパスワード",
+    "enable2fa": "二要素認証を有効化",
+    "enable2faDesc": "QRコードを認証アプリでスキャンするか、キーを手動で入力してください。",
+    "2faKey": "TOTPキー",
+    "2faCodeDesc": "認証アプリのコードを入力してください。",
+    "disable2fa": "二要素認証を無効化",
+    "disable2faDesc": "二要素認証を無効にするにはパスワードを入力してください。"
+  },
+  "general": {
+    "name": "名前",
+    "username": "ユーザー名",
+    "password": "パスワード",
+    "newPassword": "新しいパスワード",
+    "updatePassword": "パスワードを更新",
+    "mtu": "MTU",
+    "allowedIps": "許可 IP",
+    "dns": "DNS",
+    "persistentKeepalive": "永続的 Keepalive",
+    "logout": "ログアウト",
+    "continue": "続行",
+    "host": "ホスト",
+    "port": "ポート",
+    "yes": "はい",
+    "no": "いいえ",
+    "confirmPassword": "パスワードの確認",
+    "loading": "読み込み中...",
+    "2fa": "二要素認証",
+    "2faCode": "TOTPコード"
+  },
+  "setup": {
+    "welcome": "wg-easy の初期セットアップへようこそ",
+    "welcomeDesc": "Linux ホストで WireGuard をインストールして管理する最も簡単な方法です",
+    "existingSetup": "既存のセットアップがありますか？",
+    "createAdminDesc": "まず管理者ユーザー名と強力で安全なパスワードを入力してください。この情報は管理パネルへのログインに使用されます。",
+    "setupConfigDesc": "ホストとポート情報を入力してください。これは各デバイスで WireGuard を設定するときのクライアント構成に使用されます。",
+    "setupMigrationDesc": "新しいセットアップへ以前の wg-easy バージョンからデータを移行する場合は、バックアップファイルを指定してください。",
+    "upload": "アップロード",
+    "migration": "バックアップを復元:",
+    "createAccount": "アカウントを作成",
+    "successful": "セットアップが完了しました",
+    "hostDesc": "クライアントが接続する公開ホスト名",
+    "portDesc": "クライアントが接続し、WireGuard が待ち受ける公開 UDP ポート"
+  },
+  "update": {
+    "updateAvailable": "利用可能な更新があります！",
+    "update": "更新"
+  },
+  "theme": {
+    "dark": "ダークテーマ",
+    "light": "ライトテーマ",
+    "system": "システムテーマ"
+  },
+  "layout": {
+    "toggleCharts": "グラフの表示/非表示",
+    "donate": "寄付"
+  },
+  "login": {
+    "signIn": "サインイン",
+    "rememberMe": "ログイン状態を保持",
+    "rememberMeDesc": "ブラウザーを閉じた後もログイン状態を保持します",
+    "insecure": "安全でない接続ではログインできません。HTTPS を使用してください。",
+    "2faRequired": "二要素認証が必要です",
+    "2faWrong": "二要素認証が正しくありません"
+  },
+  "client": {
+    "empty": "まだクライアントはありません。",
+    "newShort": "新規",
+    "sort": "並べ替え",
+    "create": "クライアントを作成",
+    "created": "クライアントを作成しました",
+    "new": "新しいクライアント",
+    "name": "名前",
+    "expireDate": "有効期限",
+    "expireDateDesc": "この日にクライアントが無効化されます。空欄の場合は無期限です",
+    "delete": "削除",
+    "deleteClient": "クライアントを削除",
+    "deleteDialog1": "削除してもよろしいですか",
+    "deleteDialog2": "この操作は元に戻せません。",
+    "enabled": "有効",
+    "address": "アドレス",
+    "serverAllowedIps": "サーバー許可 IP",
+    "otlDesc": "短いワンタイムリンクを生成",
+    "permanent": "無期限",
+    "createdOn": "作成日: ",
+    "lastSeen": "最終接続: ",
+    "totalDownload": "総ダウンロード: ",
+    "totalUpload": "総アップロード: ",
+    "newClient": "新しいクライアント",
+    "disableClient": "クライアントを無効化",
+    "enableClient": "クライアントを有効化",
+    "noPrivKey": "このクライアントの秘密鍵は不明です。構成を作成できません。",
+    "showQR": "QRコードを表示",
+    "downloadConfig": "構成をダウンロード",
+    "allowedIpsDesc": "VPN 経由でルーティングされる IP (グローバル設定を上書き)",
+    "serverAllowedIpsDesc": "サーバーがこのクライアントへルーティングする IP",
+    "mtuDesc": "VPN トンネルの最大転送単位 (パケットサイズ) を設定します",
+    "persistentKeepaliveDesc": "Keepalive パケットを送信する間隔 (秒) を設定します。0 で無効化します",
+    "hooks": "フック",
+    "hooksDescription": "フックは wg-quick でのみ動作します",
+    "hooksLeaveEmpty": "wg-quick 専用です。それ以外の場合は空のままにしてください",
+    "dnsDesc": "クライアントが使用する DNS サーバー (グローバル設定を上書き)",
+    "notConnected": "クライアントは接続されていません",
+    "endpoint": "エンドポイント",
+    "endpointDesc": "WireGuard 接続が確立されているクライアントの IP",
+    "search": "クライアントを検索...",
+    "config": "構成",
+    "viewConfig": "構成を表示",
+    "firewallIps": "ファイアウォール許可 IP",
+    "firewallIpsDesc": "このクライアントがアクセスできる宛先 IP/CIDR (サーバー側で強制)。空欄の場合は Allowed IPs を使用します。任意のポートとプロトコルによるフィルタリングに対応しています。構文はドキュメントを参照してください。",
+    "downloadPng": "PNG をダウンロード",
+    "copyPng": "PNG をコピー"
+  },
+  "dialog": {
+    "change": "変更",
+    "cancel": "キャンセル",
+    "create": "作成"
+  },
+  "toast": {
+    "success": "成功",
+    "saved": "保存しました",
+    "error": "エラー",
+    "unknown": "不明なエラーです。詳細はコンソールを確認してください"
+  },
+  "form": {
+    "actions": "アクション",
+    "save": "保存",
+    "revert": "元に戻す",
+    "sectionGeneral": "一般",
+    "sectionAdvanced": "詳細",
+    "noItems": "項目なし",
+    "nullNoItems": "項目なし。グローバル設定を使用しています",
+    "add": "追加"
+  },
+  "admin": {
+    "general": {
+      "sessionTimeout": "セッションタイムアウト",
+      "sessionTimeoutDesc": "ログイン状態を保持する場合のセッション期間 (秒)",
+      "metrics": "メトリクス",
+      "metricsPassword": "パスワード",
+      "metricsPasswordDesc": "メトリクスエンドポイント用の Bearer パスワード (パスワードまたは argon2 ハッシュ)",
+      "json": "JSON",
+      "jsonDesc": "JSON 形式のメトリクスルート",
+      "prometheus": "Prometheus",
+      "prometheusDesc": "Prometheus メトリクスのルート"
+    },
+    "config": {
+      "connection": "接続",
+      "hostDesc": "クライアントが接続する公開ホスト名 (構成が無効化されます)",
+      "portDesc": "クライアントが接続する公開 UDP ポート (構成が無効化されます。通常はインターフェイスのポートも変更します)",
+      "allowedIpsDesc": "クライアントが使用する許可 IP (グローバル設定)",
+      "dnsDesc": "クライアントが使用する DNS サーバー (グローバル設定)",
+      "mtuDesc": "クライアントが使用する MTU (新規クライアントのみ)",
+      "persistentKeepaliveDesc": "サーバーへ Keepalive を送信する間隔 (秒)。0 = 無効 (新規クライアントのみ)",
+      "suggest": "候補",
+      "suggestDesc": "ホスト欄に使用する IP アドレスまたはホスト名を選択してください"
+    },
+    "interface": {
+      "cidrSuccess": "CIDR を変更しました",
+      "device": "デバイス",
+      "deviceDesc": "WireGuard トラフィックを転送する Ethernet デバイス",
+      "mtuDesc": "WireGuard が使用する MTU",
+      "portDesc": "WireGuard が待ち受ける UDP ポート (通常は構成ポートも変更します)",
+      "changeCidr": "CIDR を変更",
+      "restart": "インターフェイスを再起動",
+      "restartDesc": "WireGuard インターフェイスを再起動します",
+      "restartWarn": "インターフェイスを再起動してもよろしいですか？すべてのクライアントが切断されます。",
+      "restartSuccess": "インターフェイスを再起動しました",
+      "firewall": "トラフィックフィルタリング",
+      "firewallEnabled": "クライアントごとのファイアウォールを有効化",
+      "firewallEnabledDesc": "iptables を使用して、クライアントのトラフィックを特定の宛先 IP に制限します。有効にすると、クライアントごとに許可する宛先を設定できます。"
+    },
+    "introText": "管理パネルへようこそ。\n\nここでは一般設定、構成、インターフェイス設定、フックを管理できます。\n\nまずサイドバーからセクションを選択してください。"
+  },
+  "zod": {
+    "generic": {
+      "required": "{0} は必須です",
+      "validNumber": "{0} は有効な数値である必要があります",
+      "validNumberRange": "{0} は有効な数値または数値範囲である必要があります",
+      "validString": "{0} は有効な文字列である必要があります",
+      "validBoolean": "{0} は有効な真偽値である必要があります",
+      "validArray": "{0} は有効な配列である必要があります",
+      "stringMin": "{0} は {1} 文字以上である必要があります",
+      "numberMin": "{0} は {1} 以上である必要があります"
+    },
+    "client": {
+      "id": "クライアント ID",
+      "name": "名前",
+      "expiresAt": "有効期限",
+      "address4": "IPv4 アドレス",
+      "address6": "IPv6 アドレス",
+      "serverAllowedIps": "サーバー許可 IP",
+      "firewallIps": "ファイアウォール許可 IP",
+      "firewallIpsInvalid": "ファイアウォール IP の指定が無効です。対応している構文はドキュメントを参照してください。"
+    },
+    "user": {
+      "username": "ユーザー名",
+      "password": "パスワード",
+      "remember": "ログイン状態を保持",
+      "name": "名前",
+      "email": "メール",
+      "emailInvalid": "メールは有効なメールアドレスである必要があります",
+      "passwordMatch": "パスワードが一致しません",
+      "totpEnable": "TOTP 有効化",
+      "totpEnableTrue": "TOTP 有効化は true である必要があります",
+      "totpCode": "TOTPコード"
+    },
+    "userConfig": {
+      "host": "ホスト"
+    },
+    "general": {
+      "sessionTimeout": "セッションタイムアウト",
+      "metricsEnabled": "メトリクス",
+      "metricsPassword": "メトリクスパスワード"
+    },
+    "interface": {
+      "cidr": "CIDR",
+      "device": "デバイス",
+      "cidrValid": "CIDR は有効である必要があります"
+    },
+    "otl": "ワンタイムリンク",
+    "stringMalformed": "文字列の形式が正しくありません",
+    "body": "本文は有効なオブジェクトである必要があります",
+    "hook": "フック",
+    "enabled": "有効",
+    "mtu": "MTU",
+    "port": "ポート",
+    "persistentKeepalive": "永続的 Keepalive",
+    "address": "IP アドレス",
+    "dns": "DNS",
+    "allowedIps": "許可 IP",
+    "file": "ファイル"
+  },
+  "hooks": {
+    "preUp": "PreUp",
+    "postUp": "PostUp",
+    "preDown": "PreDown",
+    "postDown": "PostDown"
+  },
+  "copy": {
+    "notSupported": "コピーはサポートされていません",
+    "copied": "コピーしました！",
+    "failed": "コピーに失敗しました",
+    "copy": "コピー"
+  },
+  "awg": {
+    "jCLabel": "ジャンクパケット数 (Jc)",
+    "jCDescription": "送信するジャンクパケット数 (1-128、推奨: 4-12)",
+    "jMinLabel": "ジャンクパケット最小サイズ (Jmin)",
+    "jMinDescription": "ジャンクパケットの最小サイズ (0-1279*、推奨: 8、Jmax 未満)",
+    "jMaxLabel": "ジャンクパケット最大サイズ (Jmax)",
+    "jMaxDescription": "ジャンクパケットの最大サイズ (1-1280*、推奨: 80、Jmin より大きい)",
+    "s1Label": "初期化パケットのジャンクサイズ (S1)",
+    "s1Description": "初期化パケットのジャンクサイズ (0-1132[1280* - 148 = 1132]、推奨: 15-150、S1+56 ≠ S2)",
+    "s2Label": "応答パケットのジャンクサイズ (S2)",
+    "s2Description": "応答パケットのジャンクサイズ (0-1188[1280* - 92 = 1188]、推奨: 15-150)",
+    "s3Label": "Cookie 応答パケットのジャンクサイズ (S3)",
+    "s3Description": "Cookie 応答パケットのジャンクサイズ",
+    "s4Label": "トランスポートパケットのジャンクサイズ (S4)",
+    "s4Description": "トランスポートパケットのジャンクサイズ",
+    "h1Label": "初期化マジックヘッダー (H1)",
+    "h1Description": "初期化パケットのヘッダー値または範囲 (X または X-Y、X<Y。最小 5、最大 2147483647。値または範囲は他のヘッダーと重複してはいけません)",
+    "h2Label": "応答マジックヘッダー (H2)",
+    "h2Description": "応答パケットのヘッダー値または範囲 (X または X-Y、X<Y。最小 5、最大 2147483647。値または範囲は他のヘッダーと重複してはいけません)",
+    "h3Label": "Cookie 応答マジックヘッダー (H3)",
+    "h3Description": "Cookie 応答パケットのヘッダー値または範囲 (X または X-Y、X<Y。最小 5、最大 2147483647。値または範囲は他のヘッダーと重複してはいけません)",
+    "h4Label": "トランスポートマジックヘッダー (H4)",
+    "h4Description": "トランスポートパケットのヘッダー値または範囲 (X または X-Y、X<Y。最小 5、最大 2147483647。値または範囲は他のヘッダーと重複してはいけません)",
+    "i1Label": "特殊ジャンクパケット 1 (I1)",
+    "i1Description": "16進数形式のプロトコル模倣パケット: <b 0x...>",
+    "i2Label": "特殊ジャンクパケット 2 (I2)",
+    "i2Description": "16進数形式のプロトコル模倣パケット: <b 0x...>",
+    "i3Label": "特殊ジャンクパケット 3 (I3)",
+    "i3Description": "16進数形式のプロトコル模倣パケット: <b 0x...>",
+    "i4Label": "特殊ジャンクパケット 4 (I4)",
+    "i4Description": "16進数形式のプロトコル模倣パケット: <b 0x...>",
+    "i5Label": "特殊ジャンクパケット 5 (I5)",
+    "i5Description": "16進数形式のプロトコル模倣パケット: <b 0x...>",
+    "mtuNote": "値は MTU に依存します",
+    "obfuscationParameters": "AmneziaWG 難読化パラメーター"
+  }
+}

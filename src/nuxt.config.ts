@@ -52,6 +52,11 @@ export default defineNuxtConfig({
         name: 'Italiano',
       },
       {
+        code: 'ja',
+        language: 'ja-JP',
+        name: '日本語',
+      },
+      {
         code: 'fr',
         language: 'fr-FR',
         name: 'Français',
@@ -130,6 +135,11 @@ export default defineNuxtConfig({
         code: 'bg',
         language: 'bg-BG',
         name: 'Български',
+      },
+      {
+        code: 'hi',
+        language: 'hi-IN',
+        name: 'हिन्दी',
       },
       {
         code: 'gl',
