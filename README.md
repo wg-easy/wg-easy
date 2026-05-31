@@ -1,8 +1,10 @@
-# WireGuard Easy
+# WireGuard Easy Nix
+
+Got tired of people suggesting to run this with a container inside of Nix. At the end of the day all you need to do is run the process in a systemd unit and have the variables exposed. This even lets you set common variables with Nix instead of having to set them every time. Any changes will only impact new clients.
 
 This fork exposes wg-easy as a Nix flake with a NixOS module at `nixosModules.default`.
-Configure it with `services.wg-easy`, including `enable`, `interfaceName`, `wireguardPort`, `uiPort`, `stateDir`, `enableIPv6`, `defaultDns`, `defaultAllowedIps`, `defaultServerAllowedIps`, `defaultFirewallAllowedIps`, `defaultPersistentKeepalive`, `firewallEnabled`, `forceUpdateClients`, `insecure`, `openFirewall`, `openWebUIFirewall`, and `extraEnvironment`.
 
+Here is a fully filled out config. You don't need to use all of these. The commonly used ones are filled out.
 ```nix
 {
   inputs.wg-easy.url = "github:connoralydon/wg-easy-nix";
@@ -12,7 +14,32 @@ Configure it with `services.wg-easy`, including `enable`, `interfaceName`, `wire
       system = "x86_64-linux";
       modules = [
         wg-easy.nixosModules.default
-        { services.wg-easy.enable = true; }
+        ({ pkgs, ... }: {
+          services.wg-easy = {
+            enable = true;
+            package = wg-easy.packages.${pkgs.system}.default;
+
+            interfaceName = "wg0";
+            wireguardPort = 51820;
+            uiPort = 51821;
+            stateDir = "/var/lib/wg-easy";
+            externalInterface = null;
+
+            enableIPv6 = false;
+            defaultDns = [ "10.8.0.1" ];
+            defaultAllowedIps = [ "10.8.0.0/24" ];
+            defaultServerAllowedIps = null;
+            defaultFirewallAllowedIps = null;
+            defaultPersistentKeepalive = null;
+            firewallEnabled = null;
+            forceUpdateClients = false;
+            insecure = false;
+
+            openFirewall = true;
+            openWebUIFirewall = false;
+            extraEnvironment = { };
+          };
+        })
       ];
     };
   };
