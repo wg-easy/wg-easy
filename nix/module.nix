@@ -86,8 +86,8 @@ in
 
     defaultPersistentKeepalive = lib.mkOption {
       type = lib.types.nullOr (lib.types.ints.between 0 65535);
-      default = 25;
-      description = "Persistent keepalive to stamp onto new clients. Set null to preserve wg-easy's configured default.";
+      default = null;
+      description = "Persistent keepalive to stamp onto new clients. Leave null to preserve wg-easy's configured default.";
     };
 
     firewallEnabled = lib.mkOption {
