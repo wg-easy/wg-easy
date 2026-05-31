@@ -1,6 +1,23 @@
 # WireGuard Easy
 
-> Nix fork: exposes `nixosModules.default`; configure `services.wg-easy` with `enable`, `package`, `interfaceName`, `wireguardPort`, `uiPort`, `stateDir`, `externalInterface`, `enableIPv6`, `defaultDns`, `defaultAllowedIps`, `defaultServerAllowedIps`, `defaultFirewallAllowedIps`, `defaultPersistentKeepalive`, `firewallEnabled`, `forceUpdateClients`, `insecure`, `openFirewall`, `openWebUIFirewall`, and `extraEnvironment`.
+This fork exposes wg-easy as a Nix flake with a NixOS module at `nixosModules.default`.
+Configure it with `services.wg-easy`, including `enable`, `interfaceName`, `wireguardPort`, `uiPort`, `stateDir`, `enableIPv6`, `defaultDns`, `defaultAllowedIps`, `defaultServerAllowedIps`, `defaultFirewallAllowedIps`, `defaultPersistentKeepalive`, `firewallEnabled`, `forceUpdateClients`, `insecure`, `openFirewall`, `openWebUIFirewall`, and `extraEnvironment`.
+
+```nix
+{
+  inputs.wg-easy.url = "github:connoralydon/wg-easy-nix";
+
+  outputs = { nixpkgs, wg-easy, ... }: {
+    nixosConfigurations.server = nixpkgs.lib.nixosSystem {
+      system = "x86_64-linux";
+      modules = [
+        wg-easy.nixosModules.default
+        { services.wg-easy.enable = true; }
+      ];
+    };
+  };
+}
+```
 
 [![Build & Publish latest Image](https://github.com/wg-easy/wg-easy/actions/workflows/deploy.yml/badge.svg)](https://github.com/wg-easy/wg-easy/actions/workflows/deploy.yml)
 [![Lint](https://github.com/wg-easy/wg-easy/actions/workflows/lint.yml/badge.svg?branch=master)](https://github.com/wg-easy/wg-easy/actions/workflows/lint.yml)
