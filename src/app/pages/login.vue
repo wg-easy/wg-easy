@@ -24,7 +24,10 @@
         />
 
         <!-- Divider -->
-        <div v-if="authMethods.oauthEnabled" class="flex items-center gap-2">
+        <div
+          v-if="authMethods.oauthEnabled && !authMethods.passwordDisabled"
+          class="flex items-center gap-2"
+        >
           <div class="h-px flex-1 bg-gray-300 dark:bg-neutral-600"></div>
           <span class="text-xs text-gray-500 dark:text-neutral-400">
             {{ $t('login.or') }}
@@ -34,7 +37,11 @@
       </div>
 
       <!-- Classic Login Form -->
-      <form class="flex flex-col gap-5" @submit.prevent="submit">
+      <form
+        v-if="!authMethods?.passwordDisabled"
+        class="flex flex-col gap-5"
+        @submit.prevent="submit"
+      >
         <BaseInput
           v-model="username"
           type="text"
@@ -73,13 +80,8 @@
         </label>
 
         <button
-          class="rounded py-2 text-sm text-white shadow transition dark:text-white"
-          :class="{
-            'cursor-pointer bg-red-800 hover:bg-red-700 dark:bg-red-800 dark:hover:bg-red-700':
-              password && username,
-            'cursor-not-allowed bg-gray-200 dark:bg-neutral-800':
-              !password || !username,
-          }"
+          class="rounded bg-red-800 py-2 text-sm text-white shadow transition hover:bg-red-700 disabled:cursor-not-allowed disabled:bg-gray-200 dark:bg-red-800 dark:text-white dark:hover:bg-red-700 disabled:dark:bg-neutral-800"
+          :disabled="!password || !username"
         >
           <IconsLoading
             v-if="authenticating"

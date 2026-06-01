@@ -90,7 +90,7 @@ export async function buildOauthConfig(event: H3Event) {
 
   if (!isEnabledProvider(provider)) {
     throw createError({
-      statusCode: 400,
+      statusCode: 403,
       statusMessage: 'Provider is not enabled',
     });
   }

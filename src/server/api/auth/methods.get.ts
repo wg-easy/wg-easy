@@ -12,5 +12,6 @@ export default defineEventHandler(() => {
     ),
     oauthEnabled:
       WG_ENV.OAUTH_PROVIDERS !== undefined && WG_ENV.OAUTH_PROVIDERS.length > 0,
+    passwordDisabled: WG_ENV.DISABLE_PASSWORD_AUTH,
   };
 });

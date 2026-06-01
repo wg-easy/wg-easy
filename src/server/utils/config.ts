@@ -50,13 +50,17 @@ export const WG_ENV = {
   ),
   /** Automatically register users that log in with an OAuth provider */
   OAUTH_AUTO_REGISTER: process.env.OAUTH_AUTO_REGISTER === 'true',
+  /** Disable password authentication */
+  DISABLE_PASSWORD_AUTH: process.env.DISABLE_PASSWORD_AUTH === 'true',
 };
 
-if (WG_ENV.OAUTH_PROVIDERS && WG_ENV.OAUTH_PROVIDERS.length > 1) {
+if (WG_ENV.OAUTH_PROVIDERS && WG_ENV.OAUTH_PROVIDERS.length > 0) {
   SERVER_DEBUG(`
 Enabled OAuth providers: ${WG_ENV.OAUTH_PROVIDERS.join(', ')}
 Allowed OAuth domains: ${WG_ENV.OAUTH_ALLOWED_DOMAINS?.join(', ') ?? 'All'}
-OAuth auto register: ${WG_ENV.OAUTH_AUTO_REGISTER ? 'Enabled' : 'Disabled'}`);
+OAuth auto register: ${WG_ENV.OAUTH_AUTO_REGISTER ? 'Enabled' : 'Disabled'}
+Password authentication: ${WG_ENV.DISABLE_PASSWORD_AUTH ? 'Disabled' : 'Enabled'}
+`);
 }
 
 export const WG_INITIAL_ENV = {

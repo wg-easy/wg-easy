@@ -33,11 +33,17 @@ If your provider does not support multiple redirect URIs (e.g. GitHub) but allow
 
 ### Auto Register
 
-To automatically register users that log in with an OAuth provider, set the env var `OAUTH_AUTO_REGISTER` to `true`.
+To automatically register users that log in with an OAuth provider, set the following environment variable to `true`:
 
-If a user logs in with an email address that is not yet registered, a new account will be created for them.
+| Env                   | Required | Default | Description              |
+| --------------------- | -------- | ------- | ------------------------ |
+| `OAUTH_AUTO_REGISTER` | ✖️       | `false` | Enable auto-registration |
 
-If a user logs in with an email address that is already registered, their account will be linked to the OAuth provider (if not already linked), regardless of the value of `OAUTH_AUTO_REGISTER`.
+When enabled:
+
+- If a user logs in with an email address that is not yet registered, a new account will be created for them.
+
+- If a user logs in with an email address that is already registered, their account will be linked to the OAuth provider (if not already linked), regardless of the value of `OAUTH_AUTO_REGISTER`.
 
 /// warning | Security
 
@@ -49,7 +55,11 @@ Use [Allowed Domains](#allowed-domains) to restrict which users can log in.
 
 ### Allowed Domains
 
-To only allow users with an email address from a specific domain to log in, set the env var `OAUTH_ALLOWED_DOMAINS` to the allowed domain.
+To only allow users with an email address from a specific domain to log in, set the following environment variable to the allowed domain.
+
+| Env                     | Required | Default | Description           |
+| ----------------------- | -------- | ------- | --------------------- |
+| `OAUTH_ALLOWED_DOMAINS` | ✖️       | -       | Allowed email domains |
 
 You can allow multiple domains by separating them with a comma:
 
@@ -134,3 +144,23 @@ docker run --rm authelia/authelia:latest authelia crypto hash generate pbkdf2 --
 ### Generic OAuth
 
 Not currently supported
+
+### Disable Password Authentication
+
+To disable password-based authentication and only allow login via OAuth providers, set the following environment variable to `true`:
+
+| Env                     | Required | Default | Description                     |
+| ----------------------- | -------- | ------- | ------------------------------- |
+| `DISABLE_PASSWORD_AUTH` | ✖️       | `false` | Disable password authentication |
+
+When enabled:
+
+- Users will not be able to log in with a password
+
+/// warning | Access Recovery
+
+Before disabling password authentication, ensure that at least one OAuth provider is configured and that you have successfully linked an administrator account.
+
+If no login method is available, you will not be able to log in to the application and will need to reset the configuration to regain access.
+
+///

@@ -1,6 +1,13 @@
 import { UserLoginSchema } from '#db/repositories/user/types';
 
 export default defineEventHandler(async (event) => {
+  if (WG_ENV.DISABLE_PASSWORD_AUTH) {
+    throw createError({
+      statusCode: 403,
+      statusMessage: 'Password authentication is disabled',
+    });
+  }
+
   const { username, password, remember, totpCode } = await readValidatedBody(
     event,
     validateZod(UserLoginSchema, event)
