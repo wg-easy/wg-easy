@@ -33,12 +33,12 @@
     "@vueuse/nuxt": "^14.3.0",
     "apexcharts": "^5.13.0",
     "argon2": "^0.44.0",
-    "cidr-tools": "^12.0.1",
+    "cidr-tools": "^12.0.2",
     "citty": "^0.2.2",
     "consola": "^3.4.2",
     "crc-32": "^1.2.2",
     "drizzle-orm": "^0.45.2",
-    "ip-bigint": "^9.0.4",
+    "ip-bigint": "^9.0.5",
     "is-cidr": "^7.0.0",
     "is-ip": "^5.0.1",
     "js-sha256": "^0.11.1",
@@ -71,7 +71,7 @@
     "tsx": "^4.22.3",
     "typescript": "^6.0.3",
     "vitest": "^4.1.7",
-    "vue-tsc": "^3.3.1"
+    "vue-tsc": "^3.3.3"
   },
-  "packageManager": "pnpm@11.3.0"
+  "packageManager": "pnpm@11.5.0"
 }
