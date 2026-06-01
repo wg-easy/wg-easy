@@ -900,6 +900,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#disable-password-authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Disable Password Authentication
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2105,6 +2116,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#disable-password-authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Disable Password Authentication
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2185,16 +2207,59 @@
 <li><code>https://&lt;your-domain&gt;/api/auth/&lt;provider&gt;/</code></li>
 </ul>
 <h3 id="auto-register"><a class="toclink" href="#auto-register">Auto Register</a></h3>
-<p>To automatically register users that log in with an OAuth provider, set the env var <code>OAUTH_AUTO_REGISTER</code> to <code>true</code>.</p>
+<p>To automatically register users that log in with an OAuth provider, set the following environment variable to <code>true</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Env</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>OAUTH_AUTO_REGISTER</code></td>
+<td>✖️</td>
+<td><code>false</code></td>
+<td>Enable auto-registration</td>
+</tr>
+</tbody>
+</table>
+<p>When enabled:</p>
+<ul>
+<li>
 <p>If a user logs in with an email address that is not yet registered, a new account will be created for them.</p>
+</li>
+<li>
 <p>If a user logs in with an email address that is already registered, their account will be linked to the OAuth provider (if not already linked), regardless of the value of <code>OAUTH_AUTO_REGISTER</code>.</p>
+</li>
+</ul>
 <div class="admonition warning">
 <p class="admonition-title"> Security</p>
 <p>Users will be created with Admin Permissions, as the permissions system is not yet implemented. Only enable this if you trust all users that can log in with the OAuth provider.</p>
 <p>Use <a href="#allowed-domains">Allowed Domains</a> to restrict which users can log in.</p>
 </div>
 <h3 id="allowed-domains"><a class="toclink" href="#allowed-domains">Allowed Domains</a></h3>
-<p>To only allow users with an email address from a specific domain to log in, set the env var <code>OAUTH_ALLOWED_DOMAINS</code> to the allowed domain.</p>
+<p>To only allow users with an email address from a specific domain to log in, set the following environment variable to the allowed domain.</p>
+<table>
+<thead>
+<tr>
+<th>Env</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>OAUTH_ALLOWED_DOMAINS</code></td>
+<td>✖️</td>
+<td>-</td>
+<td>Allowed email domains</td>
+</tr>
+</tbody>
+</table>
 <p>You can allow multiple domains by separating them with a comma:</p>
 <p>e.g. <code>example.com,example.org</code></p>
 <h3 id="google"><a class="toclink" href="#google">Google</a></h3>
@@ -2330,6 +2395,35 @@ docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </
 </code></pre></div>
 <h3 id="generic-oauth"><a class="toclink" href="#generic-oauth">Generic OAuth</a></h3>
 <p>Not currently supported</p>
+<h3 id="disable-password-authentication"><a class="toclink" href="#disable-password-authentication">Disable Password Authentication</a></h3>
+<p>To disable password-based authentication and only allow login via OAuth providers, set the following environment variable to <code>true</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Env</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DISABLE_PASSWORD_AUTH</code></td>
+<td>✖️</td>
+<td><code>false</code></td>
+<td>Disable password authentication</td>
+</tr>
+</tbody>
+</table>
+<p>When enabled:</p>
+<ul>
+<li>Users will not be able to log in with a password</li>
+</ul>
+<div class="admonition warning">
+<p class="admonition-title">Access Recovery</p>
+<p>Before disabling password authentication, ensure that at least one OAuth provider is configured and that you have successfully linked an administrator account.</p>
+<p>If no login method is available, you will not be able to log in to the application and will need to reset the configuration to regain access.</p>
+</div>
 
 
 
