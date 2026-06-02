@@ -38,6 +38,7 @@ export const WG_ENV = {
   /** If IPv6 should be disabled */
   DISABLE_IPV6: process.env.DISABLE_IPV6 === 'true',
   WG_EXECUTABLE: await detectAwg(),
+  DISABLE_VERSION_CHECK: process.env.DISABLE_VERSION_CHECK === 'true'
 };
 
 export const WG_INITIAL_ENV = {
