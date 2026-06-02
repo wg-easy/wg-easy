@@ -317,10 +317,11 @@ async function disable2fa() {
 }
 
 const _unlinkOauth = useSubmit(
-  `/api/auth/unlink`,
-  {
-    method: 'post',
-  },
+  (data) =>
+    $fetch(`/api/auth/unlink`, {
+      method: 'post',
+      body: data,
+    }),
   {
     revert: async () => {
       return authStore.update();

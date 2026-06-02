@@ -29,5 +29,7 @@
 <script setup lang="ts">
 const route = useRoute();
 
-const loggedIn = computed(() => route.path !== '/login');
+const loggedIn = computed(
+  () => route.path !== '/login' && route.path !== '/login/2fa'
+);
 </script>
