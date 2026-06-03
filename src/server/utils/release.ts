@@ -7,7 +7,7 @@ async function fetchLatestRelease() {
   if (WG_ENV.DISABLE_VERSION_CHECK) {
     return {
       version: RELEASE,
-      changelog: ''
+      changelog: '',
     };
   }
 
