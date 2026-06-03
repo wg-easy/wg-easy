@@ -43,10 +43,11 @@ function createClient() {
 }
 
 const _createClient = useSubmit(
-  '/api/client',
-  {
-    method: 'post',
-  },
+  (data) =>
+    $fetch('/api/client', {
+      method: 'post',
+      body: data,
+    }),
   {
     revert: () => clientsStore.refresh(),
     successMsg: t('client.created'),

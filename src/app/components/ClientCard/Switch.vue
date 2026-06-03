@@ -18,10 +18,11 @@ const enabled = ref(props.client.enabled);
 const clientsStore = useClientsStore();
 
 const _disableClient = useSubmit(
-  `/api/client/${props.client.id}/disable`,
-  {
-    method: 'post',
-  },
+  (data) =>
+    $fetch(`/api/client/${props.client.id}/disable`, {
+      method: 'post',
+      body: data,
+    }),
   {
     revert: async () => {
       await clientsStore.refresh();
@@ -31,10 +32,11 @@ const _disableClient = useSubmit(
 );
 
 const _enableClient = useSubmit(
-  `/api/client/${props.client.id}/enable`,
-  {
-    method: 'post',
-  },
+  (data) =>
+    $fetch(`/api/client/${props.client.id}/enable`, {
+      method: 'post',
+      body: data,
+    }),
   {
     revert: async () => {
       await clientsStore.refresh();

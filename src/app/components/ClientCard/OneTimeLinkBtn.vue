@@ -14,10 +14,11 @@ const props = defineProps<{ client: LocalClient }>();
 const clientsStore = useClientsStore();
 
 const _showOneTimeLink = useSubmit(
-  `/api/client/${props.client.id}/generateOneTimeLink`,
-  {
-    method: 'post',
-  },
+  (data) =>
+    $fetch(`/api/client/${props.client.id}/generateOneTimeLink`, {
+      method: 'post',
+      body: data,
+    }),
   {
     revert: async () => {
       await clientsStore.refresh();

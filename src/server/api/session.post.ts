@@ -18,9 +18,9 @@ export default defineEventHandler(async (event) => {
           statusMessage: 'Invalid username or password',
         });
       case 'TOTP_REQUIRED':
-        return { status: 'TOTP_REQUIRED' };
+        return { status: 'TOTP_REQUIRED' as const };
       case 'INVALID_TOTP_CODE':
-        return { status: 'INVALID_TOTP_CODE' };
+        return { status: 'INVALID_TOTP_CODE' as const };
       case 'USER_DISABLED':
         throw createError({
           statusCode: 401,
@@ -47,5 +47,5 @@ export default defineEventHandler(async (event) => {
 
   SERVER_DEBUG(`New Session: ${data.id} for ${user.id} (${user.username})`);
 
-  return { status: 'success' };
+  return { status: 'success' as const };
 });

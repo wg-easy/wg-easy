@@ -50,10 +50,11 @@ const password = ref<string>('');
 const confirmPassword = ref<string>('');
 
 const _submit = useSubmit(
-  '/api/setup/2',
-  {
-    method: 'post',
-  },
+  (data) =>
+    $fetch('/api/setup/2', {
+      method: 'post',
+      body: data,
+    }),
   {
     revert: async (success) => {
       if (success) {

@@ -127,10 +127,11 @@ const name = ref(authStore.userData?.name);
 const email = ref(authStore.userData?.email);
 
 const _submit = useSubmit(
-  `/api/me`,
-  {
-    method: 'post',
-  },
+  (data) =>
+    $fetch(`/api/me`, {
+      method: 'post',
+      body: data,
+    }),
   {
     revert: () => {
       return authStore.update();
@@ -147,10 +148,11 @@ const newPassword = ref('');
 const confirmPassword = ref('');
 
 const _updatePassword = useSubmit(
-  `/api/me/password`,
-  {
-    method: 'post',
-  },
+  (data) =>
+    $fetch(`/api/me/password`, {
+      method: 'post',
+      body: data,
+    }),
   {
     revert: async () => {
       currentPassword.value = '';
@@ -171,10 +173,11 @@ function updatePassword() {
 const twofa = ref<{ key: string; qrcode: string } | null>(null);
 
 const _setup2fa = useSubmit(
-  `/api/me/totp`,
-  {
-    method: 'post',
-  },
+  (data) =>
+    $fetch(`/api/me/totp`, {
+      method: 'post',
+      body: data,
+    }),
   {
     revert: async (success, data) => {
       if (success && data?.type === 'setup') {
@@ -199,10 +202,11 @@ async function setup2fa() {
 const code = ref<string>('');
 
 const _enable2fa = useSubmit(
-  `/api/me/totp`,
-  {
-    method: 'post',
-  },
+  (data) =>
+    $fetch(`/api/me/totp`, {
+      method: 'post',
+      body: data,
+    }),
   {
     revert: async (success, data) => {
       if (success && data?.type === 'created') {
@@ -224,10 +228,11 @@ async function enable2fa() {
 const disable2faPassword = ref('');
 
 const _disable2fa = useSubmit(
-  `/api/me/totp`,
-  {
-    method: 'post',
-  },
+  (data) =>
+    $fetch(`/api/me/totp`, {
+      method: 'post',
+      body: data,
+    }),
   {
     revert: async (success, data) => {
       if (success && data?.type === 'deleted') {
