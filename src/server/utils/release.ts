@@ -4,6 +4,13 @@ type GithubRelease = {
 };
 
 async function fetchLatestRelease() {
+  if (WG_ENV.DISABLE_VERSION_CHECK) {
+    return {
+      version: RELEASE,
+      changelog: '',
+    };
+  }
+
   try {
     const response = await $fetch<GithubRelease>(
       'https://api.github.com/repos/wg-easy/wg-easy/releases/latest',
