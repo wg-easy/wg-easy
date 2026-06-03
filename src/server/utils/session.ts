@@ -70,21 +70,26 @@ export async function getCurrentUser(event: H3Event) {
       });
     }
 
+    // TODO: timing can be used to enumerate usernames
+
     const foundUser = await Database.users.getByUsername(username);
 
-    // Always verify password to prevent timing-based username enumeration
-    const userHashPassword =
-      foundUser?.password ??
-      '$argon2id$v=19$m=65536,t=3,p=4$aaaaaaaaaaaaaaaa$bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';
-    const passwordValid = await isPasswordValid(password, userHashPassword);
-
-    if (!foundUser || !passwordValid) {
+    if (!foundUser) {
       throw createError({
         statusCode: 401,
         statusMessage: 'Session failed',
       });
     }
 
+    const userHashPassword = foundUser.password;
+    const passwordValid = await isPasswordValid(password, userHashPassword);
+
+    if (!passwordValid) {
+      throw createError({
+        statusCode: 401,
+        statusMessage: 'Session failed',
+      });
+    }
     user = foundUser;
   } else {
     throw createError({
