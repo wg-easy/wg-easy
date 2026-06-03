@@ -40,10 +40,11 @@ const { data: _data, refresh } = await useFetch(`/api/admin/hooks`, {
 const data = toRef(_data.value);
 
 const _submit = useSubmit(
-  `/api/admin/hooks`,
-  {
-    method: 'post',
-  },
+  (data) =>
+    $fetch(`/api/admin/hooks`, {
+      method: 'post',
+      body: data,
+    }),
   { revert }
 );
 

@@ -225,10 +225,11 @@ const { data: _data, refresh } = await useFetch(`/api/client/${id}`, {
 const data = toRef(_data.value);
 
 const _submit = useSubmit(
-  `/api/client/${id}`,
-  {
-    method: 'post',
-  },
+  (data) =>
+    $fetch(`/api/client/${id}`, {
+      method: 'post',
+      body: data,
+    }),
   {
     revert: async (success) => {
       if (success) {
@@ -250,10 +251,11 @@ async function revert() {
 }
 
 const _deleteClient = useSubmit(
-  `/api/client/${id}`,
-  {
-    method: 'delete',
-  },
+  (data) =>
+    $fetch(`/api/client/${id}`, {
+      method: 'delete',
+      body: data,
+    }),
   {
     revert: async () => {
       await navigateTo('/');

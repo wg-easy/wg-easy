@@ -78,10 +78,11 @@ const totpRequired = ref(false);
 const totp = ref<string>('');
 
 const _submit = useSubmit(
-  '/api/session',
-  {
-    method: 'post',
-  },
+  (data) =>
+    $fetch('/api/session', {
+      method: 'post',
+      body: data,
+    }),
   {
     revert: async (success, data) => {
       if (success) {
