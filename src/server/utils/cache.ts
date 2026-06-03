@@ -6,7 +6,7 @@ type Opts = {
 };
 
 /**
- * Cache the result of a function for the given expiry time
+ * Cache the result of a function for the given expiry time in milliseconds
  */
 export function cacheFunction<T>(fn: () => T, { expiry }: Opts): () => T {
   let cache: { value: T; expiry: number } | null = null;
