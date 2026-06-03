@@ -58,6 +58,17 @@ export class UserService {
     this.#statements = createPreparedStatement(db);
   }
 
+  #createTotp(user: { username: string; totpKey: string }) {
+    return new TOTP({
+      issuer: 'wg-easy',
+      label: user.username,
+      algorithm: 'SHA1',
+      digits: 6,
+      period: 30,
+      secret: user.totpKey,
+    });
+  }
+
   async getAll() {
     return this.#statements.findAll.execute();
   }
@@ -156,22 +167,13 @@ export class UserService {
         if (!code) {
           return { success: false, error: 'TOTP_REQUIRED' };
         } else {
-          if (!txUser.totpKey) {
+          const totpKey = txUser.totpKey;
+          if (!totpKey) {
             return { success: false, error: 'UNEXPECTED_ERROR' };
           }
 
-          const totp = new TOTP({
-            issuer: 'wg-easy',
-            label: txUser.username,
-            algorithm: 'SHA1',
-            digits: 6,
-            period: 30,
-            secret: txUser.totpKey,
-          });
-
-          const valid = totp.validate({ token: code, window: 1 });
-
-          if (valid === null) {
+          const totp = this.#createTotp({ username: txUser.username, totpKey });
+          if (totp.validate({ token: code, window: 1 }) === null) {
             return { success: false, error: 'INVALID_TOTP_CODE' };
           }
         }
@@ -195,22 +197,13 @@ export class UserService {
         throw new Error('User not found');
       }
 
-      if (!txUser.totpKey) {
+      const totpKey = txUser.totpKey;
+      if (!totpKey) {
         throw new Error('TOTP key is not set');
       }
 
-      const totp = new TOTP({
-        issuer: 'wg-easy',
-        label: txUser.username,
-        algorithm: 'SHA1',
-        digits: 6,
-        period: 30,
-        secret: txUser.totpKey,
-      });
-
-      const valid = totp.validate({ token: code, window: 1 });
-
-      if (valid === null) {
+      const totp = this.#createTotp({ username: txUser.username, totpKey });
+      if (totp.validate({ token: code, window: 1 }) === null) {
         throw new Error('Invalid TOTP code');
       }
 
