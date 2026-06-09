@@ -30,6 +30,11 @@ const detectAwg = async (): Promise<'awg' | 'wg'> => {
   } else return 'wg';
 };
 
+const oauthProviders = process.env.OAUTH_PROVIDERS?.split(',')
+  .map((v) => v.trim())
+  .filter((v) => isValidOauthProvider(v))
+  .filter((v) => isConfiguredOauthProvider(OAUTH_PROVIDERS[v]));
+
 export const WG_ENV = {
   /** UI is hosted on HTTP instead of HTTPS */
   INSECURE: process.env.INSECURE === 'true',
@@ -40,16 +45,16 @@ export const WG_ENV = {
   WG_EXECUTABLE: await detectAwg(),
   DISABLE_VERSION_CHECK: process.env.DISABLE_VERSION_CHECK === 'true',
   /** List of enabled OAuth providers */
-  OAUTH_PROVIDERS: process.env.OAUTH_PROVIDERS?.split(',')
-    .map((v) => v.trim())
-    .filter((v) => isValidOauthProvider(v))
-    .filter((v) => isConfiguredOauthProvider(OAUTH_PROVIDERS[v])),
+  OAUTH_PROVIDERS: oauthProviders,
   /** List of allowed OAuth domains */
   OAUTH_ALLOWED_DOMAINS: process.env.OAUTH_ALLOWED_DOMAINS?.split(',').map(
     (v) => v.trim()
   ),
   /** Automatically register users that log in with an OAuth provider */
   OAUTH_AUTO_REGISTER: process.env.OAUTH_AUTO_REGISTER === 'true',
+  /** Which OAuth provider to automatically launch */
+  OAUTH_AUTO_LAUNCH:
+    oauthProviders?.find((p) => p === process.env.OAUTH_AUTO_LAUNCH) ?? null,
   /** Disable password authentication */
   DISABLE_PASSWORD_AUTH: process.env.DISABLE_PASSWORD_AUTH === 'true',
 };
@@ -60,6 +65,7 @@ Enabled OAuth providers: ${WG_ENV.OAUTH_PROVIDERS.join(', ')}
 Allowed OAuth domains: ${WG_ENV.OAUTH_ALLOWED_DOMAINS?.join(', ') ?? 'All'}
 OAuth auto register: ${WG_ENV.OAUTH_AUTO_REGISTER ? 'Enabled' : 'Disabled'}
 Password authentication: ${WG_ENV.DISABLE_PASSWORD_AUTH ? 'Disabled' : 'Enabled'}
+Auto launch OAuth provider: ${WG_ENV.OAUTH_AUTO_LAUNCH ?? 'None'}
 `);
 }
 

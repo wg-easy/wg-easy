@@ -4,7 +4,7 @@ title: External Authentication
 
 ## OAuth
 
-### Providers
+### Setup
 
 To enable OAuth set the env var `OAUTH_PROVIDERS` to any of the following providers:
 
@@ -65,28 +65,44 @@ You can allow multiple domains by separating them with a comma:
 
 e.g. `example.com,example.org`
 
-### Google
+### Auto Launch
+
+To automatically launch the OAuth login flow when visiting the login page, set the following environment variable to the provider you want to launch:
+
+| Env                 | Required | Default | Description                   |
+| ------------------- | -------- | ------- | ----------------------------- |
+| `OAUTH_AUTO_LAUNCH` | ✖️       | -       | Auto launch an OAuth provider |
+
+When enabled:
+
+- Visiting the login page will automatically redirect to the selected provider's login page
+- The user can still access the normal login page by visiting `/login?auto_launch=false`
+- You can auto launch any provider by visiting `/login?auto_launch=<provider>`
+
+#### Provider Configuration
+
+#### Google
 
 | Env                          | Required | Description          |
 | ---------------------------- | -------- | -------------------- |
 | `OAUTH_GOOGLE_CLIENT_ID`     | ✔️       | Google Client ID     |
 | `OAUTH_GOOGLE_CLIENT_SECRET` | ✔️       | Google Client Secret |
 
-#### Setup
+##### Setup
 
 1. Go to [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
 2. Create an OAuth 2.0 Client ID (Web application)
 3. Add Authorized redirect URI: See [Redirect URIs](#redirect-uris)
 4. Copy the Client ID and Client Secret to the environment variables
 
-### GitHub
+#### GitHub
 
 | Env                          | Required | Description          |
 | ---------------------------- | -------- | -------------------- |
 | `OAUTH_GITHUB_CLIENT_ID`     | ✔️       | GitHub Client ID     |
 | `OAUTH_GITHUB_CLIENT_SECRET` | ✔️       | GitHub Client Secret |
 
-#### Setup
+##### Setup
 
 1. Go to [GitHub Developer Settings](https://github.com/settings/developers)
 2. Create a new OAuth App
@@ -94,7 +110,7 @@ e.g. `example.com,example.org`
 4. Create a new client secret
 5. Copy the Client ID and Client Secret to the environment variables
 
-### Generic OIDC
+#### Generic OIDC
 
 This supports generic OIDC providers like Authelia, Authentik, etc.
 
@@ -113,7 +129,7 @@ The provider needs to be available with HTTPS and have a valid certificate.
 | `OAUTH_OIDC_CLIENT_SECRET` | ✔️       | -       | -                          | OIDC Client Secret |
 | `OAUTH_OIDC_NAME`          | ✖️       | OIDC    | `Authelia`                 | Provider Name      |
 
-#### Authelia Setup
+##### Authelia Setup
 
 Generate Client ID and Secret:
 
@@ -141,11 +157,11 @@ docker run --rm authelia/authelia:latest authelia crypto hash generate pbkdf2 --
   token_endpoint_auth_method: client_secret_post
 ```
 
-### Generic OAuth
+#### Generic OAuth
 
 Not currently supported
 
-### Disable Password Authentication
+#### Disable Password Authentication
 
 To disable password-based authentication and only allow login via OAuth providers, set the following environment variable to `true`:
 

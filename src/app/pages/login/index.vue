@@ -69,6 +69,7 @@
 <script setup lang="ts">
 const toast = useToast();
 const { t } = useI18n();
+const route = useRoute();
 
 const authenticating = ref(false);
 const remember = ref(false);
@@ -76,6 +77,29 @@ const username = ref<string>('');
 const password = ref<string>('');
 
 const { data: authMethods } = await useFetch('/api/auth/methods');
+
+watchEffect(() => {
+  const autoLauchQuery =
+    typeof route.query.auto_launch === 'string' && !!route.query.auto_launch
+      ? route.query.auto_launch
+      : undefined;
+
+  if (authMethods.value?.autoLaunchProvider && !autoLauchQuery) {
+    navigateTo(`/api/auth/${authMethods.value.autoLaunchProvider}`, {
+      external: true,
+    });
+  }
+
+  if (
+    autoLauchQuery &&
+    autoLauchQuery !== 'false' &&
+    authMethods.value?.providers?.[autoLauchQuery as OAUTH_PROVIDER]
+  ) {
+    navigateTo(`/api/auth/${autoLauchQuery}`, {
+      external: true,
+    });
+  }
+});
 
 const _submit = useSubmit(
   (data) =>
