@@ -3,6 +3,12 @@ import type { UserType } from '#db/repositories/user/types';
 
 export type WGSession = Partial<{
   userId: ID;
+  // TODO: add pending login expiration
+  pendingLogin: {
+    type: 'password' | 'oauth';
+    userId: ID;
+    remember: boolean;
+  };
   oauth_verifier: string;
   oauth_nonce: string;
   oauth_state: string;

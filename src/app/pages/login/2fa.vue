@@ -35,18 +35,20 @@
 <script setup lang="ts">
 const toast = useToast();
 const { t } = useI18n();
-const loginStore = useLoginStore();
 
 const authenticating = ref(false);
 const totp = ref<string>('');
 
-if (!loginStore.hasPendingLogin) {
-  await navigateTo('/login');
-}
+const { error } = await useFetch('/api/auth/pending');
+watchEffect(() => {
+  if (error.value) {
+    navigateTo('/login');
+  }
+});
 
 const _submit = useSubmit(
   (data) =>
-    $fetch('/api/auth/password', {
+    $fetch('/api/auth/verify-2fa', {
       method: 'post',
       body: data,
     }),
@@ -54,23 +56,14 @@ const _submit = useSubmit(
     revert: async (success, data) => {
       if (success) {
         if (data?.status === 'success') {
-          loginStore.clearPendingLogin();
           await navigateTo('/');
+          return;
         } else if (data?.status === 'INVALID_TOTP_CODE') {
           authenticating.value = false;
           totp.value = '';
           toast.showToast({
             title: t('general.2fa'),
             message: t('login.2faWrong'),
-            type: 'error',
-          });
-          return;
-        } else if (data?.status === 'TOTP_REQUIRED') {
-          authenticating.value = false;
-          totp.value = '';
-          toast.showToast({
-            title: t('general.2fa'),
-            message: t('login.2faRequired'),
             type: 'error',
           });
           return;
@@ -83,24 +76,27 @@ const _submit = useSubmit(
 );
 
 async function submit() {
-  const challenge = loginStore.pendingChallenge;
-
-  if (!challenge || !totp.value || authenticating.value) return;
+  if (!totp.value || authenticating.value) return;
 
   authenticating.value = true;
-
-  if (challenge.type === 'password') {
-    return _submit({
-      username: challenge.username,
-      password: challenge.password,
-      remember: challenge.remember,
-      totpCode: totp.value,
-    });
-  }
+  return _submit({ totpCode: totp.value });
 }
 
+const _cancel = useSubmit(
+  (data) =>
+    $fetch('/api/auth/cancel', {
+      method: 'post',
+      body: data,
+    }),
+  {
+    revert: async () => {
+      await navigateTo('/login');
+    },
+    noSuccessToast: true,
+  }
+);
+
 async function cancel() {
-  loginStore.clearPendingLogin();
-  await navigateTo('/login');
+  return _cancel({});
 }
 </script>

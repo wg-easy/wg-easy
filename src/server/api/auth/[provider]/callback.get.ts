@@ -34,6 +34,18 @@ export default defineEventHandler(async (event) => {
 
   if (!result.success) {
     switch (result.error) {
+      case 'TOTP_REQUIRED':
+        await session.update({
+          pendingLogin: {
+            type: 'oauth',
+            userId: result.userId,
+            remember: false,
+          },
+          oauth_nonce: undefined,
+          oauth_state: undefined,
+          oauth_verifier: undefined,
+        });
+        return sendRedirect(event, '/login/2fa');
       case 'USER_DISABLED':
         throw createError({
           statusCode: 401,
@@ -56,7 +68,7 @@ export default defineEventHandler(async (event) => {
           statusMessage: 'Unexpected error',
         });
     }
-    assertUnreachable(result.error);
+    assertUnreachable(result);
   }
 
   // Create session

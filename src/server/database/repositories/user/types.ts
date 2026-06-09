@@ -25,7 +25,6 @@ export const UserLoginSchema = z.object({
   username: username,
   password: password,
   remember: remember,
-  totpCode: totpCode.optional(),
 });
 
 export const UserSetupSchema = z

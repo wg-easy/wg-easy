@@ -13,10 +13,14 @@ type LoginResult =
       success: false;
       error:
         | 'INCORRECT_CREDENTIALS'
-        | 'TOTP_REQUIRED'
         | 'USER_DISABLED'
         | 'INVALID_TOTP_CODE'
         | 'UNEXPECTED_ERROR';
+    }
+  | {
+      success: false;
+      error: 'TOTP_REQUIRED';
+      userId: ID;
     };
 
 type LoginWithOAuthResult =
@@ -31,6 +35,11 @@ type LoginWithOAuthResult =
         | 'USER_ALREADY_LINKED'
         | 'UNEXPECTED_ERROR'
         | 'AUTO_REGISTER_DISABLED';
+    }
+  | {
+      success: false;
+      error: 'TOTP_REQUIRED';
+      userId: ID;
     };
 
 function createPreparedStatement(db: DBType) {
@@ -172,7 +181,7 @@ export class UserService {
     return this.#statements.updateKey.execute({ id, key });
   }
 
-  login(username: string, password: string, code: string | undefined) {
+  login(username: string, password: string) {
     return this.#db.transaction(async (tx): Promise<LoginResult> => {
       const txUser = await tx.query.user
         .findFirst({ where: eq(user.username, username) })
@@ -187,19 +196,11 @@ export class UserService {
       }
 
       if (txUser.totpVerified) {
-        if (!code) {
-          return { success: false, error: 'TOTP_REQUIRED' };
-        } else {
-          const totpKey = txUser.totpKey;
-          if (!totpKey) {
-            return { success: false, error: 'UNEXPECTED_ERROR' };
-          }
-
-          const totp = this.#createTotp({ username: txUser.username, totpKey });
-          if (totp.validate({ token: code, window: 1 }) === null) {
-            return { success: false, error: 'INVALID_TOTP_CODE' };
-          }
-        }
+        return {
+          success: false,
+          error: 'TOTP_REQUIRED',
+          userId: txUser.id,
+        };
       }
 
       if (!txUser.enabled) {
@@ -265,6 +266,22 @@ export class UserService {
     });
   }
 
+  async validateTotpCode(id: ID, code: string) {
+    const txUser = await this.#db.query.user
+      .findFirst({ where: eq(user.id, id) })
+      .execute();
+
+    if (!txUser || !txUser.totpVerified || !txUser.totpKey) {
+      return false;
+    }
+
+    const totp = this.#createTotp({
+      username: txUser.username,
+      totpKey: txUser.totpKey,
+    });
+    return totp.validate({ token: code, window: 1 }) !== null;
+  }
+
   /**
    * Login or register user with OAuth provider.
    * If user with the same email already exists, link account with OAuth provider.
@@ -288,6 +305,13 @@ export class UserService {
         .execute();
 
       if (userById) {
+        if (userById.totpVerified) {
+          return {
+            success: false,
+            error: 'TOTP_REQUIRED',
+            userId: userById.id,
+          };
+        }
         if (!userById.enabled) {
           return { success: false, error: 'USER_DISABLED' };
         }
@@ -316,6 +340,14 @@ export class UserService {
           .set({ oauthProvider: provider, oauthId: oauthId })
           .where(eq(user.id, userByEmail.id))
           .execute();
+
+        if (userByEmail.totpVerified) {
+          return {
+            success: false,
+            error: 'TOTP_REQUIRED',
+            userId: userByEmail.id,
+          };
+        }
 
         // TODO: return updated user
         return { success: true, user: userByEmail };

@@ -69,7 +69,6 @@
 <script setup lang="ts">
 const toast = useToast();
 const { t } = useI18n();
-const loginStore = useLoginStore();
 
 const authenticating = ref(false);
 const remember = ref(false);
@@ -88,15 +87,9 @@ const _submit = useSubmit(
     revert: async (success, data) => {
       if (success) {
         if (data?.status === 'success') {
-          loginStore.clearPendingLogin();
           await navigateTo('/');
         } else if (data?.status === 'TOTP_REQUIRED') {
           authenticating.value = false;
-          loginStore.setPendingPasswordLogin(
-            username.value,
-            password.value,
-            remember.value
-          );
           await navigateTo('/login/2fa');
           return;
         } else if (data?.status === 'INVALID_TOTP_CODE') {

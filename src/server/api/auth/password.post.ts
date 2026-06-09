@@ -8,12 +8,14 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const { username, password, remember, totpCode } = await readValidatedBody(
+  const { username, password, remember } = await readValidatedBody(
     event,
     validateZod(UserLoginSchema, event)
   );
 
-  const result = await Database.users.login(username, password, totpCode);
+  const result = await Database.users.login(username, password);
+
+  const session = await useWGSession(event, remember);
 
   // TODO: add localization support
 
@@ -25,6 +27,13 @@ export default defineEventHandler(async (event) => {
           statusMessage: 'Invalid username or password',
         });
       case 'TOTP_REQUIRED':
+        await session.update({
+          pendingLogin: {
+            type: 'password',
+            userId: result.userId,
+            remember,
+          },
+        });
         return { status: 'TOTP_REQUIRED' as const };
       case 'INVALID_TOTP_CODE':
         return { status: 'INVALID_TOTP_CODE' as const };
@@ -39,12 +48,10 @@ export default defineEventHandler(async (event) => {
           statusMessage: 'Unexpected error',
         });
     }
-    assertUnreachable(result.error);
+    assertUnreachable(result);
   }
 
   const user = result.user;
-
-  const session = await useWGSession(event, remember);
 
   const data = await session.update({
     userId: user.id,
