@@ -159,6 +159,7 @@
                   v-for="(info, provider) in authMethods.providers"
                   :key="provider"
                   class="flex items-center gap-2 p-2"
+                  as="a"
                   :href="`/api/auth/${provider}?link=true`"
                 >
                   <IconsBrandsProvider :provider="provider" class="h-4 w-4" />

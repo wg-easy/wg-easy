@@ -40,11 +40,9 @@ const authenticating = ref(false);
 const totp = ref<string>('');
 
 const { error } = await useFetch('/api/auth/pending');
-watchEffect(() => {
-  if (error.value) {
-    navigateTo('/login');
-  }
-});
+if (error.value) {
+  await navigateTo('/login');
+}
 
 const _submit = useSubmit(
   (data) =>

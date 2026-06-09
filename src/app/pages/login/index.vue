@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="flex flex-col gap-5">
     <div
       v-if="authMethods && authMethods.oauthEnabled"
       class="flex flex-col gap-5"
