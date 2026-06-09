@@ -18,19 +18,6 @@ You can enable multiple providers by separating them with a comma:
 
 e.g. `google,github`
 
-### Redirect URIs
-
-You have to configure the following redirect URIs in your OAuth provider:
-
-- `https://<your-domain>/api/auth/<provider>/callback`
-  Used to log in to with the provider
-- `https://<your-domain>/api/auth/<provider>/link`
-  Used to link an existing account to the provider
-
-If your provider does not support multiple redirect URIs (e.g. GitHub) but allows multiple URIs under the same base, then configure:
-
-- `https://<your-domain>/api/auth/<provider>/`
-
 ### Auto Register
 
 To automatically register users that log in with an OAuth provider, set the following environment variable to `true`:
@@ -79,7 +66,20 @@ When enabled:
 - The user can still access the normal login page by visiting `/login?auto_launch=false`
 - You can auto launch any provider by visiting `/login?auto_launch=<provider>`
 
-#### Provider Configuration
+### Redirect URIs
+
+You have to configure the following redirect URIs in your OAuth provider:
+
+- `https://<your-domain>/api/auth/<provider>/callback`
+  Used to log in to with the provider
+- `https://<your-domain>/api/auth/<provider>/link`
+  Used to link an existing account to the provider
+
+If your provider does not support multiple redirect URIs (e.g. GitHub) but allows multiple URIs under the same base, then configure:
+
+- `https://<your-domain>/api/auth/<provider>/`
+
+### Provider Configuration
 
 #### Google
 
@@ -88,7 +88,7 @@ When enabled:
 | `OAUTH_GOOGLE_CLIENT_ID`     | ✔️       | Google Client ID     |
 | `OAUTH_GOOGLE_CLIENT_SECRET` | ✔️       | Google Client Secret |
 
-##### Setup
+<h5>Setup</h5>
 
 1. Go to [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
 2. Create an OAuth 2.0 Client ID (Web application)
@@ -102,7 +102,7 @@ When enabled:
 | `OAUTH_GITHUB_CLIENT_ID`     | ✔️       | GitHub Client ID     |
 | `OAUTH_GITHUB_CLIENT_SECRET` | ✔️       | GitHub Client Secret |
 
-##### Setup
+<h5>Setup</h5>
 
 1. Go to [GitHub Developer Settings](https://github.com/settings/developers)
 2. Create a new OAuth App
@@ -161,7 +161,7 @@ docker run --rm authelia/authelia:latest authelia crypto hash generate pbkdf2 --
 
 Not currently supported
 
-#### Disable Password Authentication
+### Disable Password Authentication
 
 To disable password-based authentication and only allow login via OAuth providers, set the following environment variable to `true`:
 
