@@ -1,7 +1,7 @@
 export default defineEventHandler(async (event) => {
   const session = await useWGSession(event);
 
-  if (!session.data.userId) {
+  if (!session.data.userId || session.data.pendingLogin) {
     // not logged in
     throw createError({
       statusCode: 401,
@@ -14,6 +14,12 @@ export default defineEventHandler(async (event) => {
     throw createError({
       statusCode: 404,
       statusMessage: 'Not found in Database',
+    });
+  }
+  if (!user.enabled) {
+    throw createError({
+      statusCode: 403,
+      statusMessage: 'User is disabled',
     });
   }
 

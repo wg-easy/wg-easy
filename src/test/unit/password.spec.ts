@@ -17,4 +17,8 @@ describe('password', () => {
 
     expect(isValidPasswordHash(hash.replace('argon2', 'argon3'))).toBe(false);
   });
+
+  test('missing password hash is never valid', async () => {
+    await expect(isPasswordValid('password', null)).resolves.toBe(false);
+  });
 });

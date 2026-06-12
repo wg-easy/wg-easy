@@ -195,16 +195,16 @@ export class UserService {
         return { success: false, error: 'INCORRECT_CREDENTIALS' };
       }
 
+      if (!txUser.enabled) {
+        return { success: false, error: 'USER_DISABLED' };
+      }
+
       if (txUser.totpVerified) {
         return {
           success: false,
           error: 'TOTP_REQUIRED',
           userId: txUser.id,
         };
-      }
-
-      if (!txUser.enabled) {
-        return { success: false, error: 'USER_DISABLED' };
       }
 
       return { success: true, user: txUser };
@@ -272,14 +272,24 @@ export class UserService {
       .execute();
 
     if (!txUser || !txUser.totpVerified || !txUser.totpKey) {
-      return false;
+      return 'INVALID_TOTP_CODE' as const;
     }
 
     const totp = this.#createTotp({
       username: txUser.username,
       totpKey: txUser.totpKey,
     });
-    return totp.validate({ token: code, window: 1 }) !== null;
+    const isValid = totp.validate({ token: code, window: 1 }) !== null;
+
+    if (!isValid) {
+      return 'INVALID_TOTP_CODE' as const;
+    }
+
+    if (!txUser.enabled) {
+      return 'USER_DISABLED' as const;
+    }
+
+    return 'success' as const;
   }
 
   /**
@@ -305,15 +315,15 @@ export class UserService {
         .execute();
 
       if (userById) {
+        if (!userById.enabled) {
+          return { success: false, error: 'USER_DISABLED' };
+        }
         if (userById.totpVerified) {
           return {
             success: false,
             error: 'TOTP_REQUIRED',
             userId: userById.id,
           };
-        }
-        if (!userById.enabled) {
-          return { success: false, error: 'USER_DISABLED' };
         }
         return { success: true, user: userById };
       }

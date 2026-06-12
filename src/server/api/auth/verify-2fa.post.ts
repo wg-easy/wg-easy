@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
     event,
     validateZod(Verify2faSchema, event)
   );
-  const session = await useWGSession(event, false);
+  const session = await useWGSession(event);
 
   const pendingLogin = session.data.pendingLogin;
   if (!pendingLogin) {
@@ -19,13 +19,23 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const isValid = await Database.users.validateTotpCode(
+  const totpStatus = await Database.users.validateTotpCode(
     pendingLogin.userId,
     totpCode
   );
 
-  if (!isValid) {
-    return { status: 'INVALID_TOTP_CODE' as const };
+  switch (totpStatus) {
+    case 'INVALID_TOTP_CODE':
+      return { status: 'INVALID_TOTP_CODE' as const };
+    case 'USER_DISABLED':
+      throw createError({
+        statusCode: 401,
+        statusMessage: 'User disabled',
+      });
+    case 'success':
+      break;
+    default:
+      assertUnreachable(totpStatus);
   }
 
   await session.update({

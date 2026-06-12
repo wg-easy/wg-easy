@@ -144,7 +144,10 @@ export function hasPermissionsWithData<Resource extends keyof Permissions>(
       const isAllowed = hasPermissions(user, resource, action, data);
 
       if (!isAllowed) {
-        throw new Error('Permission denied');
+        throw createError({
+          statusCode: 403,
+          statusMessage: 'Permission denied',
+        });
       }
 
       return isAllowed;
