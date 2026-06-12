@@ -49,7 +49,7 @@ export async function getCurrentUser(event: H3Event) {
 
   const authorization = getHeader(event, 'Authorization');
 
-  let user: UserType | undefined = undefined;
+  let user: UserType | undefined;
   if (session.data.userId) {
     // Handle if authenticating using Session
     user = await Database.users.get(session.data.userId);
