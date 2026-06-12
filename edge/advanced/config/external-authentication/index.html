@@ -12,31 +12,31 @@
         <meta name="author" content="WireGuard Easy">
       
       
-        <link rel="canonical" href="https://wg-easy.github.io/wg-easy/edge/advanced/api/">
+        <link rel="canonical" href="https://wg-easy.github.io/wg-easy/edge/advanced/config/external-authentication/">
       
       
-        <link rel="prev" href="../../getting-started/">
+        <link rel="prev" href="../experimental-config/">
       
       
-        <link rel="next" href="../config/amnezia/">
+        <link rel="next" href="../optional-config/">
       
       
         
       
       
-      <link rel="icon" href="../../assets/logo/favicon.png">
+      <link rel="icon" href="../../../assets/logo/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
-        <title>API - wg-easy</title>
+        <title>External Authentication - wg-easy</title>
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
       
         
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -55,7 +55,7 @@
       
     
     
-    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#authentication" class="md-skip">
+        <a href="#oauth" class="md-skip">
           Skip to content
         </a>
       
@@ -98,9 +98,9 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../.." title="wg-easy" class="md-header__button md-logo" aria-label="wg-easy" data-md-component="logo">
+    <a href="../../.." title="wg-easy" class="md-header__button md-logo" aria-label="wg-easy" data-md-component="logo">
       
-  <img src="../../assets/logo/logo.png" alt="logo">
+  <img src="../../../assets/logo/logo.png" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -117,7 +117,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              API
+              External Authentication
             
           </span>
         </div>
@@ -228,7 +228,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../.." class="md-tabs__link">
+      <a href="../../.." class="md-tabs__link">
         
   
   
@@ -247,7 +247,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../faq/" class="md-tabs__link">
+      <a href="../../../faq/" class="md-tabs__link">
         
   
   
@@ -266,7 +266,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../getting-started/" class="md-tabs__link">
+      <a href="../../../getting-started/" class="md-tabs__link">
         
   
   
@@ -289,7 +289,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="./" class="md-tabs__link">
+        <a href="../../api/" class="md-tabs__link">
           
   
   
@@ -309,7 +309,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../contributing/general/" class="md-tabs__link">
+        <a href="../../../contributing/general/" class="md-tabs__link">
           
   
   
@@ -336,7 +336,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../examples/tutorials/adguard/" class="md-tabs__link">
+        <a href="../../../examples/tutorials/adguard/" class="md-tabs__link">
           
   
   
@@ -359,7 +359,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../guides/2fa/" class="md-tabs__link">
+        <a href="../../../guides/2fa/" class="md-tabs__link">
           
   
   
@@ -393,9 +393,9 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../.." title="wg-easy" class="md-nav__button md-logo" aria-label="wg-easy" data-md-component="logo">
+    <a href="../../.." title="wg-easy" class="md-nav__button md-logo" aria-label="wg-easy" data-md-component="logo">
       
-  <img src="../../assets/logo/logo.png" alt="logo">
+  <img src="../../../assets/logo/logo.png" alt="logo">
 
     </a>
     wg-easy
@@ -422,7 +422,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../.." class="md-nav__link">
+      <a href="../../.." class="md-nav__link">
         
   
   
@@ -449,7 +449,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../faq/" class="md-nav__link">
+      <a href="../../../faq/" class="md-nav__link">
         
   
   
@@ -476,7 +476,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../getting-started/" class="md-nav__link">
+      <a href="../../../getting-started/" class="md-nav__link">
         
   
   
@@ -555,35 +555,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    API
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../api/" class="md-nav__link">
         
   
   
@@ -599,80 +574,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#authentication" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Authentication
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Authentication">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#authentication-example" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Authentication Example
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#endpoints" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Endpoints
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Endpoints">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#endpoints-example" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Endpoints Example
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -682,8 +583,10 @@
                 
   
   
+    
   
   
+  
     
     
     
@@ -692,13 +595,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_2" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_2" checked>
         
           
           <label class="md-nav__link" for="__nav_4_2" id="__nav_4_2_label" tabindex="0">
@@ -719,7 +620,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_2_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_2_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_4_2">
             <span class="md-nav__icon md-icon"></span>
             
@@ -737,7 +638,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../config/amnezia/" class="md-nav__link">
+      <a href="../amnezia/" class="md-nav__link">
         
   
   
@@ -765,7 +666,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../config/experimental-config/" class="md-nav__link">
+      <a href="../experimental-config/" class="md-nav__link">
         
   
   
@@ -790,10 +691,35 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../config/external-authentication/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    External Authentication
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -809,6 +735,185 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#oauth" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OAuth
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="OAuth">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#auto-register" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Auto Register
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#allowed-domains" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Allowed Domains
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#auto-launch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Auto Launch
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#redirect-uris" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Redirect URIs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#provider-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Provider Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Provider Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#google" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Google
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#github" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GitHub
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#generic-oidc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Generic OIDC
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Generic OIDC">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#authelia-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Authelia Setup
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#generic-oauth" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Generic OAuth
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#disable-password-authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Disable Password Authentication
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -821,7 +926,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../config/optional-config/" class="md-nav__link">
+      <a href="../optional-config/" class="md-nav__link">
         
   
   
@@ -849,7 +954,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../config/unattended-setup/" class="md-nav__link">
+      <a href="../unattended-setup/" class="md-nav__link">
         
   
   
@@ -937,7 +1042,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../metrics/prometheus/" class="md-nav__link">
+      <a href="../../metrics/prometheus/" class="md-nav__link">
         
   
   
@@ -1025,7 +1130,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../migrate/" class="md-nav__link">
+      <a href="../../migrate/" class="md-nav__link">
         
   
   
@@ -1053,7 +1158,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../migrate/from-14-to-15/" class="md-nav__link">
+      <a href="../../migrate/from-14-to-15/" class="md-nav__link">
         
   
   
@@ -1148,7 +1253,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../contributing/general/" class="md-nav__link">
+      <a href="../../../contributing/general/" class="md-nav__link">
         
   
   
@@ -1176,7 +1281,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../contributing/issues-and-pull-requests/" class="md-nav__link">
+      <a href="../../../contributing/issues-and-pull-requests/" class="md-nav__link">
         
   
   
@@ -1204,7 +1309,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../contributing/translation/" class="md-nav__link">
+      <a href="../../../contributing/translation/" class="md-nav__link">
         
   
   
@@ -1343,7 +1448,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/tutorials/adguard/" class="md-nav__link">
+      <a href="../../../examples/tutorials/adguard/" class="md-nav__link">
         
   
   
@@ -1371,7 +1476,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/tutorials/auto-updates/" class="md-nav__link">
+      <a href="../../../examples/tutorials/auto-updates/" class="md-nav__link">
         
   
   
@@ -1399,7 +1504,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/tutorials/basic-installation/" class="md-nav__link">
+      <a href="../../../examples/tutorials/basic-installation/" class="md-nav__link">
         
   
   
@@ -1427,7 +1532,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/tutorials/caddy/" class="md-nav__link">
+      <a href="../../../examples/tutorials/caddy/" class="md-nav__link">
         
   
   
@@ -1455,7 +1560,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/tutorials/docker-run/" class="md-nav__link">
+      <a href="../../../examples/tutorials/docker-run/" class="md-nav__link">
         
   
   
@@ -1483,7 +1588,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/tutorials/dockerless/" class="md-nav__link">
+      <a href="../../../examples/tutorials/dockerless/" class="md-nav__link">
         
   
   
@@ -1511,7 +1616,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/tutorials/podman-nft/" class="md-nav__link">
+      <a href="../../../examples/tutorials/podman-nft/" class="md-nav__link">
         
   
   
@@ -1539,7 +1644,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/tutorials/reverse-proxyless/" class="md-nav__link">
+      <a href="../../../examples/tutorials/reverse-proxyless/" class="md-nav__link">
         
   
   
@@ -1567,7 +1672,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/tutorials/routed/" class="md-nav__link">
+      <a href="../../../examples/tutorials/routed/" class="md-nav__link">
         
   
   
@@ -1595,7 +1700,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/tutorials/traefik/" class="md-nav__link">
+      <a href="../../../examples/tutorials/traefik/" class="md-nav__link">
         
   
   
@@ -1690,7 +1795,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../guides/2fa/" class="md-nav__link">
+      <a href="../../../guides/2fa/" class="md-nav__link">
         
   
   
@@ -1718,7 +1823,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../guides/admin/" class="md-nav__link">
+      <a href="../../../guides/admin/" class="md-nav__link">
         
   
   
@@ -1746,7 +1851,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../guides/cli/" class="md-nav__link">
+      <a href="../../../guides/cli/" class="md-nav__link">
         
   
   
@@ -1774,7 +1879,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../guides/clients/" class="md-nav__link">
+      <a href="../../../guides/clients/" class="md-nav__link">
         
   
   
@@ -1802,7 +1907,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../guides/setup/" class="md-nav__link">
+      <a href="../../../guides/setup/" class="md-nav__link">
         
   
   
@@ -1855,22 +1960,123 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#authentication" class="md-nav__link">
+  <a href="#oauth" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Authentication
+        OAuth
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Authentication">
+    <nav class="md-nav" aria-label="OAuth">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#authentication-example" class="md-nav__link">
+  <a href="#setup" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Authentication Example
+        Setup
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#auto-register" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Auto Register
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#allowed-domains" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Allowed Domains
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#auto-launch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Auto Launch
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#redirect-uris" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Redirect URIs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#provider-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Provider Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Provider Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#google" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Google
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#github" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GitHub
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#generic-oidc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Generic OIDC
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Generic OIDC">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#authelia-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Authelia Setup
       
     </span>
   </a>
@@ -1881,24 +2087,28 @@
     </nav>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#endpoints" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#generic-oauth" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Endpoints
+        Generic OAuth
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Endpoints">
-      <ul class="md-nav__list">
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
         
           <li class="md-nav__item">
-  <a href="#endpoints-example" class="md-nav__link">
+  <a href="#disable-password-authentication" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Endpoints Example
+        Disable Password Authentication
       
     </span>
   </a>
@@ -1927,7 +2137,7 @@
 
 
   
-    <a href="https://github.com/wg-easy/wg-easy/edit/master/docs/content/advanced/api.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/wg-easy/wg-easy/edit/master/docs/content/advanced/config/external-authentication.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -1936,60 +2146,301 @@
     
       
     
-    <a href="https://github.com/wg-easy/wg-easy/raw/master/docs/content/advanced/api.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/wg-easy/wg-easy/raw/master/docs/content/advanced/config/external-authentication.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
     </a>
   
 
 
-  <h1>API</h1>
+  <h1>External Authentication</h1>
 
-<div class="admonition warning">
-<p class="admonition-title">Breaking Changes</p>
-<p>This API is not yet stable and may change in the future. The API is currently in development and is subject to change without notice. The API is not yet documented, but we will add documentation as the API stabilizes.</p>
-</div>
-<p>You can use the API to interact with the application programmatically. The API is available at <code>/api</code> and supports both GET and POST requests. The API is designed to be simple and easy to use, with a focus on providing a consistent interface for all endpoints.</p>
-<p>There is no documentation for the API yet, but this will be added as the underlying library supports it.</p>
-<h2 id="authentication"><a class="toclink" href="#authentication">Authentication</a></h2>
-<p>To use the API, you need to authenticate using Basic Authentication. The username and password are the same as the ones you use to log in to the web application.
-If you use 2FA, the API will not work. You need to disable 2FA in the web application to use the API.</p>
-<h3 id="authentication-example"><a class="toclink" href="#authentication-example">Authentication Example</a></h3>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">requests.auth</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTTPBasicAuth</span>
-
-<span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;https://example.com:51821/api/client&quot;</span>
-<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">auth</span><span class="o">=</span><span class="n">HTTPBasicAuth</span><span class="p">(</span><span class="s1">&#39;username&#39;</span><span class="p">,</span> <span class="s1">&#39;password&#39;</span><span class="p">))</span>
-<span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-<span class="k">else</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error: </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</code></pre></div>
-<h2 id="endpoints"><a class="toclink" href="#endpoints">Endpoints</a></h2>
-<p>The Endpoints are not yet documented. But as file-based routing is used, you can find the endpoints in the <code>src/server/api</code> folder. The method is defined in the file name.</p>
-<h3 id="endpoints-example"><a class="toclink" href="#endpoints-example">Endpoints Example</a></h3>
+<h2 id="oauth"><a class="toclink" href="#oauth">OAuth</a></h2>
+<h3 id="setup"><a class="toclink" href="#setup">Setup</a></h3>
+<p>To enable OAuth set the env var <code>OAUTH_PROVIDERS</code> to any of the following providers:</p>
 <table>
 <thead>
 <tr>
-<th>File Name</th>
-<th>Endpoint</th>
-<th>Method</th>
+<th>Provider</th>
+<th>Value</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>src/server/api/client.get.ts</code></td>
-<td><code>/api/client</code></td>
-<td>GET</td>
+<td><a href="#google">Google</a></td>
+<td><code>google</code></td>
 </tr>
 <tr>
-<td><code>src/server/api/setup/2.post.ts</code></td>
-<td><code>/api/setup/2</code></td>
-<td>POST</td>
+<td><a href="#github">GitHub</a></td>
+<td><code>github</code></td>
+</tr>
+<tr>
+<td><a href="#generic-oidc">Generic OIDC</a></td>
+<td><code>oidc</code></td>
 </tr>
 </tbody>
 </table>
+<p>You can enable multiple providers by separating them with a comma:</p>
+<p>e.g. <code>google,github</code></p>
+<h3 id="auto-register"><a class="toclink" href="#auto-register">Auto Register</a></h3>
+<p>To automatically register users that log in with an OAuth provider, set the following environment variable to <code>true</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Env</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>OAUTH_AUTO_REGISTER</code></td>
+<td>✖️</td>
+<td><code>false</code></td>
+<td>Enable auto-registration</td>
+</tr>
+</tbody>
+</table>
+<p>When enabled:</p>
+<ul>
+<li>
+<p>If a user logs in with an email address that is not yet registered, a new account will be created for them.</p>
+</li>
+<li>
+<p>If a user logs in with an email address that is already registered, their account will be linked to the OAuth provider (if not already linked), regardless of the value of <code>OAUTH_AUTO_REGISTER</code>.</p>
+</li>
+</ul>
+<div class="admonition warning">
+<p class="admonition-title"> Security</p>
+<p>Users will be created with Admin Permissions, as the permissions system is not yet implemented. Only enable this if you trust all users that can log in with the OAuth provider.</p>
+<p>Use <a href="#allowed-domains">Allowed Domains</a> to restrict which users can log in.</p>
+</div>
+<h3 id="allowed-domains"><a class="toclink" href="#allowed-domains">Allowed Domains</a></h3>
+<p>To only allow users with an email address from a specific domain to log in, set the following environment variable to the allowed domain.</p>
+<table>
+<thead>
+<tr>
+<th>Env</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>OAUTH_ALLOWED_DOMAINS</code></td>
+<td>✖️</td>
+<td>-</td>
+<td>Allowed email domains</td>
+</tr>
+</tbody>
+</table>
+<p>You can allow multiple domains by separating them with a comma:</p>
+<p>e.g. <code>example.com,example.org</code></p>
+<h3 id="auto-launch"><a class="toclink" href="#auto-launch">Auto Launch</a></h3>
+<p>To automatically launch the OAuth login flow when visiting the login page, set the following environment variable to the provider you want to launch:</p>
+<table>
+<thead>
+<tr>
+<th>Env</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>OAUTH_AUTO_LAUNCH</code></td>
+<td>✖️</td>
+<td>-</td>
+<td>Auto launch an OAuth provider</td>
+</tr>
+</tbody>
+</table>
+<p>When enabled:</p>
+<ul>
+<li>Visiting the login page will automatically redirect to the selected provider's login page</li>
+<li>The user can still access the normal login page by visiting <code>/login?auto_launch=false</code></li>
+<li>You can auto launch any provider by visiting <code>/login?auto_launch=&lt;provider&gt;</code></li>
+</ul>
+<h3 id="redirect-uris"><a class="toclink" href="#redirect-uris">Redirect URIs</a></h3>
+<p>You have to configure the following redirect URIs in your OAuth provider:</p>
+<ul>
+<li><code>https://&lt;your-domain&gt;/api/auth/&lt;provider&gt;/callback</code>
+  Used to log in to with the provider</li>
+<li><code>https://&lt;your-domain&gt;/api/auth/&lt;provider&gt;/link</code>
+  Used to link an existing account to the provider</li>
+</ul>
+<p>If your provider does not support multiple redirect URIs (e.g. GitHub) but allows multiple URIs under the same base, then configure:</p>
+<ul>
+<li><code>https://&lt;your-domain&gt;/api/auth/&lt;provider&gt;/</code></li>
+</ul>
+<h3 id="provider-configuration"><a class="toclink" href="#provider-configuration">Provider Configuration</a></h3>
+<h4 id="google"><a class="toclink" href="#google">Google</a></h4>
+<table>
+<thead>
+<tr>
+<th>Env</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>OAUTH_GOOGLE_CLIENT_ID</code></td>
+<td>✔️</td>
+<td>Google Client ID</td>
+</tr>
+<tr>
+<td><code>OAUTH_GOOGLE_CLIENT_SECRET</code></td>
+<td>✔️</td>
+<td>Google Client Secret</td>
+</tr>
+</tbody>
+</table>
+<h5>Setup</h5>
+
+<ol>
+<li>Go to <a href="https://console.cloud.google.com/apis/credentials">Google Cloud Console</a></li>
+<li>Create an OAuth 2.0 Client ID (Web application)</li>
+<li>Add Authorized redirect URI: See <a href="#redirect-uris">Redirect URIs</a></li>
+<li>Copy the Client ID and Client Secret to the environment variables</li>
+</ol>
+<h4 id="github"><a class="toclink" href="#github">GitHub</a></h4>
+<table>
+<thead>
+<tr>
+<th>Env</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>OAUTH_GITHUB_CLIENT_ID</code></td>
+<td>✔️</td>
+<td>GitHub Client ID</td>
+</tr>
+<tr>
+<td><code>OAUTH_GITHUB_CLIENT_SECRET</code></td>
+<td>✔️</td>
+<td>GitHub Client Secret</td>
+</tr>
+</tbody>
+</table>
+<h5>Setup</h5>
+
+<ol>
+<li>Go to <a href="https://github.com/settings/developers">GitHub Developer Settings</a></li>
+<li>Create a new OAuth App</li>
+<li>Add Authorization callback URL: See <a href="#redirect-uris">Redirect URIs</a></li>
+<li>Create a new client secret</li>
+<li>Copy the Client ID and Client Secret to the environment variables</li>
+</ol>
+<h4 id="generic-oidc"><a class="toclink" href="#generic-oidc">Generic OIDC</a></h4>
+<p>This supports generic OIDC providers like Authelia, Authentik, etc.</p>
+<p>The provider needs to support:</p>
+<ul>
+<li>PKCE</li>
+<li>default scopes: <code>openid email profile</code></li>
+<li>Client Secret Authentication <code>client_secret_post</code></li>
+</ul>
+<p>The provider needs to be available with HTTPS and have a valid certificate.</p>
+<table>
+<thead>
+<tr>
+<th>Env</th>
+<th>Required</th>
+<th>Default</th>
+<th>Example</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>OAUTH_OIDC_SERVER</code></td>
+<td>✔️</td>
+<td>-</td>
+<td><code>https://auth.example.com</code></td>
+<td>OIDC Server</td>
+</tr>
+<tr>
+<td><code>OAUTH_OIDC_CLIENT_ID</code></td>
+<td>✔️</td>
+<td>-</td>
+<td>-</td>
+<td>OIDC Client ID</td>
+</tr>
+<tr>
+<td><code>OAUTH_OIDC_CLIENT_SECRET</code></td>
+<td>✔️</td>
+<td>-</td>
+<td>-</td>
+<td>OIDC Client Secret</td>
+</tr>
+<tr>
+<td><code>OAUTH_OIDC_NAME</code></td>
+<td>✖️</td>
+<td>OIDC</td>
+<td><code>Authelia</code></td>
+<td>Provider Name</td>
+</tr>
+</tbody>
+</table>
+<h5 id="authelia-setup"><a class="toclink" href="#authelia-setup">Authelia Setup</a></h5>
+<p>Generate Client ID and Secret:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Client ID</span>
+docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>authelia/authelia:latest<span class="w"> </span>authelia<span class="w"> </span>crypto<span class="w"> </span>rand<span class="w"> </span>--length<span class="w"> </span><span class="m">72</span><span class="w"> </span>--charset<span class="w"> </span>rfc3986
+<span class="c1"># Client Secret</span>
+docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>authelia/authelia:latest<span class="w"> </span>authelia<span class="w"> </span>crypto<span class="w"> </span><span class="nb">hash</span><span class="w"> </span>generate<span class="w"> </span>pbkdf2<span class="w"> </span>--variant<span class="w"> </span>sha512<span class="w"> </span>--random<span class="w"> </span>--random.length<span class="w"> </span><span class="m">72</span><span class="w"> </span>--random.charset<span class="w"> </span>rfc3986
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">client_id</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;...&#39;</span>
+<span class="w">  </span><span class="nt">client_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wg-easy</span>
+<span class="w">  </span><span class="nt">client_secret</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;$pbkdf2-...&#39;</span>
+<span class="w">  </span><span class="nt">redirect_uris</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://&lt;your-domain&gt;/api/auth/oidc/callback</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://&lt;your-domain&gt;/api/auth/oidc/link</span>
+<span class="w">  </span><span class="nt">scopes</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">openid</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">profile</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">email</span>
+<span class="w">  </span><span class="nt">authorization_policy</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">one_factor</span>
+<span class="w">  </span><span class="nt">pre_configured_consent_duration</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1 week</span>
+<span class="w">  </span><span class="nt">require_pkce</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">  </span><span class="nt">token_endpoint_auth_method</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client_secret_post</span>
+</code></pre></div>
+<h4 id="generic-oauth"><a class="toclink" href="#generic-oauth">Generic OAuth</a></h4>
+<p>Not currently supported</p>
+<h3 id="disable-password-authentication"><a class="toclink" href="#disable-password-authentication">Disable Password Authentication</a></h3>
+<p>To disable password-based authentication and only allow login via OAuth providers, set the following environment variable to <code>true</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Env</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DISABLE_PASSWORD_AUTH</code></td>
+<td>✖️</td>
+<td><code>false</code></td>
+<td>Disable password authentication</td>
+</tr>
+</tbody>
+</table>
+<p>When enabled:</p>
+<ul>
+<li>Users will not be able to log in with a password</li>
+</ul>
+<div class="admonition warning">
+<p class="admonition-title">Access Recovery</p>
+<p>Before disabling password authentication, ensure that at least one OAuth provider is configured and that you have successfully linked an administrator account.</p>
+<p>If no login method is available, you will not be able to log in to the application and will need to reset the configuration to regain access.</p>
+</div>
 
 
 
@@ -2053,10 +2504,10 @@ If you use 2FA, the API will not work. You need to disable 2FA in the web applic
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.top", "navigation.expand", "navigation.instant", "content.action.edit", "content.action.view", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.tabs", "navigation.top", "navigation.expand", "navigation.instant", "content.action.edit", "content.action.view", "content.code.annotate"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
       
     
   </body>
