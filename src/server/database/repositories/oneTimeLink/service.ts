@@ -52,6 +52,10 @@ export class OneTimeLinkService {
   }
 
   generate(id: ID) {
+    // SECURITY
+    // This is known to be vulnerable to brute force attacks
+    // Mitigations: Small Window, One Time Use
+    // Making it longer defeats the whole purpose
     const key = `${id}-${Math.floor(Math.random() * 1000)}`;
     const oneTimeLink = Math.abs(CRC32.str(key)).toString(16);
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString();
@@ -60,6 +64,11 @@ export class OneTimeLinkService {
   }
 
   erase(id: ID) {
+    // SECURITY
+    // This is known the extend the Window for brute force attacks
+    // Reason: Set the expiresAt to 10 seconds in the future to allow a second request to get the otl
+    // some browser apparently make two requests when downloading a file
+    // cant find the bug report anymore, maybe this can be removed?
     const expiresAt = new Date(Date.now() + 10 * 1000).toISOString();
     return this.#statements.erase.execute({ id, expiresAt });
   }
