@@ -1,12 +1,14 @@
 <template>
   <SelectRoot v-model="langProxy" :default-value="locale">
     <SelectTrigger
-      class="inline-flex h-8 items-center justify-around gap-2 rounded bg-gray-200 px-3 text-sm leading-none dark:bg-neutral-700 dark:text-neutral-400"
+      class="group inline-flex h-8 items-center justify-around gap-2 rounded bg-gray-200 px-3 text-sm leading-none dark:bg-neutral-700 dark:text-neutral-400"
       aria-label="Select language"
     >
       <IconsLanguage class="size-3" />
       <SelectValue />
-      <IconsArrowDown class="size-3" />
+      <IconsArrowDown
+        class="size-3 transition-transform group-data-[state=open]:rotate-180"
+      />
     </SelectTrigger>
 
     <SelectPortal>

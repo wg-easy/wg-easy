@@ -3,13 +3,22 @@
 import argon2 from 'argon2';
 import { deserialize } from '@phc/format';
 
+const DUMMY_HASH =
+  '$argon2id$v=19$m=65536,t=3,p=4$jsh6z1/SbZHYAiO/Ww9HZw$ikzkoXWqc2b0Pc4O8ZNJjp1xKZSb7SNM/3dPMNUPk9Y';
+
 /**
- * Checks if `password` matches the hash.
+ * Checks if `password` matches the `hash`.
+ *
+ * Checks against `DUMMY_HASH` and returns false if `hash` is null
  */
-export function isPasswordValid(
+export async function isPasswordValid(
   password: string,
-  hash: string
+  hash: string | null
 ): Promise<boolean> {
+  if (hash === null) {
+    await argon2.verify(DUMMY_HASH, password);
+    return false;
+  }
   return argon2.verify(hash, password);
 }
 

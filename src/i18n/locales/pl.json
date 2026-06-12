@@ -72,6 +72,7 @@
   },
   "login": {
     "signIn": "Zaloguj się",
+    "or": "lub",
     "rememberMe": "Zapamiętaj mnie",
     "rememberMeDesc": "Pozostań zalogowany po zamknięciu przeglądarki",
     "insecure": "Nie możesz zalogować się przez niezabezpieczone połączenie. Użyj HTTPS.",
