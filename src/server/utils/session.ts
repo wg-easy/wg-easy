@@ -54,6 +54,13 @@ export async function getCurrentUser(event: H3Event) {
     // Handle if authenticating using Session
     user = await Database.users.get(session.data.userId);
   } else if (authorization) {
+    if (WG_ENV.DISABLE_PASSWORD_AUTH) {
+      throw createError({
+        statusCode: 403,
+        statusMessage: 'Password authentication is disabled',
+      });
+    }
+
     // Handle if authenticating using Header
     const [method, value] = authorization.split(' ');
     // Support Basic Authentication

@@ -14,6 +14,13 @@ export default defineEventHandler(async (event) => {
     });
   }
 
+  if (new Date() > new Date(otl.expiresAt)) {
+    throw createError({
+      statusCode: 410,
+      statusMessage: 'One Time Link has expired',
+    });
+  }
+
   const client = await Database.clients.get(otl.id);
   if (!client) {
     throw createError({
