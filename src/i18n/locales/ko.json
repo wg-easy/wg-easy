@@ -20,7 +20,11 @@
     "2faKey": "TOTP 키",
     "2faCodeDesc": "인증기 앱에서 코드를 입력하십시오.",
     "disable2fa": "2단계 인증 비활성화",
-    "disable2faDesc": "2단계 인증을 비활성화하려면 비밀번호를 입력하세요."
+    "disable2faDesc": "2단계 인증을 비활성화하려면 비밀번호를 입력하세요.",
+    "linkOauth": "외부 제공자와 계정 연결",
+    "unlinkOauth": "연결 해제",
+    "linkedWith": "{0}와(과) 연결됨",
+    "providerDisabled": "현재 연결된 제공자가 활성화되어 있지 않습니다"
   },
   "general": {
     "name": "이름",
@@ -28,6 +32,7 @@
     "password": "비밀번호",
     "newPassword": "새 비밀번호",
     "updatePassword": "비밀번호 업데이트",
+    "addPassword": "비밀번호 추가",
     "mtu": "MTU",
     "allowedIps": "허용된 IP",
     "dns": "DNS",
@@ -41,7 +46,8 @@
     "confirmPassword": "비밀번호 확인",
     "loading": "로딩 중...",
     "2fa": "2단계 인증",
-    "2faCode": "TOTP 코드"
+    "2faCode": "TOTP 코드",
+    "externalAuth": "외부 인증"
   },
   "setup": {
     "welcome": "wg-easy의 첫 번째 설정에 오신 것을 환영합니다.",
@@ -72,6 +78,8 @@
   },
   "login": {
     "signIn": "로그인",
+    "signInWith": "{0}(으)로 로그인",
+    "or": "또는",
     "rememberMe": "로그인 상태 유지",
     "rememberMeDesc": "브라우저를 닫은 후에도 로그인 유지",
     "insecure": "안전하지 않은 연결로 로그인할 수 없습니다. HTTPS를 사용하세요.",
@@ -88,6 +96,7 @@
     "name": "이름",
     "expireDate": "만료 날짜",
     "expireDateDesc": "클라이언트가 비활성화될 날짜. 영구적으로 비워두기",
+    "delete": "삭제",
     "deleteClient": "클라이언트 삭제",
     "deleteDialog1": "정말로 삭제하시겠습니까",
     "deleteDialog2": "이 작업은 실행 취소할 수 없습니다.",
@@ -116,7 +125,14 @@
     "dnsDesc": "클라이언트가 사용할 DNS 서버(전역 구성 무시)",
     "notConnected": "클라이언트가 연결되지 않음",
     "endpoint": "엔드포인트",
-    "endpointDesc": "WireGuard에 연결된 클라이언트의 IP 주소"
+    "endpointDesc": "WireGuard에 연결된 클라이언트의 IP 주소",
+    "search": "클라이언트 검색...",
+    "config": "구성",
+    "viewConfig": "구성 보기",
+    "firewallIps": "방화벽 허용 IP",
+    "firewallIpsDesc": "이 클라이언트가 접근할 수 있는 목적지 IP/CIDR(서버 측 적용). 허용된 IP를 사용하려면 비워 두십시오. 선택적 포트 및 프로토콜 필터링을 지원합니다. 구문은 문서를 참조하십시오.",
+    "downloadPng": "PNG 다운로드",
+    "copyPng": "PNG 복사"
   },
   "dialog": {
     "change": "변경",
@@ -126,7 +142,8 @@
   "toast": {
     "success": "성공",
     "saved": "저장됨",
-    "error": "오류"
+    "error": "오류",
+    "unknown": "알 수 없는 오류. 자세한 내용은 콘솔을 참조하십시오"
   },
   "form": {
     "actions": "작업",
@@ -171,7 +188,10 @@
       "restart": "인터페이스 재시작",
       "restartDesc": "WireGuard 인터페이스를 재시작합니다.",
       "restartWarn": "인터페이스를 재시작하시겠습니까? 이 작업은 모든 클라이언트를 연결 해제합니다.",
-      "restartSuccess": "인터페이스가 재시작되었습니다"
+      "restartSuccess": "인터페이스가 재시작되었습니다",
+      "firewall": "트래픽 필터링",
+      "firewallEnabled": "클라이언트별 방화벽 활성화",
+      "firewallEnabledDesc": "iptables를 사용하여 클라이언트 트래픽을 특정 목적지 IP로 제한합니다. 활성화하면 각 클라이언트에 허용된 목적지를 구성할 수 있습니다."
     },
     "introText": "관리 패널에 오신 것을 환영합니다.\n\n여기에서 일반 설정, 구성, 인터페이스 설정 및 후크를 관리할 수 있습니다.\n\n사이드바에서 섹션 중 하나를 선택하여 시작하세요."
   },
@@ -179,6 +199,7 @@
     "generic": {
       "required": "{0}은(는) 필수입니다.",
       "validNumber": "{0}은(는) 유효한 숫자여야 합니다.",
+      "validNumberRange": "{0}은(는) 유효한 숫자 또는 숫자 범위여야 합니다",
       "validString": "{0}은 유효한 문자열이어야 합니다",
       "validBoolean": "{0}은(는) 유효한 불리언이어야 합니다.",
       "validArray": "{0}는 유효한 배열이어야 합니다",
@@ -191,7 +212,9 @@
       "expiresAt": "만료 시간",
       "address4": "IPv4 주소",
       "address6": "IPv6 주소",
-      "serverAllowedIps": "서버 허용된 IP"
+      "serverAllowedIps": "서버 허용된 IP",
+      "firewallIps": "방화벽 허용 IP",
+      "firewallIpsInvalid": "잘못된 방화벽 IP 항목입니다. 지원되는 구문은 문서를 참조하십시오."
     },
     "user": {
       "username": "사용자 이름",
@@ -236,5 +259,47 @@
     "postUp": "PostUp",
     "preDown": "PreDown",
     "postDown": "PostDown"
+  },
+  "copy": {
+    "notSupported": "복사가 지원되지 않습니다",
+    "copied": "복사됨!",
+    "failed": "복사 실패",
+    "copy": "복사"
+  },
+  "awg": {
+    "jCLabel": "정크 패킷 수 (Jc)",
+    "jCDescription": "보낼 정크 패킷의 수 (1-128, 권장: 4-12)",
+    "jMinLabel": "정크 패킷 최소 크기 (Jmin)",
+    "jMinDescription": "정크 패킷의 최소 크기 (0-1279*, 권장: 8, Jmax보다 작아야 함)",
+    "jMaxLabel": "정크 패킷 최대 크기 (Jmax)",
+    "jMaxDescription": "정크 패킷의 최대 크기 (1-1280*, 권장: 80, Jmin보다 커야 함)",
+    "s1Label": "초기화 패킷 정크 크기 (S1)",
+    "s1Description": "초기화 패킷 정크 크기 (0-1132[1280* - 148 = 1132], 권장: 15-150, S1+56 ≠ S2)",
+    "s2Label": "응답 패킷 정크 크기 (S2)",
+    "s2Description": "응답 패킷 정크 크기 (0-1188[1280* - 92 = 1188], 권장: 15-150)",
+    "s3Label": "쿠키 응답 패킷 정크 크기 (S3)",
+    "s3Description": "쿠키 응답 패킷 정크 크기",
+    "s4Label": "전송 패킷 정크 크기 (S4)",
+    "s4Description": "전송 패킷 정크 크기",
+    "h1Label": "초기화 매직 헤더 (H1)",
+    "h1Description": "초기화 패킷 헤더 값 또는 범위 (X 또는 X-Y, X<Y. 최소 5, 최대 2147483647. 값 또는 범위가 다른 헤더와 겹치지 않아야 함)",
+    "h2Label": "응답 매직 헤더 (H2)",
+    "h2Description": "응답 패킷 헤더 값 또는 범위 (X 또는 X-Y, X<Y. 최소 5, 최대 2147483647. 값 또는 범위가 다른 헤더와 겹치지 않아야 함)",
+    "h3Label": "쿠키 응답 매직 헤더 (H3)",
+    "h3Description": "쿠키 응답 패킷 헤더 값 또는 범위 (X 또는 X-Y, X<Y. 최소 5, 최대 2147483647. 값 또는 범위가 다른 헤더와 겹치지 않아야 함)",
+    "h4Label": "전송 매직 헤더 (H4)",
+    "h4Description": "전송 패킷 헤더 값 또는 범위 (X 또는 X-Y, X<Y. 최소 5, 최대 2147483647. 값 또는 범위가 다른 헤더와 겹치지 않아야 함)",
+    "i1Label": "특수 정크 패킷 1 (I1)",
+    "i1Description": "16진수 형식의 프로토콜 모방 패킷: <b 0x...>",
+    "i2Label": "특수 정크 패킷 2 (I2)",
+    "i2Description": "16진수 형식의 프로토콜 모방 패킷: <b 0x...>",
+    "i3Label": "특수 정크 패킷 3 (I3)",
+    "i3Description": "16진수 형식의 프로토콜 모방 패킷: <b 0x...>",
+    "i4Label": "특수 정크 패킷 4 (I4)",
+    "i4Description": "16진수 형식의 프로토콜 모방 패킷: <b 0x...>",
+    "i5Label": "특수 정크 패킷 5 (I5)",
+    "i5Description": "16진수 형식의 프로토콜 모방 패킷: <b 0x...>",
+    "mtuNote": "값은 MTU에 따라 달라집니다",
+    "obfuscationParameters": "AmneziaWG 난독화 매개변수"
   }
 }
