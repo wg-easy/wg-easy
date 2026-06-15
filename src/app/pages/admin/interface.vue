@@ -145,8 +145,8 @@
         >
           <FormSecondaryActionField
             :label="$t('admin.interface.changeCidr')"
-            class="w-full"
-            tabindex="-1"
+            class="inline-block w-full"
+            as="span"
           />
         </AdminCidrDialog>
         <AdminRestartInterfaceDialog
@@ -155,8 +155,8 @@
         >
           <FormSecondaryActionField
             :label="$t('admin.interface.restart')"
-            class="w-full"
-            tabindex="-1"
+            class="inline-block w-full"
+            as="span"
           />
         </AdminRestartInterfaceDialog>
       </FormGroup>

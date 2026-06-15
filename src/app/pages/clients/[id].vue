@@ -188,9 +188,7 @@
             >
               <FormSecondaryActionField
                 :label="$t('client.delete')"
-                class="w-full"
-                type="button"
-                tabindex="-1"
+                class="inline-block w-full"
                 as="span"
               />
             </ClientsDeleteDialog>
@@ -200,9 +198,7 @@
             >
               <FormSecondaryActionField
                 :label="$t('client.viewConfig')"
-                class="w-full"
-                type="button"
-                tabindex="-1"
+                class="inline-block w-full"
                 as="span"
               />
             </ClientsConfigDialog>
