@@ -1,19 +1,14 @@
 ---
 title: Home
-hide:
-    - navigation
 ---
 
 # Welcome to the Documentation for `wg-easy`
 
-/// info | This Documentation is Versioned
+!!! info "This Documentation is Versioned"
 
-**Make sure** to select the correct version of this documentation! It should match the version of the image you are using. The default version corresponds to [the most recent stable release][docs-tagging].
-///
+    **Make sure** to select the correct version of this documentation! It should match the version of the image you are using. The default version corresponds to [the most recent stable release](./getting-started.md#tagging-convention).
 
 This documentation provides you not only with the basic setup and configuration of `wg-easy` but also with advanced configuration, elaborate usage scenarios, detailed examples, hints and more.
-
-[docs-tagging]: ./getting-started.md#tagging-convention
 
 ## About
 

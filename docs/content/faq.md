@@ -1,7 +1,5 @@
 ---
 title: FAQ
-hide:
-    - navigation
 ---
 
 Here are some frequently asked questions or errors about `wg-easy`. If you have a question that is not answered here, please feel free to open a discussion on GitHub.

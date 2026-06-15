@@ -2,10 +2,9 @@
 title: Traefik
 ---
 
-/// note | Opinionated
+!!! note "Opinionated"
 
-This guide is opinionated. If you use other conventions or folder layouts, feel free to change the commands and paths.
-///
+    This guide is opinionated. If you use other conventions or folder layouts, feel free to change the commands and paths.
 
 ## Create docker compose project
 

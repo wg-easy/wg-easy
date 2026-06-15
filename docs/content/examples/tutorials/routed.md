@@ -58,10 +58,9 @@ Pick an IPv4 and IPv6 subnet for your clients and add static routes on your rout
 
 ### Example
 
-/// note | 2001:db8::/32
+!!! note "2001:db8::/32"
 
-The _documentation prefix_ `2001:db8::/32` (RFC 3849) used in this example is not meant for production use, replace it with your own ISP-assigned IPv6 prefix (GUA) or local prefix (ULA)
-///
+    The _documentation prefix_ `2001:db8::/32` (RFC 3849) used in this example is not meant for production use, replace it with your own ISP-assigned IPv6 prefix (GUA) or local prefix (ULA)
 
 I want my WireGuard clients in `192.168.0.0/24` and `2001:db8:abc:0::/64`.
 
@@ -94,18 +93,16 @@ PostDown
 iptables -D INPUT -p udp -m udp --dport {{port}} -j ACCEPT; iptables -D FORWARD -i wg0 -j ACCEPT; iptables -D FORWARD -o wg0 -j ACCEPT; ip6tables -D INPUT -p udp -m udp --dport {{port}} -j ACCEPT; ip6tables -D FORWARD -i wg0 -j ACCEPT; ip6tables -D FORWARD -o wg0 -j ACCEPT
 ```
 
-/// warning | Important: When using nftables use the following hooks instead.
+!!! warning "Important: When using nftables use the following hooks instead."
 
-PostUp
+    PostUp
 
-```shell
-nft add chain ip filter WG_EASY; nft add rule ip filter DOCKER-USER jump WG_EASY; nft add rule ip filter WG_EASY iifname {{device}} accept; nft add rule ip filter WG_EASY oifname {{device}} accept; nft add chain ip6 filter WG_EASY; nft add rule ip6 filter DOCKER-USER jump WG_EASY; nft add rule ip6 filter WG_EASY iifname {{device}} accept; nft add rule ip6 filter WG_EASY oifname {{device}} accept;
-```
+    ```shell
+    nft add chain ip filter WG_EASY; nft add rule ip filter DOCKER-USER jump WG_EASY; nft add rule ip filter WG_EASY iifname {{device}} accept; nft add rule ip filter WG_EASY oifname {{device}} accept; nft add chain ip6 filter WG_EASY; nft add rule ip6 filter DOCKER-USER jump WG_EASY; nft add rule ip6 filter WG_EASY iifname {{device}} accept; nft add rule ip6 filter WG_EASY oifname {{device}} accept;
+    ```
 
-PostDown
+    PostDown
 
-```shell
-nft delete rule ip filter DOCKER-USER handle $(nft -a list chain ip filter DOCKER-USER | awk '/jump WG_EASY/ {print $NF}'); nft flush chain ip filter WG_EASY; nft delete chain ip filter WG_EASY; nft delete rule ip6 filter DOCKER-USER handle $(nft -a list chain ip6 filter DOCKER-USER | awk '/jump WG_EASY/ {print $NF}'); nft flush chain ip6 filter WG_EASY; nft delete chain ip6 filter WG_EASY
-```
-
-///
+    ```shell
+    nft delete rule ip filter DOCKER-USER handle $(nft -a list chain ip filter DOCKER-USER | awk '/jump WG_EASY/ {print $NF}'); nft flush chain ip filter WG_EASY; nft delete chain ip filter WG_EASY; nft delete rule ip6 filter DOCKER-USER handle $(nft -a list chain ip6 filter DOCKER-USER | awk '/jump WG_EASY/ {print $NF}'); nft flush chain ip6 filter WG_EASY; nft delete chain ip6 filter WG_EASY
+    ```

@@ -22,9 +22,9 @@ e.g. `google,github`
 
 To automatically register users that log in with an OAuth provider, set the following environment variable to `true`:
 
-| Env                   | Required | Default | Description              |
-| --------------------- | -------- | ------- | ------------------------ |
-| `OAUTH_AUTO_REGISTER` | ✖️       | `false` | Enable auto-registration |
+| Env                   | Required           | Default | Description              |
+| --------------------- | ------------------ | ------- | ------------------------ |
+| `OAUTH_AUTO_REGISTER` | :white_check_mark: | `false` | Enable auto-registration |
 
 When enabled:
 
@@ -32,13 +32,11 @@ When enabled:
 
 - If a user logs in with an email address that is already registered, their account will be linked to the OAuth provider (if not already linked), regardless of the value of `OAUTH_AUTO_REGISTER`.
 
-/// warning | Security
+!!! warning "Security"
 
-Users will be created with Admin Permissions, as the permissions system is not yet implemented. Only enable this if you trust all users that can log in with the OAuth provider.
+    Users will be created with Admin Permissions, as the permissions system is not yet implemented. Only enable this if you trust all users that can log in with the OAuth provider.
 
-Use [Allowed Domains](#allowed-domains) to restrict which users can log in.
-
-///
+    Use [Allowed Domains](#allowed-domains) to restrict which users can log in.
 
 ### Allowed Domains
 
@@ -46,7 +44,7 @@ To only allow users with an email address from a specific domain to log in, set 
 
 | Env                     | Required | Default | Description           |
 | ----------------------- | -------- | ------- | --------------------- |
-| `OAUTH_ALLOWED_DOMAINS` | ✖️       | -       | Allowed email domains |
+| `OAUTH_ALLOWED_DOMAINS` | :x:      | -       | Allowed email domains |
 
 You can allow multiple domains by separating them with a comma:
 
@@ -58,7 +56,7 @@ To automatically launch the OAuth login flow when visiting the login page, set t
 
 | Env                 | Required | Default | Description                   |
 | ------------------- | -------- | ------- | ----------------------------- |
-| `OAUTH_AUTO_LAUNCH` | ✖️       | -       | Auto launch an OAuth provider |
+| `OAUTH_AUTO_LAUNCH` | :x:      | -       | Auto launch an OAuth provider |
 
 When enabled:
 
@@ -83,10 +81,10 @@ If your provider does not support multiple redirect URIs (e.g. GitHub) but allow
 
 #### Google
 
-| Env                          | Required | Description          |
-| ---------------------------- | -------- | -------------------- |
-| `OAUTH_GOOGLE_CLIENT_ID`     | ✔️       | Google Client ID     |
-| `OAUTH_GOOGLE_CLIENT_SECRET` | ✔️       | Google Client Secret |
+| Env                          | Required           | Description          |
+| ---------------------------- | ------------------ | -------------------- |
+| `OAUTH_GOOGLE_CLIENT_ID`     | :white_check_mark: | Google Client ID     |
+| `OAUTH_GOOGLE_CLIENT_SECRET` | :white_check_mark: | Google Client Secret |
 
 <h5>Setup</h5>
 
@@ -97,10 +95,10 @@ If your provider does not support multiple redirect URIs (e.g. GitHub) but allow
 
 #### GitHub
 
-| Env                          | Required | Description          |
-| ---------------------------- | -------- | -------------------- |
-| `OAUTH_GITHUB_CLIENT_ID`     | ✔️       | GitHub Client ID     |
-| `OAUTH_GITHUB_CLIENT_SECRET` | ✔️       | GitHub Client Secret |
+| Env                          | Required           | Description          |
+| ---------------------------- | ------------------ | -------------------- |
+| `OAUTH_GITHUB_CLIENT_ID`     | :white_check_mark: | GitHub Client ID     |
+| `OAUTH_GITHUB_CLIENT_SECRET` | :white_check_mark: | GitHub Client Secret |
 
 <h5>Setup</h5>
 
@@ -122,12 +120,12 @@ The provider needs to support:
 
 The provider needs to be available with HTTPS and have a valid certificate.
 
-| Env                        | Required | Default | Example                    | Description        |
-| -------------------------- | -------- | ------- | -------------------------- | ------------------ |
-| `OAUTH_OIDC_SERVER`        | ✔️       | -       | `https://auth.example.com` | OIDC Server        |
-| `OAUTH_OIDC_CLIENT_ID`     | ✔️       | -       | -                          | OIDC Client ID     |
-| `OAUTH_OIDC_CLIENT_SECRET` | ✔️       | -       | -                          | OIDC Client Secret |
-| `OAUTH_OIDC_NAME`          | ✖️       | OIDC    | `Authelia`                 | Provider Name      |
+| Env                        | Required           | Default | Example                    | Description        |
+| -------------------------- | ------------------ | ------- | -------------------------- | ------------------ |
+| `OAUTH_OIDC_SERVER`        | :white_check_mark: | -       | `https://auth.example.com` | OIDC Server        |
+| `OAUTH_OIDC_CLIENT_ID`     | :white_check_mark: | -       | -                          | OIDC Client ID     |
+| `OAUTH_OIDC_CLIENT_SECRET` | :white_check_mark: | -       | -                          | OIDC Client Secret |
+| `OAUTH_OIDC_NAME`          | :x:                | OIDC    | `Authelia`                 | Provider Name      |
 
 ##### Authelia Setup
 
@@ -167,16 +165,14 @@ To disable password-based authentication and only allow login via OAuth provider
 
 | Env                     | Required | Default | Description                     |
 | ----------------------- | -------- | ------- | ------------------------------- |
-| `DISABLE_PASSWORD_AUTH` | ✖️       | `false` | Disable password authentication |
+| `DISABLE_PASSWORD_AUTH` | :x:      | `false` | Disable password authentication |
 
 When enabled:
 
 - Users will not be able to log in with a password
 
-/// warning | Access Recovery
+!!! warning "Access Recovery"
 
-Before disabling password authentication, ensure that at least one OAuth provider is configured and that you have successfully linked an administrator account.
+    Before disabling password authentication, ensure that at least one OAuth provider is configured and that you have successfully linked an administrator account.
 
-If no login method is available, you will not be able to log in to the application and will need to reset the configuration to regain access.
-
-///
+    If no login method is available, you will not be able to log in to the application and will need to reset the configuration to regain access.

@@ -60,12 +60,10 @@ cli clients:qr <client_id>
 
 Replace `<client_id>` with the actual client ID you want to show the QR code for.
 
-/// warning | IPv6 Support
+!!! warning "IPv6 Support"
 
-IPv6 support is enabled by default, even if you disabled it using environment variables. To disable it pass the `--no-ipv6` flag when running the CLI.
+    IPv6 support is enabled by default, even if you disabled it using environment variables. To disable it pass the `--no-ipv6` flag when running the CLI.
 
-```shell
-cli clients:qr <client_id> --no-ipv6
-```
-
-///
+    ```shell
+    cli clients:qr <client_id> --no-ipv6
+    ```

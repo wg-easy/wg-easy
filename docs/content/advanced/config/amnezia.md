@@ -39,14 +39,14 @@ If a parameter is not set, it will not be added to the configuration. If all Amn
 
 ### Parameter Compatibility Table
 
-| Parameter | Can differ between server and client | Configurable on server | Configurable on client  |
-| --------- | ------------------------------------ | ---------------------- | ----------------------- |
-| Jc        | ✅ Yes                               | ✅                     | ✅                      |
-| Jmin      | ✅ Yes                               | ✅                     | ✅                      |
-| Jmax      | ✅ Yes                               | ✅                     | ✅                      |
-| S1-S4     | ❌ No, must match                    | ✅                     | ❌ (copied from server) |
-| H1-H4     | ❌ No, must match                    | ✅                     | ❌ (copied from server) |
-| I1-I5     | ✅ Yes                               | ✅                     | ✅                      |
+| Parameter | Can differ between server and client | Configurable on server | Configurable on client   |
+| --------- | ------------------------------------ | ---------------------- | ------------------------ |
+| Jc        | :white_check_mark: Yes               | :white_check_mark:     | :white_check_mark:       |
+| Jmin      | :white_check_mark: Yes               | :white_check_mark:     | :white_check_mark:       |
+| Jmax      | :white_check_mark: Yes               | :white_check_mark:     | :white_check_mark:       |
+| S1-S4     | :x: No, must match                   | :white_check_mark:     | :x: (copied from server) |
+| H1-H4     | :x: No, must match                   | :white_check_mark:     | :x: (copied from server) |
+| I1-I5     | :white_check_mark: Yes               | :white_check_mark:     | :white_check_mark:       |
 
 ## Client Applications
 
