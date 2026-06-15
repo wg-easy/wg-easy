@@ -51,7 +51,9 @@ In the setup wizard, select that you already have a configuration file and uploa
 
 ### Environment Variables
 
-v15 does not use the same environment variables as v14, most of them have been moved to the Admin Panel in the Web UI.
+v15 does use some of the environment variables as v14. View [Configuration Overrides](../config/optional-config.md#configuration-overrides) to see which environment variables are supported in v15.
+
+If you want to be able to change settings through the Web UI, do not set the corresponding environment variables, as they will override the database settings. Instead, manually change the settings through the Web UI after the migration.
 
 ### Done
 
