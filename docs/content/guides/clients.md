@@ -23,9 +23,11 @@ Use the Firewall Allowed IPs feature to prevent access to IP ranges that the use
 
 ## Firewall Allowed IPs
 
-!!! note "Attention"
+/// note | Attention
 
-    This field only appears when **Per-Client Firewall** is enabled in the Admin Panel → Interface settings.
+This field only appears when **Per-Client Firewall** is enabled in the Admin Panel → Interface settings.
+
+///
 
 Server-side firewall rules that restrict which destinations the client can access, regardless of their local configuration.
 
@@ -44,12 +46,14 @@ Unlike "Allowed IPs" which only controls routing on the client side, these rules
 - `[2001:db8::1]:443` - IPv6 address with port (brackets required)
 - `[2001:db8::/32]:443/tcp` - IPv6 CIDR with port and protocol
 
-!!! warning "Invalid Formats"
+/// warning | Invalid Formats
 
-    Protocol specifiers (`/tcp` or `/udp`) require a port number. The following formats are **not supported** and will result in an error:
+Protocol specifiers (`/tcp` or `/udp`) require a port number. The following formats are **not supported** and will result in an error:
 
-    - `10.10.0.3/tcp` (use `10.10.0.3:443/tcp` instead)
-    - `10.10.0.0/24/udp` (use `10.10.0.0/24:53/udp` instead)
+- `10.10.0.3/tcp` (use `10.10.0.3:443/tcp` instead)
+- `10.10.0.0/24/udp` (use `10.10.0.0/24:53/udp` instead)
+
+///
 
 **Behavior:**
 
@@ -57,9 +61,11 @@ Unlike "Allowed IPs" which only controls routing on the client side, these rules
 - **Specified**: Only listed destinations are accessible (allow-only, everything else is blocked)
 - **Disable for specific client**: To disable firewall filtering for a single client while keeping it enabled for others, add `0.0.0.0/0, ::/0` to allow all traffic
 
-!!! note
+/// note
 
-    To allow clients to reach the VPN server itself (e.g. for DNS), include the server's VPN address in the firewall allowed IPs.
+To allow clients to reach the VPN server itself (e.g. for DNS), include the server's VPN address in the firewall allowed IPs.
+
+///
 
 **Use Case Examples**:
 

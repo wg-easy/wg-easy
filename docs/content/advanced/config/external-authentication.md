@@ -32,11 +32,13 @@ When enabled:
 
 - If a user logs in with an email address that is already registered, their account will be linked to the OAuth provider (if not already linked), regardless of the value of `OAUTH_AUTO_REGISTER`.
 
-!!! warning "Security"
+/// warning | Security
 
-    Users will be created with Admin Permissions, as the permissions system is not yet implemented. Only enable this if you trust all users that can log in with the OAuth provider.
+Users will be created with Admin Permissions, as the permissions system is not yet implemented. Only enable this if you trust all users that can log in with the OAuth provider.
 
-    Use [Allowed Domains](#allowed-domains) to restrict which users can log in.
+Use [Allowed Domains](#allowed-domains) to restrict which users can log in.
+
+///
 
 ### Allowed Domains
 
@@ -171,8 +173,10 @@ When enabled:
 
 - Users will not be able to log in with a password
 
-!!! warning "Access Recovery"
+/// warning | Access Recovery
 
-    Before disabling password authentication, ensure that at least one OAuth provider is configured and that you have successfully linked an administrator account.
+Before disabling password authentication, ensure that at least one OAuth provider is configured and that you have successfully linked an administrator account.
 
-    If no login method is available, you will not be able to log in to the application and will need to reset the configuration to regain access.
+If no login method is available, you will not be able to log in to the application and will need to reset the configuration to regain access.
+
+///
