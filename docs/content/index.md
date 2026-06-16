@@ -1,5 +1,7 @@
 ---
 title: Home
+hide:
+    - navigation
 ---
 
 # Welcome to the Documentation for `wg-easy`
