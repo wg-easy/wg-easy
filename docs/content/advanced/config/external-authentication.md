@@ -22,9 +22,9 @@ e.g. `google,github`
 
 To automatically register users that log in with an OAuth provider, set the following environment variable to `true`:
 
-| Env                   | Required           | Default | Description              |
-| --------------------- | ------------------ | ------- | ------------------------ |
-| `OAUTH_AUTO_REGISTER` | :white_check_mark: | `false` | Enable auto-registration |
+| Env                   | Required | Default | Description              |
+| --------------------- | -------- | ------- | ------------------------ |
+| `OAUTH_AUTO_REGISTER` | :x:      | `false` | Enable auto-registration |
 
 When enabled:
 
