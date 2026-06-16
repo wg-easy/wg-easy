@@ -69,7 +69,8 @@ toggle.name = "Switch to system preference"
 [project.extra.version]
 provider = "mike"
 
-[project.markdown_extensions.admonition]
+[project.markdown_extensions.pymdownx.blocks.admonition]
+types = ["danger", "note", "info", "question", "warning"]
 
 [project.markdown_extensions.md_in_html]
 
