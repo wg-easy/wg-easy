@@ -221,6 +221,10 @@ export class UserService {
         throw new Error('User not found');
       }
 
+      if (txUser.totpVerified) {
+        throw new Error('TOTP is already verified');
+      }
+
       const totpKey = txUser.totpKey;
       if (!totpKey) {
         throw new Error('TOTP key is not set');

@@ -23,6 +23,13 @@ export default definePermissionEventHandler(
     checkPermissions(user);
 
     if (body.type === 'setup') {
+      if (user.totpVerified) {
+        throw createError({
+          statusCode: 409,
+          statusMessage: 'TOTP is already enabled',
+        });
+      }
+
       const key = new Secret({ size: 20 });
 
       const totp = new TOTP({
@@ -50,6 +57,13 @@ export default definePermissionEventHandler(
         type: 'created',
       } as Response;
     } else if (body.type === 'delete') {
+      if (!user.totpVerified) {
+        throw createError({
+          statusCode: 409,
+          statusMessage: 'TOTP is not enabled',
+        });
+      }
+
       await Database.users.deleteTotpKey(user.id, body.currentPassword);
 
       return {
