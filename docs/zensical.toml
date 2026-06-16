@@ -20,8 +20,6 @@ docs_dir = "content/"
 
 site_url = "https://wg-easy.github.io/wg-easy"
 
-extra_css = ["assets/stylesheets/extra.css"]
-
 [project.theme]
 variant = "modern"
 favicon = "assets/logo/favicon.png"
