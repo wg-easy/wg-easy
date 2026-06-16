@@ -135,8 +135,14 @@ jobs:
       - name: Create manifest list and push
         working-directory: ${{ runner.temp }}/digests
         run: |
-          docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
-            $(printf 'ghcr.io/wg-easy/wg-easy@sha256:%s ' *)
+          n=3
+          for i in $(seq 1 $n); do
+            docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+              $(printf 'ghcr.io/wg-easy/wg-easy@sha256:%s ' *) && break
+
+            [ "$i" = "$n" ] && exit 1
+            sleep 10
+          done
 
       - name: Inspect image
         run: |
