@@ -46,9 +46,8 @@ const name = z
   .pipe(safeStringRefine);
 
 const email = z
-  .string({ message: t('zod.user.email') })
-  .min(5, t('zod.user.email'))
   .email({ message: t('zod.user.emailInvalid') })
+  .min(5, t('zod.user.email'))
   .pipe(safeStringRefine)
   .nullable();
 
@@ -80,3 +79,7 @@ export const UserUpdateTotpSchema = z.union([
     currentPassword: password,
   }),
 ]);
+
+export const Verify2faSchema = z.object({
+  totpCode: totpCode,
+});
