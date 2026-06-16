@@ -35,7 +35,6 @@ features = [
   "content.code.copy",
   "content.code.annotate",
 ]
-#font = false
 
 [project.theme.icon]
 repo = "fontawesome/brands/github"
@@ -63,6 +62,8 @@ primary = "grey"
 accent = "red"
 toggle.icon = "lucide/moon"
 toggle.name = "Switch to system preference"
+
+# [project.plugins.privacy]
 
 [project.extra.version]
 provider = "mike"
