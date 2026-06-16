@@ -5,7 +5,7 @@
     "dev": "docker compose -f docker-compose.dev.yml up wg-easy --build",
     "cli:dev": "docker compose -f docker-compose.dev.yml run --build --rm -it wg-easy cli:dev",
     "build": "docker build -t wg-easy .",
-    "docs:preview": "docker run --rm -it -p 8080:8080 -v ./docs:/docs squidfunk/mkdocs-material serve -a 0.0.0.0:8080",
+    "docs:preview": "docker run --rm -it -p 8080:8080 -v ./docs:/docs zensical/zensical serve -a 0.0.0.0:8080",
     "scripts:version": "bash scripts/version.sh",
     "scripts:i18n": "bash scripts/i18n.sh",
     "format:check:docs": "prettier --check docs"
