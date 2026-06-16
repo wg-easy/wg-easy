@@ -37,7 +37,7 @@ features = [
   "content.code.copy",
   "content.code.annotate",
 ]
-font = false
+#font = false
 
 [project.theme.icon]
 repo = "fontawesome/brands/github"
