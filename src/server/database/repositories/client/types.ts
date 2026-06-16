@@ -1,6 +1,7 @@
 import type { InferSelectModel } from 'drizzle-orm';
 import z from 'zod';
 
+import { isIPv4, isIPv6 } from 'is-ip';
 import type { client } from './schema';
 
 export type ClientType = InferSelectModel<typeof client>;
@@ -20,7 +21,8 @@ export type UpdateClientType = Omit<
 const name = z
   .string({ message: t('zod.client.name') })
   .min(1, t('zod.client.name'))
-  .pipe(safeStringRefine);
+  .pipe(safeStringRefine)
+  .pipe(controlStringRefine);
 
 // TODO?: validate iso string
 const expiresAt = z
@@ -32,14 +34,18 @@ const expiresAt = z
 const address4 = z
   .string({ message: t('zod.client.address4') })
   .min(1, { message: t('zod.client.address4') })
-  .pipe(safeStringRefine);
+  .pipe(safeStringRefine)
+  .pipe(controlStringRefine)
+  .refine((v) => isIPv4(v));
 
 const address6 = z
   .string({ message: t('zod.client.address6') })
   .min(1, { message: t('zod.client.address6') })
-  .pipe(safeStringRefine);
+  .pipe(safeStringRefine)
+  .pipe(controlStringRefine)
+  .refine((v) => isIPv6(v));
 
-const filter = z.string().optional();
+const filter = z.string().pipe(safeStringRefine).optional();
 
 const serverAllowedIps = z.array(AddressSchema, {
   message: t('zod.client.serverAllowedIps'),

@@ -1,8 +1,4 @@
-import { z } from 'zod';
-
-const Verify2faSchema = z.object({
-  totpCode: z.string().min(6).max(6),
-});
+import { Verify2faSchema } from '#db/repositories/user/types';
 
 export default defineEventHandler(async (event) => {
   const { totpCode } = await readValidatedBody(
