@@ -45,8 +45,6 @@ const address6 = z
   .pipe(controlStringRefine)
   .refine((v) => isIPv6(v));
 
-const filter = z.string().pipe(safeStringRefine).optional();
-
 const serverAllowedIps = z.array(AddressSchema, {
   message: t('zod.client.serverAllowedIps'),
 });
@@ -58,8 +56,13 @@ export const ClientCreateSchema = z.object({
 
 export type ClientCreateType = z.infer<typeof ClientCreateSchema>;
 
+const filter = z.string().pipe(safeStringRefine);
+
+const sort = z.enum(['asc', 'desc']);
+
 export const ClientQuerySchema = z.object({
-  filter: filter,
+  filter: filter.optional(),
+  sort: sort.optional(),
 });
 
 export type ClientQueryType = z.infer<typeof ClientQuerySchema>;

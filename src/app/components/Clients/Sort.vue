@@ -1,6 +1,6 @@
 <template>
   <BasePrimaryButton @click="toggleSort">
-    <IconsArrowDown v-if="globalStore.sortClient === true" class="mr-2 w-4" />
+    <IconsArrowDown v-if="globalStore.sortClient === 'asc'" class="mr-2 w-4" />
     <IconsArrowUp v-else class="mr-2 w-4" />
     <span class="text-sm">{{ $t('client.sort') }}</span>
   </BasePrimaryButton>
@@ -11,7 +11,7 @@ const globalStore = useGlobalStore();
 const clientsStore = useClientsStore();
 
 function toggleSort() {
-  globalStore.sortClient = !globalStore.sortClient;
+  globalStore.sortClient = globalStore.sortClient === 'asc' ? 'desc' : 'asc';
   clientsStore.refresh().catch(console.error);
 }
 </script>
