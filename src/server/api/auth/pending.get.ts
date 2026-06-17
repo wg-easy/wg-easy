@@ -7,6 +7,16 @@ export default defineEventHandler(async (event) => {
       statusMessage: 'No pending authentication',
     });
   }
+  if (new Date() > new Date(session.data.pendingLogin.expires_at)) {
+    await session.update({
+      pendingLogin: undefined,
+    });
+
+    throw createError({
+      statusCode: 401,
+      statusMessage: 'No pending authentication',
+    });
+  }
 
   return {
     type: session.data.pendingLogin.type,

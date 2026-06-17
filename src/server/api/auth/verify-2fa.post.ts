@@ -14,6 +14,13 @@ export default defineEventHandler(async (event) => {
       statusMessage: 'No pending authentication',
     });
   }
+  if (new Date() > new Date(pendingLogin.expires_at)) {
+    await session.update({
+      pendingLogin: undefined,
+    });
+
+    return { status: 'PENDING_LOGIN_EXPIRED' as const };
+  }
 
   const totpStatus = await Database.users.validateTotpCode(
     pendingLogin.userId,

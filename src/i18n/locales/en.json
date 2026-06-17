@@ -84,7 +84,8 @@
     "rememberMeDesc": "Stay logged after closing the browser",
     "insecure": "You can't log in with an insecure connection. Use HTTPS.",
     "2faRequired": "Two Factor Authentication is required",
-    "2faWrong": "Two Factor Authentication is wrong"
+    "2faWrong": "Two Factor Authentication is wrong",
+    "loginExpired": "Login expired. Try again"
   },
   "client": {
     "empty": "There are no clients yet.",
