@@ -12,6 +12,11 @@ type OAuthConfig = {
   userInfoFlow?: 'github';
 };
 
+type ConfiguredOAuthConfig = OAuthConfig & {
+  clientId: string;
+  clientSecret: string;
+};
+
 const GoogleConfig: OAuthConfig = {
   friendlyName: 'Google',
   server: 'https://accounts.google.com',
@@ -63,22 +68,23 @@ export function isValidOauthProvider(
 }
 
 export function isConfiguredOauthProvider(
-  oauthProvider: (typeof OAUTH_PROVIDERS)[OAUTH_PROVIDER]
-): oauthProvider is (typeof OAUTH_PROVIDERS)[OAUTH_PROVIDER] & {
-  clientId: string;
-  clientSecret: string;
-} {
+  oauthProvider: OAuthConfig
+): oauthProvider is ConfiguredOAuthConfig {
   if (!oauthProvider.clientId || !oauthProvider.clientSecret) {
     return false;
   }
   return true;
 }
 
-function isEnabledProvider(provider: OAUTH_PROVIDER) {
-  return WG_ENV.OAUTH_PROVIDERS?.includes(provider);
+function getEnabledOauthProvider(provider: OAUTH_PROVIDER) {
+  if (!WG_ENV.OAUTH_PROVIDERS?.includes(provider)) {
+    return;
+  }
+
+  // WG_ENV.OAUTH_PROVIDERS is filtered to configured providers during startup.
+  return OAUTH_PROVIDERS[provider] as ConfiguredOAuthConfig;
 }
 
-// TODO: simplify logic between WG_ENV.OAUTH_PROVIDERS and buildOauthConfig
 export async function buildOauthConfig(event: H3Event) {
   const provider = getRouterParam(event, 'provider');
   if (!provider || !isValidOauthProvider(provider)) {
@@ -88,19 +94,11 @@ export async function buildOauthConfig(event: H3Event) {
     });
   }
 
-  if (!isEnabledProvider(provider)) {
+  const oauthProvider = getEnabledOauthProvider(provider);
+  if (!oauthProvider) {
     throw createError({
       statusCode: 403,
       statusMessage: 'Provider is not enabled',
-    });
-  }
-
-  const oauthProvider = OAUTH_PROVIDERS[provider];
-
-  if (!isConfiguredOauthProvider(oauthProvider)) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Provider is not configured',
     });
   }
 
