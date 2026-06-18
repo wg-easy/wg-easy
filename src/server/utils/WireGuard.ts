@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 import { createDebug } from 'obug';
 import type { InterfaceType } from '#db/repositories/interface/types';
+import type { ClientQueryType } from '#db/repositories/client/types';
 
 const WG_DEBUG = createDebug('WireGuard');
 
@@ -78,15 +79,10 @@ class WireGuard {
     WG_DEBUG('Config synced successfully.');
   }
 
-  async getClientsForUser(userId: ID, filter?: string) {
+  async getClientsForUser(userId: ID, query: ClientQueryType) {
     const wgInterface = await Database.interfaces.get();
 
-    let dbClients;
-    if (filter?.trim()) {
-      dbClients = await Database.clients.getForUserFiltered(userId, filter);
-    } else {
-      dbClients = await Database.clients.getForUser(userId);
-    }
+    const dbClients = await Database.clients.getAllForUser(userId, query);
 
     const clients = dbClients.map((client) => ({
       ...client,
@@ -126,15 +122,10 @@ class WireGuard {
     return clientDump;
   }
 
-  async getAllClients(filter?: string) {
+  async getAllClients(query: ClientQueryType = {}) {
     const wgInterface = await Database.interfaces.get();
 
-    let dbClients;
-    if (filter?.trim()) {
-      dbClients = await Database.clients.getAllPublicFiltered(filter);
-    } else {
-      dbClients = await Database.clients.getAllPublic();
-    }
+    const dbClients = await Database.clients.getAllPublic(query);
 
     const clients = dbClients.map((client) => ({
       ...client,

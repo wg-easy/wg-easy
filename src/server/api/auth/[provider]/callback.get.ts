@@ -40,6 +40,8 @@ export default defineEventHandler(async (event) => {
             type: 'oauth',
             userId: result.userId,
             remember: false,
+            // 5min
+            expires_at: Date.now() + 5 * 60 * 1000,
           },
           oauth_nonce: undefined,
           oauth_state: undefined,

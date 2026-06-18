@@ -65,6 +65,14 @@ const _submit = useSubmit(
             type: 'error',
           });
           return;
+        } else if (data?.status === 'PENDING_LOGIN_EXPIRED') {
+          toast.showToast({
+            title: t('general.2fa'),
+            message: t('login.loginExpired'),
+            type: 'error',
+          });
+          await navigateTo('/login');
+          return;
         }
       }
       authenticating.value = false;
