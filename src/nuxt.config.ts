@@ -162,8 +162,7 @@ export default defineNuxtConfig({
     },
     esbuild: {
       options: {
-        // to support big int
-        target: 'node20',
+        target: 'node24',
       },
     },
     externals: {
