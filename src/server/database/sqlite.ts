@@ -13,6 +13,8 @@ import { InterfaceService } from './repositories/interface/service';
 import { HooksService } from './repositories/hooks/service';
 import { OneTimeLinkService } from './repositories/oneTimeLink/service';
 
+import { WG_ENV, WG_INITIAL_ENV } from '#server/utils/config';
+
 const DB_DEBUG = createDebug('Database');
 
 const client = createClient({ url: 'file:/etc/wireguard/wg-easy.db' });

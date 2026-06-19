@@ -1,3 +1,8 @@
+import { readValidatedBody } from 'h3';
+
+import Database from '#server/utils/Database';
+import { definePermissionEventHandler } from '#server/utils/handler';
+import { validateZod } from '#server/utils/types';
 import { UserUpdateSchema } from '#db/repositories/user/types';
 
 export default definePermissionEventHandler(

@@ -1,7 +1,14 @@
 import { eq, sql, and } from 'drizzle-orm';
 import { TOTP } from 'otpauth';
+
 import { user } from './schema';
 import type { UserType } from './types';
+
+import { WG_ENV } from '#server/utils/config';
+import type { OAUTH_PROVIDER } from '#server/utils/oauth';
+import { hashPassword, isPasswordValid } from '#server/utils/password';
+import type { ID } from '#server/utils/types';
+import { roles } from '#shared/utils/permissions';
 import type { DBType } from '#db/sqlite';
 
 type LoginResult =

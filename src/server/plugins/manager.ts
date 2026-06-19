@@ -1,3 +1,8 @@
+import { defineNitroPlugin } from 'nitropack/runtime';
+
+import WireGuard from '#server/utils/WireGuard';
+import { RELEASE } from '#server/utils/config';
+
 export default defineNitroPlugin((nitroApp) => {
   console.log(`
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓

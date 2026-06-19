@@ -1,6 +1,9 @@
 import type { InferSelectModel } from 'drizzle-orm';
 import z from 'zod';
+
 import type { hooks } from './schema';
+
+import { HookSchema, schemaForType } from '#server/utils/types';
 
 export type HooksType = InferSelectModel<typeof hooks>;
 

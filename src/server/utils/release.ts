@@ -1,3 +1,9 @@
+import { createError } from 'h3';
+import { $fetch } from 'ofetch';
+
+import { cacheFunction } from '#server/utils/cache';
+import { RELEASE, SERVER_DEBUG, WG_ENV } from '#server/utils/config';
+
 type GithubRelease = {
   tag_name: string;
   body: string;

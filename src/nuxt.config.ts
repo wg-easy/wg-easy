@@ -160,6 +160,9 @@ export default defineNuxtConfig({
     },
   },
   nitro: {
+    imports: {
+      autoImport: false,
+    },
     esbuild: {
       options: {
         // to support big int

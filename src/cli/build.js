@@ -1,6 +1,7 @@
 // @ts-check
 
 import { fileURLToPath } from 'node:url';
+
 import esbuild from 'esbuild';
 
 esbuild.build({

@@ -1,4 +1,9 @@
+import { createError, readValidatedBody } from 'h3';
 import { Secret, TOTP } from 'otpauth';
+
+import Database from '#server/utils/Database';
+import { definePermissionEventHandler } from '#server/utils/handler';
+import { validateZod } from '#server/utils/types';
 import { UserUpdateTotpSchema } from '#db/repositories/user/types';
 
 type Response =

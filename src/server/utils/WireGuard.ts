@@ -1,5 +1,14 @@
 import fs from 'node:fs/promises';
+
 import { createDebug } from 'obug';
+
+import Database from '#server/utils/Database';
+import { OLD_ENV, WG_ENV } from '#server/utils/config';
+import { firewall } from '#server/utils/firewall';
+import { encodeQRCode } from '#server/utils/qr';
+import type { ID } from '#server/utils/types';
+import { wg } from '#server/utils/wgHelper';
+import { setIntervalImmediately } from '#shared/utils/time';
 import type { InterfaceType } from '#db/repositories/interface/types';
 import type { ClientQueryType } from '#db/repositories/client/types';
 

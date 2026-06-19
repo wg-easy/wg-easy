@@ -3,6 +3,9 @@ import { int, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core';
 
 import { client } from '../../schema';
 
+import type { Role } from '#shared/utils/permissions';
+import type { OAUTH_PROVIDER } from '#server/utils/oauth';
+
 export const user = sqliteTable(
   'users_table',
   {

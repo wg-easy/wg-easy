@@ -1,3 +1,10 @@
+import { createError, sendRedirect } from 'h3';
+
+import Database from '#server/utils/Database';
+import { definePermissionEventHandler } from '#server/utils/handler';
+import { buildOauthConfig, getUserInfo } from '#server/utils/oauth';
+import { useWGSession } from '#server/utils/session';
+
 export default definePermissionEventHandler(
   'me',
   'update',

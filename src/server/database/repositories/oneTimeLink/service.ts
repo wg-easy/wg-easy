@@ -1,6 +1,9 @@
 import { eq, sql } from 'drizzle-orm';
 import CRC32 from 'crc-32';
+
 import { oneTimeLink } from './schema';
+
+import type { ID } from '#server/utils/types';
 import type { DBType } from '#db/sqlite';
 
 function createPreparedStatement(db: DBType) {

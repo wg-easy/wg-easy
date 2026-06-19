@@ -1,5 +1,16 @@
+import {
+  defineEventHandler,
+  getRequestHost,
+  getValidatedQuery,
+  sendRedirect,
+} from 'h3';
 import * as client from 'openid-client';
 import { z } from 'zod';
+
+import { WG_ENV } from '#server/utils/config';
+import { buildOauthConfig } from '#server/utils/oauth';
+import { useWGSession } from '#server/utils/session';
+import { validateZod } from '#server/utils/types';
 
 const OauthQuerySchema = z.object({
   link: z.coerce.boolean().optional(),
