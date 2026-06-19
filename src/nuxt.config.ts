@@ -2,10 +2,7 @@ import { fileURLToPath } from 'node:url';
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  future: {
-    compatibilityVersion: 4,
-  },
-  compatibilityDate: '2026-02-06',
+  compatibilityDate: '2026-06-19',
   devtools: { enabled: true },
   modules: [
     '@nuxtjs/i18n',

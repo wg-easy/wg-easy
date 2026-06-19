@@ -1,3 +1,5 @@
+import { createError } from 'h3';
+
 import type { ClientType } from '#db/repositories/client/types';
 import type { UserType } from '#db/repositories/user/types';
 
