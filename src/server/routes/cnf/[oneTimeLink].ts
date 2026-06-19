@@ -1,3 +1,13 @@
+import {
+  createError,
+  defineEventHandler,
+  getValidatedRouterParams,
+  setHeader,
+} from 'h3';
+
+import Database from '#server/utils/Database';
+import WireGuard from '#server/utils/WireGuard';
+import { validateZod } from '#server/utils/types';
 import { OneTimeLinkGetSchema } from '#db/repositories/oneTimeLink/types';
 
 export default defineEventHandler(async (event) => {

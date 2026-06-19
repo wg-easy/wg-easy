@@ -1,3 +1,4 @@
+import { useTranslation } from '@intlify/h3';
 import type { ZodType } from 'zod';
 import z from 'zod';
 import type { H3Event, EventHandlerRequest } from 'h3';

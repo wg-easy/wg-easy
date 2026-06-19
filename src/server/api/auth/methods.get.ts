@@ -1,3 +1,9 @@
+import { defineEventHandler } from 'h3';
+
+import { WG_ENV } from '#server/utils/config';
+import { OAUTH_PROVIDERS } from '#server/utils/oauth';
+import type { OAUTH_PROVIDER } from '#server/utils/oauth';
+
 export default defineEventHandler(() => {
   return {
     providers: WG_ENV.OAUTH_PROVIDERS?.reduce(

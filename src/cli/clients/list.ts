@@ -1,7 +1,7 @@
 import { defineCommand } from 'citty';
 import { consola } from 'consola';
 
-import { db } from '../db';
+import { db } from '#cli/db';
 
 export default defineCommand({
   meta: {

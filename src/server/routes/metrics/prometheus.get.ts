@@ -1,3 +1,10 @@
+import { setHeader } from 'h3';
+
+import Database from '#server/utils/Database';
+import WireGuard from '#server/utils/WireGuard';
+import { defineMetricsHandler } from '#server/utils/handler';
+import { isPeerConnected } from '#shared/utils/time';
+
 export default defineMetricsHandler('prometheus', async ({ event }) => {
   setHeader(event, 'Content-Type', 'text/plain');
   return getPrometheusResponse();

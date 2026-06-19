@@ -1,6 +1,8 @@
 import { eq, sql } from 'drizzle-orm';
+
 import { hooks } from './schema';
 import type { HooksUpdateType } from './types';
+
 import type { DBType } from '#db/sqlite';
 
 function createPreparedStatement(db: DBType) {

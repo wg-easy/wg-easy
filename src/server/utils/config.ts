@@ -1,6 +1,13 @@
 import { createDebug } from 'obug';
 import packageJson from '@@/package.json';
 
+import { exec } from '#server/utils/cmd';
+import {
+  OAUTH_PROVIDERS,
+  isConfiguredOauthProvider,
+  isValidOauthProvider,
+} from '#server/utils/oauth';
+
 export const RELEASE = 'v' + packageJson.version;
 
 export const SERVER_DEBUG = createDebug('Server');

@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest';
-import { firewallTestExports } from '../../server/utils/firewall';
-import { typesTestExports } from '../../server/utils/types';
+
+import { firewallTestExports } from '#server/utils/firewall';
+import { typesTestExports } from '#server/utils/types';
 
 describe('firewall', () => {
   describe('isValidFirewallEntry', () => {

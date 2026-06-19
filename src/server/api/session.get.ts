@@ -1,3 +1,9 @@
+import { createError, defineEventHandler } from 'h3';
+
+import Database from '#server/utils/Database';
+import { useWGSession } from '#server/utils/session';
+import type { SharedPublicUser } from '#shared/utils/permissions';
+
 export default defineEventHandler(async (event) => {
   const session = await useWGSession(event);
 

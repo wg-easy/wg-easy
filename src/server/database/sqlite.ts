@@ -4,14 +4,15 @@ import { createClient } from '@libsql/client';
 import { createDebug } from 'obug';
 import { eq } from 'drizzle-orm';
 
-import * as schema from './schema';
-import { ClientService } from './repositories/client/service';
-import { GeneralService } from './repositories/general/service';
-import { UserService } from './repositories/user/service';
-import { UserConfigService } from './repositories/userConfig/service';
-import { InterfaceService } from './repositories/interface/service';
-import { HooksService } from './repositories/hooks/service';
-import { OneTimeLinkService } from './repositories/oneTimeLink/service';
+import { GeneralService } from '#db/repositories/general/service';
+import { UserService } from '#db/repositories/user/service';
+import { UserConfigService } from '#db/repositories/userConfig/service';
+import { InterfaceService } from '#db/repositories/interface/service';
+import { HooksService } from '#db/repositories/hooks/service';
+import { OneTimeLinkService } from '#db/repositories/oneTimeLink/service';
+import { ClientService } from '#db/repositories/client/service';
+import * as schema from '#db/schema';
+import { WG_ENV, WG_INITIAL_ENV } from '#server/utils/config';
 
 const DB_DEBUG = createDebug('Database');
 

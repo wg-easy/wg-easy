@@ -1,8 +1,27 @@
 import type { InferSelectModel } from 'drizzle-orm';
 import z from 'zod';
-
 import { isIPv4, isIPv6 } from 'is-ip';
+
 import type { client } from './schema';
+
+import {
+  AddressSchema,
+  AllowedIpsSchema,
+  DnsSchema,
+  EnabledSchema,
+  FirewallIpsSchema,
+  HookSchema,
+  ISchema,
+  JcSchema,
+  JmaxSchema,
+  JminSchema,
+  MtuSchema,
+  PersistentKeepaliveSchema,
+  controlStringRefine,
+  safeStringRefine,
+  schemaForType,
+  t,
+} from '#server/utils/types';
 
 export type ClientType = InferSelectModel<typeof client>;
 

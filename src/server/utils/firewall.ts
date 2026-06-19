@@ -1,6 +1,7 @@
 import { createDebug } from 'obug';
 import { isIPv6 } from 'is-ip';
 
+import { exec } from '#server/utils/cmd';
 import type { ClientType } from '#db/repositories/client/types';
 import type { InterfaceType } from '#db/repositories/interface/types';
 import type { UserConfigType } from '#db/repositories/userConfig/types';

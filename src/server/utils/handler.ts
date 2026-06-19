@@ -1,4 +1,9 @@
+import { createError, defineEventHandler, getHeader } from 'h3';
 import type { EventHandlerRequest, EventHandlerResponse, H3Event } from 'h3';
+
+import Database from '#server/utils/Database';
+import { isPasswordValid } from '#server/utils/password';
+import { getCurrentUser } from '#server/utils/session';
 import type { UserType } from '#db/repositories/user/types';
 import type { SetupStepType } from '#db/repositories/general/types';
 import {

@@ -1,6 +1,9 @@
 import type { InferSelectModel } from 'drizzle-orm';
 import z from 'zod';
+
 import type { general } from './schema';
+
+import { safeStringRefine, t } from '#server/utils/types';
 
 export type GeneralType = InferSelectModel<typeof general>;
 

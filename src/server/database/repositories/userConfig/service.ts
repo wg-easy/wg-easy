@@ -1,6 +1,8 @@
 import { eq, sql } from 'drizzle-orm';
+
 import { userConfig } from './schema';
 import type { UserConfigUpdateType } from './types';
+
 import { wgInterface } from '#db/schema';
 import type { DBType } from '#db/sqlite';
 

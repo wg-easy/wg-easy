@@ -1,5 +1,8 @@
+import { createError, getRequestURL, getRouterParam } from 'h3';
 import type { H3Event } from 'h3';
 import * as client from 'openid-client';
+
+import { WG_ENV } from '#server/utils/config';
 
 type OAuthConfig = {
   friendlyName: string;

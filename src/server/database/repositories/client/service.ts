@@ -1,5 +1,6 @@
 import { eq, sql, or, like, and } from 'drizzle-orm';
 import { containsCidr, parseCidr } from 'cidr-tools';
+
 import { client } from './schema';
 import type {
   ClientCreateFromExistingType,
@@ -7,6 +8,11 @@ import type {
   ClientQueryType,
   UpdateClientType,
 } from './types';
+
+import Database from '#server/utils/Database';
+import { nextIP } from '#server/utils/ip';
+import type { ID } from '#server/utils/types';
+import { wg } from '#server/utils/wgHelper';
 import type { DBType } from '#db/sqlite';
 import { wgInterface, userConfig } from '#db/schema';
 

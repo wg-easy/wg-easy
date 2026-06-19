@@ -1,7 +1,10 @@
 import { eq, sql } from 'drizzle-orm';
 import { parseCidr } from 'cidr-tools';
+
 import { wgInterface } from './schema';
 import type { InterfaceCidrUpdateType, InterfaceUpdateType } from './types';
+
+import { nextIP } from '#server/utils/ip';
 import { client as clientSchema } from '#db/schema';
 import type { DBType } from '#db/sqlite';
 

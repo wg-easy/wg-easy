@@ -1,8 +1,10 @@
 import { Resolver } from 'node:dns/promises';
 import { networkInterfaces } from 'node:os';
+
 import { stringifyIp } from 'ip-bigint';
 import type { parseCidr } from 'cidr-tools';
 
+import { cacheFunction } from '#server/utils/cache';
 import type { ClientNextIpType } from '#db/repositories/client/types';
 
 type ParsedCidr = ReturnType<typeof parseCidr>;
