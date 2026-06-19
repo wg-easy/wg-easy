@@ -4,7 +4,7 @@ import {
   hashPassword,
   isPasswordValid,
   isValidPasswordHash,
-} from '../../server/utils/password';
+} from '#server/utils/password';
 
 describe('password', () => {
   test('password', async () => {

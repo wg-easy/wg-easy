@@ -1,11 +1,9 @@
 import { parseCidr } from 'cidr-tools';
 import { stringifyIp } from 'ip-bigint';
 
-import { removeNewlines } from './template';
-
+import { removeNewlines, iptablesTemplate } from '#server/utils/template';
 import { exec } from '#server/utils/cmd';
 import { WG_ENV } from '#server/utils/config';
-import { iptablesTemplate } from '#server/utils/template';
 import type { ClientType } from '#db/repositories/client/types';
 import type { InterfaceType } from '#db/repositories/interface/types';
 import type { UserConfigType } from '#db/repositories/userConfig/types';
