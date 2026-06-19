@@ -1,4 +1,3 @@
-// Make sure to not use any Path Aliases in these files
 export * from '#db/repositories/client/schema';
 export * from '#db/repositories/general/schema';
 export * from '#db/repositories/hooks/schema';
