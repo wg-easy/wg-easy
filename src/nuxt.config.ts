@@ -169,15 +169,12 @@ export default defineNuxtConfig({
         target: 'node20',
       },
     },
-    alias: {
-      '#db': fileURLToPath(new URL('./server/database/', import.meta.url)),
-    },
     externals: {
       traceInclude: [fileURLToPath(new URL('./cli/index.ts', import.meta.url))],
     },
   },
   alias: {
-    // for typecheck reasons (https://github.com/nuxt/cli/issues/323)
     '#db': fileURLToPath(new URL('./server/database/', import.meta.url)),
+    '#cli': fileURLToPath(new URL('./cli', import.meta.url)),
   },
 });

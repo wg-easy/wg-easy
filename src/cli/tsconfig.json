@@ -9,7 +9,8 @@
     "moduleResolution": "bundler",
     "paths": {
       "#cli/*": ["./*"],
-      "#server/*": ["../server/*"]
+      "#server/*": ["../server/*"],
+      "#db/*": ["../server/database/*"]
     }
   },
   "include": ["./**/*.ts"]
