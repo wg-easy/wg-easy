@@ -2,9 +2,9 @@ import { defineCommand } from 'citty';
 import { consola } from 'consola';
 import { eq } from 'drizzle-orm';
 
-import { wg } from '../../server/utils/wgHelper';
-import { encodeQRCodeTerm } from '../../server/utils/qr';
-import { db, schema } from '../db';
+import { db, schema } from '#cli/db';
+import { wg } from '#server/utils/wgHelper';
+import { encodeQRCodeTerm } from '#server/utils/qr';
 
 export default defineCommand({
   meta: {

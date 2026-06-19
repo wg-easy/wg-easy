@@ -1,5 +1,3 @@
-// ! Auto Imports are not supported in this file
-
 import argon2 from 'argon2';
 import { deserialize } from '@phc/format';
 

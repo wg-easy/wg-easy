@@ -1,4 +1,3 @@
-// ! Auto Imports are not supported in this file
 import { WG_ENV } from '#server/utils/config';
 import type { InterfaceType } from '#db/repositories/interface/types';
 

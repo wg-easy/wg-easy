@@ -9,8 +9,6 @@ import type { InterfaceType } from '#db/repositories/interface/types';
 import type { UserConfigType } from '#db/repositories/userConfig/types';
 import type { HooksType } from '#db/repositories/hooks/types';
 
-// ! Auto Imports are not supported in this file
-
 type Options = {
   enableIpv6?: boolean;
 };

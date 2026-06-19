@@ -6,7 +6,11 @@
     "esModuleInterop": true,
     "strict": true,
     "skipLibCheck": true,
-    "moduleResolution": "bundler"
+    "moduleResolution": "bundler",
+    "paths": {
+      "#cli/*": ["./*"],
+      "#server/*": ["../server/*"]
+    }
   },
   "include": ["./**/*.ts"]
 }

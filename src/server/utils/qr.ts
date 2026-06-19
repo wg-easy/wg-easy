@@ -1,5 +1,3 @@
-// ! Auto Imports are not supported in this file
-
 import type { ErrorCorrection } from 'qr';
 import { encodeQR } from 'qr';
 
