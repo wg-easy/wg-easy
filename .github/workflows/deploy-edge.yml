@@ -28,7 +28,7 @@ jobs:
           # - platform: linux/arm/v7
           #   os: ubuntu-24.04-arm
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           ref: master
 
@@ -153,7 +153,7 @@ jobs:
       contents: write
     needs: docker-merge
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           ref: master
 
