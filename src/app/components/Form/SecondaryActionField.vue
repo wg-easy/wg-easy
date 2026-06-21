@@ -1,16 +1,32 @@
 <template>
-  <input
-    :value="label"
-    :type="type ?? 'button'"
-    class="col-span-2 rounded-lg border-2 border-gray-100 py-2 text-gray-500 hover:border-red-800 hover:bg-red-800 hover:text-white focus:border-red-800 focus:outline-0 focus:ring-0 dark:border-neutral-800 dark:bg-neutral-700 dark:text-neutral-200 dark:placeholder:text-neutral-400"
-  />
+  <BaseFormSecondaryButton
+    :as="as"
+    :value="isInput ? label : undefined"
+    :type="isInput ? type : undefined"
+    class="col-span-2 px-4 py-2"
+  >
+    <template v-if="!isInput">
+      {{ label }}
+    </template>
+  </BaseFormSecondaryButton>
 </template>
 
 <script lang="ts" setup>
 import type { InputTypeHTMLAttribute } from 'vue';
 
-defineProps<{
-  label: string;
-  type?: InputTypeHTMLAttribute;
-}>();
+const props = withDefaults(
+  defineProps<{
+    label: string;
+    type?: InputTypeHTMLAttribute;
+    as?: string;
+  }>(),
+  {
+    type: 'button',
+    as: 'input',
+  }
+);
+
+const isInput = computed(() => {
+  return props.as === 'input';
+});
 </script>

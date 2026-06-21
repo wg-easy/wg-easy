@@ -1,4 +1,5 @@
-import type { ZodSchema } from 'zod';
+import { useTranslation } from '@intlify/h3';
+import type { ZodType } from 'zod';
 import z from 'zod';
 import type { H3Event, EventHandlerRequest } from 'h3';
 import { isIP } from 'is-ip';
@@ -19,6 +20,15 @@ export const safeStringRefine = z
     (v) => v !== '__proto__' && v !== 'constructor' && v !== 'prototype',
     { message: t('zod.stringMalformed') }
   );
+
+function hasControlChars(str: string) {
+  // eslint-disable-next-line no-control-regex
+  return /[\x00-\x1F\x7F]/.test(str);
+}
+
+export const controlStringRefine = z
+  .string()
+  .refine((v) => !hasControlChars(v), { message: t('zod.stringMalformed') });
 
 export const EnabledSchema = z.boolean({ message: t('zod.enabled') });
 
@@ -70,7 +80,11 @@ export const HSchema = z
   })
   .nullable();
 
-export const ISchema = z.string().nullable();
+export const ISchema = z
+  .string()
+  .pipe(safeStringRefine)
+  .pipe(controlStringRefine)
+  .nullable();
 
 export const PortSchema = z
   .number({ message: t('zod.port') })
@@ -85,7 +99,8 @@ export const PersistentKeepaliveSchema = z
 export const AddressSchema = z
   .string({ message: t('zod.address') })
   .min(1, { message: t('zod.address') })
-  .pipe(safeStringRefine);
+  .pipe(safeStringRefine)
+  .pipe(controlStringRefine);
 
 export const DnsSchema = z.array(AddressSchema, { message: t('zod.dns') });
 
@@ -168,7 +183,7 @@ export const schemaForType =
   };
 
 export function validateZod<T>(
-  schema: ZodSchema<T>,
+  schema: ZodType<T>,
   event: H3Event<EventHandlerRequest>
 ) {
   return async (data: unknown) => {
@@ -199,6 +214,22 @@ export function validateZod<T>(
                         newMessage = t('zod.generic.numberMin', [
                           t(v.message),
                           v.minimum,
+                        ]);
+                        break;
+                    }
+                    break;
+                  case 'too_big':
+                    switch (v.origin) {
+                      case 'string':
+                        newMessage = t('zod.generic.stringMax', [
+                          t(v.message),
+                          v.maximum,
+                        ]);
+                        break;
+                      case 'number':
+                        newMessage = t('zod.generic.numberMax', [
+                          t(v.message),
+                          v.maximum,
                         ]);
                         break;
                     }
@@ -247,6 +278,7 @@ export function validateZod<T>(
           })
           .join('; ');
       }
+      // eslint-disable-next-line preserve-caught-error
       throw new Error(message);
     }
   };

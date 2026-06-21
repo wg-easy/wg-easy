@@ -6,9 +6,10 @@ import { defineCommand, runMain } from 'citty';
 import packageJson from '../package.json';
 
 // Commands
-import dbAdminReset from './admin/reset';
-import clientsList from './clients/list';
-import clientsQr from './clients/qr';
+import clientsList from '#cli/clients/list';
+import clientsQr from '#cli/clients/qr';
+import dbAdminReset from '#cli/admin/reset';
+
 const subCommands = [dbAdminReset, clientsList, clientsQr] as const;
 
 // from citty

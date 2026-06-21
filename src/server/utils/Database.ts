@@ -1,3 +1,4 @@
+import WireGuard from '#server/utils/WireGuard';
 /**
  * Changing the Database Provider
  * This design allows for easy swapping of different database implementations.

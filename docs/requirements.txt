@@ -1,4 +1,2 @@
-mkdocs-material
-pillow
-cairosvg
-mike
+zensical==0.0.45
+git+https://github.com/squidfunk/mike.git

@@ -1,3 +1,11 @@
+import { createError, readValidatedBody } from 'h3';
+
+import Database from '#server/utils/Database';
+import WireGuard from '#server/utils/WireGuard';
+import { WG_ENV } from '#server/utils/config';
+import { firewall } from '#server/utils/firewall';
+import { definePermissionEventHandler } from '#server/utils/handler';
+import { validateZod } from '#server/utils/types';
 import { InterfaceUpdateSchema } from '#db/repositories/interface/types';
 
 export default definePermissionEventHandler(

@@ -1,6 +1,22 @@
 import type { InferSelectModel } from 'drizzle-orm';
 import z from 'zod';
+
 import type { userConfig } from './schema';
+
+import {
+  AllowedIpsSchema,
+  DnsSchema,
+  ISchema,
+  JcSchema,
+  JmaxSchema,
+  JminSchema,
+  MtuSchema,
+  PersistentKeepaliveSchema,
+  PortSchema,
+  safeStringRefine,
+  schemaForType,
+  t,
+} from '#server/utils/types';
 
 export type UserConfigType = InferSelectModel<typeof userConfig>;
 

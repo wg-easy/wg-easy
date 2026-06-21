@@ -1,3 +1,8 @@
+import { getValidatedRouterParams } from 'h3';
+
+import Database from '#server/utils/Database';
+import { definePermissionEventHandler } from '#server/utils/handler';
+import { validateZod } from '#server/utils/types';
 import { ClientGetSchema } from '#db/repositories/client/types';
 
 export default definePermissionEventHandler(

@@ -61,6 +61,7 @@ Pick an IPv4 and IPv6 subnet for your clients and add static routes on your rout
 /// note | 2001:db8::/32
 
 The _documentation prefix_ `2001:db8::/32` (RFC 3849) used in this example is not meant for production use, replace it with your own ISP-assigned IPv6 prefix (GUA) or local prefix (ULA)
+
 ///
 
 I want my WireGuard clients in `192.168.0.0/24` and `2001:db8:abc:0::/64`.

@@ -7,6 +7,7 @@ title: No Reverse Proxy
 This is insecure. You should use a reverse proxy to secure the connection.
 
 Only use this method if you know what you are doing.
+
 ///
 
 If you only allow access to the web UI from your local network, you can skip the reverse proxy setup. This is not recommended, but it is possible.

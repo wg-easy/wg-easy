@@ -1,3 +1,13 @@
+import {
+  createError,
+  defineEventHandler,
+  getValidatedRouterParams,
+  setHeader,
+} from 'h3';
+
+import Database from '#server/utils/Database';
+import WireGuard from '#server/utils/WireGuard';
+import { validateZod } from '#server/utils/types';
 import { OneTimeLinkGetSchema } from '#db/repositories/oneTimeLink/types';
 
 export default defineEventHandler(async (event) => {
@@ -11,6 +21,13 @@ export default defineEventHandler(async (event) => {
     throw createError({
       statusCode: 404,
       statusMessage: 'Invalid One Time Link',
+    });
+  }
+
+  if (new Date() > new Date(otl.expiresAt)) {
+    throw createError({
+      statusCode: 410,
+      statusMessage: 'One Time Link has expired',
     });
   }
 

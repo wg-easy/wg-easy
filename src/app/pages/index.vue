@@ -2,11 +2,15 @@
   <main>
     <Panel>
       <PanelHead>
-        <PanelHeadTitle :text="$t('pages.clients')" />
+        <PanelHeadTitle>
+          {{ $t('pages.clients') }}
+        </PanelHeadTitle>
         <PanelHeadBoat>
           <ClientsSearch />
-          <ClientsSort />
-          <ClientsNew />
+          <div class="flex gap-2">
+            <ClientsSort />
+            <ClientsNew />
+          </div>
         </PanelHeadBoat>
       </PanelHead>
 

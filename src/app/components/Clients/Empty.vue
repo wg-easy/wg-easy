@@ -3,7 +3,7 @@
     {{ $t('client.empty') }}<br /><br />
     <ClientsCreateDialog>
       <BaseSecondaryButton as="span">
-        <IconsPlus class="w-4 md:mr-2" />
+        <IconsPlus class="mr-2 w-4" />
         <span class="text-sm">{{ $t('client.new') }}</span>
       </BaseSecondaryButton>
     </ClientsCreateDialog>

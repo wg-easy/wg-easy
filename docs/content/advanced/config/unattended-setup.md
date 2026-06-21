@@ -23,6 +23,7 @@ These will only be used during the first start of the container. After that, the
 If variables are in the same group, you have to set all of them. For example, if you set `INIT_IPV4_CIDR`, you also have to set `INIT_IPV6_CIDR`.
 
 If you want to skip the setup process, you have to configure group `1`
+
 ///
 
 /// note | Security
@@ -30,4 +31,5 @@ If you want to skip the setup process, you have to configure group `1`
 The initial username and password is not checked for complexity. Make sure to set a long enough username and password. Otherwise, the user won't be able to log in.
 
 It's recommended to remove the variables after the setup is done to prevent the password from being exposed.
+
 ///

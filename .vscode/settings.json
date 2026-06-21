@@ -26,5 +26,8 @@
   "i18n-ally.sortKeys": false,
   "i18n-ally.keepFulfilled": false,
   "i18n-ally.keystyle": "nested",
-  "editor.gotoLocation.multipleDefinitions": "goto"
+  "editor.gotoLocation.multipleDefinitions": "goto",
+  "[toml]": {
+    "editor.defaultFormatter": "tamasfe.even-better-toml"
+  }
 }

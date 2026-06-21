@@ -24,6 +24,7 @@ There are a few requirements for a suitable host system:
 
 On the host, you need to have a suitable container runtime (like _Docker_ or _Podman_) installed. We assume [_Docker Compose_][docker-compose] is [installed][docker-compose-installation]. We have aligned file names and configuration conventions with the latest [Docker Compose specification][docker-compose-specification].
 If you're using podman, make sure to read the related [documentation][docs-podman].
+
 ///
 
 [docker-compose]: https://docs.docker.com/compose/
@@ -69,6 +70,7 @@ When publishing a tag we follow the [Semantic Versioning][semver] specification.
 /// danger | Use the Correct Commands For Stopping and Starting `wg-easy`
 
 **Use `sudo docker compose up / down`, not `sudo docker compose start / stop`**. Otherwise, the container is not properly destroyed and you may experience problems during startup because of inconsistent state.
+
 ///
 
 **That's it! It really is that easy**.

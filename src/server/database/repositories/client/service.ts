@@ -1,11 +1,18 @@
 import { eq, sql, or, like, and } from 'drizzle-orm';
 import { containsCidr, parseCidr } from 'cidr-tools';
+
 import { client } from './schema';
 import type {
   ClientCreateFromExistingType,
   ClientCreateType,
+  ClientQueryType,
   UpdateClientType,
 } from './types';
+
+import Database from '#server/utils/Database';
+import { nextIP } from '#server/utils/ip';
+import type { ID } from '#server/utils/types';
+import { wg } from '#server/utils/wgHelper';
 import type { DBType } from '#db/sqlite';
 import { wgInterface, userConfig } from '#db/schema';
 
@@ -18,62 +25,8 @@ function createPreparedStatement(db: DBType) {
         },
       })
       .prepare(),
-    findAllPublic: db.query.client
-      .findMany({
-        with: {
-          oneTimeLink: true,
-        },
-        columns: {
-          privateKey: false,
-          preSharedKey: false,
-        },
-      })
-      .prepare(),
     findById: db.query.client
       .findFirst({ where: eq(client.id, sql.placeholder('id')) })
-      .prepare(),
-    findByUserId: db.query.client
-      .findMany({
-        where: eq(client.userId, sql.placeholder('userId')),
-        with: { oneTimeLink: true },
-        columns: {
-          privateKey: false,
-          preSharedKey: false,
-        },
-      })
-      .prepare(),
-    findAllPublicFiltered: db.query.client
-      .findMany({
-        where: or(
-          like(client.name, sql.placeholder('filter')),
-          like(client.ipv4Address, sql.placeholder('filter')),
-          like(client.ipv6Address, sql.placeholder('filter'))
-        ),
-        with: {
-          oneTimeLink: true,
-        },
-        columns: {
-          privateKey: false,
-          preSharedKey: false,
-        },
-      })
-      .prepare(),
-    findByUserIdFiltered: db.query.client
-      .findMany({
-        where: and(
-          eq(client.userId, sql.placeholder('userId')),
-          or(
-            like(client.name, sql.placeholder('filter')),
-            like(client.ipv4Address, sql.placeholder('filter')),
-            like(client.ipv6Address, sql.placeholder('filter'))
-          )
-        ),
-        with: { oneTimeLink: true },
-        columns: {
-          privateKey: false,
-          preSharedKey: false,
-        },
-      })
       .prepare(),
     toggle: db
       .update(client)
@@ -96,15 +49,6 @@ export class ClientService {
     this.#statements = createPreparedStatement(db);
   }
 
-  async getForUser(userId: ID) {
-    const result = await this.#statements.findByUserId.execute({ userId });
-    return result.map((row) => ({
-      ...row,
-      createdAt: new Date(row.createdAt),
-      updatedAt: new Date(row.updatedAt),
-    }));
-  }
-
   /**
    * Never return values directly from this function. Use {@link getAllPublic} instead.
    */
@@ -120,8 +64,41 @@ export class ClientService {
   /**
    * Returns all clients without sensitive data
    */
-  async getAllPublic() {
-    const result = await this.#statements.findAllPublic.execute();
+  async getAllPublic({ filter, sort }: ClientQueryType) {
+    const filters = [];
+
+    if (filter?.trim()) {
+      const filterPattern = `%${filter?.toLowerCase()}%`;
+      filters.push(
+        or(
+          like(client.name, filterPattern),
+          like(client.ipv4Address, filterPattern),
+          like(client.ipv6Address, filterPattern)
+        )
+      );
+    }
+
+    const result = await this.#db.query.client
+      .findMany({
+        with: {
+          oneTimeLink: true,
+        },
+        where: and(...filters),
+        columns: {
+          privateKey: false,
+          preSharedKey: false,
+        },
+        orderBy: (t, { asc, desc }) => {
+          if (sort === 'desc') {
+            return desc(t.name);
+          } else {
+            // default to asc
+            return asc(t.name);
+          }
+        },
+      })
+      .execute();
+
     return result.map((row) => ({
       ...row,
       createdAt: new Date(row.createdAt),
@@ -130,32 +107,40 @@ export class ClientService {
   }
 
   /**
-   * Get clients based on user ID and filter conditions
+   * Returns all clients without sensitive data belonging to user
    */
-  async getForUserFiltered(userId: ID, filter: string) {
-    const filterPattern = `%${filter.toLowerCase()}%`;
+  async getAllForUser(userId: ID, { filter, sort }: ClientQueryType) {
+    const filters = [];
 
-    const result = await this.#statements.findByUserIdFiltered.execute({
-      userId,
-      filter: filterPattern,
-    });
+    if (filter?.trim()) {
+      const filterPattern = `%${filter?.toLowerCase()}%`;
+      filters.push(
+        or(
+          like(client.name, filterPattern),
+          like(client.ipv4Address, filterPattern),
+          like(client.ipv6Address, filterPattern)
+        )
+      );
+    }
 
-    return result.map((row) => ({
-      ...row,
-      createdAt: new Date(row.createdAt),
-      updatedAt: new Date(row.updatedAt),
-    }));
-  }
-
-  /**
-   * Get all clients based on filter conditions without sensitive data
-   */
-  async getAllPublicFiltered(filter: string) {
-    const filterPattern = `%${filter.toLowerCase()}%`;
-
-    const result = await this.#statements.findAllPublicFiltered.execute({
-      filter: filterPattern,
-    });
+    const result = await this.#db.query.client
+      .findMany({
+        where: and(eq(client.userId, userId), ...filters),
+        with: { oneTimeLink: true },
+        columns: {
+          privateKey: false,
+          preSharedKey: false,
+        },
+        orderBy: (t, { asc, desc }) => {
+          if (sort === 'desc') {
+            return desc(t.name);
+          } else {
+            // default to asc
+            return asc(t.name);
+          }
+        },
+      })
+      .execute();
 
     return result.map((row) => ({
       ...row,

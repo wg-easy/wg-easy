@@ -1,0 +1,97 @@
+[project]
+site_name = "wg-easy"
+site_description = "The easiest way to run WireGuard VPN + Web-based Admin UI."
+site_author = "WireGuard Easy"
+copyright = """
+<p>
+&copy <a href="https://github.com/wg-easy"><em>Wireguard Easy</em></a><br/>
+<span>This project is licensed under AGPL-3.0-only.</span><br/>
+<span>This project is not affiliated, associated, authorized, endorsed by, or in any way officially connected with Jason A. Donenfeld, ZX2C4 or Edge Security</span><br/>
+<span>"WireGuard" and the "WireGuard" logo are registered trademarks of Jason A. Donenfeld</span>
+</p>
+"""
+
+repo_url = "https://github.com/wg-easy/wg-easy"
+repo_name = "wg-easy"
+
+edit_uri = "edit/master/docs/content"
+
+docs_dir = "content/"
+
+site_url = "https://wg-easy.github.io/wg-easy"
+
+[project.theme]
+variant = "modern"
+favicon = "assets/logo/favicon.png"
+logo = "assets/logo/logo.png"
+features = [
+  "navigation.instant",
+  "navigation.tabs",
+  "navigation.expand",
+  "navigation.path",
+  "navigation.top",
+  "content.action.edit",
+  "content.action.view",
+  "content.code.copy",
+  "content.code.annotate",
+]
+
+[project.theme.icon]
+repo = "fontawesome/brands/github"
+
+# Palette toggle for automatic mode
+[[project.theme.palette]]
+media = "(prefers-color-scheme)"
+toggle.icon = "lucide/sun-moon"
+toggle.name = "Switch to light mode"
+
+# Palette toggle for light mode
+[[project.theme.palette]]
+media = "(prefers-color-scheme: light)"
+scheme = "default"
+primary = "grey"
+accent = "red"
+toggle.icon = "lucide/sun"
+toggle.name = "Switch to dark mode"
+
+# Palette toggle for dark mode
+[[project.theme.palette]]
+media = "(prefers-color-scheme: dark)"
+scheme = "slate"
+primary = "grey"
+accent = "red"
+toggle.icon = "lucide/moon"
+toggle.name = "Switch to system preference"
+
+# [project.plugins.privacy]
+
+[project.extra.version]
+provider = "mike"
+
+[project.markdown_extensions.pymdownx.blocks.admonition]
+types = ["danger", "note", "info", "question", "warning"]
+
+[project.markdown_extensions.md_in_html]
+
+[project.markdown_extensions.toc]
+permalink = true
+
+[project.markdown_extensions.pymdownx.details]
+
+[project.markdown_extensions.pymdownx.emoji]
+emoji_generator = "zensical.extensions.emoji.to_svg"
+emoji_index = "zensical.extensions.emoji.twemoji"
+
+[project.markdown_extensions.pymdownx.highlight]
+anchor_linenums = true
+line_spans = "__span"
+pygments_lang_class = true
+
+[project.markdown_extensions.pymdownx.inlinehilite]
+
+[project.markdown_extensions.pymdownx.smartsymbols]
+
+[project.markdown_extensions.pymdownx.superfences]
+custom_fences = [
+  { name = "mermaid", class = "mermaid", format = "pymdownx.superfences.fence_code_format" },
+]

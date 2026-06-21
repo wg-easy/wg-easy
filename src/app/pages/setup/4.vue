@@ -43,10 +43,11 @@ const host = ref<null | string>(null);
 const port = ref<number>(51820);
 
 const _submit = useSubmit(
-  '/api/setup/4',
-  {
-    method: 'post',
-  },
+  (data) =>
+    $fetch('/api/setup/4', {
+      method: 'post',
+      body: data,
+    }),
   {
     revert: async (success) => {
       if (success) {

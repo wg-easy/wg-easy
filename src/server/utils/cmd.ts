@@ -1,7 +1,8 @@
 import childProcess from 'child_process';
-import debug from 'debug';
 
-const CMD_DEBUG = debug('CMD');
+import { createDebug } from 'obug';
+
+const CMD_DEBUG = createDebug('CMD');
 
 export function exec(
   cmd: string,

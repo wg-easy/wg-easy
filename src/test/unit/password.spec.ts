@@ -1,9 +1,10 @@
 import { expect, test, describe } from 'vitest';
+
 import {
   hashPassword,
   isPasswordValid,
   isValidPasswordHash,
-} from '../../server/utils/password';
+} from '#server/utils/password';
 
 describe('password', () => {
   test('password', async () => {
@@ -16,5 +17,9 @@ describe('password', () => {
     expect(isValidPasswordHash(hash)).toBe(true);
 
     expect(isValidPasswordHash(hash.replace('argon2', 'argon3'))).toBe(false);
+  });
+
+  test('missing password hash is never valid', async () => {
+    await expect(isPasswordValid('password', null)).resolves.toBe(false);
   });
 });

@@ -1,6 +1,12 @@
+import { readValidatedBody } from 'h3';
 import { parseCidr } from 'cidr-tools';
 import { stringifyIp } from 'ip-bigint';
 import { z } from 'zod';
+
+import Database from '#server/utils/Database';
+import { defineSetupEventHandler } from '#server/utils/handler';
+import { nextIP } from '#server/utils/ip';
+import { FileSchema, validateZod } from '#server/utils/types';
 
 export default defineSetupEventHandler('migrate', async ({ event }) => {
   const { file } = await readValidatedBody(

@@ -2,7 +2,9 @@
   <main v-if="data">
     <Panel>
       <PanelHead>
-        <PanelHeadTitle :text="data.name" />
+        <PanelHeadTitle>
+          {{ data.name }}
+        </PanelHeadTitle>
       </PanelHead>
       <PanelBody>
         <FormElement @submit.prevent="submit">
@@ -186,9 +188,7 @@
             >
               <FormSecondaryActionField
                 :label="$t('client.delete')"
-                class="w-full"
-                type="button"
-                tabindex="-1"
+                class="inline-block w-full"
                 as="span"
               />
             </ClientsDeleteDialog>
@@ -198,9 +198,7 @@
             >
               <FormSecondaryActionField
                 :label="$t('client.viewConfig')"
-                class="w-full"
-                type="button"
-                tabindex="-1"
+                class="inline-block w-full"
                 as="span"
               />
             </ClientsConfigDialog>
@@ -223,10 +221,11 @@ const { data: _data, refresh } = await useFetch(`/api/client/${id}`, {
 const data = toRef(_data.value);
 
 const _submit = useSubmit(
-  `/api/client/${id}`,
-  {
-    method: 'post',
-  },
+  (data) =>
+    $fetch(`/api/client/${id}`, {
+      method: 'post',
+      body: data,
+    }),
   {
     revert: async (success) => {
       if (success) {
@@ -248,10 +247,11 @@ async function revert() {
 }
 
 const _deleteClient = useSubmit(
-  `/api/client/${id}`,
-  {
-    method: 'delete',
-  },
+  (data) =>
+    $fetch(`/api/client/${id}`, {
+      method: 'delete',
+      body: data,
+    }),
   {
     revert: async () => {
       await navigateTo('/');

@@ -9,9 +9,11 @@ This tutorial is a follow-up to the official [Traefik tutorial](./traefik.md). I
 - A working [wg-easy](./basic-installation.md) and [Traefik](./traefik.md) setup from the previous guides.
 
 /// warning | Important: Following this guide will reset your WireGuard configuration.
+
 The process involves re-creating the `wg-easy` container and its data, which means **all existing WireGuard clients and settings will be deleted.**
 
 You will need to create your clients again after completing this guide.
+
 ///
 
 ## Add `adguard` configuration
@@ -152,12 +154,14 @@ networks:
 2. Navigate to `https://adguard.$example.com$` to begin the AdGuard Home setup.
 
 /// warning | Important: Configure AdGuard Home Admin Web Interface Port
+
 During the initial AdGuard Home setup on the `Step 2/5` page, you **must** set the **Admin Web Interface Port** to **3000**. Do not use the default port 80, as it will not work with the Traefik configuration.
 
 After completing the setup, the AdGuard UI might appear unresponsive. This is expected. **Simply reload the page**, and the panel will display correctly.
-///
 
 > If you accidentally left it default (80), you will need to manually edit the `docker-compose.yml` file for AdGuard Home (`/etc/docker/containers/adguard/docker-compose.yml`) and change the line `traefik.http.services.adguard.loadbalancer.server.port=3000` to `traefik.http.services.adguard.loadbalancer.server.port=80`. After making this change, restart AdGuard Home by navigating to `/etc/docker/containers/adguard` and running `sudo docker compose up -d`.
+
+///
 
 ## Final System Checks
 

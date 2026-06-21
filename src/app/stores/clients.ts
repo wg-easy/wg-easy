@@ -31,9 +31,12 @@ export const useClientsStore = defineStore('Clients', () => {
   const clients = ref<null | LocalClient[]>(null);
   const clientsPersist = ref<Record<string, ClientPersist>>({});
 
-  const searchParams = ref({
-    filter: undefined as string | undefined,
-  });
+  const filter = ref<string | undefined>(undefined);
+
+  const searchParams = computed(() => ({
+    filter: filter.value,
+    sort: globalStore.sortClient,
+  }));
 
   const { data: _clients, refresh: _refresh } = useFetch('/api/client', {
     method: 'get',
@@ -43,7 +46,7 @@ export const useClientsStore = defineStore('Clients', () => {
   // TODO: rewrite
   async function refresh({ updateCharts = false } = {}) {
     await _refresh();
-    let transformedClients = _clients.value?.map((client) => {
+    const transformedClients = _clients.value?.map((client) => {
       let avatar = undefined;
       if (client.name.includes('@') && client.name.includes('.')) {
         avatar = `https://gravatar.com/avatar/${sha256(client.name.toLowerCase().trim())}.jpg`;
@@ -126,21 +129,12 @@ export const useClientsStore = defineStore('Clients', () => {
       };
     });
 
-    // TODO: move sort to backend
-    if (transformedClients !== undefined) {
-      transformedClients = sortByProperty(
-        transformedClients,
-        'name',
-        globalStore.sortClient
-      );
-    }
-
     clients.value = transformedClients ?? null;
   }
 
-  function setSearchQuery(filter: string) {
+  function setSearchQuery(query: string) {
     clients.value = null;
-    searchParams.value.filter = filter || undefined;
+    filter.value = query || undefined;
   }
 
   return { clients, clientsPersist, refresh, _clients, setSearchQuery };

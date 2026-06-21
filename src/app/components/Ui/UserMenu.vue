@@ -70,10 +70,11 @@ const authStore = useAuthStore();
 const toggleState = ref(false);
 
 const _submit = useSubmit(
-  '/api/session',
-  {
-    method: 'delete',
-  },
+  (data) =>
+    $fetch('/api/session', {
+      method: 'delete',
+      body: data,
+    }),
   {
     revert: async () => {
       await navigateTo('/login');

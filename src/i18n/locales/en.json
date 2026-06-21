@@ -20,7 +20,11 @@
     "2faKey": "TOTP Key",
     "2faCodeDesc": "Enter the code from your authenticator app.",
     "disable2fa": "Disable Two Factor Authentication",
-    "disable2faDesc": "Enter your password to disable Two Factor Authentication."
+    "disable2faDesc": "Enter your password to disable Two Factor Authentication.",
+    "linkOauth": "Link your account with an external provider",
+    "unlinkOauth": "Unlink",
+    "linkedWith": "Linked with {0}",
+    "providerDisabled": "Your currently linked provider is not enabled"
   },
   "general": {
     "name": "Name",
@@ -28,6 +32,7 @@
     "password": "Password",
     "newPassword": "New Password",
     "updatePassword": "Update Password",
+    "addPassword": "Add Password",
     "mtu": "MTU",
     "allowedIps": "Allowed IPs",
     "dns": "DNS",
@@ -41,7 +46,8 @@
     "confirmPassword": "Confirm Password",
     "loading": "Loading...",
     "2fa": "Two Factor Authentication",
-    "2faCode": "TOTP Code"
+    "2faCode": "TOTP Code",
+    "externalAuth": "External Authentication"
   },
   "setup": {
     "welcome": "Welcome to your first setup of wg-easy",
@@ -72,11 +78,14 @@
   },
   "login": {
     "signIn": "Sign In",
+    "signInWith": "Sign in with {0}",
+    "or": "or",
     "rememberMe": "Remember me",
     "rememberMeDesc": "Stay logged after closing the browser",
     "insecure": "You can't log in with an insecure connection. Use HTTPS.",
     "2faRequired": "Two Factor Authentication is required",
-    "2faWrong": "Two Factor Authentication is wrong"
+    "2faWrong": "Two Factor Authentication is wrong",
+    "loginExpired": "Login expired. Try again"
   },
   "client": {
     "empty": "There are no clients yet.",
@@ -197,7 +206,9 @@
       "validBoolean": "{0} must be a valid boolean",
       "validArray": "{0} must be a valid array",
       "stringMin": "{0} must be at least {1} Character",
-      "numberMin": "{0} must be at least {1}"
+      "stringMax": "{0} must be at most {1} Character",
+      "numberMin": "{0} must be at least {1}",
+      "numberMax": "{0} must be at most {1}"
     },
     "client": {
       "id": "Client ID",

@@ -1,7 +1,14 @@
-import { eq, sql } from 'drizzle-orm';
+import { eq, sql, and } from 'drizzle-orm';
 import { TOTP } from 'otpauth';
+
 import { user } from './schema';
 import type { UserType } from './types';
+
+import { WG_ENV } from '#server/utils/config';
+import type { OAUTH_PROVIDER } from '#server/utils/oauth';
+import { hashPassword, isPasswordValid } from '#server/utils/password';
+import type { ID } from '#server/utils/types';
+import { roles } from '#shared/utils/permissions';
 import type { DBType } from '#db/sqlite';
 
 type LoginResult =
@@ -13,10 +20,33 @@ type LoginResult =
       success: false;
       error:
         | 'INCORRECT_CREDENTIALS'
-        | 'TOTP_REQUIRED'
         | 'USER_DISABLED'
         | 'INVALID_TOTP_CODE'
         | 'UNEXPECTED_ERROR';
+    }
+  | {
+      success: false;
+      error: 'TOTP_REQUIRED';
+      userId: ID;
+    };
+
+type LoginWithOAuthResult =
+  | {
+      success: true;
+      user: UserType;
+    }
+  | {
+      success: false;
+      error:
+        | 'USER_DISABLED'
+        | 'USER_ALREADY_LINKED'
+        | 'UNEXPECTED_ERROR'
+        | 'AUTO_REGISTER_DISABLED';
+    }
+  | {
+      success: false;
+      error: 'TOTP_REQUIRED';
+      userId: ID;
     };
 
 function createPreparedStatement(db: DBType) {
@@ -56,6 +86,17 @@ export class UserService {
   constructor(db: DBType) {
     this.#db = db;
     this.#statements = createPreparedStatement(db);
+  }
+
+  #createTotp(user: { username: string; totpKey: string }) {
+    return new TOTP({
+      issuer: 'wg-easy',
+      label: user.username,
+      algorithm: 'SHA1',
+      digits: 6,
+      period: 30,
+      secret: user.totpKey,
+    });
   }
 
   async getAll() {
@@ -102,7 +143,11 @@ export class UserService {
     return this.#statements.update.execute({ id, name, email });
   }
 
-  async updatePassword(id: ID, currentPassword: string, newPassword: string) {
+  async updatePassword(
+    id: ID,
+    currentPassword: string | null,
+    newPassword: string
+  ) {
     const hash = await hashPassword(newPassword);
 
     return this.#db.transaction(async (tx) => {
@@ -115,13 +160,20 @@ export class UserService {
         throw new Error('User not found');
       }
 
-      const passwordValid = await isPasswordValid(
-        currentPassword,
-        txUser.password
-      );
+      // only check password if already set
+      if (txUser.password !== null) {
+        if (!currentPassword) {
+          throw new Error('Invalid password');
+        }
 
-      if (!passwordValid) {
-        throw new Error('Invalid password');
+        const passwordValid = await isPasswordValid(
+          currentPassword,
+          txUser.password
+        );
+
+        if (!passwordValid) {
+          throw new Error('Invalid password');
+        }
       }
 
       await tx
@@ -136,49 +188,30 @@ export class UserService {
     return this.#statements.updateKey.execute({ id, key });
   }
 
-  login(username: string, password: string, code: string | undefined) {
+  login(username: string, password: string) {
     return this.#db.transaction(async (tx): Promise<LoginResult> => {
       const txUser = await tx.query.user
         .findFirst({ where: eq(user.username, username) })
         .execute();
 
-      if (!txUser) {
+      // always check to avoid timing attack
+      const userHashPassword = txUser?.password ?? null;
+      const passwordValid = await isPasswordValid(password, userHashPassword);
+
+      if (!txUser || !passwordValid) {
         return { success: false, error: 'INCORRECT_CREDENTIALS' };
-      }
-
-      const passwordValid = await isPasswordValid(password, txUser.password);
-
-      if (!passwordValid) {
-        return { success: false, error: 'INCORRECT_CREDENTIALS' };
-      }
-
-      if (txUser.totpVerified) {
-        if (!code) {
-          return { success: false, error: 'TOTP_REQUIRED' };
-        } else {
-          if (!txUser.totpKey) {
-            return { success: false, error: 'UNEXPECTED_ERROR' };
-          }
-
-          const totp = new TOTP({
-            issuer: 'wg-easy',
-            label: txUser.username,
-            algorithm: 'SHA1',
-            digits: 6,
-            period: 30,
-            secret: txUser.totpKey,
-          });
-
-          const valid = totp.validate({ token: code, window: 1 });
-
-          if (valid === null) {
-            return { success: false, error: 'INVALID_TOTP_CODE' };
-          }
-        }
       }
 
       if (!txUser.enabled) {
         return { success: false, error: 'USER_DISABLED' };
+      }
+
+      if (txUser.totpVerified) {
+        return {
+          success: false,
+          error: 'TOTP_REQUIRED',
+          userId: txUser.id,
+        };
       }
 
       return { success: true, user: txUser };
@@ -195,22 +228,17 @@ export class UserService {
         throw new Error('User not found');
       }
 
-      if (!txUser.totpKey) {
+      if (txUser.totpVerified) {
+        throw new Error('TOTP is already verified');
+      }
+
+      const totpKey = txUser.totpKey;
+      if (!totpKey) {
         throw new Error('TOTP key is not set');
       }
 
-      const totp = new TOTP({
-        issuer: 'wg-easy',
-        label: txUser.username,
-        algorithm: 'SHA1',
-        digits: 6,
-        period: 30,
-        secret: txUser.totpKey,
-      });
-
-      const valid = totp.validate({ token: code, window: 1 });
-
-      if (valid === null) {
+      const totp = this.#createTotp({ username: txUser.username, totpKey });
+      if (totp.validate({ token: code, window: 1 }) === null) {
         throw new Error('Invalid TOTP code');
       }
 
@@ -244,6 +272,189 @@ export class UserService {
       await tx
         .update(user)
         .set({ totpKey: null, totpVerified: false })
+        .where(eq(user.id, id))
+        .execute();
+    });
+  }
+
+  async validateTotpCode(id: ID, code: string) {
+    const txUser = await this.#db.query.user
+      .findFirst({ where: eq(user.id, id) })
+      .execute();
+
+    if (!txUser || !txUser.totpVerified || !txUser.totpKey) {
+      return 'INVALID_TOTP_CODE' as const;
+    }
+
+    const totp = this.#createTotp({
+      username: txUser.username,
+      totpKey: txUser.totpKey,
+    });
+    const isValid = totp.validate({ token: code, window: 1 }) !== null;
+
+    if (!isValid) {
+      return 'INVALID_TOTP_CODE' as const;
+    }
+
+    if (!txUser.enabled) {
+      return 'USER_DISABLED' as const;
+    }
+
+    return 'success' as const;
+  }
+
+  /**
+   * Login or register user with OAuth provider.
+   * If user with the same email already exists, link account with OAuth provider.
+   * Otherwise, create new user.
+   */
+  async loginWithOAuth(
+    provider: OAUTH_PROVIDER,
+    oauthId: string,
+    username: string,
+    email: string,
+    name: string
+  ): Promise<LoginWithOAuthResult> {
+    return this.#db.transaction(async (tx) => {
+      const userById = await tx.query.user
+        .findFirst({
+          where: and(
+            eq(user.oauthProvider, provider),
+            eq(user.oauthId, oauthId)
+          ),
+        })
+        .execute();
+
+      if (userById) {
+        if (!userById.enabled) {
+          return { success: false, error: 'USER_DISABLED' };
+        }
+        if (userById.totpVerified) {
+          return {
+            success: false,
+            error: 'TOTP_REQUIRED',
+            userId: userById.id,
+          };
+        }
+        return { success: true, user: userById };
+      }
+
+      const userByEmail = await tx.query.user
+        .findFirst({
+          where: eq(user.email, email),
+        })
+        .execute();
+
+      if (userByEmail) {
+        if (!userByEmail.enabled) {
+          return { success: false, error: 'USER_DISABLED' };
+        }
+        if (userByEmail.oauthProvider && userByEmail.oauthId) {
+          return {
+            success: false,
+            error: 'USER_ALREADY_LINKED',
+          };
+        }
+
+        await tx
+          .update(user)
+          .set({ oauthProvider: provider, oauthId: oauthId })
+          .where(eq(user.id, userByEmail.id))
+          .execute();
+
+        if (userByEmail.totpVerified) {
+          return {
+            success: false,
+            error: 'TOTP_REQUIRED',
+            userId: userByEmail.id,
+          };
+        }
+
+        // TODO: return updated user
+        return { success: true, user: userByEmail };
+      }
+
+      if (!WG_ENV.OAUTH_AUTO_REGISTER) {
+        return { success: false, error: 'AUTO_REGISTER_DISABLED' };
+      }
+
+      // Create new user
+      const newUsers = await tx
+        .insert(user)
+        .values({
+          username,
+          password: null,
+          email,
+          name,
+          role: roles.ADMIN,
+          totpVerified: false,
+          enabled: true,
+          oauthProvider: provider,
+          oauthId,
+        })
+        .returning();
+      const newUser = newUsers[0];
+
+      if (!newUser) {
+        return { success: false as const, error: 'UNEXPECTED_ERROR' as const };
+      }
+      return { success: true as const, user: newUser };
+    });
+  }
+
+  unlinkOauth(id: ID) {
+    return this.#db.transaction(async (tx) => {
+      const txUser = await tx.query.user
+        .findFirst({ where: eq(user.id, id) })
+        .execute();
+
+      if (!txUser) {
+        throw new Error('User not found');
+      }
+
+      // can't unlink if no way to log back in
+      if (!txUser.password) {
+        throw new Error('Password login not enabled');
+      }
+
+      await tx
+        .update(user)
+        .set({ oauthProvider: null, oauthId: null })
+        .where(eq(user.id, id))
+        .execute();
+    });
+  }
+
+  async linkOauth(id: ID, provider: OAUTH_PROVIDER, oauthId: string) {
+    return this.#db.transaction(async (tx) => {
+      const txUser = await tx.query.user
+        .findFirst({ where: eq(user.id, id) })
+        .execute();
+
+      if (!txUser) {
+        throw new Error('User not found');
+      }
+
+      if (txUser.oauthProvider || txUser.oauthId) {
+        throw new Error('User already linked with an OAuth provider');
+      }
+
+      const existingUser = await tx.query.user
+        .findFirst({
+          where: and(
+            eq(user.oauthProvider, provider),
+            eq(user.oauthId, oauthId)
+          ),
+        })
+        .execute();
+
+      if (existingUser) {
+        throw new Error('OAuth account already linked with another user');
+      }
+
+      await tx
+        .update(user)
+        .set({ oauthProvider: provider, oauthId: oauthId })
         .where(eq(user.id, id))
         .execute();
     });

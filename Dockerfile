@@ -7,7 +7,7 @@ RUN npm install --global corepack@latest
 RUN corepack enable pnpm
 
 # Copy Web UI
-COPY src/package.json src/pnpm-lock.yaml ./
+COPY src/package.json src/pnpm-lock.yaml src/pnpm-workspace.yaml ./
 RUN pnpm install
 
 # Build UI
@@ -21,7 +21,12 @@ RUN apk add linux-headers build-base go git && \
     cd amneziawg-go && \
     make && \
     cd ../amneziawg-tools/src && \
-    make
+    make && \
+    sed -i 's|\[\[ $proto == -4 \]\] && cmd sysctl -q net\.ipv4\.conf\.all\.src_valid_mark=1|[[ $proto == -4 ]] \&\& [[ $(sysctl -n net.ipv4.conf.all.src_valid_mark) != 1 ]] \&\& cmd sysctl -q net.ipv4.conf.all.src_valid_mark=1|' ./wg-quick/linux.bash
+
+FROM docker.io/library/node:krypton-alpine AS build-libsql
+WORKDIR /app
+RUN npm install --no-save --omit=dev libsql
 
 # Copy build result to a new image.
 # This saves a lot of disk space.
@@ -35,9 +40,8 @@ COPY --from=build /app/.output /app
 # Copy migrations
 COPY --from=build /app/server/database/migrations /app/server/database/migrations
 # libsql (https://github.com/nitrojs/nitro/issues/3328)
-RUN cd /app/server && \
-    npm install --no-save --omit=dev libsql && \
-    npm cache clean --force
+COPY --from=build-libsql /app/node_modules /app/server/node_modules
+
 # cli
 COPY --from=build /app/cli/cli.sh /usr/local/bin/cli
 RUN chmod +x /usr/local/bin/cli
@@ -59,7 +63,8 @@ RUN apk add --no-cache \
     kmod \
     iptables-legacy \
     wireguard-go \
-    wireguard-tools
+    wireguard-tools && \
+    sed -i 's|\[\[ $proto == -4 \]\] && cmd sysctl -q net\.ipv4\.conf\.all\.src_valid_mark=1|[[ $proto == -4 ]] \&\& [[ $(sysctl -n net.ipv4.conf.all.src_valid_mark) != 1 ]] \&\& cmd sysctl -q net.ipv4.conf.all.src_valid_mark=1|' /usr/bin/wg-quick
 
 RUN mkdir -p /etc/amnezia
 RUN ln -s /etc/wireguard /etc/amnezia/amneziawg
@@ -69,7 +74,7 @@ RUN update-alternatives --install /usr/sbin/iptables iptables /usr/sbin/iptables
 RUN update-alternatives --install /usr/sbin/ip6tables ip6tables /usr/sbin/ip6tables-legacy 10 --slave /usr/sbin/ip6tables-restore ip6tables-restore /usr/sbin/ip6tables-legacy-restore --slave /usr/sbin/ip6tables-save ip6tables-save /usr/sbin/ip6tables-legacy-save
 
 # Set Environment
-ENV DEBUG=Server,WireGuard,Database,CMD
+ENV DEBUG=Server,WireGuard,Database,CMD,Firewall
 ENV PORT=51821
 ENV HOST=0.0.0.0
 ENV INSECURE=false

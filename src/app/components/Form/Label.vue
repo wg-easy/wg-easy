@@ -1,7 +1,7 @@
 <template>
-  <RLabel :for="props.for" class="md:align-middle md:leading-10"
-    ><slot
-  /></RLabel>
+  <RLabel :for="props.for" class="md:leading-[2.75rem]">
+    <slot />
+  </RLabel>
 </template>
 
 <script lang="ts" setup>

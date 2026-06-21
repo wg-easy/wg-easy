@@ -7,7 +7,9 @@
       <IconsInfo class="size-4" />
     </BaseTooltip>
   </div>
-  <BaseSwitch :id="id" v-model="data" />
+  <div class="my-auto">
+    <BaseSwitch :id="id" v-model="data" />
+  </div>
 </template>
 
 <script lang="ts" setup>

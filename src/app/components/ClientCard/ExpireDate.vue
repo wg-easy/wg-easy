@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="block pb-1 text-xs text-gray-500 md:inline-block md:pb-0 dark:text-neutral-400"
-  >
+  <div class="block text-xs text-gray-500 dark:text-neutral-400">
     <span class="inline-block">{{ expiredDateFormat(client.expiresAt) }}</span>
   </div>
 </template>

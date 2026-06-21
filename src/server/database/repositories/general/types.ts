@@ -1,6 +1,9 @@
 import type { InferSelectModel } from 'drizzle-orm';
 import z from 'zod';
+
 import type { general } from './schema';
+
+import { safeStringRefine, t } from '#server/utils/types';
 
 export type GeneralType = InferSelectModel<typeof general>;
 
@@ -11,6 +14,7 @@ const metricsEnabled = z.boolean({ message: t('zod.general.metricsEnabled') });
 const metricsPassword = z
   .string({ message: t('zod.general.metricsPassword') })
   .min(1, { message: t('zod.general.metricsPassword') })
+  .pipe(safeStringRefine)
   .nullable();
 
 export const GeneralUpdateSchema = z.object({

@@ -6,7 +6,7 @@ export const useGlobalStore = defineStore('Global', () => {
     }
   );
 
-  const sortClient = ref(true); // Sort clients by name, true = asc, false = desc
+  const sortClient = ref<'asc' | 'desc'>('asc');
 
   const uiShowCharts = useCookie<boolean>('uiShowCharts', {
     default: () => false,

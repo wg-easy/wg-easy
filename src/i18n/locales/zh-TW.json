@@ -120,7 +120,11 @@
     "endpointDesc": "用戶端建立 WireGuard 連線的來源 IP",
     "search": "搜尋用戶端...",
     "config": "組態設定",
-    "viewConfig": "檢視組態設定"
+    "viewConfig": "檢視組態設定",
+    "firewallIps": "防火牆允許的 IP",
+    "firewallIpsDesc": "此用戶端可存取的目標 IP/CIDR (由伺服器端強制執行)，留白則使用「允許的 IP」中的設定。支援選用的連接埠與協定篩選，語法請參閱說明文件。",
+    "downloadPng": "下載 PNG",
+    "copyPng": "複製 PNG"
   },
   "dialog": {
     "change": "變更",
@@ -130,7 +134,8 @@
   "toast": {
     "success": "成功",
     "saved": "已儲存",
-    "error": "錯誤"
+    "error": "錯誤",
+    "unknown": "發生未知錯誤。請檢視主控台 (console) 以了解更多詳細資訊。"
   },
   "form": {
     "actions": "操作",
@@ -175,7 +180,10 @@
       "restart": "重新啟動介面",
       "restartDesc": "重新啟動 WireGuard 介面",
       "restartWarn": "您確定要重新啟動介面嗎? 所有用戶端將被中斷連線。",
-      "restartSuccess": "介面已重新啟動"
+      "restartSuccess": "介面已重新啟動",
+      "firewall": "流量過濾",
+      "firewallEnabled": "啟用個別用戶端防火牆",
+      "firewallEnabledDesc": "使用 iptables 限制用戶端流量僅能存取特定 IP。啟用後，可針對每個用戶端設定其允許的存取範圍。"
     },
     "introText": "歡迎使用管理面板。\n\n您可在此管理一般、組態、介面與 Hook 設定。\n\n請從側邊欄選擇任一項目開始。"
   },
@@ -183,6 +191,7 @@
     "generic": {
       "required": "{0} 為必填項目",
       "validNumber": "{0} 必須為有效的數字",
+      "validNumberRange": "{0} 必須為有效的數字或範圍",
       "validString": "{0} 必須為有效的字串",
       "validBoolean": "{0} 必須為有效的布林值",
       "validArray": "{0} 必須為有效的陣列",
@@ -195,7 +204,9 @@
       "expiresAt": "到期時間",
       "address4": "IPv4 位址",
       "address6": "IPv6 位址",
-      "serverAllowedIps": "伺服器允許的 IP"
+      "serverAllowedIps": "伺服器允許的 IP",
+      "firewallIps": "防火牆允許的 IP",
+      "firewallIpsInvalid": "防火牆 IP 格式無效。請參閱說明文件以了解支援的語法。"
     },
     "user": {
       "username": "使用者名稱",

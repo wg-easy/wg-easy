@@ -4,3 +4,5 @@ export type ToastParams = {
   title: string;
   message: string;
 };
+
+export type OAUTH_PROVIDER = 'google' | 'github' | 'oidc';
