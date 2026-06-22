@@ -18,14 +18,57 @@ const generateRandomHeaderValue = () =>
   Math.floor(Math.random() * 2147483642) + 5;
 
 class WireGuard {
+  #trafficUpdate: Promise<ID[]> | null = null;
+
   /**
    * Save and sync config
    */
   async saveConfig() {
     const wgInterface = await Database.interfaces.get();
+    await this.#recordTraffic(wgInterface);
     await this.#saveWireguardConfig(wgInterface);
     await this.#syncWireguardConfig(wgInterface);
     await this.#applyFirewallRules(wgInterface);
+  }
+
+  async #recordTraffic(wgInterface: InterfaceType) {
+    if (this.#trafficUpdate) {
+      return this.#trafficUpdate;
+    }
+
+    const update = (async () => {
+      const dump = await wg.dump(wgInterface.name);
+      const disabledClientIds = await Database.traffic.record(dump);
+      for (const clientId of disabledClientIds) {
+        WG_DEBUG(`Client ${clientId} exceeded a traffic quota.`);
+      }
+      return disabledClientIds;
+    })();
+    this.#trafficUpdate = update;
+
+    try {
+      return await update;
+    } finally {
+      if (this.#trafficUpdate === update) {
+        this.#trafficUpdate = null;
+      }
+    }
+  }
+
+  /**
+   * Record current traffic and immediately remove peers that exceeded a quota.
+   */
+  async updateTrafficStats() {
+    const wgInterface = await Database.interfaces.get();
+    const disabledClientIds = await this.#recordTraffic(wgInterface);
+
+    if (disabledClientIds.length > 0) {
+      await this.#saveWireguardConfig(wgInterface);
+      await this.#syncWireguardConfig(wgInterface);
+      await this.#applyFirewallRules(wgInterface);
+    }
+
+    return disabledClientIds;
   }
 
   /**
@@ -245,6 +288,7 @@ class WireGuard {
       throw err;
     });
     await this.#syncWireguardConfig(wgInterface);
+    await Database.traffic.resetBaselines();
     WG_DEBUG(`Wireguard Interface ${wgInterface.name} started successfully.`);
 
     // Check if firewall was enabled but iptables isn't available
@@ -283,15 +327,24 @@ class WireGuard {
   // Shutdown wireguard
   async Shutdown() {
     const wgInterface = await Database.interfaces.get();
+    await this.#recordTraffic(wgInterface).catch((err) => {
+      WG_DEBUG('Saving traffic stats before shutdown failed.');
+      console.error(err);
+    });
     await wg.down(wgInterface.name).catch(() => {});
   }
 
   async Restart() {
     const wgInterface = await Database.interfaces.get();
+    await this.#recordTraffic(wgInterface);
+    await this.#saveWireguardConfig(wgInterface);
     await wg.restart(wgInterface.name);
+    await Database.traffic.resetBaselines();
+    await this.#applyFirewallRules(wgInterface);
   }
 
   async cronJob() {
+    await this.updateTrafficStats();
     const clients = await Database.clients.getAll();
     let needsSave = false;
     // Expires Feature

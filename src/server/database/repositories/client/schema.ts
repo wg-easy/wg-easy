@@ -43,6 +43,9 @@ export const client = sqliteTable(
       string[] | null
     >(),
     persistentKeepalive: int('persistent_keepalive').notNull(),
+    dailyQuota: int('daily_quota'),
+    weeklyQuota: int('weekly_quota'),
+    monthlyQuota: int('monthly_quota'),
     mtu: int().notNull(),
     jC: int('j_c'),
     jMin: int('j_min'),
