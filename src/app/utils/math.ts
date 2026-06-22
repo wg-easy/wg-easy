@@ -1,3 +1,17 @@
+export const GIBIBYTE_IN_BYTES = 1024 ** 3;
+
+export function quotaBytesToGiB(bytes: number | null): number | null {
+  return bytes === null ? null : bytes / GIBIBYTE_IN_BYTES;
+}
+
+export function quotaGiBToBytes(gibibytes: number | null): number | null {
+  if (gibibytes === null || gibibytes === 0) {
+    return null;
+  }
+
+  return Math.round(gibibytes * GIBIBYTE_IN_BYTES);
+}
+
 export function bytes(
   bytes: number,
   decimals = 2,

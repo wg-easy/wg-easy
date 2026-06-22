@@ -30,6 +30,26 @@
             />
           </FormGroup>
           <FormGroup>
+            <FormHeading :description="$t('client.trafficQuotasDesc')">
+              {{ $t('client.trafficQuotas') }}
+            </FormHeading>
+            <FormQuotaField
+              id="dailyQuota"
+              v-model="data.dailyQuota"
+              :label="$t('client.dailyQuota')"
+            />
+            <FormQuotaField
+              id="weeklyQuota"
+              v-model="data.weeklyQuota"
+              :label="$t('client.weeklyQuota')"
+            />
+            <FormQuotaField
+              id="monthlyQuota"
+              v-model="data.monthlyQuota"
+              :label="$t('client.monthlyQuota')"
+            />
+          </FormGroup>
+          <FormGroup>
             <FormHeading>{{ $t('client.address') }}</FormHeading>
             <FormTextField
               id="ipv4Address"
