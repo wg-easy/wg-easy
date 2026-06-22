@@ -17,9 +17,14 @@ const nullObject = new Proxy(
 // eslint-disable-next-line import/no-mutable-exports
 let provider = nullObject as never as DBServiceType;
 
-connect().then((db) => {
-  provider = db;
-  WireGuard.Startup();
-});
+connect()
+  .then((db) => {
+    provider = db;
+    WireGuard.Startup();
+  })
+  .catch((err) => {
+    console.log('Failed to connect to Database:', err);
+    process.exit(1);
+  });
 
 export default provider;

@@ -69,6 +69,7 @@ async function migrate() {
     if (e instanceof Error) {
       DB_DEBUG('Failed to migrate database:', e.message);
     }
+    throw e;
   }
 }
 

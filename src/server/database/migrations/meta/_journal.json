@@ -43,6 +43,13 @@
       "when": 1780035570366,
       "tag": "0005_clumsy_korg",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1782122902196,
+      "tag": "0006_clear_leech",
+      "breakpoints": true
     }
   ]
 }
