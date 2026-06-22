@@ -12,7 +12,7 @@ export const user = sqliteTable(
     username: text().notNull().unique(),
     /** `password == null` means password login disabled */
     password: text(),
-    email: text(),
+    email: text().unique(),
     name: text().notNull(),
     role: int().$type<Role>().notNull(),
     totpKey: text('totp_key'),
