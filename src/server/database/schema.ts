@@ -1,7 +1,8 @@
-export * from '#db/repositories/client/schema';
-export * from '#db/repositories/general/schema';
-export * from '#db/repositories/hooks/schema';
-export * from '#db/repositories/interface/schema';
-export * from '#db/repositories/oneTimeLink/schema';
-export * from '#db/repositories/user/schema';
-export * from '#db/repositories/userConfig/schema';
+// ! Do not use Path Aliases in this or any of these files
+export * from './repositories/client/schema';
+export * from './repositories/general/schema';
+export * from './repositories/hooks/schema';
+export * from './repositories/interface/schema';
+export * from './repositories/oneTimeLink/schema';
+export * from './repositories/user/schema';
+export * from './repositories/userConfig/schema';

@@ -1,9 +1,9 @@
 import { sql, relations } from 'drizzle-orm';
 import { int, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core';
 
-import { wgInterface } from '#db/repositories/interface/schema';
-import { oneTimeLink } from '#db/repositories/oneTimeLink/schema';
-import { user } from '#db/repositories/user/schema';
+import { wgInterface } from '../interface/schema';
+import { oneTimeLink } from '../oneTimeLink/schema';
+import { user } from '../user/schema';
 
 /** null means use value from userConfig */
 
