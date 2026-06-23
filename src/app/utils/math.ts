@@ -4,12 +4,45 @@ export function quotaBytesToGiB(bytes: number | null): number | null {
   return bytes === null ? null : bytes / GIBIBYTE_IN_BYTES;
 }
 
+export function quotaBytesToGiBInput(bytes: number | null): string {
+  if (bytes === null) {
+    return '';
+  }
+
+  return quotaBytesToGiB(bytes)!
+    .toFixed(9)
+    .replace(/\.?0+$/, '');
+}
+
 export function quotaGiBToBytes(gibibytes: number | null): number | null {
-  if (gibibytes === null || gibibytes === 0) {
+  if (gibibytes === null || gibibytes <= 0) {
     return null;
   }
 
-  return Math.round(gibibytes * GIBIBYTE_IN_BYTES);
+  const bytes = Math.round(gibibytes * GIBIBYTE_IN_BYTES);
+  return bytes > 0 ? bytes : null;
+}
+
+export function quotaGiBInputToBytes(
+  gibibytes: string
+): number | null | undefined {
+  const value = gibibytes.trim();
+
+  if (value === '') {
+    return null;
+  }
+
+  const quotaGiB = Number(value);
+  if (!Number.isFinite(quotaGiB) || quotaGiB < 0) {
+    return undefined;
+  }
+
+  const quotaBytes = quotaGiBToBytes(quotaGiB);
+  if (quotaBytes !== null && !Number.isSafeInteger(quotaBytes)) {
+    return undefined;
+  }
+
+  return quotaBytes;
 }
 
 export function bytes(

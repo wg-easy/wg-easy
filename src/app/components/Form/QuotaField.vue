@@ -12,13 +12,16 @@
   >
     <BaseInput
       :id="id"
-      v-model.number="quotaGiB"
       :max="maximumGiB"
       :min="minimumGiB"
+      :model-value="quotaInput"
       :name="id"
       step="any"
       type="number"
       class="w-full !border-0"
+      @blur="onBlur"
+      @focus="isFocused = true"
+      @update:model-value="updateQuotaInput"
     />
     <div
       class="flex h-full items-center bg-neutral-200 px-4 dark:bg-neutral-800"
@@ -35,11 +38,27 @@ const quotaBytes = defineModel<number | null>({ required: true });
 const minimumGiB = quotaBytesToGiB(1)!;
 const maximumGiB = quotaBytesToGiB(Number.MAX_SAFE_INTEGER)!;
 
-const quotaGiB = computed<number | null>({
-  get: () => quotaBytesToGiB(quotaBytes.value),
-  set: (value) => {
-    const normalized = (value as number | string | null) === '' ? null : value;
-    quotaBytes.value = quotaGiBToBytes(normalized);
-  },
+const isFocused = ref(false);
+const quotaInput = ref(quotaBytesToGiBInput(quotaBytes.value));
+
+watch(quotaBytes, (value) => {
+  if (!isFocused.value) {
+    quotaInput.value = quotaBytesToGiBInput(value);
+  }
 });
+
+function updateQuotaInput(value: unknown) {
+  const nextValue = typeof value === 'string' ? value : String(value ?? '');
+  quotaInput.value = nextValue;
+
+  const nextBytes = quotaGiBInputToBytes(nextValue);
+  if (nextBytes !== undefined) {
+    quotaBytes.value = nextBytes;
+  }
+}
+
+function onBlur() {
+  isFocused.value = false;
+  quotaInput.value = quotaBytesToGiBInput(quotaBytes.value);
+}
 </script>
