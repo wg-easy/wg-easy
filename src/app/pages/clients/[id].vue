@@ -226,6 +226,7 @@
         </FormElement>
       </PanelBody>
     </Panel>
+    <ClientsTrafficReport :client-id="data.id" />
   </main>
 </template>
 

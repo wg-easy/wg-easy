@@ -4,9 +4,9 @@ import {
   calculateTrafficDelta,
   getExceededTrafficQuotas,
   getTrafficPeriodRange,
-  parseUtcDate,
   sumTrafficDays,
 } from '#server/utils/traffic';
+import { parseUtcDate } from '#shared/utils/time';
 
 describe('traffic accounting', () => {
   test('calculates increasing and reset counter deltas', () => {

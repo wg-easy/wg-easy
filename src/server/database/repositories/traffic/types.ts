@@ -1,6 +1,9 @@
 import z from 'zod';
 
-import { TRAFFIC_PERIODS, parseUtcDate } from '#server/utils/traffic';
+import { parseUtcDate } from '#shared/utils/time';
+import { TRAFFIC_PERIODS } from '#shared/utils/traffic';
+
+export type { TrafficReport } from '#shared/utils/traffic';
 
 export const TrafficQuerySchema = z.object({
   period: z.enum(TRAFFIC_PERIODS),
@@ -16,21 +19,4 @@ export type TrafficPeer = {
   publicKey: string;
   transferRx: number;
   transferTx: number;
-};
-
-export type TrafficReport = {
-  period: TrafficQueryType['period'];
-  start: string;
-  endExclusive: string;
-  quotaBytes: number | null;
-  receivedBytes: number;
-  sentBytes: number;
-  totalBytes: number;
-  exceeded: boolean;
-  days: Array<{
-    date: string;
-    receivedBytes: number;
-    sentBytes: number;
-    totalBytes: number;
-  }>;
 };

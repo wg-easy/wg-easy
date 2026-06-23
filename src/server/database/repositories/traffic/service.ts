@@ -10,14 +10,13 @@ import type { DBType } from '#db/sqlite';
 import type { ID } from '#server/utils/types';
 import {
   calculateTrafficDelta,
-  formatUtcDate,
   getExceededTrafficQuotas,
   getTrafficPeriodRange,
-  parseUtcDate,
   sumTrafficDays,
   type TrafficDay,
-  type TrafficPeriod,
 } from '#server/utils/traffic';
+import { formatUtcDate, parseUtcDate } from '#shared/utils/time';
+import type { TrafficPeriod } from '#shared/utils/traffic';
 
 type QuotaClient = Pick<
   ClientType,

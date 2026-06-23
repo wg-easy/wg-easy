@@ -1,6 +1,5 @@
-export const TRAFFIC_PERIODS = ['daily', 'weekly', 'monthly'] as const;
-
-export type TrafficPeriod = (typeof TRAFFIC_PERIODS)[number];
+import { formatUtcDate } from '#shared/utils/time';
+import { TRAFFIC_PERIODS, type TrafficPeriod } from '#shared/utils/traffic';
 
 export type TrafficDay = {
   date: string;
@@ -15,23 +14,6 @@ export type TrafficQuotas = {
 };
 
 const DAY_MS = 24 * 60 * 60 * 1000;
-
-export function formatUtcDate(date: Date) {
-  return date.toISOString().slice(0, 10);
-}
-
-export function parseUtcDate(value: string) {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
-    return null;
-  }
-
-  const date = new Date(`${value}T00:00:00.000Z`);
-  if (Number.isNaN(date.getTime()) || formatUtcDate(date) !== value) {
-    return null;
-  }
-
-  return date;
-}
 
 export function getTrafficPeriodRange(
   period: TrafficPeriod,
