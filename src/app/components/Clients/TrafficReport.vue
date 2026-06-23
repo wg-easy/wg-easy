@@ -44,10 +44,28 @@
           </div>
         </div>
 
-        <div v-if="pending" class="text-sm text-gray-500 dark:text-neutral-300">
+        <div class="min-h-5 text-sm text-gray-500 dark:text-neutral-300">
+          <span v-if="pending && report">
+            {{ $t('client.trafficLoading') }}
+          </span>
+          <span
+            v-else-if="error && report"
+            class="text-red-800 dark:text-red-300"
+          >
+            {{ $t('client.trafficLoadError') }}
+          </span>
+        </div>
+
+        <div
+          v-if="pending && !report"
+          class="flex min-h-96 items-center text-sm text-gray-500 dark:text-neutral-300"
+        >
           {{ $t('client.trafficLoading') }}
         </div>
-        <div v-else-if="error" class="text-sm text-red-800 dark:text-red-300">
+        <div
+          v-else-if="error && !report"
+          class="flex min-h-96 items-center text-sm text-red-800 dark:text-red-300"
+        >
           {{ $t('client.trafficLoadError') }}
         </div>
         <template v-else-if="report">
@@ -117,20 +135,30 @@
             </div>
           </div>
 
-          <div class="overflow-x-auto">
+          <div
+            class="h-72 overflow-auto rounded-lg border-2 border-gray-100 dark:border-neutral-800"
+          >
             <table v-if="report.days.length > 0" class="w-full text-sm">
               <thead>
                 <tr class="border-b border-gray-100 dark:border-neutral-800">
-                  <th class="py-2 pr-4 text-left font-medium">
+                  <th
+                    class="sticky top-0 bg-white px-4 py-2 text-left font-medium dark:bg-neutral-700"
+                  >
                     {{ $t('client.trafficDate') }}
                   </th>
-                  <th class="px-4 py-2 text-right font-medium">
+                  <th
+                    class="sticky top-0 bg-white px-4 py-2 text-right font-medium dark:bg-neutral-700"
+                  >
                     {{ $t('client.trafficReceived') }}
                   </th>
-                  <th class="px-4 py-2 text-right font-medium">
+                  <th
+                    class="sticky top-0 bg-white px-4 py-2 text-right font-medium dark:bg-neutral-700"
+                  >
                     {{ $t('client.trafficSent') }}
                   </th>
-                  <th class="py-2 pl-4 text-right font-medium">
+                  <th
+                    class="sticky top-0 bg-white px-4 py-2 text-right font-medium dark:bg-neutral-700"
+                  >
                     {{ $t('client.trafficTotal') }}
                   </th>
                 </tr>
@@ -141,7 +169,7 @@
                   :key="day.date"
                   class="border-b border-gray-100 last:border-b-0 dark:border-neutral-800"
                 >
-                  <td class="py-2 pr-4">
+                  <td class="px-4 py-2">
                     {{ day.date }}
                   </td>
                   <td class="px-4 py-2 text-right">
@@ -157,7 +185,10 @@
               </tbody>
             </table>
 
-            <div v-else class="text-sm text-gray-500 dark:text-neutral-300">
+            <div
+              v-else
+              class="flex h-full items-center px-4 text-sm text-gray-500 dark:text-neutral-300"
+            >
               {{ $t('client.trafficNoData') }}
             </div>
           </div>
