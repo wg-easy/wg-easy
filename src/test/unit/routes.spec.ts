@@ -2,8 +2,12 @@ import { describe, expect, test } from 'vitest';
 
 import { routesTestExports } from '#server/utils/routes';
 
-const { normalizeRoute, isManageable, collectDesiredRoutes } =
-  routesTestExports;
+const {
+  normalizeRoute,
+  isManageable,
+  collectDesiredRoutes,
+  parseDeviceRoutes,
+} = routesTestExports;
 
 describe('routes', () => {
   describe('normalizeRoute', () => {
@@ -108,6 +112,36 @@ describe('routes', () => {
         { enableIpv6: true }
       );
       expect([...result[4]]).toEqual(['10.0.0.0/24']);
+    });
+  });
+
+  describe('parseDeviceRoutes', () => {
+    test('flags the kernel connected route as unmanaged', () => {
+      const output = [
+        '100.255.1.0/24 proto kernel scope link src 100.255.1.1',
+        '192.168.120.0/22 scope link',
+      ].join('\n');
+      expect(parseDeviceRoutes(output)).toEqual([
+        { cidr: '100.255.1.0/24', managed: false },
+        { cidr: '192.168.120.0/22', managed: true },
+      ]);
+    });
+    test('skips default routes', () => {
+      expect(parseDeviceRoutes('default via 10.0.0.1')).toEqual([]);
+    });
+    test('handles empty output', () => {
+      expect(parseDeviceRoutes('')).toEqual([]);
+      expect(parseDeviceRoutes('\n  \n')).toEqual([]);
+    });
+    test('flags IPv6 link-local kernel route as unmanaged', () => {
+      const output = [
+        'fe80::/64 proto kernel metric 256 pref medium',
+        '2001:db8::/64 metric 1024 pref medium',
+      ].join('\n');
+      expect(parseDeviceRoutes(output)).toEqual([
+        { cidr: 'fe80::/64', managed: false },
+        { cidr: '2001:db8::/64', managed: true },
+      ]);
     });
   });
 });

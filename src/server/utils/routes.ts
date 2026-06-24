@@ -99,8 +99,40 @@ function collectDesiredRoutes(
   return desired;
 }
 
+/**
+ * Parse `ip route show dev <inf>` output into routes tagged with whether wg-easy
+ * manages them. Kernel-installed routes (the connected subnet, link-local,
+ * multicast) are present but flagged unmanaged, so they are never removed and
+ * never re-added.
+ */
+function parseDeviceRoutes(output: string): DeviceRoute[] {
+  const result: DeviceRoute[] = [];
+
+  for (const line of output.trim().split('\n')) {
+    const trimmed = line.trim();
+    if (!trimmed) {
+      continue;
+    }
+    const dest = trimmed.split(/\s+/)[0];
+    if (!dest || dest === 'default') {
+      continue;
+    }
+    const normalized = normalizeRoute(dest);
+    if (!normalized) {
+      continue;
+    }
+    const managed =
+      !trimmed.includes('proto kernel') &&
+      isManageable(normalized.cidr, normalized.version);
+    result.push({ cidr: normalized.cidr, managed });
+  }
+
+  return result;
+}
+
 export const routesTestExports = {
   normalizeRoute,
   isManageable,
   collectDesiredRoutes,
+  parseDeviceRoutes,
 };
