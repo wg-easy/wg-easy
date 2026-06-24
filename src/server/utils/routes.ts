@@ -149,6 +149,69 @@ function diffRoutes(
   return { toAdd, toDel };
 }
 
+export const routes = {
+  /**
+   * Reconcile the host routing table for the interface so it matches the Server
+   * Allowed IPs of all enabled clients. Runs after `wg syncconf`, which updates
+   * peers but not routes. Adds missing routes and removes stale managed ones,
+   * without bouncing the interface.
+   */
+  async reconcile(
+    wgInterface: InterfaceType,
+    clients: RoutesClient[],
+    options: { enableIpv6: boolean }
+  ): Promise<void> {
+    if (reconcileInProgress) {
+      ROUTES_DEBUG('Reconcile already in progress, queuing');
+      reconcileQueued = true;
+      return;
+    }
+
+    reconcileInProgress = true;
+
+    try {
+      const desired = collectDesiredRoutes(clients, options);
+      const families: IpVersion[] = options.enableIpv6 ? [4, 6] : [4];
+
+      for (const version of families) {
+        const output = await exec(
+          `ip -${version} route show dev ${wgInterface.name}`,
+          { log: false }
+        );
+        const current = parseDeviceRoutes(output);
+        const { toAdd, toDel } = diffRoutes(desired[version], current);
+
+        // Delete before add to avoid a transient conflict on a prefix change.
+        for (const cidr of toDel) {
+          try {
+            await exec(
+              `ip -${version} route del ${cidr} dev ${wgInterface.name}`
+            );
+          } catch (err) {
+            ROUTES_DEBUG(`Failed to remove route ${cidr}:`, err);
+          }
+        }
+        for (const cidr of toAdd) {
+          try {
+            await exec(
+              `ip -${version} route add ${cidr} dev ${wgInterface.name}`
+            );
+          } catch (err) {
+            ROUTES_DEBUG(`Failed to add route ${cidr}:`, err);
+          }
+        }
+      }
+    } finally {
+      reconcileInProgress = false;
+      if (reconcileQueued) {
+        reconcileQueued = false;
+        ROUTES_DEBUG('Processing queued reconcile');
+        await this.reconcile(wgInterface, clients, options);
+      }
+    }
+  },
+};
+
 export const routesTestExports = {
   normalizeRoute,
   isManageable,
