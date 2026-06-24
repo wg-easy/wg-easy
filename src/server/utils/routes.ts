@@ -130,9 +130,29 @@ function parseDeviceRoutes(output: string): DeviceRoute[] {
   return result;
 }
 
+/**
+ * Compute which routes to add and which managed routes to remove. A desired
+ * route already present in any form (including a kernel route) is not re-added;
+ * only managed routes are removed.
+ */
+function diffRoutes(
+  desired: Set<string>,
+  current: DeviceRoute[]
+): { toAdd: string[]; toDel: string[] } {
+  const currentCidrs = new Set(current.map((route) => route.cidr));
+
+  const toAdd = [...desired].filter((cidr) => !currentCidrs.has(cidr));
+  const toDel = current
+    .filter((route) => route.managed && !desired.has(route.cidr))
+    .map((route) => route.cidr);
+
+  return { toAdd, toDel };
+}
+
 export const routesTestExports = {
   normalizeRoute,
   isManageable,
   collectDesiredRoutes,
   parseDeviceRoutes,
+  diffRoutes,
 };

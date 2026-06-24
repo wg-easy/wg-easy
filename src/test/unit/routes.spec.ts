@@ -7,6 +7,7 @@ const {
   isManageable,
   collectDesiredRoutes,
   parseDeviceRoutes,
+  diffRoutes,
 } = routesTestExports;
 
 describe('routes', () => {
@@ -142,6 +143,40 @@ describe('routes', () => {
         { cidr: 'fe80::/64', managed: false },
         { cidr: '2001:db8::/64', managed: true },
       ]);
+    });
+  });
+
+  describe('diffRoutes', () => {
+    test('adds desired routes that are not present', () => {
+      const current = [{ cidr: '100.255.1.0/24', managed: false }];
+      const { toAdd, toDel } = diffRoutes(
+        new Set(['192.168.120.0/22']),
+        current
+      );
+      expect(toAdd).toEqual(['192.168.120.0/22']);
+      expect(toDel).toEqual([]);
+    });
+    test('removes stale managed routes', () => {
+      const current = [
+        { cidr: '192.168.120.0/22', managed: true },
+        { cidr: '10.10.0.0/24', managed: true },
+      ];
+      const { toAdd, toDel } = diffRoutes(
+        new Set(['192.168.120.0/22']),
+        current
+      );
+      expect(toAdd).toEqual([]);
+      expect(toDel).toEqual(['10.10.0.0/24']);
+    });
+    test('never removes unmanaged routes', () => {
+      const current = [{ cidr: '100.255.1.0/24', managed: false }];
+      const { toDel } = diffRoutes(new Set(), current);
+      expect(toDel).toEqual([]);
+    });
+    test('does not re-add a route already present as a kernel route', () => {
+      const current = [{ cidr: '100.255.1.0/24', managed: false }];
+      const { toAdd } = diffRoutes(new Set(['100.255.1.0/24']), current);
+      expect(toAdd).toEqual([]);
     });
   });
 });
