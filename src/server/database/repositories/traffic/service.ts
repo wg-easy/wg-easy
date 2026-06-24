@@ -9,46 +9,22 @@ import type { TrafficPeer, TrafficQueryType, TrafficReport } from './types';
 import type { DBType } from '#db/sqlite';
 import type { ID } from '#server/utils/types';
 import {
+  buildTrafficReport,
   calculateTrafficDelta,
   getExceededTrafficQuotas,
   getTrafficPeriodRange,
-  sumTrafficDays,
+  getTrafficQuotaBytes,
+  getTrafficQuotaEvaluationRange,
+  type TrafficPeriodRange,
   type TrafficDay,
 } from '#server/utils/traffic';
 import { formatUtcDate, parseUtcDate } from '#shared/utils/time';
-import type { TrafficPeriod } from '#shared/utils/traffic';
 
-type QuotaClient = Pick<
-  ClientType,
-  'id' | 'enabled' | 'dailyQuota' | 'weeklyQuota' | 'monthlyQuota'
->;
-
-const quotaField = {
-  daily: 'dailyQuota',
-  weekly: 'weeklyQuota',
-  monthly: 'monthlyQuota',
-} as const satisfies Record<TrafficPeriod, keyof QuotaClient>;
-
-function quotaRanges(date: Date) {
-  return {
-    daily: getTrafficPeriodRange('daily', date),
-    weekly: getTrafficPeriodRange('weekly', date),
-    monthly: getTrafficPeriodRange('monthly', date),
-  };
-}
-
-async function getRelevantDays(
+async function getTrafficDays(
   db: Pick<DBType, 'select'>,
   clientId: ID,
-  date: Date
+  range: TrafficPeriodRange
 ): Promise<TrafficDay[]> {
-  const ranges = Object.values(quotaRanges(date));
-  const start = ranges.map((range) => range.start).sort()[0]!;
-  const endExclusive = ranges
-    .map((range) => range.endExclusive)
-    .sort()
-    .at(-1)!;
-
   return db
     .select({
       date: trafficUsage.date,
@@ -59,10 +35,11 @@ async function getRelevantDays(
     .where(
       and(
         eq(trafficUsage.clientId, clientId),
-        gte(trafficUsage.date, start),
-        lt(trafficUsage.date, endExclusive)
+        gte(trafficUsage.date, range.start),
+        lt(trafficUsage.date, range.endExclusive)
       )
     )
+    .orderBy(asc(trafficUsage.date))
     .execute();
 }
 
@@ -148,7 +125,11 @@ export class TrafficService {
           continue;
         }
 
-        const days = await getRelevantDays(tx, clientRow.id, now);
+        const days = await getTrafficDays(
+          tx,
+          clientRow.id,
+          getTrafficQuotaEvaluationRange(now)
+        );
         if (getExceededTrafficQuotas(clientRow, days, now).length > 0) {
           disabledClientIds.push(clientRow.id);
         }
@@ -188,7 +169,11 @@ export class TrafficService {
       return [];
     }
 
-    const days = await getRelevantDays(this.#db, clientId, now);
+    const days = await getTrafficDays(
+      this.#db,
+      clientId,
+      getTrafficQuotaEvaluationRange(now)
+    );
     return getExceededTrafficQuotas(clientRow, days, now);
   }
 
@@ -201,39 +186,14 @@ export class TrafficService {
   ): Promise<TrafficReport> {
     const containingDate = date ? parseUtcDate(date)! : new Date();
     const range = getTrafficPeriodRange(period, containingDate);
-    const days = await this.#db
-      .select({
-        date: trafficUsage.date,
-        receivedBytes: trafficUsage.receivedBytes,
-        sentBytes: trafficUsage.sentBytes,
-      })
-      .from(trafficUsage)
-      .where(
-        and(
-          eq(trafficUsage.clientId, clientRow.id),
-          gte(trafficUsage.date, range.start),
-          lt(trafficUsage.date, range.endExclusive)
-        )
-      )
-      .orderBy(asc(trafficUsage.date))
-      .execute();
-    const usage = sumTrafficDays(days, range);
-    const quotaBytes = clientRow[quotaField[period]];
-    const totalBytes = usage.receivedBytes + usage.sentBytes;
+    const days = await getTrafficDays(this.#db, clientRow.id, range);
+    const quotaBytes = getTrafficQuotaBytes(clientRow, period);
 
-    return {
+    return buildTrafficReport({
       period,
-      start: range.start,
-      endExclusive: range.endExclusive,
       quotaBytes,
-      receivedBytes: usage.receivedBytes,
-      sentBytes: usage.sentBytes,
-      totalBytes,
-      exceeded: quotaBytes !== null && totalBytes >= quotaBytes,
-      days: days.map((day) => ({
-        ...day,
-        totalBytes: day.receivedBytes + day.sentBytes,
-      })),
-    };
+      range,
+      days,
+    });
   }
 }

@@ -173,13 +173,13 @@
                     {{ day.date }}
                   </td>
                   <td class="px-4 py-2 text-right">
-                    {{ bytes(day.receivedBytes, 2, true) }}
+                    {{ formatTrafficReportDayBytes(day, 'receivedBytes') }}
                   </td>
                   <td class="px-4 py-2 text-right">
-                    {{ bytes(day.sentBytes, 2, true) }}
+                    {{ formatTrafficReportDayBytes(day, 'sentBytes') }}
                   </td>
                   <td class="py-2 pl-4 text-right">
-                    {{ bytes(day.totalBytes, 2, true) }}
+                    {{ formatTrafficReportDayBytes(day, 'totalBytes') }}
                   </td>
                 </tr>
               </tbody>
@@ -203,7 +203,7 @@ const props = defineProps<{ clientId: number }>();
 const { t } = useI18n();
 
 const period = ref<TrafficPeriod>('daily');
-const date = ref(formatTrafficDateInput());
+const date = ref(formatUtcDate(new Date()));
 
 const periodOptions = computed<Array<{ label: string; value: TrafficPeriod }>>(
   () => [
@@ -234,28 +234,15 @@ const stats = computed(() => {
     return [];
   }
 
-  return [
-    {
-      label: t('client.trafficReceived'),
-      value: bytes(report.value.receivedBytes, 2, true),
-    },
-    {
-      label: t('client.trafficSent'),
-      value: bytes(report.value.sentBytes, 2, true),
-    },
-    {
-      label: t('client.trafficTotal'),
-      value: bytes(report.value.totalBytes, 2, true),
-    },
-  ];
+  return getTrafficReportStats(report.value, t);
 });
 
 const quotaLabel = computed(() => {
-  if (!report.value || report.value.quotaBytes === null) {
+  if (!report.value) {
     return t('client.trafficUnlimited');
   }
 
-  return bytes(report.value.quotaBytes, 2, true);
+  return getTrafficQuotaLabel(report.value, t('client.trafficUnlimited'));
 });
 
 const quotaUsagePercent = computed(() => {
@@ -270,8 +257,6 @@ const quotaUsagePercent = computed(() => {
 });
 
 const quotaUsagePercentLabel = computed(() =>
-  quotaUsagePercent.value === null
-    ? ''
-    : `${Math.round(quotaUsagePercent.value)}%`
+  formatTrafficQuotaUsagePercent(quotaUsagePercent.value)
 );
 </script>

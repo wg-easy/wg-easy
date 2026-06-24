@@ -57,8 +57,8 @@ export function bytes(
   const dm =
     decimals != null && !Number.isNaN(decimals) && decimals >= 0 ? decimals : 2;
   const sizes = kib
-    ? ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB', 'BiB']
-    : ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB', 'BB'];
+    ? ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB', 'RiB']
+    : ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB', 'RB'];
   let i = Math.floor(Math.log(bytes) / Math.log(k));
   if (maxunit !== undefined) {
     const index = sizes.indexOf(maxunit);

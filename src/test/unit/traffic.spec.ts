@@ -1,9 +1,13 @@
 import { describe, expect, test } from 'vitest';
 
 import {
+  buildTrafficReport,
   calculateTrafficDelta,
   getExceededTrafficQuotas,
   getTrafficPeriodRange,
+  getTrafficQuotaBytes,
+  getTrafficQuotaField,
+  getTrafficTotalBytes,
   sumTrafficDays,
 } from '#server/utils/traffic';
 import { parseUtcDate } from '#shared/utils/time';
@@ -52,7 +56,27 @@ describe('traffic accounting', () => {
         ],
         { start: '2026-06-01', endExclusive: '2026-06-04' }
       )
-    ).toEqual({ receivedBytes: 40, sentBytes: 60 });
+    ).toEqual({ receivedBytes: 40, sentBytes: 60, totalBytes: 100 });
+  });
+
+  test('maps periods to quota fields and byte values', () => {
+    const quotas = {
+      dailyQuota: 10,
+      weeklyQuota: 20,
+      monthlyQuota: null,
+    };
+
+    expect(getTrafficQuotaField('daily')).toBe('dailyQuota');
+    expect(getTrafficQuotaField('weekly')).toBe('weeklyQuota');
+    expect(getTrafficQuotaField('monthly')).toBe('monthlyQuota');
+    expect(getTrafficQuotaBytes(quotas, 'weekly')).toBe(20);
+    expect(getTrafficQuotaBytes(quotas, 'monthly')).toBeNull();
+  });
+
+  test('calculates combined traffic totals', () => {
+    expect(getTrafficTotalBytes({ receivedBytes: 40, sentBytes: 60 })).toBe(
+      100
+    );
   });
 
   test('enforces simultaneous quotas at the exact combined limit', () => {
@@ -79,5 +103,43 @@ describe('traffic accounting', () => {
         new Date('2026-06-03T12:00:00Z')
       )
     ).toEqual([]);
+  });
+
+  test('builds sparse traffic reports with totals and quota state', () => {
+    expect(
+      buildTrafficReport({
+        period: 'weekly',
+        range: { start: '2026-06-01', endExclusive: '2026-06-08' },
+        quotaBytes: 100,
+        days: [
+          { date: '2026-06-03', receivedBytes: 30, sentBytes: 20 },
+          { date: '2026-05-31', receivedBytes: 100, sentBytes: 100 },
+          { date: '2026-06-01', receivedBytes: 10, sentBytes: 40 },
+        ],
+      })
+    ).toEqual({
+      period: 'weekly',
+      start: '2026-06-01',
+      endExclusive: '2026-06-08',
+      quotaBytes: 100,
+      receivedBytes: 40,
+      sentBytes: 60,
+      totalBytes: 100,
+      exceeded: true,
+      days: [
+        {
+          date: '2026-06-01',
+          receivedBytes: 10,
+          sentBytes: 40,
+          totalBytes: 50,
+        },
+        {
+          date: '2026-06-03',
+          receivedBytes: 30,
+          sentBytes: 20,
+          totalBytes: 50,
+        },
+      ],
+    });
   });
 });
