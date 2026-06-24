@@ -67,7 +67,40 @@ function isManageable(cidr: string, version: IpVersion): boolean {
   return true;
 }
 
+/**
+ * Build the desired managed routes (per IP family) from enabled clients'
+ * Server Allowed IPs. IPv6 is dropped when IPv6 is disabled.
+ */
+function collectDesiredRoutes(
+  clients: RoutesClient[],
+  options: { enableIpv6: boolean }
+): DesiredRoutes {
+  const desired: DesiredRoutes = { 4: new Set(), 6: new Set() };
+
+  for (const client of clients) {
+    if (!client.enabled) {
+      continue;
+    }
+    for (const entry of client.serverAllowedIps ?? []) {
+      const normalized = normalizeRoute(entry);
+      if (!normalized) {
+        continue;
+      }
+      if (!isManageable(normalized.cidr, normalized.version)) {
+        continue;
+      }
+      if (normalized.version === 6 && !options.enableIpv6) {
+        continue;
+      }
+      desired[normalized.version].add(normalized.cidr);
+    }
+  }
+
+  return desired;
+}
+
 export const routesTestExports = {
   normalizeRoute,
   isManageable,
+  collectDesiredRoutes,
 };

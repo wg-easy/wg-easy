@@ -2,7 +2,8 @@ import { describe, expect, test } from 'vitest';
 
 import { routesTestExports } from '#server/utils/routes';
 
-const { normalizeRoute, isManageable } = routesTestExports;
+const { normalizeRoute, isManageable, collectDesiredRoutes } =
+  routesTestExports;
 
 describe('routes', () => {
   describe('normalizeRoute', () => {
@@ -48,6 +49,65 @@ describe('routes', () => {
     test('accepts ordinary subnets', () => {
       expect(isManageable('192.168.120.0/22', 4)).toBe(true);
       expect(isManageable('2001:db8::/64', 6)).toBe(true);
+    });
+  });
+
+  describe('collectDesiredRoutes', () => {
+    test('unions enabled clients and splits by family', () => {
+      const result = collectDesiredRoutes(
+        [
+          {
+            enabled: true,
+            serverAllowedIps: ['192.168.120.0/22', '2001:db8::/64'],
+          },
+          { enabled: true, serverAllowedIps: ['10.10.0.0/24'] },
+        ],
+        { enableIpv6: true }
+      );
+      expect([...result[4]].sort()).toEqual([
+        '10.10.0.0/24',
+        '192.168.120.0/22',
+      ]);
+      expect([...result[6]]).toEqual(['2001:db8::/64']);
+    });
+    test('ignores disabled clients', () => {
+      const result = collectDesiredRoutes(
+        [{ enabled: false, serverAllowedIps: ['192.168.120.0/22'] }],
+        { enableIpv6: true }
+      );
+      expect(result[4].size).toBe(0);
+    });
+    test('dedupes and normalizes host bits across clients', () => {
+      const result = collectDesiredRoutes(
+        [
+          { enabled: true, serverAllowedIps: ['192.168.120.5/22'] },
+          { enabled: true, serverAllowedIps: ['192.168.120.99/22'] },
+        ],
+        { enableIpv6: true }
+      );
+      expect([...result[4]]).toEqual(['192.168.120.0/22']);
+    });
+    test('drops default routes', () => {
+      const result = collectDesiredRoutes(
+        [{ enabled: true, serverAllowedIps: ['0.0.0.0/0', '::/0'] }],
+        { enableIpv6: true }
+      );
+      expect(result[4].size).toBe(0);
+      expect(result[6].size).toBe(0);
+    });
+    test('drops IPv6 when disabled', () => {
+      const result = collectDesiredRoutes(
+        [{ enabled: true, serverAllowedIps: ['2001:db8::/64'] }],
+        { enableIpv6: false }
+      );
+      expect(result[6].size).toBe(0);
+    });
+    test('skips unparseable entries', () => {
+      const result = collectDesiredRoutes(
+        [{ enabled: true, serverAllowedIps: ['garbage', '10.0.0.0/24'] }],
+        { enableIpv6: true }
+      );
+      expect([...result[4]]).toEqual(['10.0.0.0/24']);
     });
   });
 });
