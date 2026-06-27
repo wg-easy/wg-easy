@@ -6,8 +6,18 @@ import { createClient } from '@libsql/client';
 import { drizzle } from 'drizzle-orm/libsql';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 
-import { ClientGroupService } from '../../server/database/repositories/clientGroup/service';
+import {
+  ClientGroupService,
+  isClientGroupNameConflictError,
+} from '../../server/database/repositories/clientGroup/service';
+import {
+  ClientGroupAssignSchema,
+  ClientGroupClientParamsSchema,
+  ClientGroupCreateSchema,
+  ClientGroupGetSchema,
+} from '../../server/database/repositories/clientGroup/types';
 import * as schema from '../../server/database/schema';
+import { hasPermissions, roles } from '../../shared/utils/permissions';
 
 const migrationsThrough0006 = [
   '0000_short_skin.sql',
@@ -271,6 +281,35 @@ describe('ClientGroupService', () => {
     await expect(service.unassignClient(9999)).resolves.toBeDefined();
   });
 
+  test('moves clients between groups and assigning to the same group is idempotent', async () => {
+    const existingClient = await seedClient(db);
+    const firstGroup = await service.create({
+      name: 'Customers',
+      description: null,
+      allowedIps: null,
+      dns: null,
+      firewallIps: null,
+    });
+    const secondGroup = await service.create({
+      name: 'Staff',
+      description: null,
+      allowedIps: null,
+      dns: null,
+      firewallIps: null,
+    });
+
+    await service.assignClient(existingClient.id, firstGroup.id);
+    await service.assignClient(existingClient.id, firstGroup.id);
+    await expect(service.countAssignedClients(firstGroup.id)).resolves.toBe(1);
+
+    await service.assignClient(existingClient.id, secondGroup.id);
+    await expect(service.countAssignedClients(firstGroup.id)).resolves.toBe(0);
+    await expect(service.countAssignedClients(secondGroup.id)).resolves.toBe(1);
+    await expect(db.query.client.findFirst()).resolves.toMatchObject({
+      groupId: secondGroup.id,
+    });
+  });
+
   test('deleting a group with assigned clients sets clients to unassigned', async () => {
     const existingClient = await seedClient(db);
     const group = await service.create({
@@ -344,6 +383,45 @@ describe('ClientGroupService', () => {
     });
   });
 
+  test('rejects invalid group values without collapsing null or empty arrays', async () => {
+    await expect(
+      service.create({
+        name: 'Invalid Allowed IPs',
+        description: null,
+        allowedIps: ['not-an-ip-or-cidr'],
+        dns: null,
+        firewallIps: null,
+      })
+    ).rejects.toThrow();
+
+    await expect(
+      service.create({
+        name: 'Invalid DNS',
+        description: null,
+        allowedIps: null,
+        dns: [''],
+        firewallIps: null,
+      })
+    ).rejects.toThrow();
+
+    await expect(
+      service.create({
+        name: 'Invalid Firewall',
+        description: null,
+        allowedIps: null,
+        dns: null,
+        firewallIps: ['10.0.0.1/tcp'],
+      })
+    ).rejects.toThrow();
+
+    expect(() => ClientGroupCreateSchema.parse({ name: '   ' })).toThrow();
+    expect(() => ClientGroupGetSchema.parse({ groupId: 'abc' })).toThrow();
+    expect(() =>
+      ClientGroupClientParamsSchema.parse({ clientId: 'abc' })
+    ).toThrow();
+    expect(() => ClientGroupAssignSchema.parse({ groupId: 'abc' })).toThrow();
+  });
+
   test('trims names, rejects whitespace-only names, and rejects exact duplicates', async () => {
     await expect(
       service.create({
@@ -374,6 +452,89 @@ describe('ClientGroupService', () => {
         firewallIps: null,
       })
     ).rejects.toThrow();
+  });
+
+  test('detects only client group name unique-constraint errors', async () => {
+    await service.create({
+      name: 'Customers',
+      description: null,
+      allowedIps: null,
+      dns: null,
+      firewallIps: null,
+    });
+
+    let groupConflictError: unknown;
+    try {
+      await db
+        .insert(schema.clientGroup)
+        .values({
+          name: 'Customers',
+          description: null,
+          allowedIps: null,
+          dns: null,
+          firewallIps: null,
+        })
+        .execute();
+    } catch (error) {
+      groupConflictError = error;
+    }
+
+    expect(isClientGroupNameConflictError(groupConflictError)).toBe(true);
+
+    await seedClient(db);
+    let unrelatedConflictError: unknown;
+    try {
+      await seedClient(db, {
+        name: 'Second Phone',
+        publicKey: 'public-2',
+      });
+    } catch (error) {
+      unrelatedConflictError = error;
+    }
+
+    expect(isClientGroupNameConflictError(unrelatedConflictError)).toBe(false);
+  });
+
+  test('group details include safe assigned-client summaries only', async () => {
+    const existingClient = await seedClient(db, {
+      privateKey: 'super-private',
+      preSharedKey: 'super-psk',
+    });
+    const group = await service.create({
+      name: 'Customers',
+      description: null,
+      allowedIps: null,
+      dns: null,
+      firewallIps: null,
+    });
+
+    await service.assignClient(existingClient.id, group.id);
+    const details = await service.getDetails(group.id);
+
+    expect(details).toMatchObject({
+      id: group.id,
+      assignedClientCount: 1,
+      clients: [
+        {
+          id: existingClient.id,
+          name: 'Phone',
+          enabled: true,
+          ipv4Address: '10.8.0.2',
+          ipv6Address: 'fdcc:ad94:bacf:61a4::cafe:2',
+        },
+      ],
+    });
+    expect(details?.clients[0]).not.toHaveProperty('privateKey');
+    expect(details?.clients[0]).not.toHaveProperty('preSharedKey');
+  });
+
+  test('administrator permission model allows group APIs and client role does not', () => {
+    expect(hasPermissions({ id: 1, role: roles.ADMIN }, 'admin', 'any')).toBe(
+      true
+    );
+    expect(hasPermissions({ id: 2, role: roles.CLIENT }, 'admin', 'any')).toBe(
+      false
+    );
   });
 
   test('upgrades existing 0006 clients through migration 0007', async () => {

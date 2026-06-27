@@ -1,8 +1,10 @@
-import { count, eq, sql } from 'drizzle-orm';
+import { and, count, eq, ne, sql } from 'drizzle-orm';
 
 import { clientGroup } from './schema';
 import type {
   ClientGroupCreateType,
+  ClientGroupDetailsType,
+  ClientGroupMemberType,
   ClientGroupResultType,
   ClientGroupUpdateType,
   ClientGroupWithCountType,
@@ -12,6 +14,43 @@ import { ClientGroupCreateSchema, ClientGroupUpdateSchema } from './types';
 import { client } from '#db/schema';
 import type { DBType } from '#db/sqlite';
 import type { ID } from '#server/utils/types';
+
+const CLIENT_GROUP_NAME_CONFLICT_MESSAGE = 'Client group already exists';
+
+export function isClientGroupNameConflictError(error: unknown) {
+  let currentError = error;
+
+  while (currentError instanceof Error) {
+    const code = (currentError as { code?: unknown }).code;
+    const message = currentError.message;
+
+    const isSqliteConstraint =
+      code === 'SQLITE_CONSTRAINT' ||
+      code === 'SQLITE_CONSTRAINT_UNIQUE' ||
+      message.includes('SQLITE_CONSTRAINT') ||
+      message.includes('UNIQUE constraint failed');
+
+    if (
+      isSqliteConstraint &&
+      (message.includes('client_groups_table.name') ||
+        message.includes('client_groups_table_name_unique'))
+    ) {
+      return true;
+    }
+
+    currentError = (currentError as { cause?: unknown }).cause;
+  }
+
+  return false;
+}
+
+function throwClientGroupNameConflict(error: unknown): never {
+  if (isClientGroupNameConflictError(error)) {
+    throw new Error(CLIENT_GROUP_NAME_CONFLICT_MESSAGE);
+  }
+
+  throw error;
+}
 
 function createPreparedStatement(db: DBType) {
   return {
@@ -74,6 +113,22 @@ export class ClientGroupService {
     };
   }
 
+  #toClientGroupMember(row: {
+    id: number;
+    name: string;
+    enabled: boolean;
+    ipv4Address: string;
+    ipv6Address: string;
+    createdAt: string;
+    updatedAt: string;
+  }): ClientGroupMemberType {
+    return {
+      ...row,
+      createdAt: new Date(row.createdAt),
+      updatedAt: new Date(row.updatedAt),
+    };
+  }
+
   #withAssignedClientCount() {
     return {
       id: clientGroup.id,
@@ -90,11 +145,20 @@ export class ClientGroupService {
 
   async create(data: ClientGroupCreateType) {
     const parsedData = ClientGroupCreateSchema.parse(data);
+    const existingGroup = await this.#db.query.clientGroup
+      .findFirst({ where: eq(clientGroup.name, parsedData.name) })
+      .execute();
+
+    if (existingGroup) {
+      throw new Error('Client group already exists');
+    }
+
     const [createdGroup] = await this.#db
       .insert(clientGroup)
       .values(parsedData)
       .returning()
-      .execute();
+      .execute()
+      .catch(throwClientGroupNameConflict);
 
     if (!createdGroup) {
       throw new Error('Client group was not created');
@@ -127,14 +191,57 @@ export class ClientGroupService {
     return group ? this.#toClientGroupWithCount(group) : undefined;
   }
 
+  async getDetails(id: ID): Promise<ClientGroupDetailsType | undefined> {
+    const group = await this.get(id);
+
+    if (!group) {
+      return undefined;
+    }
+
+    const clients = await this.#db.query.client
+      .findMany({
+        where: eq(client.groupId, id),
+        columns: {
+          id: true,
+          name: true,
+          enabled: true,
+          ipv4Address: true,
+          ipv6Address: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+        orderBy: (t, { asc }) => asc(t.name),
+      })
+      .execute();
+
+    return {
+      ...group,
+      clients: clients.map((member) => this.#toClientGroupMember(member)),
+    };
+  }
+
   async update(id: ID, data: ClientGroupUpdateType) {
     const parsedData = ClientGroupUpdateSchema.parse(data);
+    const existingGroup = await this.#db.query.clientGroup
+      .findFirst({
+        where: and(
+          eq(clientGroup.name, parsedData.name),
+          ne(clientGroup.id, id)
+        ),
+      })
+      .execute();
+
+    if (existingGroup) {
+      throw new Error('Client group already exists');
+    }
+
     const [updatedGroup] = await this.#db
       .update(clientGroup)
       .set(parsedData)
       .where(eq(clientGroup.id, id))
       .returning()
-      .execute();
+      .execute()
+      .catch(throwClientGroupNameConflict);
 
     if (!updatedGroup) {
       throw new Error('Client group not found');
@@ -179,5 +286,20 @@ export class ClientGroupService {
 
   async countAssignedClients(groupId: ID) {
     return this.#db.$count(client, eq(client.groupId, groupId));
+  }
+
+  async getClientGroupId(clientId: ID) {
+    const txClient = await this.#db.query.client
+      .findFirst({
+        where: eq(client.id, clientId),
+        columns: { groupId: true },
+      })
+      .execute();
+
+    if (!txClient) {
+      throw new Error('Client not found');
+    }
+
+    return txClient.groupId;
   }
 }

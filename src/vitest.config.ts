@@ -10,6 +10,7 @@ export default defineConfig({
           alias: {
             '#db': fileURLToPath(new URL('./server/database', import.meta.url)),
             '#server': fileURLToPath(new URL('./server', import.meta.url)),
+            '#shared': fileURLToPath(new URL('./shared', import.meta.url)),
           },
         },
         test: {
