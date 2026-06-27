@@ -1,9 +1,16 @@
 import { sql, relations } from 'drizzle-orm';
-import { int, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core';
+import {
+  index,
+  int,
+  sqliteTable,
+  text,
+  uniqueIndex,
+} from 'drizzle-orm/sqlite-core';
 
 import { wgInterface } from '../interface/schema';
 import { oneTimeLink } from '../oneTimeLink/schema';
 import { user } from '../user/schema';
+import { clientGroup } from '../clientGroup/schema';
 
 /** null means use value from userConfig */
 
@@ -34,6 +41,10 @@ export const client = sqliteTable(
     publicKey: text('public_key').notNull(),
     preSharedKey: text('pre_shared_key').notNull(),
     expiresAt: text('expires_at'),
+    groupId: int('group_id').references(() => clientGroup.id, {
+      onDelete: 'set null',
+      onUpdate: 'cascade',
+    }),
     allowedIps: text('allowed_ips', { mode: 'json' }).$type<string[]>(),
     serverAllowedIps: text('server_allowed_ips', { mode: 'json' })
       .$type<string[]>()
@@ -64,6 +75,7 @@ export const client = sqliteTable(
       .$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
   },
   (table) => [
+    index('clients_table_group_id_index').on(table.groupId),
     uniqueIndex('public_key_interface_unique').on(
       table.publicKey,
       table.interfaceId
@@ -79,6 +91,10 @@ export const clientsRelations = relations(client, ({ one }) => ({
   user: one(user, {
     fields: [client.userId],
     references: [user.id],
+  }),
+  group: one(clientGroup, {
+    fields: [client.groupId],
+    references: [clientGroup.id],
   }),
   interface: one(wgInterface, {
     fields: [client.interfaceId],

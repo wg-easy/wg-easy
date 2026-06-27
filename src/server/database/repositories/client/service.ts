@@ -2,6 +2,7 @@ import { eq, sql, or, like, and } from 'drizzle-orm';
 import { containsCidr, parseCidr } from 'cidr-tools';
 
 import { client } from './schema';
+import { CurrentPublicClientColumns } from './types';
 import type {
   ClientCreateFromExistingType,
   ClientCreateType,
@@ -85,6 +86,7 @@ export class ClientService {
         },
         where: and(...filters),
         columns: {
+          ...CurrentPublicClientColumns,
           privateKey: false,
           preSharedKey: false,
         },
@@ -128,6 +130,7 @@ export class ClientService {
         where: and(eq(client.userId, userId), ...filters),
         with: { oneTimeLink: true },
         columns: {
+          ...CurrentPublicClientColumns,
           privateKey: false,
           preSharedKey: false,
         },

@@ -8,6 +8,7 @@ export default defineConfig({
       {
         resolve: {
           alias: {
+            '#db': fileURLToPath(new URL('./server/database', import.meta.url)),
             '#server': fileURLToPath(new URL('./server', import.meta.url)),
           },
         },

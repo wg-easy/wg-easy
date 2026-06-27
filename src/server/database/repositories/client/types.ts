@@ -25,6 +25,18 @@ import {
 
 export type ClientType = InferSelectModel<typeof client>;
 
+export const CurrentPublicClientColumns = {
+  groupId: false,
+} as const;
+
+export function toCurrentPublicClient<T extends { groupId: number | null }>(
+  client: T
+) {
+  const { groupId: _groupId, ...publicClient } = client;
+
+  return publicClient;
+}
+
 export type ClientNextIpType = Pick<ClientType, 'ipv4Address' | 'ipv6Address'>;
 
 export type CreateClientType = Omit<
@@ -34,7 +46,12 @@ export type CreateClientType = Omit<
 
 export type UpdateClientType = Omit<
   CreateClientType,
-  'privateKey' | 'publicKey' | 'preSharedKey' | 'userId' | 'interfaceId'
+  | 'privateKey'
+  | 'publicKey'
+  | 'preSharedKey'
+  | 'userId'
+  | 'interfaceId'
+  | 'groupId'
 >;
 
 const name = z
