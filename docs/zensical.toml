@@ -18,6 +18,9 @@ edit_uri = "edit/master/docs/content"
 
 docs_dir = "content/"
 
+# Guide navigation is generated from docs/content/guides.
+# Keep the Client Groups guide next to the Edit Client guide.
+
 site_url = "https://wg-easy.github.io/wg-easy"
 
 [project.theme]
