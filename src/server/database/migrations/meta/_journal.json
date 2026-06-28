@@ -57,6 +57,13 @@
       "when": 1782574033706,
       "tag": "0007_amused_madame_web",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1782649656986,
+      "tag": "0008_sweet_firelord",
+      "breakpoints": true
     }
   ]
 }

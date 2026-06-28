@@ -30,6 +30,7 @@ const migrationsThrough0006 = [
 ];
 
 const migration0007 = '0007_amused_madame_web.sql';
+const migration0008 = '0008_sweet_firelord.sql';
 
 type LibsqlClient = ReturnType<typeof createClient>;
 type TestDb = ReturnType<typeof drizzle<typeof schema>>;
@@ -58,7 +59,7 @@ async function applyMigrations(client: LibsqlClient, migrations: string[]) {
 }
 
 async function createTestDb(
-  migrations = [...migrationsThrough0006, migration0007]
+  migrations = [...migrationsThrough0006, migration0007, migration0008]
 ) {
   const dir = mkdtempSync(join(tmpdir(), 'wg-easy-client-groups-'));
   const client = createClient({ url: `file:${join(dir, 'test.db')}` });
@@ -221,7 +222,7 @@ describe('ClientGroupService', () => {
         description: null,
         allowedIps: null,
         dns: null,
-        firewallIps: [],
+        firewallIps: null,
       })
     ).resolves.toMatchObject({
       id: firstGroup.id,
@@ -229,7 +230,7 @@ describe('ClientGroupService', () => {
       description: null,
       allowedIps: null,
       dns: null,
-      firewallIps: [],
+      firewallIps: null,
     });
 
     await expect(
@@ -261,8 +262,10 @@ describe('ClientGroupService', () => {
     await expect(service.get(group.id)).resolves.toMatchObject({
       assignedClientCount: 1,
     });
-    await expect(db.query.client.findFirst()).resolves.toMatchObject({
+    await expect(service.listMembership()).resolves.toContainEqual({
+      clientId: existingClient.id,
       groupId: group.id,
+      position: 0,
     });
 
     await expect(service.assignClient(9999, group.id)).rejects.toThrow(
@@ -272,16 +275,14 @@ describe('ClientGroupService', () => {
       'Client group not found'
     );
 
-    await service.unassignClient(existingClient.id);
+    await service.removeClient(existingClient.id, group.id);
     await expect(service.countAssignedClients(group.id)).resolves.toBe(0);
-    await expect(db.query.client.findFirst()).resolves.toMatchObject({
-      groupId: null,
-    });
+    await expect(service.listMembership()).resolves.toEqual([]);
 
-    await expect(service.unassignClient(9999)).resolves.toBeDefined();
+    await expect(service.removeClient(9999, group.id)).resolves.toBeDefined();
   });
 
-  test('moves clients between groups and assigning to the same group is idempotent', async () => {
+  test('appends clients to multiple groups and assigning to the same group is idempotent', async () => {
     const existingClient = await seedClient(db);
     const firstGroup = await service.create({
       name: 'Customers',
@@ -303,14 +304,41 @@ describe('ClientGroupService', () => {
     await expect(service.countAssignedClients(firstGroup.id)).resolves.toBe(1);
 
     await service.assignClient(existingClient.id, secondGroup.id);
-    await expect(service.countAssignedClients(firstGroup.id)).resolves.toBe(0);
+    await expect(service.countAssignedClients(firstGroup.id)).resolves.toBe(1);
     await expect(service.countAssignedClients(secondGroup.id)).resolves.toBe(1);
-    await expect(db.query.client.findFirst()).resolves.toMatchObject({
-      groupId: secondGroup.id,
-    });
+    await expect(service.listMembership()).resolves.toEqual([
+      { clientId: existingClient.id, groupId: firstGroup.id, position: 0 },
+      { clientId: existingClient.id, groupId: secondGroup.id, position: 1 },
+    ]);
   });
 
-  test('deleting a group with assigned clients sets clients to unassigned', async () => {
+  test('lists minimal client membership without exposing client data', async () => {
+    const firstClient = await seedClient(db, { name: 'Phone' });
+    const secondClient = await seedClient(db, {
+      name: 'Tablet',
+      publicKey: 'public-2',
+      privateKey: 'private-2',
+      preSharedKey: 'psk-2',
+      ipv4Address: '10.8.0.3',
+      ipv6Address: 'fdcc:ad94:bacf:61a4::cafe:3',
+    });
+    const group = await service.create({
+      name: 'Customers',
+      description: null,
+      allowedIps: null,
+      dns: null,
+      firewallIps: null,
+    });
+
+    await service.assignClient(secondClient.id, group.id);
+
+    await expect(service.listMembership()).resolves.toEqual([
+      { clientId: secondClient.id, groupId: group.id, position: 0 },
+    ]);
+    expect(firstClient.id).toBeGreaterThan(0);
+  });
+
+  test('deleting a group removes only memberships and preserves clients', async () => {
     const existingClient = await seedClient(db);
     const group = await service.create({
       name: 'External Vendor',
@@ -325,25 +353,18 @@ describe('ClientGroupService', () => {
 
     await expect(db.query.client.findFirst()).resolves.toMatchObject({
       id: existingClient.id,
-      groupId: null,
       name: 'Phone',
     });
+    await expect(service.listMembership()).resolves.toEqual([]);
   });
 
-  test('preserves null, empty, and non-empty group JSON values', async () => {
+  test('preserves null and non-empty group JSON values and rejects empty arrays', async () => {
     const nullGroup = await service.create({
       name: 'Null Values',
       description: null,
       allowedIps: null,
       dns: null,
       firewallIps: null,
-    });
-    const emptyGroup = await service.create({
-      name: 'Empty Values',
-      description: null,
-      allowedIps: [],
-      dns: [],
-      firewallIps: [],
     });
     const configuredGroup = await service.create({
       name: 'Configured Values',
@@ -358,32 +379,46 @@ describe('ClientGroupService', () => {
       dns: null,
       firewallIps: null,
     });
-    await expect(service.get(emptyGroup.id)).resolves.toMatchObject({
-      allowedIps: [],
-      dns: [],
-      firewallIps: [],
-    });
     await expect(service.get(configuredGroup.id)).resolves.toMatchObject({
       allowedIps: ['10.30.0.0/24'],
       dns: ['8.8.8.8'],
       firewallIps: ['10.30.0.10:443/tcp'],
     });
 
+    await expect(
+      service.create({
+        name: 'Empty Values',
+        description: null,
+        allowedIps: [],
+        dns: [],
+        firewallIps: [],
+      })
+    ).rejects.toThrow();
+
+    await expect(
+      service.update(configuredGroup.id, {
+        name: 'Configured Values',
+        description: null,
+        allowedIps: [],
+        dns: [],
+        firewallIps: [],
+      })
+    ).rejects.toThrow();
     await service.update(configuredGroup.id, {
       name: 'Configured Values',
       description: null,
-      allowedIps: [],
-      dns: [],
-      firewallIps: [],
+      allowedIps: null,
+      dns: null,
+      firewallIps: null,
     });
     await expect(service.get(configuredGroup.id)).resolves.toMatchObject({
-      allowedIps: [],
-      dns: [],
-      firewallIps: [],
+      allowedIps: null,
+      dns: null,
+      firewallIps: null,
     });
   });
 
-  test('rejects invalid group values without collapsing null or empty arrays', async () => {
+  test('rejects invalid group values and empty arrays without collapsing null', async () => {
     await expect(
       service.create({
         name: 'Invalid Allowed IPs',
@@ -537,13 +572,31 @@ describe('ClientGroupService', () => {
     );
   });
 
-  test('upgrades existing 0006 clients through migration 0007', async () => {
+  test('upgrades existing 0006 clients through migrations 0007 and 0008', async () => {
     await client.close();
     const testDb = await createTestDb(migrationsThrough0006);
     client = testDb.client;
     await seedExistingClientBefore0007(client);
 
     await applyMigration(client, migration0007);
+    await client.execute({
+      sql: `INSERT INTO client_groups_table
+        (id, name, description, allowed_ips, dns, firewall_ips)
+        VALUES (?, ?, ?, ?, ?, ?)`,
+      args: [
+        42,
+        'Legacy Group',
+        null,
+        JSON.stringify([]),
+        JSON.stringify([]),
+        JSON.stringify([]),
+      ],
+    });
+    await client.execute({
+      sql: 'UPDATE clients_table SET group_id = ? WHERE id = ?',
+      args: [42, 7],
+    });
+    await applyMigration(client, migration0008);
     await client.execute('PRAGMA foreign_keys=ON');
     db = drizzle({ client, schema });
     service = new ClientGroupService(db);
@@ -578,28 +631,34 @@ describe('ClientGroupService', () => {
       dns: ['9.9.9.9'],
       serverEndpoint: 'vpn.example.test',
       enabled: false,
-      groupId: null,
+    });
+    expect(existingClient).not.toHaveProperty('groupId');
+
+    await expect(service.listMembership()).resolves.toEqual([
+      { clientId: 7, groupId: 42, position: 0 },
+    ]);
+    await expect(service.get(42)).resolves.toMatchObject({
+      allowedIps: null,
+      dns: null,
+      firewallIps: null,
     });
 
     const group = await service.create({
       name: 'Migrated Group',
       description: null,
-      allowedIps: [],
-      dns: [],
-      firewallIps: [],
+      allowedIps: null,
+      dns: null,
+      firewallIps: null,
     });
 
     await service.assignClient(7, group.id);
-    await expect(db.query.client.findFirst()).resolves.toMatchObject({
-      id: 7,
-      groupId: group.id,
-    });
-
+    await expect(service.listMembership()).resolves.toEqual([
+      { clientId: 7, groupId: 42, position: 0 },
+      { clientId: 7, groupId: group.id, position: 1 },
+    ]);
     await service.delete(group.id);
-    await expect(db.query.client.findFirst()).resolves.toMatchObject({
-      id: 7,
-      name: 'Migrated Phone',
-      groupId: null,
-    });
+    await expect(service.listMembership()).resolves.toEqual([
+      { clientId: 7, groupId: 42, position: 0 },
+    ]);
   });
 });

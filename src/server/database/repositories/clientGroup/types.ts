@@ -3,7 +3,7 @@ import z from 'zod';
 import { isIP } from 'is-ip';
 import isCidr from 'is-cidr';
 
-import type { clientGroup } from './schema';
+import type { clientGroup, clientGroupMembership } from './schema';
 
 import {
   AddressSchema,
@@ -16,6 +16,9 @@ import {
 } from '#server/utils/types';
 
 export type ClientGroupType = InferSelectModel<typeof clientGroup>;
+export type ClientGroupMembershipRowType = InferSelectModel<
+  typeof clientGroupMembership
+>;
 
 export type ClientGroupCreateType = Pick<
   ClientGroupType,
@@ -50,6 +53,28 @@ export type ClientGroupDetailsType = ClientGroupWithCountType & {
   clients: ClientGroupMemberType[];
 };
 
+export type ClientGroupMembershipType = {
+  clientId: number;
+  groupId: number;
+  position: number;
+};
+
+export type ClientGroupEdgeType = ClientGroupMembershipType & {
+  groupName: string;
+};
+
+export type ClientGroupEffectivePolicyType = {
+  allowedIps: SafeEffectivePolicyFieldType;
+  dns: SafeEffectivePolicyFieldType;
+  firewallIps: SafeEffectivePolicyFieldType;
+};
+
+export type SafeEffectivePolicyFieldType = {
+  value: string[];
+  source: 'client' | 'groups' | 'global';
+  groups: { id: number; name: string }[];
+};
+
 const name = z
   .string({ message: t('zod.clientGroup.name') })
   .trim()
@@ -70,13 +95,31 @@ const groupAllowedIp = AddressSchema.refine(
   }
 );
 
+const nonEmptyPolicyArray = <T extends z.ZodTypeAny>(schema: T) =>
+  z
+    .array(schema)
+    .refine((values) => values.some((value) => String(value).trim() !== ''), {
+      message: t('zod.clientGroup.policyRequired'),
+    })
+    .min(1, { message: t('zod.clientGroup.policyRequired') });
+
 export const ClientGroupCreateSchema = schemaForType<ClientGroupCreateType>()(
   z.object({
     name,
     description,
-    allowedIps: z.array(groupAllowedIp).nullable(),
-    dns: DnsSchema.nullable(),
-    firewallIps: FirewallIpsSchema.nullable(),
+    allowedIps: nonEmptyPolicyArray(groupAllowedIp).nullable(),
+    dns: DnsSchema.min(1, { message: t('zod.clientGroup.policyRequired') })
+      .refine((values) => values.every((value) => value.trim() !== ''), {
+        message: t('zod.clientGroup.policyRequired'),
+      })
+      .nullable(),
+    firewallIps: FirewallIpsSchema.min(1, {
+      message: t('zod.clientGroup.policyRequired'),
+    })
+      .refine((values) => values.every((value) => value.trim() !== ''), {
+        message: t('zod.clientGroup.policyRequired'),
+      })
+      .nullable(),
   })
 );
 
@@ -102,4 +145,13 @@ export const ClientGroupAssignSchema = z.object({
 
 export const ClientGroupClientParamsSchema = z.object({
   clientId,
+});
+
+export const ClientGroupMembershipReplaceSchema = z.object({
+  groupIds: z.array(groupId),
+});
+
+export const ClientGroupMembershipDeleteParamsSchema = z.object({
+  clientId,
+  groupId,
 });

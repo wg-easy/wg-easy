@@ -8,6 +8,7 @@ import { firewall } from '#server/utils/firewall';
 import { encodeQRCode } from '#server/utils/qr';
 import type { ID } from '#server/utils/types';
 import { wg } from '#server/utils/wgHelper';
+import { resolveClientEffectivePolicy } from '#shared/utils/clientPolicy';
 import { setIntervalImmediately } from '#shared/utils/time';
 import type { InterfaceType } from '#db/repositories/interface/types';
 import type { ClientQueryType } from '#db/repositories/client/types';
@@ -33,12 +34,16 @@ class WireGuard {
    */
   async #applyFirewallRules(wgInterface: InterfaceType) {
     const clients = await Database.clients.getAll();
+    const memberships = await Database.clientGroups.listMembership();
+    const groups = await Database.clientGroups.list();
     const userConfig = await Database.userConfigs.get();
     await firewall.rebuildRules(
       wgInterface,
       clients,
       userConfig,
-      !WG_ENV.DISABLE_IPV6
+      !WG_ENV.DISABLE_IPV6,
+      groups,
+      memberships
     );
   }
 
@@ -173,8 +178,16 @@ class WireGuard {
       throw new Error('Client not found');
     }
 
+    const groups = await Database.clientGroups.getGroupsForClient(client.id);
+
     return wg.generateClientConfig(wgInterface, userConfig, client, {
       enableIpv6: !WG_ENV.DISABLE_IPV6,
+      effectivePolicy: resolveClientEffectivePolicy({
+        client,
+        groups,
+        userConfig,
+        firewallEnabled: wgInterface.firewallEnabled,
+      }),
     });
   }
 

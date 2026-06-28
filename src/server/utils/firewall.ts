@@ -2,6 +2,10 @@ import { createDebug } from 'obug';
 import { isIPv6 } from 'is-ip';
 
 import { exec } from '#server/utils/cmd';
+import {
+  resolveClientEffectivePolicy,
+  type ClientPolicyGroup,
+} from '#shared/utils/clientPolicy';
 import type { ClientType } from '#db/repositories/client/types';
 import type { InterfaceType } from '#db/repositories/interface/types';
 import type { UserConfigType } from '#db/repositories/userConfig/types';
@@ -29,9 +33,16 @@ type FirewallClient = Pick<
   | 'ipv4Address'
   | 'ipv6Address'
   | 'allowedIps'
+  | 'dns'
   | 'firewallIps'
   | 'enabled'
 >;
+
+type ClientGroupMembership = {
+  clientId: number;
+  groupId: number;
+  position: number;
+};
 
 /**
  * Sanitize a client identifier for use in an iptables comment.
@@ -160,6 +171,19 @@ function generateRuleArgs(
   return rules;
 }
 
+function resolveFirewallClientIps(
+  client: FirewallClient,
+  userConfig: Pick<UserConfigType, 'defaultAllowedIps' | 'defaultDns'>,
+  groups: ClientPolicyGroup[] = []
+) {
+  return resolveClientEffectivePolicy({
+    client,
+    groups,
+    userConfig,
+    firewallEnabled: true,
+  }).firewallIps;
+}
+
 export const firewall = {
   /**
    * Initialize the custom chain if it doesn't exist
@@ -197,15 +221,11 @@ export const firewall = {
    */
   async applyClientRules(
     client: FirewallClient,
-    defaultAllowedIps: string[],
-    enableIpv6: boolean
+    userConfig: Pick<UserConfigType, 'defaultAllowedIps' | 'defaultDns'>,
+    enableIpv6: boolean,
+    groups: ClientPolicyGroup[] = []
   ): Promise<void> {
-    // Determine which IPs to use for firewall rules
-    // Priority: firewallIps > allowedIps > defaultAllowedIps
-    const effectiveIps =
-      client.firewallIps && client.firewallIps.length > 0
-        ? client.firewallIps
-        : (client.allowedIps ?? defaultAllowedIps);
+    const effectiveIps = resolveFirewallClientIps(client, userConfig, groups);
 
     FW_DEBUG(
       `Applying firewall rules for client ${client.name} (${client.id}): ${effectiveIps.join(', ')}`
@@ -241,7 +261,9 @@ export const firewall = {
     wgInterface: InterfaceType,
     clients: FirewallClient[],
     userConfig: UserConfigType,
-    enableIpv6: boolean
+    enableIpv6: boolean,
+    groups: ClientPolicyGroup[] = [],
+    memberships: ClientGroupMembership[] = []
   ): Promise<void> {
     if (!wgInterface.firewallEnabled) {
       FW_DEBUG('Firewall filtering disabled, removing any existing rules');
@@ -270,10 +292,18 @@ export const firewall = {
       // Apply rules for each enabled client
       for (const client of clients) {
         if (!client.enabled) continue;
+        const clientGroups = memberships
+          .filter((membership) => membership.clientId === client.id)
+          .sort((a, b) => a.position - b.position)
+          .map((membership) =>
+            groups.find((candidate) => candidate.id === membership.groupId)
+          )
+          .filter((group): group is ClientPolicyGroup => !!group);
         await this.applyClientRules(
           client,
-          userConfig.defaultAllowedIps,
-          enableIpv6
+          userConfig,
+          enableIpv6,
+          clientGroups
         );
       }
 
@@ -291,7 +321,14 @@ export const firewall = {
       if (rebuildQueued) {
         rebuildQueued = false;
         FW_DEBUG('Processing queued rebuild');
-        await this.rebuildRules(wgInterface, clients, userConfig, enableIpv6);
+        await this.rebuildRules(
+          wgInterface,
+          clients,
+          userConfig,
+          enableIpv6,
+          groups,
+          memberships
+        );
       }
     }
   },
@@ -361,4 +398,5 @@ export const firewallTestExports = {
   parseFirewallEntry,
   generateRuleArgs,
   sanitizeComment,
+  resolveFirewallClientIps,
 };

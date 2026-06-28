@@ -1,10 +1,12 @@
-import { and, count, eq, ne, sql } from 'drizzle-orm';
+import { and, count, eq, inArray, ne, sql } from 'drizzle-orm';
 
-import { clientGroup } from './schema';
+import { clientGroup, clientGroupMembership } from './schema';
 import type {
   ClientGroupCreateType,
   ClientGroupDetailsType,
+  ClientGroupEdgeType,
   ClientGroupMemberType,
+  ClientGroupMembershipType,
   ClientGroupResultType,
   ClientGroupUpdateType,
   ClientGroupWithCountType,
@@ -52,6 +54,25 @@ function throwClientGroupNameConflict(error: unknown): never {
   throw error;
 }
 
+function normalizeGroupPolicy<T extends string[] | null>(value: T) {
+  return value && value.length === 0 ? null : value;
+}
+
+function normalizeGroupData<T extends ClientGroupCreateType>(data: T): T {
+  return {
+    ...data,
+    allowedIps: normalizeGroupPolicy(data.allowedIps),
+    dns: normalizeGroupPolicy(data.dns),
+    firewallIps: normalizeGroupPolicy(data.firewallIps),
+  };
+}
+
+function assertUniqueGroupIds(groupIds: ID[]) {
+  if (new Set(groupIds).size !== groupIds.length) {
+    throw new Error('Duplicate client group');
+  }
+}
+
 function createPreparedStatement(db: DBType) {
   return {
     findById: db.query.clientGroup
@@ -60,11 +81,6 @@ function createPreparedStatement(db: DBType) {
     delete: db
       .delete(clientGroup)
       .where(eq(clientGroup.id, sql.placeholder('id')))
-      .prepare(),
-    unassignClient: db
-      .update(client)
-      .set({ groupId: null })
-      .where(eq(client.id, sql.placeholder('clientId')))
       .prepare(),
   };
 }
@@ -90,6 +106,9 @@ export class ClientGroupService {
   }): ClientGroupResultType {
     return {
       ...row,
+      allowedIps: normalizeGroupPolicy(row.allowedIps),
+      dns: normalizeGroupPolicy(row.dns),
+      firewallIps: normalizeGroupPolicy(row.firewallIps),
       createdAt: new Date(row.createdAt),
       updatedAt: new Date(row.updatedAt),
     };
@@ -107,9 +126,8 @@ export class ClientGroupService {
     assignedClientCount: number;
   }): ClientGroupWithCountType {
     return {
-      ...row,
-      createdAt: new Date(row.createdAt),
-      updatedAt: new Date(row.updatedAt),
+      ...this.#toClientGroup(row),
+      assignedClientCount: row.assignedClientCount,
     };
   }
 
@@ -139,18 +157,18 @@ export class ClientGroupService {
       firewallIps: clientGroup.firewallIps,
       createdAt: clientGroup.createdAt,
       updatedAt: clientGroup.updatedAt,
-      assignedClientCount: count(client.id),
+      assignedClientCount: count(clientGroupMembership.clientId),
     };
   }
 
   async create(data: ClientGroupCreateType) {
-    const parsedData = ClientGroupCreateSchema.parse(data);
+    const parsedData = normalizeGroupData(ClientGroupCreateSchema.parse(data));
     const existingGroup = await this.#db.query.clientGroup
       .findFirst({ where: eq(clientGroup.name, parsedData.name) })
       .execute();
 
     if (existingGroup) {
-      throw new Error('Client group already exists');
+      throw new Error(CLIENT_GROUP_NAME_CONFLICT_MESSAGE);
     }
 
     const [createdGroup] = await this.#db
@@ -171,7 +189,10 @@ export class ClientGroupService {
     const groups = await this.#db
       .select(this.#withAssignedClientCount())
       .from(clientGroup)
-      .leftJoin(client, eq(client.groupId, clientGroup.id))
+      .leftJoin(
+        clientGroupMembership,
+        eq(clientGroupMembership.groupId, clientGroup.id)
+      )
       .groupBy(clientGroup.id)
       .orderBy(clientGroup.name)
       .execute();
@@ -183,7 +204,10 @@ export class ClientGroupService {
     const [group] = await this.#db
       .select(this.#withAssignedClientCount())
       .from(clientGroup)
-      .leftJoin(client, eq(client.groupId, clientGroup.id))
+      .leftJoin(
+        clientGroupMembership,
+        eq(clientGroupMembership.groupId, clientGroup.id)
+      )
       .where(eq(clientGroup.id, id))
       .groupBy(clientGroup.id)
       .execute();
@@ -198,20 +222,20 @@ export class ClientGroupService {
       return undefined;
     }
 
-    const clients = await this.#db.query.client
-      .findMany({
-        where: eq(client.groupId, id),
-        columns: {
-          id: true,
-          name: true,
-          enabled: true,
-          ipv4Address: true,
-          ipv6Address: true,
-          createdAt: true,
-          updatedAt: true,
-        },
-        orderBy: (t, { asc }) => asc(t.name),
+    const clients = await this.#db
+      .select({
+        id: client.id,
+        name: client.name,
+        enabled: client.enabled,
+        ipv4Address: client.ipv4Address,
+        ipv6Address: client.ipv6Address,
+        createdAt: client.createdAt,
+        updatedAt: client.updatedAt,
       })
+      .from(clientGroupMembership)
+      .innerJoin(client, eq(client.id, clientGroupMembership.clientId))
+      .where(eq(clientGroupMembership.groupId, id))
+      .orderBy(clientGroupMembership.position, client.name)
       .execute();
 
     return {
@@ -221,7 +245,7 @@ export class ClientGroupService {
   }
 
   async update(id: ID, data: ClientGroupUpdateType) {
-    const parsedData = ClientGroupUpdateSchema.parse(data);
+    const parsedData = normalizeGroupData(ClientGroupUpdateSchema.parse(data));
     const existingGroup = await this.#db.query.clientGroup
       .findFirst({
         where: and(
@@ -232,7 +256,7 @@ export class ClientGroupService {
       .execute();
 
     if (existingGroup) {
-      throw new Error('Client group already exists');
+      throw new Error(CLIENT_GROUP_NAME_CONFLICT_MESSAGE);
     }
 
     const [updatedGroup] = await this.#db
@@ -272,27 +296,129 @@ export class ClientGroupService {
         throw new Error('Client group not found');
       }
 
+      const existingMembership = await tx.query.clientGroupMembership
+        .findFirst({
+          where: and(
+            eq(clientGroupMembership.clientId, clientId),
+            eq(clientGroupMembership.groupId, groupId)
+          ),
+        })
+        .execute();
+
+      if (existingMembership) {
+        return;
+      }
+
+      const memberships = await tx.query.clientGroupMembership
+        .findMany({
+          where: eq(clientGroupMembership.clientId, clientId),
+          columns: { position: true },
+        })
+        .execute();
+      const nextPosition =
+        memberships.reduce(
+          (maxPosition, membership) =>
+            Math.max(maxPosition, membership.position),
+          -1
+        ) + 1;
+
       await tx
-        .update(client)
-        .set({ groupId })
-        .where(eq(client.id, clientId))
+        .insert(clientGroupMembership)
+        .values({ clientId, groupId, position: nextPosition })
         .execute();
     });
   }
 
-  unassignClient(clientId: ID) {
-    return this.#statements.unassignClient.execute({ clientId });
+  async removeClient(clientId: ID, groupId: ID) {
+    return this.#db
+      .delete(clientGroupMembership)
+      .where(
+        and(
+          eq(clientGroupMembership.clientId, clientId),
+          eq(clientGroupMembership.groupId, groupId)
+        )
+      )
+      .execute();
+  }
+
+  async setClientGroups(clientId: ID, groupIds: ID[]) {
+    assertUniqueGroupIds(groupIds);
+
+    return this.#db.transaction(async (tx) => {
+      const txClient = await tx.query.client
+        .findFirst({ where: eq(client.id, clientId) })
+        .execute();
+
+      if (!txClient) {
+        throw new Error('Client not found');
+      }
+
+      if (groupIds.length > 0) {
+        const existingGroups = await tx.query.clientGroup
+          .findMany({
+            where: inArray(clientGroup.id, groupIds),
+            columns: { id: true },
+          })
+          .execute();
+        const existingGroupIds = new Set(
+          existingGroups.map((group) => group.id)
+        );
+        const missingGroupId = groupIds.find(
+          (groupId) => !existingGroupIds.has(groupId)
+        );
+
+        if (missingGroupId) {
+          throw new Error('Client group not found');
+        }
+      }
+
+      await tx
+        .delete(clientGroupMembership)
+        .where(eq(clientGroupMembership.clientId, clientId))
+        .execute();
+
+      if (groupIds.length > 0) {
+        await tx
+          .insert(clientGroupMembership)
+          .values(
+            groupIds.map((groupId, position) => ({
+              clientId,
+              groupId,
+              position,
+            }))
+          )
+          .execute();
+      }
+    });
   }
 
   async countAssignedClients(groupId: ID) {
-    return this.#db.$count(client, eq(client.groupId, groupId));
+    return this.#db.$count(
+      clientGroupMembership,
+      eq(clientGroupMembership.groupId, groupId)
+    );
   }
 
-  async getClientGroupId(clientId: ID) {
+  async listMembership(): Promise<ClientGroupMembershipType[]> {
+    const rows = await this.#db
+      .select({
+        clientId: clientGroupMembership.clientId,
+        groupId: clientGroupMembership.groupId,
+        position: clientGroupMembership.position,
+      })
+      .from(clientGroupMembership)
+      .innerJoin(client, eq(client.id, clientGroupMembership.clientId))
+      .orderBy(client.name, clientGroupMembership.position)
+      .execute();
+
+    return rows;
+  }
+
+  async getClientGroups(clientId: ID): Promise<ClientGroupEdgeType[]> {
     const txClient = await this.#db.query.client
       .findFirst({
         where: eq(client.id, clientId),
-        columns: { groupId: true },
+        columns: { id: true },
       })
       .execute();
 
@@ -300,6 +426,41 @@ export class ClientGroupService {
       throw new Error('Client not found');
     }
 
-    return txClient.groupId;
+    const rows = await this.#db
+      .select({
+        clientId: clientGroupMembership.clientId,
+        groupId: clientGroupMembership.groupId,
+        position: clientGroupMembership.position,
+        groupName: clientGroup.name,
+      })
+      .from(clientGroupMembership)
+      .innerJoin(clientGroup, eq(clientGroup.id, clientGroupMembership.groupId))
+      .where(eq(clientGroupMembership.clientId, clientId))
+      .orderBy(clientGroupMembership.position, clientGroup.name)
+      .execute();
+
+    return rows;
+  }
+
+  async getGroupsForClient(clientId: ID): Promise<ClientGroupResultType[]> {
+    const rows = await this.#db
+      .select({
+        id: clientGroup.id,
+        name: clientGroup.name,
+        description: clientGroup.description,
+        allowedIps: clientGroup.allowedIps,
+        dns: clientGroup.dns,
+        firewallIps: clientGroup.firewallIps,
+        createdAt: clientGroup.createdAt,
+        updatedAt: clientGroup.updatedAt,
+        position: clientGroupMembership.position,
+      })
+      .from(clientGroupMembership)
+      .innerJoin(clientGroup, eq(clientGroup.id, clientGroupMembership.groupId))
+      .where(eq(clientGroupMembership.clientId, clientId))
+      .orderBy(clientGroupMembership.position, clientGroup.name)
+      .execute();
+
+    return rows.map((row) => this.#toClientGroup(row));
   }
 }

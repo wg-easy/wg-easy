@@ -6,27 +6,24 @@ import { validateZod } from '#server/utils/types';
 import { ClientGroupClientParamsSchema } from '#db/repositories/clientGroup/types';
 
 export default definePermissionEventHandler(
-  'admin',
-  'any',
-  async ({ event }) => {
+  'clients',
+  'view',
+  async ({ event, checkPermissions }) => {
     const { clientId } = await getValidatedRouterParams(
       event,
       validateZod(ClientGroupClientParamsSchema, event)
     );
 
-    try {
-      await Database.clientGroups.getClientGroupId(clientId);
-      await Database.clientGroups.unassignClient(clientId);
-      return { success: true };
-    } catch (error) {
-      if (error instanceof Error && error.message === 'Client not found') {
-        throw createError({
-          statusCode: 404,
-          statusMessage: error.message,
-        });
-      }
+    const client = await Database.clients.get(clientId);
+    checkPermissions(client);
 
-      throw error;
+    if (!client) {
+      throw createError({
+        statusCode: 404,
+        statusMessage: 'Client not found',
+      });
     }
+
+    return Database.clientGroups.getClientGroups(clientId);
   }
 );

@@ -25,16 +25,10 @@ import {
 
 export type ClientType = InferSelectModel<typeof client>;
 
-export const CurrentPublicClientColumns = {
-  groupId: false,
-} as const;
+export const CurrentPublicClientColumns = {} as const;
 
-export function toCurrentPublicClient<T extends { groupId: number | null }>(
-  client: T
-) {
-  const { groupId: _groupId, ...publicClient } = client;
-
-  return publicClient;
+export function toCurrentPublicClient<T>(client: T) {
+  return client;
 }
 
 export type ClientNextIpType = Pick<ClientType, 'ipv4Address' | 'ipv6Address'>;
@@ -46,12 +40,7 @@ export type CreateClientType = Omit<
 
 export type UpdateClientType = Omit<
   CreateClientType,
-  | 'privateKey'
-  | 'publicKey'
-  | 'preSharedKey'
-  | 'userId'
-  | 'interfaceId'
-  | 'groupId'
+  'privateKey' | 'publicKey' | 'preSharedKey' | 'userId' | 'interfaceId'
 >;
 
 const name = z
@@ -88,6 +77,7 @@ const serverAllowedIps = z.array(AddressSchema, {
 export const ClientCreateSchema = z.object({
   name: name,
   expiresAt: expiresAt,
+  groupIds: z.array(z.coerce.number().int().positive()).default([]),
 });
 
 export type ClientCreateType = z.infer<typeof ClientCreateSchema>;
