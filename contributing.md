@@ -2,17 +2,15 @@
 
 First and foremost, thank you! We appreciate that you want to contribute to wg-easy, your time is valuable, and your contributions mean a lot to us.
 
-
 ## Important!
 
 By contributing to this project, you:
 
-* Agree that you have authored 100% of the content
-* Agree that you have the necessary rights to the content
-* Agree that you have received the necessary permissions from your employer to make the contributions (if applicable)
-* Agree that the content you contribute may be provided under the Project license(s)
-* Agree that, if you did not author 100% of the content, the appropriate licenses and copyrights have been added along with any other necessary attribution.
-
+- Agree that you have authored 100% of the content
+- Agree that you have the necessary rights to the content
+- Agree that you have received the necessary permissions from your employer to make the contributions (if applicable)
+- Agree that the content you contribute may be provided under the Project license(s)
+- Agree that, if you did not author 100% of the content, the appropriate licenses and copyrights have been added along with any other necessary attribution.
 
 ## Getting started
 
@@ -24,7 +22,6 @@ Creating an issue is the simplest form of contributing to a project. But there a
 - Feature requests
 - Bug reports
 
-
 ## Showing support for wg-easy
 
 Please keep in mind that open source software is built by people like you, who spend their free time creating things the rest the community can use.
@@ -34,6 +31,20 @@ Don't have time to contribute? No worries, here are some other ways to show your
 - star the [project](https://github.com/wg-easy/wg-easy)
 - tweet your support for wg-easy
 
+## AI Contribution Policy
+
+Contributions made with the assistance of AI tools are welcome, but contributors must use them responsibly and disclose that use clearly.
+
+1. Review AI-generated code closely before marking a pull request ready for review.
+2. Manually test the changes and add appropriate automated tests where feasible.
+3. Only use AI to assist in contributions that you understand well enough to explain, defend, and revise yourself during review.
+4. Disclose AI-assisted content clearly.
+5. Do not use AI to reply to questions about your issue or pull request. The questions are for you, not an AI model.
+6. AI may be used to help draft issues and pull requests, but contributors remain responsible for the accuracy, completeness, and intent of what they submit.
+
+Maintainers reserve the right to close pull requests and issues that do not disclose AI assistance, that appear to be low-quality AI-generated content, or where the contributor cannot explain or defend the proposed changes themselves.
+
+We welcome new contributors, but cannot sustain the effort of supporting contributors who primarily defer to AI rather than engaging substantively with the review process.
 
 ## Issues
 
@@ -71,7 +82,6 @@ Please be as descriptive as possible when creating an issue. Give us the informa
 - **error messages**: (required) please paste any error messages into the issue, or a [gist](https://gist.github.com/)
 - **extensions, plugins, helpers, etc** (if applicable): please list any extensions you're using
 
-
 ### Closing issues
 
 The original poster or the maintainers of wg-easy may close an issue at any time. Typically, but not exclusively, issues are closed when:
@@ -80,7 +90,6 @@ The original poster or the maintainers of wg-easy may close an issue at any time
 - The project's maintainers have determined the issue is out of scope
 - An issue is clearly a duplicate of another issue, in which case the duplicate issue will be linked.
 - A discussion has clearly run its course
-
 
 ## Next steps
 
