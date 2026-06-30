@@ -1,7 +1,8 @@
-import { eq, sql, or, like, and } from 'drizzle-orm';
+import { eq, sql, or, like, and, inArray } from 'drizzle-orm';
 import { containsCidr, parseCidr } from 'cidr-tools';
 
 import { client } from './schema';
+import { CurrentPublicClientColumns } from './types';
 import type {
   ClientCreateFromExistingType,
   ClientCreateType,
@@ -14,7 +15,12 @@ import { nextIP } from '#server/utils/ip';
 import type { ID } from '#server/utils/types';
 import { wg } from '#server/utils/wgHelper';
 import type { DBType } from '#db/sqlite';
-import { wgInterface, userConfig } from '#db/schema';
+import {
+  clientGroup,
+  clientGroupMembership,
+  wgInterface,
+  userConfig,
+} from '#db/schema';
 
 function createPreparedStatement(db: DBType) {
   return {
@@ -85,6 +91,7 @@ export class ClientService {
         },
         where: and(...filters),
         columns: {
+          ...CurrentPublicClientColumns,
           privateKey: false,
           preSharedKey: false,
         },
@@ -128,6 +135,7 @@ export class ClientService {
         where: and(eq(client.userId, userId), ...filters),
         with: { oneTimeLink: true },
         columns: {
+          ...CurrentPublicClientColumns,
           privateKey: false,
           preSharedKey: false,
         },
@@ -153,12 +161,33 @@ export class ClientService {
     return this.#statements.findById.execute({ id });
   }
 
-  async create({ name, expiresAt }: ClientCreateType) {
+  async create({ name, expiresAt, groupIds }: ClientCreateType) {
     const privateKey = await wg.generatePrivateKey();
     const publicKey = await wg.getPublicKey(privateKey);
     const preSharedKey = await wg.generatePreSharedKey();
 
     return this.#db.transaction(async (tx) => {
+      if (new Set(groupIds).size !== groupIds.length) {
+        throw new Error('Duplicate client group');
+      }
+
+      if (groupIds.length > 0) {
+        const groups = await tx.query.clientGroup
+          .findMany({
+            where: inArray(clientGroup.id, groupIds),
+            columns: { id: true },
+          })
+          .execute();
+        const existingGroupIds = new Set(groups.map((group) => group.id));
+        const missingGroupId = groupIds.find(
+          (groupId) => !existingGroupIds.has(groupId)
+        );
+
+        if (missingGroupId) {
+          throw new Error('Client group not found');
+        }
+      }
+
       const clients = await tx.query.client.findMany().execute();
       const clientInterface = await tx.query.wgInterface
         .findFirst({
@@ -185,7 +214,7 @@ export class ClientService {
       const ipv6Cidr = parseCidr(clientInterface.ipv6Cidr);
       const ipv6Address = nextIP(6, ipv6Cidr, clients);
 
-      return await tx
+      const result = await tx
         .insert(client)
         .values({
           name,
@@ -213,6 +242,27 @@ export class ClientService {
         })
         .returning({ clientId: client.id })
         .execute();
+
+      const clientId = result[0]?.clientId;
+
+      if (!clientId) {
+        throw new Error('Client was not created');
+      }
+
+      if (groupIds.length > 0) {
+        await tx
+          .insert(clientGroupMembership)
+          .values(
+            groupIds.map((groupId, position) => ({
+              clientId,
+              groupId,
+              position,
+            }))
+          )
+          .execute();
+      }
+
+      return result;
     });
   }
 

@@ -82,6 +82,16 @@ Which IPs will be routed to the client.
 
 The DNS server that the client will use.
 
+## Client Groups
+
+Administrators can assign a client to one or more Client Groups.
+
+When a client belongs to at least one group, the client's individual **Allowed IPs**, **DNS**, and **Firewall Allowed IPs** fields may become read-only. The page shows the effective value from the assigned groups, or the global/default value when none of the assigned groups defines that field.
+
+Individual client values remain stored and become active again when all groups are removed.
+
+See [Client Groups](./client-groups.md) for group creation, assignment, ordering, and policy resolution details.
+
 ## Advanced
 
 - **MTU**: The maximum transmission unit for the client.

@@ -11,6 +11,7 @@ import { InterfaceService } from '#db/repositories/interface/service';
 import { HooksService } from '#db/repositories/hooks/service';
 import { OneTimeLinkService } from '#db/repositories/oneTimeLink/service';
 import { ClientService } from '#db/repositories/client/service';
+import { ClientGroupService } from '#db/repositories/clientGroup/service';
 import * as schema from '#db/schema';
 import { WG_ENV, WG_INITIAL_ENV } from '#server/utils/config';
 
@@ -37,6 +38,7 @@ export async function connect() {
 
 class DBService {
   clients: ClientService;
+  clientGroups: ClientGroupService;
   general: GeneralService;
   users: UserService;
   userConfigs: UserConfigService;
@@ -46,6 +48,7 @@ class DBService {
 
   constructor(db: DBType) {
     this.clients = new ClientService(db);
+    this.clientGroups = new ClientGroupService(db);
     this.general = new GeneralService(db);
     this.users = new UserService(db);
     this.userConfigs = new UserConfigService(db);

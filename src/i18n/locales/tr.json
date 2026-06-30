@@ -121,10 +121,32 @@
     "search": "İstemci ara...",
     "config": "Config",
     "viewConfig": "Config Görüntüle",
-    "firewallIps": "Firewall Allowed IPs",
+    "firewallIps": "Firewall IPs",
     "firewallIpsDesc": "İstemcinin erişebileceği hedef IP/CIDR'ler (isteğe bağlı port/protokol filtreleme ile). Boş bırakılırsa Allowed IPs kullanılır. Ayrıntılı söz dizimi için dokümantasyona bakın.",
     "downloadPng": "PNG İndir",
     "copyPng": "PNG Kopyala"
+  },
+  "clientGroup": {
+    "edit": "Düzenle",
+    "delete": "Sil",
+    "editGroupLabel": "{name} grubunu düzenle",
+    "deleteGroupLabel": "{name} grubunu sil",
+    "notDefined": "Tanımlı değil",
+    "manageAllowedIps": "Bu grupta Allowed IPs yönet",
+    "manageDns": "Bu grupta DNS yönet",
+    "manageFirewallIps": "Bu grupta Firewall IPs yönet",
+    "removeAllowedIp": "Allowed IP'yi kaldır",
+    "removeDns": "DNS kaydını kaldır",
+    "removeFirewallIp": "Firewall IP'yi kaldır",
+    "selectGroup": "Grup seç",
+    "noGroupsSelected": "Seçili grup yok",
+    "removeGroupLabel": "{name} grubunu kaldır",
+    "policyRequired": "Etkin grup politikaları en az bir değer gerektirir.",
+    "managedByGroupLinked": "{groups} grubu tarafından yönetiliyor",
+    "managedByOneGroupLinked": "{groups} grubu tarafından yönetiliyor",
+    "managedByManyGroupsLinked": "{groups} grupları tarafından yönetiliyor",
+    "inheritedFromGlobal": "Genel yapılandırmadan devralındı",
+    "usingClientValue": "İstemci değeri kullanılıyor"
   },
   "dialog": {
     "change": "Değiştir",
@@ -205,8 +227,14 @@
       "address4": "IPv4 Adresi",
       "address6": "IPv6 Adresi",
       "serverAllowedIps": "Server Allowed IPs",
-      "firewallIps": "Firewall Allowed IPs",
+      "firewallIps": "Firewall IPs",
       "firewallIpsInvalid": "Geçersiz Firewall IP formatı. Desteklenen söz dizimi için dokümantasyona bakın. See docs for supported syntax."
+    },
+    "clientGroup": {
+      "id": "Client Group ID",
+      "name": "Name",
+      "description": "Description",
+      "policyRequired": "Group policy value"
     },
     "user": {
       "username": "Kullanıcı Adı",
