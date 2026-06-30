@@ -166,7 +166,11 @@ export default defineNuxtConfig({
       },
     },
     externals: {
-      traceInclude: [fileURLToPath(new URL('./cli/index.ts', import.meta.url))],
+      traceInclude: [
+        fileURLToPath(
+          new URL('./node_modules/.cache/wg-easy/trace.mjs', import.meta.url)
+        ),
+      ],
     },
   },
   alias: {
