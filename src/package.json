@@ -5,7 +5,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "nuxt build && pnpm cli:build",
+    "build": "pnpm cli:trace && nuxt build && pnpm cli:build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
@@ -16,6 +16,7 @@
     "typecheck": "nuxt typecheck",
     "check:all": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm build",
     "db:generate": "drizzle-kit generate",
+    "cli:trace": "node cli/build.js --trace",
     "cli:build": "node cli/build.js",
     "cli:dev": "tsx cli/index.ts",
     "test:unit": "vitest run --project unit"
