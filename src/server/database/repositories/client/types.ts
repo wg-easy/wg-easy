@@ -68,6 +68,13 @@ const serverAllowedIps = z.array(AddressSchema, {
   message: t('zod.client.serverAllowedIps'),
 });
 
+const quota = z
+  .number()
+  .int()
+  .positive()
+  .max(Number.MAX_SAFE_INTEGER)
+  .nullable();
+
 export const ClientCreateSchema = z.object({
   name: name,
   expiresAt: expiresAt,
@@ -110,6 +117,9 @@ export const ClientUpdateSchema = schemaForType<UpdateClientType>()(
     i4: ISchema,
     i5: ISchema,
     persistentKeepalive: PersistentKeepaliveSchema,
+    dailyQuota: quota,
+    weeklyQuota: quota,
+    monthlyQuota: quota,
     serverEndpoint: AddressSchema.nullable(),
     dns: DnsSchema.nullable(),
   })

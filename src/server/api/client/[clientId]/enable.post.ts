@@ -18,16 +18,30 @@ export default definePermissionEventHandler(
     const client = await Database.clients.get(clientId);
     checkPermissions(client);
 
-    if (
-      client &&
-      client.expiresAt !== null &&
-      new Date() > new Date(client.expiresAt)
-    ) {
+    if (!client) {
+      throw createError({
+        statusCode: 404,
+        statusMessage: 'Client not found',
+      });
+    }
+
+    if (client.expiresAt !== null && new Date() > new Date(client.expiresAt)) {
       throw createError({
         statusCode: 422,
         statusMessage:
           'Client is expired. Please update the expiration date first.',
         message: 'Client is expired. Please update the expiration date first.',
+      });
+    }
+
+    await WireGuard.updateTrafficStats();
+    const exceededQuotas = await Database.traffic.getExceededQuotas(clientId);
+    if (exceededQuotas.length > 0) {
+      const periods = exceededQuotas.join(', ');
+      throw createError({
+        statusCode: 422,
+        statusMessage: `Client traffic quota exceeded: ${periods}`,
+        message: `Client traffic quota exceeded: ${periods}`,
       });
     }
 

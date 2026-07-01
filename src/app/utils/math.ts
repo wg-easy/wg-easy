@@ -1,3 +1,50 @@
+export const GIBIBYTE_IN_BYTES = 1024 ** 3;
+
+export function quotaBytesToGiB(bytes: number | null): number | null {
+  return bytes === null ? null : bytes / GIBIBYTE_IN_BYTES;
+}
+
+export function quotaBytesToGiBInput(bytes: number | null): string {
+  if (bytes === null) {
+    return '';
+  }
+
+  return quotaBytesToGiB(bytes)!
+    .toFixed(9)
+    .replace(/\.?0+$/, '');
+}
+
+export function quotaGiBToBytes(gibibytes: number | null): number | null {
+  if (gibibytes === null || gibibytes <= 0) {
+    return null;
+  }
+
+  const bytes = Math.round(gibibytes * GIBIBYTE_IN_BYTES);
+  return bytes > 0 ? bytes : null;
+}
+
+export function quotaGiBInputToBytes(
+  gibibytes: string
+): number | null | undefined {
+  const value = gibibytes.trim();
+
+  if (value === '') {
+    return null;
+  }
+
+  const quotaGiB = Number(value);
+  if (!Number.isFinite(quotaGiB) || quotaGiB < 0) {
+    return undefined;
+  }
+
+  const quotaBytes = quotaGiBToBytes(quotaGiB);
+  if (quotaBytes !== null && !Number.isSafeInteger(quotaBytes)) {
+    return undefined;
+  }
+
+  return quotaBytes;
+}
+
 export function bytes(
   bytes: number,
   decimals = 2,
@@ -10,8 +57,8 @@ export function bytes(
   const dm =
     decimals != null && !Number.isNaN(decimals) && decimals >= 0 ? decimals : 2;
   const sizes = kib
-    ? ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB', 'BiB']
-    : ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB', 'BB'];
+    ? ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB', 'RiB']
+    : ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB', 'RB'];
   let i = Math.floor(Math.log(bytes) / Math.log(k));
   if (maxunit !== undefined) {
     const index = sizes.indexOf(maxunit);

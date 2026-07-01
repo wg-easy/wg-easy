@@ -1,0 +1,9 @@
+{
+  "extends": "../.nuxt/tsconfig.server.json",
+  "compilerOptions": {
+    "paths": {
+      "#app/*": ["../app/*"]
+    }
+  },
+  "include": ["./**/*.ts"]
+}

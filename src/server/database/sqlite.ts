@@ -11,6 +11,7 @@ import { InterfaceService } from '#db/repositories/interface/service';
 import { HooksService } from '#db/repositories/hooks/service';
 import { OneTimeLinkService } from '#db/repositories/oneTimeLink/service';
 import { ClientService } from '#db/repositories/client/service';
+import { TrafficService } from '#db/repositories/traffic/service';
 import * as schema from '#db/schema';
 import { WG_ENV, WG_INITIAL_ENV } from '#server/utils/config';
 
@@ -43,6 +44,7 @@ class DBService {
   interfaces: InterfaceService;
   hooks: HooksService;
   oneTimeLinks: OneTimeLinkService;
+  traffic: TrafficService;
 
   constructor(db: DBType) {
     this.clients = new ClientService(db);
@@ -52,6 +54,7 @@ class DBService {
     this.interfaces = new InterfaceService(db);
     this.hooks = new HooksService(db);
     this.oneTimeLinks = new OneTimeLinkService(db);
+    this.traffic = new TrafficService(db);
   }
 }
 
