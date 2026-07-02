@@ -75,7 +75,7 @@ class TCManager {
       }
 
       // Step 2: Create root qdisc with default class
-      TC_DEBUG(`Creating root qdisc (default ${state.defaultClassId})...`);
+      TC_DEBUG(`Creating root qdisc (default ${state.defaultClassId}) with ${String(state.defaultClassId).slice(1)}Mbit...`);
       try {
         await execAsync(
           `tc qdisc add dev ${this.device} parent root handle 1: hfsc default ${state.defaultClassId}`,
@@ -91,6 +91,11 @@ class TCManager {
       try {
         await execAsync(
           `tc class add dev ${this.device} parent 1: classid 1:1 hfsc sc rate ${totalUlRate}mbit ul rate ${totalUlRate}mbit`,
+          { timeout: 10000 }
+        );
+        const ul: string = String(state.defaultClassId).slice(1);
+        await execAsync(
+          `tc class add dev ${this.device} parent 1:1 classid 1:${state.defaultClassId} hfsc ls rate ${ul}mbit ul rate ${ul}mbit`,
           { timeout: 10000 }
         );
       } catch (err: any) {

@@ -45,15 +45,12 @@
           </label>
           <div class="flex items-center gap-3">
             <input
-              v-model.number="data.tcState.defaultClassId"
+              v-model.number="defaultClassSpeed"
               type="number"
               min="1"
               max="255"
               class="w-32 rounded-lg border-2 border-gray-100 text-gray-500 focus:border-red-800 focus:outline-0 focus:ring-0 dark:border-neutral-800 dark:bg-neutral-700 dark:text-neutral-200 dark:placeholder:text-neutral-400"
             >
-            <span class="text-xs text-gray-400 dark:text-neutral-500">
-              {{ $t('admin.speed.defaultClassIdDesc') }}
-            </span>
           </div>
         </div>
       </div>
@@ -226,6 +223,21 @@ function getClientsForClass(cls: TcClass): TcClient[] {
   return data.value.clients.filter((c) => c.ipv4Address && ipSet.has(c.ipv4Address));
 }
 
+// Default class speed (without '2' prefix)
+const defaultClassSpeed = computed({
+  get: () => {
+    if (!data.value) return 0;
+    const s = String(data.value.tcState.defaultClassId);
+    // Strip leading '2' if present
+    return s.startsWith('2') ? parseInt(s.slice(1), 10) || 0 : data.value.tcState.defaultClassId;
+  },
+  set: (val: number) => {
+    if (data.value) {
+      data.value.tcState.defaultClassId = val;
+    }
+  },
+});
+
 // Drag state
 const dragState = ref<{ client: TcClient; fromClassIdx: number | null } | null>(null);
 
@@ -318,7 +330,10 @@ async function applyConfig() {
   try {
     const res = await $fetch('/api/tc/state', {
       method: 'post',
-      body: data.value.tcState,
+      body: {
+        ...data.value.tcState,
+        defaultClassId: parseInt('2' + String(defaultClassSpeed.value), 10),
+      },
     });
 
     if (res.success) {
