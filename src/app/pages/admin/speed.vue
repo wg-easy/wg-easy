@@ -50,6 +50,7 @@
               min="1"
               max="255"
               class="w-32 rounded-lg border-2 border-gray-100 text-gray-500 focus:border-red-800 focus:outline-0 focus:ring-0 dark:border-neutral-800 dark:bg-neutral-700 dark:text-neutral-200 dark:placeholder:text-neutral-400"
+              @keydown="onDefaultClassKeydown"
             >
           </div>
         </div>
@@ -82,7 +83,7 @@
         <!-- Class Cards -->
         <div
           v-for="(cls, index) in data.tcState.classes"
-          :key="cls.id"
+          :key="index"
           class="flex flex-col rounded-lg border border-gray-200 p-3 dark:border-neutral-600"
         >
           <div class="mb-3 flex items-center justify-between rounded-lg bg-blue-50 px-4 py-2 dark:bg-blue-900/30">
@@ -201,6 +202,10 @@ const data = ref<TcStateResponse | null>(null);
 watch(fetchData, (val) => {
   if (val) {
     data.value = JSON.parse(JSON.stringify(val));
+    // Extract display value for default class (strip '2' prefix from backend)
+    const raw = val.tcState.defaultClassId;
+    const s = String(raw);
+    defaultClassSpeed.value = s.startsWith('2') ? parseInt(s.slice(1), 10) || 0 : raw;
   }
 }, { immediate: true });
 
@@ -216,6 +221,29 @@ const unassignedClients = computed(() => {
   return data.value.clients.filter((c) => c.ipv4Address && !assignedIps.has(c.ipv4Address));
 });
 
+// Debounce timer for class UL input
+const classUlTimers = new Map<TcClass, ReturnType<typeof setTimeout>>();
+
+function onClassUlChange(cls: TcClass) {
+  // Debounce: only update class ID after user stops typing for 500ms
+  const existing = classUlTimers.get(cls);
+  if (existing) clearTimeout(existing);
+
+  const timer = setTimeout(() => {
+    const ulStr = String(cls.ulRate);
+    const newId = parseInt('1' + ulStr, 10);
+    if (!isNaN(newId) && newId >= 10) {
+      const conflict = data.value?.tcState.classes.find((c) => c.id === newId && c !== cls);
+      if (!conflict) {
+        cls.id = newId;
+      }
+    }
+    classUlTimers.delete(cls);
+  }, 500);
+
+  classUlTimers.set(cls, timer);
+}
+
 // Get clients for a given class
 function getClientsForClass(cls: TcClass): TcClient[] {
   if (!data.value) return [];
@@ -223,20 +251,23 @@ function getClientsForClass(cls: TcClass): TcClient[] {
   return data.value.clients.filter((c) => c.ipv4Address && ipSet.has(c.ipv4Address));
 }
 
-// Default class speed (without '2' prefix)
-const defaultClassSpeed = computed({
-  get: () => {
-    if (!data.value) return 0;
-    const s = String(data.value.tcState.defaultClassId);
-    // Strip leading '2' if present
-    return s.startsWith('2') ? parseInt(s.slice(1), 10) || 0 : data.value.tcState.defaultClassId;
-  },
-  set: (val: number) => {
-    if (data.value) {
-      data.value.tcState.defaultClassId = val;
+// Default class speed — plain ref, not computed (avoid '2' prefix stripping bugs)
+const defaultClassSpeed = ref(0);
+
+// Prevent empty string / NaN from resetting the field to 0
+function onDefaultClassKeydown(e: KeyboardEvent) {
+  const input = e.target as HTMLInputElement;
+  // On Enter or Tab, clamp the value
+  if (e.key === 'Enter' || e.key === 'Tab') {
+    const num = parseInt(input.value, 10);
+    if (!isNaN(num) && num >= 1 && num <= 255) {
+      defaultClassSpeed.value = num;
+    } else {
+      // Reset to previous valid value
+      input.value = String(defaultClassSpeed.value);
     }
-  },
-});
+  }
+}
 
 // Drag state
 const dragState = ref<{ client: TcClient; fromClassIdx: number | null } | null>(null);
@@ -271,19 +302,6 @@ function moveToUnassigned(ip: string, classIdx: number) {
   const cls = data.value.tcState.classes[classIdx];
   if (cls) {
     cls.clientIps = cls.clientIps.filter((i) => i !== ip);
-  }
-}
-
-function onClassUlChange(cls: TcClass) {
-  // Auto-generate class ID as 1{UL} (e.g. UL=3 → ID=13)
-  const ulStr = String(cls.ulRate);
-  const newId = parseInt('1' + ulStr, 10);
-  if (!isNaN(newId) && newId >= 10) {
-    // Only update if the new ID doesn't conflict with existing classes
-    const conflict = data.value?.tcState.classes.find((c) => c.id === newId && c !== cls);
-    if (!conflict) {
-      cls.id = newId;
-    }
   }
 }
 
