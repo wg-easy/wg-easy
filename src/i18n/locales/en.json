@@ -7,7 +7,8 @@
       "general": "General",
       "config": "Config",
       "interface": "Interface",
-      "hooks": "Hooks"
+      "hooks": "Hooks",
+      "speed": "Speed"
     }
   },
   "user": {
@@ -157,6 +158,24 @@
     "add": "Add"
   },
   "admin": {
+    "speed": {
+      "title": "Speed Regulation — HFSC Traffic Shaping",
+      "refresh": "Refresh",
+      "apply": "Apply Configuration",
+      "totalBandwidth": "Total Bandwidth (UL rate)",
+      "totalBandwidthDesc": "Root class 1:1 — max bandwidth",
+      "defaultClassId": "Default Class ID",
+      "defaultClassIdDesc": "Unmatched traffic goes to this class",
+      "unassigned": "Unassigned Clients",
+      "noUnassigned": "All clients are assigned",
+      "classLabel": "Class",
+      "removeClass": "Remove class",
+      "moveToUnassigned": "Move to unassigned",
+      "dropHere": "Drop clients here",
+      "addClass": "Add Class",
+      "applySuccess": "Traffic control configuration applied successfully",
+      "applyError": "Failed to apply traffic control configuration"
+    },
     "general": {
       "sessionTimeout": "Session Timeout",
       "sessionTimeoutDesc": "Session duration for Remember Me (seconds)",

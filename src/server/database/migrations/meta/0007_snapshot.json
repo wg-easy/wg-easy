@@ -1,0 +1,69 @@
+{
+  "target": "sqlite",
+  "$schema": "./_journal.schema.json",
+  "version": "6",
+  "fragment": {
+    "tables": {
+      "tc_state_table": {
+        "name": "tc_state_table",
+        "columns": {
+          "id": {
+            "name": "id",
+            "type": "integer",
+            "primaryKey": true,
+            "notNull": true,
+            "default": 1,
+            "autoincrement": false
+          },
+          "total_ul_rate": {
+            "name": "total_ul_rate",
+            "type": "integer",
+            "primaryKey": false,
+            "notNull": true,
+            "default": 100
+          },
+          "default_class_id": {
+            "name": "default_class_id",
+            "type": "integer",
+            "primaryKey": false,
+            "notNull": true,
+            "default": 11
+          },
+          "classes": {
+            "name": "classes",
+            "type": "text",
+            "primaryKey": false,
+            "notNull": true,
+            "default": "'[]'"
+          },
+          "created_at": {
+            "name": "created_at",
+            "type": "text",
+            "primaryKey": false,
+            "notNull": true,
+            "default": "(CURRENT_TIMESTAMP)"
+          },
+          "updated_at": {
+            "name": "updated_at",
+            "type": "text",
+            "primaryKey": false,
+            "notNull": true,
+            "default": "(CURRENT_TIMESTAMP)"
+          }
+        },
+        "indexes": {},
+        "foreignKeys": {},
+        "compositePrimaryKeys": {},
+        "uniqueConstraints": {},
+        "checkConstraints": {}
+      }
+    },
+    "schemas": {},
+    "enums": {},
+    "_meta": {
+      "schemas": {},
+      "tables": {},
+      "columns": {}
+    }
+  }
+}

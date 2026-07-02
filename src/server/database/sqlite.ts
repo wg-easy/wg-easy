@@ -4,6 +4,7 @@ import { createClient } from '@libsql/client';
 import { createDebug } from 'obug';
 import { eq } from 'drizzle-orm';
 
+import { TcStateService } from '#db/repositories/tcState/service';
 import { GeneralService } from '#db/repositories/general/service';
 import { UserService } from '#db/repositories/user/service';
 import { UserConfigService } from '#db/repositories/userConfig/service';
@@ -12,6 +13,7 @@ import { HooksService } from '#db/repositories/hooks/service';
 import { OneTimeLinkService } from '#db/repositories/oneTimeLink/service';
 import { ClientService } from '#db/repositories/client/service';
 import * as schema from '#db/schema';
+import { tcState } from '#db/repositories/tcState/schema';
 import { WG_ENV, WG_INITIAL_ENV } from '#server/utils/config';
 
 const DB_DEBUG = createDebug('Database');
@@ -43,6 +45,7 @@ class DBService {
   interfaces: InterfaceService;
   hooks: HooksService;
   oneTimeLinks: OneTimeLinkService;
+  tcState: TcStateService;
 
   constructor(db: DBType) {
     this.clients = new ClientService(db);
@@ -52,6 +55,7 @@ class DBService {
     this.interfaces = new InterfaceService(db);
     this.hooks = new HooksService(db);
     this.oneTimeLinks = new OneTimeLinkService(db);
+    this.tcState = new TcStateService(db);
   }
 }
 

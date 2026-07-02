@@ -6,6 +6,7 @@ import Database from '#server/utils/Database';
 import { OLD_ENV, WG_ENV } from '#server/utils/config';
 import { firewall } from '#server/utils/firewall';
 import { encodeQRCode } from '#server/utils/qr';
+import TCManager from '#server/utils/TCManager';
 import type { ID } from '#server/utils/types';
 import { wg } from '#server/utils/wgHelper';
 import { setIntervalImmediately } from '#shared/utils/time';
@@ -264,6 +265,19 @@ class WireGuard {
     WG_DEBUG('Applying firewall rules...');
     await this.#applyFirewallRules(wgInterface);
     WG_DEBUG('Firewall rules applied successfully.');
+
+    // Apply TC (traffic control) configuration
+    WG_DEBUG('Applying TC configuration...');
+    try {
+      const tcResult = await TCManager.applyConfig();
+      if (tcResult.success) {
+        WG_DEBUG('TC configuration applied successfully.');
+      } else {
+        WG_DEBUG(`TC configuration applied with warnings/errors: ${tcResult.message}`);
+      }
+    } catch (tcErr) {
+      WG_DEBUG(`Failed to apply TC configuration: ${tcErr}`);
+    }
 
     WG_DEBUG('Starting Cron Job...');
     await this.startCronJob();

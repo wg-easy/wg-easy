@@ -7,7 +7,8 @@
       "general": "Общие настройки",
       "config": "Конфигурация",
       "interface": "Сетевой интерфейс",
-      "hooks": "Хуки"
+      "hooks": "Хуки",
+      "speed": "Speed"
     }
   },
   "user": {
@@ -148,6 +149,24 @@
     "add": "Добавить"
   },
   "admin": {
+    "speed": {
+      "title": "Speed Regulation — HFSC Traffic Shaping",
+      "refresh": "Обновить",
+      "apply": "Применить конфигурацию",
+      "totalBandwidth": "Общая пропускная способность (UL rate)",
+      "totalBandwidthDesc": "Root class 1:1 — максимальная пропускная способность",
+      "defaultClassId": "ID класса по умолчанию",
+      "defaultClassIdDesc": "Несопоставленный трафик идёт в этот класс",
+      "unassigned": "Клиенты без класса",
+      "noUnassigned": "Все клиенты распределены",
+      "classLabel": "Класс",
+      "removeClass": "Удалить класс",
+      "moveToUnassigned": "Переместить без класса",
+      "dropHere": "Перетащите клиентов сюда",
+      "addClass": "Добавить класс",
+      "applySuccess": "Конфигурация управления трафиком успешно применена",
+      "applyError": "Не удалось применить конфигурацию управления трафиком"
+    },
     "general": {
       "sessionTimeout": "Время жизни сессии",
       "sessionTimeoutDesc": "Длительность сессии для «Запомнить меня» (в секундах)",
