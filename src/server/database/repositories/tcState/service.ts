@@ -32,7 +32,7 @@ export class TcStateService {
       await this.#db.insert(tcState).values({
         id: 1,
         totalUlRate: 100,
-        defaultClassId: 21, // 2{ulRate} convention: 21 means ulRate=1
+        defaultClassId: 211, // 2{ulRate} convention: 211 means ulRate=11
         classes: [],
       }).execute();
       state = await this.#statements.get.execute();

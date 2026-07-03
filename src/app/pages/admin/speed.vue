@@ -31,7 +31,7 @@
               type="number"
               min="1"
               max="10000"
-              class="w-32 rounded-lg border-2 border-gray-100 text-gray-500 focus:border-red-800 focus:outline-0 focus:ring-0 dark:border-neutral-800 dark:bg-neutral-700 dark:text-neutral-200 dark:placeholder:text-neutral-400"
+              class="w-full max-w-[8rem] rounded-lg border-2 border-gray-100 text-gray-500 focus:border-red-800 focus:outline-0 focus:ring-0 dark:border-neutral-800 dark:bg-neutral-700 dark:text-neutral-200 dark:placeholder:text-neutral-400"
             >
             <span class="text-sm text-gray-500 dark:text-neutral-400">Mbit</span>
             <span class="ml-2 hidden text-xs text-gray-400 dark:text-neutral-500 lg:inline">
@@ -57,22 +57,40 @@
       </div>
 
       <!-- Class Cards Grid -->
-      <div class="grid grid-cols-1 gap-4 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+      <div class="grid grid-cols-1 gap-4 overflow-x-auto sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         <!-- Unassigned Clients -->
         <div class="flex flex-col">
           <div class="mb-3 rounded-lg bg-orange-50 px-4 py-2 text-center text-sm font-medium text-orange-800 dark:bg-orange-900/30 dark:text-orange-200">
             {{ $t('admin.speed.unassigned') }}
           </div>
-          <div class="flex-1 rounded-lg border-2 border-dashed border-orange-200 bg-orange-50/30 p-3 dark:border-orange-800 dark:bg-orange-950/20">
+          <div
+            class="flex-1 rounded-lg border-2 border-dashed border-orange-200 bg-orange-50/30 p-3 dark:border-orange-800 dark:bg-orange-950/20"
+            data-drop-target="-1"
+            @dragover.prevent
+            @drop="onDropUnassigned"
+          >
             <div
               v-for="client in unassignedClients"
               :key="client.id"
-              class="mb-2 cursor-grab rounded-lg border border-orange-200 bg-white px-3 py-2 text-sm shadow-sm transition hover:shadow-md active:cursor-grabbing dark:border-orange-700 dark:bg-neutral-700"
+              class="mb-2 min-w-[180px] cursor-grab rounded-lg border border-orange-200 bg-white px-3 py-2 text-sm shadow-sm transition hover:shadow-md active:cursor-grabbing dark:border-orange-700 dark:bg-neutral-700"
               draggable="true"
               @dragstart="onDragStart(client, null)"
             >
-              <div class="font-medium text-gray-800 dark:text-neutral-100">{{ client.name }}</div>
-              <div class="text-xs text-gray-500 dark:text-neutral-400">{{ client.ipv4Address }}</div>
+              <div class="flex items-center justify-between">
+                <div class="min-w-0">
+                  <div class="truncate font-medium text-gray-800 dark:text-neutral-100" :title="client.name">{{ client.name }}</div>
+                  <div class="truncate text-xs text-gray-500 dark:text-neutral-400" :title="client.ipv4Address">{{ client.ipv4Address }}</div>
+                </div>
+                <button
+                  class="rounded p-2 min-w-[44px] min-h-[44px] text-gray-400 transition hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-neutral-600 dark:hover:text-neutral-300"
+                  :title="$t('admin.speed.moveToClass')"
+                  @click.stop="toggleMenu($event, client, null)"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 5v.01M12 12v.01M12 19v.01" />
+                  </svg>
+                </button>
+              </div>
             </div>
             <div v-if="unassignedClients.length === 0" class="text-center text-xs text-gray-400 dark:text-neutral-500 py-4">
               {{ $t('admin.speed.noUnassigned') }}
@@ -91,7 +109,7 @@
               {{ cls.ulRate }} Mbit
             </span>
             <button
-              class="text-red-500 transition hover:text-red-700 dark:text-red-400"
+              class="p-2 min-w-[44px] min-h-[44px] text-red-500 transition hover:text-red-700 dark:text-red-400"
               :title="$t('admin.speed.removeClass')"
               @click="removeClass(index)"
             >
@@ -116,30 +134,42 @@
           </div>
           <div
             class="flex-1 rounded-lg border-2 border-dashed border-blue-200 bg-blue-50/30 p-3 dark:border-blue-800 dark:bg-blue-950/20"
+            :data-drop-target="index"
             @dragover.prevent
             @drop="onDrop(index)"
           >
             <div
               v-for="client in getClientsForClass(cls)"
               :key="client.ipv4Address"
-              class="mb-2 rounded-lg border border-blue-200 bg-white px-3 py-2 text-sm shadow-sm transition hover:shadow-md dark:border-blue-700 dark:bg-neutral-700"
+              class="mb-2 min-w-[180px] rounded-lg border border-blue-200 bg-white px-3 py-2 text-sm shadow-sm transition hover:shadow-md dark:border-blue-700 dark:bg-neutral-700"
               draggable="true"
               @dragstart="onDragStart(client, index)"
             >
               <div class="flex items-center justify-between">
-                <div>
-                  <div class="font-medium text-gray-800 dark:text-neutral-100">{{ client.name }}</div>
-                  <div class="text-xs text-gray-500 dark:text-neutral-400">{{ client.ipv4Address }}</div>
+                <div class="min-w-0">
+                  <div class="truncate font-medium text-gray-800 dark:text-neutral-100" :title="client.name">{{ client.name }}</div>
+                  <div class="truncate text-xs text-gray-500 dark:text-neutral-400" :title="client.ipv4Address">{{ client.ipv4Address }}</div>
                 </div>
-                <button
-                  class="text-gray-400 transition hover:text-red-500"
-                  :title="$t('admin.speed.moveToUnassigned')"
-                  @click="moveToUnassigned(client.ipv4Address, index)"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
+                <div class="flex items-center gap-1">
+                  <button
+                    class="rounded p-2 min-w-[44px] min-h-[44px] text-gray-400 transition hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-neutral-600 dark:hover:text-neutral-300"
+                    :title="$t('admin.speed.moveToClass')"
+                    @click.stop="toggleMenu($event, client, index)"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 5v.01M12 12v.01M12 19v.01" />
+                    </svg>
+                  </button>
+                  <button
+                    class="p-2 min-w-[44px] min-h-[44px] text-gray-400 transition hover:text-red-500"
+                    :title="$t('admin.speed.moveToUnassigned')"
+                    @click="moveToUnassigned(client.ipv4Address, index)"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
               </div>
             </div>
             <div v-if="cls.clientIps.length === 0" class="text-center text-xs text-gray-400 dark:text-neutral-500 py-4">
@@ -149,7 +179,7 @@
         </div>
 
         <!-- Add Class Card -->
-        <div class="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 p-6 dark:border-neutral-600">
+        <div class="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 p-4 sm:p-6 dark:border-neutral-600">
           <button
             class="inline-flex items-center rounded bg-red-800 px-4 py-2 text-sm text-white transition hover:bg-red-600"
             @click="addClass"
@@ -162,6 +192,42 @@
         </div>
       </div>
     </div>
+
+    <!-- Class selector dropdown -->
+    <Teleport to="body">
+      <div
+        v-if="menuOpenFor !== null"
+        class="fixed inset-0 z-50"
+        @click="closeMenu"
+      >
+        <div
+          class="absolute rounded-lg border border-gray-200 bg-white py-1 shadow-xl dark:border-neutral-600 dark:bg-neutral-800"
+          :style="{ left: menuPosition.x + 'px', top: menuPosition.y + 'px', minWidth: '160px' }"
+          @click.stop
+        >
+          <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase dark:text-neutral-500">
+            {{ $t('admin.speed.moveToClass') }}
+          </div>
+          <button
+            v-for="(cls, idx) in data.tcState.classes"
+            :key="idx"
+            class="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-gray-700 transition hover:bg-gray-100 dark:text-neutral-200 dark:hover:bg-neutral-700"
+            @click="moveClientViaMenu(idx)"
+          >
+            <span class="inline-block h-2 w-2 rounded-full bg-blue-500"></span>
+            {{ cls.ulRate }} Mbit
+          </button>
+          <div v-if="data.tcState.classes.length > 0" class="mx-2 my-1 border-t border-gray-100 dark:border-neutral-700"></div>
+          <button
+            class="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-orange-600 transition hover:bg-gray-100 dark:text-orange-400 dark:hover:bg-neutral-700"
+            @click="moveClientViaMenu(null)"
+          >
+            <span class="inline-block h-2 w-2 rounded-full bg-orange-500"></span>
+            {{ $t('admin.speed.unassigned') }}
+          </button>
+        </div>
+      </div>
+    </Teleport>
   </main>
 </template>
 
@@ -224,6 +290,49 @@ const unassignedClients = computed(() => {
   return data.value.clients.filter((c) => c.ipv4Address && !assignedIps.has(c.ipv4Address));
 });
 
+// Class selector dropdown state
+const menuOpenFor = ref<{ client: TcClient; fromClassIdx: number | null } | null>(null);
+const menuPosition = ref({ x: 0, y: 0 });
+
+function toggleMenu(e: MouseEvent, client: TcClient, fromClassIdx: number | null) {
+  if (menuOpenFor.value?.client.ipv4Address === client.ipv4Address) {
+    menuOpenFor.value = null;
+    return;
+  }
+  menuOpenFor.value = { client, fromClassIdx };
+  // Position near the click, clamped to viewport
+  const x = Math.min(e.clientX, window.innerWidth - 180);
+  const y = Math.min(e.clientY, window.innerHeight - 300);
+  menuPosition.value = { x, y };
+}
+
+function closeMenu() {
+  menuOpenFor.value = null;
+}
+
+function moveClientViaMenu(toClassIdx: number | null) {
+  if (!menuOpenFor.value || !data.value) return;
+  const { client, fromClassIdx } = menuOpenFor.value;
+
+  // Remove from source class
+  if (fromClassIdx !== null) {
+    const srcClass = data.value.tcState.classes[fromClassIdx];
+    if (srcClass) {
+      srcClass.clientIps = srcClass.clientIps.filter((ip) => ip !== client.ipv4Address);
+    }
+  }
+
+  // Add to target class (null = unassigned)
+  if (toClassIdx !== null) {
+    const dstClass = data.value.tcState.classes[toClassIdx];
+    if (dstClass && client.ipv4Address && !dstClass.clientIps.includes(client.ipv4Address)) {
+      dstClass.clientIps.push(client.ipv4Address);
+    }
+  }
+
+  menuOpenFor.value = null;
+}
+
 // Debounce timer for class UL input
 const classUlTimers = new Map<TcClass, ReturnType<typeof setTimeout>>();
 
@@ -274,6 +383,18 @@ const dragState = ref<{ client: TcClient; fromClassIdx: number | null } | null>(
 
 function onDragStart(client: TcClient, fromClassIdx: number | null) {
   dragState.value = { client, fromClassIdx };
+}
+
+function onDropUnassigned() {
+  if (!dragState.value || !data.value) return;
+  const { client, fromClassIdx } = dragState.value;
+  if (fromClassIdx !== null) {
+    const srcClass = data.value.tcState.classes[fromClassIdx];
+    if (srcClass) {
+      srcClass.clientIps = srcClass.clientIps.filter((ip) => ip !== client.ipv4Address);
+    }
+  }
+  dragState.value = null;
 }
 
 function onDrop(toClassIdx: number) {
