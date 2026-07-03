@@ -198,6 +198,9 @@ const { data: fetchData, refresh: _refresh } = await useFetch<TcStateResponse>('
 // Use a ref instead of computed for stable reactivity
 const data = ref<TcStateResponse | null>(null);
 
+// Default class speed — must be declared BEFORE the watch that uses it (avoid TDZ)
+const defaultClassSpeed = ref(0);
+
 // Initialize from fetch data
 watch(fetchData, (val) => {
   if (val) {
@@ -250,9 +253,6 @@ function getClientsForClass(cls: TcClass): TcClient[] {
   const ipSet = new Set(cls.clientIps);
   return data.value.clients.filter((c) => c.ipv4Address && ipSet.has(c.ipv4Address));
 }
-
-// Default class speed — plain ref, not computed (avoid '2' prefix stripping bugs)
-const defaultClassSpeed = ref(0);
 
 // Prevent empty string / NaN from resetting the field to 0
 function onDefaultClassKeydown(e: KeyboardEvent) {

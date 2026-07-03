@@ -5,7 +5,7 @@ export const tcState = sqliteTable('tc_state_table', {
   id: int().primaryKey({ autoIncrement: false }).default(1),
 
   totalUlRate: int('total_ul_rate').notNull().default(100),
-  defaultClassId: int('default_class_id').notNull().default(11),
+  defaultClassId: int('default_class_id').notNull().default(21), // 2{ulRate} convention: 21 means ulRate=1
 
   /** JSON array of { id: number, ulRate: number, clientIps: string[] } */
   classes: text({ mode: 'json' }).$type<TcClass[]>().notNull().default([]),

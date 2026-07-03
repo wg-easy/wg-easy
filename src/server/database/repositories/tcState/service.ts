@@ -28,11 +28,11 @@ export class TcStateService {
   }> {
     let state = await this.#statements.get.execute();
     if (!state) {
-      // First run: create default state with empty classes and default class 1:11
+      // First run: create default state with empty classes and default class 1:21 (2{ulRate} convention: ulRate=1)
       await this.#db.insert(tcState).values({
         id: 1,
         totalUlRate: 100,
-        defaultClassId: 11,
+        defaultClassId: 21, // 2{ulRate} convention: 21 means ulRate=1
         classes: [],
       }).execute();
       state = await this.#statements.get.execute();
