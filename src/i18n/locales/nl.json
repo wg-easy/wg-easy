@@ -20,7 +20,7 @@
     "2faKey": "TOTP-sleutel",
     "2faCodeDesc": "Voer de code in van uw authenticator-app.",
     "disable2fa": "Twee-factor-authenticatie uitschakelen",
-    "disable2faDesc": "Voer uw wachtwoord in om de twee-factor-authenticatie uit te schakelen."
+    "disable2faDesc": "Voer uw wachtwoord in om de twee-factor-authenticatie uit te schakelen.",
     "linkOauth": "Koppel uw account met een externe provider",
     "unlinkOauth": "Ontkoppelen",
     "linkedWith": "Gekoppeld met {0}",
