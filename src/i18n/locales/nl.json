@@ -20,7 +20,11 @@
     "2faKey": "TOTP-sleutel",
     "2faCodeDesc": "Voer de code in van uw authenticator-app.",
     "disable2fa": "Twee-factor-authenticatie uitschakelen",
-    "disable2faDesc": "Voer uw wachtwoord in om de twee-factor-authenticatie uit te schakelen."
+    "disable2faDesc": "Voer uw wachtwoord in om de twee-factor-authenticatie uit te schakelen.",
+    "linkOauth": "Koppel uw account met een externe provider",
+    "unlinkOauth": "Ontkoppelen",
+    "linkedWith": "Gekoppeld met {0}",
+    "providerDisabled": "Uw huidige gekoppelde provider is niet ingeschakeld"
   },
   "general": {
     "name": "Naam",
@@ -28,6 +32,7 @@
     "password": "Wachtwoord",
     "newPassword": "Nieuw wachtwoord",
     "updatePassword": "Wachtwoord bijwerken",
+    "addPassword": "Add Password",
     "mtu": "MTU",
     "allowedIps": "Toegestane IP's",
     "dns": "DNS",
@@ -41,7 +46,8 @@
     "confirmPassword": "Wachtwoord bevestigen",
     "loading": "Laden...",
     "2fa": "Twee-factor-authenticatie uitschakelen",
-    "2faCode": "TOTP-code"
+    "2faCode": "TOTP-code",
+    "externalAuth": "Externe authenticatie"
   },
   "setup": {
     "welcome": "Welkom bij uw eerste installatie van wg-easy",
@@ -72,11 +78,14 @@
   },
   "login": {
     "signIn": "Inloggen",
+    "signInWith": "Sign in with {0}",
+    "or": "or",
     "rememberMe": "Onthoud mij",
     "rememberMeDesc": "Ingelogd blijven na het sluiten van de browser",
     "insecure": "U kunt niet inloggen via een onveilige verbinding. Gebruik HTTPS.",
     "2faRequired": "Twee-factor-authenticatie is vereist",
-    "2faWrong": "Twee-factor-authenticatiecode is fout"
+    "2faWrong": "Twee-factor-authenticatiecode is fout",
+    "loginExpired": "Login verlopen. Probeer het opnieuw"
   },
   "client": {
     "empty": "Er zijn nog geen cliënten.",
@@ -196,7 +205,9 @@
       "validBoolean": "{0} moet een geldige boolean zijn",
       "validArray": "{0} moet een geldige array zijn",
       "stringMin": "{0} moet minstens {1} teken bevatten",
-      "numberMin": "{0} moet minstens {1} zijn"
+      "stringMax": "{0} mag maximaal {1} tekens bevatten",
+      "numberMin": "{0} moet minstens {1} zijn",
+      "numberMax": "{0} mag maximaal {1} zijn"
     },
     "client": {
       "id": "Cliënt-ID",
