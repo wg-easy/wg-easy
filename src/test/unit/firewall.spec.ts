@@ -292,4 +292,86 @@ describe('firewall', () => {
       ]);
     });
   });
+  describe('buildClientRuleCommands', () => {
+    const baseClient = {
+      id: 1,
+      name: 'Test',
+      ipv4Address: '10.8.0.2',
+      ipv6Address: 'fdcc:ad94:bacf:61a4::2',
+      allowedIps: null as string[] | null,
+      firewallIps: null as string[] | null,
+      enabled: true,
+    };
+
+    test('includes comments when the comment module is supported', () => {
+      const commands = firewallTestExports.buildClientRuleCommands(
+        { ...baseClient, firewallIps: ['10.0.0.1'] },
+        ['0.0.0.0/0', '::/0'],
+        true,
+        true
+      );
+      expect(commands).toEqual([
+        'iptables -A WG_CLIENTS -s 10.8.0.2 -d 10.0.0.1 -m comment --comment "client 1: Test" -j ACCEPT',
+      ]);
+    });
+
+    // Regression test for #2545: hosts without the xt_comment kernel module
+    // (e.g. Synology DSM) reject any rule using `-m comment`, which previously
+    // aborted the whole firewall rebuild. When comments are unsupported no rule
+    // may reference the comment module.
+    test('omits comments when xt_comment is unavailable (#2545)', () => {
+      const commands = firewallTestExports.buildClientRuleCommands(
+        { ...baseClient, firewallIps: ['10.0.0.1'] },
+        ['0.0.0.0/0', '::/0'],
+        true,
+        false
+      );
+      expect(commands).toEqual([
+        'iptables -A WG_CLIENTS -s 10.8.0.2 -d 10.0.0.1 -j ACCEPT',
+      ]);
+      for (const command of commands) {
+        expect(command).not.toContain('-m comment');
+      }
+    });
+
+    test('routes IPv6 destinations to ip6tables and skips them when IPv6 is disabled', () => {
+      const client = {
+        ...baseClient,
+        firewallIps: ['10.0.0.1', '2001:db8::1'],
+      };
+
+      expect(
+        firewallTestExports.buildClientRuleCommands(client, [], true, false)
+      ).toEqual([
+        'iptables -A WG_CLIENTS -s 10.8.0.2 -d 10.0.0.1 -j ACCEPT',
+        'ip6tables -A WG_CLIENTS -s fdcc:ad94:bacf:61a4::2 -d 2001:db8::1 -j ACCEPT',
+      ]);
+
+      expect(
+        firewallTestExports.buildClientRuleCommands(client, [], false, false)
+      ).toEqual(['iptables -A WG_CLIENTS -s 10.8.0.2 -d 10.0.0.1 -j ACCEPT']);
+    });
+
+    test('falls back to allowedIps then defaultAllowedIps', () => {
+      expect(
+        firewallTestExports.buildClientRuleCommands(
+          { ...baseClient, allowedIps: ['10.1.0.0/24'] },
+          ['0.0.0.0/0'],
+          false,
+          false
+        )
+      ).toEqual([
+        'iptables -A WG_CLIENTS -s 10.8.0.2 -d 10.1.0.0/24 -j ACCEPT',
+      ]);
+
+      expect(
+        firewallTestExports.buildClientRuleCommands(
+          baseClient,
+          ['0.0.0.0/0'],
+          false,
+          false
+        )
+      ).toEqual(['iptables -A WG_CLIENTS -s 10.8.0.2 -d 0.0.0.0/0 -j ACCEPT']);
+    });
+  });
 });
