@@ -3,6 +3,7 @@ import fs from 'node:fs/promises';
 import { createDebug } from 'obug';
 
 import Database from '#server/utils/Database';
+import { mergeClientStatuses } from '#server/utils/clientStatus';
 import { OLD_ENV, WG_ENV } from '#server/utils/config';
 import { firewall } from '#server/utils/firewall';
 import { encodeQRCode } from '#server/utils/qr';
@@ -103,21 +104,7 @@ class WireGuard {
 
     // Loop WireGuard status
     const dump = await wg.dump(wgInterface.name);
-    dump.forEach(
-      ({ publicKey, latestHandshakeAt, endpoint, transferRx, transferTx }) => {
-        const client = clients.find((client) => client.publicKey === publicKey);
-        if (!client) {
-          return;
-        }
-
-        client.latestHandshakeAt = latestHandshakeAt;
-        client.endpoint = endpoint;
-        client.transferRx = transferRx;
-        client.transferTx = transferTx;
-      }
-    );
-
-    return clients;
+    return mergeClientStatuses(clients, dump);
   }
 
   async dumpByPublicKey(publicKey: string) {
@@ -146,21 +133,7 @@ class WireGuard {
 
     // Loop WireGuard status
     const dump = await wg.dump(wgInterface.name);
-    dump.forEach(
-      ({ publicKey, latestHandshakeAt, endpoint, transferRx, transferTx }) => {
-        const client = clients.find((client) => client.publicKey === publicKey);
-        if (!client) {
-          return;
-        }
-
-        client.latestHandshakeAt = latestHandshakeAt;
-        client.endpoint = endpoint;
-        client.transferRx = transferRx;
-        client.transferTx = transferTx;
-      }
-    );
-
-    return clients;
+    return mergeClientStatuses(clients, dump);
   }
 
   async getClientConfiguration({ clientId }: { clientId: ID }) {
