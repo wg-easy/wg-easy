@@ -4,5 +4,6 @@ export * from './repositories/general/schema';
 export * from './repositories/hooks/schema';
 export * from './repositories/interface/schema';
 export * from './repositories/oneTimeLink/schema';
+export * from './repositories/traffic/schema';
 export * from './repositories/user/schema';
 export * from './repositories/userConfig/schema';
