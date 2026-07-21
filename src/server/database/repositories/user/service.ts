@@ -6,9 +6,11 @@ import type { UserType } from './types';
 
 import { WG_ENV } from '#server/utils/config';
 import type { OAUTH_PROVIDER } from '#server/utils/oauth';
+import { TRUSTED_HEADER_PROVIDER } from '#server/utils/oauth';
 import { hashPassword, isPasswordValid } from '#server/utils/password';
 import type { ID } from '#server/utils/types';
 import { roles } from '#shared/utils/permissions';
+import type { Role } from '#shared/utils/permissions';
 import type { DBType } from '#db/sqlite';
 
 type LoginResult =
@@ -387,6 +389,121 @@ export class UserService {
           email,
           name,
           role: roles.ADMIN,
+          totpVerified: false,
+          enabled: true,
+          oauthProvider: provider,
+          oauthId,
+        })
+        .returning();
+      const newUser = newUsers[0];
+
+      if (!newUser) {
+        return { success: false as const, error: 'UNEXPECTED_ERROR' as const };
+      }
+      return { success: true as const, user: newUser };
+    });
+  }
+
+  /**
+   * Login or register a user asserted by a trusted upstream proxy
+   * (trusted-header SSO, Culpur fork).
+   *
+   * Reuses the same OAuth account machinery as {@link loginWithOAuth}
+   * (oauth_provider = 'trusted-header', oauth_id = the proxy's stable subject)
+   * and honours the same OAUTH_AUTO_REGISTER gate, so a trusted-header identity
+   * behaves like any other linked/auto-registered account downstream.
+   *
+   * Differs from {@link loginWithOAuth} in two ways that the header transport
+   * requires:
+   *  - `email` is optional. The proxy may not assert one, so lookup is keyed on
+   *    (provider, oauthId); email-based linking only runs when an email is
+   *    present. `loginWithOAuth` mandates a verified email, which we can't
+   *    guarantee here.
+   *  - the auto-provisioned role is configurable via TRUSTED_PROXY_DEFAULT_ROLE
+   *    rather than always ADMIN.
+   */
+  async loginWithTrustedHeader(
+    oauthId: string,
+    username: string,
+    email: string | null,
+    name: string,
+    defaultRole: Role
+  ): Promise<LoginWithOAuthResult> {
+    const provider = TRUSTED_HEADER_PROVIDER;
+    return this.#db.transaction(async (tx) => {
+      const userById = await tx.query.user
+        .findFirst({
+          where: and(
+            eq(user.oauthProvider, provider),
+            eq(user.oauthId, oauthId)
+          ),
+        })
+        .execute();
+
+      if (userById) {
+        if (!userById.enabled) {
+          return { success: false, error: 'USER_DISABLED' };
+        }
+        if (userById.totpVerified) {
+          return {
+            success: false,
+            error: 'TOTP_REQUIRED',
+            userId: userById.id,
+          };
+        }
+        return { success: true, user: userById };
+      }
+
+      // Link an existing local account only when the proxy asserts an email we
+      // can match against; without one there is no safe way to link.
+      if (email) {
+        const userByEmail = await tx.query.user
+          .findFirst({
+            where: eq(user.email, email),
+          })
+          .execute();
+
+        if (userByEmail) {
+          if (!userByEmail.enabled) {
+            return { success: false, error: 'USER_DISABLED' };
+          }
+          if (userByEmail.oauthProvider && userByEmail.oauthId) {
+            return {
+              success: false,
+              error: 'USER_ALREADY_LINKED',
+            };
+          }
+
+          await tx
+            .update(user)
+            .set({ oauthProvider: provider, oauthId: oauthId })
+            .where(eq(user.id, userByEmail.id))
+            .execute();
+
+          if (userByEmail.totpVerified) {
+            return {
+              success: false,
+              error: 'TOTP_REQUIRED',
+              userId: userByEmail.id,
+            };
+          }
+
+          return { success: true, user: userByEmail };
+        }
+      }
+
+      if (!WG_ENV.OAUTH_AUTO_REGISTER) {
+        return { success: false, error: 'AUTO_REGISTER_DISABLED' };
+      }
+
+      const newUsers = await tx
+        .insert(user)
+        .values({
+          username,
+          password: null,
+          email,
+          name,
+          role: defaultRole,
           totpVerified: false,
           enabled: true,
           oauthProvider: provider,
