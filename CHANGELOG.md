@@ -9,21 +9,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-Support disabling version check (https://github.com/wg-easy/wg-easy/pull/2648)
-OAuth integration (https://github.com/wg-easy/wg-easy/pull/2659)
+- Support disabling version check (https://github.com/wg-easy/wg-easy/pull/2648)
+- OAuth integration (https://github.com/wg-easy/wg-easy/pull/2659)
 
 ### Fixed
 
-Button styling (https://github.com/wg-easy/wg-easy/pull/2666)
-Escape Prometheus label values (https://github.com/wg-easy/wg-easy/pull/2702)
-Skip ip6tables for firewall when IPv6 is disabled (https://github.com/wg-easy/wg-easy/pull/2701)
+- Button styling (https://github.com/wg-easy/wg-easy/pull/2666)
+- Escape Prometheus label values (https://github.com/wg-easy/wg-easy/pull/2702)
+- Skip ip6tables for firewall when IPv6 is disabled (https://github.com/wg-easy/wg-easy/pull/2701)
 
 ### Changed
 
-Only set sysctl if needed (https://github.com/wg-easy/wg-easy/pull/2630)
-Improve security (https://github.com/wg-easy/wg-easy/pull/2661, https://github.com/wg-easy/wg-easy/pull/2668, https://github.com/wg-easy/wg-easy/pull/2669)
-Replace mkdocs with zensical (https://github.com/wg-easy/wg-easy/pull/2667)
-Migrate to Nuxt 4 (https://github.com/wg-easy/wg-easy/pull/2660)
+- Only set sysctl if needed (https://github.com/wg-easy/wg-easy/pull/2630)
+- Improve security (https://github.com/wg-easy/wg-easy/pull/2661, https://github.com/wg-easy/wg-easy/pull/2668, https://github.com/wg-easy/wg-easy/pull/2669)
+- Replace mkdocs with zensical (https://github.com/wg-easy/wg-easy/pull/2667)
+- Migrate to Nuxt 4 (https://github.com/wg-easy/wg-easy/pull/2660)
 
 ## [15.3.0] - 2026-05-18
 
