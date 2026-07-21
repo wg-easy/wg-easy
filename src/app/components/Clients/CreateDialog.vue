@@ -14,6 +14,13 @@
           v-model="expiresAt"
           :label="$t('client.expireDate')"
         />
+        <FormHeading class="mt-4">
+          {{ $t('clientGroup.title') }}
+        </FormHeading>
+        <ClientGroupsSelector
+          v-model="selectedGroupIds"
+          :groups="groupsStore.groups"
+        />
       </div>
     </template>
     <template #actions>
@@ -30,16 +37,26 @@
 </template>
 
 <script lang="ts" setup>
+import { groupIdsFromSelection } from '../../utils/clientGroups';
+
 const name = ref<string>('');
 const expiresAt = ref<string | null>(null);
 const clientsStore = useClientsStore();
+const groupsStore = useClientGroupsStore();
+const selectedGroupIds = ref<string[]>([]);
 
 const { t } = useI18n();
 
 defineProps<{ triggerClass?: string }>();
 
+await groupsStore.refresh();
+
 function createClient() {
-  return _createClient({ name: name.value, expiresAt: expiresAt.value });
+  return _createClient({
+    name: name.value,
+    expiresAt: expiresAt.value,
+    groupIds: groupIdsFromSelection(selectedGroupIds.value),
+  });
 }
 
 const _createClient = useSubmit(
