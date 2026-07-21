@@ -12,13 +12,13 @@
         <meta name="author" content="WireGuard Easy">
       
       
-        <link rel="canonical" href="https://wg-easy.github.io/Pre-release/examples/tutorials/auto-updates/">
+        <link rel="canonical" href="https://wg-easy.github.io/Pre-release/advanced/config/external-authentication/">
       
       
-        <link rel="prev" href="../adguard/">
+        <link rel="prev" href="../experimental-config/">
       
       
-        <link rel="next" href="../basic-installation/">
+        <link rel="next" href="../optional-config/">
       
       
         
@@ -29,7 +29,7 @@
     
     
       
-        <title>Auto Updates - wg-easy</title>
+        <title>External Authentication - wg-easy</title>
       
     
     
@@ -85,7 +85,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#docker-compose" class="md-skip">
+        <a href="#oauth" class="md-skip">
           Skip to content
         </a>
       
@@ -122,7 +122,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Auto Updates
+              External Authentication
             
           </span>
         </div>
@@ -262,14 +262,16 @@
   
   
   
+    
+  
   
     
       
     
     
     
-      <li class="md-tabs__item">
-        <a href="../../../advanced/api/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../api/" class="md-tabs__link">
           
   
   Advanced
@@ -306,8 +308,6 @@
   
   
   
-    
-  
   
     
       
@@ -318,16 +318,14 @@
   
   
   
-    
-  
   
     
       
     
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../adguard/" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../../examples/tutorials/adguard/" class="md-tabs__link">
           
   
   Examples
@@ -489,26 +487,29 @@
       
   
   
+    
   
   
+  
     
     
     
     
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
       
         
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
         
           
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
-        
-          
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
             
   
   
@@ -525,7 +526,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
             
@@ -542,7 +543,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../advanced/api/" class="md-nav__link">
+      <a href="../../api/" class="md-nav__link">
         
   
   
@@ -566,8 +567,10 @@
                 
   
   
+    
   
   
+  
     
     
     
@@ -576,13 +579,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_2" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_2" checked>
         
           
           <label class="md-nav__link" for="__nav_4_2" id="__nav_4_2_label" tabindex="0">
@@ -602,7 +603,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_2_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_2_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_4_2">
             <span class="md-nav__icon md-icon"></span>
             
@@ -619,7 +620,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../advanced/config/amnezia/" class="md-nav__link">
+      <a href="../amnezia/" class="md-nav__link">
         
   
   
@@ -646,7 +647,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../advanced/config/experimental-config/" class="md-nav__link">
+      <a href="../experimental-config/" class="md-nav__link">
         
   
   
@@ -670,10 +671,34 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../../advanced/config/external-authentication/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  External Authentication
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="././" class="md-nav__link md-nav__link--active">
         
   
   
@@ -688,6 +713,186 @@
   
 
       </a>
+      
+        
+
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#oauth" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        OAuth
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="OAuth">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Setup
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#auto-register" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Auto Register
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#allowed-domains" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Allowed Domains
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#auto-launch" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Auto Launch
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#redirect-uris" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Redirect URIs
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#provider-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Provider Configuration
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Provider Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#google" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Google
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#github" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        GitHub
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#generic-oidc" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Generic OIDC
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Generic OIDC">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#authelia-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Authelia Setup
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#generic-oauth" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Generic OAuth
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#disable-password-authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Disable Password Authentication
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -700,7 +905,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../advanced/config/optional-config/" class="md-nav__link">
+      <a href="../optional-config/" class="md-nav__link">
         
   
   
@@ -727,7 +932,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../advanced/config/unattended-setup/" class="md-nav__link">
+      <a href="../unattended-setup/" class="md-nav__link">
         
   
   
@@ -812,7 +1017,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../advanced/metrics/prometheus/" class="md-nav__link">
+      <a href="../../metrics/prometheus/" class="md-nav__link">
         
   
   
@@ -897,7 +1102,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../advanced/migrate/" class="md-nav__link">
+      <a href="../../migrate/" class="md-nav__link">
         
   
   
@@ -924,7 +1129,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../advanced/migrate/from-14-to-15/" class="md-nav__link">
+      <a href="../../migrate/from-14-to-15/" class="md-nav__link">
         
   
   
@@ -1101,29 +1306,26 @@
       
   
   
-    
   
   
-  
     
     
     
     
       
-        
-        
-      
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
         
           
-          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
             
   
   
@@ -1140,7 +1342,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_6">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1154,8 +1356,6 @@
                 
   
   
-    
-  
   
   
     
@@ -1166,11 +1366,13 @@
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6_1" checked>
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6_1" >
         
           
           <label class="md-nav__link" for="__nav_6_1" id="__nav_6_1_label" tabindex="0">
@@ -1190,7 +1392,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_6_1_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_6_1_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_6_1">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1207,7 +1409,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../adguard/" class="md-nav__link">
+      <a href="../../../examples/tutorials/adguard/" class="md-nav__link">
         
   
   
@@ -1231,34 +1433,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      
-      
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-  Auto Updates
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="././" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../../examples/tutorials/auto-updates/" class="md-nav__link">
         
   
   
@@ -1273,75 +1451,6 @@
   
 
       </a>
-      
-        
-
-
-<nav class="md-nav md-nav--secondary" aria-label="On this page">
-  
-  
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      On this page
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#docker-compose" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Docker Compose
-      </span>
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Docker Compose">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#watchtower" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Watchtower
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#docker-run" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Docker Run
-      </span>
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#podman" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Podman
-      </span>
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1354,7 +1463,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../basic-installation/" class="md-nav__link">
+      <a href="../../../examples/tutorials/basic-installation/" class="md-nav__link">
         
   
   
@@ -1381,7 +1490,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../caddy/" class="md-nav__link">
+      <a href="../../../examples/tutorials/caddy/" class="md-nav__link">
         
   
   
@@ -1408,7 +1517,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../docker-run/" class="md-nav__link">
+      <a href="../../../examples/tutorials/docker-run/" class="md-nav__link">
         
   
   
@@ -1435,7 +1544,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../dockerless/" class="md-nav__link">
+      <a href="../../../examples/tutorials/dockerless/" class="md-nav__link">
         
   
   
@@ -1462,7 +1571,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../podman-nft/" class="md-nav__link">
+      <a href="../../../examples/tutorials/podman-nft/" class="md-nav__link">
         
   
   
@@ -1489,7 +1598,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reverse-proxyless/" class="md-nav__link">
+      <a href="../../../examples/tutorials/reverse-proxyless/" class="md-nav__link">
         
   
   
@@ -1516,7 +1625,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../routed/" class="md-nav__link">
+      <a href="../../../examples/tutorials/routed/" class="md-nav__link">
         
   
   
@@ -1543,7 +1652,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../traefik/" class="md-nav__link">
+      <a href="../../../examples/tutorials/traefik/" class="md-nav__link">
         
   
   
@@ -1807,22 +1916,123 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#docker-compose" class="md-nav__link">
+  <a href="#oauth" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        Docker Compose
+        OAuth
       </span>
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Docker Compose">
+    <nav class="md-nav" aria-label="OAuth">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#watchtower" class="md-nav__link">
+  <a href="#setup" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        Watchtower
+        Setup
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#auto-register" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Auto Register
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#allowed-domains" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Allowed Domains
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#auto-launch" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Auto Launch
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#redirect-uris" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Redirect URIs
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#provider-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Provider Configuration
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Provider Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#google" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Google
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#github" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        GitHub
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#generic-oidc" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Generic OIDC
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Generic OIDC">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#authelia-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Authelia Setup
       </span>
     </span>
   </a>
@@ -1833,26 +2043,36 @@
     </nav>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#docker-run" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#generic-oauth" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        Docker Run
+        Generic OAuth
       </span>
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#podman" class="md-nav__link">
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#disable-password-authentication" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        Podman
+        Disable Password Authentication
       </span>
     </span>
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1902,27 +2122,16 @@
     
     
     
-      
-  
-  
-    
-    
-    
-    
-    
       <li class="md-path__item">
-        <a href="../adguard/" class="md-path__link">
+        <a href="../../api/" class="md-path__link">
           
   
   <span class="md-ellipsis">
-    Examples
+    Advanced
   </span>
 
         </a>
       </li>
-    
-  
-
     
   
 
@@ -1936,11 +2145,11 @@
     
     
       <li class="md-path__item">
-        <a href="../adguard/" class="md-path__link">
+        <a href="../amnezia/" class="md-path__link">
           
   
   <span class="md-ellipsis">
-    Tutorials
+    Config
   </span>
 
         </a>
@@ -1957,7 +2166,7 @@
                 
                   
   
-    <a href="https://github.com/wg-easy/wg-easy/edit/master/docs/content/examples/tutorials/auto-updates.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/wg-easy/wg-easy/edit/master/docs/content/advanced/config/external-authentication.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-file-pen" viewBox="0 0 24 24"><path d="M12.659 22H18a2 2 0 0 0 2-2V8a2.4 2.4 0 0 0-.706-1.706l-3.588-3.588A2.4 2.4 0 0 0 14 2H6a2 2 0 0 0-2 2v9.34"/><path d="M14 2v5a1 1 0 0 0 1 1h5M10.378 12.622a1 1 0 0 1 3 3.003L8.36 20.637a2 2 0 0 1-.854.506l-2.867.837a.5.5 0 0 1-.62-.62l.836-2.869a2 2 0 0 1 .506-.853z"/></svg>
     </a>
@@ -1966,60 +2175,301 @@
     
       
     
-    <a href="https://github.com/wg-easy/wg-easy/raw/master/docs/content/examples/tutorials/auto-updates.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/wg-easy/wg-easy/raw/master/docs/content/advanced/config/external-authentication.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-file-code-2" viewBox="0 0 24 24"><path d="M4 12.15V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.706.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2h-3.35"/><path d="M14 2v5a1 1 0 0 0 1 1h5M5 16l-3 3 3 3M9 22l3-3-3-3"/></svg>
     </a>
   
 
 
-  <h1 id="__skip">Auto Updates</h1>
+  <h1 id="__skip">External Authentication</h1>
 
-<h2 id="docker-compose">Docker Compose<a class="headerlink" href="#docker-compose" title="Permanent link">&para;</a></h2>
-<p>With Docker Compose <code>wg-easy</code> can be updated with a single command:</p>
-<div class="language-shell highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">cd</span><span class="w"> </span>/etc/docker/containers/wg-easy
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>sudo<span class="w"> </span>docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>-d<span class="w"> </span>--pull<span class="w"> </span>always
+<h2 id="oauth">OAuth<a class="headerlink" href="#oauth" title="Permanent link">&para;</a></h2>
+<h3 id="setup">Setup<a class="headerlink" href="#setup" title="Permanent link">&para;</a></h3>
+<p>To enable OAuth set the env var <code>OAUTH_PROVIDERS</code> to any of the following providers:</p>
+<table>
+<thead>
+<tr>
+<th>Provider</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="#google">Google</a></td>
+<td><code>google</code></td>
+</tr>
+<tr>
+<td><a href="#github">GitHub</a></td>
+<td><code>github</code></td>
+</tr>
+<tr>
+<td><a href="#generic-oidc">Generic OIDC</a></td>
+<td><code>oidc</code></td>
+</tr>
+</tbody>
+</table>
+<p>You can enable multiple providers by separating them with a comma:</p>
+<p>e.g. <code>google,github</code></p>
+<h3 id="auto-register">Auto Register<a class="headerlink" href="#auto-register" title="Permanent link">&para;</a></h3>
+<p>To automatically register users that log in with an OAuth provider, set the following environment variable to <code>true</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Env</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>OAUTH_AUTO_REGISTER</code></td>
+<td><img alt="❌" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/274c.svg" title=":x:" /></td>
+<td><code>false</code></td>
+<td>Enable auto-registration</td>
+</tr>
+</tbody>
+</table>
+<p>When enabled:</p>
+<ul>
+<li>
+<p>If a user logs in with an email address that is not yet registered, a new account will be created for them.</p>
+</li>
+<li>
+<p>If a user logs in with an email address that is already registered, their account will be linked to the OAuth provider (if not already linked), regardless of the value of <code>OAUTH_AUTO_REGISTER</code>.</p>
+</li>
+</ul>
+<div class="admonition warning">
+<p class="admonition-title"> Security</p>
+<p>Users will be created with Admin Permissions, as the permissions system is not yet implemented. Only enable this if you trust all users that can log in with the OAuth provider.</p>
+<p>Use <a href="#allowed-domains">Allowed Domains</a> to restrict which users can log in.</p>
+</div>
+<h3 id="allowed-domains">Allowed Domains<a class="headerlink" href="#allowed-domains" title="Permanent link">&para;</a></h3>
+<p>To only allow users with an email address from a specific domain to log in, set the following environment variable to the allowed domain.</p>
+<table>
+<thead>
+<tr>
+<th>Env</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>OAUTH_ALLOWED_DOMAINS</code></td>
+<td><img alt="❌" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/274c.svg" title=":x:" /></td>
+<td>-</td>
+<td>Allowed email domains</td>
+</tr>
+</tbody>
+</table>
+<p>You can allow multiple domains by separating them with a comma:</p>
+<p>e.g. <code>example.com,example.org</code></p>
+<h3 id="auto-launch">Auto Launch<a class="headerlink" href="#auto-launch" title="Permanent link">&para;</a></h3>
+<p>To automatically launch the OAuth login flow when visiting the login page, set the following environment variable to the provider you want to launch:</p>
+<table>
+<thead>
+<tr>
+<th>Env</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>OAUTH_AUTO_LAUNCH</code></td>
+<td><img alt="❌" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/274c.svg" title=":x:" /></td>
+<td>-</td>
+<td>Auto launch an OAuth provider</td>
+</tr>
+</tbody>
+</table>
+<p>When enabled:</p>
+<ul>
+<li>Visiting the login page will automatically redirect to the selected provider's login page</li>
+<li>The user can still access the normal login page by visiting <code>/login?auto_launch=false</code></li>
+<li>You can auto launch any provider by visiting <code>/login?auto_launch=&lt;provider&gt;</code></li>
+</ul>
+<h3 id="redirect-uris">Redirect URIs<a class="headerlink" href="#redirect-uris" title="Permanent link">&para;</a></h3>
+<p>You have to configure the following redirect URIs in your OAuth provider:</p>
+<ul>
+<li><code>https://&lt;your-domain&gt;/api/auth/&lt;provider&gt;/callback</code>
+  Used to log in to with the provider</li>
+<li><code>https://&lt;your-domain&gt;/api/auth/&lt;provider&gt;/link</code>
+  Used to link an existing account to the provider</li>
+</ul>
+<p>If your provider does not support multiple redirect URIs (e.g. GitHub) but allows multiple URIs under the same base, then configure:</p>
+<ul>
+<li><code>https://&lt;your-domain&gt;/api/auth/&lt;provider&gt;/</code></li>
+</ul>
+<h3 id="provider-configuration">Provider Configuration<a class="headerlink" href="#provider-configuration" title="Permanent link">&para;</a></h3>
+<h4 id="google">Google<a class="headerlink" href="#google" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Env</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>OAUTH_GOOGLE_CLIENT_ID</code></td>
+<td><img alt="✅" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/2705.svg" title=":white_check_mark:" /></td>
+<td>Google Client ID</td>
+</tr>
+<tr>
+<td><code>OAUTH_GOOGLE_CLIENT_SECRET</code></td>
+<td><img alt="✅" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/2705.svg" title=":white_check_mark:" /></td>
+<td>Google Client Secret</td>
+</tr>
+</tbody>
+</table>
+<h5>Setup</h5>
+
+<ol>
+<li>Go to <a href="https://console.cloud.google.com/apis/credentials">Google Cloud Console</a></li>
+<li>Create an OAuth 2.0 Client ID (Web application)</li>
+<li>Add Authorized redirect URI: See <a href="#redirect-uris">Redirect URIs</a></li>
+<li>Copy the Client ID and Client Secret to the environment variables</li>
+</ol>
+<h4 id="github">GitHub<a class="headerlink" href="#github" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Env</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>OAUTH_GITHUB_CLIENT_ID</code></td>
+<td><img alt="✅" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/2705.svg" title=":white_check_mark:" /></td>
+<td>GitHub Client ID</td>
+</tr>
+<tr>
+<td><code>OAUTH_GITHUB_CLIENT_SECRET</code></td>
+<td><img alt="✅" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/2705.svg" title=":white_check_mark:" /></td>
+<td>GitHub Client Secret</td>
+</tr>
+</tbody>
+</table>
+<h5>Setup</h5>
+
+<ol>
+<li>Go to <a href="https://github.com/settings/developers">GitHub Developer Settings</a></li>
+<li>Create a new OAuth App</li>
+<li>Add Authorization callback URL: See <a href="#redirect-uris">Redirect URIs</a></li>
+<li>Create a new client secret</li>
+<li>Copy the Client ID and Client Secret to the environment variables</li>
+</ol>
+<h4 id="generic-oidc">Generic OIDC<a class="headerlink" href="#generic-oidc" title="Permanent link">&para;</a></h4>
+<p>This supports generic OIDC providers like Authelia, Authentik, etc.</p>
+<p>The provider needs to support:</p>
+<ul>
+<li>PKCE</li>
+<li>default scopes: <code>openid email profile</code></li>
+<li>Client Secret Authentication <code>client_secret_post</code></li>
+</ul>
+<p>The provider needs to be available with HTTPS and have a valid certificate.</p>
+<table>
+<thead>
+<tr>
+<th>Env</th>
+<th>Required</th>
+<th>Default</th>
+<th>Example</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>OAUTH_OIDC_SERVER</code></td>
+<td><img alt="✅" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/2705.svg" title=":white_check_mark:" /></td>
+<td>-</td>
+<td><code>https://auth.example.com</code></td>
+<td>OIDC Server</td>
+</tr>
+<tr>
+<td><code>OAUTH_OIDC_CLIENT_ID</code></td>
+<td><img alt="✅" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/2705.svg" title=":white_check_mark:" /></td>
+<td>-</td>
+<td>-</td>
+<td>OIDC Client ID</td>
+</tr>
+<tr>
+<td><code>OAUTH_OIDC_CLIENT_SECRET</code></td>
+<td><img alt="✅" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/2705.svg" title=":white_check_mark:" /></td>
+<td>-</td>
+<td>-</td>
+<td>OIDC Client Secret</td>
+</tr>
+<tr>
+<td><code>OAUTH_OIDC_NAME</code></td>
+<td><img alt="❌" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/274c.svg" title=":x:" /></td>
+<td>OIDC</td>
+<td><code>Authelia</code></td>
+<td>Provider Name</td>
+</tr>
+</tbody>
+</table>
+<h5 id="authelia-setup">Authelia Setup<a class="headerlink" href="#authelia-setup" title="Permanent link">&para;</a></h5>
+<p>Generate Client ID and Secret:</p>
+<div class="language-shell highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Client ID</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>authelia/authelia:latest<span class="w"> </span>authelia<span class="w"> </span>crypto<span class="w"> </span>rand<span class="w"> </span>--length<span class="w"> </span><span class="m">72</span><span class="w"> </span>--charset<span class="w"> </span>rfc3986
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="c1"># Client Secret</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>authelia/authelia:latest<span class="w"> </span>authelia<span class="w"> </span>crypto<span class="w"> </span><span class="nb">hash</span><span class="w"> </span>generate<span class="w"> </span>pbkdf2<span class="w"> </span>--variant<span class="w"> </span>sha512<span class="w"> </span>--random<span class="w"> </span>--random.length<span class="w"> </span><span class="m">72</span><span class="w"> </span>--random.charset<span class="w"> </span>rfc3986
 </span></code></pre></div>
-<h3 id="watchtower">Watchtower<a class="headerlink" href="#watchtower" title="Permanent link">&para;</a></h3>
-<p>If you want the updates to be fully automatic you can install Watchtower. This will check for updates every day at 4:00 AM and update the container if a new version is available.</p>
-<p>File: <code>/etc/docker/containers/watchtower/docker-compose.yml</code></p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nt">services</span><span class="p">:</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="nt">watchtower</span><span class="p">:</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">        </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nickfedor/watchtower:latest</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">        </span><span class="nt">volumes</span><span class="p">:</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/var/run/docker.sock:/var/run/docker.sock</span>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">        </span><span class="nt">env_file</span><span class="p">:</span>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">watchtower.env</span>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">        </span><span class="nt">restart</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">unless-stopped</span>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">client_id</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;...&#39;</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nt">client_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wg-easy</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="nt">client_secret</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;$pbkdf2-...&#39;</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span><span class="nt">redirect_uris</span><span class="p">:</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://&lt;your-domain&gt;/api/auth/oidc/callback</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://&lt;your-domain&gt;/api/auth/oidc/link</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">  </span><span class="nt">scopes</span><span class="p">:</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">openid</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">profile</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">email</span>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">  </span><span class="nt">authorization_policy</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">one_factor</span>
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="w">  </span><span class="nt">pre_configured_consent_duration</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1 week</span>
+</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="w">  </span><span class="nt">require_pkce</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="w">  </span><span class="nt">token_endpoint_auth_method</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client_secret_post</span>
 </span></code></pre></div>
-<p>File: <code>/etc/docker/containers/watchtower/watchtower.env</code></p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>WATCHTOWER_CLEANUP=true
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>WATCHTOWER_SCHEDULE=0 0 4 * * *
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>TZ=Europe/Berlin
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a># Email
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a># WATCHTOWER_NOTIFICATIONS_LEVEL=info
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a># WATCHTOWER_NOTIFICATIONS=email
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a># WATCHTOWER_NOTIFICATION_EMAIL_FROM=mail@example.com
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a># WATCHTOWER_NOTIFICATION_EMAIL_TO=mail@example.com
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a># WATCHTOWER_NOTIFICATION_EMAIL_SERVER=smtp.example.com
-</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a># WATCHTOWER_NOTIFICATION_EMAIL_SERVER_USER=mail@example.com
-</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a># WATCHTOWER_NOTIFICATION_EMAIL_SERVER_PASSWORD=&quot;SuperSecurePassword&quot;
-</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a># WATCHTOWER_NOTIFICATION_EMAIL_SERVER_PORT=587
-</span></code></pre></div>
-<div class="language-shell highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nb">cd</span><span class="w"> </span>/etc/docker/containers/watchtower
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>sudo<span class="w"> </span>docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>-d
-</span></code></pre></div>
-<h2 id="docker-run">Docker Run<a class="headerlink" href="#docker-run" title="Permanent link">&para;</a></h2>
-<div class="language-shell highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>sudo<span class="w"> </span>docker<span class="w"> </span>stop<span class="w"> </span>wg-easy
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>sudo<span class="w"> </span>docker<span class="w"> </span>rm<span class="w"> </span>wg-easy
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>sudo<span class="w"> </span>docker<span class="w"> </span>pull<span class="w"> </span>ghcr.io/wg-easy/wg-easy
-</span></code></pre></div>
-<p>And then run the <code>docker run -d \ ...</code> command from <a href=".././docker-run/">Docker Run</a> again.</p>
-<h2 id="podman">Podman<a class="headerlink" href="#podman" title="Permanent link">&para;</a></h2>
-<p>To update <code>wg-easy</code> (and every container that has auto updates enabled), you can run the following command:</p>
-<div class="language-shell highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>sudo<span class="w"> </span>podman<span class="w"> </span>auto-update
-</span></code></pre></div>
+<h4 id="generic-oauth">Generic OAuth<a class="headerlink" href="#generic-oauth" title="Permanent link">&para;</a></h4>
+<p>Not currently supported</p>
+<h3 id="disable-password-authentication">Disable Password Authentication<a class="headerlink" href="#disable-password-authentication" title="Permanent link">&para;</a></h3>
+<p>To disable password-based authentication and only allow login via OAuth providers, set the following environment variable to <code>true</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Env</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DISABLE_PASSWORD_AUTH</code></td>
+<td><img alt="❌" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/274c.svg" title=":x:" /></td>
+<td><code>false</code></td>
+<td>Disable password authentication</td>
+</tr>
+</tbody>
+</table>
+<p>When enabled:</p>
+<ul>
+<li>Users will not be able to log in with a password</li>
+</ul>
+<div class="admonition warning">
+<p class="admonition-title">Access Recovery</p>
+<p>Before disabling password authentication, ensure that at least one OAuth provider is configured and that you have successfully linked an administrator account.</p>
+<p>If no login method is available, you will not be able to log in to the application and will need to reset the configuration to regain access.</p>
+</div>
 
 
 
