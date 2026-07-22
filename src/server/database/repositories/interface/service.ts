@@ -93,10 +93,6 @@ export class InterfaceService {
         .execute();
 
       const clients = await tx.query.client.findMany().execute();
-      const ipv4CidrChanged = data.ipv4Cidr !== oldCidr.ipv4Cidr;
-      const ipv6CidrChanged = data.ipv6Cidr !== oldCidr.ipv6Cidr;
-      const ipv4Cidr = ipv4CidrChanged ? parseCidr(data.ipv4Cidr) : null;
-      const ipv6Cidr = ipv6CidrChanged ? parseCidr(data.ipv6Cidr) : null;
       const ipv4Addresses = new Set(
         clients.map((client) => client.ipv4Address)
       );
@@ -108,15 +104,23 @@ export class InterfaceService {
         // only calculate ip if cidr has changed
 
         let nextIpv4 = client.ipv4Address;
-        if (ipv4Cidr) {
-          nextIpv4 = nextIPFromUsedAddresses(4, ipv4Cidr, ipv4Addresses);
+        if (data.ipv4Cidr !== oldCidr.ipv4Cidr) {
+          nextIpv4 = nextIPFromUsedAddresses(
+            4,
+            parseCidr(data.ipv4Cidr),
+            ipv4Addresses
+          );
           ipv4Addresses.add(nextIpv4);
           ipv4Addresses.delete(client.ipv4Address);
         }
 
         let nextIpv6 = client.ipv6Address;
-        if (ipv6Cidr) {
-          nextIpv6 = nextIPFromUsedAddresses(6, ipv6Cidr, ipv6Addresses);
+        if (data.ipv6Cidr !== oldCidr.ipv6Cidr) {
+          nextIpv6 = nextIPFromUsedAddresses(
+            6,
+            parseCidr(data.ipv6Cidr),
+            ipv6Addresses
+          );
           ipv6Addresses.add(nextIpv6);
           ipv6Addresses.delete(client.ipv6Address);
         }
