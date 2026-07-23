@@ -1,9 +1,45 @@
-import { describe, expect, test } from 'vitest';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
 
-import { firewallTestExports } from '#server/utils/firewall';
+import { exec } from '#server/utils/cmd';
+import { firewall, firewallTestExports } from '#server/utils/firewall';
 import { typesTestExports } from '#server/utils/types';
 
+vi.mock('#server/utils/cmd', () => ({
+  exec: vi.fn().mockResolvedValue(''),
+}));
+
+const execMock = vi.mocked(exec);
+
 describe('firewall', () => {
+  beforeEach(() => {
+    execMock.mockClear();
+  });
+
+  describe('IPv4-only chain management', () => {
+    test('does not invoke ip6tables when initializing and flushing', async () => {
+      await firewall.initChain('wg0', false);
+      await firewall.flushChain(false);
+
+      expect(execMock).toHaveBeenCalledWith(
+        expect.stringContaining('iptables -C FORWARD -i wg0')
+      );
+      expect(execMock).not.toHaveBeenCalledWith(
+        expect.stringContaining('ip6tables')
+      );
+    });
+
+    test('does not invoke ip6tables when removing filtering', async () => {
+      await firewall.removeFiltering('wg0', false);
+
+      expect(execMock).toHaveBeenCalledWith(
+        expect.stringContaining('iptables -D FORWARD -i wg0')
+      );
+      expect(execMock).not.toHaveBeenCalledWith(
+        expect.stringContaining('ip6tables')
+      );
+    });
+  });
+
   describe('isValidFirewallEntry', () => {
     test('invalid ips', () => {
       expect(() => typesTestExports.FirewallIpEntrySchema.parse('')).toThrow();

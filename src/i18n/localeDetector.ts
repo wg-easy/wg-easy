@@ -3,11 +3,10 @@ import {
   tryHeaderLocale,
   tryQueryLocale,
 } from '@intlify/utils/h3';
-import type { H3Event } from 'h3';
 
-// TODO: use defineI18nLocaleDetector
+import { defineI18nLocaleDetector } from '#imports';
 
-export default (event: H3Event, config: { defaultLocale: string }) => {
+export default defineI18nLocaleDetector((event, config) => {
   const query = tryQueryLocale(event, { lang: '' });
   if (query) {
     return query.toString();
@@ -27,4 +26,4 @@ export default (event: H3Event, config: { defaultLocale: string }) => {
   }
 
   return config.defaultLocale;
-};
+});
