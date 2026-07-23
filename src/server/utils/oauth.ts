@@ -61,6 +61,23 @@ export const OAUTH_PROVIDERS = {
 
 export type OAUTH_PROVIDER = keyof typeof OAUTH_PROVIDERS;
 
+/**
+ * Pseudo-provider tag for trusted-header SSO (Culpur fork).
+ *
+ * This is NOT a click-to-login OAuth provider: it has no client id/secret and is
+ * deliberately absent from `OAUTH_PROVIDERS` so it never appears as a login
+ * button or in `/api/auth/methods`. It exists only as a value for the
+ * `oauth_provider` DB column so trusted-header identities are linked/looked up
+ * via the same account machinery as real OAuth users.
+ */
+export const TRUSTED_HEADER_PROVIDER = 'trusted-header' as const;
+
+/**
+ * Any value the `oauth_provider` DB column may hold: a real OAuth provider, or
+ * the trusted-header pseudo-provider.
+ */
+export type AUTH_PROVIDER = OAUTH_PROVIDER | typeof TRUSTED_HEADER_PROVIDER;
+
 export function isValidOauthProvider(
   provider: string
 ): provider is OAUTH_PROVIDER {

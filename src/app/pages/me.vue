@@ -184,12 +184,25 @@ const { data: authMethods } = await useFetch('/api/auth/methods');
 const name = ref(authStore.userData?.name);
 const email = ref(authStore.userData?.email);
 const hasPassword = computed(() => authStore.userData?.hasPassword);
-const oauthProvider = computed(() => authStore.userData?.oauthProvider);
+// Real, click-to-login OAuth providers. The 'trusted-header' pseudo-provider
+// (Culpur fork) is intentionally excluded: it has no link/unlink UI, so a
+// trusted-header user is treated here as having no linkable OAuth provider.
+const OAUTH_LOGIN_PROVIDERS: OAUTH_PROVIDER[] = ['google', 'github', 'oidc'];
+function isOauthLoginProvider(
+  provider: string | null | undefined
+): provider is OAUTH_PROVIDER {
+  return !!provider && (OAUTH_LOGIN_PROVIDERS as string[]).includes(provider);
+}
+const oauthProvider = computed(() => {
+  const provider = authStore.userData?.oauthProvider;
+  return isOauthLoginProvider(provider) ? provider : undefined;
+});
 const oauthProviderInfo = computed(() => {
-  if (!authStore.userData?.oauthProvider) {
+  const provider = oauthProvider.value;
+  if (!provider) {
     return null;
   }
-  return authMethods.value?.providers?.[authStore.userData.oauthProvider];
+  return authMethods.value?.providers?.[provider];
 });
 
 const _submit = useSubmit(

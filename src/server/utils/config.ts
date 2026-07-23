@@ -64,7 +64,64 @@ export const WG_ENV = {
     oauthProviders?.find((p) => p === process.env.OAUTH_AUTO_LAUNCH) ?? null,
   /** Disable password authentication */
   DISABLE_PASSWORD_AUTH: process.env.DISABLE_PASSWORD_AUTH === 'true',
+  /**
+   * Trusted-header SSO (Culpur fork).
+   *
+   * When enabled, an already-authenticated upstream reverse proxy (e.g. an
+   * Authentik forward-auth outpost) may assert the caller's identity via a
+   * header. wg-easy then establishes a session for the matching user, reusing
+   * the OAuth account machinery (oauth_provider = 'trusted-header') and the
+   * OAUTH_AUTO_REGISTER gate to auto-provision when absent. DISABLED by default:
+   * stock behaviour is unchanged unless TRUSTED_PROXY_ENABLED is set.
+   */
+  TRUSTED_PROXY_ENABLED: process.env.TRUSTED_PROXY_ENABLED === 'true',
+  /**
+   * Shared secret the trusted proxy injects (PRIMARY trust factor). The feature
+   * fails closed if this is unset while enabled. In a shared-bridge / Docker
+   * SNAT topology this — not the source IP — is what proves a request came from
+   * the proxy, because every inbound connection is SNAT'd to the bridge gateway.
+   */
+  TRUSTED_PROXY_SECRET: process.env.TRUSTED_PROXY_SECRET ?? '',
+  /** Header the proxy uses to carry the shared secret. */
+  TRUSTED_PROXY_SECRET_HEADER: (
+    process.env.TRUSTED_PROXY_SECRET_HEADER ?? 'x-wg-proxy-secret'
+  ).toLowerCase(),
+  /** Header carrying the verified username, e.g. 'x-authentik-username'. */
+  TRUSTED_PROXY_HEADER: (
+    process.env.TRUSTED_PROXY_HEADER ?? 'x-authentik-username'
+  ).toLowerCase(),
+  /** Optional header carrying the verified email. */
+  TRUSTED_PROXY_EMAIL_HEADER: (
+    process.env.TRUSTED_PROXY_EMAIL_HEADER ?? 'x-authentik-email'
+  ).toLowerCase(),
+  /** Optional header carrying the display name. */
+  TRUSTED_PROXY_NAME_HEADER: (
+    process.env.TRUSTED_PROXY_NAME_HEADER ?? 'x-authentik-name'
+  ).toLowerCase(),
+  /**
+   * Optional comma-separated allowlist of proxy source IPs permitted to assert
+   * identity (defense-in-depth). Left empty when SNAT makes the peer IP
+   * non-discriminating; the shared secret remains the trust boundary.
+   */
+  TRUSTED_PROXY_IPS: (process.env.TRUSTED_PROXY_IPS ?? '')
+    .split(',')
+    .map((x) => x.trim())
+    .filter((x) => x.length > 0),
+  /** Role for auto-provisioned federated users: 'admin' or 'client' (default). */
+  TRUSTED_PROXY_DEFAULT_ROLE:
+    process.env.TRUSTED_PROXY_DEFAULT_ROLE === 'admin' ? 'admin' : 'client',
 };
+
+if (WG_ENV.TRUSTED_PROXY_ENABLED) {
+  SERVER_DEBUG(`
+Trusted-header SSO: Enabled${WG_ENV.TRUSTED_PROXY_SECRET ? '' : ' (NO SECRET — fails closed)'}
+Username header: ${WG_ENV.TRUSTED_PROXY_HEADER}
+Secret header: ${WG_ENV.TRUSTED_PROXY_SECRET_HEADER}
+Source IP allowlist: ${WG_ENV.TRUSTED_PROXY_IPS.length > 0 ? WG_ENV.TRUSTED_PROXY_IPS.join(', ') : 'None (secret-only)'}
+Auto register: ${WG_ENV.OAUTH_AUTO_REGISTER ? 'Enabled' : 'Disabled'}
+Default role: ${WG_ENV.TRUSTED_PROXY_DEFAULT_ROLE}
+`);
+}
 
 if (WG_ENV.OAUTH_PROVIDERS && WG_ENV.OAUTH_PROVIDERS.length > 0) {
   SERVER_DEBUG(`
