@@ -7,6 +7,7 @@ import { mergeClientStatuses } from '#server/utils/clientStatus';
 import { OLD_ENV, WG_ENV } from '#server/utils/config';
 import { firewall } from '#server/utils/firewall';
 import { encodeQRCode } from '#server/utils/qr';
+import { routes } from '#server/utils/routes';
 import type { ID } from '#server/utils/types';
 import { wg } from '#server/utils/wgHelper';
 import { setIntervalImmediately } from '#shared/utils/time';
@@ -26,6 +27,7 @@ class WireGuard {
     const wgInterface = await Database.interfaces.get();
     await this.#saveWireguardConfig(wgInterface);
     await this.#syncWireguardConfig(wgInterface);
+    await this.#applyRoutes(wgInterface);
     await this.#applyFirewallRules(wgInterface);
   }
 
@@ -41,6 +43,17 @@ class WireGuard {
       userConfig,
       !WG_ENV.DISABLE_IPV6
     );
+  }
+
+  /**
+   * Reconcile host routes so Server Allowed IPs take effect without a restart.
+   * `wg syncconf` updates peers but never touches the host routing table.
+   */
+  async #applyRoutes(wgInterface: InterfaceType) {
+    const clients = await Database.clients.getAll();
+    await routes.reconcile(wgInterface, clients, {
+      enableIpv6: !WG_ENV.DISABLE_IPV6,
+    });
   }
 
   /**
