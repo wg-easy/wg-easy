@@ -165,13 +165,6 @@ export default defineNuxtConfig({
         target: 'node24',
       },
     },
-    externals: {
-      traceInclude: [
-        fileURLToPath(
-          new URL('./node_modules/.cache/wg-easy/trace.mjs', import.meta.url)
-        ),
-      ],
-    },
   },
   alias: {
     '#db': fileURLToPath(new URL('./server/database/', import.meta.url)),
