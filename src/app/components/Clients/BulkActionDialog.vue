@@ -1,20 +1,27 @@
 <template>
   <BaseDialog>
     <template #trigger>
-      <BaseSecondaryButton v-if="enabled">
-        {{ $t('client.enableSelected') }}
-      </BaseSecondaryButton>
-      <BasePrimaryButton v-else>
-        {{ $t('client.disableSelected') }}
-      </BasePrimaryButton>
+      <BaseSwitch
+        :model-value="state === 'enabled'"
+        :indeterminate="state === 'mixed'"
+        :title="
+          $t(targetEnabled ? 'client.enableSelected' : 'client.disableSelected')
+        "
+        :aria-label="
+          $t(targetEnabled ? 'client.enableSelected' : 'client.disableSelected')
+        "
+        @update:model-value="() => undefined"
+      />
     </template>
     <template #title>
-      {{ $t(enabled ? 'client.enableSelected' : 'client.disableSelected') }}
+      {{
+        $t(targetEnabled ? 'client.enableSelected' : 'client.disableSelected')
+      }}
     </template>
     <template #description>
       {{
         $t(
-          enabled
+          targetEnabled
             ? 'client.enableSelectedDescription'
             : 'client.disableSelectedDescription',
           [selectedCount]
@@ -26,8 +33,12 @@
         <BaseSecondaryButton>{{ $t('dialog.cancel') }}</BaseSecondaryButton>
       </DialogClose>
       <DialogClose as-child>
-        <BasePrimaryButton @click="$emit('confirm', enabled)">
-          {{ $t(enabled ? 'client.enableSelected' : 'client.disableSelected') }}
+        <BasePrimaryButton @click="$emit('confirm', targetEnabled)">
+          {{
+            $t(
+              targetEnabled ? 'client.enableSelected' : 'client.disableSelected'
+            )
+          }}
         </BasePrimaryButton>
       </DialogClose>
     </template>
@@ -35,10 +46,17 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{
-  enabled: boolean;
+import {
+  getBulkToggleTargetEnabled,
+  type SelectedClientEnabledState,
+} from '../../utils/clientSelection';
+
+const props = defineProps<{
   selectedCount: number;
+  state: SelectedClientEnabledState;
 }>();
+
+const targetEnabled = computed(() => getBulkToggleTargetEnabled(props.state));
 
 defineEmits<{
   confirm: [enabled: boolean];

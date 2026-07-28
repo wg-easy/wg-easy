@@ -15,8 +15,8 @@
       </label>
       <ClientsBulkActions
         v-if="selectedCount > 0"
-        class="ml-auto"
         :selected-count="selectedCount"
+        :state="selectedClientEnabledState"
         @action="bulkToggle"
       />
       <span v-else class="text-sm text-gray-500 dark:text-neutral-400">
@@ -41,6 +41,7 @@
 
 <script setup lang="ts">
 import {
+  getSelectedClientEnabledState,
   getSelectionState,
   toggleClientSelection as toggleSelection,
   toggleVisibleClientSelection,
@@ -57,6 +58,12 @@ const selectionState = computed(() =>
   getSelectionState(selectedClientIds.value, visibleIds.value)
 );
 const selectedCount = computed(() => selectedClientIds.value.size);
+const selectedClientEnabledState = computed(() =>
+  getSelectedClientEnabledState(
+    selectedClientIds.value,
+    clientsStore.clients ?? []
+  )
+);
 
 watchEffect(() => {
   if (masterCheckbox.value) {

@@ -17,6 +17,36 @@ export function getSelectionState(
   return 'partial';
 }
 
+export type SelectedClientEnabledState =
+  'none' | 'enabled' | 'disabled' | 'mixed';
+
+export function getSelectedClientEnabledState(
+  selected: Set<number>,
+  clients: readonly { id: number; enabled: boolean }[]
+): SelectedClientEnabledState {
+  const selectedStates = clients
+    .filter((client) => selected.has(client.id))
+    .map((client) => client.enabled);
+
+  if (selectedStates.length === 0) {
+    return 'none';
+  }
+
+  if (selectedStates.every(Boolean)) {
+    return 'enabled';
+  }
+
+  if (selectedStates.every((enabled) => !enabled)) {
+    return 'disabled';
+  }
+
+  return 'mixed';
+}
+
+export function getBulkToggleTargetEnabled(state: SelectedClientEnabledState) {
+  return state !== 'enabled';
+}
+
 export function toggleClientSelection(selected: Set<number>, id: number) {
   const next = new Set(selected);
 
