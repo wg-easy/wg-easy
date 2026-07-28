@@ -37,7 +37,8 @@ export default definePermissionEventHandler(
           statusCode: 422,
           statusMessage:
             'Client is expired. Please update the expiration date first.',
-          message: 'Client is expired. Please update the expiration date first.',
+          message:
+            'Client is expired. Please update the expiration date first.',
         });
       }
     }

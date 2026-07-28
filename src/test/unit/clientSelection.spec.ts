@@ -22,8 +22,8 @@ describe('client selection', () => {
   });
 
   test('clears every visible selection while retaining non-visible IDs', () => {
-    expect(toggleVisibleClientSelection(new Set([1, 2, 3, 9]), visible)).toEqual(
-      new Set([9])
-    );
+    expect(
+      toggleVisibleClientSelection(new Set([1, 2, 3, 9]), visible)
+    ).toEqual(new Set([9]));
   });
 });
