@@ -1,0 +1,1 @@
+ALTER TABLE `interfaces_table` ADD `routing_table` text;

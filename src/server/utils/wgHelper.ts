@@ -96,6 +96,7 @@ PrivateKey = ${wgInterface.privateKey}
 Address = ${address}
 ListenPort = ${wgInterface.port}
 MTU = ${wgInterface.mtu}
+${wgInterface.routingTable ? `Table = ${wgInterface.routingTable}` : ''}
 ${extraLines.length ? `${extraLines.join('\n')}\n` : ''}
 PreUp = ${iptablesTemplate(hooks.preUp, wgInterface)}
 PostUp = ${iptablesTemplate(hooks.postUp, wgInterface)}

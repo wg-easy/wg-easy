@@ -91,6 +91,15 @@ export const PortSchema = z
   .min(1, { message: t('zod.port') })
   .max(65535, { message: t('zod.port') });
 
+export const RoutingTableSchema = z
+  .string({ message: t('zod.interface.routingTable') })
+  .pipe(safeStringRefine)
+  .pipe(controlStringRefine)
+  .refine((v) => /^(auto|off|\d+)$/.test(v), {
+    message: t('zod.interface.routingTable'),
+  })
+  .nullable();
+
 export const PersistentKeepaliveSchema = z
   .number({ message: t('zod.persistentKeepalive') })
   .min(0, t('zod.persistentKeepalive'))
