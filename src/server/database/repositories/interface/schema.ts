@@ -14,7 +14,7 @@ export const wgInterface = sqliteTable('interfaces_table', {
   ipv4Cidr: text('ipv4_cidr').notNull(),
   ipv6Cidr: text('ipv6_cidr').notNull(),
   mtu: int().notNull(),
-  routingTable: text('routing_table'),
+  routingTable: text('routing_table').notNull().default('auto'),
   jC: int('j_c').default(7),
   jMin: int('j_min').default(10),
   jMax: int('j_max').default(1000),

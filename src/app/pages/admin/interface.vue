@@ -20,7 +20,7 @@
           :label="$t('admin.interface.device')"
           :description="$t('admin.interface.deviceDesc')"
         />
-        <FormNullTextField
+        <FormTextField
           id="routingTable"
           v-model="data.routingTable"
           :label="$t('admin.interface.routingTable')"

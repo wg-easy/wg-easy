@@ -97,8 +97,7 @@ export const RoutingTableSchema = z
   .pipe(controlStringRefine)
   .refine((v) => /^(auto|off|\d+)$/.test(v), {
     message: t('zod.interface.routingTable'),
-  })
-  .nullable();
+  });
 
 export const PersistentKeepaliveSchema = z
   .number({ message: t('zod.persistentKeepalive') })

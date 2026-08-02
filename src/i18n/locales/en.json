@@ -184,7 +184,7 @@
       "device": "Device",
       "deviceDesc": "Ethernet device the wireguard traffic should be forwarded through",
       "routingTable": "Routing Table",
-      "routingTableDesc": "Routing table for WireGuard routes. Leave empty for the default (auto), or set to off, auto, or a table number.",
+      "routingTableDesc": "Routing table for WireGuard routes. Set to auto, off, or a table number.",
       "mtuDesc": "MTU WireGuard will use",
       "portDesc": "UDP Port WireGuard will listen on (you probably want to change Config Port too)",
       "changeCidr": "Change CIDR",
