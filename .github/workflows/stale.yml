@@ -20,7 +20,7 @@ jobs:
       pull-requests: write
 
     steps:
-      - uses: actions/stale@v10
+      - uses: actions/stale@v11
         with:
           # Stale after 30 days of inactivity
           days-before-issue-stale: 30
