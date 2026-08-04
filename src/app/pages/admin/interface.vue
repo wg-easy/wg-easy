@@ -20,6 +20,12 @@
           :label="$t('admin.interface.device')"
           :description="$t('admin.interface.deviceDesc')"
         />
+        <FormTextField
+          id="routingTable"
+          v-model="data.routingTable"
+          :label="$t('admin.interface.routingTable')"
+          :description="$t('admin.interface.routingTableDesc')"
+        />
       </FormGroup>
       <FormGroup v-if="globalStore.information?.isAwg">
         <FormHeading>{{ $t('awg.obfuscationParameters') }}</FormHeading>

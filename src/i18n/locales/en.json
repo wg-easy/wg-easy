@@ -183,6 +183,8 @@
       "cidrSuccess": "Changed CIDR",
       "device": "Device",
       "deviceDesc": "Ethernet device the wireguard traffic should be forwarded through",
+      "routingTable": "Routing Table",
+      "routingTableDesc": "Routing table for WireGuard routes. Set to auto, off, or a table number.",
       "mtuDesc": "MTU WireGuard will use",
       "portDesc": "UDP Port WireGuard will listen on (you probably want to change Config Port too)",
       "changeCidr": "Change CIDR",
@@ -242,7 +244,8 @@
     "interface": {
       "cidr": "CIDR",
       "device": "Device",
-      "cidrValid": "CIDR must be valid"
+      "cidrValid": "CIDR must be valid",
+      "routingTable": "Routing table must be auto, off, or a table number"
     },
     "otl": "One Time link",
     "stringMalformed": "String is malformed",
