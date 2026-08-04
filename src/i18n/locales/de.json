@@ -20,7 +20,11 @@
     "2faKey": "TOTP-Schlüssel",
     "2faCodeDesc": "Geben Sie den Code aus Ihrer Authentifizierungs-App ein.",
     "disable2fa": "Zwei-Faktor-Authentifizierung deaktivieren",
-    "disable2faDesc": "Geben Sie Ihr Passwort ein, um die Zwei-Faktor-Authentifizierung zu deaktivieren."
+    "disable2faDesc": "Geben Sie Ihr Passwort ein, um die Zwei-Faktor-Authentifizierung zu deaktivieren.",
+    "linkOauth": "Konto mit einem externen Anbieter verknüpfen",
+    "unlinkOauth": "Verknüpfung aufheben",
+    "linkedWith": "Mit {0} verknüpft",
+    "providerDisabled": "Der derzeit verknüpfte Anbieter ist nicht aktiviert"
   },
   "general": {
     "name": "Name",
@@ -28,6 +32,7 @@
     "password": "Passwort",
     "newPassword": "Neues Passwort",
     "updatePassword": "Passwort aktualisieren",
+    "addPassword": "Passwort hinzufügen",
     "mtu": "MTU",
     "allowedIps": "Erlaubte IP-Adressen",
     "dns": "DNS",
@@ -41,7 +46,8 @@
     "confirmPassword": "Passwort bestätigen",
     "loading": "Laden...",
     "2fa": "Zwei-Faktor-Authentifizierung",
-    "2faCode": "TOTP-Code"
+    "2faCode": "TOTP-Code",
+    "externalAuth": "Externe Authentifizierung"
   },
   "setup": {
     "welcome": "Willkommen zur Ersteinrichtung von wg-easy",
@@ -72,11 +78,14 @@
   },
   "login": {
     "signIn": "Anmelden",
+    "signInWith": "Mit {0} anmelden",
+    "or": "oder",
     "rememberMe": "Angemeldet bleiben",
     "rememberMeDesc": "Bleiben Sie auch nach dem Schließen des Browsers angemeldet",
     "insecure": "Sie können sich nicht über eine unsichere Verbindung anmelden. Verwenden Sie HTTPS.",
     "2faRequired": "Zwei-Faktor-Authentifizierung ist erforderlich",
-    "2faWrong": "Der Zwei-Faktor-Code ist ungültig"
+    "2faWrong": "Der Zwei-Faktor-Code ist ungültig",
+    "loginExpired": "Die Anmeldung ist abgelaufen. Versuchen Sie es erneut"
   },
   "client": {
     "empty": "Es gibt noch keine Clients.",
@@ -174,6 +183,8 @@
       "cidrSuccess": "CIDR wurde geändert",
       "device": "Gerät",
       "deviceDesc": "Ethernet-Gerät, durch das der WireGuard-Datenverkehr geleitet werden soll",
+      "routingTable": "Routingtabelle",
+      "routingTableDesc": "Routingtabelle für WireGuard-Routen. Zulässig sind „auto“, „off“ oder eine Tabellennummer.",
       "mtuDesc": "MTU, die WireGuard verwendet",
       "portDesc": "UDP-Port, auf dem WireGuard lauscht (Sie sollten wahrscheinlich auch den Port unter „Konfiguration“ ändern)",
       "changeCidr": "CIDR ändern",
@@ -196,7 +207,9 @@
       "validBoolean": "{0} muss ein Wahrheitswert sein",
       "validArray": "{0} muss eine Liste sein",
       "stringMin": "{0} muss mindestens {1} Zeichen lang sein",
-      "numberMin": "{0} muss mindestens {1} sein"
+      "stringMax": "{0} darf höchstens {1} Zeichen lang sein",
+      "numberMin": "{0} muss mindestens {1} sein",
+      "numberMax": "{0} darf höchstens {1} sein"
     },
     "client": {
       "id": "Client-ID",
@@ -231,7 +244,8 @@
     "interface": {
       "cidr": "CIDR",
       "device": "Gerät",
-      "cidrValid": "CIDR muss gültig sein"
+      "cidrValid": "CIDR muss gültig sein",
+      "routingTable": "Die Routingtabelle muss „auto“, „off“ oder eine Tabellennummer sein"
     },
     "otl": "Einmal-Link",
     "stringMalformed": "Zeichenkette ist fehlerhaft",
