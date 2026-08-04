@@ -1,6 +1,12 @@
 <template>
   <DialogRoot :modal="true">
-    <DialogTrigger :class="triggerClass"><slot name="trigger" /></DialogTrigger>
+    <DialogTrigger
+      :class="triggerClass"
+      :aria-label="triggerAriaLabel"
+      :title="triggerTitle"
+    >
+      <slot name="trigger" />
+    </DialogTrigger>
     <DialogPortal>
       <DialogOverlay
         class="fixed inset-0 z-30 bg-gray-500 opacity-75 dark:bg-black dark:opacity-50"
@@ -27,5 +33,9 @@
 </template>
 
 <script lang="ts" setup>
-defineProps<{ triggerClass?: string }>();
+defineProps<{
+  triggerClass?: string;
+  triggerAriaLabel?: string;
+  triggerTitle?: string;
+}>();
 </script>

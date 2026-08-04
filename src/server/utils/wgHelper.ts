@@ -4,6 +4,10 @@ import { stringifyIp } from 'ip-bigint';
 import { removeNewlines, iptablesTemplate } from '#server/utils/template';
 import { exec } from '#server/utils/cmd';
 import { WG_ENV } from '#server/utils/config';
+import {
+  resolveClientEffectivePolicy,
+  type EffectiveClientPolicy,
+} from '#shared/utils/clientPolicy';
 import type { ClientType } from '#db/repositories/client/types';
 import type { InterfaceType } from '#db/repositories/interface/types';
 import type { UserConfigType } from '#db/repositories/userConfig/types';
@@ -11,6 +15,7 @@ import type { HooksType } from '#db/repositories/hooks/types';
 
 type Options = {
   enableIpv6?: boolean;
+  effectivePolicy?: EffectiveClientPolicy;
 };
 
 // needed to support cli
@@ -110,6 +115,13 @@ PostDown = ${iptablesTemplate(hooks.postDown, wgInterface)}`;
     options: Options = {}
   ) => {
     const { enableIpv6 = true } = options;
+    const effectivePolicy =
+      options.effectivePolicy ??
+      resolveClientEffectivePolicy({
+        client,
+        userConfig,
+        firewallEnabled: wgInterface.firewallEnabled,
+      });
 
     const address =
       `${client.ipv4Address}/32` +
@@ -122,7 +134,7 @@ PostDown = ${iptablesTemplate(hooks.postDown, wgInterface)}`;
       client.postDown ? `PostDown = ${removeNewlines(client.postDown)}` : null,
     ];
 
-    const dnsServers = client.dns ?? userConfig.defaultDns;
+    const dnsServers = effectivePolicy.dns;
     const dnsLine =
       dnsServers.length > 0 ? `DNS = ${dnsServers.join(', ')}` : null;
 
@@ -165,7 +177,7 @@ ${extraLines.length ? `${extraLines.join('\n')}\n` : ''}
 [Peer]
 PublicKey = ${wgInterface.publicKey}
 PresharedKey = ${client.preSharedKey}
-AllowedIPs = ${(client.allowedIps ?? userConfig.defaultAllowedIps).join(', ')}
+AllowedIPs = ${effectivePolicy.allowedIps.join(', ')}
 PersistentKeepalive = ${client.persistentKeepalive}
 Endpoint = ${userConfig.host}:${userConfig.port}`;
   },

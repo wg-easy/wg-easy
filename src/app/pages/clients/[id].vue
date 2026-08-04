@@ -29,6 +29,28 @@
               :label="$t('client.expireDate')"
             />
           </FormGroup>
+          <FormGroup v-if="canManageGroups">
+            <FormHeading :description="$t('clientGroup.clientSelectorDesc')">
+              {{ $t('clientGroup.title') }}
+            </FormHeading>
+            <ClientGroupsSelector
+              v-model="selectedGroupIds"
+              :groups="groupsStore.groups"
+              :disabled="groupsLoading"
+            />
+            <p
+              v-if="groupsLoading"
+              class="text-sm text-gray-500 dark:text-neutral-300"
+            >
+              {{ $t('general.loading') }}
+            </p>
+            <p
+              v-if="groupLoadError"
+              class="text-sm text-red-700 dark:text-red-300"
+            >
+              {{ groupLoadError }}
+            </p>
+          </FormGroup>
           <FormGroup>
             <FormHeading>{{ $t('client.address') }}</FormHeading>
             <FormTextField
@@ -52,7 +74,23 @@
             <FormHeading :description="$t('client.allowedIpsDesc')">
               {{ $t('general.allowedIps') }}
             </FormHeading>
-            <FormNullArrayField v-model="data.allowedIps" name="allowedIps" />
+            <p
+              v-if="!isGroupManagedPolicy('allowedIps')"
+              class="col-span-2 text-sm text-gray-500 dark:text-neutral-300"
+            >
+              {{ $t(effectivePolicyMessage('allowedIps')) }}
+            </p>
+            <FormNullArrayField
+              v-if="!isGroupManagedPolicy('allowedIps')"
+              v-model="data.allowedIps"
+              name="allowedIps"
+            />
+            <ClientGroupsManagedPolicyValue
+              v-else
+              :message-key="effectivePolicyMessage('allowedIps')"
+              :groups="draftEffectivePolicy?.allowedIps.groups ?? []"
+              :value="draftEffectivePolicy?.allowedIps.value ?? []"
+            />
           </FormGroup>
           <FormGroup>
             <FormHeading :description="$t('client.serverAllowedIpsDesc')">
@@ -67,13 +105,45 @@
             <FormHeading :description="$t('client.firewallIpsDesc')">
               {{ $t('client.firewallIps') }}
             </FormHeading>
-            <FormNullArrayField v-model="data.firewallIps" name="firewallIps" />
+            <p
+              v-if="!isGroupManagedPolicy('firewallIps')"
+              class="col-span-2 text-sm text-gray-500 dark:text-neutral-300"
+            >
+              {{ $t(effectivePolicyMessage('firewallIps')) }}
+            </p>
+            <FormNullArrayField
+              v-if="!isGroupManagedPolicy('firewallIps')"
+              v-model="data.firewallIps"
+              name="firewallIps"
+            />
+            <ClientGroupsManagedPolicyValue
+              v-else
+              :message-key="effectivePolicyMessage('firewallIps')"
+              :groups="draftEffectivePolicy?.firewallIps.groups ?? []"
+              :value="draftEffectivePolicy?.firewallIps.value ?? []"
+            />
           </FormGroup>
           <FormGroup>
             <FormHeading :description="$t('client.dnsDesc')">
               {{ $t('general.dns') }}
             </FormHeading>
-            <FormNullArrayField v-model="data.dns" name="dns" />
+            <p
+              v-if="!isGroupManagedPolicy('dns')"
+              class="col-span-2 text-sm text-gray-500 dark:text-neutral-300"
+            >
+              {{ $t(effectivePolicyMessage('dns')) }}
+            </p>
+            <FormNullArrayField
+              v-if="!isGroupManagedPolicy('dns')"
+              v-model="data.dns"
+              name="dns"
+            />
+            <ClientGroupsManagedPolicyValue
+              v-else
+              :message-key="effectivePolicyMessage('dns')"
+              :groups="draftEffectivePolicy?.dns.groups ?? []"
+              :value="draftEffectivePolicy?.dns.value ?? []"
+            />
           </FormGroup>
           <FormGroup>
             <FormHeading>{{ $t('form.sectionAdvanced') }}</FormHeading>
@@ -210,7 +280,23 @@
 </template>
 
 <script lang="ts" setup>
+import {
+  apiErrorMessage,
+  effectivePolicyMessageKey,
+  groupSelectionFromMembership,
+  saveClientGroupMembership,
+  selectedClientGroups,
+  type ClientGroupPolicyKey,
+} from '../../utils/clientGroups';
+
+import { resolveClientEffectivePolicy } from '#shared/utils/clientPolicy';
+import { hasPermissions } from '#shared/utils/permissions';
+
 const globalStore = useGlobalStore();
+const authStore = useAuthStore();
+const groupsStore = useClientGroupsStore();
+const toast = useToast();
+const { t } = useI18n();
 
 const route = useRoute();
 const id = route.params.id as string;
@@ -219,31 +305,93 @@ const { data: _data, refresh } = await useFetch(`/api/client/${id}`, {
   method: 'get',
 });
 const data = toRef(_data.value);
-
-const _submit = useSubmit(
-  (data) =>
-    $fetch(`/api/client/${id}`, {
-      method: 'post',
-      body: data,
-    }),
-  {
-    revert: async (success) => {
-      if (success) {
-        await navigateTo('/');
-      } else {
-        await revert();
-      }
-    },
-  }
+const selectedGroupIds = ref<string[]>([]);
+const initialSelectedGroupIds = ref<string[]>([]);
+const groupsLoading = ref(false);
+const groupLoadError = ref('');
+const userConfig = ref<{
+  defaultAllowedIps: string[];
+  defaultDns: string[];
+} | null>(null);
+const selectedGroups = computed(() =>
+  selectedClientGroups(groupsStore.groups, selectedGroupIds.value)
 );
+const draftEffectivePolicy = computed(() => {
+  if (!data.value || !userConfig.value) {
+    return null;
+  }
 
-function submit() {
-  return _submit(data.value);
+  return resolveClientEffectivePolicy({
+    client: {
+      allowedIps: data.value.allowedIps,
+      dns: data.value.dns,
+      firewallIps: data.value.firewallIps,
+    },
+    groups: selectedGroups.value,
+    userConfig: userConfig.value,
+    firewallEnabled: globalStore.information?.firewallEnabled === true,
+  }).fields;
+});
+
+const canManageGroups = computed(() => {
+  return (
+    authStore.userData && hasPermissions(authStore.userData, 'admin', 'any')
+  );
+});
+
+if (canManageGroups.value && data.value) {
+  await loadClientGroups();
+}
+
+async function submit() {
+  try {
+    await $fetch(`/api/client/${id}`, {
+      method: 'post',
+      body: data.value,
+    });
+  } catch (error) {
+    toast.showToast({
+      type: 'error',
+      message: apiErrorMessage(error, t('toast.unknown')),
+    });
+    await revert();
+    return;
+  }
+
+  try {
+    if (canManageGroups.value && data.value) {
+      await saveClientGroupMembership(
+        data.value.id,
+        initialSelectedGroupIds.value,
+        selectedGroupIds.value,
+        {
+          setGroups: groupsStore.setClientGroups,
+        }
+      );
+      await groupsStore.refreshMembership();
+      syncSelectedGroup();
+    }
+  } catch (error) {
+    toast.showToast({
+      type: 'error',
+      message: t('clientGroup.membershipSaveError', {
+        message: apiErrorMessage(error, t('toast.unknown')),
+      }),
+    });
+    return;
+  }
+
+  toast.showToast({
+    type: 'success',
+    message: t('toast.saved'),
+  });
+  await navigateTo('/');
 }
 
 async function revert() {
   await refresh();
   data.value = toRef(_data.value).value;
+  syncSelectedGroup();
 }
 
 const _deleteClient = useSubmit(
@@ -261,5 +409,64 @@ const _deleteClient = useSubmit(
 
 function deleteClient() {
   return _deleteClient(undefined);
+}
+
+async function loadClientGroups() {
+  groupsLoading.value = true;
+  groupLoadError.value = '';
+
+  try {
+    await Promise.all([
+      groupsStore.refresh(),
+      groupsStore.refreshMembership(),
+      refreshUserConfig(),
+    ]);
+    syncSelectedGroup();
+  } catch (error) {
+    groupLoadError.value = apiErrorMessage(error, t('clientGroup.loadError'));
+  } finally {
+    groupsLoading.value = false;
+  }
+}
+
+function syncSelectedGroup() {
+  if (!data.value) {
+    selectedGroupIds.value = [];
+    initialSelectedGroupIds.value = [];
+    return;
+  }
+
+  const currentSelection = groupSelectionFromMembership(
+    groupsStore.membership ?? [],
+    data.value.id
+  );
+  selectedGroupIds.value = currentSelection;
+  initialSelectedGroupIds.value = currentSelection;
+}
+
+function isGroupManagedPolicy(key: ClientGroupPolicyKey) {
+  if (
+    key === 'firewallIps' &&
+    globalStore.information?.firewallEnabled !== true
+  ) {
+    return false;
+  }
+
+  return selectedGroupIds.value.length > 0;
+}
+
+function effectivePolicyMessage(key: ClientGroupPolicyKey) {
+  const field = draftEffectivePolicy.value?.[key];
+
+  return field
+    ? effectivePolicyMessageKey(field)
+    : 'clientGroup.inheritedFromGlobal';
+}
+
+async function refreshUserConfig() {
+  userConfig.value = await $fetch<{
+    defaultAllowedIps: string[];
+    defaultDns: string[];
+  }>('/api/admin/userconfig');
 }
 </script>

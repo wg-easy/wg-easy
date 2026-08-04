@@ -10,6 +10,8 @@ Enable server-side firewall filtering to enforce network access restrictions per
 
 When enabled, each client can have custom "Firewall Allowed IPs" configured that restrict which destinations they can access through the VPN. These restrictions are enforced by the server using iptables/ip6tables and cannot be bypassed by the client.
 
+Client Groups can also define Firewall IP policies. Group Firewall IP policies use the same Per-Client Firewall setting and are ignored while this feature is disabled.
+
 /// warning | Experimental Feature
 
 This feature is currently experimental. While functional, it should be thoroughly tested in your environment before relying on it for production security requirements. Always verify that firewall rules are working as expected using test traffic or by manually inspecting the rules.
@@ -41,5 +43,7 @@ Most Linux distributions include iptables by default. If you're running in a min
 2. Edit any client to see the new "Firewall Allowed IPs" field
 3. Specify allowed destinations (IPs, subnets, ports) for that client
 4. Server enforces these rules automatically
+
+See [Client Groups](./client-groups.md) for grouped policy behavior.
 
 See [Edit Client → Firewall Allowed IPs](./clients.md#firewall-allowed-ips) for detailed configuration syntax and examples.
