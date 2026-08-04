@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Support disabling version check (https://github.com/wg-easy/wg-easy/pull/2648)
 - OAuth integration (https://github.com/wg-easy/wg-easy/pull/2659)
+- Support Table parameter (https://github.com/wg-easy/wg-easy/pull/2721)
 
 ### Fixed
 
