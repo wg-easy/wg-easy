@@ -4,7 +4,7 @@ import { int, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core';
 import { client } from '../client/schema';
 
 import type { Role } from '#shared/utils/permissions';
-import type { OAUTH_PROVIDER } from '#server/utils/oauth';
+import type { AUTH_PROVIDER } from '#server/utils/oauth';
 
 export const user = sqliteTable(
   'users_table',
@@ -19,7 +19,7 @@ export const user = sqliteTable(
     totpKey: text('totp_key'),
     totpVerified: int('totp_verified', { mode: 'boolean' }).notNull(),
     enabled: int({ mode: 'boolean' }).notNull(),
-    oauthProvider: text('oauth_provider').$type<OAUTH_PROVIDER>(),
+    oauthProvider: text('oauth_provider').$type<AUTH_PROVIDER>(),
     oauthId: text('oauth_id'),
     createdAt: text('created_at')
       .notNull()
