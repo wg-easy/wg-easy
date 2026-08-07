@@ -16,8 +16,8 @@ RUN pnpm build
 
 # Build amneziawg-tools
 RUN apk add linux-headers build-base go git && \
-    git clone https://github.com/amnezia-vpn/amneziawg-tools.git && \
-    git clone https://github.com/amnezia-vpn/amneziawg-go && \
+    git clone --depth 1 --branch v3.0.20260730 https://github.com/amnezia-vpn/amneziawg-tools.git && \
+    git clone --depth 1 --branch v3.0.3 https://github.com/amnezia-vpn/amneziawg-go && \
     cd amneziawg-go && \
     make && \
     cd ../amneziawg-tools/src && \
