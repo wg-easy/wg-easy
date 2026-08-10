@@ -64,7 +64,7 @@ export class ClientService {
   /**
    * Returns all clients without sensitive data
    */
-  async getAllPublic({ filter, sort }: ClientQueryType) {
+  async getAllPublic({ filter, sort, groupId }: ClientQueryType) {
     const filters = [];
 
     if (filter?.trim()) {
@@ -78,10 +78,15 @@ export class ClientService {
       );
     }
 
+    if (groupId !== undefined) {
+      filters.push(eq(client.groupId, groupId));
+    }
+
     const result = await this.#db.query.client
       .findMany({
         with: {
           oneTimeLink: true,
+          group: true,
         },
         where: and(...filters),
         columns: {
@@ -109,7 +114,7 @@ export class ClientService {
   /**
    * Returns all clients without sensitive data belonging to user
    */
-  async getAllForUser(userId: ID, { filter, sort }: ClientQueryType) {
+  async getAllForUser(userId: ID, { filter, sort, groupId }: ClientQueryType) {
     const filters = [];
 
     if (filter?.trim()) {
@@ -123,10 +128,14 @@ export class ClientService {
       );
     }
 
+    if (groupId !== undefined) {
+      filters.push(eq(client.groupId, groupId));
+    }
+
     const result = await this.#db.query.client
       .findMany({
         where: and(eq(client.userId, userId), ...filters),
-        with: { oneTimeLink: true },
+        with: { oneTimeLink: true, group: true },
         columns: {
           privateKey: false,
           preSharedKey: false,

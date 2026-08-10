@@ -68,6 +68,11 @@ const serverAllowedIps = z.array(AddressSchema, {
   message: t('zod.client.serverAllowedIps'),
 });
 
+const groupId = z
+  .number({ message: t('zod.client.groupId') })
+  .int({ message: t('zod.client.groupId') })
+  .nullable();
+
 export const ClientCreateSchema = z.object({
   name: name,
   expiresAt: expiresAt,
@@ -82,6 +87,7 @@ const sort = z.enum(['asc', 'desc']);
 export const ClientQuerySchema = z.object({
   filter: filter.optional(),
   sort: sort.optional(),
+  groupId: z.coerce.number().int().optional(),
 });
 
 export type ClientQueryType = z.infer<typeof ClientQuerySchema>;
@@ -89,6 +95,7 @@ export type ClientQueryType = z.infer<typeof ClientQuerySchema>;
 export const ClientUpdateSchema = schemaForType<UpdateClientType>()(
   z.object({
     name: name,
+    groupId: groupId,
     enabled: EnabledSchema,
     expiresAt: expiresAt,
     ipv4Address: address4,

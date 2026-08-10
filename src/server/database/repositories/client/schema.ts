@@ -1,6 +1,7 @@
 import { sql, relations } from 'drizzle-orm';
 import { int, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core';
 
+import { group } from '../group/schema';
 import { wgInterface } from '../interface/schema';
 import { oneTimeLink } from '../oneTimeLink/schema';
 import { user } from '../user/schema';
@@ -23,6 +24,10 @@ export const client = sqliteTable(
         onDelete: 'cascade',
         onUpdate: 'cascade',
       }),
+    groupId: int('group_id').references(() => group.id, {
+      onDelete: 'set null',
+      onUpdate: 'cascade',
+    }),
     name: text().notNull(),
     ipv4Address: text('ipv4_address').notNull().unique(),
     ipv6Address: text('ipv6_address').notNull().unique(),
@@ -83,5 +88,9 @@ export const clientsRelations = relations(client, ({ one }) => ({
   interface: one(wgInterface, {
     fields: [client.interfaceId],
     references: [wgInterface.name],
+  }),
+  group: one(group, {
+    fields: [client.groupId],
+    references: [group.id],
   }),
 }));

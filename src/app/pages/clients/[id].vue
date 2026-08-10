@@ -17,6 +17,13 @@
               v-model="data.name"
               :label="$t('general.name')"
             />
+            <FormSelectField
+              id="groupId"
+              v-model="data.groupId"
+              :label="$t('client.group')"
+              :description="$t('client.groupDesc')"
+              :options="groupOptions"
+            />
             <FormSwitchField
               id="enabled"
               v-model="data.enabled"
@@ -211,6 +218,7 @@
 
 <script lang="ts" setup>
 const globalStore = useGlobalStore();
+const { t } = useI18n();
 
 const route = useRoute();
 const id = route.params.id as string;
@@ -219,6 +227,16 @@ const { data: _data, refresh } = await useFetch(`/api/client/${id}`, {
   method: 'get',
 });
 const data = toRef(_data.value);
+
+const { data: groups } = await useFetch('/api/group', { method: 'get' });
+
+const groupOptions = computed(() => [
+  { label: t('client.noGroup'), value: null },
+  ...(groups.value?.map((group) => ({
+    label: group.name,
+    value: group.id,
+  })) ?? []),
+]);
 
 const _submit = useSubmit(
   (data) =>

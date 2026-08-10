@@ -7,7 +7,8 @@
       "general": "General",
       "config": "Config",
       "interface": "Interface",
-      "hooks": "Hooks"
+      "hooks": "Hooks",
+      "groups": "Groups"
     }
   },
   "user": {
@@ -133,7 +134,27 @@
     "firewallIps": "Firewall Allowed IPs",
     "firewallIpsDesc": "Destination IPs/CIDRs this client can access (server-side enforcement). Leave empty to use Allowed IPs. Supports optional port and protocol filtering. See docs for syntax.",
     "downloadPng": "Download PNG",
-    "copyPng": "Copy PNG"
+    "copyPng": "Copy PNG",
+    "group": "Group",
+    "groupDesc": "Assign this client to a group for organization",
+    "noGroup": "No group",
+    "filterByGroup": "Filter by group",
+    "allGroups": "All groups"
+  },
+  "group": {
+    "name": "Name",
+    "color": "Color",
+    "colorDesc": "Optional color used for the group badge",
+    "new": "New Group",
+    "create": "Create Group",
+    "created": "Group created",
+    "edit": "Edit Group",
+    "delete": "Delete",
+    "deleteGroup": "Delete Group",
+    "deleteDialog1": "Are you sure you want to delete",
+    "deleteDialog2": "Clients in this group will be ungrouped. This action cannot be undone.",
+    "empty": "There are no groups yet.",
+    "clientCount": "Clients"
   },
   "dialog": {
     "change": "Change",
@@ -219,7 +240,13 @@
       "address6": "IPv6 Address",
       "serverAllowedIps": "Server Allowed IPs",
       "firewallIps": "Firewall Allowed IPs",
-      "firewallIpsInvalid": "Invalid firewall IP entry. See docs for supported syntax."
+      "firewallIpsInvalid": "Invalid firewall IP entry. See docs for supported syntax.",
+      "groupId": "Group"
+    },
+    "group": {
+      "id": "Group ID",
+      "name": "Name",
+      "color": "Color must be a valid hex color"
     },
     "user": {
       "username": "Username",

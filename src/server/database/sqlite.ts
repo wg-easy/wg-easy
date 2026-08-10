@@ -5,6 +5,7 @@ import { createDebug } from 'obug';
 import { eq } from 'drizzle-orm';
 
 import { GeneralService } from '#db/repositories/general/service';
+import { GroupService } from '#db/repositories/group/service';
 import { UserService } from '#db/repositories/user/service';
 import { UserConfigService } from '#db/repositories/userConfig/service';
 import { InterfaceService } from '#db/repositories/interface/service';
@@ -38,6 +39,7 @@ export async function connect() {
 class DBService {
   clients: ClientService;
   general: GeneralService;
+  groups: GroupService;
   users: UserService;
   userConfigs: UserConfigService;
   interfaces: InterfaceService;
@@ -47,6 +49,7 @@ class DBService {
   constructor(db: DBType) {
     this.clients = new ClientService(db);
     this.general = new GeneralService(db);
+    this.groups = new GroupService(db);
     this.users = new UserService(db);
     this.userConfigs = new UserConfigService(db);
     this.interfaces = new InterfaceService(db);

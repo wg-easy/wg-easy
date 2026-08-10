@@ -8,6 +8,7 @@
         <PanelHeadBoat>
           <ClientsSearch />
           <div class="flex gap-2">
+            <ClientsGroupFilter />
             <ClientsSort />
             <ClientsNew />
           </div>

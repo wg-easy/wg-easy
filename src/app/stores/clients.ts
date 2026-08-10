@@ -32,10 +32,12 @@ export const useClientsStore = defineStore('Clients', () => {
   const clientsPersist = ref<Record<string, ClientPersist>>({});
 
   const filter = ref<string | undefined>(undefined);
+  const groupId = ref<number | undefined>(undefined);
 
   const searchParams = computed(() => ({
     filter: filter.value,
     sort: globalStore.sortClient,
+    groupId: groupId.value,
   }));
 
   const { data: _clients, refresh: _refresh } = useFetch('/api/client', {
@@ -137,5 +139,17 @@ export const useClientsStore = defineStore('Clients', () => {
     filter.value = query || undefined;
   }
 
-  return { clients, clientsPersist, refresh, _clients, setSearchQuery };
+  function setGroupFilter(id: number | undefined) {
+    clients.value = null;
+    groupId.value = id;
+  }
+
+  return {
+    clients,
+    clientsPersist,
+    refresh,
+    _clients,
+    setSearchQuery,
+    setGroupFilter,
+  };
 });
