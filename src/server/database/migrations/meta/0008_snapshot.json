@@ -1,0 +1,72 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "id": "0008_amnezia_wg_params",
+  "prevId": "0007_blushing_electro",
+  "tables": {
+    "interfaces_table": {
+      "name": "interfaces_table",
+      "columns": {
+        "name": { "name": "name", "type": "text", "primaryKey": true, "notNull": true },
+        "device": { "name": "device", "type": "text", "notNull": true },
+        "port": { "name": "port", "type": "integer", "notNull": true },
+        "private_key": { "name": "private_key", "type": "text", "notNull": true },
+        "public_key": { "name": "public_key", "type": "text", "notNull": true },
+        "ipv4_cidr": { "name": "ipv4_cidr", "type": "text", "notNull": true },
+        "ipv6_cidr": { "name": "ipv6_cidr", "type": "text", "notNull": true },
+        "mtu": { "name": "mtu", "type": "integer", "notNull": true },
+        "routing_table": { "name": "routing_table", "type": "text", "notNull": true, "default": "auto" },
+        "j_c": { "name": "j_c", "type": "integer" },
+        "j_min": { "name": "j_min", "type": "integer" },
+        "j_max": { "name": "j_max", "type": "integer" },
+        "s1": { "name": "s1", "type": "integer" },
+        "s2": { "name": "s2", "type": "integer" },
+        "s3": { "name": "s3", "type": "integer" },
+        "s4": { "name": "s4", "type": "integer" },
+        "h1": { "name": "h1", "type": "text" },
+        "h2": { "name": "h2", "type": "text" },
+        "h3": { "name": "h3", "type": "text" },
+        "h4": { "name": "h4", "type": "text" },
+        "i1": { "name": "i1", "type": "text" },
+        "i2": { "name": "i2", "type": "text" },
+        "i3": { "name": "i3", "type": "text" },
+        "i4": { "name": "i4", "type": "text" },
+        "i5": { "name": "i5", "type": "text" },
+        "header_protection_key": { "name": "header_protection_key", "type": "text" },
+        "content_padding_addition": { "name": "content_padding_addition", "type": "integer" },
+        "rekey_after_time": { "name": "rekey_after_time", "type": "integer" },
+        "rekey_timeout": { "name": "rekey_timeout", "type": "integer" },
+        "enabled": { "name": "enabled", "type": "boolean", "notNull": true },
+        "firewall_enabled": { "name": "firewall_enabled", "type": "boolean", "notNull": true, "default": false },
+        "created_at": { "name": "created_at", "type": "text", "notNull": true, "default": "CURRENT_TIMESTAMP" },
+        "updated_at": { "name": "updated_at", "type": "text", "notNull": true, "default": "CURRENT_TIMESTAMP" }
+      }
+    },
+    "user_configs_table": {
+      "name": "user_configs_table",
+      "columns": {
+        "id": { "name": "id", "type": "text", "primaryKey": true, "notNull": true },
+        "default_mtu": { "name": "default_mtu", "type": "integer", "notNull": true },
+        "default_persistent_keepalive": { "name": "default_persistent_keepalive", "type": "integer", "notNull": true },
+        "default_dns": { "name": "default_dns", "type": "text", "notNull": true },
+        "default_allowed_ips": { "name": "default_allowed_ips", "type": "text", "notNull": true },
+        "default_j_c": { "name": "default_j_c", "type": "integer" },
+        "default_j_min": { "name": "default_j_min", "type": "integer" },
+        "default_j_max": { "name": "default_j_max", "type": "integer" },
+        "default_i1": { "name": "default_i1", "type": "text" },
+        "default_i2": { "name": "default_i2", "type": "text" },
+        "default_i3": { "name": "default_i3", "type": "text" },
+        "default_i4": { "name": "default_i4", "type": "text" },
+        "default_i5": { "name": "default_i5", "type": "text" },
+        "header_protection_key": { "name": "header_protection_key", "type": "text" },
+        "content_padding_addition": { "name": "content_padding_addition", "type": "integer" },
+        "rekey_after_time": { "name": "rekey_after_time", "type": "integer" },
+        "rekey_timeout": { "name": "rekey_timeout", "type": "integer" },
+        "host": { "name": "host", "type": "text", "notNull": true },
+        "port": { "name": "port", "type": "integer", "notNull": true },
+        "created_at": { "name": "created_at", "type": "text", "notNull": true, "default": "CURRENT_TIMESTAMP" },
+        "updated_at": { "name": "updated_at", "type": "text", "notNull": true, "default": "CURRENT_TIMESTAMP" }
+      }
+    }
+  }
+}

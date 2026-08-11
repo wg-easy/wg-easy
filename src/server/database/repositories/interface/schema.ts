@@ -31,6 +31,10 @@ export const wgInterface = sqliteTable('interfaces_table', {
   i3: text(),
   i4: text(),
   i5: text(),
+  headerProtectionKey: text('header_protection_key'),
+  contentPaddingAddition: int('content_padding_addition'),
+  rekeyAfterTime: int('rekey_after_time'),
+  rekeyTimeout: int('rekey_timeout'),
   // does nothing yet
   enabled: int({ mode: 'boolean' }).notNull(),
   // Enable per-client firewall filtering via iptables

@@ -50,6 +50,10 @@ export const UserConfigUpdateSchema = schemaForType<UserConfigUpdateType>()(
     defaultI3: ISchema,
     defaultI4: ISchema,
     defaultI5: ISchema,
+    headerProtectionKey: z.string().pipe(safeStringRefine).nullish(),
+    contentPaddingAddition: z.number().int().nullish(),
+    rekeyAfterTime: z.number().int().nullish(),
+    rekeyTimeout: z.number().int().nullish(),
     host: host,
   })
 );

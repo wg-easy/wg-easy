@@ -26,6 +26,10 @@ export const userConfig = sqliteTable('user_configs_table', {
   defaultI3: text('default_i3'),
   defaultI4: text('default_i4'),
   defaultI5: text('default_i5'),
+  headerProtectionKey: text('header_protection_key'),
+  contentPaddingAddition: int('content_padding_addition'),
+  rekeyAfterTime: int('rekey_after_time'),
+  rekeyTimeout: int('rekey_timeout'),
   host: text().notNull(),
   port: int().notNull(),
   createdAt: text('created_at')

@@ -48,6 +48,30 @@
           :label="$t('awg.jMaxLabel')"
           :description="$t('awg.jMaxDescription')"
         />
+        <FormTextField
+          id="headerProtectionKey"
+          v-model="data.headerProtectionKey"
+          label="Header Protection Key"
+          description="Optional AmneziaWG header protection key"
+        />
+        <FormNullNumberField
+          id="contentPaddingAddition"
+          v-model="data.contentPaddingAddition"
+          label="Content Padding Addition"
+          description="Optional AmneziaWG content padding addition"
+        />
+        <FormNullNumberField
+          id="rekeyAfterTime"
+          v-model="data.rekeyAfterTime"
+          label="Rekey After Time"
+          description="Optional AmneziaWG rekey after time"
+        />
+        <FormNullNumberField
+          id="rekeyTimeout"
+          v-model="data.rekeyTimeout"
+          label="Rekey Timeout"
+          description="Optional AmneziaWG rekey timeout"
+        />
         <FormNullNumberField
           id="s1"
           v-model="data.s1"
