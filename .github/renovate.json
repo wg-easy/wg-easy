@@ -14,6 +14,10 @@
       "groupName": "docker-digest",
       "matchDatasources": ["docker"],
       "matchUpdateTypes": ["digest"]
+    },
+    {
+      "matchManagers": ["docker-compose"],
+      "pinDigests": false
     }
   ],
   "customManagers": [
