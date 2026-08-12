@@ -1,4 +1,4 @@
-FROM docker.io/library/node:krypton-alpine AS build
+FROM docker.io/library/node:krypton-alpine@sha256:d32cdf619f63fe0471182d08996dd516c6275bb5fd31ae06e55a570bd9e1ad43 AS build
 WORKDIR /app
 
 # update corepack
@@ -29,13 +29,13 @@ RUN apk add linux-headers build-base go git && \
     make && \
     sed -i 's|\[\[ $proto == -4 \]\] && cmd sysctl -q net\.ipv4\.conf\.all\.src_valid_mark=1|[[ $proto == -4 ]] \&\& [[ $(sysctl -n net.ipv4.conf.all.src_valid_mark) != 1 ]] \&\& cmd sysctl -q net.ipv4.conf.all.src_valid_mark=1|' ./wg-quick/linux.bash
 
-FROM docker.io/library/node:krypton-alpine AS build-libsql
+FROM docker.io/library/node:krypton-alpine@sha256:d32cdf619f63fe0471182d08996dd516c6275bb5fd31ae06e55a570bd9e1ad43 AS build-libsql
 WORKDIR /app
 RUN npm install --no-save --omit=dev libsql
 
 # Copy build result to a new image.
 # This saves a lot of disk space.
-FROM docker.io/library/node:krypton-alpine
+FROM docker.io/library/node:krypton-alpine@sha256:d32cdf619f63fe0471182d08996dd516c6275bb5fd31ae06e55a570bd9e1ad43
 WORKDIR /app
 
 HEALTHCHECK --interval=1m --timeout=5s --retries=3 CMD /usr/bin/timeout 5s /bin/sh -c "/usr/bin/wg show | /bin/grep -q interface || exit 1"
