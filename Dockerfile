@@ -14,10 +14,13 @@ RUN pnpm install
 COPY src ./
 RUN pnpm build
 
+ARG AWGTOOLS_BRANCH=v3.0.20260805
+ARG AWGGO_BRANCH=v3.0.20260805
+
 # Build amneziawg-tools
 RUN apk add linux-headers build-base go git && \
-    git clone --depth 1 --branch v3.0.20260730 https://github.com/amnezia-vpn/amneziawg-tools.git && \
-    git clone --depth 1 --branch v3.0.3 https://github.com/amnezia-vpn/amneziawg-go && \
+    git clone --depth 1 --branch ${AWGTOOLS_BRANCH} https://github.com/amnezia-vpn/amneziawg-tools.git && \
+    git clone --depth 1 --branch ${AWGGO_BRANCH} https://github.com/amnezia-vpn/amneziawg-go && \
     cd amneziawg-go && \
     make && \
     cd ../amneziawg-tools/src && \
@@ -63,8 +66,7 @@ RUN apk add --no-cache \
     kmod \
     iptables-legacy \
     wireguard-go \
-    wireguard-tools && \
-    sed -i 's|\[\[ $proto == -4 \]\] && cmd sysctl -q net\.ipv4\.conf\.all\.src_valid_mark=1|[[ $proto == -4 ]] \&\& [[ $(sysctl -n net.ipv4.conf.all.src_valid_mark) != 1 ]] \&\& cmd sysctl -q net.ipv4.conf.all.src_valid_mark=1|' /usr/bin/wg-quick
+    wireguard-tools
 
 RUN mkdir -p /etc/amnezia
 RUN ln -s /etc/wireguard /etc/amnezia/amneziawg
