@@ -36,14 +36,15 @@ const { copied, copy, isSupported } = useClipboard({
   legacy: false,
 });
 
-const { data: config, status, refresh } = useFetch(
-  `/api/client/${props.clientId}/configuration`,
-  {
-    responseType: 'text',
-    server: false,
-    immediate: false,
-  }
-);
+const {
+  data: config,
+  status,
+  refresh,
+} = useFetch(`/api/client/${props.clientId}/configuration`, {
+  responseType: 'text',
+  server: false,
+  immediate: false,
+});
 
 async function loadOnOpen(open: boolean) {
   if (!open) return;
