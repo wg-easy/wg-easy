@@ -1,5 +1,5 @@
 <template>
-  <BaseDialog :trigger-class="triggerClass">
+  <BaseDialog :trigger-class="triggerClass" @update:open="loadOnOpen">
     <template #trigger>
       <slot />
     </template>
@@ -36,13 +36,21 @@ const { copied, copy, isSupported } = useClipboard({
   legacy: false,
 });
 
-const { data: config, status } = useFetch(
-  `/api/client/${props.clientId}/configuration`,
-  {
-    responseType: 'text',
-    server: false,
-  }
-);
+const {
+  data: config,
+  status,
+  refresh,
+} = useFetch(`/api/client/${props.clientId}/configuration`, {
+  responseType: 'text',
+  server: false,
+  immediate: false,
+});
+
+async function loadOnOpen(open: boolean) {
+  if (!open) return;
+
+  await refresh();
+}
 
 async function copyCode() {
   if (status.value !== 'success') {

@@ -5,7 +5,7 @@
 </template>
 
 <script lang="ts" setup>
-import { Label as RLabel } from 'radix-vue';
+import { Label as RLabel } from 'reka-ui';
 
 const props = defineProps<{ for: string }>();
 </script>

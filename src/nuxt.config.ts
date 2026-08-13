@@ -9,7 +9,7 @@ export default defineNuxtConfig({
     '@nuxtjs/tailwindcss',
     '@pinia/nuxt',
     '@nuxtjs/color-mode',
-    'radix-vue/nuxt',
+    'reka-ui/nuxt',
     '@vueuse/nuxt',
     '@nuxt/eslint',
     '@nuxt/test-utils/module',
