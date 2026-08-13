@@ -18,6 +18,10 @@
     {
       "matchManagers": ["docker-compose"],
       "pinDigests": false
+    },
+    {
+      "groupName": "AmneziaWG",
+      "matchDepNames": ["amnezia-vpn/**"]
     }
   ],
   "customManagers": [
