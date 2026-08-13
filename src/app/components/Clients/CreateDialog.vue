@@ -1,5 +1,5 @@
 <template>
-  <BaseDialog :trigger-class="triggerClass">
+  <BaseDialog :trigger-class="triggerClass" @update:open="resetOnOpen">
     <template #trigger>
       <slot />
     </template>
@@ -37,6 +37,13 @@ const clientsStore = useClientsStore();
 const { t } = useI18n();
 
 defineProps<{ triggerClass?: string }>();
+
+function resetOnOpen(open: boolean) {
+  if (!open) return;
+
+  name.value = '';
+  expiresAt.value = null;
+}
 
 function createClient() {
   return _createClient({ name: name.value, expiresAt: expiresAt.value });

@@ -1,5 +1,5 @@
 <template>
-  <DialogRoot :modal="true">
+  <DialogRoot :modal="true" @update:open="updateOpen">
     <DialogTrigger :class="triggerClass"><slot name="trigger" /></DialogTrigger>
     <DialogPortal>
       <DialogOverlay
@@ -28,4 +28,12 @@
 
 <script lang="ts" setup>
 defineProps<{ triggerClass?: string }>();
+
+const emit = defineEmits<{
+  'update:open': [open: boolean];
+}>();
+
+function updateOpen(open: boolean) {
+  emit('update:open', open);
+}
 </script>
