@@ -39,25 +39,35 @@ const clientsStore = useClientsStore();
 // TODO?: use hover card to show more detailed info without leaving the page
 // or do something like a accordion
 
-const intervalId = ref<NodeJS.Timeout | null>(null);
+const initialRefresh = clientsStore.refresh();
+let pageMounted = false;
 
-clientsStore.refresh();
+const { resume: resumePolling } = useTimeoutPoll(
+  async () => {
+    try {
+      await clientsStore.refresh({
+        updateCharts: globalStore.uiShowCharts,
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  },
+  1000,
+  { immediate: false }
+);
 
 onMounted(() => {
   // TODO?: replace with websocket or similar
-  intervalId.value = setInterval(() => {
-    clientsStore
-      .refresh({
-        updateCharts: globalStore.uiShowCharts,
-      })
-      .catch(console.error);
-  }, 1000);
+  pageMounted = true;
+
+  void initialRefresh.catch(console.error).finally(() => {
+    if (pageMounted) {
+      resumePolling();
+    }
+  });
 });
 
 onUnmounted(() => {
-  if (intervalId.value !== null) {
-    clearInterval(intervalId.value);
-    intervalId.value = null;
-  }
+  pageMounted = false;
 });
 </script>
