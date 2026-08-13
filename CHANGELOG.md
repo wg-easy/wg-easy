@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Button styling (https://github.com/wg-easy/wg-easy/pull/2666)
 - Escape Prometheus label values (https://github.com/wg-easy/wg-easy/pull/2702)
 - Skip ip6tables for firewall when IPv6 is disabled (https://github.com/wg-easy/wg-easy/pull/2701)
+- Various bug fixes (https://github.com/wg-easy/wg-easy/pull/2733)
 
 ### Changed
 
