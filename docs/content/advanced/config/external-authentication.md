@@ -157,6 +157,31 @@ docker run --rm authelia/authelia:latest authelia crypto hash generate pbkdf2 --
   token_endpoint_auth_method: client_secret_post
 ```
 
+##### [VoidAuth](https://voidauth.app/#/) Setup
+
+Create a new OIDC App. Note client id and client secret.
+
+The only important thing to configure are the redirect URLs.  
+Set them like described here: [Redirect URIs](#redirect-uris).
+
+> Note: `<provider>` needs to be set to `oidc`
+
+Add these environment variables to your setup:
+
+```yaml
+services:
+    wg-easy:
+        environment:
+            - OAUTH_PROVIDERS=oidc
+            - OAUTH_OIDC_SERVER=https://<voidauth domain>/oidc
+            - OAUTH_OIDC_CLIENT_ID=<client id>
+            - OAUTH_OIDC_CLIENT_SECRET=<client secret>
+            # Optional
+            - OAUTH_OIDC_NAME=Voidauth
+            - OAUTH_AUTO_REGISTER=true
+            - OAUTH_AUTO_LAUNCH=oidc
+```
+
 #### Generic OAuth
 
 Not currently supported
