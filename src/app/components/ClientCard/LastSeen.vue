@@ -1,7 +1,11 @@
 <template>
   <span
     v-if="client.latestHandshakeAt"
-    :title="$t('client.lastSeen') + $d(new Date(client.latestHandshakeAt))"
+    :title="
+      $t('client.lastSeen', {
+        date: $d(new Date(client.latestHandshakeAt)),
+      })
+    "
   >
     {{ lastSeen }}
   </span>

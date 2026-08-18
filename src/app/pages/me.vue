@@ -125,7 +125,11 @@
                   class="h-4 w-4"
                 />
                 <span>
-                  {{ $t('me.linkedWith', [oauthProviderInfo.friendlyName]) }}
+                  {{
+                    $t('me.linkedWith', {
+                      provider: oauthProviderInfo.friendlyName,
+                    })
+                  }}
                 </span>
               </div>
               <div>

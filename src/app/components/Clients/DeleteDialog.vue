@@ -3,9 +3,11 @@
     <template #trigger><slot /></template>
     <template #title>{{ $t('client.deleteClient') }}</template>
     <template #description>
-      {{ $t('client.deleteDialog1') }}
-      <strong>{{ clientName }}</strong
-      >? {{ $t('client.deleteDialog2') }}
+      <i18n-t keypath="client.deleteDialog">
+        <template #name>
+          <strong>{{ clientName }}</strong>
+        </template>
+      </i18n-t>
     </template>
     <template #actions>
       <DialogClose as-child>
