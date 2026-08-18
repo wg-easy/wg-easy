@@ -8,6 +8,18 @@ services:
     #  - PORT=51821
     #  - HOST=0.0.0.0
     #  - INSECURE=false
+    #  Trusted-header SSO (trust an upstream forward-auth proxy, e.g. Authentik).
+    #  Disabled unless TRUSTED_PROXY_ENABLED=true. The shared secret is the trust
+    #  boundary — see docs/advanced/config/optional-config.
+    #  - TRUSTED_PROXY_ENABLED=true
+    #  - TRUSTED_PROXY_SECRET=change-me-to-a-long-random-value
+    #  - OAUTH_AUTO_REGISTER=true          # auto-provision proxy-authenticated users
+    #  - TRUSTED_PROXY_HEADER=x-authentik-username
+    #  - TRUSTED_PROXY_EMAIL_HEADER=x-authentik-email
+    #  - TRUSTED_PROXY_NAME_HEADER=x-authentik-name
+    #  - TRUSTED_PROXY_SECRET_HEADER=x-wg-proxy-secret
+    #  - TRUSTED_PROXY_IPS=               # optional source-IP allowlist (see docs)
+    #  - TRUSTED_PROXY_DEFAULT_ROLE=client
 
     image: ghcr.io/wg-easy/wg-easy:15
     container_name: wg-easy
