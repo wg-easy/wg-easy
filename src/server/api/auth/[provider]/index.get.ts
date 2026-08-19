@@ -1,15 +1,11 @@
-import {
-  defineEventHandler,
-  getRequestHost,
-  getValidatedQuery,
-  sendRedirect,
-} from 'h3';
+import { defineEventHandler, getValidatedQuery, sendRedirect } from 'h3';
 import * as client from 'openid-client';
 import { z } from 'zod';
 
 import { WG_ENV } from '#server/utils/config';
 import { buildOauthConfig } from '#server/utils/oauth';
 import { useWGSession } from '#server/utils/session';
+import { getTrustedRequestHost } from '#server/utils/trustedProxy';
 import { validateZod } from '#server/utils/types';
 
 const OauthQuerySchema = z.object({
@@ -24,7 +20,7 @@ export default defineEventHandler(async (event) => {
 
   const { config, provider, providerConfig } = await buildOauthConfig(event);
 
-  const host = getRequestHost(event);
+  const host = getTrustedRequestHost(event, WG_ENV.TRUSTED_PROXIES);
   const protocol = WG_ENV.INSECURE ? 'http' : 'https';
   const baseUri = `${protocol}://${host}/api/auth/${provider}`;
 

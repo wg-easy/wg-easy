@@ -1,8 +1,9 @@
-import { createError, getRequestURL, getRouterParam } from 'h3';
+import { createError, getRouterParam } from 'h3';
 import type { H3Event } from 'h3';
 import * as client from 'openid-client';
 
 import { WG_ENV } from '#server/utils/config';
+import { getTrustedRequestURL } from '#server/utils/trustedProxy';
 
 type OAuthConfig = {
   friendlyName: string;
@@ -178,7 +179,8 @@ export async function getUserInfo(
   state: OauthState,
   providerConfig: OAuthConfig
 ) {
-  const currentUrl = getRequestURL(event);
+  const currentUrl = getTrustedRequestURL(event, WG_ENV.TRUSTED_PROXIES);
+  currentUrl.protocol = WG_ENV.INSECURE ? 'http' : 'https';
 
   const tokens = await client.authorizationCodeGrant(config, currentUrl, {
     pkceCodeVerifier: state.oauth_verifier,
