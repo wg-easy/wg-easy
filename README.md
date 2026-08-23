@@ -20,6 +20,7 @@ You have found the easiest way to install & manage WireGuard on any Linux host!
 - List, create, edit, delete, enable & disable clients.
 - Show a client's QR code.
 - Download a client's configuration file.
+- Export a FlClash/Mihomo profile for split routing through WireGuard.
 - Statistics for which clients are connected.
 - Tx/Rx charts for each connected client.
 - Gravatar support.
