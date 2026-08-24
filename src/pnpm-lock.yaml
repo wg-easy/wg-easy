@@ -45,8 +45,8 @@ importers:
         specifier: ^0.45.1
         version: 0.45.1
       cidr-tools:
-        specifier: ^12.1.3
-        version: 12.1.3
+        specifier: ^13.0.0
+        version: 13.0.1
       citty:
         specifier: ^0.2.2
         version: 0.2.2
@@ -2718,8 +2718,12 @@ packages:
     resolution: {integrity: sha512-5gppzHz6kQy4wob+bAyk5FsqF7irqxi7V6o2qO/iL1pWbwxL4uTNZ9IHk/X4MKdDegjjWIz8uERyX5nIFITT4g==}
     engines: {node: '>=22'}
 
-  cidr-tools@12.1.3:
-    resolution: {integrity: sha512-nrz3c8ARh18FGrDZG4O6DffMcsOeh/Sw4hsMLSxAxxcCl3OfE2aGinplB1URIE2LSkrSQltL/eYweqw1E9FBuQ==}
+  cidr-regex@7.1.0:
+    resolution: {integrity: sha512-BQ5X/OTeC6hrD7k8/rNY93etXfQ3mcjIiYOkYDrB5oThXyOrgoa/jgeQxVglQaDA7UrtEnSEpHBqpfuyriwXsQ==}
+    engines: {node: '>=22'}
+
+  cidr-tools@13.0.1:
+    resolution: {integrity: sha512-j9aD4mSRkq1djA4jyk2rU2/K4gyio3wUggFVX+NZ2Dn2Fv8p1ZxSNbg4YuJI8eXjbNDp8IEMaiNBsz5BGUayuA==}
     engines: {node: '>=22'}
 
   citty@0.1.6:
@@ -3768,6 +3772,10 @@ packages:
   ioredis@5.11.1:
     resolution: {integrity: sha512-ehuGcf94bQXhfagULNXrJdfnWO38v070jxSx/qE87Kjzmu2fU7ro5EFAb+OPituLqgfyuQaym5DlrNydW2sJ9A==}
     engines: {node: '>=12.22.0'}
+
+  ip-bigint@10.0.1:
+    resolution: {integrity: sha512-vXJrmSsmlZE7KIwKvBzmGESLqqLV//YbjdMmTFPmhGYhh2wB7K5o7U+qZbzePOGNkdwNdUWdWnjQ6QKKBiSx4w==}
+    engines: {node: '>=22'}
 
   ip-bigint@9.0.8:
     resolution: {integrity: sha512-DxVFaACbpbgORsUxhcfD7TOsUgeNmKUcoJDXps/Y3CjTJpfcVfFwNu6sXIL4Y1iI8SqiCOAEKvCtIUWFZx8Qvw==}
@@ -8719,9 +8727,12 @@ snapshots:
 
   cidr-regex@7.0.1: {}
 
-  cidr-tools@12.1.3:
+  cidr-regex@7.1.0: {}
+
+  cidr-tools@13.0.1:
     dependencies:
-      ip-bigint: 9.0.8
+      cidr-regex: 7.1.0
+      ip-bigint: 10.0.1
 
   citty@0.1.6:
     dependencies:
@@ -9746,6 +9757,10 @@ snapshots:
       standard-as-callback: 2.1.0
     transitivePeerDependencies:
       - supports-color
+
+  ip-bigint@10.0.1:
+    dependencies:
+      cidr-regex: 7.1.0
 
   ip-bigint@9.0.8: {}
 
