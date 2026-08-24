@@ -15,9 +15,9 @@ COPY src ./
 RUN pnpm build
 
 # renovate: datasource=github-releases depName=amnezia-vpn/amneziawg-tools
-ARG AWGTOOLS_BRANCH=v3.0.20260805
+ARG AWGTOOLS_BRANCH=v3.1.20260812
 # renovate: datasource=github-tags depName=amnezia-vpn/amneziawg-go
-ARG AWGGO_BRANCH=v3.0.20260805
+ARG AWGGO_BRANCH=v3.1.20260814
 
 # Build amneziawg-tools
 RUN apk add linux-headers build-base go git && \
