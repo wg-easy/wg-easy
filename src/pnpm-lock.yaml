@@ -40,7 +40,7 @@ importers:
         version: 14.4.0(2b18b4a4d95dcdc94899147e03978a2f)
       apexcharts:
         specifier: ^6.8.0
-        version: 6.8.0
+        version: 6.10.0
       argon2:
         specifier: ^0.45.1
         version: 0.45.1
@@ -103,7 +103,7 @@ importers:
         version: 3.5.41(typescript@6.0.3)
       vue3-apexcharts:
         specifier: ^1.11.1
-        version: 1.11.1(apexcharts@6.8.0)(vue@3.5.41(typescript@6.0.3))
+        version: 1.11.1(apexcharts@6.10.0)(vue@3.5.41(typescript@6.0.3))
       zod:
         specifier: ^4.4.3
         version: 4.4.3
@@ -2478,8 +2478,11 @@ packages:
     resolution: {integrity: sha512-KMReFUr0B4t+D+OBkjR3KYqvocp2XaSzO55UcB6mgQMd3KbcE+mWTyvVV7D/zsdEbNnV6acZUutkiHQXvTr1Rw==}
     engines: {node: '>= 8'}
 
-  apexcharts@6.8.0:
-    resolution: {integrity: sha512-ifEl3w/NAMsKQ60JNDD8nRCGdnGeuuKNvUzZTQpPr/3JNewoZv98H42VpXFB96sHle/8GDsHn/NQp785xsNh4A==}
+  apex-commons@0.5.0:
+    resolution: {integrity: sha512-xz83SgPREE1wGtoflvxjwJtcjzl5bKTz2/bDxWCZNL6QVjUNE47kMg/1Zqt0bSh6eOnmFCWlTDc3RU8o85N+wg==}
+
+  apexcharts@6.10.0:
+    resolution: {integrity: sha512-XkDW9pb5L5jrjox86Q20gR2w6YnU4hUpv+FjL1eKtYKQGtyTUSsnFeuUE8wVDz8hNNHbOEx7Sl9cjfCmhB3NVw==}
     engines: {node: ^20.19.0 || ^22.12.0 || >=24.0.0}
 
   archiver-utils@5.0.2:
@@ -8480,7 +8483,11 @@ snapshots:
       normalize-path: 3.0.0
       picomatch: 2.3.2
 
-  apexcharts@6.8.0: {}
+  apex-commons@0.5.0: {}
+
+  apexcharts@6.10.0:
+    dependencies:
+      apex-commons: 0.5.0
 
   archiver-utils@5.0.2:
     dependencies:
@@ -12024,9 +12031,9 @@ snapshots:
       '@vue/language-core': 3.3.10
       typescript: 6.0.3
 
-  vue3-apexcharts@1.11.1(apexcharts@6.8.0)(vue@3.5.41(typescript@6.0.3)):
+  vue3-apexcharts@1.11.1(apexcharts@6.10.0)(vue@3.5.41(typescript@6.0.3)):
     dependencies:
-      apexcharts: 6.8.0
+      apexcharts: 6.10.0
       vue: 3.5.41(typescript@6.0.3)
 
   vue@3.5.41(typescript@6.0.3):
