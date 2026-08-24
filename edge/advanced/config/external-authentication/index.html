@@ -852,6 +852,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#voidauth-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        VoidAuth Setup
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2039,6 +2050,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#voidauth-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        VoidAuth Setup
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2439,6 +2461,13 @@
 </span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="w">  </span><span class="nt">require_pkce</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 </span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="w">  </span><span class="nt">token_endpoint_auth_method</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client_secret_post</span>
 </span></code></pre></div>
+<h5 id="voidauth-setup"><a href="https://voidauth.app/#/">VoidAuth</a> Setup<a class="headerlink" href="#voidauth-setup" title="Permanent link">&para;</a></h5>
+<ol>
+<li>In VoidAuth, create a new OIDC App.</li>
+<li>The only setting you need to configure are the redirect URLs — set it as described in <a href="#redirect-uris">Redirect URIs</a>.<br />
+<code>Note: Use oidc as the &lt;provider&gt; value in the redirect URL.</code></li>
+<li>In wg-easy, set OAUTH_OIDC_SERVER to <code>https://&lt;voidauth domain&gt;/oidc</code></li>
+</ol>
 <h4 id="generic-oauth">Generic OAuth<a class="headerlink" href="#generic-oauth" title="Permanent link">&para;</a></h4>
 <p>Not currently supported</p>
 <h3 id="disable-password-authentication">Disable Password Authentication<a class="headerlink" href="#disable-password-authentication" title="Permanent link">&para;</a></h3>
