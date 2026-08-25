@@ -20,7 +20,11 @@
     "2faKey": "Chave TOTP",
     "2faCodeDesc": "Introduce o código da túa aplicación de autenticación.",
     "disable2fa": "Desactivar a autenticación de dobre factor",
-    "disable2faDesc": "Introduce o teu contrasinal para desactivar a autenticación de dobre factor."
+    "disable2faDesc": "Introduce o teu contrasinal para desactivar a autenticación de dobre factor.",
+    "linkOauth": "Vincula a túa conta cun provedor externo",
+    "unlinkOauth": "Desvincular",
+    "linkedWith": "Vincular con {provider}",
+    "providerDisabled": "O provedor vinculado á túa conta non está activado"
   },
   "general": {
     "name": "Nome",
@@ -28,6 +32,7 @@
     "password": "Contrasinal",
     "newPassword": "Novo contrasinal",
     "updatePassword": "Actualizar contrasinal",
+    "addPassword": "Engadir contrasinal",
     "mtu": "MTU",
     "allowedIps": "IP permitidas",
     "dns": "DNS",
@@ -41,7 +46,8 @@
     "confirmPassword": "Confirmar o contrasinal",
     "loading": "Cargando...",
     "2fa": "Autenticación de dobre factor",
-    "2faCode": "Código TOTP"
+    "2faCode": "Código TOTP",
+    "externalAuth": "Autenticación Externa"
   },
   "setup": {
     "welcome": "Benvido á túa primeira configuración de wg-easy",
@@ -72,11 +78,14 @@
   },
   "login": {
     "signIn": "Iniciar sesión",
+    "signInWith": "Iniciar sesión con {provider}",
+    "or": "ou",
     "rememberMe": "Lembrarme",
     "rememberMeDesc": "Manter a sesión iniciada ao pechar o navegador",
     "insecure": "Non podes iniciar sesión cunha conexión insegura. Usa HTTPS.",
     "2faRequired": "É necesaria a autenticación de dobre factor",
-    "2faWrong": "A autenticación de dobre factor é incorrecta"
+    "2faWrong": "A autenticación de dobre factor é incorrecta",
+    "loginExpired": "Inicio de sesión caducado. Téntao de novo"
   },
   "client": {
     "empty": "Aínda non hai clientes.",
@@ -120,7 +129,7 @@
     "search": "Buscar clientes...",
     "config": "Configuración",
     "viewConfig": "Ver configuración",
-    "firewallIps": "IPs permitidas do cortalumes",
+    "firewallIps": "IPs permitidas da devasa",
     "firewallIpsDesc": "IPs/CIDRs de destino aos que este cliente pode acceder (aplicado no lado do servidor). Déixao baleiro para usar as IPs permitidas. Admite filtrado opcional por porto e protocolo. Consulta a documentación para a sintaxe.",
     "downloadPng": "Descargar PNG",
     "copyPng": "Copiar PNG"
@@ -133,7 +142,8 @@
   "toast": {
     "success": "Éxito",
     "saved": "Gardado",
-    "error": "Erro"
+    "error": "Erro",
+    "unknown": "Erro descoñecido. Revisa a consola para máis detalles"
   },
   "form": {
     "actions": "Accións",
@@ -172,6 +182,8 @@
       "cidrSuccess": "CIDR cambiado",
       "device": "Dispositivo",
       "deviceDesc": "Dispositivo Ethernet polo que se redirixirá o tráfico de WireGuard",
+      "routingTable": "Táboa de encamiñamento",
+      "routingTableDesc": "Táboa de encamiñamento para as rutas de WireGuard. Definir como auto, off ou un número de táboa.",
       "mtuDesc": "MTU que usará WireGuard",
       "portDesc": "Porto UDP no que WireGuard escoitará (probablemente tamén queiras cambiar o Porto da configuración)",
       "changeCidr": "Cambiar CIDR",
@@ -193,8 +205,10 @@
       "validString": "{field} debe ser unha cadea válida",
       "validBoolean": "{field} debe ser un booleano válido",
       "validArray": "{field} debe ser un array válido",
-      "stringMin": "{field} debe ter polo menos {min} carácter",
-      "numberMin": "{field} debe ser polo menos {min}"
+      "stringMin": "{field} debe ter polo menos {min} caracteres",
+      "stringMax": "{field} debe ter como máximo {max} caracteres",
+      "numberMin": "{field} debe ser polo menos {min}",
+      "numberMax": "{field} debe ser como máximo {max}"
     },
     "client": {
       "id": "ID do cliente",
@@ -229,7 +243,8 @@
     "interface": {
       "cidr": "CIDR",
       "device": "Dispositivo",
-      "cidrValid": "O CIDR debe ser válido"
+      "cidrValid": "O CIDR debe ser válido",
+      "routingTable": "A táboa de encamiñamento debe ser auto, off ou un número de táboa"
     },
     "otl": "Ligazón dun só uso",
     "stringMalformed": "A cadea está mal formada",
