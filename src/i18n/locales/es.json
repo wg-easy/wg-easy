@@ -244,7 +244,7 @@
       "cidr": "CIDR",
       "device": "Dispositivo",
       "cidrValid": "El CIDR debe ser válido",
-      "routingTable": "La tabla de enrutamiento debe de ser auto, off, o un número de tabla"
+      "routingTable": "La tabla de enrutamiento debe ser auto, off o un número de tabla"
     },
     "otl": "Enlace de un solo uso",
     "stringMalformed": "Cadena malformada",
