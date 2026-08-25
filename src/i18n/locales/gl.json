@@ -23,7 +23,7 @@
     "disable2faDesc": "Introduce o teu contrasinal para desactivar a autenticación de dobre factor.",
     "linkOauth": "Vincula a túa conta cun provedor externo",
     "unlinkOauth": "Desvincular",
-    "linkedWith": "Vincular con {provider}",
+    "linkedWith": "Vinculado con {provider}",
     "providerDisabled": "O provedor vinculado á túa conta non está activado"
   },
   "general": {
