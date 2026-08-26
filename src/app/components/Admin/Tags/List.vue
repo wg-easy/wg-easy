@@ -29,10 +29,7 @@
           <IconsEdit class="w-5" />
         </BaseSecondaryButton>
       </AdminTagsEditDialog>
-      <AdminTagsDeleteDialog
-        :tag-name="tag.name"
-        @delete="deleteTag(tag.id)"
-      >
+      <AdminTagsDeleteDialog :tag-name="tag.name" @delete="deleteTag(tag.id)">
         <BaseSecondaryButton as="span" class="rounded p-2">
           <IconsDelete class="w-5" />
         </BaseSecondaryButton>
@@ -47,7 +44,7 @@ const { t } = useI18n();
 
 function deleteTag(id: number) {
   const submit = useSubmit(
-    () => $fetch(`/api/tag/${id}`, { method: 'delete' }),
+    () => $fetch<{ success: boolean }>(`/api/tag/${id}`, { method: 'delete' }),
     {
       revert: () => tagsStore.refresh(),
       successMsg: t('admin.tags.deleted'),

@@ -51,7 +51,7 @@ const confirmPassword = ref<string>('');
 
 const _submit = useSubmit(
   (data) =>
-    $fetch('/api/setup/2', {
+    $fetch<{ success: boolean }>('/api/setup/2', {
       method: 'post',
       body: data,
     }),

@@ -105,8 +105,7 @@ const search = ref('');
 
 const canCreateTags = computed(
   () =>
-    !!authStore.userData &&
-    hasPermissions(authStore.userData, 'tags', 'create')
+    !!authStore.userData && hasPermissions(authStore.userData, 'tags', 'create')
 );
 
 function tagName(id: number) {
@@ -145,7 +144,11 @@ const showCreateOption = computed(() => {
 });
 
 const _createAndAssignTag = useSubmit(
-  (body) => $fetch('/api/tag', { method: 'post', body }),
+  (body) =>
+    $fetch<{ success: boolean; tagId: number }>('/api/tag', {
+      method: 'post',
+      body,
+    }),
   {
     successMsg: t('admin.tags.created'),
     revert: async (success, result) => {

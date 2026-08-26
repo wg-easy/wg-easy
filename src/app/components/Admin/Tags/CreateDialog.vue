@@ -51,7 +51,7 @@ function createTag() {
 
 const _createTag = useSubmit(
   (data) =>
-    $fetch('/api/tag', {
+    $fetch<{ success: boolean; tagId: number }>('/api/tag', {
       method: 'post',
       body: data,
     }),

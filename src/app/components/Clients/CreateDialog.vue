@@ -14,11 +14,7 @@
           v-model="description"
           :label="$t('general.description')"
         />
-        <FormTagsField
-          id="tags"
-          v-model="tagIds"
-          :label="$t('general.tags')"
-        />
+        <FormTagsField id="tags" v-model="tagIds" :label="$t('general.tags')" />
         <FormDateField
           id="expiresAt"
           v-model="expiresAt"
@@ -70,7 +66,7 @@ function createClient() {
 
 const _createClient = useSubmit(
   (data) =>
-    $fetch('/api/client', {
+    $fetch<{ success: boolean; clientId: number }>('/api/client', {
       method: 'post',
       body: data,
     }),

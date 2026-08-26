@@ -233,7 +233,7 @@ const tagIds = ref<number[]>(data.value?.tags?.map((tag) => tag.id) ?? []);
 
 const _submit = useSubmit(
   (data) =>
-    $fetch(`/api/client/${id}`, {
+    $fetch<{ success: boolean }>(`/api/client/${id}`, {
       method: 'post',
       body: data,
     }),
@@ -260,7 +260,7 @@ async function revert() {
 
 const _deleteClient = useSubmit(
   (data) =>
-    $fetch(`/api/client/${id}`, {
+    $fetch<{ success: boolean }>(`/api/client/${id}`, {
       method: 'delete',
       body: data,
     }),
