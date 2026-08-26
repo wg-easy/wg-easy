@@ -5,6 +5,12 @@
   >
     {{ client.name }}
   </div>
+  <div
+    v-if="client.description"
+    class="break-all text-xs text-gray-500 dark:text-neutral-400"
+  >
+    {{ client.description }}
+  </div>
 </template>
 
 <script setup lang="ts">

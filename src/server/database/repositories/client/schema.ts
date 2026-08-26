@@ -24,6 +24,7 @@ export const client = sqliteTable(
         onUpdate: 'cascade',
       }),
     name: text().notNull(),
+    description: text(),
     ipv4Address: text('ipv4_address').notNull().unique(),
     ipv6Address: text('ipv6_address').notNull().unique(),
     preUp: text('pre_up').default('').notNull(),

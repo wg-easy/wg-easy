@@ -28,6 +28,7 @@
   },
   "general": {
     "name": "Name",
+    "description": "Description",
     "username": "Username",
     "password": "Password",
     "newPassword": "New Password",
