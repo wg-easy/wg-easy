@@ -29,6 +29,42 @@
               :label="$t('client.expireDate')"
             />
           </FormGroup>
+          <FormGroup v-if="data.quota || canManageQuotas">
+            <FormHeading>{{ $t('quota.title') }}</FormHeading>
+            <QuotaClientStatus :quota="data.quota" />
+            <template v-if="canManageQuotas">
+              <FormLabel for="clientQuota">{{
+                $t('quota.assignedQuota')
+              }}</FormLabel>
+              <select
+                id="clientQuota"
+                v-model="selectedQuotaId"
+                class="rounded border-2 border-gray-100 bg-white text-gray-700 focus:border-red-800 focus:ring-0 dark:border-neutral-800 dark:bg-neutral-700 dark:text-neutral-200"
+              >
+                <option value="">{{ $t('quota.unassigned') }}</option>
+                <option
+                  v-for="quota in quotaOptions"
+                  :key="quota.id"
+                  :value="String(quota.id)"
+                >
+                  {{ quota.name }}
+                </option>
+              </select>
+              <div class="col-span-2 flex flex-wrap justify-end gap-2">
+                <NuxtLink
+                  v-if="data.quotaId"
+                  :to="`/admin/quotas#quota-${data.quotaId}`"
+                >
+                  <BaseSecondaryButton as="span">
+                    {{ $t('quota.manage') }}
+                  </BaseSecondaryButton>
+                </NuxtLink>
+                <BasePrimaryButton type="button" @click="assignQuota">
+                  {{ $t('quota.saveAssignment') }}
+                </BasePrimaryButton>
+              </div>
+            </template>
+          </FormGroup>
           <FormGroup>
             <FormHeading>{{ $t('client.address') }}</FormHeading>
             <FormTextField
@@ -211,6 +247,8 @@
 
 <script lang="ts" setup>
 const globalStore = useGlobalStore();
+const authStore = useAuthStore();
+const { t } = useI18n();
 
 const route = useRoute();
 const id = route.params.id as string;
@@ -219,6 +257,22 @@ const { data: _data, refresh } = await useFetch(`/api/client/${id}`, {
   method: 'get',
 });
 const data = toRef(_data.value);
+const canManageQuotas = computed(
+  () =>
+    authStore.userData !== null &&
+    hasPermissions(authStore.userData, 'quotas', 'update')
+);
+const { data: quotaOptions, refresh: refreshQuotas } = await useFetch(
+  '/api/admin/quotas',
+  {
+    method: 'get',
+    immediate: canManageQuotas.value,
+    default: () => [],
+  }
+);
+const selectedQuotaId = ref(
+  data.value?.quotaId ? String(data.value.quotaId) : ''
+);
 
 const _submit = useSubmit(
   (data) =>
@@ -261,5 +315,28 @@ const _deleteClient = useSubmit(
 
 function deleteClient() {
   return _deleteClient(undefined);
+}
+
+const _assignQuota = useSubmit(
+  (body) =>
+    $fetch(`/api/client/${id}/quota`, {
+      method: 'put',
+      body,
+    }),
+  {
+    successMsg: t('quota.assignmentSaved'),
+    revert: async (success) => {
+      if (success) {
+        await Promise.all([refresh(), refreshQuotas()]);
+        data.value = toRef(_data.value).value;
+      }
+    },
+  }
+);
+
+function assignQuota() {
+  return _assignQuota({
+    quotaId: selectedQuotaId.value ? Number(selectedQuotaId.value) : null,
+  });
 }
 </script>

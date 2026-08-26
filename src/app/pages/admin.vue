@@ -59,6 +59,7 @@ const menuItems = computed(() => [
   { id: 'config', name: t('pages.admin.config') },
   { id: 'interface', name: t('pages.admin.interface') },
   { id: 'hooks', name: t('pages.admin.hooks') },
+  { id: 'quotas', name: t('pages.admin.quotas') },
 ]);
 
 const defaultItem = { id: '', name: t('pages.admin.panel') };
