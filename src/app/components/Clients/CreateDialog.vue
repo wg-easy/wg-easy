@@ -9,6 +9,11 @@
     <template #description>
       <div class="flex flex-col">
         <FormTextField id="name" v-model="name" :label="$t('client.name')" />
+        <FormNullTextField
+          id="description"
+          v-model="description"
+          :label="$t('general.description')"
+        />
         <FormDateField
           id="expiresAt"
           v-model="expiresAt"
@@ -31,6 +36,7 @@
 
 <script lang="ts" setup>
 const name = ref<string>('');
+const description = ref<string | null>(null);
 const expiresAt = ref<string | null>(null);
 const clientsStore = useClientsStore();
 
@@ -42,11 +48,16 @@ function resetOnOpen(open: boolean) {
   if (!open) return;
 
   name.value = '';
+  description.value = null;
   expiresAt.value = null;
 }
 
 function createClient() {
-  return _createClient({ name: name.value, expiresAt: expiresAt.value });
+  return _createClient({
+    name: name.value,
+    description: description.value,
+    expiresAt: expiresAt.value,
+  });
 }
 
 const _createClient = useSubmit(

@@ -17,6 +17,11 @@
               v-model="data.name"
               :label="$t('general.name')"
             />
+            <FormNullTextField
+              id="description"
+              v-model="data.description"
+              :label="$t('general.description')"
+            />
             <FormSwitchField
               id="enabled"
               v-model="data.enabled"

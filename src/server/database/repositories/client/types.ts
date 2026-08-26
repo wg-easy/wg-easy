@@ -43,6 +43,12 @@ const name = z
   .pipe(safeStringRefine)
   .pipe(controlStringRefine);
 
+const description = z
+  .string()
+  .pipe(safeStringRefine)
+  .pipe(controlStringRefine)
+  .nullable();
+
 // TODO?: validate iso string
 const expiresAt = z
   .string({ message: t('zod.client.expiresAt') })
@@ -70,6 +76,7 @@ const serverAllowedIps = z.array(AddressSchema, {
 
 export const ClientCreateSchema = z.object({
   name: name,
+  description: description,
   expiresAt: expiresAt,
 });
 
@@ -89,6 +96,7 @@ export type ClientQueryType = z.infer<typeof ClientQuerySchema>;
 export const ClientUpdateSchema = schemaForType<UpdateClientType>()(
   z.object({
     name: name,
+    description: description,
     enabled: EnabledSchema,
     expiresAt: expiresAt,
     ipv4Address: address4,

@@ -153,7 +153,7 @@ export class ClientService {
     return this.#statements.findById.execute({ id });
   }
 
-  async create({ name, expiresAt }: ClientCreateType) {
+  async create({ name, description, expiresAt }: ClientCreateType) {
     const privateKey = await wg.generatePrivateKey();
     const publicKey = await wg.getPublicKey(privateKey);
     const preSharedKey = await wg.generatePreSharedKey();
@@ -189,6 +189,7 @@ export class ClientService {
         .insert(client)
         .values({
           name,
+          description,
           // TODO: properly assign user id
           userId: 1,
           interfaceId: 'wg0',
