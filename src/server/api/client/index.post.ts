@@ -10,7 +10,7 @@ export default definePermissionEventHandler(
   'clients',
   'create',
   async ({ event }) => {
-    const { name, description, expiresAt } = await readValidatedBody(
+    const { name, description, expiresAt, tagIds } = await readValidatedBody(
       event,
       validateZod(ClientCreateSchema, event)
     );
@@ -19,6 +19,7 @@ export default definePermissionEventHandler(
       name,
       description,
       expiresAt,
+      tagIds,
     });
     await WireGuard.saveConfig();
 

@@ -3,6 +3,7 @@ import { int, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core';
 
 import { wgInterface } from '../interface/schema';
 import { oneTimeLink } from '../oneTimeLink/schema';
+import { clientTag } from '../tag/schema';
 import { user } from '../user/schema';
 
 /** null means use value from userConfig */
@@ -72,7 +73,7 @@ export const client = sqliteTable(
   ]
 );
 
-export const clientsRelations = relations(client, ({ one }) => ({
+export const clientsRelations = relations(client, ({ one, many }) => ({
   oneTimeLink: one(oneTimeLink, {
     fields: [client.id],
     references: [oneTimeLink.id],
@@ -85,4 +86,5 @@ export const clientsRelations = relations(client, ({ one }) => ({
     fields: [client.interfaceId],
     references: [wgInterface.name],
   }),
+  clientTags: many(clientTag),
 }));
