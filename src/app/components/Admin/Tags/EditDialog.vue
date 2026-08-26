@@ -24,17 +24,17 @@
           class="max-h-56 overflow-y-auto rounded-lg border-2 border-gray-100 dark:border-neutral-800"
         >
           <IconsLoading
-            v-if="!clients"
+            v-if="!clientsStore.clients"
             class="mx-auto my-3 w-5 animate-spin"
           />
           <p
-            v-else-if="clients.length === 0"
+            v-else-if="clientsStore.clients.length === 0"
             class="p-3 text-center text-sm text-gray-400 dark:text-neutral-400"
           >
             {{ $t('client.empty') }}
           </p>
           <button
-            v-for="client in clients"
+            v-for="client in clientsStore.clients"
             :key="client.id"
             type="button"
             class="flex w-full items-center gap-2 px-3 py-1.5 text-left text-sm hover:bg-gray-100 dark:hover:bg-neutral-600"
@@ -67,20 +67,12 @@
 </template>
 
 <script lang="ts" setup>
-import type { TypedInternalResponse } from 'nitropack/types';
-
-type ClientWithTags = TypedInternalResponse<
-  '/api/client',
-  unknown,
-  'get'
->[number];
-
 const props = defineProps<{ triggerClass?: string; tag: LocalTag }>();
 
 const name = ref(props.tag.name);
 const description = ref(props.tag.description);
-const clients = ref<ClientWithTags[] | null>(null);
 const tagsStore = useTagsStore();
+const clientsStore = useClientsStore();
 
 const { t } = useI18n();
 
@@ -89,18 +81,14 @@ function resetOnOpen(open: boolean) {
 
   name.value = props.tag.name;
   description.value = props.tag.description;
-  fetchClients();
+  clientsStore.refresh();
 }
 
-async function fetchClients() {
-  clients.value = await $fetch('/api/client');
-}
-
-function isAssigned(client: ClientWithTags) {
+function isAssigned(client: LocalClient) {
   return client.tags.some((clientTag) => clientTag.id === props.tag.id);
 }
 
-function toggleClient(client: ClientWithTags) {
+function toggleClient(client: LocalClient) {
   const currentTagIds = client.tags.map((clientTag) => clientTag.id);
   const tagIds = isAssigned(client)
     ? currentTagIds.filter((tagId) => tagId !== props.tag.id)
@@ -108,7 +96,7 @@ function toggleClient(client: ClientWithTags) {
 
   const submit = useSubmit(
     () =>
-      $fetch(`/api/client/${client.id}`, {
+      $fetch<{ success: boolean }>(`/api/client/${client.id}`, {
         method: 'post',
         body: { ...client, tagIds },
       }),
@@ -116,7 +104,7 @@ function toggleClient(client: ClientWithTags) {
       noSuccessToast: true,
       revert: async (success) => {
         if (success) {
-          await fetchClients();
+          await clientsStore.refresh();
         }
       },
     }
@@ -131,7 +119,7 @@ function editTag() {
 
 const _editTag = useSubmit(
   (data) =>
-    $fetch(`/api/tag/${props.tag.id}`, {
+    $fetch<{ success: boolean }>(`/api/tag/${props.tag.id}`, {
       method: 'post',
       body: data,
     }),

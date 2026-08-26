@@ -14,7 +14,10 @@ function createPreparedStatement(db: DBType) {
     findById: db.query.tag
       .findFirst({ where: eq(tag.id, sql.placeholder('id')) })
       .prepare(),
-    delete: db.delete(tag).where(eq(tag.id, sql.placeholder('id'))).prepare(),
+    delete: db
+      .delete(tag)
+      .where(eq(tag.id, sql.placeholder('id')))
+      .prepare(),
   };
 }
 
