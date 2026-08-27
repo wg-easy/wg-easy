@@ -91,6 +91,14 @@ export const PortSchema = z
   .min(1, { message: t('zod.port') })
   .max(65535, { message: t('zod.port') });
 
+export const RoutingTableSchema = z
+  .string({ message: t('zod.interface.routingTable') })
+  .pipe(safeStringRefine)
+  .pipe(controlStringRefine)
+  .refine((v) => /^(auto|off|\d+)$/.test(v), {
+    message: t('zod.interface.routingTable'),
+  });
+
 export const PersistentKeepaliveSchema = z
   .number({ message: t('zod.persistentKeepalive') })
   .min(0, t('zod.persistentKeepalive'))
@@ -205,67 +213,70 @@ export function validateZod<T>(
                   case 'too_small':
                     switch (v.origin) {
                       case 'string':
-                        newMessage = t('zod.generic.stringMin', [
-                          t(v.message),
-                          v.minimum,
-                        ]);
+                        newMessage = t('zod.generic.stringMin', {
+                          field: t(v.message),
+                          min: v.minimum,
+                        });
                         break;
                       case 'number':
-                        newMessage = t('zod.generic.numberMin', [
-                          t(v.message),
-                          v.minimum,
-                        ]);
+                        newMessage = t('zod.generic.numberMin', {
+                          field: t(v.message),
+                          min: v.minimum,
+                        });
                         break;
                     }
                     break;
                   case 'too_big':
                     switch (v.origin) {
                       case 'string':
-                        newMessage = t('zod.generic.stringMax', [
-                          t(v.message),
-                          v.maximum,
-                        ]);
+                        newMessage = t('zod.generic.stringMax', {
+                          field: t(v.message),
+                          max: v.maximum,
+                        });
                         break;
                       case 'number':
-                        newMessage = t('zod.generic.numberMax', [
-                          t(v.message),
-                          v.maximum,
-                        ]);
+                        newMessage = t('zod.generic.numberMax', {
+                          field: t(v.message),
+                          max: v.maximum,
+                        });
                         break;
                     }
                     break;
                   case 'invalid_type': {
                     if (v.input === null || v.input === undefined) {
-                      newMessage = t('zod.generic.required', [
-                        v.path.join('.'),
-                      ]);
+                      newMessage = t('zod.generic.required', {
+                        field: v.path.join('.'),
+                      });
                     } else {
                       switch (v.expected) {
                         case 'string':
-                          newMessage = t('zod.generic.validString', [
-                            t(v.message),
-                          ]);
+                          newMessage = t('zod.generic.validString', {
+                            field: t(v.message),
+                          });
                           break;
                         case 'boolean':
-                          newMessage = t('zod.generic.validBoolean', [
-                            t(v.message),
-                          ]);
+                          newMessage = t('zod.generic.validBoolean', {
+                            field: t(v.message),
+                          });
                           break;
                         case 'number':
-                          newMessage = t('zod.generic.validNumber', [
-                            t(v.message),
-                          ]);
+                          newMessage = t('zod.generic.validNumber', {
+                            field: t(v.message),
+                          });
                           break;
                         case 'array':
-                          newMessage = t('zod.generic.validArray', [
-                            t(v.message),
-                          ]);
+                          newMessage = t('zod.generic.validArray', {
+                            field: t(v.message),
+                          });
                           break;
                       }
                     }
                     break;
                   }
                 }
+              }
+              if (!newMessage && v.message === 'zod.generic.validNumberRange') {
+                newMessage = t(v.message, { field: v.path.join('.') });
               }
               if (newMessage) {
                 m = newMessage;

@@ -1,5 +1,5 @@
 <template>
-  <BaseDialog :trigger-class="triggerClass">
+  <BaseDialog :trigger-class="triggerClass" @update:open="resetOnOpen">
     <template #trigger><slot /></template>
     <template #title>{{ $t('admin.config.suggest') }}</template>
     <template #description>
@@ -36,4 +36,10 @@ const { data } = useFetch(props.url, {
 });
 
 const selected = ref<string>();
+
+async function resetOnOpen(open: boolean) {
+  if (!open) return;
+
+  selected.value = undefined;
+}
 </script>

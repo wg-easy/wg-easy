@@ -20,7 +20,11 @@
     "2faKey": "TOTP 金鑰",
     "2faCodeDesc": "請輸入驗證碼應用程式提供的驗證碼。",
     "disable2fa": "停用兩步驟驗證",
-    "disable2faDesc": "請輸入您的密碼以停用兩步驟驗證。"
+    "disable2faDesc": "請輸入您的密碼以停用兩步驟驗證。",
+    "linkOauth": "將您的帳戶連結至外部服務",
+    "unlinkOauth": "取消連結",
+    "linkedWith": "已連結至 {provider}",
+    "providerDisabled": "您目前已連結的服務尚未啟用"
   },
   "general": {
     "name": "名稱",
@@ -28,6 +32,7 @@
     "password": "密碼",
     "newPassword": "新密碼",
     "updatePassword": "更新密碼",
+    "addPassword": "新增密碼",
     "mtu": "MTU",
     "allowedIps": "允許的 IP",
     "dns": "DNS",
@@ -41,7 +46,8 @@
     "confirmPassword": "確認密碼",
     "loading": "正在載入...",
     "2fa": "兩步驟驗證",
-    "2faCode": "TOTP 驗證碼"
+    "2faCode": "TOTP 驗證碼",
+    "externalAuth": "外部驗證"
   },
   "setup": {
     "welcome": "歡迎首次設定您的 wg-easy",
@@ -72,11 +78,14 @@
   },
   "login": {
     "signIn": "登入",
+    "signInWith": "使用 {provider} 登入",
+    "or": "或",
     "rememberMe": "記住我",
     "rememberMeDesc": "關閉瀏覽器後仍保持登入狀態",
     "insecure": "您無法在不安全的連線下登入。請使用 HTTPS。",
     "2faRequired": "需要兩步驟驗證",
-    "2faWrong": "兩步驟驗證碼不正確"
+    "2faWrong": "兩步驟驗證碼不正確",
+    "loginExpired": "登入已逾時，請再試一次"
   },
   "client": {
     "empty": "尚無用戶端。",
@@ -90,17 +99,16 @@
     "expireDateDesc": "用戶端將被停用的日期。留白表示永久有效",
     "delete": "刪除",
     "deleteClient": "刪除用戶端",
-    "deleteDialog1": "您確定要刪除",
-    "deleteDialog2": "此動作無法復原。",
+    "deleteDialog": "您確定要刪除用戶端 {name} 嗎？此動作無法復原。",
     "enabled": "啟用",
     "address": "位址",
     "serverAllowedIps": "伺服器允許的 IP",
     "otlDesc": "產生暫時性單次連結",
     "permanent": "永久",
-    "createdOn": "建立於 ",
-    "lastSeen": "上次連線於 ",
-    "totalDownload": "總下載量: ",
-    "totalUpload": "總上傳量: ",
+    "createdOn": "建立於 {date}",
+    "lastSeen": "上次連線於 {date}",
+    "totalDownload": "總下載量: {total}",
+    "totalUpload": "總上傳量: {total}",
     "newClient": "新增用戶端",
     "disableClient": "停用用戶端",
     "enableClient": "啟用用戶端",
@@ -180,6 +188,8 @@
       "cidrSuccess": "已變更 CIDR",
       "device": "裝置",
       "deviceDesc": "用於轉送 WireGuard 流量的乙太網路裝置",
+      "routingTable": "路由表",
+      "routingTableDesc": "WireGuard 路由使用的路由表。請設定為 auto、off 或路由表號碼。",
       "mtuDesc": "WireGuard 將使用的 MTU",
       "portDesc": "WireGuard 監聽的 UDP 連接埠 (您可能也需要變更連接埠組態設定檔)",
       "changeCidr": "變更 CIDR",
@@ -195,14 +205,16 @@
   },
   "zod": {
     "generic": {
-      "required": "{0} 為必填項目",
-      "validNumber": "{0} 必須為有效的數字",
-      "validNumberRange": "{0} 必須為有效的數字或範圍",
-      "validString": "{0} 必須為有效的字串",
-      "validBoolean": "{0} 必須為有效的布林值",
-      "validArray": "{0} 必須為有效的陣列",
-      "stringMin": "{0} 至少需要 {1} 個字元",
-      "numberMin": "{0} 不能小於 {1}"
+      "required": "{field} 為必填項目",
+      "validNumber": "{field} 必須為有效的數字",
+      "validNumberRange": "{field} 必須為有效的數字或範圍",
+      "validString": "{field} 必須為有效的字串",
+      "validBoolean": "{field} 必須為有效的布林值",
+      "validArray": "{field} 必須為有效的陣列",
+      "stringMin": "{field} 至少需要 {min} 個字元",
+      "stringMax": "{field} 最多只能有 {max} 個字元",
+      "numberMin": "{field} 不能小於 {min}",
+      "numberMax": "{field} 不能大於 {max}"
     },
     "client": {
       "id": "用戶端 ID",
@@ -237,7 +249,8 @@
     "interface": {
       "cidr": "CIDR",
       "device": "裝置",
-      "cidrValid": "CIDR 格式無效"
+      "cidrValid": "CIDR 格式無效",
+      "routingTable": "路由表必須為 auto、off 或路由表號碼"
     },
     "otl": "單次連結",
     "stringMalformed": "字串格式錯誤",

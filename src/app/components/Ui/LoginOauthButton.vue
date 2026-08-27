@@ -5,7 +5,7 @@
   >
     <IconsBrandsProvider :provider="provider" class="h-4 w-4" />
     <span>
-      {{ $t('login.signInWith', [info.friendlyName]) }}
+      {{ $t('login.signInWith', { provider: info.friendlyName }) }}
     </span>
   </a>
 </template>

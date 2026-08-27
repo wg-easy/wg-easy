@@ -20,7 +20,11 @@
     "2faKey": "Clave TOTP",
     "2faCodeDesc": "Introduce el código de tu aplicación de autenticación.",
     "disable2fa": "Desactivar autenticación en dos pasos",
-    "disable2faDesc": "Introduce tu contraseña para desactivar la autenticación en dos pasos."
+    "disable2faDesc": "Introduce tu contraseña para desactivar la autenticación en dos pasos.",
+    "linkOauth": "Vincula tu cuenta con un proveedor externo",
+    "unlinkOauth": "Desvincular",
+    "linkedWith": "Vinculado con {provider}",
+    "providerDisabled": "El proveedor vinculado a tu cuenta no está activado"
   },
   "general": {
     "name": "Nombre",
@@ -28,6 +32,7 @@
     "password": "Contraseña",
     "newPassword": "Nueva contraseña",
     "updatePassword": "Actualizar contraseña",
+    "addPassword": "Añadir contraseña",
     "mtu": "MTU",
     "allowedIps": "IPs permitidas",
     "dns": "DNS",
@@ -41,7 +46,8 @@
     "confirmPassword": "Confirmar contraseña",
     "loading": "Cargando...",
     "2fa": "Autenticación en dos pasos",
-    "2faCode": "Código TOTP"
+    "2faCode": "Código TOTP",
+    "externalAuth": "Autenticación externa"
   },
   "setup": {
     "welcome": "Bienvenido a tu primera configuración de wg-easy",
@@ -72,11 +78,14 @@
   },
   "login": {
     "signIn": "Iniciar sesión",
+    "signInWith": "Iniciar sesión con {provider}",
+    "or": "o",
     "rememberMe": "Recordarme",
     "rememberMeDesc": "Mantener sesión iniciada tras cerrar el navegador",
     "insecure": "No puedes iniciar sesión con una conexión no segura. Usa HTTPS.",
     "2faRequired": "Se requiere autenticación en dos pasos",
-    "2faWrong": "El código de autenticación en dos pasos es incorrecto"
+    "2faWrong": "El código de autenticación en dos pasos es incorrecto",
+    "loginExpired": "Inicio de sesión caducado. Vuelve a intentarlo"
   },
   "client": {
     "empty": "No hay clientes todavía.",
@@ -88,18 +97,18 @@
     "name": "Nombre",
     "expireDate": "Fecha de expiración",
     "expireDateDesc": "Fecha en que el cliente será desactivado. En blanco = permanente",
+    "delete": "Eliminar",
     "deleteClient": "Eliminar cliente",
-    "deleteDialog1": "¿Estás seguro de que deseas eliminar a",
-    "deleteDialog2": "Esta acción no se puede deshacer.",
+    "deleteDialog": "¿Estás seguro de que deseas eliminar a {name}? Esta acción no se puede deshacer.",
     "enabled": "Habilitado",
     "address": "Dirección",
     "serverAllowedIps": "IPs permitidas del servidor",
     "otlDesc": "Generar enlace único de un solo uso",
     "permanent": "Permanente",
-    "createdOn": "Creado el ",
-    "lastSeen": "Última conexión el ",
-    "totalDownload": "Descarga total: ",
-    "totalUpload": "Subida total: ",
+    "createdOn": "Creado el {date}",
+    "lastSeen": "Última conexión el {date}",
+    "totalDownload": "Descarga total: {total}",
+    "totalUpload": "Subida total: {total}",
     "newClient": "Nuevo cliente",
     "disableClient": "Desactivar cliente",
     "enableClient": "Activar cliente",
@@ -122,7 +131,7 @@
     "dnsDesc": "Servidor DNS que usarán los clientes (anula la configuración global)",
     "notConnected": "Cliente no conectado",
     "endpoint": "Punto de conexión",
-    "endpointDesc": "IP del cliente desde donde se establece la conexión WireGuard",
+    "endpointDesc": "IP del cliente desde la que se establece la conexión WireGuard",
     "search": "Buscar clientes...",
     "config": "Configuración",
     "viewConfig": "Ver configuración",
@@ -179,6 +188,8 @@
       "cidrSuccess": "CIDR cambiado",
       "device": "Dispositivo",
       "deviceDesc": "Dispositivo Ethernet por donde se reenviará el tráfico de WireGuard",
+      "routingTable": "Tabla de enrutamiento",
+      "routingTableDesc": "Tabla de enrutamiento para las rutas de WireGuard. Puede ser auto, off o un número de tabla.",
       "mtuDesc": "MTU que usará WireGuard",
       "portDesc": "Puerto UDP en el que escuchará WireGuard (debes cambiar también el puerto de config)",
       "changeCidr": "Cambiar CIDR",
@@ -194,14 +205,16 @@
   },
   "zod": {
     "generic": {
-      "required": "{0} es obligatorio",
-      "validNumber": "{0} debe ser un número válido",
-      "validNumberRange": "{0} debe ser un número válido o un rango de números",
-      "validString": "{0} debe ser una cadena válida",
-      "validBoolean": "{0} debe ser un booleano válido",
-      "validArray": "{0} debe ser una lista válida",
-      "stringMin": "{0} debe tener al menos {1} caracteres",
-      "numberMin": "{0} debe ser al menos {1}"
+      "required": "{field} es obligatorio",
+      "validNumber": "{field} debe ser un número válido",
+      "validNumberRange": "{field} debe ser un número válido o un rango de números",
+      "validString": "{field} debe ser una cadena válida",
+      "validBoolean": "{field} debe ser un booleano válido",
+      "validArray": "{field} debe ser una lista válida",
+      "stringMin": "{field} debe tener al menos {min} caracteres",
+      "stringMax": "{field} debe tener como máximo {max} caracteres",
+      "numberMin": "{field} debe ser al menos {min}",
+      "numberMax": "{field} debe ser como máximo {max}"
     },
     "client": {
       "id": "ID del cliente",
@@ -236,7 +249,8 @@
     "interface": {
       "cidr": "CIDR",
       "device": "Dispositivo",
-      "cidrValid": "El CIDR debe ser válido"
+      "cidrValid": "El CIDR debe ser válido",
+      "routingTable": "La tabla de enrutamiento debe ser auto, off o un número de tabla"
     },
     "otl": "Enlace de un solo uso",
     "stringMalformed": "Cadena malformada",

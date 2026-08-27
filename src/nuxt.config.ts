@@ -8,8 +8,8 @@ export default defineNuxtConfig({
     '@nuxtjs/i18n',
     '@nuxtjs/tailwindcss',
     '@pinia/nuxt',
-    '@eschricht/nuxt-color-mode',
-    'radix-vue/nuxt',
+    '@nuxtjs/color-mode',
+    'reka-ui/nuxt',
     '@vueuse/nuxt',
     '@nuxt/eslint',
     '@nuxt/test-utils/module',
@@ -17,8 +17,8 @@ export default defineNuxtConfig({
   colorMode: {
     preference: 'system',
     fallback: 'light',
-    classSuffix: '',
-    cookieName: 'theme',
+    storage: 'cookie',
+    storageKey: 'theme',
   },
   css: ['~/app.css'],
   i18n: {

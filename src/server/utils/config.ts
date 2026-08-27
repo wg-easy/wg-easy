@@ -2,6 +2,7 @@ import { createDebug } from 'obug';
 import packageJson from '@@/package.json';
 
 import { exec } from '#server/utils/cmd';
+import { parseTrustedProxies } from '#server/utils/trustedProxy';
 import {
   OAUTH_PROVIDERS,
   isConfiguredOauthProvider,
@@ -64,6 +65,8 @@ export const WG_ENV = {
     oauthProviders?.find((p) => p === process.env.OAUTH_AUTO_LAUNCH) ?? null,
   /** Disable password authentication */
   DISABLE_PASSWORD_AUTH: process.env.DISABLE_PASSWORD_AUTH === 'true',
+  /** Proxies allowed to provide forwarded request information */
+  TRUSTED_PROXIES: parseTrustedProxies(process.env.TRUSTED_PROXIES),
 };
 
 if (WG_ENV.OAUTH_PROVIDERS && WG_ENV.OAUTH_PROVIDERS.length > 0) {

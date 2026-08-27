@@ -6,7 +6,7 @@
       "panel": "Admin-Konsole",
       "general": "Allgemein",
       "config": "Konfiguration",
-      "interface": "Oberfläche",
+      "interface": "Interface",
       "hooks": "Hooks"
     }
   },
@@ -20,7 +20,11 @@
     "2faKey": "TOTP-Schlüssel",
     "2faCodeDesc": "Geben Sie den Code aus Ihrer Authentifizierungs-App ein.",
     "disable2fa": "Zwei-Faktor-Authentifizierung deaktivieren",
-    "disable2faDesc": "Geben Sie Ihr Passwort ein, um die Zwei-Faktor-Authentifizierung zu deaktivieren."
+    "disable2faDesc": "Geben Sie Ihr Passwort ein, um die Zwei-Faktor-Authentifizierung zu deaktivieren.",
+    "linkOauth": "Konto mit einem externen Anbieter verknüpfen",
+    "unlinkOauth": "Verknüpfung aufheben",
+    "linkedWith": "Mit {provider} verknüpft",
+    "providerDisabled": "Der derzeit verknüpfte Anbieter ist nicht aktiviert"
   },
   "general": {
     "name": "Name",
@@ -28,6 +32,7 @@
     "password": "Passwort",
     "newPassword": "Neues Passwort",
     "updatePassword": "Passwort aktualisieren",
+    "addPassword": "Passwort hinzufügen",
     "mtu": "MTU",
     "allowedIps": "Erlaubte IP-Adressen",
     "dns": "DNS",
@@ -41,7 +46,8 @@
     "confirmPassword": "Passwort bestätigen",
     "loading": "Laden...",
     "2fa": "Zwei-Faktor-Authentifizierung",
-    "2faCode": "TOTP-Code"
+    "2faCode": "TOTP-Code",
+    "externalAuth": "Externe Authentifizierung"
   },
   "setup": {
     "welcome": "Willkommen zur Ersteinrichtung von wg-easy",
@@ -49,34 +55,37 @@
     "existingSetup": "Haben Sie eine bestehende Einrichtung?",
     "createAdminDesc": "Bitte geben Sie zuerst einen Admin-Benutzernamen sowie ein starkes, sicheres Passwort ein. Diese Anmeldedaten benötigen Sie, um sich in der Admin-Konsole anzumelden.",
     "setupConfigDesc": "Bitte geben Sie die Host- und Portinformationen ein. Diese werden für die Client-Konfiguration verwendet, wenn Sie WireGuard auf Ihren Geräten einrichten.",
-    "setupMigrationDesc": "Bitte halten Sie die Sicherungsdatei bereit, wenn Sie Ihre Daten von Ihrer vorherigen wg-easy Version auf ihre neue Einrichtung migrieren möchten.",
+    "setupMigrationDesc": "Bitte geben Sie die Sicherungsdatei an, wenn Sie Ihre Daten von Ihrer vorherigen wg-easy Version in Ihre neue Installation migrieren möchten.",
     "upload": "Hochladen",
     "migration": "Backup wiederherstellen:",
     "createAccount": "Konto erstellen",
     "successful": "Einrichtung erfolgreich",
-    "hostDesc": "Öffentlicher Hostname mit dem sich die Clients verbinden",
-    "portDesc": "Öffentlicher UDP-Port an dem sich die Clients verbinden und auf dem WireGuard läuft"
+    "hostDesc": "Öffentlicher Hostname, mit dem sich die Clients verbinden",
+    "portDesc": "Öffentlicher UDP-Port, über den sich die Clients verbinden und auf dem WireGuard lauscht"
   },
   "update": {
     "updateAvailable": "Ein neues Update ist verfügbar!",
     "update": "Aktualisieren"
   },
   "theme": {
-    "dark": "Dunkles Thema",
-    "light": "Helles Thema",
-    "system": "System Thema"
+    "dark": "Dunkles Design",
+    "light": "Helles Design",
+    "system": "Systemeinstellung"
   },
   "layout": {
-    "toggleCharts": "Statistiken ein-/ausblenden",
+    "toggleCharts": "Diagramme ein-/ausblenden",
     "donate": "Spenden"
   },
   "login": {
     "signIn": "Anmelden",
+    "signInWith": "Mit {provider} anmelden",
+    "or": "oder",
     "rememberMe": "Angemeldet bleiben",
     "rememberMeDesc": "Bleiben Sie auch nach dem Schließen des Browsers angemeldet",
-    "insecure": "Sie können sich nicht über eine unsichere Verbindung anmelden. Bitte benutzen Sie HTTPS.",
-    "2faRequired": "Zwei-Faktor-Authentifizierung wird benötigt",
-    "2faWrong": "Zwei-Faktor-Authentifizierung ist fehlgeschlagen"
+    "insecure": "Sie können sich nicht über eine unsichere Verbindung anmelden. Verwenden Sie HTTPS.",
+    "2faRequired": "Zwei-Faktor-Authentifizierung ist erforderlich",
+    "2faWrong": "Der Zwei-Faktor-Code ist ungültig",
+    "loginExpired": "Die Anmeldung ist abgelaufen. Versuchen Sie es erneut"
   },
   "client": {
     "empty": "Es gibt noch keine Clients.",
@@ -90,17 +99,16 @@
     "expireDateDesc": "Datum, an dem der Client deaktiviert wird. Leer lassen für dauerhaft aktiv.",
     "delete": "Löschen",
     "deleteClient": "Client löschen",
-    "deleteDialog1": "Sind Sie sicher, dass Sie diesen Client löschen möchten",
-    "deleteDialog2": "Diese Aktion kann nicht rückgängig gemacht werden.",
+    "deleteDialog": "Möchten Sie {name} wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
     "enabled": "Aktiviert",
     "address": "Adresse",
     "serverAllowedIps": "Serverseitig erlaubte IP-Adressen",
     "otlDesc": "Einen kurzen Einmal-Link erzeugen",
     "permanent": "Dauerhaft",
-    "createdOn": "Angelegt am ",
-    "lastSeen": "Zuletzt verbunden am ",
-    "totalDownload": "Gesamt-Download: ",
-    "totalUpload": "Gesamt-Upload: ",
+    "createdOn": "Erstellt am {date}",
+    "lastSeen": "Zuletzt verbunden am {date}",
+    "totalDownload": "Gesamt-Download: {total}",
+    "totalUpload": "Gesamt-Upload: {total}",
     "newClient": "Neuer Client",
     "disableClient": "Client deaktivieren",
     "enableClient": "Client aktivieren",
@@ -110,27 +118,27 @@
     "disableSelected": "Ausgewählte deaktivieren",
     "enableSelectedDescription": "Ausgewählte Clients aktivieren: {0}?",
     "disableSelectedDescription": "Ausgewählte Clients deaktivieren: {0}?",
-    "noPrivKey": "Dieser Client hat keinen bekannten privaten Schlüssel, weshalb keine Konfiguration angelegt werden kann.",
+    "noPrivKey": "Für diesen Client ist kein privater Schlüssel bekannt. Die Konfiguration kann daher nicht erstellt werden.",
     "showQR": "QR-Code anzeigen",
     "downloadConfig": "Konfiguration herunterladen",
     "allowedIpsDesc": "Welche IP-Adressen durch das VPN geleitet werden (überschreibt die globale Konfiguration)",
     "serverAllowedIpsDesc": "Welche IP-Adressen der Server zum Client leiten wird",
-    "mtuDesc": "Setzt die maximale Übertragungsgröße (Paketgröße) für den VPN-Tunnel",
+    "mtuDesc": "Legt die maximale Übertragungseinheit (Paketgröße) für den VPN-Tunnel fest",
     "persistentKeepaliveDesc": "Legt das Intervall (in Sekunden) für Keepalive-Pakete fest. 0 deaktiviert es",
     "hooks": "Hooks",
     "hooksDescription": "Hooks funktionieren nur mit wg-quick",
     "hooksLeaveEmpty": "Nur für wg-quick. Andernfalls leer lassen",
-    "dnsDesc": "DNS-Server, den die Clients benutzen (überschreibt die globale Konfiguration)",
+    "dnsDesc": "DNS-Server, den die Clients verwenden (überschreibt die globale Konfiguration)",
     "notConnected": "Client nicht verbunden",
     "endpoint": "Endpunkt",
-    "endpointDesc": "IP-Adresse des Clients, von dem aus die WireGuard-Verbindung hergestellt wird",
+    "endpointDesc": "IP-Adresse des Clients, von der aus die WireGuard-Verbindung hergestellt wird",
     "search": "Suche Clients...",
     "config": "Konfiguration",
     "viewConfig": "Konfiguration anzeigen",
-    "firewallIps": "Firewall erlaubte IPs",
-    "firewallIpsDesc": "Ziel-IPs/CIDRs, auf die dieser Client zugreifen darf (serverseitig erzwingen). Lassen Sie das Feld leer, um die Liste der zugelassenen IPs zu verwenden. Unterstützt optionale Port- und Protokollfilterung. Die Syntax finden Sie in der Dokumentation.",
-    "downloadPng": "Herunterladen PNG",
-    "copyPng": "Kopieren PNG"
+    "firewallIps": "Von der Firewall erlaubte IP-Adressen",
+    "firewallIpsDesc": "Ziel-IP-Adressen und CIDR-Bereiche, auf die dieser Client zugreifen darf (serverseitig durchgesetzt). Lassen Sie das Feld leer, um „Erlaubte IP-Adressen“ zu verwenden. Optionale Filterung nach Port und Protokoll wird unterstützt. Die Syntax finden Sie in der Dokumentation.",
+    "downloadPng": "PNG herunterladen",
+    "copyPng": "PNG kopieren"
   },
   "dialog": {
     "change": "Ändern",
@@ -150,28 +158,28 @@
     "sectionGeneral": "Allgemein",
     "sectionAdvanced": "Erweitert",
     "noItems": "Keine Einträge",
-    "nullNoItems": "Keine Einträge. Die globale Konfiguration wird benutzt",
+    "nullNoItems": "Keine Einträge. Es wird die globale Konfiguration verwendet",
     "add": "Hinzufügen"
   },
   "admin": {
     "general": {
       "sessionTimeout": "Sitzungszeitüberschreitung",
-      "sessionTimeoutDesc": "Sitzungsdauer für \"Angemeldet bleiben\" (Sekunden)",
-      "metrics": "Statistiken",
+      "sessionTimeoutDesc": "Sitzungsdauer für „Angemeldet bleiben“ (Sekunden)",
+      "metrics": "Metriken",
       "metricsPassword": "Passwort",
-      "metricsPasswordDesc": "Bearer-Passwort für den Statistik-Endpunkt (Passwort oder Argon2-Hash)",
+      "metricsPasswordDesc": "Bearer-Passwort für den Metrik-Endpunkt (Passwort oder Argon2-Hash)",
       "json": "JSON",
-      "jsonDesc": "Pfad zu den Statistiken als JSON",
+      "jsonDesc": "Pfad zu den Metriken im JSON-Format",
       "prometheus": "Prometheus",
-      "prometheusDesc": "Pfad zu den Prometheus-Statistiken"
+      "prometheusDesc": "Pfad zu den Prometheus-Metriken"
     },
     "config": {
       "connection": "Verbindung",
-      "hostDesc": "Öffentlicher Hostname mit dem sich die Clients verbinden (überschreibt die Konfiguration)",
-      "portDesc": "Öffentlicher UDP-Port an dem sich die Clients verbinden (überschreibt die Konfiguration, vermutlich wollen Sie auch den Interface-Port ändern)",
-      "allowedIpsDesc": "Erlaubte IP-Adressen, die die Clients nutzen werden (Globale Konfiguration)",
-      "dnsDesc": "DNS-Server, den die Clients nutzen werden (Globale Konfiguration)",
-      "mtuDesc": "MTU, den die Clients benutzen werden (nur für neue Clients)",
+      "hostDesc": "Öffentlicher Hostname, mit dem sich die Clients verbinden (macht bestehende Konfigurationen ungültig)",
+      "portDesc": "Öffentlicher UDP-Port, über den sich die Clients verbinden (macht bestehende Konfigurationen ungültig; Sie sollten wahrscheinlich auch den Interface-Port ändern)",
+      "allowedIpsDesc": "Erlaubte IP-Adressen, die die Clients verwenden (globale Konfiguration)",
+      "dnsDesc": "DNS-Server, den die Clients verwenden (globale Konfiguration)",
+      "mtuDesc": "MTU, die die Clients verwenden (nur für neue Clients)",
       "persistentKeepaliveDesc": "Intervall in Sekunden, in dem Keepalive-Pakete an den Server gesendet werden. 0 = deaktiviert (nur für neue Clients)",
       "suggest": "Vorschlagen",
       "suggestDesc": "Wählen Sie eine IP-Adresse oder einen Hostnamen für das Host-Feld aus"
@@ -180,29 +188,33 @@
       "cidrSuccess": "CIDR wurde geändert",
       "device": "Gerät",
       "deviceDesc": "Ethernet-Gerät, durch das der WireGuard-Datenverkehr geleitet werden soll",
-      "mtuDesc": "MTU, den WireGuard benutzen wird",
-      "portDesc": "UDP-Port, auf dem WireGuard lauschen wird (Sie wollen wahrscheinlich auch den Interface-Port ändern)",
+      "routingTable": "Routingtabelle",
+      "routingTableDesc": "Routingtabelle für WireGuard-Routen. Zulässig sind „auto“, „off“ oder eine Tabellennummer.",
+      "mtuDesc": "MTU, die WireGuard verwendet",
+      "portDesc": "UDP-Port, auf dem WireGuard lauscht (Sie sollten wahrscheinlich auch den Port unter „Konfiguration“ ändern)",
       "changeCidr": "CIDR ändern",
       "restart": "Interface neu starten",
       "restartDesc": "Das WireGuard-Interface neu starten",
-      "restartWarn": "Sind Sie sicher, dass Sie das Interface neu starten möchten? Dies wird die Verbindungen aller Clients trennen.",
+      "restartWarn": "Möchten Sie das Interface wirklich neu starten? Dadurch werden alle Clientverbindungen getrennt.",
       "restartSuccess": "Interface neu gestartet",
-      "firewall": "Datenverkehr Filterung",
+      "firewall": "Datenverkehrsfilterung",
       "firewallEnabled": "Firewall pro Client aktivieren",
-      "firewallEnabledDesc": "Beschränken Sie den Client-Datenverkehr mithilfe von iptables auf bestimmte Ziel-IP-Adressen. Bei Aktivierung kann für jeden Client eine Liste der zulässigen Ziele konfiguriert werden."
+      "firewallEnabledDesc": "Beschränken Sie den Client-Datenverkehr mithilfe von iptables auf bestimmte Ziel-IP-Adressen. Bei Aktivierung kann für jeden Client eine Liste der erlaubten Ziele konfiguriert werden."
     },
-    "introText": "Willkommen in der Admin-Konsole.\n\nHier können Sie die allgemeinen Einstellungen, die Konfiguration, die Schnittstelleneinstellungen und die Hooks verwalten.\n\nBeginnen Sie, indem Sie einen der Bereiche in der Seitenleiste auswählen."
+    "introText": "Willkommen in der Admin-Konsole.\n\nHier können Sie die allgemeinen Einstellungen, die Konfiguration, die Interface-Einstellungen und die Hooks verwalten.\n\nBeginnen Sie, indem Sie einen der Bereiche in der Seitenleiste auswählen."
   },
   "zod": {
     "generic": {
-      "required": "{0} ist erforderlich",
-      "validNumber": "{0} muss eine Zahl sein",
-      "validNumberRange": "{0} muss eine gültige Zahl oder ein gültiger Zahlenbereich sein",
-      "validString": "{0} muss eine Zeichenkette sein",
-      "validBoolean": "{0} muss ein Wahrheitswert sein",
-      "validArray": "{0} muss eine Liste sein",
-      "stringMin": "{0} muss mindestens {1} Zeichen lang sein",
-      "numberMin": "{0} muss mindestens {1} sein"
+      "required": "{field} ist erforderlich",
+      "validNumber": "{field} muss eine Zahl sein",
+      "validNumberRange": "{field} muss eine gültige Zahl oder ein gültiger Zahlenbereich sein",
+      "validString": "{field} muss eine Zeichenkette sein",
+      "validBoolean": "{field} muss ein Wahrheitswert sein",
+      "validArray": "{field} muss eine Liste sein",
+      "stringMin": "{field} muss mindestens {min} Zeichen lang sein",
+      "stringMax": "{field} darf höchstens {max} Zeichen lang sein",
+      "numberMin": "{field} muss mindestens {min} sein",
+      "numberMax": "{field} darf höchstens {max} sein"
     },
     "client": {
       "id": "Client-ID",
@@ -211,7 +223,7 @@
       "address4": "IPv4-Adresse",
       "address6": "IPv6-Adresse",
       "serverAllowedIps": "Serverseitig erlaubte IP-Adressen",
-      "firewallIps": "Von der Firewall zugelassene IP-Adressen",
+      "firewallIps": "Von der Firewall erlaubte IP-Adressen",
       "firewallIpsInvalid": "Ungültiger IP-Eintrag in der Firewall. Informationen zur unterstützten Syntax finden Sie in der Dokumentation."
     },
     "user": {
@@ -223,7 +235,7 @@
       "emailInvalid": "Die E-Mail-Adresse muss gültig sein",
       "passwordMatch": "Die Passwörter müssen übereinstimmen",
       "totpEnable": "TOTP aktivieren",
-      "totpEnableTrue": "\"TOTP aktivieren\" muss ausgewählt sein",
+      "totpEnableTrue": "„TOTP aktivieren“ muss ausgewählt sein",
       "totpCode": "TOTP-Code"
     },
     "userConfig": {
@@ -231,13 +243,14 @@
     },
     "general": {
       "sessionTimeout": "Sitzungszeitüberschreitung",
-      "metricsEnabled": "Statistiken",
-      "metricsPassword": "Passwort für Statistiken"
+      "metricsEnabled": "Metriken",
+      "metricsPassword": "Metrik-Passwort"
     },
     "interface": {
       "cidr": "CIDR",
       "device": "Gerät",
-      "cidrValid": "CIDR muss gültig sein"
+      "cidrValid": "CIDR muss gültig sein",
+      "routingTable": "Die Routingtabelle muss „auto“, „off“ oder eine Tabellennummer sein"
     },
     "otl": "Einmal-Link",
     "stringMalformed": "Zeichenkette ist fehlerhaft",
@@ -259,7 +272,7 @@
     "postDown": "PostDown"
   },
   "copy": {
-    "notSupported": "Kopieren ist nicht unterstützt",
+    "notSupported": "Kopieren wird nicht unterstützt",
     "copied": "Kopiert!",
     "failed": "Kopieren fehlgeschlagen",
     "copy": "Kopieren"
@@ -280,13 +293,13 @@
     "s4Label": "Junk-Paketgröße des Transport-Pakets (S4)",
     "s4Description": "Junk-Paketgröße des Transport-Pakets",
     "h1Label": "Init-Magic-Header (H1)",
-    "h1Description": "Wert des Init-Paket-Headers (5-2147483647, muss eindeutig zu H2-H4 sein)",
+    "h1Description": "Wert oder Bereich für den Header des Init-Pakets (X oder X-Y, wobei X < Y gilt. Minimum: 5, Maximum: 2147483647. Der Wert oder Bereich darf sich nicht mit anderen Headern überschneiden)",
     "h2Label": "Antwort-Magic-Header (H2)",
-    "h2Description": "Wert des Antwort-Paket-Headers (5-2147483647, muss eindeutig zu H1, H3, H4 sein)",
+    "h2Description": "Wert oder Bereich für den Header des Antwortpakets (X oder X-Y, wobei X < Y gilt. Minimum: 5, Maximum: 2147483647. Der Wert oder Bereich darf sich nicht mit anderen Headern überschneiden)",
     "h3Label": "Cookie-Antwort-Magic-Header (H3)",
-    "h3Description": "Wert des Cookie-Antwort-Paket-Headers (5-2147483647, muss eindeutig zu H1, H2, H4 sein)",
+    "h3Description": "Wert oder Bereich für den Header des Cookie-Antwortpakets (X oder X-Y, wobei X < Y gilt. Minimum: 5, Maximum: 2147483647. Der Wert oder Bereich darf sich nicht mit anderen Headern überschneiden)",
     "h4Label": "Transport-Magic-Header (H4)",
-    "h4Description": "Wert des Transport-Paket-Headers (5-2147483647, muss eindeutig zu H1-H3 sein)",
+    "h4Description": "Wert oder Bereich für den Header des Transportpakets (X oder X-Y, wobei X < Y gilt. Minimum: 5, Maximum: 2147483647. Der Wert oder Bereich darf sich nicht mit anderen Headern überschneiden)",
     "i1Label": "Spezial-Junk-Paket 1 (I1)",
     "i1Description": "Protokoll-Nachahmungspaket im Hex-Format: <b 0x...>",
     "i2Label": "Spezial-Junk-Paket 2 (I2)",
@@ -298,6 +311,6 @@
     "i5Label": "Spezial-Junk-Paket 5 (I5)",
     "i5Description": "Protokoll-Nachahmungspaket im Hex-Format: <b 0x...>",
     "mtuNote": "Werte hängen von der MTU ab",
-    "obfuscationParameters": "AmneziaWG Verschleierungsparameter"
+    "obfuscationParameters": "AmneziaWG-Verschleierungsparameter"
   }
 }

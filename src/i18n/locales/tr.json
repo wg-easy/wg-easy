@@ -7,7 +7,7 @@
       "general": "Genel",
       "config": "Yapılandırma",
       "interface": "Arayüz",
-      "hooks": "Hooks"
+      "hooks": "Hook'lar"
     }
   },
   "user": {
@@ -20,7 +20,11 @@
     "2faKey": "TOTP Anahtarı",
     "2faCodeDesc": "Uygulamanızdaki doğrulama kodunu girin.",
     "disable2fa": "2FA'yı Devre Dışı Bırak",
-    "disable2faDesc": "2FA'yı kapatmak için şifrenizi girin."
+    "disable2faDesc": "2FA'yı kapatmak için şifrenizi girin.",
+    "linkOauth": "Hesabınızı harici bir sağlayıcı ile bağlayın",
+    "unlinkOauth": "Bağlantıyı Kaldır",
+    "linkedWith": "{provider} ile bağlandı",
+    "providerDisabled": "Şu anda bağlı olan sağlayıcı etkin değil"
   },
   "general": {
     "name": "İsim",
@@ -28,34 +32,36 @@
     "password": "Şifre",
     "newPassword": "Yeni Şifre",
     "updatePassword": "Şifreyi Güncelle",
+    "addPassword": "Şifre Ekle",
     "mtu": "MTU",
-    "allowedIps": "Allowed IPs",
+    "allowedIps": "İzin Verilen IP'ler",
     "dns": "DNS",
-    "persistentKeepalive": "Persistent Keepalive",
+    "persistentKeepalive": "Kalıcı Keepalive",
     "logout": "Çıkış Yap",
     "continue": "Devam Et",
-    "host": "Host",
+    "host": "Sunucu Adresi",
     "port": "Port",
     "yes": "Evet",
     "no": "Hayır",
     "confirmPassword": "Şifreyi Onayla",
     "loading": "Yükleniyor...",
     "2fa": "2FA (İki Faktörlü Doğrulama)",
-    "2faCode": "TOTP Kodu"
+    "2faCode": "TOTP Kodu",
+    "externalAuth": "Harici Kimlik Doğrulama"
   },
   "setup": {
     "welcome": "wg-easy kurulumuna hoş geldiniz",
     "welcomeDesc": "Linux üzerinde WireGuard kurmanın ve yönetmenin en kolay yolu.",
     "existingSetup": "Mevcut bir kurulumunuz var mı?",
     "createAdminDesc": "Yönetim paneline giriş için bir kullanıcı adı ve güçlü bir şifre belirleyin.",
-    "setupConfigDesc": "İstemci cihazların bağlanacağı Host ve Port bilgilerini girin.",
+    "setupConfigDesc": "İstemci cihazların bağlanacağı Sunucu Adresi ve Port bilgilerini girin.",
     "setupMigrationDesc": "Eski wg-easy verilerinizi taşımak için yedek dosyasını yükleyebilirsiniz.",
     "upload": "Yükle",
     "migration": "Yedeği Geri Yükle:",
     "createAccount": "Hesap Oluştur",
     "successful": "Kurulum Başarılı",
-    "hostDesc": "İstemcilerin bağlanacağı public hostname/IP",
-    "portDesc": "WireGuard'ın dinleyeceği public UDP portu"
+    "hostDesc": "İstemcilerin bağlanacağı genel sunucu adresi",
+    "portDesc": "WireGuard'ın dinleyeceği genel UDP portu"
   },
   "update": {
     "updateAvailable": "Yeni bir güncelleme mevcut!",
@@ -72,11 +78,14 @@
   },
   "login": {
     "signIn": "Giriş Yap",
+    "signInWith": "{provider} ile giriş yap",
+    "or": "veya",
     "rememberMe": "Beni hatırla",
     "rememberMeDesc": "Oturumu açık tut",
     "insecure": "Güvensiz bağlantı üzerinden giriş yapılamaz. Lütfen HTTPS kullanın.",
     "2faRequired": "2FA Doğrulaması Gerekli",
-    "2faWrong": "Hatalı 2FA Kodu"
+    "2faWrong": "Hatalı 2FA Kodu",
+    "loginExpired": "Oturum süresi doldu. Tekrar deneyin"
   },
   "client": {
     "empty": "Henüz kayıtlı bir istemci yok.",
@@ -90,17 +99,16 @@
     "expireDateDesc": "Boş bırakılırsa süresiz olur.",
     "delete": "Sil",
     "deleteClient": "İstemciyi Sil",
-    "deleteDialog1": "Silmek istediğinize emin misiniz",
-    "deleteDialog2": "Bu işlem geri alınamaz.",
+    "deleteDialog": "{name} istemcisini silmek istediğinize emin misiniz? Bu işlem geri alınamaz.",
     "enabled": "Aktif",
     "address": "Adres",
-    "serverAllowedIps": "Server Allowed IPs",
+    "serverAllowedIps": "Sunucu İzin Verilen IP'leri",
     "otlDesc": "Tek seferlik kısa link oluştur",
     "permanent": "Süresiz",
-    "createdOn": "Oluşturulma: ",
-    "lastSeen": "Son Görülme: ",
-    "totalDownload": "Toplam İndirme: ",
-    "totalUpload": "Toplam Yükleme: ",
+    "createdOn": "Oluşturulma: {date}",
+    "lastSeen": "Son Görülme: {date}",
+    "totalDownload": "Toplam İndirme: {total}",
+    "totalUpload": "Toplam Yükleme: {total}",
     "newClient": "Yeni İstemci",
     "disableClient": "İstemciyi Devre Dışı Bırak",
     "enableClient": "İstemciyi Etkinleştir",
@@ -113,22 +121,22 @@
     "noPrivKey": "Özel anahtar (private key) bulunamadı. Yapılandırma oluşturulamaz.",
     "showQR": "QR Kodunu Göster",
     "downloadConfig": "Config İndir",
-    "allowedIpsDesc": "VPN üzerinden yönlendirilecek IP'ler (global ayarı ezer)",
+    "allowedIpsDesc": "VPN üzerinden yönlendirilecek IP'ler (genel yapılandırmayı geçersiz kılar)",
     "serverAllowedIpsDesc": "Sunucunun istemciye yönlendireceği IP'ler",
     "mtuDesc": "VPN tüneli için paket boyutu (MTU)",
     "persistentKeepaliveDesc": "Bağlantıyı ayakta tutma aralığı (saniye). 0 devre dışı bırakır.",
-    "hooks": "Hooks",
-    "hooksDescription": "Hooks sadece wg-quick ile çalışır",
+    "hooks": "Hook'lar",
+    "hooksDescription": "Hook'lar sadece wg-quick ile çalışır",
     "hooksLeaveEmpty": "Sadece wg-quick içindir. Aksi halde boş bırakın.",
-    "dnsDesc": "İstemci DNS sunucuları (global ayarı ezer)",
+    "dnsDesc": "İstemci DNS sunucuları (genel yapılandırmayı geçersiz kılar)",
     "notConnected": "Bağlı Değil",
     "endpoint": "Endpoint",
     "endpointDesc": "İstemcinin WireGuard bağlantısı kurduğu IP adresi",
     "search": "İstemci ara...",
     "config": "Config",
     "viewConfig": "Config Görüntüle",
-    "firewallIps": "Firewall Allowed IPs",
-    "firewallIpsDesc": "İstemcinin erişebileceği hedef IP/CIDR'ler (isteğe bağlı port/protokol filtreleme ile). Boş bırakılırsa Allowed IPs kullanılır. Ayrıntılı söz dizimi için dokümantasyona bakın.",
+    "firewallIps": "Güvenlik Duvarı İzin Verilen IP'leri",
+    "firewallIpsDesc": "İstemcinin erişebileceği hedef IP/CIDR'ler (isteğe bağlı port/protokol filtreleme ile). Boş bırakılırsa İzin Verilen IP'ler kullanılır. Ayrıntılı söz dizimi için dokümantasyona bakın.",
     "downloadPng": "PNG İndir",
     "copyPng": "PNG Kopyala"
   },
@@ -150,7 +158,7 @@
     "sectionGeneral": "Genel",
     "sectionAdvanced": "Gelişmiş",
     "noItems": "Öge yok",
-    "nullNoItems": "Öge yok. Global ayarlar kullanılıyor.",
+    "nullNoItems": "Öge yok. Genel yapılandırma kullanılıyor.",
     "add": "Ekle"
   },
   "admin": {
@@ -167,42 +175,46 @@
     },
     "config": {
       "connection": "Bağlantı",
-      "hostDesc": "İstemcilerin bağlanacağı Host (configleri etkiler)",
-      "portDesc": "İstemcilerin bağlanacağı UDP portu. Bunu değiştirmek mevcut istemci yapılandırmalarını geçersiz kılabilir ve WireGuard Arayüz Portu ile eşleşmelidir.",
-      "allowedIpsDesc": "Genel Allowed IPs (izin verilen IP'ler)",
-      "dnsDesc": "Global DNS",
-      "mtuDesc": "Varsayılan MTU (yeni istemciler için)",
-      "persistentKeepaliveDesc": "Varsayılan Keepalive (yeni istemciler için)",
+      "hostDesc": "İstemcilerin bağlanacağı sunucu adresi (config'leri geçersiz kılar)",
+      "portDesc": "İstemcilerin bağlanacağı UDP portu (config'leri geçersiz kılar, Arayüz Portunu da değiştirmek isteyebilirsiniz)",
+      "allowedIpsDesc": "İstemcilerin kullanacağı izin verilen IP'ler (genel yapılandırma)",
+      "dnsDesc": "İstemcilerin kullanacağı DNS sunucusu (genel yapılandırma)",
+      "mtuDesc": "İstemcilerin kullanacağı MTU (yalnızca yeni istemciler için)",
+      "persistentKeepaliveDesc": "Sunucuya keepalive gönderme aralığı (saniye). 0 devre dışı bırakır (yalnızca yeni istemciler için)",
       "suggest": "Öner",
-      "suggestDesc": "Host alanı için bir IP veya Hostname öner"
+      "suggestDesc": "Sunucu Adresi alanı için bir IP veya Hostname öner"
     },
     "interface": {
       "cidrSuccess": "CIDR güncellendi",
-      "device": "Arayüz",
+      "device": "Aygıt",
       "deviceDesc": "Trafiğin yönlendirileceği ağ arayüzü (ethernet)",
+      "routingTable": "Yönlendirme Tablosu",
+      "routingTableDesc": "WireGuard rotaları için yönlendirme tablosu. auto, off veya bir tablo numarasına ayarlayın.",
       "mtuDesc": "WireGuard arayüz MTU'su",
-      "portDesc": "WireGuard dinleme portu",
+      "portDesc": "WireGuard dinleme portu (Config Portunu da değiştirmek isteyebilirsiniz)",
       "changeCidr": "CIDR Değiştir",
       "restart": "Arayüzü Yeniden Başlat",
       "restartDesc": "WireGuard arayüzünü resetler",
       "restartWarn": "Arayüzü yeniden başlatmak tüm istemci bağlantılarını koparacaktır. Emin misiniz?",
       "restartSuccess": "Arayüz yeniden başlatıldı",
       "firewall": "Trafik Filtreleme",
-      "firewallEnabled": "İstemci Bazlı Firewall",
-      "firewallEnabledDesc": "iptables kullanarak istemci trafiğini kısıtlayın."
+      "firewallEnabled": "İstemci Bazlı Güvenlik Duvarı",
+      "firewallEnabledDesc": "iptables kullanarak istemci trafiğini belirli hedef IP'lerle sınırlayın."
     },
-    "introText": "Yönetici paneline hoş geldiniz.\n\nBuradan sistem ayarlarını, WireGuard yapılandırmasını ve Hooks ayarlarını yönetebilirsiniz."
+    "introText": "Yönetici paneline hoş geldiniz.\n\nBuradan genel ayarları, yapılandırmayı, arayüz ayarlarını ve Hook'ları yönetebilirsiniz.\n\nBaşlamak için kenar çubuğundaki bölümlerden birini seçin."
   },
   "zod": {
     "generic": {
-      "required": "{0} alanı zorunludur",
-      "validNumber": "{0} geçerli bir sayı olmalıdır",
-      "validNumberRange": "{0} geçerli bir sayı veya aralık olmalıdır",
-      "validString": "{0} geçerli bir metin olmalıdır",
-      "validBoolean": "{0} geçerli bir boolean olmalıdır",
-      "validArray": "{0} geçerli bir dizi olmalıdır",
-      "stringMin": "{0} en az {1} karakter olmalıdır",
-      "numberMin": "{0} en az {1} olmalıdır"
+      "required": "{field} alanı zorunludur",
+      "validNumber": "{field} geçerli bir sayı olmalıdır",
+      "validNumberRange": "{field} geçerli bir sayı veya aralık olmalıdır",
+      "validString": "{field} geçerli bir metin olmalıdır",
+      "validBoolean": "{field} geçerli bir boolean olmalıdır",
+      "validArray": "{field} geçerli bir dizi olmalıdır",
+      "stringMin": "{field} en az {min} karakter olmalıdır",
+      "stringMax": "{field} en fazla {max} karakter olmalıdır",
+      "numberMin": "{field} en az {min} olmalıdır",
+      "numberMax": "{field} en fazla {max} olmalıdır"
     },
     "client": {
       "id": "Client ID",
@@ -210,9 +222,9 @@
       "expiresAt": "Son Kullanma",
       "address4": "IPv4 Adresi",
       "address6": "IPv6 Adresi",
-      "serverAllowedIps": "Server Allowed IPs",
-      "firewallIps": "Firewall Allowed IPs",
-      "firewallIpsInvalid": "Geçersiz Firewall IP formatı. Desteklenen söz dizimi için dokümantasyona bakın. See docs for supported syntax."
+      "serverAllowedIps": "Sunucu İzin Verilen IP'leri",
+      "firewallIps": "Güvenlik Duvarı İzin Verilen IP'leri",
+      "firewallIpsInvalid": "Geçersiz Güvenlik Duvarı IP girişi. Desteklenen söz dizimi için dokümantasyona bakın."
     },
     "user": {
       "username": "Kullanıcı Adı",
@@ -227,7 +239,7 @@
       "totpCode": "2FA Kodu"
     },
     "userConfig": {
-      "host": "Host"
+      "host": "Sunucu Adresi"
     },
     "general": {
       "sessionTimeout": "Zaman Aşımı",
@@ -237,7 +249,8 @@
     "interface": {
       "cidr": "CIDR",
       "device": "Aygıt",
-      "cidrValid": "Geçersiz CIDR"
+      "cidrValid": "Geçersiz CIDR",
+      "routingTable": "Yönlendirme tablosu auto, off veya bir tablo numarası olmalıdır"
     },
     "otl": "OTL (One Time Link)",
     "stringMalformed": "Hatalı format",
@@ -246,10 +259,10 @@
     "enabled": "Aktif",
     "mtu": "MTU",
     "port": "Port",
-    "persistentKeepalive": "Keepalive",
+    "persistentKeepalive": "Kalıcı Keepalive",
     "address": "IP Adresi",
     "dns": "DNS",
-    "allowedIps": "Allowed IPs",
+    "allowedIps": "İzin Verilen IP'ler",
     "file": "Dosya"
   },
   "hooks": {
@@ -266,37 +279,37 @@
   },
   "awg": {
     "jCLabel": "Junk paket sayısı (Jc)",
-    "jCDescription": "Gönderilecek sahte paket sayısı (1-128)",
+    "jCDescription": "Gönderilecek sahte paket sayısı (1-128, önerilen: 4-12)",
     "jMinLabel": "Junk min boyutu (Jmin)",
-    "jMinDescription": "Sahte paketlerin minimum boyutu (Jmin < Jmax, MTU ile sınırlı)",
+    "jMinDescription": "Sahte paketlerin minimum boyutu (0-1279*, önerilen: 8, Jmax'tan küçük olmalıdır)",
     "jMaxLabel": "Junk maks boyutu (Jmax)",
-    "jMaxDescription": "Sahte paketlerin maksimum boyutu (Jmax > Jmin, MTU ile sınırlı)",
+    "jMaxDescription": "Sahte paketlerin maksimum boyutu (1-1280*, önerilen: 80, Jmin'den büyük olmalıdır)",
     "s1Label": "Init junk boyutu (S1)",
-    "s1Description": "Başlangıç paketi junk boyutu",
+    "s1Description": "Başlangıç paketi junk boyutu (0-1132[1280* - 148 = 1132], önerilen: 15-150, S1+56 ≠ S2)",
     "s2Label": "Response junk boyutu (S2)",
-    "s2Description": "Yanıt paketi junk boyutu",
+    "s2Description": "Yanıt paketi junk boyutu (0-1188[1280* - 92 = 1188], önerilen: 15-150)",
     "s3Label": "Cookie junk boyutu (S3)",
     "s3Description": "Cookie reply junk boyutu",
     "s4Label": "Transport junk boyutu (S4)",
     "s4Description": "Transport junk boyutu",
     "h1Label": "Init magic header (H1)",
-    "h1Description": "Init paket başlık değeri",
+    "h1Description": "Init paket başlık değeri veya aralığı (X veya X-Y, X<Y olmalıdır. Min 5, maks 2147483647. Diğer header'larla çakışmamalıdır)",
     "h2Label": "Response magic header (H2)",
-    "h2Description": "Response paket başlık değeri",
+    "h2Description": "Response paket başlık değeri veya aralığı (X veya X-Y, X<Y olmalıdır. Min 5, maks 2147483647. Diğer header'larla çakışmamalıdır)",
     "h3Label": "Cookie magic header (H3)",
-    "h3Description": "Cookie reply başlık değeri",
+    "h3Description": "Cookie reply başlık değeri veya aralığı (X veya X-Y, X<Y olmalıdır. Min 5, maks 2147483647. Diğer header'larla çakışmamalıdır)",
     "h4Label": "Transport magic header (H4)",
-    "h4Description": "Transport paket başlık değeri",
+    "h4Description": "Transport paket başlık değeri veya aralığı (X veya X-Y, X<Y olmalıdır. Min 5, maks 2147483647. Diğer header'larla çakışmamalıdır)",
     "i1Label": "Özel junk 1 (I1)",
-    "i1Description": "Hex formatında protocol mimic paketi",
+    "i1Description": "Hex formatında protocol mimic paketi: <b 0x...>",
     "i2Label": "Özel junk 2 (I2)",
-    "i2Description": "Hex formatında protocol mimic paketi",
+    "i2Description": "Hex formatında protocol mimic paketi: <b 0x...>",
     "i3Label": "Özel junk 3 (I3)",
-    "i3Description": "Hex formatında protocol mimic paketi",
+    "i3Description": "Hex formatında protocol mimic paketi: <b 0x...>",
     "i4Label": "Özel junk 4 (I4)",
-    "i4Description": "Hex formatında protocol mimic paketi",
+    "i4Description": "Hex formatında protocol mimic paketi: <b 0x...>",
     "i5Label": "Özel junk 5 (I5)",
-    "i5Description": "Hex formatında protocol mimic paketi",
+    "i5Description": "Hex formatında protocol mimic paketi: <b 0x...>",
     "mtuNote": "Değerler MTU'ya bağlıdır",
     "obfuscationParameters": "AmneziaWG Obfuscation Ayarları"
   }

@@ -1,0 +1,37 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:best-practices",
+    "docker:enableMajor",
+    "schedule:earlyMondays"
+  ],
+  "ignorePresets": [":pinDevDependencies"],
+  "timezone": "Europe/Berlin",
+  "automerge": false,
+  "prHourlyLimit": 0,
+  "packageRules": [
+    {
+      "groupName": "docker-digest",
+      "matchDatasources": ["docker"],
+      "matchUpdateTypes": ["digest"]
+    },
+    {
+      "matchManagers": ["docker-compose"],
+      "pinDigests": false
+    },
+    {
+      "groupName": "AmneziaWG",
+      "matchDepNames": ["amnezia-vpn/**"]
+    }
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Docker ARG versions",
+      "managerFilePatterns": ["/(^|/)Dockerfile[^/]*$/"],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>[a-z-]+?) depName=(?<depName>.+?)\\s+?ARG [a-zA-Z_]+=(?<currentValue>.+)"
+      ]
+    }
+  ]
+}

@@ -16,7 +16,7 @@
 <!-- Include details of your testing environment, tests ran to see how -->
 <!-- your change affects other areas of the code, etc. -->
 
-## Screenshots:
+## Screenshots
 
 <!-- Add screenshots or recordings for visual changes. -->
 <!-- Remove this section if it is not applicable. -->
@@ -31,7 +31,7 @@
 - [ ] Refactoring (change which does not alter existing functionality)
 - [ ] Documentation (changes to documentation only)
 
-## Checklist:
+## Checklist
 
 <!-- Go over all the following points, and put an `x` in all the boxes that apply. -->
 <!-- If you're unsure about any of these, don't hesitate to ask. We're here to help! -->
@@ -43,7 +43,7 @@
 - [ ] My change requires a change to the documentation.
 - [ ] I have updated the documentation accordingly.
 
-## AI Disclosure:
+## AI Disclosure
 
 <!-- See the AI contribution policy: https://github.com/wg-easy/wg-easy/blob/master/contributing.md#ai-contribution-policy -->
 <!-- Disclose whether AI tools were used -->
