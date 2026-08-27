@@ -3,7 +3,19 @@ import { describe, expect, test } from 'vitest';
 import {
   getQuotaTimezones,
   resolveBrowserTimezone,
+  resolveQuotaClientIds,
 } from '../../app/utils/quotaForm';
+
+describe('quota form client assignment', () => {
+  test('forces a quota created for a client to remain assigned to that client', () => {
+    expect(resolveQuotaClientIds([], 42)).toEqual([42]);
+    expect(resolveQuotaClientIds([7, 42], 42)).toEqual([42]);
+  });
+
+  test('preserves selected clients for shared quota management', () => {
+    expect(resolveQuotaClientIds([7, 42])).toEqual([7, 42]);
+  });
+});
 
 describe('quota form timezones', () => {
   test('uses the browser timezone for new quotas', () => {

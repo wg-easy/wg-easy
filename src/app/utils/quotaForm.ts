@@ -1,3 +1,10 @@
+export function resolveQuotaClientIds(
+  clientIds: number[],
+  fixedClientId?: number
+) {
+  return fixedClientId === undefined ? clientIds : [fixedClientId];
+}
+
 const fallbackTimezones = [
   'UTC',
   'Africa/Johannesburg',

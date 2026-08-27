@@ -51,6 +51,18 @@
                 </option>
               </select>
               <div class="col-span-2 flex flex-wrap justify-end gap-2">
+                <QuotaFormDialog
+                  :clients="[]"
+                  :fixed-client-id="data.id"
+                  @saved="quotaCreated"
+                >
+                  <template #trigger>
+                    <BaseSecondaryButton type="button" class="gap-2">
+                      <IconsPlus class="size-4" />
+                      {{ $t('quota.create') }}
+                    </BaseSecondaryButton>
+                  </template>
+                </QuotaFormDialog>
                 <NuxtLink
                   v-if="data.quotaId"
                   :to="`/admin/quotas#quota-${data.quotaId}`"
@@ -338,5 +350,11 @@ function assignQuota() {
   return _assignQuota({
     quotaId: selectedQuotaId.value ? Number(selectedQuotaId.value) : null,
   });
+}
+
+async function quotaCreated() {
+  await Promise.all([refresh(), refreshQuotas()]);
+  data.value = toRef(_data.value).value;
+  selectedQuotaId.value = data.value?.quotaId ? String(data.value.quotaId) : '';
 }
 </script>

@@ -186,7 +186,7 @@
             </label>
           </fieldset>
 
-          <fieldset>
+          <fieldset v-if="fixedClientId === undefined">
             <legend class="text-sm font-medium">
               {{ $t('quota.clients') }}
             </legend>
@@ -242,6 +242,7 @@ type ByteUnit = 'MB' | 'GB' | 'TB';
 const props = defineProps<{
   quota?: QuotaPublic;
   clients: { id: number; name: string; ipv4Address: string }[];
+  fixedClientId?: number;
 }>();
 const emit = defineEmits<{ saved: [] }>();
 const { t } = useI18n();
@@ -298,7 +299,10 @@ function initialForm() {
         : browserTimezone.value,
     weekday: reset?.frequency === 'WEEKLY' ? reset.weekday : 1,
     day: reset?.frequency === 'MONTHLY' ? reset.day : 1,
-    clientIds: [...(props.quota?.clientIds ?? [])],
+    clientIds: resolveQuotaClientIds(
+      [...(props.quota?.clientIds ?? [])],
+      props.fixedClientId
+    ),
   };
 }
 
@@ -360,7 +364,7 @@ function requestBody(): QuotaInput {
     enabled: form.enabled,
     limit,
     reset,
-    clientIds: form.clientIds,
+    clientIds: resolveQuotaClientIds(form.clientIds, props.fixedClientId),
   };
 }
 
