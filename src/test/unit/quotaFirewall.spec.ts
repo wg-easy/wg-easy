@@ -50,7 +50,7 @@ describe('quota nftables rules', () => {
       'quota q_7_total { over 1000 bytes used 500 bytes; }'
     );
     expect(rules.match(/quota name "q_7_total"/g)).toHaveLength(8);
-    expect(rules).toContain('add @blocked { 7 } drop');
+    expect(rules).toContain('add @blocked { 7 }');
     expect(rules).toContain('ip saddr 10.8.0.2');
     expect(rules).toContain('ip6 daddr fd00::3');
   });
@@ -75,6 +75,28 @@ describe('quota nftables rules', () => {
     expect(rules).toContain('quota q_7_rx { over 100 bytes used 10 bytes; }');
     expect(rules).toContain('quota q_7_tx { over 200 bytes used 20 bytes; }');
     expect(rules).not.toContain('ip6 ');
+  });
+
+  test('lets the threshold-crossing packet reach WireGuard before blocking later traffic', () => {
+    const rules = buildQuotaRuleset(
+      'wg0',
+      [
+        {
+          id: 7,
+          enabled: true,
+          limit: { mode: 'TX', txBytes: 100 },
+          usedRxBytes: 0,
+          usedTxBytes: 0,
+          exceededAt: null,
+        },
+      ],
+      clients.slice(0, 1),
+      false
+    );
+
+    expect(rules).toContain('numgen inc mod 1 offset 7 @blocked drop');
+    expect(rules).toContain('quota name "q_7_tx" add @blocked { 7 }\n');
+    expect(rules).not.toContain('quota name "q_7_tx" add @blocked { 7 } drop');
   });
 
   test('does not enforce disabled quotas', () => {

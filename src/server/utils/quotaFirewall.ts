@@ -137,8 +137,10 @@ export function buildQuotaRuleset(
         const match = addressMatch(interfaceName, client, direction, version);
         lines.push(`    ${match} ${blockedMatch(quota.id)}`);
         if (object) {
+          // Let the crossing packet reach WireGuard so its persisted counter
+          // records the exceeded state; the blocked-set rule drops later traffic.
           lines.push(
-            `    ${match} quota name "${object.name}" add @blocked { ${quota.id} } drop`
+            `    ${match} quota name "${object.name}" add @blocked { ${quota.id} }`
           );
         }
       }

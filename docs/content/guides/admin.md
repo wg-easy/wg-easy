@@ -65,6 +65,31 @@ Changing a quota preserves its current usage and immediately reevaluates the new
 
 ### Enforcement backend
 
-wg-easy uses nftables named quotas when the host kernel and `nft` command support them. This blocks traffic at the exact limit. Otherwise, wg-easy falls back to WireGuard counter polling every 10 seconds, so traffic may continue briefly after crossing a limit.
+wg-easy uses nftables named quotas when the container has `NET_ADMIN` capability and the host kernel supports the `nft_quota` module. The container image includes the `nft` command, but installing that command does not add missing kernel support.
+
+On hosts where `CONFIG_NFT_QUOTA=m`, load the module before starting wg-easy:
+
+```shell
+sudo modprobe nft_quota
+echo nft_quota | sudo tee /etc/modules-load.d/nft-quota.conf
+```
+
+On Ubuntu, install the matching optional kernel modules if `modprobe` reports that `nft_quota` is not available:
+
+```shell
+sudo apt update
+sudo apt install linux-modules-extra-$(uname -r)
+sudo modprobe nft_quota
+```
+
+Restart the wg-easy container after loading the module because the enforcement backend is detected and cached for the lifetime of the server process. When nftables enforcement is active, the following command lists its rules:
+
+```shell
+docker exec <container-name> nft list table inet wg_easy_quota
+```
+
+The packet that crosses the limit is allowed through so WireGuard can persist the exceeded state; subsequent traffic is blocked. Small amounts of in-flight traffic may also pass before blocking takes effect.
+
+If the kernel probe or ruleset installation fails, wg-easy falls back to WireGuard counter polling every 10 seconds. Traffic can continue until the next poll, so the amount over the configured limit depends on transfer speed. Some VM-based container runtimes, including Docker Desktop installations whose LinuxKit kernel lacks nftables quota support, use this fallback even though the `nft` command is installed.
 
 Quota state and usage are included in the JSON and Prometheus metrics endpoints. The Prometheus quota labels use stable quota IDs and a fixed set of direction/state values to limit label cardinality.
