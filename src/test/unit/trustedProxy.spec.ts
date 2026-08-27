@@ -4,6 +4,7 @@ import { createEvent, type H3Event } from 'h3';
 import { describe, expect, test } from 'vitest';
 
 import {
+  getTrustedRequestIP,
   getTrustedRequestHost,
   getTrustedRequestURL,
   parseTrustedProxies,
@@ -35,9 +36,11 @@ describe('trusted request helpers', () => {
     const event = createTestEvent('192.0.2.10', {
       host: 'wg-easy:51821',
       'x-forwarded-host': 'vpn.example.com',
+      'x-forwarded-for': '198.51.100.25',
       'x-forwarded-proto': 'https',
     });
 
+    expect(getTrustedRequestIP(event, ['10.0.0.0/8'])).toBe('192.0.2.10');
     expect(getTrustedRequestHost(event, ['10.0.0.0/8'])).toBe('wg-easy:51821');
     expect(getTrustedRequestURL(event, ['10.0.0.0/8']).origin).toBe(
       'http://wg-easy:51821'
@@ -50,9 +53,11 @@ describe('trusted request helpers', () => {
     const event = createTestEvent('10.0.0.2', {
       host: 'wg-easy:51821',
       'x-forwarded-host': 'vpn.example.com:8443, wg-easy:51821',
+      'x-forwarded-for': '198.51.100.25',
       'x-forwarded-proto': 'HTTPS, http',
     });
 
+    expect(getTrustedRequestIP(event, ['10.0.0.0/8'])).toBe('198.51.100.25');
     expect(getTrustedRequestHost(event, ['10.0.0.0/8'])).toBe(
       'vpn.example.com:8443'
     );
@@ -64,10 +69,16 @@ describe('trusted request helpers', () => {
     );
     expect(event.node.req.headers['x-forwarded-proto']).toBe('HTTPS, http');
   });
+
+  test('returns undefined when no request address is available', () => {
+    const event = createTestEvent(undefined, {});
+
+    expect(getTrustedRequestIP(event, ['10.0.0.0/8'])).toBeUndefined();
+  });
 });
 
 function createTestEvent(
-  remoteAddress: string,
+  remoteAddress: string | undefined,
   headers: IncomingMessage['headers']
 ): H3Event {
   const request = {
