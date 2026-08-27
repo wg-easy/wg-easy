@@ -1364,6 +1364,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#rate-limiting" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Rate Limiting
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1800,6 +1811,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#rate-limiting" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Rate Limiting
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1999,6 +2021,18 @@
 <div class="language-shell highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>sudo<span class="w"> </span>docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>-d
 </span></code></pre></div>
 <p>You can now access <code>wg-easy</code> at <a href="https://wg-easy.example.com">https://wg-easy.example.com</a> and start the setup.</p>
+<h2 id="rate-limiting">Rate Limiting<a class="headerlink" href="#rate-limiting" title="Permanent link">&para;</a></h2>
+<p>wg-easy does not implement rate limiting. Configure Caddy, a Caddy rate
+limiting module, or an external security tool such as CrowdSec to limit requests
+to these paths:</p>
+<ul>
+<li><code>/api/auth/password</code></li>
+<li><code>/api/auth/verify-2fa</code></li>
+<li><code>/cnf/*</code></li>
+</ul>
+<p>Choose limits appropriate for your deployment. When using wg-easy security logs
+for detection, configure <a href="../../../advanced/config/optional-config/#trusted-proxies"><code>TRUSTED_PROXIES</code></a>
+so that logged events contain the original client IP address.</p>
 
 
 

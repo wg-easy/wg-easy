@@ -1603,6 +1603,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#rate-limiting" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Rate Limiting
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1954,6 +1965,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#rate-limiting" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Rate Limiting
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2085,7 +2107,7 @@
 <p>File: <code>/etc/docker/containers/traefik/docker-compose.yml</code></p>
 <div class="language-yaml highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nt">services</span><span class="p">:</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="nt">traefik</span><span class="p">:</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">        </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">traefik:3.3</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">        </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">traefik:3.7</span>
 </span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">        </span><span class="nt">container_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">traefik</span>
 </span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">        </span><span class="nt">restart</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">unless-stopped</span>
 </span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">        </span><span class="nt">ports</span><span class="p">:</span>
@@ -2220,6 +2242,33 @@
 </span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>sudo<span class="w"> </span>docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>-d
 </span></code></pre></div>
 <p>You can now access <code>wg-easy</code> at <code>https://wg-easy.$example.com$</code> and start the setup.</p>
+<h2 id="rate-limiting">Rate Limiting<a class="headerlink" href="#rate-limiting" title="Permanent link">&para;</a></h2>
+<p>wg-easy does not implement rate limiting. Configure a Traefik rate limit
+middleware or an external security tool such as CrowdSec to limit requests to
+these paths:</p>
+<ul>
+<li><code>/api/auth/password</code></li>
+<li><code>/api/auth/verify-2fa</code></li>
+<li><code>/cnf/*</code></li>
+</ul>
+<p>Choose limits appropriate for your deployment. When using wg-easy security logs
+for detection, configure <a href="../../../advanced/config/optional-config/#trusted-proxies"><code>TRUSTED_PROXIES</code></a>
+so that logged events contain the original client IP address.</p>
+<p>For example, add these labels to the <code>wg-easy</code> service to allow an average of
+five requests per minute per client IP, with a burst of five requests:</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nt">labels</span><span class="p">:</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">'traefik.http.routers.wg-easy-rate-limit.rule=Host(`wg-easy.$example.com$`)</span><span class="nv"> </span><span class="s">&amp;&amp;</span><span class="nv"> </span><span class="s">(Path(`/api/auth/password`)</span><span class="nv"> </span><span class="s">||</span><span class="nv"> </span><span class="s">Path(`/api/auth/verify-2fa`)</span><span class="nv"> </span><span class="s">||</span><span class="nv"> </span><span class="s">PathPrefix(`/cnf/`))'</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">'traefik.http.routers.wg-easy-rate-limit.entrypoints=websecure'</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">'traefik.http.routers.wg-easy-rate-limit.service=wg-easy'</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">'traefik.http.routers.wg-easy-rate-limit.middlewares=wg-easy-rate-limit'</span>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">'traefik.http.routers.wg-easy-rate-limit.priority=100'</span>
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">'traefik.http.middlewares.wg-easy-rate-limit.ratelimit.average=5'</span>
+</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">'traefik.http.middlewares.wg-easy-rate-limit.ratelimit.period=1m'</span>
+</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">'traefik.http.middlewares.wg-easy-rate-limit.ratelimit.burst=5'</span>
+</span></code></pre></div>
+<p>The dedicated router applies the <a href="https://doc.traefik.io/traefik/v3.7/reference/routing-configuration/http/middlewares/ratelimit/">rate limit middleware</a>
+only to the sensitive paths. Adjust <code>average</code>, <code>period</code>, and <code>burst</code> for your
+deployment.</p>
 
 
 
