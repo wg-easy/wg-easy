@@ -57,6 +57,13 @@
       "when": 1785630544322,
       "tag": "0007_blushing_electro",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1787910018681,
+      "tag": "0008_chubby_edwin_jarvis",
+      "breakpoints": true
     }
   ]
 }

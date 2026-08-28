@@ -78,11 +78,28 @@ AllowedIPs = ${allowedIps.join(', ')}${extraLines.length ? `\n${extraLines.join(
         I3: wgInterface.i3,
         I4: wgInterface.i4,
         I5: wgInterface.i5,
+        HeaderProtectionKey: wgInterface.headerProtectionKey,
+        ContentPaddingAddition: wgInterface.contentPaddingAddition,
+        RekeyAfterTime: wgInterface.rekeyAfterTime,
+        RekeyTimeout: wgInterface.rekeyTimeout,
+        RejectAfterTime: wgInterface.rejectAfterTime,
+        KeepaliveTimeout: wgInterface.keepaliveTimeout,
+        MaxHandshakeAttempts: wgInterface.maxHandshakeAttempts,
       } as const;
 
-      awgLines = Object.entries(parameters)
-        .filter(([_, value]) => !!value)
-        .map(([key, value]) => `${key} = ${value}`);
+      const booleanParameters = {
+        RandomTrailers: wgInterface.randomTrailers,
+        DisableCookies: wgInterface.disableCookies,
+      } as const;
+
+      awgLines = [
+        ...Object.entries(parameters)
+          .filter(([_, value]) => !!value)
+          .map(([key, value]) => `${key} = ${value}`),
+        ...Object.entries(booleanParameters)
+          .filter(([_, value]) => value !== null && value !== undefined)
+          .map(([key, value]) => `${key} = ${value ? 'true' : 'false'}`),
+      ];
     }
 
     const extraLines = [...awgLines].filter((v) => v !== null);
@@ -147,11 +164,28 @@ PostDown = ${iptablesTemplate(hooks.postDown, wgInterface)}`;
         I3: client.i3,
         I4: client.i4,
         I5: client.i5,
+        HeaderProtectionKey: client.headerProtectionKey,
+        ContentPaddingAddition: client.contentPaddingAddition,
+        RekeyAfterTime: client.rekeyAfterTime,
+        RekeyTimeout: client.rekeyTimeout,
+        RejectAfterTime: client.rejectAfterTime,
+        KeepaliveTimeout: client.keepaliveTimeout,
+        MaxHandshakeAttempts: client.maxHandshakeAttempts,
       } as const;
 
-      awgLines = Object.entries(parameters)
-        .filter(([_, value]) => !!value)
-        .map(([key, value]) => `${key} = ${value}`);
+      const booleanParameters = {
+        RandomTrailers: client.randomTrailers,
+        DisableCookies: client.disableCookies,
+      } as const;
+
+      awgLines = [
+        ...Object.entries(parameters)
+          .filter(([_, value]) => !!value)
+          .map(([key, value]) => `${key} = ${value}`),
+        ...Object.entries(booleanParameters)
+          .filter(([_, value]) => value !== null && value !== undefined)
+          .map(([key, value]) => `${key} = ${value ? 'true' : 'false'}`),
+      ];
     }
 
     const extraLines = [dnsLine, ...hookLines, ...awgLines].filter(
