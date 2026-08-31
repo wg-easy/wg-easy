@@ -3,6 +3,7 @@ import { int, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core';
 
 import { wgInterface } from '../interface/schema';
 import { oneTimeLink } from '../oneTimeLink/schema';
+import { quota } from '../quota/schema';
 import { user } from '../user/schema';
 
 /** null means use value from userConfig */
@@ -23,6 +24,10 @@ export const client = sqliteTable(
         onDelete: 'cascade',
         onUpdate: 'cascade',
       }),
+    quotaId: int('quota_id').references(() => quota.id, {
+      onDelete: 'set null',
+      onUpdate: 'cascade',
+    }),
     name: text().notNull(),
     ipv4Address: text('ipv4_address').notNull().unique(),
     ipv6Address: text('ipv6_address').notNull().unique(),
@@ -71,6 +76,21 @@ export const client = sqliteTable(
   ]
 );
 
+export const quotaClientCounter = sqliteTable('quota_client_counters_table', {
+  clientId: int('client_id')
+    .primaryKey()
+    .references(() => client.id, {
+      onDelete: 'cascade',
+      onUpdate: 'cascade',
+    }),
+  previousRxBytes: int('previous_rx_bytes').default(0).notNull(),
+  previousTxBytes: int('previous_tx_bytes').default(0).notNull(),
+  updatedAt: text('updated_at')
+    .notNull()
+    .default(sql`(CURRENT_TIMESTAMP)`)
+    .$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
+});
+
 export const clientsRelations = relations(client, ({ one }) => ({
   oneTimeLink: one(oneTimeLink, {
     fields: [client.id],
@@ -84,4 +104,22 @@ export const clientsRelations = relations(client, ({ one }) => ({
     fields: [client.interfaceId],
     references: [wgInterface.name],
   }),
+  quota: one(quota, {
+    fields: [client.quotaId],
+    references: [quota.id],
+  }),
+  quotaCounter: one(quotaClientCounter, {
+    fields: [client.id],
+    references: [quotaClientCounter.clientId],
+  }),
 }));
+
+export const quotaClientCounterRelations = relations(
+  quotaClientCounter,
+  ({ one }) => ({
+    client: one(client, {
+      fields: [quotaClientCounter.clientId],
+      references: [client.id],
+    }),
+  })
+);

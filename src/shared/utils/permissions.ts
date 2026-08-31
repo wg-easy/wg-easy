@@ -73,6 +73,10 @@ export type Permissions = {
     dataType: never;
     action: 'any';
   };
+  quotas: {
+    dataType: never;
+    action: 'view' | 'create' | 'update' | 'delete';
+  };
   me: {
     dataType: UserType;
     action: 'update';
@@ -91,6 +95,12 @@ export const ROLES = {
     admin: {
       any: true,
     },
+    quotas: {
+      view: true,
+      create: true,
+      update: true,
+      delete: true,
+    },
     me: {
       update: (loggedIn, toChange) => loggedIn.id === toChange.id,
     },
@@ -105,6 +115,12 @@ export const ROLES = {
     },
     admin: {
       any: false,
+    },
+    quotas: {
+      view: false,
+      create: false,
+      update: false,
+      delete: false,
     },
     me: {
       update: (loggedIn, toChange) => loggedIn.id === toChange.id,

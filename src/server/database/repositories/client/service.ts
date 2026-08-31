@@ -22,11 +22,15 @@ function createPreparedStatement(db: DBType) {
       .findMany({
         with: {
           oneTimeLink: true,
+          quota: true,
         },
       })
       .prepare(),
     findById: db.query.client
-      .findFirst({ where: eq(client.id, sql.placeholder('id')) })
+      .findFirst({
+        where: eq(client.id, sql.placeholder('id')),
+        with: { quota: true },
+      })
       .prepare(),
     toggle: db
       .update(client)
@@ -82,6 +86,7 @@ export class ClientService {
       .findMany({
         with: {
           oneTimeLink: true,
+          quota: true,
         },
         where: and(...filters),
         columns: {
@@ -126,7 +131,7 @@ export class ClientService {
     const result = await this.#db.query.client
       .findMany({
         where: and(eq(client.userId, userId), ...filters),
-        with: { oneTimeLink: true },
+        with: { oneTimeLink: true, quota: true },
         columns: {
           privateKey: false,
           preSharedKey: false,

@@ -18,8 +18,7 @@ export default definePermissionEventHandler(
     const client = await Database.clients.get(clientId);
     checkPermissions(client);
 
-    await Database.clients.delete(clientId);
-    await WireGuard.saveConfig();
+    await WireGuard.runConfigMutation(() => Database.clients.delete(clientId));
     return { success: true };
   }
 );

@@ -30,6 +30,7 @@ export default definePermissionEventHandler(
 
     return {
       ...result,
+      isQuotaBlocked: Boolean(result.quota?.enabled && result.quota.exceededAt),
       endpoint: data?.endpoint,
     };
   }

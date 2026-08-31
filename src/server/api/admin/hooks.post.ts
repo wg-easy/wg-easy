@@ -14,8 +14,7 @@ export default definePermissionEventHandler(
       event,
       validateZod(HooksUpdateSchema, event)
     );
-    await Database.hooks.update(data);
-    await WireGuard.saveConfig();
+    await WireGuard.runConfigMutation(() => Database.hooks.update(data));
     return { success: true };
   }
 );

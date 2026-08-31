@@ -1,5 +1,7 @@
 import WireGuard from '#server/utils/WireGuard';
+import Database from '#server/utils/Database';
 import { defineMetricsHandler } from '#server/utils/handler';
+import { quotaFirewall } from '#server/utils/quotaFirewall';
 import { isPeerConnected } from '#shared/utils/time';
 
 export default defineMetricsHandler('json', async () => {
@@ -7,7 +9,10 @@ export default defineMetricsHandler('json', async () => {
 });
 
 async function getMetricsJSON() {
-  const clients = await WireGuard.getAllClients();
+  const [clients, quotas] = await Promise.all([
+    WireGuard.getAllClients(),
+    Database.quotas.getAll(),
+  ]);
   let wireguardPeerCount = 0;
   let wireguardEnabledPeersCount = 0;
   let wireguardConnectedPeersCount = 0;
@@ -24,6 +29,8 @@ async function getMetricsJSON() {
     wireguard_configured_peers: wireguardPeerCount,
     wireguard_enabled_peers: wireguardEnabledPeersCount,
     wireguard_connected_peers: wireguardConnectedPeersCount,
+    quota_enforcement_backend: quotaFirewall.backend,
+    quotas,
     clients: clients.map((client) => ({
       name: client.name,
       enabled: client.enabled,

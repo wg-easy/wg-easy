@@ -2,11 +2,13 @@ import fs from 'node:fs/promises';
 
 import { createDebug } from 'obug';
 
+import { AsyncMutex } from '#server/utils/AsyncMutex';
 import Database from '#server/utils/Database';
 import { mergeClientStatuses } from '#server/utils/clientStatus';
 import { OLD_ENV, WG_ENV } from '#server/utils/config';
 import { firewall } from '#server/utils/firewall';
 import { encodeQRCode } from '#server/utils/qr';
+import { buildQuotaRuleset, quotaFirewall } from '#server/utils/quotaFirewall';
 import type { ID } from '#server/utils/types';
 import { wg } from '#server/utils/wgHelper';
 import { setIntervalImmediately } from '#shared/utils/time';
@@ -18,15 +20,32 @@ const WG_DEBUG = createDebug('WireGuard');
 const generateRandomHeaderValue = () =>
   Math.floor(Math.random() * 2147483642) + 5;
 
-class WireGuard {
+export class WireGuard {
+  readonly #stateMutex = new AsyncMutex();
+  #quotaCollectionPromise: Promise<void> | null = null;
   /**
    * Save and sync config
    */
-  async saveConfig() {
+  async #saveConfig() {
     const wgInterface = await Database.interfaces.get();
     await this.#saveWireguardConfig(wgInterface);
     await this.#syncWireguardConfig(wgInterface);
     await this.#applyFirewallRules(wgInterface);
+    await this.#applyQuotaRules(wgInterface);
+  }
+
+  async #applyQuotaRules(wgInterface: InterfaceType) {
+    const [quotas, clients] = await Promise.all([
+      Database.quotas.getAll(),
+      Database.clients.getAll(),
+    ]);
+    const ruleset = buildQuotaRuleset(
+      wgInterface.name,
+      quotas,
+      clients,
+      !WG_ENV.DISABLE_IPV6
+    );
+    await quotaFirewall.rebuild(ruleset);
   }
 
   /**
@@ -60,7 +79,7 @@ class WireGuard {
     );
 
     for (const client of clients) {
-      if (!client.enabled) {
+      if (!this.#isClientEffectivelyEnabled(client)) {
         continue;
       }
       result.push(
@@ -83,6 +102,15 @@ class WireGuard {
     WG_DEBUG('Config saved successfully.');
   }
 
+  #isClientEffectivelyEnabled(client: {
+    enabled: boolean;
+    quota?: { enabled: boolean; exceededAt: string | null } | null;
+  }) {
+    return (
+      client.enabled && !(client.quota?.enabled && client.quota.exceededAt)
+    );
+  }
+
   async #syncWireguardConfig(wgInterface: InterfaceType) {
     WG_DEBUG('Syncing Config...');
     await wg.sync(wgInterface.name);
@@ -96,6 +124,7 @@ class WireGuard {
 
     const clients = dbClients.map((client) => ({
       ...client,
+      isQuotaBlocked: Boolean(client.quota?.enabled && client.quota.exceededAt),
       latestHandshakeAt: null as Date | null,
       endpoint: null as string | null,
       transferRx: null as number | null,
@@ -125,6 +154,7 @@ class WireGuard {
 
     const clients = dbClients.map((client) => ({
       ...client,
+      isQuotaBlocked: Boolean(client.quota?.enabled && client.quota.exceededAt),
       latestHandshakeAt: null as Date | null,
       endpoint: null as string | null,
       transferRx: null as number | null,
@@ -200,6 +230,9 @@ class WireGuard {
       Database.interfaces.update(wgInterface);
     }
 
+    const quotasReset = await this.#stateMutex.runExclusive(() =>
+      this.#resetDueQuotas()
+    );
     WG_DEBUG(`Starting Wireguard Interface ${wgInterface.name}...`);
     await this.#saveWireguardConfig(wgInterface);
     await wg.down(wgInterface.name).catch(() => {});
@@ -218,6 +251,10 @@ class WireGuard {
       throw err;
     });
     await this.#syncWireguardConfig(wgInterface);
+    if (quotasReset) {
+      const dump = await wg.dump(wgInterface.name);
+      await Database.quotas.checkpointClientCounters(dump);
+    }
     WG_DEBUG(`Wireguard Interface ${wgInterface.name} started successfully.`);
 
     // Check if firewall was enabled but iptables isn't available
@@ -236,10 +273,17 @@ class WireGuard {
 
     WG_DEBUG('Applying firewall rules...');
     await this.#applyFirewallRules(wgInterface);
+    await this.#applyQuotaRules(wgInterface);
     WG_DEBUG('Firewall rules applied successfully.');
 
     WG_DEBUG('Starting Cron Job...');
     await this.startCronJob();
+    setIntervalImmediately(() => {
+      this.collectQuotaUsage().catch((err) => {
+        WG_DEBUG('Collecting quota usage failed.');
+        console.error(err);
+      });
+    }, 10 * 1000);
     WG_DEBUG('Cron Job started successfully.');
   }
 
@@ -255,29 +299,40 @@ class WireGuard {
 
   // Shutdown wireguard
   async Shutdown() {
-    const wgInterface = await Database.interfaces.get();
-    await wg.down(wgInterface.name).catch(() => {});
+    await this.#stateMutex.runExclusive(async () => {
+      const wgInterface = await Database.interfaces.get();
+      try {
+        const dump = await wg.dump(wgInterface.name);
+        await Database.quotas.collectClientCounters(dump);
+      } finally {
+        await wg.down(wgInterface.name).catch(() => {});
+      }
+    });
   }
 
   async Restart() {
-    const wgInterface = await Database.interfaces.get();
-    await wg.restart(wgInterface.name);
+    await this.runConfigMutation(async () => {
+      const wgInterface = await Database.interfaces.get();
+      await wg.restart(wgInterface.name);
+    });
   }
 
   async cronJob() {
     const clients = await Database.clients.getAll();
-    let needsSave = false;
-    // Expires Feature
-    for (const client of clients) {
-      if (client.enabled !== true) continue;
-      if (
+    const expiredClients = clients.filter(
+      (client) =>
+        client.enabled === true &&
         client.expiresAt !== null &&
         new Date() > new Date(client.expiresAt)
-      ) {
-        WG_DEBUG(`Client ${client.id} expired.`);
-        await Database.clients.toggle(client.id, false);
-        needsSave = true;
-      }
+    );
+    // Expires Feature
+    if (expiredClients.length > 0) {
+      await this.runConfigMutation(async () => {
+        for (const client of expiredClients) {
+          WG_DEBUG(`Client ${client.id} expired.`);
+          await Database.clients.toggle(client.id, false);
+        }
+      });
     }
     // One Time Link Feature
     for (const client of clients) {
@@ -290,10 +345,76 @@ class WireGuard {
         // otl does not need wireguard sync
       }
     }
+  }
 
-    if (needsSave) {
-      await this.saveConfig();
+  async runConfigMutation<T>(mutation: () => Promise<T>) {
+    return this.#stateMutex.runExclusive(async () => {
+      const wgInterface = await Database.interfaces.get();
+      const dump = await wg.dump(wgInterface.name);
+      const blockStateChanged =
+        await Database.quotas.collectClientCounters(dump);
+      let result: T;
+      try {
+        result = await mutation();
+      } catch (error) {
+        if (blockStateChanged) await this.#saveConfig();
+        throw error;
+      }
+      await Database.quotas.checkpointClientCounters(dump);
+      await this.#saveConfig();
+      return result;
+    });
+  }
+
+  async collectQuotaUsage() {
+    if (this.#quotaCollectionPromise) {
+      return this.#quotaCollectionPromise;
     }
+    const collection = this.#stateMutex.runExclusive(async () => {
+      const wgInterface = await Database.interfaces.get();
+      const dump = await wg.dump(wgInterface.name);
+      const needsSave = await Database.quotas.collectClientCounters(dump);
+      if (await this.#resetDueQuotas()) {
+        await Database.quotas.checkpointClientCounters(dump);
+        await this.#saveConfig();
+      } else if (needsSave) {
+        await this.#saveConfig();
+      }
+    });
+    this.#quotaCollectionPromise = collection;
+    try {
+      await collection;
+    } finally {
+      if (this.#quotaCollectionPromise === collection) {
+        this.#quotaCollectionPromise = null;
+      }
+    }
+  }
+
+  async resetQuota(quotaId: ID) {
+    return this.#stateMutex.runExclusive(async () => {
+      const wgInterface = await Database.interfaces.get();
+      const dump = await wg.dump(wgInterface.name);
+      const blockStateChanged =
+        await Database.quotas.collectClientCounters(dump);
+      const result = await Database.quotas.reset(quotaId);
+      if (result) {
+        await Database.quotas.checkpointClientCounters(dump);
+      }
+      if (result || blockStateChanged) {
+        await this.#saveConfig();
+      }
+      return result;
+    });
+  }
+
+  async #resetDueQuotas() {
+    const due = await Database.quotas.getDue();
+    for (const quota of due) {
+      WG_DEBUG(`Resetting quota ${quota.id}.`);
+      await Database.quotas.reset(quota.id);
+    }
+    return due.length > 0;
   }
 }
 

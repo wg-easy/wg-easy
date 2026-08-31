@@ -7,7 +7,8 @@
       "general": "General",
       "config": "Config",
       "interface": "Interface",
-      "hooks": "Hooks"
+      "hooks": "Hooks",
+      "quotas": "Quotas"
     }
   },
   "user": {
@@ -134,6 +135,74 @@
     "downloadPng": "Download PNG",
     "copyPng": "Copy PNG"
   },
+  "quota": {
+    "title": "Quota",
+    "create": "Create Quota",
+    "edit": "Edit Quota",
+    "delete": "Delete Quota",
+    "empty": "No quotas have been created.",
+    "pageDescription": "Manage traffic limits shared by one or more clients.",
+    "formDescription": "Set the traffic direction, limit, reset schedule, and assigned clients.",
+    "enabled": "Enforce quota",
+    "enabledDescription": "Disabled quotas continue recording usage without blocking clients.",
+    "mode": "Traffic mode",
+    "rx": "RX",
+    "tx": "TX",
+    "total": "Total",
+    "rxLimit": "RX limit",
+    "txLimit": "TX limit",
+    "totalLimit": "Combined limit",
+    "reset": "Automatic reset",
+    "frequency": "Frequency",
+    "resetTime": "Reset time",
+    "timezone": "Timezone",
+    "weekday": "Weekday",
+    "monthDay": "Day of month",
+    "clients": "Assigned clients",
+    "clientCount": "{count} clients",
+    "nextReset": "Next reset: {date}",
+    "noReset": "No automatic reset",
+    "resetSchedule": "{frequency} reset ({timezone})",
+    "resetUsage": "Reset Usage",
+    "resetConfirm": "Reset all current usage for {name}?",
+    "deleteConfirm": "Delete {name}? Assigned clients will become unassigned.",
+    "created": "Quota created",
+    "updated": "Quota updated",
+    "deleted": "Quota deleted",
+    "resetSuccess": "Quota usage reset",
+    "assignedQuota": "Assigned quota",
+    "unassigned": "No quota",
+    "manage": "Manage Quota",
+    "saveAssignment": "Save Assignment",
+    "assignmentSaved": "Quota assignment saved",
+    "modes": {
+      "RX": "RX only",
+      "TX": "TX only",
+      "TOTAL": "RX + TX",
+      "SEPARATE": "Separate RX / TX"
+    },
+    "frequencies": {
+      "NONE": "Never",
+      "DAILY": "Daily",
+      "WEEKLY": "Weekly",
+      "MONTHLY": "Monthly"
+    },
+    "weekdays": {
+      "0": "Sunday",
+      "1": "Monday",
+      "2": "Tuesday",
+      "3": "Wednesday",
+      "4": "Thursday",
+      "5": "Friday",
+      "6": "Saturday"
+    },
+    "status": {
+      "active": "Active",
+      "disabled": "Accounting only",
+      "exceeded": "Exceeded",
+      "blocked": "Blocked"
+    }
+  },
   "dialog": {
     "change": "Change",
     "cancel": "Cancel",
@@ -239,6 +308,13 @@
       "sessionTimeout": "Session Timeout",
       "metricsEnabled": "Metrics",
       "metricsPassword": "Metrics Password"
+    },
+    "quota": {
+      "bytes": "Quota limit must be a positive whole number of bytes",
+      "resetTime": "Quota reset time must use HH:mm format",
+      "timezone": "Quota timezone must be a valid IANA timezone",
+      "name": "Quota name must be between 1 and 64 safe characters",
+      "clientIds": "Quota client IDs must be unique"
     },
     "interface": {
       "cidr": "CIDR",

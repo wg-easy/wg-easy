@@ -56,6 +56,9 @@ importers:
       crc-32:
         specifier: ^1.2.2
         version: 1.2.2
+      croner:
+        specifier: 10.0.1
+        version: 10.0.1
       drizzle-orm:
         specifier: ^0.45.2
         version: 0.45.2(@libsql/client@0.17.4)
