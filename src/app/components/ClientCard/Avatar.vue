@@ -1,5 +1,20 @@
 <template>
-  <div class="relative mt-2 h-10 w-10 self-start rounded-full bg-gray-50">
+  <label
+    v-if="selectionMode"
+    class="relative mt-2 flex h-10 w-10 cursor-pointer items-center justify-center self-start rounded-full bg-gray-50 text-red-800"
+  >
+    <input
+      :checked="selected"
+      type="checkbox"
+      class="h-5 w-5 accent-red-800"
+      :aria-label="$t('client.selectClient', [client.name])"
+      @change="$emit('toggle-selection')"
+    />
+  </label>
+  <div
+    v-else
+    class="relative mt-2 h-10 w-10 self-start rounded-full bg-gray-50"
+  >
     <BaseAvatar :img="client.avatar" class="h-10 w-10">
       <IconsAvatar class="h-6 w-6 text-gray-300" />
     </BaseAvatar>
@@ -26,5 +41,11 @@
 <script setup lang="ts">
 defineProps<{
   client: LocalClient;
+  selected?: boolean;
+  selectionMode?: boolean;
+}>();
+
+defineEmits<{
+  'toggle-selection': [];
 }>();
 </script>
