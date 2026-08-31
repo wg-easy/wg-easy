@@ -57,6 +57,20 @@
       "when": 1785630544322,
       "tag": "0007_blushing_electro",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1787763388172,
+      "tag": "0008_thankful_marvex",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1787767220237,
+      "tag": "0009_wandering_paladin",
+      "breakpoints": true
     }
   ]
 }

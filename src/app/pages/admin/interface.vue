@@ -183,7 +183,7 @@ const data = toRef(_data.value);
 
 const _submit = useSubmit(
   (data) =>
-    $fetch(`/api/admin/interface`, {
+    $fetch<{ success: boolean }>(`/api/admin/interface`, {
       method: 'post',
       body: data,
     }),
@@ -209,7 +209,7 @@ async function revert() {
 
 const _changeCidr = useSubmit(
   (data) =>
-    $fetch(`/api/admin/interface/cidr`, {
+    $fetch<{ success: boolean }>(`/api/admin/interface/cidr`, {
       method: 'post',
       body: data,
     }),
@@ -225,7 +225,7 @@ async function changeCidr(ipv4Cidr: string, ipv6Cidr: string) {
 
 const _restartInterface = useSubmit(
   (data) =>
-    $fetch(`/api/admin/interface/restart`, {
+    $fetch<{ success: boolean }>(`/api/admin/interface/restart`, {
       method: 'post',
       body: data,
     }),
