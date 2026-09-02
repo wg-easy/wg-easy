@@ -287,6 +287,146 @@ describe('firewall', () => {
       expect(result).toBe('client 1: ' + 'a'.repeat(246));
     });
   });
+  describe('getRoutedSubnets', () => {
+    test('excludes the client own tunnel addresses', () => {
+      expect(
+        firewallTestExports.getRoutedSubnets({
+          id: 1,
+          name: 'gateway',
+          ipv4Address: '10.8.0.3',
+          ipv6Address: 'fd00::3',
+          allowedIps: null,
+          firewallIps: null,
+          serverAllowedIps: ['10.8.0.3/32', 'fd00::3/128'],
+          enabled: true,
+        })
+      ).toEqual([]);
+    });
+
+    test('returns additional routed subnets beyond the own tunnel addresses', () => {
+      expect(
+        firewallTestExports.getRoutedSubnets({
+          id: 1,
+          name: 'gateway',
+          ipv4Address: '10.8.0.3',
+          ipv6Address: 'fd00::3',
+          allowedIps: null,
+          firewallIps: null,
+          serverAllowedIps: [
+            '10.8.0.3/32',
+            'fd00::3/128',
+            '192.168.1.0/24',
+            'fd10::/64',
+          ],
+          enabled: true,
+        })
+      ).toEqual(['192.168.1.0/24', 'fd10::/64']);
+    });
+
+    test('returns an empty array when serverAllowedIps is empty or null', () => {
+      expect(
+        firewallTestExports.getRoutedSubnets({
+          id: 1,
+          name: 'regular-client',
+          ipv4Address: '10.8.0.2',
+          ipv6Address: 'fd00::2',
+          allowedIps: null,
+          firewallIps: null,
+          serverAllowedIps: [],
+          enabled: true,
+        })
+      ).toEqual([]);
+    });
+  });
+
+  describe('applyClientRules: routed subnets (site-to-site gateways)', () => {
+    test('adds a return-traffic rule for an additional routed subnet', async () => {
+      await firewall.applyClientRules(
+        {
+          id: 58,
+          name: 'gateway',
+          ipv4Address: '10.8.0.51',
+          ipv6Address: 'fd00::51',
+          allowedIps: ['10.8.0.0/24'],
+          firewallIps: null,
+          serverAllowedIps: ['10.8.0.51/32', '172.17.0.0/16'],
+          enabled: true,
+        },
+        ['10.0.0.0/8'],
+        false,
+        '10.8.0.0/24',
+        'fd00::/64'
+      );
+
+      expect(execMock).toHaveBeenCalledWith(
+        expect.stringContaining('-A WG_CLIENTS -s 172.17.0.0/16 -d 10.8.0.0/24')
+      );
+    });
+
+    test('adds an IPv6 return-traffic rule only when IPv6 is enabled', async () => {
+      const client = {
+        id: 58,
+        name: 'gateway',
+        ipv4Address: '10.8.0.51',
+        ipv6Address: 'fd00::51',
+        allowedIps: ['10.8.0.0/24'],
+        firewallIps: null,
+        serverAllowedIps: ['10.8.0.51/32', 'fd10::/64'],
+        enabled: true,
+      };
+
+      await firewall.applyClientRules(
+        client,
+        ['10.0.0.0/8'],
+        false,
+        '10.8.0.0/24',
+        'fd00::/64'
+      );
+      expect(execMock).not.toHaveBeenCalledWith(
+        expect.stringContaining('ip6tables')
+      );
+
+      execMock.mockClear();
+
+      await firewall.applyClientRules(
+        client,
+        ['10.0.0.0/8'],
+        true,
+        '10.8.0.0/24',
+        'fd00::/64'
+      );
+      expect(execMock).toHaveBeenCalledWith(
+        expect.stringContaining(
+          'ip6tables -A WG_CLIENTS -s fd10::/64 -d fd00::/64'
+        )
+      );
+    });
+
+    test('does not add any return-traffic rule for a regular client', async () => {
+      await firewall.applyClientRules(
+        {
+          id: 3,
+          name: 'laptop',
+          ipv4Address: '10.8.0.2',
+          ipv6Address: 'fd00::2',
+          allowedIps: ['0.0.0.0/0'],
+          firewallIps: null,
+          serverAllowedIps: [],
+          enabled: true,
+        },
+        ['10.0.0.0/8'],
+        false,
+        '10.8.0.0/24',
+        'fd00::/64'
+      );
+
+      const calls = execMock.mock.calls.map((call) => call[0]);
+      expect(calls.some((cmd) => String(cmd).includes('-d 10.8.0.0/24'))).toBe(
+        false
+      );
+    });
+  });
+
   describe('generateRuleArgs', () => {
     test('includes comment when provided', () => {
       const rules = firewallTestExports.generateRuleArgs(
