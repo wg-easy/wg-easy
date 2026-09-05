@@ -1,5 +1,6 @@
 import { parseCidr } from 'cidr-tools';
 import { stringifyIp } from 'ip-bigint';
+import isCidr from 'is-cidr';
 
 import { removeNewlines, iptablesTemplate } from '#server/utils/template';
 import { exec } from '#server/utils/cmd';
@@ -16,6 +17,95 @@ type Options = {
 // needed to support cli
 const wgExecutable =
   typeof WG_ENV !== 'undefined' ? WG_ENV.WG_EXECUTABLE : 'dev';
+
+function parseRunningAllowedIps(output: string) {
+  const allowedIps = new Set<string>();
+
+  for (const line of output.split('\n')) {
+    const separator = line.indexOf('\t');
+    if (separator === -1) {
+      continue;
+    }
+
+    for (const value of line.slice(separator + 1).split(/\s+/)) {
+      if (isCidr(value)) {
+        allowedIps.add(value);
+      }
+    }
+  }
+
+  return allowedIps;
+}
+
+function parseConfigAllowedIps(output: string) {
+  const allowedIps = new Set<string>();
+
+  for (const line of output.split('\n')) {
+    const match = line.match(/^\s*AllowedIPs\s*=\s*(.+)$/i);
+    if (!match) {
+      continue;
+    }
+
+    for (const value of match[1]!.split(',').map((value) => value.trim())) {
+      if (isCidr(value)) {
+        allowedIps.add(value);
+      }
+    }
+  }
+
+  return allowedIps;
+}
+
+function isDefaultRoute(cidr: string) {
+  return parseCidr(cidr).prefix === '0';
+}
+
+function routeFamily(cidr: string) {
+  return cidr.includes(':') ? '-6' : '-4';
+}
+
+async function syncRoutes(
+  infName: string,
+  routingTable: string,
+  previousAllowedIps: Set<string>,
+  desiredAllowedIps: Set<string>
+) {
+  if (routingTable === 'off') {
+    return;
+  }
+
+  const table = routingTable === 'auto' ? '' : ` table ${routingTable}`;
+
+  for (const cidr of previousAllowedIps.difference(desiredAllowedIps)) {
+    if (routingTable === 'auto' && isDefaultRoute(cidr)) {
+      continue;
+    }
+
+    await exec(
+      `ip ${routeFamily(cidr)} route delete ${cidr} dev ${infName}${table} 2>/dev/null || true`
+    );
+  }
+
+  for (const cidr of desiredAllowedIps) {
+    if (routingTable === 'auto' && isDefaultRoute(cidr)) {
+      continue;
+    }
+
+    if (routingTable !== 'auto') {
+      await exec(
+        `ip ${routeFamily(cidr)} route replace ${cidr} dev ${infName}${table}`
+      );
+      continue;
+    }
+
+    const existingRoute = await exec(
+      `ip ${routeFamily(cidr)} route show dev ${infName} match ${cidr}`
+    );
+    if (!existingRoute) {
+      await exec(`ip ${routeFamily(cidr)} route add ${cidr} dev ${infName}`);
+    }
+  }
+}
 
 export const wg = {
   generateServerPeer: (
@@ -199,9 +289,34 @@ Endpoint = ${userConfig.host}:${userConfig.port}`;
     );
   },
 
-  sync: (infName: string) => {
-    return exec(
+  sync: async (infName: string, routingTable: string) => {
+    const previousAllowedIps = parseRunningAllowedIps(
+      await exec(`${wgExecutable} show ${infName} allowed-ips`)
+    );
+    const desiredAllowedIps = parseConfigAllowedIps(
+      await exec(`${wgExecutable}-quick strip ${infName}`)
+    );
+
+    const defaultRouteChanged = [
+      ...previousAllowedIps.symmetricDifference(desiredAllowedIps),
+    ].some((cidr) => isDefaultRoute(cidr));
+
+    // wg-quick installs policy-routing rules for default routes. Recreate the
+    // interface when one changes so those rules stay in sync as well.
+    if (routingTable === 'auto' && defaultRouteChanged) {
+      return exec(
+        `${wgExecutable}-quick down ${infName}; ${wgExecutable}-quick up ${infName}`
+      );
+    }
+
+    await exec(
       `${wgExecutable} syncconf ${infName} <(${wgExecutable}-quick strip ${infName})`
+    );
+    await syncRoutes(
+      infName,
+      routingTable,
+      previousAllowedIps,
+      desiredAllowedIps
     );
   },
 
