@@ -43,7 +43,7 @@ export const client = sqliteTable(
       string[] | null
     >(),
     persistentKeepalive: int('persistent_keepalive').notNull(),
-    mtu: int().notNull(),
+    mtu: int(),
     jC: int('j_c'),
     jMin: int('j_min'),
     jMax: int('j_max'),
