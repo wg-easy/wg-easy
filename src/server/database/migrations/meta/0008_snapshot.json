@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "95077f5e-9145-4ff3-b863-01233f67bf6d",
+  "id": "885a870f-9dc1-4d97-941e-d3d718b02d74",
   "prevId": "6d5a5bde-368b-45cb-b73a-9f4324210d73",
   "tables": {
     "clients_table": {
@@ -200,13 +200,6 @@
           "notNull": false,
           "autoincrement": false
         },
-        "header_protection_key": {
-          "name": "header_protection_key",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
         "content_padding_addition": {
           "name": "content_padding_addition",
           "type": "text",
@@ -245,13 +238,6 @@
         "max_handshake_attempts": {
           "name": "max_handshake_attempts",
           "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "random_trailers": {
-          "name": "random_trailers",
-          "type": "integer",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false

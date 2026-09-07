@@ -135,6 +135,9 @@
           :label="$t('awg.headerProtectionKeyLabel')"
           :description="$t('awg.headerProtectionKeyDescription')"
         />
+
+        <div class="col-span-full text-sm">{{ $t('awg.rangeNote') }}</div>
+
         <FormNullTextField
           id="contentPaddingAddition"
           v-model="data.contentPaddingAddition"

@@ -144,12 +144,11 @@
               :label="$t('awg.i5Label')"
               :description="$t('awg.i5Description')"
             />
-            <FormNullTextField
-              id="headerProtectionKey"
-              v-model="data.headerProtectionKey"
-              :label="$t('awg.headerProtectionKeyLabel')"
-              :description="$t('awg.headerProtectionKeyDescription')"
-            />
+
+            <div class="col-span-full text-sm">
+              {{ $t('awg.rangeNote') }}
+            </div>
+
             <FormNullTextField
               id="contentPaddingAddition"
               v-model="data.contentPaddingAddition"
@@ -185,12 +184,6 @@
               v-model="data.maxHandshakeAttempts"
               :label="$t('awg.maxHandshakeAttemptsLabel')"
               :description="$t('awg.maxHandshakeAttemptsDescription')"
-            />
-            <FormNullSwitchField
-              id="randomTrailers"
-              v-model="data.randomTrailers"
-              :label="$t('awg.randomTrailersLabel')"
-              :description="$t('awg.randomTrailersDescription')"
             />
             <FormNullSwitchField
               id="disableCookies"
