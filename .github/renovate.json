@@ -16,6 +16,20 @@
       "matchUpdateTypes": ["digest"]
     },
     {
+      "groupName": "github-actions-digest",
+      "matchManagers": ["github-actions"],
+      "matchUpdateTypes": ["digest"]
+    },
+    {
+      "matchManagers": ["npm"],
+      "rangeStrategy": "bump"
+    },
+    {
+      "groupName": "npm-non-major",
+      "matchManagers": ["npm"],
+      "matchUpdateTypes": ["patch", "minor", "lockFileMaintenance"]
+    },
+    {
       "matchManagers": ["docker-compose"],
       "pinDigests": false
     },
