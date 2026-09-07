@@ -77,7 +77,7 @@
           </FormGroup>
           <FormGroup>
             <FormHeading>{{ $t('form.sectionAdvanced') }}</FormHeading>
-            <FormNumberField
+            <FormNullNumberField
               id="mtu"
               v-model="data.mtu"
               :description="$t('client.mtuDesc')"
