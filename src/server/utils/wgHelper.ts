@@ -113,14 +113,15 @@ PostDown = ${iptablesTemplate(hooks.postDown, wgInterface)}`;
         ? buildAwgLines(clientAwgParameters(wgInterface, client))
         : [];
 
-    const extraLines = [dnsLine, ...hookLines, ...awgLines].filter(
+    const mtuLine = client.mtu ? `MTU = ${client.mtu}` : null;
+
+    const extraLines = [mtuLine, dnsLine, ...hookLines, ...awgLines].filter(
       (v) => v !== null
     );
 
     return `[Interface]
 PrivateKey = ${client.privateKey}
 Address = ${address}
-MTU = ${client.mtu}
 ${extraLines.length ? `${extraLines.join('\n')}\n` : ''}
 [Peer]
 PublicKey = ${wgInterface.publicKey}
