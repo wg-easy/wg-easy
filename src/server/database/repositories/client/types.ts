@@ -100,7 +100,7 @@ export const ClientUpdateSchema = schemaForType<UpdateClientType>()(
     allowedIps: AllowedIpsSchema.nullable(),
     serverAllowedIps: serverAllowedIps,
     firewallIps: FirewallIpsSchema.nullable(),
-    mtu: MtuSchema,
+    mtu: MtuSchema.nullable(),
     jC: JcSchema,
     jMin: JminSchema,
     jMax: JmaxSchema,
