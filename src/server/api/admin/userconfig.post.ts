@@ -14,8 +14,7 @@ export default definePermissionEventHandler(
       event,
       validateZod(UserConfigUpdateSchema, event)
     );
-    await Database.userConfigs.update(data);
-    await WireGuard.saveConfig();
+    await WireGuard.runConfigMutation(() => Database.userConfigs.update(data));
     return { success: true };
   }
 );

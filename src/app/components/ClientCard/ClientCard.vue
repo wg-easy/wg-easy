@@ -20,6 +20,7 @@
           </div>
           <ClientCardOneTimeLink :client="client" />
           <ClientCardExpireDate :client="client" />
+          <QuotaClientStatus :quota="client.quota" compact />
         </div>
 
         <div

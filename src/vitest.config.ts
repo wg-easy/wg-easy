@@ -9,6 +9,8 @@ export default defineConfig({
         resolve: {
           alias: {
             '#server': fileURLToPath(new URL('./server', import.meta.url)),
+            '#db': fileURLToPath(new URL('./server/database', import.meta.url)),
+            '#shared': fileURLToPath(new URL('./shared', import.meta.url)),
           },
         },
         test: {

@@ -36,8 +36,7 @@ export default definePermissionEventHandler(
       }
     }
 
-    await Database.interfaces.update(data);
-    await WireGuard.saveConfig();
+    await WireGuard.runConfigMutation(() => Database.interfaces.update(data));
     return { success: true };
   }
 );

@@ -7,7 +7,8 @@
       "general": "一般設定",
       "config": "組態設定",
       "interface": "介面設定",
-      "hooks": "Hook 設定"
+      "hooks": "Hook 設定",
+      "quotas": "流量配額"
     }
   },
   "user": {
@@ -134,6 +135,74 @@
     "downloadPng": "下載 PNG",
     "copyPng": "複製 PNG"
   },
+  "quota": {
+    "title": "流量配額",
+    "create": "建立配額",
+    "edit": "編輯配額",
+    "delete": "刪除配額",
+    "empty": "尚未建立任何配額。",
+    "pageDescription": "管理由一個或多個用戶端共享的流量限制。",
+    "formDescription": "設定流量方向、限制、重設排程與指派的用戶端。",
+    "enabled": "強制執行配額",
+    "enabledDescription": "停用時仍會記錄用量，但不會阻擋用戶端。",
+    "mode": "流量模式",
+    "rx": "RX",
+    "tx": "TX",
+    "total": "合計",
+    "rxLimit": "RX 限制",
+    "txLimit": "TX 限制",
+    "totalLimit": "合計限制",
+    "reset": "自動重設",
+    "frequency": "頻率",
+    "resetTime": "重設時間",
+    "timezone": "時區",
+    "weekday": "星期",
+    "monthDay": "每月日期",
+    "clients": "已指派用戶端",
+    "clientCount": "{count} 個用戶端",
+    "nextReset": "下次重設：{date}",
+    "noReset": "不自動重設",
+    "resetSchedule": "{frequency}重設（{timezone}）",
+    "resetUsage": "重設用量",
+    "resetConfirm": "要重設 {name} 的所有目前用量嗎？",
+    "deleteConfirm": "要刪除 {name} 嗎？已指派的用戶端將變為未指派。",
+    "created": "已建立配額",
+    "updated": "已更新配額",
+    "deleted": "已刪除配額",
+    "resetSuccess": "已重設配額用量",
+    "assignedQuota": "指派的配額",
+    "unassigned": "無配額",
+    "manage": "管理配額",
+    "saveAssignment": "儲存指派",
+    "assignmentSaved": "已儲存配額指派",
+    "modes": {
+      "RX": "僅 RX",
+      "TX": "僅 TX",
+      "TOTAL": "RX + TX",
+      "SEPARATE": "分開計算 RX / TX"
+    },
+    "frequencies": {
+      "NONE": "永不",
+      "DAILY": "每日",
+      "WEEKLY": "每週",
+      "MONTHLY": "每月"
+    },
+    "weekdays": {
+      "0": "星期日",
+      "1": "星期一",
+      "2": "星期二",
+      "3": "星期三",
+      "4": "星期四",
+      "5": "星期五",
+      "6": "星期六"
+    },
+    "status": {
+      "active": "執行中",
+      "disabled": "僅記錄",
+      "exceeded": "已超額",
+      "blocked": "已阻擋"
+    }
+  },
   "dialog": {
     "change": "變更",
     "cancel": "取消",
@@ -239,6 +308,13 @@
       "sessionTimeout": "工作階段逾時",
       "metricsEnabled": "計量",
       "metricsPassword": "計量密碼"
+    },
+    "quota": {
+      "bytes": "配額限制必須是正整數位元組數",
+      "resetTime": "配額重設時間必須使用 HH:mm 格式",
+      "timezone": "配額時區必須是有效的 IANA 時區",
+      "name": "配額名稱必須為 1 至 64 個安全字元",
+      "clientIds": "配額用戶端 ID 不可重複"
     },
     "interface": {
       "cidr": "CIDR",

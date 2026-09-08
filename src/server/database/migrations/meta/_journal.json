@@ -57,6 +57,13 @@
       "when": 1785630544322,
       "tag": "0007_blushing_electro",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1787754394564,
+      "tag": "0008_unusual_speedball",
+      "breakpoints": true
     }
   ]
 }

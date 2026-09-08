@@ -15,8 +15,9 @@ export default definePermissionEventHandler(
       validateZod(ClientCreateSchema, event)
     );
 
-    const result = await Database.clients.create({ name, expiresAt });
-    await WireGuard.saveConfig();
+    const result = await WireGuard.runConfigMutation(() =>
+      Database.clients.create({ name, expiresAt })
+    );
 
     const clientId = result[0]!.clientId;
     return { success: true, clientId };
