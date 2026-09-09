@@ -17,6 +17,16 @@
               v-model="data.name"
               :label="$t('general.name')"
             />
+            <FormNullTextField
+              id="description"
+              v-model="data.description"
+              :label="$t('general.description')"
+            />
+            <FormTagsField
+              id="tags"
+              v-model="tagIds"
+              :label="$t('general.tags')"
+            />
             <FormSwitchField
               id="enabled"
               v-model="data.enabled"
@@ -219,10 +229,11 @@ const { data: _data, refresh } = await useFetch(`/api/client/${id}`, {
   method: 'get',
 });
 const data = toRef(_data.value);
+const tagIds = ref<number[]>(data.value?.tags?.map((tag) => tag.id) ?? []);
 
 const _submit = useSubmit(
   (data) =>
-    $fetch(`/api/client/${id}`, {
+    $fetch<{ success: boolean }>(`/api/client/${id}`, {
       method: 'post',
       body: data,
     }),
@@ -238,17 +249,18 @@ const _submit = useSubmit(
 );
 
 function submit() {
-  return _submit(data.value);
+  return _submit({ ...data.value, tagIds: tagIds.value });
 }
 
 async function revert() {
   await refresh();
   data.value = toRef(_data.value).value;
+  tagIds.value = data.value?.tags?.map((tag) => tag.id) ?? [];
 }
 
 const _deleteClient = useSubmit(
   (data) =>
-    $fetch(`/api/client/${id}`, {
+    $fetch<{ success: boolean }>(`/api/client/${id}`, {
       method: 'delete',
       body: data,
     }),

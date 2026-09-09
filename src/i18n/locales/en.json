@@ -7,7 +7,8 @@
       "general": "General",
       "config": "Config",
       "interface": "Interface",
-      "hooks": "Hooks"
+      "hooks": "Hooks",
+      "tags": "Tags"
     }
   },
   "user": {
@@ -28,6 +29,8 @@
   },
   "general": {
     "name": "Name",
+    "description": "Description",
+    "tags": "Tags",
     "username": "Username",
     "password": "Password",
     "newPassword": "New Password",
@@ -153,7 +156,10 @@
     "sectionAdvanced": "Advanced",
     "noItems": "No items",
     "nullNoItems": "No items. Using global config",
-    "add": "Add"
+    "add": "Add",
+    "addTag": "Add Tag",
+    "searchOrCreateTag": "Search or create tag",
+    "createNewTag": "Create new tag \"{name}\""
   },
   "admin": {
     "general": {
@@ -195,7 +201,18 @@
       "firewallEnabled": "Enable Per-Client Firewall",
       "firewallEnabledDesc": "Restrict client traffic to specific destination IPs using iptables. When enabled, each client can be configured with allowed destinations."
     },
-    "introText": "Welcome to the admin panel.\n\nHere you can manage the general settings, the configuration, the interface settings and the hooks.\n\nStart by choosing one of the sections in the sidebar."
+    "tags": {
+      "new": "New Tag",
+      "edit": "Edit Tag",
+      "empty": "There are no tags yet.",
+      "created": "Tag created",
+      "updated": "Tag updated",
+      "deleted": "Tag deleted",
+      "deleteTag": "Delete Tag",
+      "deleteDialog": "Are you sure you want to delete {name}? This will remove it from all clients. This action cannot be undone.",
+      "clients": "Clients"
+    },
+    "introText": "Welcome to the admin panel.\n\nHere you can manage the general settings, the configuration, the interface settings, the hooks and the tags.\n\nStart by choosing one of the sections in the sidebar."
   },
   "zod": {
     "generic": {
@@ -219,6 +236,10 @@
       "serverAllowedIps": "Server Allowed IPs",
       "firewallIps": "Firewall Allowed IPs",
       "firewallIpsInvalid": "Invalid firewall IP entry. See docs for supported syntax."
+    },
+    "tag": {
+      "id": "Tag ID",
+      "name": "Name"
     },
     "user": {
       "username": "Username",

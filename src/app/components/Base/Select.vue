@@ -10,17 +10,20 @@
 
     <SelectPortal>
       <SelectContent
-        class="z-[100] min-w-28 rounded bg-gray-300 dark:bg-neutral-500"
+        :side-offset="5"
+        class="z-[100] min-w-32 overflow-hidden rounded-lg border border-gray-200 bg-white text-gray-700 shadow-xl dark:border-neutral-600 dark:bg-neutral-700 dark:text-neutral-200"
       >
-        <SelectViewport class="p-2">
+        <SelectViewport class="p-1">
           <SelectItem
             v-for="(option, index) in options"
             :key="index"
             :value="option.value"
-            class="relative flex h-6 items-center rounded px-3 text-sm leading-none outline-none hover:bg-red-800 hover:text-white dark:text-white"
+            class="relative flex h-8 cursor-pointer items-center rounded px-3 text-sm leading-none outline-none hover:bg-red-800 hover:text-white"
           >
             <SelectItemText>
-              {{ option.value }} - {{ option.label }}
+              {{
+                hideValue ? option.label : `${option.value} - ${option.label}`
+              }}
             </SelectItemText>
           </SelectItem>
         </SelectViewport>
@@ -32,6 +35,7 @@
 <script lang="ts" setup>
 defineProps<{
   options: { label: string; value: string }[];
+  hideValue?: boolean;
 }>();
 const selected = defineModel<string>();
 </script>
