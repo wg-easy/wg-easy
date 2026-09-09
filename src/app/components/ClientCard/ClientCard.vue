@@ -4,7 +4,12 @@
     class="relative flex flex-col justify-between gap-3 px-3 py-3 sm:flex-row md:py-5"
   >
     <div class="flex w-full items-center gap-3 md:gap-4">
-      <ClientCardAvatar :client="client" />
+      <ClientCardAvatar
+        :client="client"
+        :selected="selected"
+        :selection-mode="selectionMode"
+        @toggle-selection="$emit('toggle-selection')"
+      />
       <div class="flex w-full flex-col gap-2 xxs:flex-row">
         <div class="flex flex-grow flex-col gap-1">
           <ClientCardName :client="client" />
@@ -47,5 +52,11 @@
 <script setup lang="ts">
 defineProps<{
   client: LocalClient;
+  selected?: boolean;
+  selectionMode?: boolean;
+}>();
+
+defineEmits<{
+  'toggle-selection': [];
 }>();
 </script>

@@ -121,6 +121,11 @@ export const ClientGetSchema = z.object({
   clientId: clientId,
 });
 
+export const ClientBulkToggleSchema = z.object({
+  clientIds: z.array(clientId).min(1),
+  enabled: z.boolean(),
+});
+
 export type ClientCreateFromExistingType = Pick<
   ClientType,
   | 'name'
