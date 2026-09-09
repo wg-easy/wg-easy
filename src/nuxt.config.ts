@@ -153,6 +153,11 @@ export default defineNuxtConfig({
         language: 'sv-SE',
         name: 'Svenska',
       },
+      {
+        code: 'az',
+        language: 'az-AZ',
+        name: 'Azərbaycan',
+      },
     ],
     defaultLocale: 'en',
     vueI18n: './i18n.config.ts',
