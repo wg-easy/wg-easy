@@ -19,6 +19,7 @@ async function getPrometheusResponse() {
   const wireguardSentBytes = [];
   const wireguardReceivedBytes = [];
   const wireguardLatestHandshakeSeconds = [];
+  const wireguardEndpointInfo = [];
   for (const client of clients) {
     if (client.enabled === true) {
       wireguardEnabledPeersCount++;
@@ -46,6 +47,17 @@ async function getPrometheusResponse() {
     wireguardLatestHandshakeSeconds.push(
       `wireguard_latest_handshake_seconds{${id}} ${client.latestHandshakeAt ? (Date.now() - client.latestHandshakeAt.getTime()) / 1000 : 0}`
     );
+
+    if (client.endpoint) {
+      const endpointId = formatPrometheusLabels({
+        interface: wgInterface.name,
+        name: client.name,
+        endpoint: client.endpoint,
+      });
+      wireguardEndpointInfo.push(
+        `wireguard_peer_endpoint_info{${endpointId}} 1`
+      );
+    }
   }
 
   const id = formatPrometheusLabels({ interface: wgInterface.name });
@@ -74,6 +86,10 @@ async function getPrometheusResponse() {
     '# HELP wireguard_latest_handshake_seconds UNIX timestamp seconds of the last handshake',
     '# TYPE wireguard_latest_handshake_seconds gauge',
     `${wireguardLatestHandshakeSeconds.join('\n')}`,
+    '',
+    '# HELP wireguard_peer_endpoint_info Current endpoint (IP:port) of a connected peer',
+    '# TYPE wireguard_peer_endpoint_info gauge',
+    `${wireguardEndpointInfo.join('\n')}`,
     '',
   ];
 
