@@ -60,8 +60,8 @@ importers:
         specifier: ^0.45.2
         version: 0.45.2(@libsql/client@0.17.4)
       ip-bigint:
-        specifier: ^9.0.8
-        version: 9.0.8
+        specifier: ^10.0.1
+        version: 10.0.1
       is-cidr:
         specifier: ^7.0.1
         version: 7.0.1
@@ -3793,10 +3793,6 @@ packages:
 
   ip-bigint@10.0.1:
     resolution: {integrity: sha512-vXJrmSsmlZE7KIwKvBzmGESLqqLV//YbjdMmTFPmhGYhh2wB7K5o7U+qZbzePOGNkdwNdUWdWnjQ6QKKBiSx4w==}
-    engines: {node: '>=22'}
-
-  ip-bigint@9.0.8:
-    resolution: {integrity: sha512-DxVFaACbpbgORsUxhcfD7TOsUgeNmKUcoJDXps/Y3CjTJpfcVfFwNu6sXIL4Y1iI8SqiCOAEKvCtIUWFZx8Qvw==}
     engines: {node: '>=22'}
 
   ip-regex@5.0.0:
@@ -9803,8 +9799,6 @@ snapshots:
   ip-bigint@10.0.1:
     dependencies:
       cidr-regex: 7.1.0
-
-  ip-bigint@9.0.8: {}
 
   ip-regex@5.0.0: {}
 
