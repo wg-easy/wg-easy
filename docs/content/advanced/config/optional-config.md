@@ -11,7 +11,7 @@ You can set these environment variables to configure the container. They are not
 | `INSECURE`              | `false`   | `true`                      | If access over http is allowed                                  |
 | `DISABLE_IPV6`          | `false`   | `true`                      | If IPv6 support should be disabled                              |
 | `DISABLE_VERSION_CHECK` | `false`   | `true`                      | If wg-easy should check for new updates                         |
-| `TRUSTED_PROXIES`       |           | `172.18.0.2,fd00:1234::/64` | Proxy IP addresses or CIDRs allowed to forward the request host |
+| `TRUSTED_PROXIES`       |           | `172.18.0.2,fd00:1234::/64` | Proxy IP addresses or CIDRs allowed to forward request metadata |
 
 ## Trusted Proxies
 
@@ -25,7 +25,9 @@ environment:
 ```
 
 Only add the source addresses used by your reverse proxy. wg-easy only uses
-`X-Forwarded-Host` when the request comes from one of these addresses. The
+`X-Forwarded-Host` and `X-Forwarded-For` when the request comes from one of
+these addresses. The forwarded client address is included in security logs so
+that tools such as CrowdSec can identify failed authentication attempts. The
 request protocol remains controlled by `INSECURE`. Invalid addresses prevent
 wg-easy from starting so that configuration errors are not silently ignored.
 Restart the container after changing this setting.
