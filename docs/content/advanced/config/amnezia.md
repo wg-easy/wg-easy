@@ -39,14 +39,33 @@ If a parameter is not set, it will not be added to the configuration. If all Amn
 
 ### Parameter Compatibility Table
 
-| Parameter | Can differ between server and client | Configurable on server | Configurable on client   |
-| --------- | ------------------------------------ | ---------------------- | ------------------------ |
-| Jc        | :white_check_mark: Yes               | :white_check_mark:     | :white_check_mark:       |
-| Jmin      | :white_check_mark: Yes               | :white_check_mark:     | :white_check_mark:       |
-| Jmax      | :white_check_mark: Yes               | :white_check_mark:     | :white_check_mark:       |
-| S1-S4     | :x: No, must match                   | :white_check_mark:     | :x: (copied from server) |
-| H1-H4     | :x: No, must match                   | :white_check_mark:     | :x: (copied from server) |
-| I1-I5     | :white_check_mark: Yes               | :white_check_mark:     | :white_check_mark:       |
+| Parameter              | Can differ between server and client | Configurable on server | Configurable on client   |
+| ---------------------- | ------------------------------------ | ---------------------- | ------------------------ |
+| Jc                     | :white_check_mark: Yes               | :white_check_mark:     | :white_check_mark:       |
+| Jmin                   | :white_check_mark: Yes               | :white_check_mark:     | :white_check_mark:       |
+| Jmax                   | :white_check_mark: Yes               | :white_check_mark:     | :white_check_mark:       |
+| S1-S4                  | :x: No, must match                   | :white_check_mark:     | :x: (copied from server) |
+| H1-H4                  | :x: No, must match                   | :white_check_mark:     | :x: (copied from server) |
+| I1-I5                  | :white_check_mark: Yes               | :white_check_mark:     | :white_check_mark:       |
+| HeaderProtectionKey    | :x: No, must match                   | :white_check_mark:     | :x: (copied from server) |
+| RandomTrailers         | :x: No, must match                   | :white_check_mark:     | :x: (copied from server) |
+| ContentPaddingAddition | :white_check_mark: Yes               | :white_check_mark:     | :white_check_mark:       |
+| RekeyAfterTime         | :white_check_mark: Yes               | :white_check_mark:     | :white_check_mark:       |
+| RekeyTimeout           | :white_check_mark: Yes               | :white_check_mark:     | :white_check_mark:       |
+| RejectAfterTime        | :white_check_mark: Yes               | :white_check_mark:     | :white_check_mark:       |
+| KeepaliveTimeout       | :white_check_mark: Yes               | :white_check_mark:     | :white_check_mark:       |
+| MaxHandshakeAttempts   | :white_check_mark: Yes               | :white_check_mark:     | :white_check_mark:       |
+| DisableCookies         | :white_check_mark: Yes               | :white_check_mark:     | :white_check_mark:       |
+
+### AmneziaWG 3.0 and 3.1 Parameters
+
+These parameters require AmneziaWG 3.0 or newer on both ends of the tunnel. Older clients reject configurations that contain them, so leave them unset if you still support AmneziaWG 2.x clients.
+
+`HeaderProtectionKey` is a 32 byte key in base64, in the same format as a WireGuard key. It encrypts the packet headers, so it has to be identical on both sides and is copied into every client configuration. Header protection uses the first 12 bytes of each junk prefix as its nonce, which means **S1, S2, S3 and S4 all have to be set to at least 12** while a key is configured.
+
+`ContentPaddingAddition`, `RekeyAfterTime`, `RekeyTimeout`, `RejectAfterTime`, `KeepaliveTimeout` and `MaxHandshakeAttempts` accept either a single number or an inclusive range written as `lower-upper` (for example `30-90`, both bounds between 0 and 65535). When a range is given, AmneziaWG picks a random value from it, which removes the fixed timings a DPI system could otherwise fingerprint.
+
+`RandomTrailers` appends a random amount of bytes to handshake packets and has to be enabled on both sides. `DisableCookies` stops this side from answering handshakes with cookie messages when it is under load and only affects the peer it is set on.
 
 ## Client Applications
 

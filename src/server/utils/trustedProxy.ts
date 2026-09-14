@@ -61,6 +61,15 @@ export function getTrustedRequestURL(
   });
 }
 
+export function getTrustedRequestIP(
+  event: H3Event,
+  trustedProxies: readonly string[]
+): string | undefined {
+  return getRequestIP(event, {
+    xForwardedFor: isRequestFromTrustedProxy(event, trustedProxies),
+  });
+}
+
 function isRequestFromTrustedProxy(
   event: H3Event,
   trustedProxies: readonly string[]

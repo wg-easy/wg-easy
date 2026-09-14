@@ -22,7 +22,7 @@ File: `/etc/docker/containers/traefik/docker-compose.yml`
 ```yaml
 services:
     traefik:
-        image: traefik:3.3
+        image: traefik:3.7
         container_name: traefik
         restart: unless-stopped
         ports:
@@ -184,3 +184,36 @@ sudo docker compose up -d
 ```
 
 You can now access `wg-easy` at `https://wg-easy.$example.com$` and start the setup.
+
+## Rate Limiting
+
+wg-easy does not implement rate limiting. Configure a Traefik rate limit
+middleware or an external security tool such as CrowdSec to limit requests to
+these paths:
+
+- `/api/auth/password`
+- `/api/auth/verify-2fa`
+- `/cnf/*`
+
+Choose limits appropriate for your deployment. When using wg-easy security logs
+for detection, configure [`TRUSTED_PROXIES`](../../advanced/config/optional-config.md#trusted-proxies)
+so that logged events contain the original client IP address.
+
+For example, add these labels to the `wg-easy` service to allow an average of
+five requests per minute per client IP, with a burst of five requests:
+
+```yaml
+labels:
+    - 'traefik.http.routers.wg-easy-rate-limit.rule=Host(`wg-easy.$example.com$`) && (Path(`/api/auth/password`) || Path(`/api/auth/verify-2fa`) || PathPrefix(`/cnf/`))'
+    - 'traefik.http.routers.wg-easy-rate-limit.entrypoints=websecure'
+    - 'traefik.http.routers.wg-easy-rate-limit.service=wg-easy'
+    - 'traefik.http.routers.wg-easy-rate-limit.middlewares=wg-easy-rate-limit'
+    - 'traefik.http.routers.wg-easy-rate-limit.priority=100'
+    - 'traefik.http.middlewares.wg-easy-rate-limit.ratelimit.average=5'
+    - 'traefik.http.middlewares.wg-easy-rate-limit.ratelimit.period=1m'
+    - 'traefik.http.middlewares.wg-easy-rate-limit.ratelimit.burst=5'
+```
+
+The dedicated router applies the [rate limit middleware](https://doc.traefik.io/traefik/v3.7/reference/routing-configuration/http/middlewares/ratelimit/)
+only to the sensitive paths. Adjust `average`, `period`, and `burst` for your
+deployment.
