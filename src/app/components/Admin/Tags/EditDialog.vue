@@ -59,7 +59,7 @@
       </DialogClose>
       <DialogClose as-child>
         <BasePrimaryButton @click="editTag">
-          {{ $t('dialog.change') }}
+          {{ $t('form.save') }}
         </BasePrimaryButton>
       </DialogClose>
     </template>
