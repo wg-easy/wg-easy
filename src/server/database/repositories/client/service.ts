@@ -1,4 +1,4 @@
-import { eq, sql, or, like, and } from 'drizzle-orm';
+import { eq, sql, or, like, and, inArray } from 'drizzle-orm';
 import { containsCidr, parseCidr } from 'cidr-tools';
 
 import { client } from './schema';
@@ -14,7 +14,7 @@ import { nextIP } from '#server/utils/ip';
 import type { ID } from '#server/utils/types';
 import { wg } from '#server/utils/wgHelper';
 import type { DBType } from '#db/sqlite';
-import { wgInterface, userConfig } from '#db/schema';
+import { wgInterface, userConfig, clientTag, tag } from '#db/schema';
 
 function createPreparedStatement(db: DBType) {
   return {
@@ -26,7 +26,10 @@ function createPreparedStatement(db: DBType) {
       })
       .prepare(),
     findById: db.query.client
-      .findFirst({ where: eq(client.id, sql.placeholder('id')) })
+      .findFirst({
+        where: eq(client.id, sql.placeholder('id')),
+        with: { clientTags: { with: { tag: true } } },
+      })
       .prepare(),
     toggle: db
       .update(client)
@@ -49,6 +52,30 @@ export class ClientService {
     this.#statements = createPreparedStatement(db);
   }
 
+  #tagFilter(tagId?: number[], tagName?: string[]) {
+    const tagFilters = [];
+
+    if (tagId && tagId.length > 0) {
+      tagFilters.push(inArray(clientTag.tagId, tagId));
+    }
+    if (tagName && tagName.length > 0) {
+      tagFilters.push(inArray(tag.name, tagName));
+    }
+
+    if (tagFilters.length === 0) {
+      return undefined;
+    }
+
+    return inArray(
+      client.id,
+      this.#db
+        .select({ id: clientTag.clientId })
+        .from(clientTag)
+        .innerJoin(tag, eq(clientTag.tagId, tag.id))
+        .where(or(...tagFilters))
+    );
+  }
+
   /**
    * Never return values directly from this function. Use {@link getAllPublic} instead.
    */
@@ -64,7 +91,7 @@ export class ClientService {
   /**
    * Returns all clients without sensitive data
    */
-  async getAllPublic({ filter, sort }: ClientQueryType) {
+  async getAllPublic({ filter, sort, tagId, tagName }: ClientQueryType) {
     const filters = [];
 
     if (filter?.trim()) {
@@ -78,10 +105,16 @@ export class ClientService {
       );
     }
 
+    const tagFilter = this.#tagFilter(tagId, tagName);
+    if (tagFilter) {
+      filters.push(tagFilter);
+    }
+
     const result = await this.#db.query.client
       .findMany({
         with: {
           oneTimeLink: true,
+          clientTags: { with: { tag: true } },
         },
         where: and(...filters),
         columns: {
@@ -99,8 +132,9 @@ export class ClientService {
       })
       .execute();
 
-    return result.map((row) => ({
+    return result.map(({ clientTags, ...row }) => ({
       ...row,
+      tags: clientTags.map(({ tag }) => tag),
       createdAt: new Date(row.createdAt),
       updatedAt: new Date(row.updatedAt),
     }));
@@ -109,7 +143,10 @@ export class ClientService {
   /**
    * Returns all clients without sensitive data belonging to user
    */
-  async getAllForUser(userId: ID, { filter, sort }: ClientQueryType) {
+  async getAllForUser(
+    userId: ID,
+    { filter, sort, tagId, tagName }: ClientQueryType
+  ) {
     const filters = [];
 
     if (filter?.trim()) {
@@ -123,10 +160,18 @@ export class ClientService {
       );
     }
 
+    const tagFilter = this.#tagFilter(tagId, tagName);
+    if (tagFilter) {
+      filters.push(tagFilter);
+    }
+
     const result = await this.#db.query.client
       .findMany({
         where: and(eq(client.userId, userId), ...filters),
-        with: { oneTimeLink: true },
+        with: {
+          oneTimeLink: true,
+          clientTags: { with: { tag: true } },
+        },
         columns: {
           privateKey: false,
           preSharedKey: false,
@@ -142,18 +187,25 @@ export class ClientService {
       })
       .execute();
 
-    return result.map((row) => ({
+    return result.map(({ clientTags, ...row }) => ({
       ...row,
+      tags: clientTags.map(({ tag }) => tag),
       createdAt: new Date(row.createdAt),
       updatedAt: new Date(row.updatedAt),
     }));
   }
 
-  get(id: ID) {
-    return this.#statements.findById.execute({ id });
+  async get(id: ID) {
+    const result = await this.#statements.findById.execute({ id });
+    if (!result) {
+      return result;
+    }
+
+    const { clientTags, ...row } = result;
+    return { ...row, tags: clientTags.map(({ tag }) => tag) };
   }
 
-  async create({ name, expiresAt }: ClientCreateType) {
+  async create({ name, description, expiresAt, tagIds }: ClientCreateType) {
     const privateKey = await wg.generatePrivateKey();
     const publicKey = await wg.getPublicKey(privateKey);
     const preSharedKey = await wg.generatePreSharedKey();
@@ -185,10 +237,11 @@ export class ClientService {
       const ipv6Cidr = parseCidr(clientInterface.ipv6Cidr);
       const ipv6Address = nextIP(6, ipv6Cidr, clients);
 
-      return await tx
+      const inserted = await tx
         .insert(client)
         .values({
           name,
+          description,
           // TODO: properly assign user id
           userId: 1,
           interfaceId: 'wg0',
@@ -213,6 +266,17 @@ export class ClientService {
         })
         .returning({ clientId: client.id })
         .execute();
+
+      const clientId = inserted[0]!.clientId;
+
+      if (tagIds.length > 0) {
+        await tx
+          .insert(clientTag)
+          .values(tagIds.map((tagId) => ({ clientId, tagId })))
+          .execute();
+      }
+
+      return inserted;
     });
   }
 
@@ -224,7 +288,7 @@ export class ClientService {
     return this.#statements.delete.execute({ id });
   }
 
-  update(id: ID, data: UpdateClientType) {
+  update(id: ID, { tagIds, ...data }: UpdateClientType) {
     return this.#db.transaction(async (tx) => {
       const clientInterface = await tx.query.wgInterface
         .findFirst({
@@ -245,6 +309,14 @@ export class ClientService {
       }
 
       await tx.update(client).set(data).where(eq(client.id, id)).execute();
+
+      await tx.delete(clientTag).where(eq(clientTag.clientId, id)).execute();
+      if (tagIds.length > 0) {
+        await tx
+          .insert(clientTag)
+          .values(tagIds.map((tagId) => ({ clientId: id, tagId })))
+          .execute();
+      }
     });
   }
 
