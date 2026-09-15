@@ -1,4 +1,4 @@
-import { eq, sql, or, like, and } from 'drizzle-orm';
+import { eq, sql, or, like, and, inArray } from 'drizzle-orm';
 import { containsCidr, parseCidr } from 'cidr-tools';
 
 import { client } from './schema';
@@ -218,6 +218,14 @@ export class ClientService {
 
   toggle(id: ID, enabled: boolean) {
     return this.#statements.toggle.execute({ id, enabled });
+  }
+
+  toggleMany(ids: ID[], enabled: boolean) {
+    return this.#db
+      .update(client)
+      .set({ enabled })
+      .where(inArray(client.id, ids))
+      .execute();
   }
 
   delete(id: ID) {
