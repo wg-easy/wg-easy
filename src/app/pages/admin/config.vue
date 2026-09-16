@@ -34,7 +34,7 @@
       </FormGroup>
       <FormGroup>
         <FormHeading>{{ $t('form.sectionAdvanced') }}</FormHeading>
-        <FormNumberField
+        <FormNullNumberField
           id="defaultMtu"
           v-model="data.defaultMtu"
           :label="$t('general.mtu')"
