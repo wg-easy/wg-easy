@@ -51,7 +51,7 @@
     "qr": "^0.7.0",
     "reka-ui": "^2.10.4",
     "semver": "^7.8.5",
-    "tailwindcss": "^3.4.19",
+    "tailwindcss": "^4.3.3",
     "vue": "latest",
     "vue3-apexcharts": "^1.11.1",
     "zod": "^4.6.4"
