@@ -70,7 +70,7 @@
     "prettier": "^3.9.6",
     "prettier-plugin-tailwindcss": "^0.8.1",
     "tsx": "^4.23.13",
-    "typescript": "^6.0.3",
+    "typescript": "^7.0.2",
     "vitest": "^4.1.11",
     "vue-tsc": "^3.3.11"
   },
