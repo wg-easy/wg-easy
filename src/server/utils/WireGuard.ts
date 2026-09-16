@@ -85,7 +85,7 @@ class WireGuard {
 
   async #syncWireguardConfig(wgInterface: InterfaceType) {
     WG_DEBUG('Syncing Config...');
-    await wg.sync(wgInterface.name);
+    await wg.sync(wgInterface.name, wgInterface.routingTable);
     WG_DEBUG('Config synced successfully.');
   }
 
