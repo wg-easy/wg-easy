@@ -1,6 +1,7 @@
 import { createError, getValidatedRouterParams } from 'h3';
 
 import Database from '#server/utils/Database';
+import { omitClientSecrets } from '#server/utils/clientPublic';
 import WireGuard from '#server/utils/WireGuard';
 import { definePermissionEventHandler } from '#server/utils/handler';
 import { validateZod } from '#server/utils/types';
@@ -29,7 +30,7 @@ export default definePermissionEventHandler(
     const data = await WireGuard.dumpByPublicKey(result.publicKey);
 
     return {
-      ...result,
+      ...omitClientSecrets(result),
       endpoint: data?.endpoint,
     };
   }
