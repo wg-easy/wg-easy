@@ -33,8 +33,6 @@ export class UserConfigService {
     return userConfig;
   }
 
-  // TODO: wrap ipv6 host in square brackets
-
   /**
    * sets host of user config
    *
