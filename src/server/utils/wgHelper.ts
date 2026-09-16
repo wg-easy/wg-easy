@@ -9,6 +9,7 @@ import {
 import { removeNewlines, iptablesTemplate } from '#server/utils/template';
 import { exec } from '#server/utils/cmd';
 import { WG_ENV } from '#server/utils/config';
+import { formatEndpoint } from '#server/utils/endpoint';
 import type { ClientType } from '#db/repositories/client/types';
 import type { InterfaceType } from '#db/repositories/interface/types';
 import type { UserConfigType } from '#db/repositories/userConfig/types';
@@ -127,7 +128,7 @@ PublicKey = ${wgInterface.publicKey}
 PresharedKey = ${client.preSharedKey}
 AllowedIPs = ${(client.allowedIps ?? userConfig.defaultAllowedIps).join(', ')}
 PersistentKeepalive = ${client.persistentKeepalive}
-Endpoint = ${userConfig.host}:${userConfig.port}`;
+Endpoint = ${formatEndpoint(userConfig.host, userConfig.port)}`;
   },
 
   generatePrivateKey: () => {
