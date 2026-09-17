@@ -5,35 +5,31 @@ import WireGuard from '#server/utils/WireGuard';
 import { definePermissionEventHandler } from '#server/utils/handler';
 import { validateZod } from '#server/utils/types';
 import { ClientGetSchema } from '#db/repositories/client/types';
+import { wg } from '#server/utils/wgHelper';
 
 export default definePermissionEventHandler(
   'clients',
-  'view',
+  'update',
   async ({ event, checkPermissions }) => {
     const { clientId } = await getValidatedRouterParams(
       event,
       validateZod(ClientGetSchema, event)
     );
 
-    const result = await Database.clients.get(clientId);
-    checkPermissions(result);
+    const client = await Database.clients.get(clientId);
+    checkPermissions(client);
 
-    if (!result) {
+    if (!client) {
       throw createError({
         statusCode: 404,
         statusMessage: 'Client not found',
       });
     }
 
-    // data can be undefined if the client is disabled
-    const data = await WireGuard.dumpByPublicKey(result.publicKey);
+    const preSharedKey = await wg.generatePreSharedKey();
+    await Database.clients.updatePreSharedKey(clientId, preSharedKey);
+    await WireGuard.saveConfig();
 
-    const { preSharedKey, privateKey, ...safeResult } = result;
-
-    return {
-      ...safeResult,
-      hasPreSharedKey: preSharedKey !== null,
-      endpoint: data?.endpoint,
-    };
+    return { success: true };
   }
 );
