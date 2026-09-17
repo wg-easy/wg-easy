@@ -26,6 +26,9 @@ export const userConfig = sqliteTable('user_configs_table', {
   defaultI3: text('default_i3'),
   defaultI4: text('default_i4'),
   defaultI5: text('default_i5'),
+  defaultPreSharedKey: int('default_pre_shared_key', { mode: 'boolean' })
+    .notNull()
+    .default(true),
   host: text().notNull(),
   port: int().notNull(),
   createdAt: text('created_at')
