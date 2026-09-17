@@ -4,21 +4,15 @@
       <slot />
     </template>
     <template #title>
-      {{ $t('client.new') }}
+      {{ $t('admin.tags.new') }}
     </template>
     <template #description>
       <div class="flex flex-col">
-        <FormTextField id="name" v-model="name" :label="$t('client.name')" />
+        <FormTextField id="name" v-model="name" :label="$t('general.name')" />
         <FormNullTextField
           id="description"
           v-model="description"
           :label="$t('general.description')"
-        />
-        <FormTagsField id="tags" v-model="tagIds" :label="$t('general.tags')" />
-        <FormDateField
-          id="expiresAt"
-          v-model="expiresAt"
-          :label="$t('client.expireDate')"
         />
       </div>
     </template>
@@ -27,8 +21,8 @@
         <BaseSecondaryButton>{{ $t('dialog.cancel') }}</BaseSecondaryButton>
       </DialogClose>
       <DialogClose as-child>
-        <BasePrimaryButton @click="createClient">
-          {{ $t('client.create') }}
+        <BasePrimaryButton @click="createTag">
+          {{ $t('dialog.create') }}
         </BasePrimaryButton>
       </DialogClose>
     </template>
@@ -38,9 +32,7 @@
 <script lang="ts" setup>
 const name = ref<string>('');
 const description = ref<string | null>(null);
-const tagIds = ref<number[]>([]);
-const expiresAt = ref<string | null>(null);
-const clientsStore = useClientsStore();
+const tagsStore = useTagsStore();
 
 const { t } = useI18n();
 
@@ -51,28 +43,21 @@ function resetOnOpen(open: boolean) {
 
   name.value = '';
   description.value = null;
-  tagIds.value = [];
-  expiresAt.value = null;
 }
 
-function createClient() {
-  return _createClient({
-    name: name.value,
-    description: description.value,
-    tagIds: tagIds.value,
-    expiresAt: expiresAt.value,
-  });
+function createTag() {
+  return _createTag({ name: name.value, description: description.value });
 }
 
-const _createClient = useSubmit(
+const _createTag = useSubmit(
   (data) =>
-    $fetch<{ success: boolean; clientId: number }>('/api/client', {
+    $fetch<{ success: boolean; tagId: number }>('/api/tag', {
       method: 'post',
       body: data,
     }),
   {
-    revert: () => clientsStore.refresh(),
-    successMsg: t('client.created'),
+    revert: () => tagsStore.refresh(),
+    successMsg: t('admin.tags.created'),
   }
 );
 </script>

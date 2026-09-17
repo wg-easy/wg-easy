@@ -64,6 +64,13 @@
       "when": 1788760134302,
       "tag": "0008_thin_patch",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1789356873057,
+      "tag": "0009_narrow_roxanne_simpson",
+      "breakpoints": true
     }
   ]
 }
