@@ -16,6 +16,11 @@ let rebuildQueued = false;
 // Cache iptables availability check result
 let iptablesAvailable: boolean | null = null;
 
+// Cache whether iptables supports the comment module (xt_comment kernel module).
+// Some systems (e.g. Synology DSM) ship iptables without the xt_comment kernel
+// module, which makes `-m comment` fail at rule insertion. See #2545.
+let commentSupported: boolean | null = null;
+
 type ParsedEntry = {
   ip: string;
   port?: number;
@@ -160,6 +165,81 @@ function generateRuleArgs(
   return rules;
 }
 
+/**
+ * Probe whether the given iptables binary can actually insert a rule that uses
+ * the comment module. The userspace extension (libxt_comment) may be present
+ * while the xt_comment kernel module is missing, in which case parsing succeeds
+ * but rule insertion fails. We therefore probe by inserting a throwaway rule
+ * into a dedicated probe chain rather than relying on `--help`.
+ */
+async function probeComment(bin: 'iptables' | 'ip6tables'): Promise<boolean> {
+  const probeChain = `${CHAIN_NAME}_PROBE`;
+  try {
+    await exec(
+      `${bin} -N ${probeChain} 2>/dev/null || ${bin} -F ${probeChain}`
+    );
+    await exec(
+      `${bin} -A ${probeChain} -m comment --comment "wg-easy comment probe" -j RETURN`
+    );
+    return true;
+  } catch {
+    return false;
+  } finally {
+    await exec(`${bin} -F ${probeChain} 2>/dev/null || true`);
+    await exec(`${bin} -X ${probeChain} 2>/dev/null || true`);
+  }
+}
+
+/**
+ * Build the list of iptables/ip6tables commands needed to allow a client's
+ * traffic. Pure function (no side effects) so it can be unit tested.
+ *
+ * When `useComments` is false the `-m comment` argument is omitted entirely,
+ * which keeps rule creation working on hosts without the xt_comment kernel
+ * module (see #2545).
+ */
+function buildClientRuleCommands(
+  client: FirewallClient,
+  defaultAllowedIps: string[],
+  enableIpv6: boolean,
+  useComments: boolean
+): string[] {
+  // Determine which IPs to use for firewall rules
+  // Priority: firewallIps > allowedIps > defaultAllowedIps
+  const effectiveIps =
+    client.firewallIps && client.firewallIps.length > 0
+      ? client.firewallIps
+      : (client.allowedIps ?? defaultAllowedIps);
+
+  const comment = useComments
+    ? sanitizeComment(client.id, client.name)
+    : undefined;
+
+  const commands: string[] = [];
+
+  for (const ipEntry of effectiveIps) {
+    const parsed = parseFirewallEntry(ipEntry);
+    const baseIp = parsed.ip.split('/')[0] ?? parsed.ip; // Handle CIDR by checking base IP
+    const destIsIpv6 = isIPv6(baseIp);
+
+    if (destIsIpv6) {
+      if (enableIpv6) {
+        const rules = generateRuleArgs(client.ipv6Address, parsed, comment);
+        for (const rule of rules) {
+          commands.push(`ip6tables ${rule}`);
+        }
+      }
+    } else {
+      const rules = generateRuleArgs(client.ipv4Address, parsed, comment);
+      for (const rule of rules) {
+        commands.push(`iptables ${rule}`);
+      }
+    }
+  }
+
+  return commands;
+}
+
 export const firewall = {
   /**
    * Initialize the custom chain if it doesn't exist
@@ -204,39 +284,22 @@ export const firewall = {
   async applyClientRules(
     client: FirewallClient,
     defaultAllowedIps: string[],
-    enableIpv6: boolean
+    enableIpv6: boolean,
+    useComments: boolean = true
   ): Promise<void> {
-    // Determine which IPs to use for firewall rules
-    // Priority: firewallIps > allowedIps > defaultAllowedIps
-    const effectiveIps =
-      client.firewallIps && client.firewallIps.length > 0
-        ? client.firewallIps
-        : (client.allowedIps ?? defaultAllowedIps);
-
-    FW_DEBUG(
-      `Applying firewall rules for client ${client.name} (${client.id}): ${effectiveIps.join(', ')}`
+    const commands = buildClientRuleCommands(
+      client,
+      defaultAllowedIps,
+      enableIpv6,
+      useComments
     );
 
-    const comment = sanitizeComment(client.id, client.name);
+    FW_DEBUG(
+      `Applying ${commands.length} firewall rule(s) for client ${client.name} (${client.id})`
+    );
 
-    for (const ipEntry of effectiveIps) {
-      const parsed = parseFirewallEntry(ipEntry);
-      const baseIp = parsed.ip.split('/')[0] ?? parsed.ip; // Handle CIDR by checking base IP
-      const destIsIpv6 = isIPv6(baseIp);
-
-      if (destIsIpv6) {
-        if (enableIpv6) {
-          const rules = generateRuleArgs(client.ipv6Address, parsed, comment);
-          for (const rule of rules) {
-            await exec(`ip6tables ${rule}`);
-          }
-        }
-      } else {
-        const rules = generateRuleArgs(client.ipv4Address, parsed, comment);
-        for (const rule of rules) {
-          await exec(`iptables ${rule}`);
-        }
-      }
+    for (const command of commands) {
+      await exec(command);
     }
   },
 
@@ -273,13 +336,18 @@ export const firewall = {
       // Flush existing rules
       await this.flushChain(enableIpv6);
 
+      // Detect once whether the comment module is usable. Without it, adding
+      // rules with `-m comment` fails and would abort the whole rebuild (#2545).
+      const useComments = await this.supportsComment(enableIpv6);
+
       // Apply rules for each enabled client
       for (const client of clients) {
         if (!client.enabled) continue;
         await this.applyClientRules(
           client,
           userConfig.defaultAllowedIps,
-          enableIpv6
+          enableIpv6,
+          useComments
         );
       }
 
@@ -363,10 +431,44 @@ export const firewall = {
   },
 
   /**
+   * Check whether iptables (and ip6tables, when IPv6 is enabled) can insert
+   * rules using the comment module. The result is cached.
+   *
+   * Some systems ship iptables without the xt_comment kernel module. Adding a
+   * rule with `-m comment` then fails, which previously aborted the whole
+   * firewall rebuild and made enabling the feature impossible (#2545). When
+   * comments are unsupported we fall back to creating rules without them.
+   *
+   * @param enableIpv6 - If true, also require ip6tables to support comments.
+   */
+  async supportsComment(enableIpv6: boolean = true): Promise<boolean> {
+    // Return cached result if we've already checked
+    if (commentSupported !== null) {
+      return commentSupported;
+    }
+
+    const ipv4Supported = await probeComment('iptables');
+    const ipv6Supported = enableIpv6 ? await probeComment('ip6tables') : true;
+
+    commentSupported = ipv4Supported && ipv6Supported;
+
+    if (commentSupported) {
+      FW_DEBUG('iptables comment module is available');
+    } else {
+      FW_DEBUG(
+        'iptables comment module (xt_comment) is not available, creating firewall rules without comments'
+      );
+    }
+
+    return commentSupported;
+  },
+
+  /**
    * Clear the availability cache to force a re-check
    */
   clearAvailabilityCache(): void {
     iptablesAvailable = null;
+    commentSupported = null;
   },
 };
 
@@ -374,4 +476,5 @@ export const firewallTestExports = {
   parseFirewallEntry,
   generateRuleArgs,
   sanitizeComment,
+  buildClientRuleCommands,
 };
