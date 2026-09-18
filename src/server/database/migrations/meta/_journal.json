@@ -64,6 +64,13 @@
       "when": 1788760134302,
       "tag": "0008_thin_patch",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1788800000000,
+      "tag": "0009_pre_shared_key_optional",
+      "breakpoints": true
     }
   ]
 }

@@ -43,8 +43,7 @@ export const wg = {
     return `# Client: ${client.name} (${client.id})
 [Peer]
 PublicKey = ${client.publicKey}
-PresharedKey = ${client.preSharedKey}
-AllowedIPs = ${allowedIps.join(', ')}${extraLines.length ? `\n${extraLines.join('\n')}` : ''}`;
+${client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''}AllowedIPs = ${allowedIps.join(', ')}${extraLines.length ? `\n${extraLines.join('\n')}` : ''}`;
   },
 
   generateServerInterface: (
@@ -124,8 +123,7 @@ MTU = ${client.mtu}
 ${extraLines.length ? `${extraLines.join('\n')}\n` : ''}
 [Peer]
 PublicKey = ${wgInterface.publicKey}
-PresharedKey = ${client.preSharedKey}
-AllowedIPs = ${(client.allowedIps ?? userConfig.defaultAllowedIps).join(', ')}
+${client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''}AllowedIPs = ${(client.allowedIps ?? userConfig.defaultAllowedIps).join(', ')}
 PersistentKeepalive = ${client.persistentKeepalive}
 Endpoint = ${userConfig.host}:${userConfig.port}`;
   },
