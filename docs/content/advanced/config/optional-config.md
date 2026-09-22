@@ -12,6 +12,7 @@ You can set these environment variables to configure the container. They are not
 | `DISABLE_IPV6`          | `false`   | `true`                      | If IPv6 support should be disabled                              |
 | `DISABLE_VERSION_CHECK` | `false`   | `true`                      | If wg-easy should check for new updates                         |
 | `TRUSTED_PROXIES`       |           | `172.18.0.2,fd00:1234::/64` | Proxy IP addresses or CIDRs allowed to forward request metadata |
+| `WG_INTERFACE`          | `wg0`     | `wg1`                       | Name of the WireGuard interface                                 |
 
 ## Trusted Proxies
 
@@ -31,6 +32,15 @@ that tools such as CrowdSec can identify failed authentication attempts. The
 request protocol remains controlled by `INSECURE`. Invalid addresses prevent
 wg-easy from starting so that configuration errors are not silently ignored.
 Restart the container after changing this setting.
+
+## WireGuard Interface
+
+Set `WG_INTERFACE` to specify a custom interface name, useful if you are running multiple wg-easy instances on the same host with `network_mode: host`:
+
+```yaml
+environment:
+    - WG_INTERFACE=wg1
+```
 
 /// note | IPv6 Caveats
 

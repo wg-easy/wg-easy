@@ -3,6 +3,7 @@ import { eq, sql } from 'drizzle-orm';
 import { userConfig } from './schema';
 import type { UserConfigUpdateType } from './types';
 
+import { WG_ENV } from '#server/utils/config';
 import { wgInterface } from '#db/schema';
 import type { DBType } from '#db/sqlite';
 
@@ -24,7 +25,9 @@ export class UserConfigService {
   }
 
   async get() {
-    const userConfig = await this.#statements.get.execute({ interface: 'wg0' });
+    const userConfig = await this.#statements.get.execute({
+      interface: WG_ENV.WG_INTERFACE,
+    });
 
     if (!userConfig) {
       throw new Error('User config not found');
@@ -45,13 +48,13 @@ export class UserConfigService {
       await tx
         .update(userConfig)
         .set({ host, port })
-        .where(eq(userConfig.id, 'wg0'))
+        .where(eq(userConfig.id, WG_ENV.WG_INTERFACE))
         .execute();
 
       await tx
         .update(wgInterface)
         .set({ port })
-        .where(eq(wgInterface.name, 'wg0'))
+        .where(eq(wgInterface.name, WG_ENV.WG_INTERFACE))
         .execute();
     });
   }
@@ -60,7 +63,7 @@ export class UserConfigService {
     return this.#db
       .update(userConfig)
       .set(data)
-      .where(eq(userConfig.id, 'wg0'))
+      .where(eq(userConfig.id, WG_ENV.WG_INTERFACE))
       .execute();
   }
 }

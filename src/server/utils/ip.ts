@@ -96,7 +96,7 @@ async function getReverseDns(ip: string) {
   }
 }
 
-function getPrivateInformation() {
+function getPrivateInformation(interfaceName: string) {
   const interfaces = networkInterfaces();
 
   const interfaceNames = Object.keys(interfaces);
@@ -104,7 +104,7 @@ function getPrivateInformation() {
   const obj: Record<string, { ipv4: string[]; ipv6: string[] }> = {};
 
   for (const name of interfaceNames) {
-    if (name === 'wg0') {
+    if (name === interfaceName) {
       continue;
     }
 
@@ -132,10 +132,10 @@ function getPrivateInformation() {
   return obj;
 }
 
-async function getIpInformation() {
+export async function getIpInformation(interfaceName: string) {
   const results = [];
 
-  const publicInfo = await getPublicInformation();
+  const publicInfo = await cachedGetPublicInformation();
   if (publicInfo.ipv4) {
     results.push({
       value: publicInfo.ipv4,
@@ -155,7 +155,7 @@ async function getIpInformation() {
     });
   }
 
-  const privateInfo = getPrivateInformation();
+  const privateInfo = getPrivateInformation(interfaceName);
   for (const [name, { ipv4, ipv6 }] of Object.entries(privateInfo)) {
     for (const ip of ipv4) {
       results.push({
@@ -175,9 +175,9 @@ async function getIpInformation() {
 }
 
 /**
- * Fetch IP Information
+ * Fetch public IP Information
  * @cache Response is cached for 15 min
  */
-export const cachedGetIpInformation = cacheFunction(getIpInformation, {
+const cachedGetPublicInformation = cacheFunction(getPublicInformation, {
   expiry: 15 * 60 * 1000,
 });
