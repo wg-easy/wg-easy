@@ -32,7 +32,7 @@
     "@tailwindcss/forms": "^0.5.11",
     "@vueuse/core": "^14.4.0",
     "@vueuse/nuxt": "^14.4.0",
-    "apexcharts": "^6.10.0",
+    "apexcharts": "^7.5.1",
     "argon2": "^0.45.1",
     "cidr-tools": "^13.0.1",
     "citty": "^0.2.2",
