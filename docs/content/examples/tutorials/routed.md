@@ -86,13 +86,13 @@ Then go to Admin → Hooks and add:
 PostUp
 
 ```shell
-iptables -A INPUT -p udp -m udp --dport {{port}} -j ACCEPT; iptables -A FORWARD -i wg0 -j ACCEPT; iptables -A FORWARD -o wg0 -j ACCEPT; ip6tables -A INPUT -p udp -m udp --dport {{port}} -j ACCEPT; ip6tables -A FORWARD -i wg0 -j ACCEPT; ip6tables -A FORWARD -o wg0 -j ACCEPT
+iptables -A INPUT -p udp -m udp --dport {{port}} -j ACCEPT; iptables -A FORWARD -i {{interface}} -j ACCEPT; iptables -A FORWARD -o {{interface}} -j ACCEPT; ip6tables -A INPUT -p udp -m udp --dport {{port}} -j ACCEPT; ip6tables -A FORWARD -i {{interface}} -j ACCEPT; ip6tables -A FORWARD -o {{interface}} -j ACCEPT
 ```
 
 PostDown
 
 ```shell
-iptables -D INPUT -p udp -m udp --dport {{port}} -j ACCEPT; iptables -D FORWARD -i wg0 -j ACCEPT; iptables -D FORWARD -o wg0 -j ACCEPT; ip6tables -D INPUT -p udp -m udp --dport {{port}} -j ACCEPT; ip6tables -D FORWARD -i wg0 -j ACCEPT; ip6tables -D FORWARD -o wg0 -j ACCEPT
+iptables -D INPUT -p udp -m udp --dport {{port}} -j ACCEPT; iptables -D FORWARD -i {{interface}} -j ACCEPT; iptables -D FORWARD -o {{interface}} -j ACCEPT; ip6tables -D INPUT -p udp -m udp --dport {{port}} -j ACCEPT; ip6tables -D FORWARD -i {{interface}} -j ACCEPT; ip6tables -D FORWARD -o {{interface}} -j ACCEPT
 ```
 
 /// warning | Important: When using nftables use the following hooks instead.
@@ -100,13 +100,13 @@ iptables -D INPUT -p udp -m udp --dport {{port}} -j ACCEPT; iptables -D FORWARD 
 PostUp
 
 ```shell
-nft add chain ip filter WG_EASY; nft add rule ip filter DOCKER-USER jump WG_EASY; nft add rule ip filter WG_EASY iifname {{device}} accept; nft add rule ip filter WG_EASY oifname {{device}} accept; nft add chain ip6 filter WG_EASY; nft add rule ip6 filter DOCKER-USER jump WG_EASY; nft add rule ip6 filter WG_EASY iifname {{device}} accept; nft add rule ip6 filter WG_EASY oifname {{device}} accept;
+nft add chain ip filter WG_EASY_{{interface}}; nft add rule ip filter DOCKER-USER jump WG_EASY_{{interface}}; nft add rule ip filter WG_EASY_{{interface}} iifname {{device}} accept; nft add rule ip filter WG_EASY_{{interface}} oifname {{device}} accept; nft add chain ip6 filter WG_EASY_{{interface}}; nft add rule ip6 filter DOCKER-USER jump WG_EASY_{{interface}}; nft add rule ip6 filter WG_EASY_{{interface}} iifname {{device}} accept; nft add rule ip6 filter WG_EASY_{{interface}} oifname {{device}} accept;
 ```
 
 PostDown
 
 ```shell
-nft delete rule ip filter DOCKER-USER handle $(nft -a list chain ip filter DOCKER-USER | awk '/jump WG_EASY/ {print $NF}'); nft flush chain ip filter WG_EASY; nft delete chain ip filter WG_EASY; nft delete rule ip6 filter DOCKER-USER handle $(nft -a list chain ip6 filter DOCKER-USER | awk '/jump WG_EASY/ {print $NF}'); nft flush chain ip6 filter WG_EASY; nft delete chain ip6 filter WG_EASY
+nft delete rule ip filter DOCKER-USER handle $(nft -a list chain ip filter DOCKER-USER | awk '/jump WG_EASY_{{interface}}/ {print $NF}'); nft flush chain ip filter WG_EASY_{{interface}}; nft delete chain ip filter WG_EASY_{{interface}}; nft delete rule ip6 filter DOCKER-USER handle $(nft -a list chain ip6 filter DOCKER-USER | awk '/jump WG_EASY_{{interface}}/ {print $NF}'); nft flush chain ip6 filter WG_EASY_{{interface}}; nft delete chain ip6 filter WG_EASY_{{interface}}
 ```
 
 ///
