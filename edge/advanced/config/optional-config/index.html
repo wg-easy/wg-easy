@@ -766,6 +766,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#wireguard-interface" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        WireGuard Interface
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1776,6 +1787,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#wireguard-interface" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        WireGuard Interface
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1931,6 +1953,12 @@
 <td><code>172.18.0.2,fd00:1234::/64</code></td>
 <td>Proxy IP addresses or CIDRs allowed to forward request metadata</td>
 </tr>
+<tr>
+<td><code>WG_INTERFACE</code></td>
+<td><code>wg0</code></td>
+<td><code>wg1</code></td>
+<td>Name of the WireGuard interface</td>
+</tr>
 </tbody>
 </table>
 <h2 id="trusted-proxies">Trusted Proxies<a class="headerlink" href="#trusted-proxies" title="Permanent link">&para;</a></h2>
@@ -1947,6 +1975,11 @@ that tools such as CrowdSec can identify failed authentication attempts. The
 request protocol remains controlled by <code>INSECURE</code>. Invalid addresses prevent
 wg-easy from starting so that configuration errors are not silently ignored.
 Restart the container after changing this setting.</p>
+<h2 id="wireguard-interface">WireGuard Interface<a class="headerlink" href="#wireguard-interface" title="Permanent link">&para;</a></h2>
+<p>Set <code>WG_INTERFACE</code> to specify a custom interface name, useful if you are running multiple wg-easy instances on the same host with <code>network_mode: host</code>:</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nt">environment</span><span class="p">:</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">WG_INTERFACE=wg1</span>
+</span></code></pre></div>
 <div class="admonition note">
 <p class="admonition-title">IPv6 Caveats</p>
 <p>Disabling IPv6 will disable the creation of the default IPv6 firewall rules and won't add a IPv6 address to the interface and clients.</p>
