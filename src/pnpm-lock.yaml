@@ -197,8 +197,8 @@ importers:
         specifier: ^14.4.0
         version: 14.4.0(d3e414f291a94191ad8ee9803f470127)
       apexcharts:
-        specifier: ^6.10.0
-        version: 6.10.0
+        specifier: ^7.5.1
+        version: 7.5.1
       argon2:
         specifier: ^0.45.1
         version: 0.45.1
@@ -261,7 +261,7 @@ importers:
         version: 3.5.43(typescript@6.0.3)
       vue3-apexcharts:
         specifier: ^1.11.1
-        version: 1.11.1(apexcharts@6.10.0)(vue@3.5.43(typescript@6.0.3))
+        version: 1.11.1(apexcharts@7.5.1)(vue@3.5.43(typescript@6.0.3))
       zod:
         specifier: ^4.6.4
         version: 4.6.5
@@ -2656,11 +2656,11 @@ packages:
     resolution: {integrity: sha512-KMReFUr0B4t+D+OBkjR3KYqvocp2XaSzO55UcB6mgQMd3KbcE+mWTyvVV7D/zsdEbNnV6acZUutkiHQXvTr1Rw==}
     engines: {node: '>= 8'}
 
-  apex-commons@0.5.0:
-    resolution: {integrity: sha512-xz83SgPREE1wGtoflvxjwJtcjzl5bKTz2/bDxWCZNL6QVjUNE47kMg/1Zqt0bSh6eOnmFCWlTDc3RU8o85N+wg==}
+  apex-commons@0.8.1:
+    resolution: {integrity: sha512-F7fqJVh0smeTu1d86uuRSNNZvaM/l11GNQMbu6oAiSvuXp+K8KCufg0oZTy2VQBEEipRLAdFqkHnphlVpTG0Gw==}
 
-  apexcharts@6.10.0:
-    resolution: {integrity: sha512-XkDW9pb5L5jrjox86Q20gR2w6YnU4hUpv+FjL1eKtYKQGtyTUSsnFeuUE8wVDz8hNNHbOEx7Sl9cjfCmhB3NVw==}
+  apexcharts@7.5.1:
+    resolution: {integrity: sha512-I+S/KSXKGwaCZx73CvAg7yLfM892NEZR2CG5UHkjGFjBq/LhesuglIGuaKn1fiGa5Z0voAyfFROLjWywZNyOEA==}
     engines: {node: ^20.19.0 || ^22.12.0 || >=24.0.0}
 
   archiver-utils@5.0.2:
@@ -8709,11 +8709,11 @@ snapshots:
       normalize-path: 3.0.0
       picomatch: 2.3.2
 
-  apex-commons@0.5.0: {}
+  apex-commons@0.8.1: {}
 
-  apexcharts@6.10.0:
+  apexcharts@7.5.1:
     dependencies:
-      apex-commons: 0.5.0
+      apex-commons: 0.8.1
 
   archiver-utils@5.0.2:
     dependencies:
@@ -12271,9 +12271,9 @@ snapshots:
       '@vue/language-core': 3.3.11
       typescript: 6.0.3
 
-  vue3-apexcharts@1.11.1(apexcharts@6.10.0)(vue@3.5.43(typescript@6.0.3)):
+  vue3-apexcharts@1.11.1(apexcharts@7.5.1)(vue@3.5.43(typescript@6.0.3)):
     dependencies:
-      apexcharts: 6.10.0
+      apexcharts: 7.5.1
       vue: 3.5.43(typescript@6.0.3)
 
   vue@3.5.43(typescript@6.0.3):
