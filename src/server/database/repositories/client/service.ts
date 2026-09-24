@@ -28,6 +28,15 @@ function createPreparedStatement(db: DBType) {
     findById: db.query.client
       .findFirst({ where: eq(client.id, sql.placeholder('id')) })
       .prepare(),
+    findByIdPublic: db.query.client
+      .findFirst({
+        where: eq(client.id, sql.placeholder('id')),
+        columns: {
+          privateKey: false,
+          preSharedKey: false,
+        },
+      })
+      .prepare(),
     toggle: db
       .update(client)
       .set({ enabled: sql.placeholder('enabled') as never as boolean })
@@ -149,8 +158,18 @@ export class ClientService {
     }));
   }
 
+  /**
+   * Includes WireGuard secrets. JSON API responses should use {@link getPublic}.
+   */
   get(id: ID) {
     return this.#statements.findById.execute({ id });
+  }
+
+  /**
+   * Returns one client without sensitive data
+   */
+  getPublic(id: ID) {
+    return this.#statements.findByIdPublic.execute({ id });
   }
 
   async create({ name, expiresAt }: ClientCreateType) {
