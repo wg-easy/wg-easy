@@ -31,7 +31,13 @@ export type InterfaceCreateType = Omit<
 
 export type InterfaceUpdateType = Omit<
   InterfaceCreateType,
-  'name' | 'createdAt' | 'updatedAt' | 'privateKey' | 'publicKey'
+  | 'name'
+  | 'createdAt'
+  | 'updatedAt'
+  | 'privateKey'
+  | 'publicKey'
+  | 'ipv4Cidr'
+  | 'ipv6Cidr'
 >;
 
 const device = z
