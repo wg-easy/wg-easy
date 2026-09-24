@@ -39,10 +39,20 @@ const device = z
   .min(1, t('zod.interface.device'))
   .pipe(safeStringRefine);
 
-const cidr = z
+const cidr4 = z
   .string({ message: t('zod.interface.cidr') })
   .min(1, { message: t('zod.interface.cidr') })
-  .refine((value) => isCidr(value), { message: t('zod.interface.cidrValid') })
+  .refine((value) => isCidr.v4(value), {
+    message: t('zod.interface.cidrValid'),
+  })
+  .pipe(safeStringRefine);
+
+const cidr6 = z
+  .string({ message: t('zod.interface.cidr') })
+  .min(1, { message: t('zod.interface.cidr') })
+  .refine((value) => isCidr.v6(value), {
+    message: t('zod.interface.cidrValid'),
+  })
   .pipe(safeStringRefine);
 
 /**
@@ -54,8 +64,8 @@ const HEADER_PROTECTION_MIN_JUNK_SIZE = 12;
 export const InterfaceUpdateSchema = schemaForType<InterfaceUpdateType>()(
   z
     .object({
-      ipv4Cidr: cidr,
-      ipv6Cidr: cidr,
+      device: device,
+      port: PortSchema,
       mtu: MtuSchema,
       routingTable: RoutingTableSchema,
       jC: JcSchema,
@@ -83,8 +93,7 @@ export const InterfaceUpdateSchema = schemaForType<InterfaceUpdateType>()(
       maxHandshakeAttempts: AwgRangeSchema,
       randomTrailers: z.boolean().nullable(),
       disableCookies: z.boolean().nullable(),
-      port: PortSchema,
-      device: device,
+
       enabled: EnabledSchema,
       firewallEnabled: EnabledSchema,
     })
@@ -113,7 +122,7 @@ export type InterfaceCidrUpdateType = {
 export const InterfaceCidrUpdateSchema =
   schemaForType<InterfaceCidrUpdateType>()(
     z.object({
-      ipv4Cidr: cidr,
-      ipv6Cidr: cidr,
+      ipv4Cidr: cidr4,
+      ipv6Cidr: cidr6,
     })
   );
