@@ -33,7 +33,7 @@ export function useSubmit<T>(
       if (e instanceof FetchError) {
         toast.showToast({
           type: 'error',
-          message: e.data.message,
+          message: e.data?.message ?? e.message,
         });
       } else if (e instanceof Error) {
         toast.showToast({
