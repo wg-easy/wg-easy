@@ -1,4 +1,5 @@
 import WireGuard from '#server/utils/WireGuard';
+import { wg } from '#server/utils/wgHelper';
 /**
  * Changing the Database Provider
  * This design allows for easy swapping of different database implementations.
@@ -17,7 +18,7 @@ const nullObject = new Proxy(
 // eslint-disable-next-line import/no-mutable-exports
 let provider = nullObject as never as DBServiceType;
 
-connect()
+connect((name) => wg.down(name))
   .then(async (db) => {
     provider = db;
     await WireGuard.Startup();

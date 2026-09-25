@@ -12,6 +12,7 @@ import { HooksService } from '#db/repositories/hooks/service';
 import { OneTimeLinkService } from '#db/repositories/oneTimeLink/service';
 import { ClientService } from '#db/repositories/client/service';
 import * as schema from '#db/schema';
+import { prepareInterfaceRename } from '#db/renameInterface';
 import { WG_ENV, WG_INITIAL_ENV } from '#server/utils/config';
 
 const DB_DEBUG = createDebug('Database');
@@ -19,9 +20,11 @@ const DB_DEBUG = createDebug('Database');
 const client = createClient({ url: 'file:/etc/wireguard/wg-easy.db' });
 const db = drizzle({ client, schema });
 
-export async function connect() {
+export async function connect(
+  down: (name: string) => Promise<unknown> = async () => {}
+) {
   await migrate();
-  await renameInterface(db);
+  await prepareInterfaceRename(client, db, WG_ENV.WG_INTERFACE, down);
   const dbService = new DBService(db);
 
   if (WG_INITIAL_ENV.ENABLED) {
@@ -121,28 +124,6 @@ async function initialSetup(db: DBServiceType) {
 
     await db.general.setSetupStep(0);
   }
-}
-
-// Renames the interface to the one specified in `WG_INTERFACE` then hooks, users, and clients via `ON UPDATE CASCADE`
-async function renameInterface(db: DBType) {
-  const wgInterface = await db.query.wgInterface.findFirst();
-
-  if (!wgInterface) {
-    throw new Error('Interface not found');
-  }
-
-  if (wgInterface.name === WG_ENV.WG_INTERFACE) {
-    return;
-  }
-
-  DB_DEBUG(
-    `Renaming Interface ${wgInterface.name} to ${WG_ENV.WG_INTERFACE}...`
-  );
-  await db
-    .update(schema.wgInterface)
-    .set({ name: WG_ENV.WG_INTERFACE })
-    .where(eq(schema.wgInterface.name, wgInterface.name))
-    .execute();
 }
 
 async function disableIpv6(db: DBType) {
