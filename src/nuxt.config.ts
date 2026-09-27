@@ -148,6 +148,16 @@ export default defineNuxtConfig({
         language: 'vi-VN',
         name: 'Tiếng Việt',
       },
+      {
+        code: 'sv',
+        language: 'sv-SE',
+        name: 'Svenska',
+      },
+      {
+        code: 'az',
+        language: 'az-AZ',
+        name: 'Azərbaycan',
+      },
     ],
     defaultLocale: 'en',
     vueI18n: './i18n.config.ts',

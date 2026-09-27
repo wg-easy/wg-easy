@@ -2,6 +2,7 @@ import { createDebug } from 'obug';
 import packageJson from '@@/package.json';
 
 import { exec } from '#server/utils/cmd';
+import { parseInterfaceName } from '#server/utils/interfaceName';
 import { parseTrustedProxies } from '#server/utils/trustedProxy';
 import {
   OAUTH_PROVIDERS,
@@ -50,6 +51,8 @@ export const WG_ENV = {
   PORT: assertEnv('PORT'),
   /** If IPv6 should be disabled */
   DISABLE_IPV6: process.env.DISABLE_IPV6 === 'true',
+  /** Name of the WireGuard interface */
+  WG_INTERFACE: parseInterfaceName(process.env.WG_INTERFACE),
   WG_EXECUTABLE: await detectAwg(),
   DISABLE_VERSION_CHECK: process.env.DISABLE_VERSION_CHECK === 'true',
   /** List of enabled and configured OAuth providers */

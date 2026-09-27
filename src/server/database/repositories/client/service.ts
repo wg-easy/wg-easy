@@ -9,6 +9,7 @@ import type {
   UpdateClientType,
 } from './types';
 
+import { WG_ENV } from '#server/utils/config';
 import Database from '#server/utils/Database';
 import { nextIP } from '#server/utils/ip';
 import type { ID } from '#server/utils/types';
@@ -27,6 +28,15 @@ function createPreparedStatement(db: DBType) {
       .prepare(),
     findById: db.query.client
       .findFirst({ where: eq(client.id, sql.placeholder('id')) })
+      .prepare(),
+    findByIdPublic: db.query.client
+      .findFirst({
+        where: eq(client.id, sql.placeholder('id')),
+        columns: {
+          privateKey: false,
+          preSharedKey: false,
+        },
+      })
       .prepare(),
     toggle: db
       .update(client)
@@ -149,8 +159,18 @@ export class ClientService {
     }));
   }
 
+  /**
+   * Includes WireGuard secrets. JSON API responses should use {@link getPublic}.
+   */
   get(id: ID) {
     return this.#statements.findById.execute({ id });
+  }
+
+  /**
+   * Returns one client without sensitive data
+   */
+  getPublic(id: ID) {
+    return this.#statements.findByIdPublic.execute({ id });
   }
 
   async create({ name, expiresAt }: ClientCreateType) {
@@ -162,7 +182,7 @@ export class ClientService {
       const clients = await tx.query.client.findMany().execute();
       const clientInterface = await tx.query.wgInterface
         .findFirst({
-          where: eq(wgInterface.name, 'wg0'),
+          where: eq(wgInterface.name, WG_ENV.WG_INTERFACE),
         })
         .execute();
 
@@ -191,7 +211,7 @@ export class ClientService {
           name,
           // TODO: properly assign user id
           userId: 1,
-          interfaceId: 'wg0',
+          interfaceId: WG_ENV.WG_INTERFACE,
           expiresAt,
           privateKey,
           publicKey,
@@ -236,7 +256,7 @@ export class ClientService {
     return this.#db.transaction(async (tx) => {
       const clientInterface = await tx.query.wgInterface
         .findFirst({
-          where: eq(wgInterface.name, 'wg0'),
+          where: eq(wgInterface.name, WG_ENV.WG_INTERFACE),
         })
         .execute();
 
@@ -272,7 +292,7 @@ export class ClientService {
       .values({
         name,
         userId: 1,
-        interfaceId: 'wg0',
+        interfaceId: WG_ENV.WG_INTERFACE,
         privateKey,
         publicKey,
         preSharedKey,

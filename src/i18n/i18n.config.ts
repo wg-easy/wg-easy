@@ -22,6 +22,8 @@ import hi from './locales/hi.json';
 import gl from './locales/gl.json';
 import cs from './locales/cs.json';
 import vi from './locales/vi.json';
+import sv from './locales/sv.json';
+import az from './locales/az.json';
 
 export default defineI18nConfig(() => ({
   legacy: false,
@@ -51,5 +53,7 @@ export default defineI18nConfig(() => ({
     gl,
     cs,
     vi,
+    sv,
+    az,
   },
 }));
