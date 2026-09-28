@@ -144,6 +144,53 @@
               :label="$t('awg.i5Label')"
               :description="$t('awg.i5Description')"
             />
+
+            <div class="col-span-full text-sm">
+              {{ $t('awg.rangeNote') }}
+            </div>
+
+            <FormNullTextField
+              id="contentPaddingAddition"
+              v-model="data.contentPaddingAddition"
+              :label="$t('awg.contentPaddingAdditionLabel')"
+              :description="$t('awg.contentPaddingAdditionDescription')"
+            />
+            <FormNullTextField
+              id="rekeyAfterTime"
+              v-model="data.rekeyAfterTime"
+              :label="$t('awg.rekeyAfterTimeLabel')"
+              :description="$t('awg.rekeyAfterTimeDescription')"
+            />
+            <FormNullTextField
+              id="rekeyTimeout"
+              v-model="data.rekeyTimeout"
+              :label="$t('awg.rekeyTimeoutLabel')"
+              :description="$t('awg.rekeyTimeoutDescription')"
+            />
+            <FormNullTextField
+              id="rejectAfterTime"
+              v-model="data.rejectAfterTime"
+              :label="$t('awg.rejectAfterTimeLabel')"
+              :description="$t('awg.rejectAfterTimeDescription')"
+            />
+            <FormNullTextField
+              id="keepaliveTimeout"
+              v-model="data.keepaliveTimeout"
+              :label="$t('awg.keepaliveTimeoutLabel')"
+              :description="$t('awg.keepaliveTimeoutDescription')"
+            />
+            <FormNullTextField
+              id="maxHandshakeAttempts"
+              v-model="data.maxHandshakeAttempts"
+              :label="$t('awg.maxHandshakeAttemptsLabel')"
+              :description="$t('awg.maxHandshakeAttemptsDescription')"
+            />
+            <FormNullSwitchField
+              id="disableCookies"
+              v-model="data.disableCookies"
+              :label="$t('awg.disableCookiesLabel')"
+              :description="$t('awg.disableCookiesDescription')"
+            />
           </FormGroup>
           <FormGroup>
             <FormHeading :description="$t('client.hooksDescription')">

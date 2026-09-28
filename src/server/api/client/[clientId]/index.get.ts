@@ -15,7 +15,7 @@ export default definePermissionEventHandler(
       validateZod(ClientGetSchema, event)
     );
 
-    const result = await Database.clients.get(clientId);
+    const result = await Database.clients.getPublic(clientId);
     checkPermissions(result);
 
     if (!result) {

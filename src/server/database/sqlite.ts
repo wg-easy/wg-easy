@@ -21,6 +21,7 @@ const db = drizzle({ client, schema });
 
 export async function connect() {
   await migrate();
+  await renameInterface(db);
   const dbService = new DBService(db);
 
   if (WG_INITIAL_ENV.ENABLED) {
@@ -122,16 +123,38 @@ async function initialSetup(db: DBServiceType) {
   }
 }
 
+// Renames the interface to the one specified in `WG_INTERFACE` then hooks, users, and clients via `ON UPDATE CASCADE`
+async function renameInterface(db: DBType) {
+  const wgInterface = await db.query.wgInterface.findFirst();
+
+  if (!wgInterface) {
+    throw new Error('Interface not found');
+  }
+
+  if (wgInterface.name === WG_ENV.WG_INTERFACE) {
+    return;
+  }
+
+  DB_DEBUG(
+    `Renaming Interface ${wgInterface.name} to ${WG_ENV.WG_INTERFACE}...`
+  );
+  await db
+    .update(schema.wgInterface)
+    .set({ name: WG_ENV.WG_INTERFACE })
+    .where(eq(schema.wgInterface.name, wgInterface.name))
+    .execute();
+}
+
 async function disableIpv6(db: DBType) {
   // This should match the initial value migration
   const postUpMatch =
-    ' ip6tables -t nat -A POSTROUTING -s {{ipv6Cidr}} -o {{device}} -j MASQUERADE; ip6tables -A INPUT -p udp -m udp --dport {{port}} -j ACCEPT; ip6tables -A FORWARD -i wg0 -j ACCEPT; ip6tables -A FORWARD -o wg0 -j ACCEPT;';
+    ' ip6tables -t nat -A POSTROUTING -s {{ipv6Cidr}} -o {{device}} -j MASQUERADE; ip6tables -A INPUT -p udp -m udp --dport {{port}} -j ACCEPT; ip6tables -A FORWARD -i {{interface}} -j ACCEPT; ip6tables -A FORWARD -o {{interface}} -j ACCEPT;';
   const postDownMatch =
-    ' ip6tables -t nat -D POSTROUTING -s {{ipv6Cidr}} -o {{device}} -j MASQUERADE; ip6tables -D INPUT -p udp -m udp --dport {{port}} -j ACCEPT; ip6tables -D FORWARD -i wg0 -j ACCEPT; ip6tables -D FORWARD -o wg0 -j ACCEPT;';
+    ' ip6tables -t nat -D POSTROUTING -s {{ipv6Cidr}} -o {{device}} -j MASQUERADE; ip6tables -D INPUT -p udp -m udp --dport {{port}} -j ACCEPT; ip6tables -D FORWARD -i {{interface}} -j ACCEPT; ip6tables -D FORWARD -o {{interface}} -j ACCEPT;';
 
   await db.transaction(async (tx) => {
     const hooks = await tx.query.hooks.findFirst({
-      where: eq(schema.hooks.id, 'wg0'),
+      where: eq(schema.hooks.id, WG_ENV.WG_INTERFACE),
     });
 
     if (!hooks) {
@@ -146,7 +169,7 @@ async function disableIpv6(db: DBType) {
           postUp: hooks.postUp.replace(postUpMatch, ''),
           postDown: hooks.postDown.replace(postDownMatch, ''),
         })
-        .where(eq(schema.hooks.id, 'wg0'))
+        .where(eq(schema.hooks.id, WG_ENV.WG_INTERFACE))
         .execute();
     } else {
       DB_DEBUG('IPv6 Post Up hooks already disabled, skipping...');
@@ -159,7 +182,7 @@ async function disableIpv6(db: DBType) {
           postUp: hooks.postUp.replace(postUpMatch, ''),
           postDown: hooks.postDown.replace(postDownMatch, ''),
         })
-        .where(eq(schema.hooks.id, 'wg0'))
+        .where(eq(schema.hooks.id, WG_ENV.WG_INTERFACE))
         .execute();
     } else {
       DB_DEBUG('IPv6 Post Down hooks already disabled, skipping...');

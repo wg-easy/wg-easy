@@ -52,6 +52,15 @@ export const client = sqliteTable(
     i3: text(),
     i4: text(),
     i5: text(),
+    // HeaderProtectionKey and RandomTrailers have to match the interface and
+    // are therefore only configurable on the server
+    contentPaddingAddition: text('content_padding_addition'),
+    rekeyAfterTime: text('rekey_after_time'),
+    rekeyTimeout: text('rekey_timeout'),
+    rejectAfterTime: text('reject_after_time'),
+    keepaliveTimeout: text('keepalive_timeout'),
+    maxHandshakeAttempts: text('max_handshake_attempts'),
+    disableCookies: int('disable_cookies', { mode: 'boolean' }),
     dns: text({ mode: 'json' }).$type<string[]>(),
     serverEndpoint: text('server_endpoint'),
     enabled: int({ mode: 'boolean' }).notNull(),
