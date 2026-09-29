@@ -1,4 +1,5 @@
 {
+  "vpn": { "protocol": "Протокол VPN" },
   "pages": {
     "me": "Аккаунт",
     "clients": "Клиенты",

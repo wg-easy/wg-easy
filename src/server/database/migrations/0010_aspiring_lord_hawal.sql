@@ -1,0 +1,1 @@
+ALTER TABLE `interfaces_table` ADD `protocol` text DEFAULT 'awg' NOT NULL;

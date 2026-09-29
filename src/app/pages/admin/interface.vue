@@ -1,6 +1,7 @@
 <template>
   <main v-if="data">
-    <FormElement @submit.prevent="submit">
+    <FormProtocolField v-model="protocol" />
+    <FormElement v-if="!pending" @submit.prevent="submit">
       <FormGroup>
         <FormNumberField
           id="mtu"
@@ -27,7 +28,7 @@
           :description="$t('admin.interface.routingTableDesc')"
         />
       </FormGroup>
-      <FormGroup v-if="globalStore.information?.isAwg">
+      <FormGroup v-if="protocol === 'awg'">
         <FormHeading>{{ $t('awg.obfuscationParameters') }}</FormHeading>
 
         <FormNullNumberField
@@ -228,20 +229,29 @@
 </template>
 
 <script setup lang="ts">
+const protocol = ref<'awg' | 'wg'>('awg');
 const globalStore = useGlobalStore();
 
 const { t } = useI18n();
 
-const { data: _data, refresh } = await useFetch(`/api/admin/interface`, {
+const {
+  data: _data,
+  refresh,
+  pending,
+} = await useFetch(`/api/admin/interface`, {
   method: 'get',
+  query: { protocol },
+  watch: false,
 });
 
 const data = toRef(_data.value);
+watch(protocol, () => revert());
 
 const _submit = useSubmit(
   (data) =>
     $fetch(`/api/admin/interface`, {
       method: 'post',
+      query: { protocol: protocol.value },
       body: data,
     }),
   {
@@ -268,6 +278,7 @@ const _changeCidr = useSubmit(
   (data) =>
     $fetch(`/api/admin/interface/cidr`, {
       method: 'post',
+      query: { protocol: protocol.value },
       body: data,
     }),
   {
@@ -284,6 +295,7 @@ const _restartInterface = useSubmit(
   (data) =>
     $fetch(`/api/admin/interface/restart`, {
       method: 'post',
+      query: { protocol: protocol.value },
       body: data,
     }),
   {

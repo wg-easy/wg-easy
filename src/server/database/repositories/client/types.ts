@@ -70,6 +70,7 @@ const serverAllowedIps = z.array(AddressSchema, {
 });
 
 export const ClientCreateSchema = z.object({
+  protocol: z.enum(['awg', 'wg']).default('awg'),
   name: name,
   expiresAt: expiresAt,
 });

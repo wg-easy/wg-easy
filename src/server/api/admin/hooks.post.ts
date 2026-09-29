@@ -1,5 +1,6 @@
 import { readValidatedBody } from 'h3';
 
+import { requestedInterface } from '#server/utils/protocol';
 import Database from '#server/utils/Database';
 import WireGuard from '#server/utils/WireGuard';
 import { definePermissionEventHandler } from '#server/utils/handler';
@@ -14,7 +15,7 @@ export default definePermissionEventHandler(
       event,
       validateZod(HooksUpdateSchema, event)
     );
-    await Database.hooks.update(data);
+    await Database.hooks.update(data, requestedInterface(event));
     await WireGuard.saveConfig();
     return { success: true };
   }

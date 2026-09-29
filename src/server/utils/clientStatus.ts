@@ -1,5 +1,6 @@
 type StatusFields = {
   publicKey: string;
+  interfaceId?: string;
   latestHandshakeAt: Date | null;
   endpoint: string | null;
   transferRx: number | null;
@@ -11,11 +12,16 @@ export function mergeClientStatuses<T extends StatusFields>(
   statuses: readonly StatusFields[]
 ): T[] {
   const clientsByPublicKey = new Map(
-    clients.map((client) => [client.publicKey, client])
+    clients.map((client) => [
+      `${client.interfaceId ?? ''}:${client.publicKey}`,
+      client,
+    ])
   );
 
   for (const status of statuses) {
-    const client = clientsByPublicKey.get(status.publicKey);
+    const client = clientsByPublicKey.get(
+      `${status.interfaceId ?? ''}:${status.publicKey}`
+    );
     if (!client) {
       continue;
     }

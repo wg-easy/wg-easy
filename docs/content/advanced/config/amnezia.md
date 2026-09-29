@@ -16,7 +16,7 @@ These measures make it harder for third parties to analyze or identify your traf
 
 ## Activating AmneziaWG
 
-This fork always uses AmneziaWG. `EXPERIMENTAL_AWG` and `OVERRIDE_AUTO_AWG`
+This fork runs AmneziaWG and classic WireGuard simultaneously. Choose the protocol when creating a client; select it on admin pages to edit the corresponding interface. `EXPERIMENTAL_AWG` and `OVERRIDE_AUTO_AWG`
 are no longer required and do not switch the protocol.
 
 Use an AmneziaWG 3.1 kernel module on the Linux host, or expose `/dev/net/tun`

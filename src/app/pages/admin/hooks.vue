@@ -1,6 +1,7 @@
 <template>
   <main v-if="data">
-    <FormElement @submit.prevent="submit">
+    <FormProtocolField v-model="protocol" />
+    <FormElement v-if="!pending" @submit.prevent="submit">
       <FormGroup>
         <FormTextArea
           id="PreUp"
@@ -33,16 +34,25 @@
 </template>
 
 <script setup lang="ts">
-const { data: _data, refresh } = await useFetch(`/api/admin/hooks`, {
+const protocol = ref<'awg' | 'wg'>('awg');
+const {
+  data: _data,
+  refresh,
+  pending,
+} = await useFetch(`/api/admin/hooks`, {
   method: 'get',
+  query: { protocol },
+  watch: false,
 });
 
 const data = toRef(_data.value);
+watch(protocol, () => revert());
 
 const _submit = useSubmit(
   (data) =>
     $fetch(`/api/admin/hooks`, {
       method: 'post',
+      query: { protocol: protocol.value },
       body: data,
     }),
   { revert }

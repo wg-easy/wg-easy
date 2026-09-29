@@ -38,7 +38,7 @@ RUN npm install --no-save --omit=dev libsql
 FROM docker.io/library/node:krypton-alpine@sha256:50c8e8ca1d27439048670df5883f32d57cf81cff6233222c893fd0d9884cbd81
 WORKDIR /app
 
-HEALTHCHECK --interval=1m --timeout=5s --retries=3 CMD /usr/bin/timeout 5s /bin/sh -c "/usr/bin/awg show ${WG_INTERFACE:-wg0} >/dev/null 2>&1"
+HEALTHCHECK --interval=1m --timeout=5s --retries=3 CMD /usr/bin/timeout 5s /bin/sh -c "/usr/bin/awg show ${WG_INTERFACE:-wg0} >/dev/null 2>&1 && /usr/bin/wg show ${CLASSIC_WG_INTERFACE:-wg1} >/dev/null 2>&1"
 
 # Copy build
 COPY --from=build /app/.output /app

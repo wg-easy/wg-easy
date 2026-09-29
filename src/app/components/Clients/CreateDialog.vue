@@ -8,6 +8,7 @@
     </template>
     <template #description>
       <div class="flex flex-col">
+        <FormProtocolField v-model="protocol" />
         <FormTextField id="name" v-model="name" :label="$t('client.name')" />
         <FormDateField
           id="expiresAt"
@@ -30,6 +31,7 @@
 </template>
 
 <script lang="ts" setup>
+const protocol = ref<'awg' | 'wg'>('awg');
 const name = ref<string>('');
 const expiresAt = ref<string | null>(null);
 const clientsStore = useClientsStore();
@@ -42,11 +44,16 @@ function resetOnOpen(open: boolean) {
   if (!open) return;
 
   name.value = '';
+  protocol.value = 'awg';
   expiresAt.value = null;
 }
 
 function createClient() {
-  return _createClient({ name: name.value, expiresAt: expiresAt.value });
+  return _createClient({
+    name: name.value,
+    expiresAt: expiresAt.value,
+    protocol: protocol.value,
+  });
 }
 
 const _createClient = useSubmit(

@@ -24,15 +24,18 @@ export class UserConfigService {
     this.#statements = createPreparedStatement(db);
   }
 
-  async get() {
+  async get(interfaceName = WG_ENV.WG_INTERFACE) {
     const userConfig = await this.#statements.get.execute({
-      interface: WG_ENV.WG_INTERFACE,
+      interface: interfaceName,
     });
 
     if (!userConfig) {
       throw new Error('User config not found');
     }
 
+    if (!userConfig.host && interfaceName !== WG_ENV.WG_INTERFACE) {
+      userConfig.host = (await this.get()).host;
+    }
     return userConfig;
   }
 
@@ -57,11 +60,14 @@ export class UserConfigService {
     });
   }
 
-  update(data: Partial<UserConfigUpdateType>) {
+  update(
+    data: Partial<UserConfigUpdateType>,
+    interfaceName = WG_ENV.WG_INTERFACE
+  ) {
     return this.#db
       .update(userConfig)
       .set(data)
-      .where(eq(userConfig.id, WG_ENV.WG_INTERFACE))
+      .where(eq(userConfig.id, interfaceName))
       .execute();
   }
 }

@@ -26,10 +26,16 @@ export default definePermissionEventHandler(
     }
 
     // data can be undefined if the client is disabled
-    const data = await WireGuard.dumpByPublicKey(result.publicKey);
+    const data = await WireGuard.dumpByPublicKey(
+      result.publicKey,
+      result.interfaceId
+    );
 
+    const iface = await Database.interfaces.get(result.interfaceId);
     return {
       ...result,
+      protocol: iface.protocol,
+      firewallEnabled: iface.firewallEnabled,
       endpoint: data?.endpoint,
     };
   }

@@ -63,7 +63,7 @@
               name="serverAllowedIps"
             />
           </FormGroup>
-          <FormGroup v-if="globalStore.information?.firewallEnabled">
+          <FormGroup v-if="data.firewallEnabled">
             <FormHeading :description="$t('client.firewallIpsDesc')">
               {{ $t('client.firewallIps') }}
             </FormHeading>
@@ -90,7 +90,7 @@
               :label="$t('general.persistentKeepalive')"
             />
           </FormGroup>
-          <FormGroup v-if="globalStore.information?.isAwg">
+          <FormGroup v-if="data.protocol === 'awg'">
             <FormHeading>{{ $t('awg.obfuscationParameters') }}</FormHeading>
 
             <FormNullNumberField
@@ -257,8 +257,6 @@
 </template>
 
 <script lang="ts" setup>
-const globalStore = useGlobalStore();
-
 const route = useRoute();
 const id = route.params.id as string;
 

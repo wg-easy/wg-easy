@@ -4,6 +4,7 @@ import { parseCidr } from 'cidr-tools';
 import { wgInterface } from './schema';
 import type { InterfaceCidrUpdateType, InterfaceUpdateType } from './types';
 
+import { assertSeparateNetworks } from '#server/utils/protocol';
 import { createAwgDefaults } from '#server/utils/awgDefaults';
 import { WG_ENV } from '#server/utils/config';
 import { nextIPFromUsedAddresses } from '#server/utils/ip';
@@ -42,9 +43,13 @@ export class InterfaceService {
     this.#statements = createPreparedStatement(db);
   }
 
-  async get() {
+  getAll() {
+    return this.#db.query.wgInterface.findMany().execute();
+  }
+
+  async get(interfaceName = WG_ENV.WG_INTERFACE) {
     const wgInterface = await this.#statements.get.execute({
-      interface: WG_ENV.WG_INTERFACE,
+      interface: interfaceName,
     });
     if (!wgInterface) {
       throw new Error('Interface not found');
@@ -60,34 +65,53 @@ export class InterfaceService {
     });
   }
 
-  initialize(privateKey: string, publicKey: string) {
+  async initialize(
+    privateKey: string,
+    publicKey: string,
+    interfaceName = WG_ENV.WG_INTERFACE
+  ) {
+    const current = await this.get(interfaceName);
     return this.#db
       .update(wgInterface)
-      .set({ ...createAwgDefaults(), privateKey, publicKey })
-      .where(eq(wgInterface.name, WG_ENV.WG_INTERFACE))
+      .set({
+        ...(current.protocol === 'awg' ? createAwgDefaults() : {}),
+        privateKey,
+        publicKey,
+      })
+      .where(eq(wgInterface.name, interfaceName))
       .execute();
   }
 
-  update(data: InterfaceUpdateType) {
+  update(data: InterfaceUpdateType, interfaceName = WG_ENV.WG_INTERFACE) {
     return this.#db
       .update(wgInterface)
       .set(data)
-      .where(eq(wgInterface.name, WG_ENV.WG_INTERFACE))
+      .where(eq(wgInterface.name, interfaceName))
       .execute();
   }
 
-  setFirewallEnabled(firewallEnabled: boolean) {
+  setFirewallEnabled(
+    firewallEnabled: boolean,
+    interfaceName = WG_ENV.WG_INTERFACE
+  ) {
     return this.#statements.setFirewallEnabled.execute({
-      interface: WG_ENV.WG_INTERFACE,
+      interface: interfaceName,
       firewallEnabled,
     });
   }
 
-  updateCidr(data: InterfaceCidrUpdateType) {
+  updateCidr(
+    data: InterfaceCidrUpdateType,
+    interfaceName = WG_ENV.WG_INTERFACE
+  ) {
     return this.#db.transaction(async (tx) => {
+      const interfaces = await tx.query.wgInterface.findMany().execute();
+      for (const other of interfaces) {
+        if (other.name !== interfaceName) assertSeparateNetworks(data, other);
+      }
       const oldCidr = await tx.query.wgInterface
         .findFirst({
-          where: eq(wgInterface.name, WG_ENV.WG_INTERFACE),
+          where: eq(wgInterface.name, interfaceName),
           columns: { ipv4Cidr: true, ipv6Cidr: true },
         })
         .execute();
@@ -99,10 +123,12 @@ export class InterfaceService {
       await tx
         .update(wgInterface)
         .set(data)
-        .where(eq(wgInterface.name, WG_ENV.WG_INTERFACE))
+        .where(eq(wgInterface.name, interfaceName))
         .execute();
 
-      const clients = await tx.query.client.findMany().execute();
+      const clients = await tx.query.client
+        .findMany({ where: eq(clientSchema.interfaceId, interfaceName) })
+        .execute();
       const ipv4Addresses = new Set(
         clients.map((client) => client.ipv4Address)
       );

@@ -5,7 +5,7 @@
         src="/logo.png"
         width="32"
         class="dark:bg mr-2 inline align-middle"
-      /><span class="align-middle">AmneziaWG 3.1</span>
+      /><span class="align-middle">WG + AWG</span>
     </h1>
   </NuxtLink>
 </template>

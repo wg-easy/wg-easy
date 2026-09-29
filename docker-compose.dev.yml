@@ -12,6 +12,7 @@ services:
       - /dev/net/tun:/dev/net/tun
     ports:
       - "51820:51820/udp"
+      - "51822:51822/udp"
       - "127.0.0.1:51821:51821/tcp"
     cap_add:
       - NET_ADMIN

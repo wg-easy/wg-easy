@@ -1,6 +1,7 @@
 <template>
   <main v-if="data">
-    <FormElement @submit.prevent="submit">
+    <FormProtocolField v-model="protocol" />
+    <FormElement v-if="!pending" @submit.prevent="submit">
       <FormGroup>
         <FormHeading>{{ $t('admin.config.connection') }}</FormHeading>
         <FormHostField
@@ -47,7 +48,7 @@
           :description="$t('admin.config.persistentKeepaliveDesc')"
         />
       </FormGroup>
-      <FormGroup v-if="globalStore.information?.isAwg">
+      <FormGroup v-if="protocol === 'awg'">
         <FormHeading>{{ $t('awg.obfuscationParameters') }}</FormHeading>
 
         <FormNullNumberField
@@ -112,18 +113,26 @@
 </template>
 
 <script lang="ts" setup>
-const globalStore = useGlobalStore();
+const protocol = ref<'awg' | 'wg'>('awg');
 
-const { data: _data, refresh } = await useFetch(`/api/admin/userconfig`, {
+const {
+  data: _data,
+  refresh,
+  pending,
+} = await useFetch(`/api/admin/userconfig`, {
   method: 'get',
+  query: { protocol },
+  watch: false,
 });
 
 const data = toRef(_data.value);
+watch(protocol, () => revert());
 
 const _submit = useSubmit(
   (data) =>
     $fetch(`/api/admin/userconfig`, {
       method: 'post',
+      query: { protocol: protocol.value },
       body: data,
     }),
   { revert }

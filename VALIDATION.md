@@ -1,5 +1,28 @@
 # Validation — 2026-09-29
 
+## Simultaneous WireGuard and AmneziaWG
+
+- 74 unit tests pass, including protocol dispatch, classic config exclusion of
+  AWG fields, overlapping subnet rejection and identical-key stat isolation.
+- Type checking, ESLint, Compose validation and Linux/arm64 Docker production
+  build pass.
+- `scripts/test-dual-protocol.py` verifies both protocols connecting and passing
+  VPN traffic concurrently, isolated live peers, protocol-specific stats, API
+  editing, config and SVG QR export, CIDR changes confined to WG, restart
+  persistence/reconnection, and revocation of WG without interrupting AWG.
+- Upgrade from the prior AWG-only image preserves the existing AWG server and
+  client configs byte-for-byte while provisioning the second interface.
+- Browser verification: WG creation selects 10.9.0.2, both WG/AWG badges render,
+  and switching admin Interface to WG shows port 51822 without AWG fields.
+- The UI review container is separate from integration tests and uses local-only
+  HTTP; it is not a production deployment.
+
+The integration test reconnects clients explicitly after restart. Mobile imports,
+IPv6 traffic, automatic reconnect latency, internet routing/DNS and amd64 execution
+remain unverified locally. CI is configured to run the fresh-install Docker test.
+
+## Previous AWG-only baseline
+
 Based on upstream `5f2009a`.
 
 Passed locally:

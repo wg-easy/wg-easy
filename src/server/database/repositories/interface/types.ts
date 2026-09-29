@@ -31,6 +31,7 @@ export type InterfaceCreateType = Omit<
 
 export type InterfaceUpdateType = Omit<
   InterfaceCreateType,
+  | 'protocol'
   | 'name'
   | 'createdAt'
   | 'updatedAt'

@@ -1,5 +1,6 @@
 import { createError, readValidatedBody } from 'h3';
 
+import { requestedInterface } from '#server/utils/protocol';
 import Database from '#server/utils/Database';
 import WireGuard from '#server/utils/WireGuard';
 import { WG_ENV } from '#server/utils/config';
@@ -36,7 +37,7 @@ export default definePermissionEventHandler(
       }
     }
 
-    await Database.interfaces.update(data);
+    await Database.interfaces.update(data, requestedInterface(event));
     await WireGuard.saveConfig();
     return { success: true };
   }

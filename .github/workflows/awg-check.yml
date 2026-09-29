@@ -30,3 +30,4 @@ jobs:
       - run: docker compose config --quiet
       - run: docker build -t awg-easy:test .
       - run: docker run --rm --entrypoint awg awg-easy:test --version
+      - run: python3 scripts/test-dual-protocol.py awg-easy:test

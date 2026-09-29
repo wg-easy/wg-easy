@@ -34,8 +34,9 @@ export const WG_ENV = {
   DISABLE_IPV6: process.env.DISABLE_IPV6 === 'true',
   /** Name of the WireGuard interface */
   WG_INTERFACE: parseInterfaceName(process.env.WG_INTERFACE),
-  // This fork always uses AWG, including its userspace fallback.
-  WG_EXECUTABLE: 'awg' as const,
+  CLASSIC_WG_INTERFACE: parseInterfaceName(
+    process.env.CLASSIC_WG_INTERFACE || 'wg1'
+  ),
   DISABLE_VERSION_CHECK: process.env.DISABLE_VERSION_CHECK === 'true',
   /** List of enabled and configured OAuth providers */
   OAUTH_PROVIDERS: oauthProviders,

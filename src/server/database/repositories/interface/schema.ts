@@ -7,6 +7,9 @@ import { userConfig } from '../userConfig/schema';
 // maybe support multiple interfaces in the future
 export const wgInterface = sqliteTable('interfaces_table', {
   name: text().primaryKey(),
+  protocol: text({ enum: ['awg', 'wg'] })
+    .notNull()
+    .default('awg'),
   device: text().notNull(),
   port: int().notNull().unique(),
   privateKey: text('private_key').notNull(),

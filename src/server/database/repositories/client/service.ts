@@ -9,6 +9,7 @@ import type {
   UpdateClientType,
 } from './types';
 
+import { interfaceForProtocol } from '#server/utils/protocol';
 import { WG_ENV } from '#server/utils/config';
 import Database from '#server/utils/Database';
 import { nextIP } from '#server/utils/ip';
@@ -173,16 +174,16 @@ export class ClientService {
     return this.#statements.findByIdPublic.execute({ id });
   }
 
-  async create({ name, expiresAt }: ClientCreateType) {
-    const privateKey = await wg.generatePrivateKey();
-    const publicKey = await wg.getPublicKey(privateKey);
-    const preSharedKey = await wg.generatePreSharedKey();
+  async create({ name, expiresAt, protocol }: ClientCreateType) {
+    const privateKey = await wg.generatePrivateKey(protocol);
+    const publicKey = await wg.getPublicKey(privateKey, protocol);
+    const preSharedKey = await wg.generatePreSharedKey(protocol);
 
     return this.#db.transaction(async (tx) => {
       const clients = await tx.query.client.findMany().execute();
       const clientInterface = await tx.query.wgInterface
         .findFirst({
-          where: eq(wgInterface.name, WG_ENV.WG_INTERFACE),
+          where: eq(wgInterface.name, interfaceForProtocol(protocol)),
         })
         .execute();
 
@@ -211,7 +212,7 @@ export class ClientService {
           name,
           // TODO: properly assign user id
           userId: 1,
-          interfaceId: WG_ENV.WG_INTERFACE,
+          interfaceId: interfaceForProtocol(protocol),
           expiresAt,
           privateKey,
           publicKey,
@@ -248,9 +249,13 @@ export class ClientService {
 
   update(id: ID, data: UpdateClientType) {
     return this.#db.transaction(async (tx) => {
+      const current = await tx.query.client.findFirst({
+        where: eq(client.id, id),
+      });
+      if (!current) throw new Error('Client not found');
       const clientInterface = await tx.query.wgInterface
         .findFirst({
-          where: eq(wgInterface.name, WG_ENV.WG_INTERFACE),
+          where: eq(wgInterface.name, current.interfaceId),
         })
         .execute();
 

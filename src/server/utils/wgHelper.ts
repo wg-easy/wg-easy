@@ -8,7 +8,7 @@ import {
 } from '#server/utils/awg';
 import { removeNewlines, iptablesTemplate } from '#server/utils/template';
 import { exec } from '#server/utils/cmd';
-import { WG_ENV } from '#server/utils/config';
+import type { VpnProtocol } from '#server/utils/protocol';
 import { formatEndpoint } from '#server/utils/endpoint';
 import type { ClientType } from '#db/repositories/client/types';
 import type { InterfaceType } from '#db/repositories/interface/types';
@@ -18,10 +18,6 @@ import type { HooksType } from '#db/repositories/hooks/types';
 type Options = {
   enableIpv6?: boolean;
 };
-
-// needed to support cli
-const wgExecutable =
-  typeof WG_ENV !== 'undefined' ? WG_ENV.WG_EXECUTABLE : 'dev';
 
 export const wg = {
   generateServerPeer: (
@@ -65,7 +61,7 @@ AllowedIPs = ${allowedIps.join(', ')}${extraLines.length ? `\n${extraLines.join(
       (enableIpv6 ? `, ${ipv6Addr}/${cidr6.prefix}` : '');
 
     const extraLines =
-      wgExecutable === 'awg'
+      wgInterface.protocol === 'awg'
         ? buildAwgLines(interfaceAwgParameters(wgInterface))
         : [];
 
@@ -110,7 +106,7 @@ PostDown = ${iptablesTemplate(hooks.postDown, wgInterface)}`;
       dnsServers.length > 0 ? `DNS = ${dnsServers.join(', ')}` : null;
 
     const awgLines =
-      wgExecutable === 'awg'
+      wgInterface.protocol === 'awg'
         ? buildAwgLines(clientAwgParameters(wgInterface, client))
         : [];
 
@@ -131,41 +127,41 @@ PersistentKeepalive = ${client.persistentKeepalive}
 Endpoint = ${formatEndpoint(userConfig.host, userConfig.port)}`;
   },
 
-  generatePrivateKey: () => {
+  generatePrivateKey: (wgExecutable: VpnProtocol = 'awg') => {
     return exec(`${wgExecutable} genkey`);
   },
 
-  getPublicKey: (privateKey: string) => {
+  getPublicKey: (privateKey: string, wgExecutable: VpnProtocol = 'awg') => {
     return exec(`echo ${privateKey} | ${wgExecutable} pubkey`, {
       log: `echo ***hidden*** | ${wgExecutable} pubkey`,
     });
   },
 
-  generatePreSharedKey: () => {
+  generatePreSharedKey: (wgExecutable: VpnProtocol = 'awg') => {
     return exec(`${wgExecutable} genpsk`);
   },
 
-  up: (infName: string) => {
+  up: (infName: string, wgExecutable: VpnProtocol = 'awg') => {
     return exec(`${wgExecutable}-quick up ${infName}`);
   },
 
-  down: (infName: string) => {
+  down: (infName: string, wgExecutable: VpnProtocol = 'awg') => {
     return exec(`${wgExecutable}-quick down ${infName}`);
   },
 
-  restart: (infName: string) => {
+  restart: (infName: string, wgExecutable: VpnProtocol = 'awg') => {
     return exec(
       `${wgExecutable}-quick down ${infName}; ${wgExecutable}-quick up ${infName}`
     );
   },
 
-  sync: (infName: string) => {
+  sync: (infName: string, wgExecutable: VpnProtocol = 'awg') => {
     return exec(
       `${wgExecutable} syncconf ${infName} <(${wgExecutable}-quick strip ${infName})`
     );
   },
 
-  dump: async (infName: string) => {
+  dump: async (infName: string, wgExecutable: VpnProtocol = 'awg') => {
     const rawDump = await exec(`${wgExecutable} show ${infName} dump`, {
       log: false,
     });
