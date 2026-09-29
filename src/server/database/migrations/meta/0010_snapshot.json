@@ -1,8 +1,8 @@
 {
-  "id": "209191ca-75c3-4821-93f5-255119b9a351",
-  "prevId": "885a870f-9dc1-4d97-941e-d3d718b02d74",
   "version": "6",
   "dialect": "sqlite",
+  "id": "985448af-d6d3-4a64-a9de-d5be7dbad711",
+  "prevId": "209191ca-75c3-4821-93f5-255119b9a351",
   "tables": {
     "clients_table": {
       "name": "clients_table",
@@ -33,6 +33,13 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
+          "autoincrement": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
           "autoincrement": false
         },
         "ipv4_address": {
@@ -315,28 +322,28 @@
         "clients_table_user_id_users_table_id_fk": {
           "name": "clients_table_user_id_users_table_id_fk",
           "tableFrom": "clients_table",
+          "tableTo": "users_table",
           "columnsFrom": [
             "user_id"
           ],
-          "tableTo": "users_table",
           "columnsTo": [
             "id"
           ],
-          "onUpdate": "cascade",
-          "onDelete": "restrict"
+          "onDelete": "restrict",
+          "onUpdate": "cascade"
         },
         "clients_table_interface_id_interfaces_table_name_fk": {
           "name": "clients_table_interface_id_interfaces_table_name_fk",
           "tableFrom": "clients_table",
+          "tableTo": "interfaces_table",
           "columnsFrom": [
             "interface_id"
           ],
-          "tableTo": "interfaces_table",
           "columnsTo": [
             "name"
           ],
-          "onUpdate": "cascade",
-          "onDelete": "cascade"
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -479,15 +486,15 @@
         "hooks_table_id_interfaces_table_name_fk": {
           "name": "hooks_table_id_interfaces_table_name_fk",
           "tableFrom": "hooks_table",
+          "tableTo": "interfaces_table",
           "columnsFrom": [
             "id"
           ],
-          "tableTo": "interfaces_table",
           "columnsTo": [
             "name"
           ],
-          "onUpdate": "cascade",
-          "onDelete": "cascade"
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -841,17 +848,131 @@
         "one_time_links_table_id_clients_table_id_fk": {
           "name": "one_time_links_table_id_clients_table_id_fk",
           "tableFrom": "one_time_links_table",
+          "tableTo": "clients_table",
           "columnsFrom": [
             "id"
           ],
-          "tableTo": "clients_table",
           "columnsTo": [
             "id"
           ],
-          "onUpdate": "cascade",
-          "onDelete": "cascade"
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
         }
       },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "client_tags_table": {
+      "name": "client_tags_table",
+      "columns": {
+        "client_id": {
+          "name": "client_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "tag_id": {
+          "name": "tag_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "client_tags_table_client_id_clients_table_id_fk": {
+          "name": "client_tags_table_client_id_clients_table_id_fk",
+          "tableFrom": "client_tags_table",
+          "tableTo": "clients_table",
+          "columnsFrom": [
+            "client_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
+        "client_tags_table_tag_id_tags_table_id_fk": {
+          "name": "client_tags_table_tag_id_tags_table_id_fk",
+          "tableFrom": "client_tags_table",
+          "tableTo": "tags_table",
+          "columnsFrom": [
+            "tag_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "client_tags_table_client_id_tag_id_pk": {
+          "columns": [
+            "client_id",
+            "tag_id"
+          ],
+          "name": "client_tags_table_client_id_tag_id_pk"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "tags_table": {
+      "name": "tags_table",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(CURRENT_TIMESTAMP)"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(CURRENT_TIMESTAMP)"
+        }
+      },
+      "indexes": {
+        "tags_table_name_unique": {
+          "name": "tags_table_name_unique",
+          "columns": [
+            "name"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}
@@ -1115,15 +1236,15 @@
         "user_configs_table_id_interfaces_table_name_fk": {
           "name": "user_configs_table_id_interfaces_table_name_fk",
           "tableFrom": "user_configs_table",
+          "tableTo": "interfaces_table",
           "columnsFrom": [
             "id"
           ],
-          "tableTo": "interfaces_table",
           "columnsTo": [
             "name"
           ],
-          "onUpdate": "cascade",
-          "onDelete": "cascade"
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -1134,9 +1255,9 @@
   "views": {},
   "enums": {},
   "_meta": {
-    "columns": {},
     "schemas": {},
-    "tables": {}
+    "tables": {},
+    "columns": {}
   },
   "internal": {
     "indexes": {}

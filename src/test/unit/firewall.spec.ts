@@ -18,7 +18,7 @@ describe('firewall', () => {
   describe('IPv4-only chain management', () => {
     test('does not invoke ip6tables when initializing and flushing', async () => {
       await firewall.initChain('wg0', false);
-      await firewall.flushChain(false);
+      await firewall.flushChain('wg0', false);
 
       expect(execMock).toHaveBeenCalledWith(
         expect.stringContaining('iptables -C FORWARD -i wg0')
@@ -36,6 +36,30 @@ describe('firewall', () => {
       );
       expect(execMock).not.toHaveBeenCalledWith(
         expect.stringContaining('ip6tables')
+      );
+    });
+  });
+
+  describe('interface scoped chains', () => {
+    test('uses one chain per interface', async () => {
+      await firewall.initChain('wg1', false);
+
+      expect(execMock).toHaveBeenCalledWith(
+        expect.stringContaining('iptables -N WG_CLIENTS_wg1')
+      );
+      expect(execMock).not.toHaveBeenCalledWith(
+        expect.stringContaining('iptables -N WG_CLIENTS ')
+      );
+    });
+
+    test('stops referencing the legacy chain when removing filtering', async () => {
+      await firewall.removeFiltering('wg1', false);
+
+      expect(execMock).toHaveBeenCalledWith(
+        expect.stringContaining('iptables -D FORWARD -i wg1 -j WG_CLIENTS ')
+      );
+      expect(execMock).toHaveBeenCalledWith(
+        expect.stringContaining('iptables -X WG_CLIENTS_wg1')
       );
     });
   });
@@ -290,41 +314,43 @@ describe('firewall', () => {
   describe('generateRuleArgs', () => {
     test('includes comment when provided', () => {
       const rules = firewallTestExports.generateRuleArgs(
+        'wg0',
         '10.8.0.2',
         { ip: '10.0.0.1' },
         'client 1: test'
       );
       expect(rules).toEqual([
-        '-A WG_CLIENTS -s 10.8.0.2 -d 10.0.0.1 -m comment --comment "client 1: test" -j ACCEPT',
+        '-A WG_CLIENTS_wg0 -s 10.8.0.2 -d 10.0.0.1 -m comment --comment "client 1: test" -j ACCEPT',
       ]);
     });
     test('omits comment when not provided', () => {
-      const rulesTcp = firewallTestExports.generateRuleArgs('10.8.0.2', {
+      const rulesTcp = firewallTestExports.generateRuleArgs('wg0', '10.8.0.2', {
         ip: '10.0.0.1',
         port: 80,
         proto: 'tcp',
       });
       expect(rulesTcp).toEqual([
-        '-A WG_CLIENTS -s 10.8.0.2 -d 10.0.0.1 -p tcp --dport 80 -j ACCEPT',
+        '-A WG_CLIENTS_wg0 -s 10.8.0.2 -d 10.0.0.1 -p tcp --dport 80 -j ACCEPT',
       ]);
-      const rulesUdp = firewallTestExports.generateRuleArgs('10.8.0.2', {
+      const rulesUdp = firewallTestExports.generateRuleArgs('wg0', '10.8.0.2', {
         ip: '10.0.0.1',
         port: 80,
         proto: 'udp',
       });
       expect(rulesUdp).toEqual([
-        '-A WG_CLIENTS -s 10.8.0.2 -d 10.0.0.1 -p udp --dport 80 -j ACCEPT',
+        '-A WG_CLIENTS_wg0 -s 10.8.0.2 -d 10.0.0.1 -p udp --dport 80 -j ACCEPT',
       ]);
     });
     test('comment with port generates two rules for both proto', () => {
       const rules = firewallTestExports.generateRuleArgs(
+        'wg0',
         '10.8.0.2',
         { ip: '10.0.0.1', port: 443, proto: 'both' },
         'client 2: phone'
       );
       expect(rules).toEqual([
-        '-A WG_CLIENTS -s 10.8.0.2 -d 10.0.0.1 -p tcp --dport 443 -m comment --comment "client 2: phone" -j ACCEPT',
-        '-A WG_CLIENTS -s 10.8.0.2 -d 10.0.0.1 -p udp --dport 443 -m comment --comment "client 2: phone" -j ACCEPT',
+        '-A WG_CLIENTS_wg0 -s 10.8.0.2 -d 10.0.0.1 -p tcp --dport 443 -m comment --comment "client 2: phone" -j ACCEPT',
+        '-A WG_CLIENTS_wg0 -s 10.8.0.2 -d 10.0.0.1 -p udp --dport 443 -m comment --comment "client 2: phone" -j ACCEPT',
       ]);
     });
   });

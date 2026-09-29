@@ -18,9 +18,9 @@ const nullObject = new Proxy(
 let provider = nullObject as never as DBServiceType;
 
 connect()
-  .then((db) => {
+  .then(async (db) => {
     provider = db;
-    WireGuard.Startup();
+    await WireGuard.Startup();
   })
   .catch((err) => {
     console.log('Failed to connect to Database:', err);
