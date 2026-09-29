@@ -1,0 +1,32 @@
+name: AWG fork checks
+
+on:
+  push:
+    branches: [master, amneziawg-3.1]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  application:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: "24"
+          cache: pnpm
+          cache-dependency-path: src/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+        working-directory: src
+      - run: pnpm test:unit && pnpm typecheck && pnpm lint && pnpm build
+        working-directory: src
+  container:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - run: docker compose config --quiet
+      - run: docker build -t awg-easy:test .
+      - run: docker run --rm --entrypoint awg awg-easy:test --version

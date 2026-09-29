@@ -1,4 +1,5 @@
 import fs from 'node:fs/promises';
+import { randomInt } from 'node:crypto';
 
 import { createDebug } from 'obug';
 
@@ -15,8 +16,7 @@ import type { ClientQueryType } from '#db/repositories/client/types';
 
 const WG_DEBUG = createDebug('WireGuard');
 
-const generateRandomHeaderValue = () =>
-  Math.floor(Math.random() * 2147483642) + 5;
+const generateRandomHeaderValue = () => randomInt(5, 2147483647);
 
 class WireGuard {
   /**
@@ -178,7 +178,9 @@ class WireGuard {
       const privateKey = await wg.generatePrivateKey();
       const publicKey = await wg.getPublicKey(privateKey);
 
-      await Database.interfaces.updateKeyPair(privateKey, publicKey);
+      // Persist keys and AWG defaults together; a restart must not rotate the
+      // shared header-protection key or partially initialize the interface.
+      await Database.interfaces.initialize(privateKey, publicKey);
       wgInterface = await Database.interfaces.get();
       WG_DEBUG('New Wireguard Keys generated successfully.');
     }
@@ -197,7 +199,7 @@ class WireGuard {
       wgInterface.h3 = String(h3)!;
       wgInterface.h4 = String(h4)!;
 
-      Database.interfaces.update(wgInterface);
+      await Database.interfaces.update(wgInterface);
     }
 
     WG_DEBUG(`Starting Wireguard Interface ${wgInterface.name}...`);

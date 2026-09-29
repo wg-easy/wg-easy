@@ -5,6 +5,7 @@ import {
   clientAwgParameters,
   interfaceAwgParameters,
 } from '#server/utils/awg';
+import { createAwgDefaults } from '#server/utils/awgDefaults';
 import { InterfaceUpdateSchema } from '#db/repositories/interface/types';
 import { AwgRangeSchema, HSchema, KeySchema } from '#server/utils/types';
 
@@ -60,6 +61,10 @@ const client = {
 describe('AmneziaWG config lines', () => {
   test('leaves out parameters that are not set', () => {
     expect(buildAwgLines({ Jc: null, Jmin: null })).toEqual([]);
+  });
+
+  test('preserves explicit zero values when disabling junk', () => {
+    expect(buildAwgLines({ Jc: 0, S4: 0 })).toEqual(['Jc = 0', 'S4 = 0']);
   });
 
   test('writes booleans as on/off, not true/false', () => {
@@ -218,5 +223,49 @@ describe('InterfaceUpdateSchema', () => {
         s4: 40,
       })
     ).not.toThrow();
+  });
+});
+
+describe('new AmneziaWG 3.1 installations', () => {
+  test('generates valid unique keys and distinct headers for each installation', () => {
+    const first = createAwgDefaults();
+    const second = createAwgDefaults();
+    expect(KeySchema.parse(first.headerProtectionKey)).toBe(
+      first.headerProtectionKey
+    );
+    expect(first.headerProtectionKey).not.toBe(second.headerProtectionKey);
+    expect(new Set([first.h1, first.h2, first.h3, first.h4]).size).toBe(4);
+    for (const header of [first.h1, first.h2, first.h3, first.h4]) {
+      expect(HSchema.parse(header)).toBe(header);
+    }
+    for (const size of [first.s1, first.s2, first.s3, first.s4]) {
+      expect(size).toBeGreaterThanOrEqual(12);
+    }
+  });
+
+  test('exports matching header protection and trailer settings on both ends', () => {
+    const profile = { ...wgInterface, ...createAwgDefaults() };
+    const server = interfaceAwgParameters(profile);
+    const peer = clientAwgParameters(profile, {
+      ...client,
+      contentPaddingAddition: profile.contentPaddingAddition,
+      disableCookies: profile.disableCookies,
+    });
+    for (const key of [
+      'HeaderProtectionKey',
+      'RandomTrailers',
+      'S1',
+      'S2',
+      'S3',
+      'S4',
+      'H1',
+      'H2',
+      'H3',
+      'H4',
+    ]) {
+      expect(peer[key]).toEqual(server[key]);
+    }
+    expect(buildAwgLines(peer)).toContain('DisableCookies = on');
+    expect(buildAwgLines(peer)).toContain('ContentPaddingAddition = 0-64');
   });
 });

@@ -3,14 +3,17 @@ volumes:
 
 services:
   wg-easy:
+    environment:
+      - INSECURE=true # UI bound to loopback; use an SSH tunnel
     #environment:
     #  Optional:
     #  - PORT=51821
     #  - HOST=0.0.0.0
     #  - INSECURE=false
 
-    image: ghcr.io/wg-easy/wg-easy:15
-    container_name: wg-easy
+    build: .
+    image: awg-easy:local
+    container_name: awg-easy
     networks:
       wg:
         ipv4_address: 10.42.42.42
@@ -18,9 +21,11 @@ services:
     volumes:
       - etc_wireguard:/etc/wireguard
       - /lib/modules:/lib/modules:ro
+    devices:
+      - /dev/net/tun:/dev/net/tun
     ports:
       - "51820:51820/udp"
-      - "51821:51821/tcp"
+      - "127.0.0.1:51821:51821/tcp"
     restart: unless-stopped
     cap_add:
       - NET_ADMIN

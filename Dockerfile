@@ -38,7 +38,7 @@ RUN npm install --no-save --omit=dev libsql
 FROM docker.io/library/node:krypton-alpine@sha256:50c8e8ca1d27439048670df5883f32d57cf81cff6233222c893fd0d9884cbd81
 WORKDIR /app
 
-HEALTHCHECK --interval=1m --timeout=5s --retries=3 CMD /usr/bin/timeout 5s /bin/sh -c "/usr/bin/wg show | /bin/grep -q interface || exit 1"
+HEALTHCHECK --interval=1m --timeout=5s --retries=3 CMD /usr/bin/timeout 5s /bin/sh -c "/usr/bin/awg show ${WG_INTERFACE:-wg0} >/dev/null 2>&1"
 
 # Copy build
 COPY --from=build /app/.output /app
@@ -84,8 +84,9 @@ ENV HOST=0.0.0.0
 ENV INSECURE=false
 ENV INIT_ENABLED=false
 ENV DISABLE_IPV6=false
+ENV DISABLE_VERSION_CHECK=true
 
-LABEL org.opencontainers.image.source=https://github.com/wg-easy/wg-easy
+LABEL org.opencontainers.image.source=https://github.com/niteus-dev/awg-easy
 
 # Run Web UI
 CMD ["/usr/bin/dumb-init", "node", "server/index.mjs"]

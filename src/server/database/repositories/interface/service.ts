@@ -4,6 +4,7 @@ import { parseCidr } from 'cidr-tools';
 import { wgInterface } from './schema';
 import type { InterfaceCidrUpdateType, InterfaceUpdateType } from './types';
 
+import { createAwgDefaults } from '#server/utils/awgDefaults';
 import { WG_ENV } from '#server/utils/config';
 import { nextIPFromUsedAddresses } from '#server/utils/ip';
 import { client as clientSchema } from '#db/schema';
@@ -57,6 +58,14 @@ export class InterfaceService {
       privateKey,
       publicKey,
     });
+  }
+
+  initialize(privateKey: string, publicKey: string) {
+    return this.#db
+      .update(wgInterface)
+      .set({ ...createAwgDefaults(), privateKey, publicKey })
+      .where(eq(wgInterface.name, WG_ENV.WG_INTERFACE))
+      .execute();
   }
 
   update(data: InterfaceUpdateType) {

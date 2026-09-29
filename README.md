@@ -1,125 +1,70 @@
-# WireGuard Easy
+# AWG Easy
 
-[![Build & Publish latest Image](https://github.com/wg-easy/wg-easy/actions/workflows/deploy.yml/badge.svg)](https://github.com/wg-easy/wg-easy/actions/workflows/deploy.yml)
-[![Lint](https://github.com/wg-easy/wg-easy/actions/workflows/lint.yml/badge.svg?branch=master)](https://github.com/wg-easy/wg-easy/actions/workflows/lint.yml)
-[![GitHub Stars](https://img.shields.io/github/stars/wg-easy/wg-easy)](https://github.com/wg-easy/wg-easy/stargazers)
-[![License](https://img.shields.io/github/license/wg-easy/wg-easy)](LICENSE)
-[![GitHub Release](https://img.shields.io/github/v/release/wg-easy/wg-easy)](https://github.com/wg-easy/wg-easy/releases/latest)
-[![Image Pulls](https://img.shields.io/badge/image_pulls-28M+-blue)](https://github.com/wg-easy/wg-easy/pkgs/container/wg-easy)
+Fork of [wg-easy](https://github.com/wg-easy/wg-easy) for AmneziaWG 3.1.
+Based on upstream commit `5f2009a`. Upstream UI, authentication, client management,
+QR export and database migrations are retained. Original documentation is in
+[README.upstream.md](README.upstream.md); this file describes the fork's defaults.
 
-You have found the easiest way to install & manage WireGuard on any Linux host!
+## What changes
 
-<p align="center">
-  <img src="./assets/screenshot.png" width="802" alt="wg-easy Screenshot" />
-</p>
+- Always uses `awg` / `awg-quick`; never silently falls back to plain WireGuard.
+- Bundles amneziawg-tools `v3.1.20260812` and amneziawg-go `v3.1.20260828`.
+- New databases receive a random 32-byte header-protection key, unique H1–H4,
+  S1/S2/S3/S4 = 128/56/12/12, ContentPaddingAddition = 0-64,
+  RandomTrailers = on and DisableCookies = on.
+- Shared parameters are exported identically to clients; new clients copy the
+  server's padding and cookie policy. Individual client settings remain editable.
+- Health checks query the configured AWG interface. `/dev/net/tun` allows the
+  official AWG userspace fallback when the host has no AWG kernel module.
 
-## Features
+## Run on a Linux host
 
-- All-in-one: WireGuard + Web UI.
-- Easy installation, simple to use.
-- List, create, edit, delete, enable & disable clients.
-- Show a client's QR code.
-- Download a client's configuration file.
-- Statistics for which clients are connected.
-- Tx/Rx charts for each connected client.
-- Gravatar support.
-- Automatic Light / Dark Mode
-- Multilanguage Support
-- One Time Links
-- Client Expiration
-- Prometheus metrics support
-- IPv6 support
-- CIDR support
-- 2FA support
-- Per-client firewall filtering (requires iptables)
-- OIDC support (Google, GitHub, Authelia, Authentik, etc.)
-
-> [!NOTE]
-> To better manage documentation for this project, it has its own site here: [https://wg-easy.github.io/wg-easy/latest](https://wg-easy.github.io/wg-easy/latest)
-
-- [Getting Started](https://wg-easy.github.io/wg-easy/latest/getting-started/)
-- [Basic Installation](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/basic-installation/)
-- [Caddy](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/caddy/)
-- [Traefik](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/traefik/)
-- [Podman](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/podman-nft/)
-- [AdGuard Home](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/adguard/)
-
-> [!NOTE]
-> If you want to migrate from the old version to the new version, you can find the migration guide here: [Migration Guide](https://wg-easy.github.io/wg-easy/latest/advanced/migrate/)
-
-## Installation
-
-This is a quick start guide to get you up and running with WireGuard Easy.
-
-For a more detailed installation guide, please refer to the [Getting Started](https://wg-easy.github.io/wg-easy/latest/getting-started/) page.
-
-### 1. Install Docker
-
-If you haven't installed Docker yet, install it by running as root:
-
-```shell
-curl -sSL https://get.docker.com | sh
-exit
+```sh
+docker compose up -d --build
 ```
 
-And log in again.
+The host needs Docker Compose, `/dev/net/tun`, IPv6 support for the included
+Compose network, and UDP 51820 reachable by clients. If an AmneziaWG kernel module
+is installed, it must support 3.1; an old module does not fall back to userspace
+merely because it rejects new parameters. Upgrade or remove it first.
 
-### 2. Run WireGuard Easy
+The admin UI is bound to `127.0.0.1:51821`. For a remote server:
 
-The easiest way to run WireGuard Easy is with Docker Compose.
-
-Just follow [these steps](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/basic-installation/) in the detailed documentation.
-
-You can also install WireGuard Easy with the [docker run command](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/docker-run/) or via [podman](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/podman-nft/).
-
-Now [setup a reverse proxy](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/basic-installation/#setup-reverse-proxy) to be able to access the Web UI securely from the internet. This step is optional, just make sure to follow the guide [here](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/reverse-proxyless/) if you decide not to do it.
-
-## Donate
-
-Are you enjoying this project? Consider donating.
-
-Founder: [Buy Emile a beer!](https://github.com/sponsors/WeeJeWel) 🍻
-
-Maintainer: [Buy kaaax0815 a coffee!](https://github.com/sponsors/kaaax0815) ☕
-
-## Development
-
-### Prerequisites
-
-- Docker
-- Node LTS & corepack enabled
-- Visual Studio Code
-
-### Dev Server
-
-This starts the development server with docker
-
-```shell
-pnpm dev
+```sh
+ssh -L 51821:127.0.0.1:51821 user@server
 ```
 
-### Update Auto Imports
+Open http://localhost:51821, finish setup with your public VPN endpoint, create a
+client and import the downloaded config or QR into an AmneziaWG 3.1-capable client.
+The supplied HTTP setting is for this loopback/SSH setup. For public access,
+configure HTTPS and set `INSECURE=false` as described in upstream documentation.
 
-If you add something that should be auto-importable and VSCode complains, run:
+## Existing installations
 
-```shell
+Back up the entire `/etc/wireguard` volume before trying this fork. Existing
+interface keys and obfuscation settings are preserved. There is **no automatic
+conversion** of an existing WG/AWG tunnel to a new 3.1 profile. For an existing
+interface, configure HeaderProtectionKey, S1–S4 (at least 12), RandomTrailers and
+other desired parameters in the admin UI, then re-export every client config.
+Plain WireGuard clients cannot consume the new profile.
+
+`EXPERIMENTAL_AWG` and `OVERRIDE_AUTO_AWG` no longer select the protocol.
+The database and volume paths retain upstream names for compatibility.
+Upstream update notifications are disabled in the container because upstream
+release images do not contain this fork's defaults.
+
+## Development and validation
+
+```sh
 cd src
-pnpm install
-cd ..
+pnpm install --frozen-lockfile
+pnpm test:unit
+pnpm typecheck
+pnpm build
 ```
 
-### Test Cli
+A successful build is not a VPN interoperability test. Before deployment, verify
+handshake, routed traffic, DNS, restart persistence, QR/config import, client
+revocation and traffic counters with an actual 3.1 client on Linux.
 
-This starts the cli with docker
-
-```shell
-pnpm cli:dev
-```
-
-## License
-
-This project is licensed under the AGPL-3.0-only License - see the [LICENSE](LICENSE) file for details
-
-This project is not affiliated, associated, authorized, endorsed by, or in any way officially connected with Jason A. Donenfeld, ZX2C4 or Edge Security
-
-"WireGuard" and the "WireGuard" logo are registered trademarks of Jason A. Donenfeld
+License: AGPL-3.0, inherited from wg-easy; see [LICENSE](LICENSE).

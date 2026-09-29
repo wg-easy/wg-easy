@@ -1,7 +1,6 @@
 import { createDebug } from 'obug';
 import packageJson from '@@/package.json';
 
-import { exec } from '#server/utils/cmd';
 import { parseInterfaceName } from '#server/utils/interfaceName';
 import { parseTrustedProxies } from '#server/utils/trustedProxy';
 import {
@@ -21,24 +20,6 @@ export const OLD_ENV = {
   PASSWORD_HASH: process.env.PASSWORD_HASH,
 };
 
-const detectAwg = async (): Promise<'awg' | 'wg'> => {
-  /** TODO: delete on next major version */
-  if (process.env.EXPERIMENTAL_AWG === 'true') {
-    const OVERRIDE_AUTO_AWG = process.env.OVERRIDE_AUTO_AWG?.toLowerCase();
-
-    if (
-      OVERRIDE_AUTO_AWG === ('wg' as const) ||
-      OVERRIDE_AUTO_AWG === ('awg' as const)
-    ) {
-      return OVERRIDE_AUTO_AWG;
-    } else {
-      return await exec('modinfo amneziawg')
-        .then(() => 'awg' as const)
-        .catch(() => 'wg' as const);
-    }
-  } else return 'wg';
-};
-
 const oauthProviders = process.env.OAUTH_PROVIDERS?.split(',')
   .map((v) => v.trim())
   .filter((v) => isValidOauthProvider(v))
@@ -53,7 +34,8 @@ export const WG_ENV = {
   DISABLE_IPV6: process.env.DISABLE_IPV6 === 'true',
   /** Name of the WireGuard interface */
   WG_INTERFACE: parseInterfaceName(process.env.WG_INTERFACE),
-  WG_EXECUTABLE: await detectAwg(),
+  // This fork always uses AWG, including its userspace fallback.
+  WG_EXECUTABLE: 'awg' as const,
   DISABLE_VERSION_CHECK: process.env.DISABLE_VERSION_CHECK === 'true',
   /** List of enabled and configured OAuth providers */
   OAUTH_PROVIDERS: oauthProviders,

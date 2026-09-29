@@ -227,6 +227,8 @@ export class ClientService {
           i3: clientConfig.defaultI3,
           i4: clientConfig.defaultI4,
           i5: clientConfig.defaultI5,
+          contentPaddingAddition: clientInterface.contentPaddingAddition,
+          disableCookies: clientInterface.disableCookies,
           persistentKeepalive: clientConfig.defaultPersistentKeepalive,
           serverAllowedIps: [],
           enabled: true,
