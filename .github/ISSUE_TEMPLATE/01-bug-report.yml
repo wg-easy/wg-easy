@@ -1,0 +1,37 @@
+---
+name: 🐛 Bug Report
+description: Create a report to help us improve
+title: "[Bug]: "
+type: Bug
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Thanks :heart: for taking the time to fill out this bug report!**
+        We kindly ask that you search to see if an issue [already exists](https://github.com/wg-easy/wg-easy/issues?q=is%3Aissue+sort%3Acreated-desc+) for the bug you encountered.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: Describe the bug
+      placeholder: Tell us what you see!
+      value: "A bug happened!"
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-should-happen
+    attributes:
+      label: Expected behavior
+      placeholder: Tell us what you expected!
+      value: "Work just fine!"
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log output
+      description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
+      render: shell

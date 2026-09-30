@@ -1,0 +1,38 @@
+import { sql } from 'drizzle-orm';
+import { int, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+
+import { wgInterface } from '../interface/schema';
+
+// default* means clients store it themselves
+export const userConfig = sqliteTable('user_configs_table', {
+  /** same as `wgInterface.name` */
+  id: text()
+    .primaryKey()
+    .references(() => wgInterface.name, {
+      onDelete: 'cascade',
+      onUpdate: 'cascade',
+    }),
+  defaultMtu: int('default_mtu').notNull(),
+  defaultPersistentKeepalive: int('default_persistent_keepalive').notNull(),
+  defaultDns: text('default_dns', { mode: 'json' }).$type<string[]>().notNull(),
+  defaultAllowedIps: text('default_allowed_ips', { mode: 'json' })
+    .$type<string[]>()
+    .notNull(),
+  defaultJC: int('default_j_c').default(7),
+  defaultJMin: int('default_j_min').default(10),
+  defaultJMax: int('default_j_max').default(1000),
+  defaultI1: text('default_i1'),
+  defaultI2: text('default_i2'),
+  defaultI3: text('default_i3'),
+  defaultI4: text('default_i4'),
+  defaultI5: text('default_i5'),
+  host: text().notNull(),
+  port: int().notNull(),
+  createdAt: text('created_at')
+    .notNull()
+    .default(sql`(CURRENT_TIMESTAMP)`),
+  updatedAt: text('updated_at')
+    .notNull()
+    .default(sql`(CURRENT_TIMESTAMP)`)
+    .$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
+});

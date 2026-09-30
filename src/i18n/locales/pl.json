@@ -1,0 +1,297 @@
+{
+  "pages": {
+    "me": "Konto",
+    "clients": "Klienci",
+    "admin": {
+      "panel": "Panel administratora",
+      "general": "Ogólne",
+      "config": "Konfiguracja",
+      "interface": "Interfejs",
+      "hooks": "Hooki"
+    }
+  },
+  "user": {
+    "email": "E-mail"
+  },
+  "me": {
+    "currentPassword": "Aktualne hasło",
+    "enable2fa": "Włącz uwierzytelnianie dwuskładnikowe",
+    "enable2faDesc": "Zeskanuj kod QR aplikacją uwierzytelniającą lub wprowadź klucz ręcznie.",
+    "2faKey": "Klucz TOTP",
+    "2faCodeDesc": "Wprowadź kod z aplikacji uwierzytelniającej.",
+    "disable2fa": "Wyłącz uwierzytelnianie dwuskładnikowe",
+    "disable2faDesc": "Wprowadź hasło, aby wyłączyć uwierzytelnianie dwuskładnikowe."
+  },
+  "general": {
+    "name": "Nazwa",
+    "username": "Nazwa użytkownika",
+    "password": "Hasło",
+    "newPassword": "Nowe hasło",
+    "updatePassword": "Aktualizuj hasło",
+    "mtu": "MTU",
+    "allowedIps": "Dozwolone adresy IP",
+    "dns": "DNS",
+    "persistentKeepalive": "Utrzymywanie połączenia (Keepalive)",
+    "logout": "Wyloguj",
+    "continue": "Kontynuuj",
+    "host": "Host",
+    "port": "Port",
+    "yes": "Tak",
+    "no": "Nie",
+    "confirmPassword": "Potwierdź hasło",
+    "loading": "Ładowanie...",
+    "2fa": "Uwierzytelnianie dwuskładnikowe",
+    "2faCode": "Kod TOTP"
+  },
+  "setup": {
+    "welcome": "Witaj w pierwszej konfiguracji wg-easy",
+    "welcomeDesc": "Znalazłeś najłatwiejszy sposób na instalację i zarządzanie WireGuard na dowolnym hoście Linux",
+    "existingSetup": "Czy masz już istniejącą konfigurację?",
+    "createAdminDesc": "Najpierw wprowadź nazwę użytkownika administratora i silne hasło. Dane te będą używane do logowania się do panelu administracyjnego.",
+    "setupConfigDesc": "Wprowadź informacje o hoście i porcie. Zostaną one użyte do konfiguracji klientów podczas ustawiania WireGuard na ich urządzeniach.",
+    "setupMigrationDesc": "Wskaż plik kopii zapasowej, jeśli chcesz przenieść dane z poprzedniej wersji wg-easy do nowej konfiguracji.",
+    "upload": "Prześlij",
+    "migration": "Przywróć kopię zapasową:",
+    "createAccount": "Utwórz konto",
+    "successful": "Konfiguracja zakończona sukcesem",
+    "hostDesc": "Publiczna nazwa hosta, z którą będą łączyć się klienci",
+    "portDesc": "Publiczny port UDP, na którym WireGuard będzie nasłuchiwać i z którym połączą się klienci"
+  },
+  "update": {
+    "updateAvailable": "Dostępna jest aktualizacja!",
+    "update": "Aktualizuj"
+  },
+  "theme": {
+    "dark": "Ciemny motyw",
+    "light": "Jasny motyw",
+    "system": "Motyw systemowy"
+  },
+  "layout": {
+    "toggleCharts": "Pokaż/ukryj wykresy",
+    "donate": "Dotacja"
+  },
+  "login": {
+    "signIn": "Zaloguj się",
+    "or": "lub",
+    "rememberMe": "Zapamiętaj mnie",
+    "rememberMeDesc": "Pozostań zalogowany po zamknięciu przeglądarki",
+    "insecure": "Nie możesz zalogować się przez niezabezpieczone połączenie. Użyj HTTPS.",
+    "2faRequired": "Wymagane jest uwierzytelnianie dwuskładnikowe",
+    "2faWrong": "Błędny kod uwierzytelniania dwuskładnikowego"
+  },
+  "client": {
+    "empty": "Nie ma jeszcze żadnych klientów.",
+    "newShort": "Nowy",
+    "sort": "Sortuj",
+    "create": "Utwórz klienta",
+    "created": "Klient utworzony",
+    "new": "Nowy klient",
+    "name": "Nazwa",
+    "expireDate": "Data wygaśnięcia",
+    "expireDateDesc": "Data, w której klient zostanie wyłączony. Pozostaw puste dla bezterminowego dostępu",
+    "delete": "Usuń",
+    "deleteClient": "Usuń klienta",
+    "deleteDialog": "Czy na pewno chcesz usunąć klienta {name}? Tej operacji nie można cofnąć.",
+    "enabled": "Włączony",
+    "address": "Adres",
+    "serverAllowedIps": "Dozwolone adresy IP serwera",
+    "otlDesc": "Generuj krótki link jednorazowy",
+    "permanent": "Stały",
+    "createdOn": "Utworzono: {date}",
+    "lastSeen": "Ostatnio widziany: {date}",
+    "totalDownload": "Pobieranie łącznie: {total}",
+    "totalUpload": "Wysyłanie łącznie: {total}",
+    "newClient": "Nowy klient",
+    "disableClient": "Wyłącz klienta",
+    "enableClient": "Włącz klienta",
+    "noPrivKey": "Ten klient nie posiada klucza prywatnego. Nie można utworzyć konfiguracji.",
+    "showQR": "Pokaż kod QR",
+    "downloadConfig": "Pobierz konfigurację",
+    "allowedIpsDesc": "Adresy IP kierowane przez VPN (nadpisuje konfigurację globalną)",
+    "serverAllowedIpsDesc": "Adresy IP, które serwer będzie kierował do klienta",
+    "mtuDesc": "Ustawia maksymalną jednostkę transmisji (rozmiar pakietu) dla tunelu VPN",
+    "persistentKeepaliveDesc": "Ustawia interwał (w sekundach) dla pakietów utrzymujących połączenie. 0 wyłącza.",
+    "hooks": "Hooki",
+    "hooksDescription": "Hooki działają tylko z wg-quick",
+    "hooksLeaveEmpty": "Tylko dla wg-quick. W przeciwnym razie pozostaw puste",
+    "dnsDesc": "Serwer DNS dla klientów (nadpisuje konfigurację globalną)",
+    "notConnected": "Klient niepołączony",
+    "endpoint": "Punkt końcowy",
+    "endpointDesc": "Adres IP klienta, z którego ustanowiono połączenie WireGuard",
+    "search": "Szukaj klientów...",
+    "config": "Konfiguracja",
+    "viewConfig": "Zobacz konfigurację",
+    "firewallIps": "Dozwolone IP zapory",
+    "firewallIpsDesc": "Docelowe adresy IP/CIDR, do których ten klient ma dostęp (wymuszane po stronie serwera). Pozostaw puste, aby użyć Dozwolonych IP. Obsługuje opcjonalne filtrowanie portów i protokołów. Zobacz dokumentację dla składni.",
+    "downloadPng": "Pobierz PNG",
+    "copyPng": "Kopiuj PNG"
+  },
+  "dialog": {
+    "change": "Zmień",
+    "cancel": "Anuluj",
+    "create": "Utwórz"
+  },
+  "toast": {
+    "success": "Sukces",
+    "saved": "Zapisano",
+    "error": "Błąd",
+    "unknown": "Nieznany błąd. Sprawdź konsolę, aby uzyskać więcej szczegółów"
+  },
+  "form": {
+    "actions": "Akcje",
+    "save": "Zapisz",
+    "revert": "Przywróć",
+    "sectionGeneral": "Ogólne",
+    "sectionAdvanced": "Zaawansowane",
+    "noItems": "Brak elementów",
+    "nullNoItems": "Brak elementów. Używanie konfiguracji globalnej",
+    "add": "Dodaj"
+  },
+  "admin": {
+    "general": {
+      "sessionTimeout": "Limit czasu sesji",
+      "sessionTimeoutDesc": "Czas trwania sesji dla 'Zapamiętaj mnie' (w sekundach)",
+      "metrics": "Metryki",
+      "metricsPassword": "Hasło",
+      "metricsPasswordDesc": "Hasło Bearer dla punktu końcowego metryk (hasło lub hash argon2)",
+      "json": "JSON",
+      "jsonDesc": "Ścieżka dla metryk w formacie JSON",
+      "prometheus": "Prometheus",
+      "prometheusDesc": "Ścieżka dla metryk Prometheus"
+    },
+    "config": {
+      "connection": "Połączenie",
+      "hostDesc": "Publiczna nazwa hosta, z którą będą łączyć się klienci (unieważnia konfigurację)",
+      "portDesc": "Publiczny port UDP klientów (unieważnia konfigurację; zaleca się także zmianę Portu Interfejsu)",
+      "allowedIpsDesc": "Dozwolone adresy IP klientów (konfiguracja globalna)",
+      "dnsDesc": "Serwer DNS klientów (konfiguracja globalna)",
+      "mtuDesc": "MTU klientów (tylko dla nowych klientów)",
+      "persistentKeepaliveDesc": "Interwał wysyłania pakietów keepalive do serwera (sekundy). 0 = wyłączone (tylko dla nowych klientów)",
+      "suggest": "Sugeruj",
+      "suggestDesc": "Wybierz adres IP lub nazwę hosta dla pola Host"
+    },
+    "interface": {
+      "cidrSuccess": "Zmieniono CIDR",
+      "device": "Urządzenie",
+      "deviceDesc": "Interfejs sieciowy, przez który ma być przekazywany ruch WireGuard",
+      "mtuDesc": "MTU, którego będzie używać WireGuard",
+      "portDesc": "Port UDP, na którym będzie nasłuchiwać WireGuard (zaleca się także zmianę Portu Konfiguracji)",
+      "changeCidr": "Zmień CIDR",
+      "restart": "Restartuj interfejs",
+      "restartDesc": "Zrestartuj interfejs WireGuard",
+      "restartWarn": "Czy na pewno chcesz zrestartować interfejs? Spowoduje to rozłączenie wszystkich klientów.",
+      "restartSuccess": "Interfejs zrestartowany",
+      "firewall": "Filtrowanie ruchu",
+      "firewallEnabled": "Włącz zaporę per-klient",
+      "firewallEnabledDesc": "Ogranicz ruch klienta do określonych docelowych adresów IP za pomocą iptables. Gdy włączone, każdy klient może mieć skonfigurowane dozwolone cele."
+    },
+    "introText": "Witaj w panelu administratora.\n\nTutaj możesz zarządzać ustawieniami ogólnymi, konfiguracją, ustawieniami interfejsu i hookami.\n\nZacznij od wybrania jednej z sekcji na pasku bocznym."
+  },
+  "zod": {
+    "generic": {
+      "required": "{field} jest wymagane",
+      "validNumber": "{field} musi być prawidłową liczbą",
+      "validNumberRange": "{field} musi być prawidłową liczbą lub zakresem liczb",
+      "validString": "{field} musi być prawidłowym ciągiem znaków",
+      "validBoolean": "{field} musi być prawidłową wartością logiczną",
+      "validArray": "{field} musi być prawidłową tablicą",
+      "stringMin": "{field} musi mieć co najmniej {min} znaków",
+      "numberMin": "{field} musi wynosić co najmniej {min}"
+    },
+    "client": {
+      "id": "ID klienta",
+      "name": "Nazwa",
+      "expiresAt": "Wygasa dnia",
+      "address4": "Adres IPv4",
+      "address6": "Adres IPv6",
+      "serverAllowedIps": "Dozwolone IP serwerowe",
+      "firewallIps": "Dozwolone IP zapory",
+      "firewallIpsInvalid": "Nieprawidłowy wpis IP zapory. Zobacz dokumentację dla obsługiwanej składni."
+    },
+    "user": {
+      "username": "Nazwa użytkownika",
+      "password": "Hasło",
+      "remember": "Zapamiętaj",
+      "name": "Nazwa",
+      "email": "E-mail",
+      "emailInvalid": "E-mail musi być prawidłowym adresem",
+      "passwordMatch": "Hasła muszą się zgadzać",
+      "totpEnable": "Włącz TOTP",
+      "totpEnableTrue": "Włączenie TOTP musi mieć wartość prawda",
+      "totpCode": "Kod TOTP"
+    },
+    "userConfig": {
+      "host": "Host"
+    },
+    "general": {
+      "sessionTimeout": "Limit czasu sesji",
+      "metricsEnabled": "Metryki",
+      "metricsPassword": "Hasło metryk"
+    },
+    "interface": {
+      "cidr": "CIDR",
+      "device": "Urządzenie",
+      "cidrValid": "CIDR musi być prawidłowy"
+    },
+    "otl": "Link jednorazowy",
+    "stringMalformed": "Ciąg znaków jest zniekształcony",
+    "body": "Body musi być prawidłowym obiektem",
+    "hook": "Hook",
+    "enabled": "Włączone",
+    "mtu": "MTU",
+    "port": "Port",
+    "persistentKeepalive": "Utrzymywanie połączenia",
+    "address": "Adres IP",
+    "dns": "DNS",
+    "allowedIps": "Dozwolone IP",
+    "file": "Plik"
+  },
+  "hooks": {
+    "preUp": "PreUp",
+    "postUp": "PostUp",
+    "preDown": "PreDown",
+    "postDown": "PostDown"
+  },
+  "copy": {
+    "notSupported": "Kopiowanie nie jest obsługiwane",
+    "copied": "Skopiowano!",
+    "failed": "Kopiowanie nieudane",
+    "copy": "Kopiuj"
+  },
+  "awg": {
+    "jCLabel": "Liczba pakietów śmieci (Jc)",
+    "jCDescription": "Liczba pakietów śmieci do wysłania (1-128, zalecane: 4-12)",
+    "jMinLabel": "Minimalny rozmiar pakietu śmieci (Jmin)",
+    "jMinDescription": "Minimalny rozmiar pakietów śmieci (0-1279*, zalecane: 8, musi być < Jmax)",
+    "jMaxLabel": "Maksymalny rozmiar pakietu śmieci (Jmax)",
+    "jMaxDescription": "Maksymalny rozmiar pakietów śmieci (1-1280*, zalecane: 80, musi być > Jmin)",
+    "s1Label": "Rozmiar śmieci pakietu inicjującego (S1)",
+    "s1Description": "Rozmiar śmieci pakietu inicjującego (0-1132, zalecane: 15-150, S1+56 ≠ S2)",
+    "s2Label": "Rozmiar śmieci pakietu odpowiedzi (S2)",
+    "s2Description": "Rozmiar śmieci pakietu odpowiedzi (0-1188, zalecane: 15-150)",
+    "s3Label": "Rozmiar śmieci pakietu odpowiedzi cookie (S3)",
+    "s3Description": "Rozmiar śmieci pakietu odpowiedzi cookie",
+    "s4Label": "Rozmiar śmieci pakietu transportowego (S4)",
+    "s4Description": "Rozmiar śmieci pakietu transportowego",
+    "h1Label": "Magiczny nagłówek inicjujący (H1)",
+    "h1Description": "Wartość lub zakres nagłówka pakietu inicjującego (X lub X-Y, gdzie X < Y. Min 5, max 2147483647. Wartości nie mogą nakładać się na inne nagłówki)",
+    "h2Label": "Magiczny nagłówek odpowiedzi (H2)",
+    "h2Description": "Wartość lub zakres nagłówka pakietu odpowiedzi (X lub X-Y, gdzie X < Y. Min 5, max 2147483647. Wartości nie mogą nakładać się na inne nagłówki)",
+    "h3Label": "Magiczny nagłówek odpowiedzi cookie (H3)",
+    "h3Description": "Wartość lub zakres nagłówka pakietu odpowiedzi cookie (X lub X-Y, gdzie X < Y. Min 5, max 2147483647. Wartości nie mogą nakładać się na inne nagłówki)",
+    "h4Label": "Magiczny nagłówek transportowy (H4)",
+    "h4Description": "Wartość lub zakres nagłówka pakietu transportowego (X lub X-Y, gdzie X < Y. Min 5, max 2147483647. Wartości nie mogą nakładać się na inne nagłówki)",
+    "i1Label": "Specjalny pakiet śmieci 1 (I1)",
+    "i1Description": "Pakiet imitujący protokół w formacie hex: <b 0x...>",
+    "i2Label": "Specjalny pakiet śmieci 2 (I2)",
+    "i2Description": "Pakiet imitujący protokół w formacie hex: <b 0x...>",
+    "i3Label": "Specjalny pakiet śmieci 3 (I3)",
+    "i3Description": "Pakiet imitujący protokół w formacie hex: <b 0x...>",
+    "i4Label": "Specjalny pakiet śmieci 4 (I4)",
+    "i4Description": "Pakiet imitujący protokół w formacie hex: <b 0x...>",
+    "i5Label": "Specjalny pakiet śmieci 5 (I5)",
+    "i5Description": "Pakiet imitujący protokół w formacie hex: <b 0x...>",
+    "mtuNote": "Wartości zależą od MTU",
+    "obfuscationParameters": "Parametry maskowania AmneziaWG"
+  }
+}

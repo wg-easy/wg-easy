@@ -1,114 +1,126 @@
 # WireGuard Easy
 
-[![Build & Publish Docker Image to Docker Hub](https://github.com/WeeJeWel/wg-easy/actions/workflows/deploy.yml/badge.svg?branch=production)](https://github.com/WeeJeWel/wg-easy/actions/workflows/deploy.yml)
-[![Lint](https://github.com/WeeJeWel/wg-easy/actions/workflows/lint.yml/badge.svg?branch=master)](https://github.com/WeeJeWel/wg-easy/actions/workflows/lint.yml)
-[![Docker](https://img.shields.io/docker/v/weejewel/wg-easy/latest)](https://hub.docker.com/r/weejewel/wg-easy)
-[![Docker](https://img.shields.io/docker/pulls/weejewel/wg-easy.svg)](https://hub.docker.com/r/weejewel/wg-easy)
-[![Sponsor](https://img.shields.io/github/sponsors/weejewel)](https://github.com/sponsors/WeeJeWel)
-![GitHub Stars](https://img.shields.io/github/stars/weejewel/wg-easy)
+[![Build & Publish latest Image](https://github.com/wg-easy/wg-easy/actions/workflows/deploy.yml/badge.svg)](https://github.com/wg-easy/wg-easy/actions/workflows/deploy.yml)
+[![Lint](https://github.com/wg-easy/wg-easy/actions/workflows/lint.yml/badge.svg?branch=master)](https://github.com/wg-easy/wg-easy/actions/workflows/lint.yml)
+[![GitHub Stars](https://img.shields.io/github/stars/wg-easy/wg-easy)](https://github.com/wg-easy/wg-easy/stargazers)
+[![License](https://img.shields.io/github/license/wg-easy/wg-easy)](LICENSE)
+[![GitHub Release](https://img.shields.io/github/v/release/wg-easy/wg-easy)](https://github.com/wg-easy/wg-easy/releases/latest)
+[![Image Pulls](https://img.shields.io/badge/image_pulls-28M+-blue)](https://github.com/wg-easy/wg-easy/pkgs/container/wg-easy)
 
 You have found the easiest way to install & manage WireGuard on any Linux host!
 
 <p align="center">
-  <img src="./assets/screenshot.png" width="802" />
+  <img src="./assets/screenshot.png" width="802" alt="wg-easy Screenshot" />
 </p>
 
 ## Features
 
-* All-in-one: WireGuard + Web UI.
-* Easy installation, simple to use.
-* List, create, edit, delete, enable & disable clients.
-* Show a client's QR code.
-* Download a client's configuration file.
-* Statistics for which clients are connected.
-* Tx/Rx charts for each connected client.
-* Gravatar support.
+- All-in-one: WireGuard + Web UI.
+- Easy installation, simple to use.
+- List, create, edit, delete, enable & disable clients.
+- Show a client's QR code.
+- Download a client's configuration file.
+- Statistics for which clients are connected.
+- Tx/Rx charts for each connected client.
+- Gravatar support.
+- Automatic Light / Dark Mode
+- Multilanguage Support
+- One Time Links
+- Client Expiration
+- Prometheus metrics support
+- IPv6 support
+- CIDR support
+- 2FA support
+- Per-client firewall filtering (requires iptables)
+- OIDC support (Google, GitHub, Authelia, Authentik, etc.)
 
-## Requirements
+> [!NOTE]
+> To better manage documentation for this project, it has its own site here: [https://wg-easy.github.io/wg-easy/latest](https://wg-easy.github.io/wg-easy/latest)
 
-* A host with a kernel that supports WireGuard (all modern kernels).
-* A host with Docker installed.
+- [Getting Started](https://wg-easy.github.io/wg-easy/latest/getting-started/)
+- [Basic Installation](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/basic-installation/)
+- [Caddy](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/caddy/)
+- [Traefik](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/traefik/)
+- [Podman](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/podman-nft/)
+- [AdGuard Home](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/adguard/)
+
+> [!NOTE]
+> If you want to migrate from the old version to the new version, you can find the migration guide here: [Migration Guide](https://wg-easy.github.io/wg-easy/latest/advanced/migrate/)
 
 ## Installation
 
+This is a quick start guide to get you up and running with WireGuard Easy.
+
+For a more detailed installation guide, please refer to the [Getting Started](https://wg-easy.github.io/wg-easy/latest/getting-started/) page.
+
 ### 1. Install Docker
 
-If you haven't installed Docker yet, install it by running:
+If you haven't installed Docker yet, install it by running as root:
 
-```bash
-$ curl -sSL https://get.docker.com | sh
-$ sudo usermod -aG docker $(whoami)
-$ exit
+```shell
+curl -sSL https://get.docker.com | sh
+exit
 ```
 
 And log in again.
 
 ### 2. Run WireGuard Easy
 
-To automatically install & run wg-easy, simply run:
+The easiest way to run WireGuard Easy is with Docker Compose.
 
-<pre>
-$ docker run -d \
-  --name=wg-easy \
-  -e WG_HOST=<b>🚨YOUR_SERVER_IP</b> \
-  -e PASSWORD=<b>🚨YOUR_ADMIN_PASSWORD</b> \
-  -v ~/.wg-easy:/etc/wireguard \
-  -p 51820:51820/udp \
-  -p 51821:51821/tcp \
-  --cap-add=NET_ADMIN \
-  --cap-add=SYS_MODULE \
-  --sysctl="net.ipv4.conf.all.src_valid_mark=1" \
-  --sysctl="net.ipv4.ip_forward=1" \
-  --restart unless-stopped \
-  weejewel/wg-easy
-</pre>
+Just follow [these steps](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/basic-installation/) in the detailed documentation.
 
-> 💡 Replace `YOUR_SERVER_IP` with your WAN IP, or a Dynamic DNS hostname.
-> 
-> 💡 Replace `YOUR_ADMIN_PASSWORD` with a password to log in on the Web UI.
+You can also install WireGuard Easy with the [docker run command](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/docker-run/) or via [podman](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/podman-nft/).
 
-The Web UI will now be available on `http://0.0.0.0:51821`.
+Now [setup a reverse proxy](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/basic-installation/#setup-reverse-proxy) to be able to access the Web UI securely from the internet. This step is optional, just make sure to follow the guide [here](https://wg-easy.github.io/wg-easy/latest/examples/tutorials/reverse-proxyless/) if you decide not to do it.
 
-> 💡 Your configuration files will be saved in `~/.wg-easy`
+## Donate
 
-### 3. Sponsor
+Are you enjoying this project? Consider donating.
 
-Are you enjoying this project? [Buy me a beer!](https://github.com/sponsors/WeeJeWel) 🍻
+Founder: [Buy Emile a beer!](https://github.com/sponsors/WeeJeWel) 🍻
 
-## Options
+Maintainer: [Buy kaaax0815 a coffee!](https://github.com/sponsors/kaaax0815) ☕
 
-These options can be configured by setting environment variables using `-e KEY="VALUE"` in the `docker run` command.
+## Development
 
-| Env | Default | Example | Description |
-| - | - | - | - |
-| `PASSWORD` | - | `foobar123` | When set, requires a password when logging in to the Web UI. |
-| `WG_HOST` | - | `vpn.myserver.com` | The public hostname of your VPN server. |
-| `WG_PORT` | `51820` | `12345` | The public UDP port of your VPN server. WireGuard will always listen on `51820` inside the Docker container. |
-| `WG_MTU` | `null` | `1420` | The MTU the clients will use. Server uses default WG MTU. |
-| `WG_PERSISTENT_KEEPALIVE` | `0` | `25` | Value in seconds to keep the "connection" open. If this value is 0, then connections won't be kept alive. |
-| `WG_DEFAULT_ADDRESS` | `10.8.0.x` | `10.6.0.x` | Clients IP address range. |
-| `WG_DEFAULT_DNS` | `1.1.1.1` | `8.8.8.8, 8.8.4.4` | DNS server clients will use. |
-| `WG_ALLOWED_IPS` | `0.0.0.0/0, ::/0` | `192.168.15.0/24, 10.0.1.0/24` | Allowed IPs clients will use. |
-| `WG_PRE_UP` | `...` | - | See [config.js](https://github.com/WeeJeWel/wg-easy/blob/master/src/config.js#L19) for the default value. |
-| `WG_POST_UP` | `...` | `iptables ...` | See [config.js](https://github.com/WeeJeWel/wg-easy/blob/master/src/config.js#L20) for the default value. |
-| `WG_PRE_DOWN` | `...` | - | See [config.js](https://github.com/WeeJeWel/wg-easy/blob/master/src/config.js#L27) for the default value. |
-| `WG_POST_DOWN` | `...` | `iptables ...` | See [config.js](https://github.com/WeeJeWel/wg-easy/blob/master/src/config.js#L28) for the default value. |
+### Prerequisites
 
-> If you change `WG_PORT`, make sure to also change the exposed port.
+- Docker
+- Node LTS & corepack enabled
+- Visual Studio Code
 
-## Updating
+### Dev Server
 
-To update to the latest version, simply run:
+This starts the development server with docker
 
-```bash
-docker stop wg-easy
-docker rm wg-easy
-docker pull weejewel/wg-easy
+```shell
+pnpm dev
 ```
 
-And then run the `docker run -d \ ...` command above again.
+### Update Auto Imports
 
-## Common Use Cases
+If you add something that should be auto-importable and VSCode complains, run:
+
+```shell
+cd src
+pnpm install
+cd ..
+```
+
+### Test Cli
+
+This starts the cli with docker
+
+```shell
+pnpm cli:dev
+```
+
+## License
+
+This project is licensed under the AGPL-3.0-only License - see the [LICENSE](LICENSE) file for details
+
+This project is not affiliated, associated, authorized, endorsed by, or in any way officially connected with Jason A. Donenfeld, ZX2C4 or Edge Security
 
 * [Using WireGuard-Easy with Pi-Hole](https://github.com/WeeJeWel/wg-easy/wiki/Using-WireGuard-Easy-with-Pi-Hole)
 * [Using WireGuard-Easy with nginx/SSL](https://github.com/WeeJeWel/wg-easy/wiki/Using-WireGuard-Easy-with-nginx-SSL)

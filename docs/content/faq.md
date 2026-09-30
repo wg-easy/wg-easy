@@ -1,0 +1,139 @@
+---
+title: FAQ
+hide:
+    - navigation
+---
+
+Here are some frequently asked questions or errors about `wg-easy`. If you have a question that is not answered here, please feel free to open a discussion on GitHub.
+
+## How do I restrict client access to specific networks or servers?
+
+Use the **Per-Client Firewall** feature to enforce server-side restrictions on what each client can access.
+
+**Requirements:** This feature requires `iptables` (and `ip6tables` for IPv6) to be installed on the host system.
+
+1. Enable "Per-Client Firewall" in **Admin Panel → Interface**
+2. Edit a client and configure "Firewall Allowed IPs"
+3. Specify which destinations the client should be allowed to access
+
+Unlike "Allowed IPs" which only controls client-side routing, firewall rules are enforced by the server and cannot be bypassed.
+
+See the [Admin Panel Guide](./guides/admin.md#per-client-firewall) and [Client Guide](./guides/clients.md#firewall-allowed-ips) for detailed configuration.
+
+## Error: WireGuard exited with the error: Cannot find device "wg0"
+
+This error indicates that the WireGuard interface `wg0` does not exist. This can happen if the WireGuard kernel module is not loaded or if the interface was not created properly.
+
+To resolve this issue, you can try the following steps:
+
+1. **Load the WireGuard kernel module**: If the WireGuard kernel module is not loaded, you can load it manually by running:
+
+    ```shell
+    sudo modprobe wireguard
+    ```
+
+2. **Load the WireGuard kernel module on boot**: If you want to ensure that the WireGuard kernel module is loaded automatically on boot, you can add it to the `/etc/modules` file:
+
+    ```shell
+    echo "wireguard" | sudo tee -a /etc/modules
+    ```
+
+## can't initialize iptables table `nat': Table does not exist (do you need to insmod?)
+
+This error indicates that the `nat` table in `iptables` does not exist. This can happen if the `iptables` kernel module is not loaded or if the `nat` table is not supported by your kernel.
+
+To resolve this issue, you can try the following steps:
+
+1. **Load the `nat` kernel module**: If the `nat` kernel module is not loaded, you can load it manually by running:
+
+    ```shell
+    sudo modprobe iptable_nat
+    ```
+
+2. **Load the `nat` kernel module on boot**: If you want to ensure that the `nat` kernel module is loaded automatically on boot, you can add it to the `/etc/modules` file:
+
+    ```shell
+     echo "iptable_nat" | sudo tee -a /etc/modules
+    ```
+
+## can't initialize ip6tables table `nat': Table does not exist (do you need to insmod?)
+
+This error indicates that the `nat` table in `ip6tables` does not exist. This can happen if the `ip6tables` kernel module is not loaded or if the `nat` table is not supported by your kernel.
+
+To resolve this issue, you can try the following steps:
+
+1. **Load the `nat` kernel module**: If the `nat` kernel module is not loaded, you can load it manually by running:
+
+    ```shell
+    sudo modprobe ip6table_nat
+    ```
+
+2. **Load the `nat` kernel module on boot**: If you want to ensure that the `nat` kernel module is loaded automatically on boot, you can add it to the `/etc/modules` file:
+
+    ```shell
+     echo "ip6table_nat" | sudo tee -a /etc/modules
+    ```
+
+## can't initialize iptables table `filter': Permission denied
+
+This error indicates that the `filter` table in `iptables` cannot be initialized due to permission issues. This can happen if you are not running the command with sufficient privileges.
+
+To resolve this issue, you can try the following steps:
+
+1. **Load the `filter` kernel module**: If the `filter` kernel module is not loaded, you can load it manually by running:
+
+    ```shell
+    sudo modprobe iptable_filter
+    ```
+
+2. **Load the `filter` kernel module on boot**: If you want to ensure that the `filter` kernel module is loaded automatically on boot, you can add it to the `/etc/modules` file:
+
+    ```shell
+    echo "iptable_filter" | sudo tee -a /etc/modules
+    ```
+
+## can't initialize ip6tables table `filter': Permission denied
+
+This error indicates that the `filter` table in `ip6tables` cannot be initialized due to permission issues. This can happen if you are not running the command with sufficient privileges.
+
+To resolve this issue, you can try the following steps:
+
+1. **Load the `filter` kernel module**: If the `filter` kernel module is not loaded, you can load it manually by running:
+
+    ```shell
+    sudo modprobe ip6table_filter
+    ```
+
+2. **Load the `filter` kernel module on boot**: If you want to ensure that the `filter` kernel module is loaded automatically on boot, you can add it to the `/etc/modules` file:
+
+    ```shell
+     echo "ip6table_filter" | sudo tee -a /etc/modules
+    ```
+
+## Clients lose connectivity after restarting the container when using multiple networks?
+
+When you attach multiple Docker networks (e.g., `wg` and a reverse proxy network like `traefik` or `nginx`) to the `wg-easy` container, Docker might assign the network interfaces randomly (e.g., swapping `eth0` and `eth1`). Since `wg-easy` expects the wireguard interface to act as `eth0` and configures `POSTROUTING` rules for it, connectivity will break if the interfaces are swapped upon container restart.
+
+To solve this, specify the `interface_name` and `gw_priority` explicitly in your `docker-compose.yml` file to guarantee that the `wg` network always binds to `eth0` and acts as the default gateway.
+
+**Example `docker-compose.yml`:**
+
+```yaml
+services:
+    wg-easy:
+        # ... other configuration ...
+        networks:
+            wg:
+                interface_name: eth0
+                gw_priority: 1
+                ipv4_address: 10.42.42.42
+            nginx:
+                interface_name: eth1
+                gw_priority: 0
+
+networks:
+    wg:
+        # ... wg network config ...
+    nginx:
+        external: true
+```

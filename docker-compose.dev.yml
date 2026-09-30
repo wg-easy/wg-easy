@@ -1,10 +1,37 @@
-version: "3.8"
 services:
   wg-easy:
-    image: wg-easy
-    command: npm run serve
+    build:
+      dockerfile: ./Dockerfile.dev
+    command: dev
+    tmpfs:
+      - /app/.nuxt
     volumes:
-      - ./src/:/app/
-    environment: 
-      # - PASSWORD=p
-      - WG_HOST=192.168.1.233
+      - /lib/modules:/lib/modules:ro
+      # - ./data/:/etc/wireguard
+    ports:
+      - "51820:51820/udp"
+      - "51821:51821/tcp"
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    environment:
+      - INIT_ENABLED=true
+      - INIT_HOST=test
+      - INIT_PORT=51820
+      - INIT_USERNAME=testtest
+      - INIT_PASSWORD=Qweasdyxcv!2
+
+    develop:
+      watch:
+        - action: sync
+          path: ./src
+          target: /app
+          initial_sync: true
+          ignore:
+            - node_modules/
+            - .nuxt/
+            - .output/
+            - coverage/
+            - package.json
+            - pnpm-lock.yaml
+            - pnpm-workspace.yaml

@@ -4,20 +4,65 @@ on:
   push:
     branches:
       - master
-      - production
   pull_request:
 
 jobs:
+  docs:
+    name: Check Docs
+    runs-on: ubuntu-latest
+    if: github.repository_owner == 'wg-easy'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6
+        name: Install pnpm
+        with:
+          run_install: false
+
+      - name: Setup Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: "lts/krypton"
+          check-latest: true
+          cache: "pnpm"
+
+      - name: Check docs formatting
+        run: |
+          pnpm install
+          pnpm format:check:docs
+
   lint:
     name: Lint
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
-        with:
-          node-version: '14'
+    needs: docs
+    if: github.repository_owner == 'wg-easy'
 
-      - run: |
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        command: ["lint", "typecheck", "format:check"]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6
+        name: Install pnpm
+        with:
+          run_install: false
+
+      - name: Setup Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: "lts/krypton"
+          check-latest: true
+          cache: "pnpm"
+
+      - name: pnpm ${{ matrix.command }}
+        run: |
           cd src
-          npm ci
-          npm run lint
+          pnpm install
+          pnpm ${{ matrix.command }}

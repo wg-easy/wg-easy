@@ -1,0 +1,47 @@
+---
+name: 🛠️ Feature Request
+description: Suggest an idea to help us improve
+title: "[Feat]: "
+type: Feature
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Thanks :heart: for taking the time to fill out this feature request report!**
+        We kindly ask that you search to see if an issue [already exists](https://github.com/wg-easy/wg-easy/issues?q=is%3Aissue+sort%3Acreated-desc+) for your feature.
+
+        We are also happy to accept contributions from our users. For more details see [here](https://github.com/wg-easy/wg-easy/blob/master/contributing.md).
+
+  - type: textarea
+    attributes:
+      label: Description
+      description: |
+        A clear and concise description of the feature you're interested in.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Suggested Solution
+      description: |
+        Describe the solution you'd like. A clear and concise description of what you want to happen.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Alternatives
+      description: |
+        Describe alternatives you've considered.
+        A clear and concise description of any alternative solutions or features you've considered.
+    validations:
+      required: false
+
+  - type: textarea
+    attributes:
+      label: Additional Context
+      description: |
+        Add any other context about the problem here.
+    validations:
+      required: false

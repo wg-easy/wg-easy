@@ -1,0 +1,5 @@
+contact_links:
+  - name: Get Help
+    url: https://github.com/wg-easy/wg-easy/discussions/new?category=q-a
+    about: If you can't get something to work the way you expect, open a question in the discussions.
+blank_issues_enabled: false

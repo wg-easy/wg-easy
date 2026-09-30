@@ -1,0 +1,15 @@
+allowBuilds:
+  '@parcel/watcher': false
+  argon2: false
+  esbuild: false
+  unrs-resolver: false
+  vue-demi: false
+
+minimumReleaseAgeStrict: true
+
+publicHoistPattern:
+  - '@intlify/utils'
+  - '@intlify/h3'
+  - 'h3'
+  - 'nitropack'
+  - 'ofetch'

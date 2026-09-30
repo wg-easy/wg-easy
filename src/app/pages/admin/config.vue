@@ -1,0 +1,140 @@
+<template>
+  <main v-if="data">
+    <FormElement @submit.prevent="submit">
+      <FormGroup>
+        <FormHeading>{{ $t('admin.config.connection') }}</FormHeading>
+        <FormHostField
+          id="host"
+          v-model="data.host"
+          :label="$t('general.host')"
+          :description="$t('admin.config.hostDesc')"
+          url="/api/admin/ip-info"
+        />
+        <FormNumberField
+          id="port"
+          v-model="data.port"
+          :label="$t('general.port')"
+          :description="$t('admin.config.portDesc')"
+        />
+      </FormGroup>
+      <FormGroup>
+        <FormHeading :description="$t('admin.config.allowedIpsDesc')">
+          {{ $t('general.allowedIps') }}
+        </FormHeading>
+        <FormArrayField
+          v-model="data.defaultAllowedIps"
+          name="defaultAllowedIps"
+        />
+      </FormGroup>
+      <FormGroup>
+        <FormHeading :description="$t('admin.config.dnsDesc')">
+          {{ $t('general.dns') }}
+        </FormHeading>
+        <FormArrayField v-model="data.defaultDns" name="defaultDns" />
+      </FormGroup>
+      <FormGroup>
+        <FormHeading>{{ $t('form.sectionAdvanced') }}</FormHeading>
+        <FormNumberField
+          id="defaultMtu"
+          v-model="data.defaultMtu"
+          :label="$t('general.mtu')"
+          :description="$t('admin.config.mtuDesc')"
+        />
+        <FormNumberField
+          id="defaultPersistentKeepalive"
+          v-model="data.defaultPersistentKeepalive"
+          :label="$t('general.persistentKeepalive')"
+          :description="$t('admin.config.persistentKeepaliveDesc')"
+        />
+      </FormGroup>
+      <FormGroup v-if="globalStore.information?.isAwg">
+        <FormHeading>{{ $t('awg.obfuscationParameters') }}</FormHeading>
+
+        <FormNullNumberField
+          id="jC"
+          v-model="data.defaultJC"
+          :label="$t('awg.jCLabel')"
+          :description="$t('awg.jCDescription')"
+        />
+        <FormNullNumberField
+          id="jMin"
+          v-model="data.defaultJMin"
+          :label="$t('awg.jMinLabel')"
+          :description="$t('awg.jMinDescription')"
+        />
+        <FormNullNumberField
+          id="jMax"
+          v-model="data.defaultJMax"
+          :label="$t('awg.jMaxLabel')"
+          :description="$t('awg.jMaxDescription')"
+        />
+
+        <div class="col-span-full text-sm">* {{ $t('awg.mtuNote') }}</div>
+
+        <FormNullTextField
+          id="i1"
+          v-model="data.defaultI1"
+          :label="$t('awg.i1Label')"
+          :description="$t('awg.i1Description')"
+        />
+        <FormNullTextField
+          id="i2"
+          v-model="data.defaultI2"
+          :label="$t('awg.i2Label')"
+          :description="$t('awg.i2Description')"
+        />
+        <FormNullTextField
+          id="i3"
+          v-model="data.defaultI3"
+          :label="$t('awg.i3Label')"
+          :description="$t('awg.i3Description')"
+        />
+        <FormNullTextField
+          id="i4"
+          v-model="data.defaultI4"
+          :label="$t('awg.i4Label')"
+          :description="$t('awg.i4Description')"
+        />
+        <FormNullTextField
+          id="i5"
+          v-model="data.defaultI5"
+          :label="$t('awg.i5Label')"
+          :description="$t('awg.i5Description')"
+        />
+      </FormGroup>
+      <FormGroup>
+        <FormHeading>{{ $t('form.actions') }}</FormHeading>
+        <FormPrimaryActionField type="submit" :label="$t('form.save')" />
+        <FormSecondaryActionField :label="$t('form.revert')" @click="revert" />
+      </FormGroup>
+    </FormElement>
+  </main>
+</template>
+
+<script lang="ts" setup>
+const globalStore = useGlobalStore();
+
+const { data: _data, refresh } = await useFetch(`/api/admin/userconfig`, {
+  method: 'get',
+});
+
+const data = toRef(_data.value);
+
+const _submit = useSubmit(
+  (data) =>
+    $fetch(`/api/admin/userconfig`, {
+      method: 'post',
+      body: data,
+    }),
+  { revert }
+);
+
+function submit() {
+  return _submit(data.value);
+}
+
+async function revert() {
+  await refresh();
+  data.value = toRef(_data.value).value;
+}
+</script>

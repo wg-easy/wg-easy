@@ -1,0 +1,296 @@
+{
+  "pages": {
+    "me": "Compte",
+    "clients": "Clients",
+    "admin": {
+      "panel": "Panel Admin",
+      "general": "Général",
+      "config": "Config",
+      "interface": "Interface",
+      "hooks": "Hooks"
+    }
+  },
+  "user": {
+    "email": "E-Mail"
+  },
+  "me": {
+    "currentPassword": "Mot de passe actuel",
+    "enable2fa": "Activer l'authentification à deux facteurs",
+    "enable2faDesc": "Scannez le code QR avec votre application d'authentification ou saisissez la clé manuellement.",
+    "2faKey": "Clé TOTP",
+    "2faCodeDesc": "Saisissez le code de votre application d'authentification.",
+    "disable2fa": "Désactiver l'authentification à deux facteurs",
+    "disable2faDesc": "Saisissez votre mot de passe pour désactiver l'authentification à deux facteurs."
+  },
+  "general": {
+    "name": "Nom",
+    "username": "Nom d'utilisateur",
+    "password": "Mot de passe",
+    "newPassword": "Nouveau mot de passe",
+    "updatePassword": "Mettre à jour le mot de passe",
+    "mtu": "MTU",
+    "allowedIps": "IPs autorisées",
+    "dns": "DNS",
+    "persistentKeepalive": "Keepalive persistant",
+    "logout": "Déconnexion",
+    "continue": "Continuer",
+    "host": "Hôte",
+    "port": "Port",
+    "yes": "Oui",
+    "no": "Non",
+    "confirmPassword": "Confirmer le mot de passe",
+    "loading": "Chargement...",
+    "2fa": "Authentification à deux facteurs",
+    "2faCode": "Code TOTP"
+  },
+  "setup": {
+    "welcome": "Bienvenue dans votre première installation de wg-easy",
+    "welcomeDesc": "Vous avez trouvé la façon la plus simple d'installer et de gérer WireGuard sur n'importe quel hôte Linux.",
+    "existingSetup": "Avez-vous une installation existante ?",
+    "createAdminDesc": "Veuillez d'abord saisir un nom d'utilisateur administrateur et un mot de passe sécurisé. Ces informations seront utilisées pour vous connecter à votre panel d'administration.",
+    "setupConfigDesc": "Veuillez saisir les informations relatives à l'hôte et au port. Ceci sera utilisé pour la configuration du client lors de la mise en place de WireGuard sur les appareils.",
+    "setupMigrationDesc": "Veuillez fournir le fichier de sauvegarde si vous souhaitez migrer vos données de la version précédente de wg-easy vers votre nouvelle installation.",
+    "upload": "Téléverser",
+    "migration": "Restaurer la sauvegarde :",
+    "createAccount": "Créer un compte",
+    "successful": "Installation réussie",
+    "hostDesc": "Nom d'hôte public auquel les clients se connecteront",
+    "portDesc": "Port UDP public auquel les clients se connecteront et sur lequel WireGuard écoutera"
+  },
+  "update": {
+    "updateAvailable": "Une mise à jour est disponible!",
+    "update": "Mise à jour"
+  },
+  "theme": {
+    "dark": "Thème sombre",
+    "light": "Thème clair",
+    "system": "Thème système"
+  },
+  "layout": {
+    "toggleCharts": "Afficher/masquer les graphiques",
+    "donate": "Donation"
+  },
+  "login": {
+    "signIn": "Se connecter",
+    "rememberMe": "Se souvenir de moi",
+    "rememberMeDesc": "Rester connecté après avoir fermé le navigateur",
+    "insecure": "Vous ne pouvez pas vous connecter avec une connexion non sécurisée. Utilisez HTTPS.",
+    "2faRequired": "L'authentification à deux facteurs est requise",
+    "2faWrong": "Le code d'authentification à deux facteurs est incorrect"
+  },
+  "client": {
+    "empty": "Il n'y a pas encore de clients.",
+    "newShort": "Nouveau",
+    "sort": "Trier",
+    "create": "Créer un client",
+    "created": "Client créé",
+    "new": "Nouveau client",
+    "name": "Nom",
+    "expireDate": "Date d'expiration",
+    "expireDateDesc": "Date à laquelle le client sera désactivé. Vide pour permanent",
+    "delete": "Supprimer",
+    "deleteClient": "Supprimer le client",
+    "deleteDialog": "Êtes-vous sûr de vouloir supprimer {name} ? Cette action ne peut être annulée.",
+    "enabled": "Activé",
+    "address": "Adresse",
+    "serverAllowedIps": "IPs autorisées par le serveur",
+    "otlDesc": "Générer un lien court et unique",
+    "permanent": "Permanent",
+    "createdOn": "Créé le {date}",
+    "lastSeen": "Dernière visite le {date}",
+    "totalDownload": "Téléchargement total : {total}",
+    "totalUpload": "Téléversement total : {total}",
+    "newClient": "Nouveau client",
+    "disableClient": "Désactiver le client",
+    "enableClient": "Activer le client",
+    "noPrivKey": "Ce client n'a pas de clé privée connue. Impossible de créer une configuration.",
+    "showQR": "Afficher le code QR",
+    "downloadConfig": "Télécharger la configuration",
+    "allowedIpsDesc": "Quelles IPs seront acheminées par le VPN (remplace la configuration globale)",
+    "serverAllowedIpsDesc": "Les IPs que le serveur acheminera vers le client",
+    "mtuDesc": "Définit l'unité de transmission maximale (taille des paquets) pour le tunnel VPN",
+    "persistentKeepaliveDesc": "Définit l'intervalle (en secondes) pour les paquets keep-alive. 0 le désactive",
+    "hooks": "Hooks",
+    "hooksDescription": "Les hooks ne fonctionnent qu'avec wg-quick",
+    "hooksLeaveEmpty": "Uniquement pour wg-quick. Sinon, laissez-le vide",
+    "dnsDesc": "Serveur DNS que les clients utiliseront (remplace la configuration globale)",
+    "notConnected": "Client non connecté",
+    "endpoint": "Endpoint",
+    "endpointDesc": "Adresse IP du client à partir duquel la connexion WireGuard est établie",
+    "search": "Rechercher des clients...",
+    "config": "Configuration",
+    "viewConfig": "Voir la configuration",
+    "firewallIps": "IPs autorisées par le pare-feu",
+    "firewallIpsDesc": "IPs/CIDRs de destination auxquels ce client peut accéder (application côté serveur). Laissez vide pour utiliser les IPs autorisées. Prend en charge le filtrage optionnel par port et protocole. Voir la documentation pour la syntaxe.",
+    "downloadPng": "Télécharger le PNG",
+    "copyPng": "Copier le PNG"
+  },
+  "dialog": {
+    "change": "Modifier",
+    "cancel": "Annuler",
+    "create": "Créer"
+  },
+  "toast": {
+    "success": "Réussite",
+    "saved": "Sauvegardé",
+    "error": "Erreur",
+    "unknown": "Erreur inconnue. Consultez la console pour plus de détails"
+  },
+  "form": {
+    "actions": "Actions",
+    "save": "Sauvegarder",
+    "revert": "Revenir en arrière",
+    "sectionGeneral": "Général",
+    "sectionAdvanced": "Avancé",
+    "noItems": "Aucun élément",
+    "nullNoItems": "Aucun élément. Utilisation de la configuration globale",
+    "add": "Ajouter"
+  },
+  "admin": {
+    "general": {
+      "sessionTimeout": "Délai d'expiration de la session",
+      "sessionTimeoutDesc": "Durée de la session pour Se souvenir de moi (secondes)",
+      "metrics": "Métriques",
+      "metricsPassword": "Mot de passe",
+      "metricsPasswordDesc": "Mot de passe Bearer pour le endpoint des métriques (mot de passe ou argon2 hash)",
+      "json": "JSON",
+      "jsonDesc": "Route pour les métriques au format JSON",
+      "prometheus": "Prometheus",
+      "prometheusDesc": "Route pour les métriques Prometheus"
+    },
+    "config": {
+      "connection": "Connexion",
+      "hostDesc": "Nom d'hôte public auquel les clients se connecteront (invalide la configuration)",
+      "portDesc": "Port UDP public auquel les clients se connecteront (invalide la configuration, vous souhaiterez probablement modifier le port d'interface également)",
+      "allowedIpsDesc": "IPs autorisées que les clients utiliseront (configuration globale)",
+      "dnsDesc": "Serveur DNS que les clients utiliseront (configuration globale)",
+      "mtuDesc": "MTU que les clients utiliseront (uniquement pour les nouveaux clients)",
+      "persistentKeepaliveDesc": "Intervalle en secondes keepalives du serveur. 0 = désactivé (uniquement pour les nouveaux clients)",
+      "suggest": "Suggérer",
+      "suggestDesc": "Choisissez une adresse IP ou un nom d'hôte pour le champ Hôte."
+    },
+    "interface": {
+      "cidrSuccess": "CIDR modifié",
+      "device": "Périphérique",
+      "deviceDesc": "Périphérique Ethernet dans lequel le trafic wireguard sera transmis.",
+      "mtuDesc": "MTU que WireGuard utilisera",
+      "portDesc": "Port UDP sur lequel WireGuard écoutera (vous souhaiterez probablement changer le port de configuration aussi)",
+      "changeCidr": "Modifier CIDR",
+      "restart": "Redémarrer l'interface",
+      "restartDesc": "Redémarre l'interface WireGuard",
+      "restartWarn": "Êtes-vous sûr de redémarrer l'interface ? Cela déconnectera tous les clients.",
+      "restartSuccess": "Interface redémarrée",
+      "firewall": "Filtrage du trafic",
+      "firewallEnabled": "Activer le pare-feu par client",
+      "firewallEnabledDesc": "Restreindre le trafic des clients à des IPs de destination spécifiques via iptables. Lorsqu'il est activé, chaque client peut être configuré avec des destinations autorisées."
+    },
+    "introText": "Bienvenue dans le panel d'administration.\n\nVous pouvez y gérer les paramètres généraux, la configuration, les paramètres de l'interface et les hooks.\n\nCommencez par choisir l'une des sections de la barre latérale."
+  },
+  "zod": {
+    "generic": {
+      "required": "{field} est requis",
+      "validNumber": "{field} doit être un nombre valide",
+      "validNumberRange": "{field} doit être un nombre ou une plage de nombres valide",
+      "validString": "{field} doit être une chaîne de caractères valide",
+      "validBoolean": "{field} doit être un booléen valide",
+      "validArray": "{field} doit être un tableau valide",
+      "stringMin": "{field} doit comporter au moins {min} caractère(s)",
+      "numberMin": "{field} doit être d'au moins {min}"
+    },
+    "client": {
+      "id": "ID du client",
+      "name": "Nom",
+      "expiresAt": "Expire le",
+      "address4": "Adresse IPv4",
+      "address6": "Adresse IPv6",
+      "serverAllowedIps": "IPs autorisées par le serveur",
+      "firewallIps": "IPs autorisées par le pare-feu",
+      "firewallIpsInvalid": "Entrée d'IP de pare-feu invalide. Voir la documentation pour la syntaxe supportée."
+    },
+    "user": {
+      "username": "Nom d'utilisateur",
+      "password": "Mot de passe",
+      "remember": "Se souvenir",
+      "name": "Nom",
+      "email": "Email",
+      "emailInvalid": "L'email doit être valide",
+      "passwordMatch": "Les mots de passe doivent correspondre",
+      "totpEnable": "Activer TOTP",
+      "totpEnableTrue": "Activer TOTP doit être activé",
+      "totpCode": "Code TOTP"
+    },
+    "userConfig": {
+      "host": "Hôte"
+    },
+    "general": {
+      "sessionTimeout": "Délai d'expiration de la session",
+      "metricsEnabled": "Métriques",
+      "metricsPassword": "Mot de passe métriques"
+    },
+    "interface": {
+      "cidr": "CIDR",
+      "device": "Périphérique",
+      "cidrValid": "CIDR doit être valide"
+    },
+    "otl": "Lien unique",
+    "stringMalformed": "La chaîne est malformée",
+    "body": "Le corps doit être un objet valide",
+    "hook": "Hook",
+    "enabled": "Activé",
+    "mtu": "MTU",
+    "port": "Port",
+    "persistentKeepalive": "Keepalive persistant",
+    "address": "Adresse IP",
+    "dns": "DNS",
+    "allowedIps": "IPs autorisées",
+    "file": "Fichier"
+  },
+  "hooks": {
+    "preUp": "PreUp",
+    "postUp": "PostUp",
+    "preDown": "PreDown",
+    "postDown": "PostDown"
+  },
+  "copy": {
+    "notSupported": "La copie n'est pas prise en charge",
+    "copied": "Copié !",
+    "failed": "Échec de la copie",
+    "copy": "Copier"
+  },
+  "awg": {
+    "jCLabel": "Nombre de paquets parasites (Jc)",
+    "jCDescription": "Nombre de paquets parasites à envoyer (1-128, recommandé : 4-12)",
+    "jMinLabel": "Taille min des paquets parasites (Jmin)",
+    "jMinDescription": "Taille minimale des paquets parasites (0-1279*, recommandé : 8, doit être < Jmax)",
+    "jMaxLabel": "Taille max des paquets parasites (Jmax)",
+    "jMaxDescription": "Taille maximale des paquets parasites (1-1280*, recommandé : 80, doit être > Jmin)",
+    "s1Label": "Taille parasite du paquet init (S1)",
+    "s1Description": "Taille parasite du paquet d'initialisation (0-1132[1280* - 148 = 1132], recommandé : 15-150, S1+56 ≠ S2)",
+    "s2Label": "Taille parasite du paquet réponse (S2)",
+    "s2Description": "Taille parasite du paquet de réponse (0-1188[1280* - 92 = 1188], recommandé : 15-150)",
+    "s3Label": "Taille parasite du paquet cookie reply (S3)",
+    "s3Description": "Taille parasite du paquet de réponse cookie",
+    "s4Label": "Taille parasite du paquet transport (S4)",
+    "s4Description": "Taille parasite du paquet de transport",
+    "h1Label": "En-tête magique init (H1)",
+    "h1Description": "Valeur ou plage de l'en-tête du paquet init (X ou X-Y, où X<Y. Min 5, max 2147483647. La valeur ou la plage ne doit pas chevaucher les autres en-têtes)",
+    "h2Label": "En-tête magique réponse (H2)",
+    "h2Description": "Valeur ou plage de l'en-tête du paquet réponse (X ou X-Y, où X<Y. Min 5, max 2147483647. La valeur ou la plage ne doit pas chevaucher les autres en-têtes)",
+    "h3Label": "En-tête magique cookie reply (H3)",
+    "h3Description": "Valeur ou plage de l'en-tête du paquet cookie reply (X ou X-Y, où X<Y. Min 5, max 2147483647. La valeur ou la plage ne doit pas chevaucher les autres en-têtes)",
+    "h4Label": "En-tête magique transport (H4)",
+    "h4Description": "Valeur ou plage de l'en-tête du paquet transport (X ou X-Y, où X<Y. Min 5, max 2147483647. La valeur ou la plage ne doit pas chevaucher les autres en-têtes)",
+    "i1Label": "Paquet parasite spécial 1 (I1)",
+    "i1Description": "Paquet de simulation de protocole en format hexadécimal : <b 0x...>",
+    "i2Label": "Paquet parasite spécial 2 (I2)",
+    "i2Description": "Paquet de simulation de protocole en format hexadécimal : <b 0x...>",
+    "i3Label": "Paquet parasite spécial 3 (I3)",
+    "i3Description": "Paquet de simulation de protocole en format hexadécimal : <b 0x...>",
+    "i4Label": "Paquet parasite spécial 4 (I4)",
+    "i4Description": "Paquet de simulation de protocole en format hexadécimal : <b 0x...>",
+    "i5Label": "Paquet parasite spécial 5 (I5)",
+    "i5Description": "Paquet de simulation de protocole en format hexadécimal : <b 0x...>",
+    "mtuNote": "Les valeurs dépendent du MTU",
+    "obfuscationParameters": "Paramètres d'obfuscation AmneziaWG"
+  }
+}

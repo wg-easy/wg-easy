@@ -1,0 +1,296 @@
+{
+  "pages": {
+    "me": "帳戶",
+    "clients": "客戶端",
+    "admin": {
+      "panel": "管理員版面",
+      "general": "一般設定",
+      "config": "配置設定",
+      "interface": "介面設定",
+      "hooks": "掛鉤設定"
+    }
+  },
+  "user": {
+    "email": "電郵"
+  },
+  "me": {
+    "currentPassword": "目前密碼",
+    "enable2fa": "啟用雙重認證",
+    "enable2faDesc": "使用認證應用程式掃描二維碼，或手動輸入密匙。",
+    "2faKey": "TOTP密匙",
+    "2faCodeDesc": "請輸入認證應用程式中的驗證碼。",
+    "disable2fa": "停用雙重認證",
+    "disable2faDesc": "請輸入密碼以停用雙重認證。"
+  },
+  "general": {
+    "name": "名稱",
+    "username": "用戶名",
+    "password": "密碼",
+    "newPassword": "新密碼",
+    "updatePassword": "更改密碼",
+    "mtu": "MTU",
+    "allowedIps": "IP白名單",
+    "dns": "域名系統",
+    "persistentKeepalive": "保持連線",
+    "logout": "登出",
+    "continue": "繼續",
+    "host": "主機",
+    "port": "連接埠",
+    "yes": "是",
+    "no": "否",
+    "confirmPassword": "確認新密碼",
+    "loading": "載入中...",
+    "2fa": "雙重認證",
+    "2faCode": "TOTP驗證碼"
+  },
+  "setup": {
+    "welcome": "歡迎首次設定wg-easy",
+    "welcomeDesc": "這是在任何Linux主機上安裝與管理WireGuard最簡單的方法。",
+    "existingSetup": "你有現存設定嗎？",
+    "createAdminDesc": "請輸入管理員用戶名及高強度密碼。這些資料將用於登入管理員版面。",
+    "setupConfigDesc": "請輸入主機及連接埠資料。這將用於客戶端設定，以便在他們的裝置上設定WireGuard。",
+    "setupMigrationDesc": "如果你想將舊版wg-easy的資料轉移到新設定，請提供備份檔案。",
+    "upload": "上傳",
+    "migration": "還原備份：",
+    "createAccount": "建立帳戶",
+    "successful": "設定成功",
+    "hostDesc": "客戶端連接的公共主機名稱",
+    "portDesc": "客戶端和WireGuard使用的公共UDP連接埠"
+  },
+  "update": {
+    "updateAvailable": "有新版本更新！",
+    "update": "更新"
+  },
+  "theme": {
+    "dark": "深色模式",
+    "light": "淺色模式",
+    "system": "系統預設"
+  },
+  "layout": {
+    "toggleCharts": "顯示或隱藏圖表",
+    "donate": "贊助"
+  },
+  "login": {
+    "signIn": "登入",
+    "rememberMe": "保持登入",
+    "rememberMeDesc": "關閉瀏覽器後仍保持登入",
+    "insecure": "連線不安全，請使用HTTPS。",
+    "2faRequired": "需要雙重認證",
+    "2faWrong": "雙重認證失敗"
+  },
+  "client": {
+    "empty": "目前沒有客戶端。",
+    "newShort": "新增",
+    "sort": "排序",
+    "create": "建立客戶端",
+    "created": "客戶端已建立",
+    "new": "新增客戶端",
+    "name": "名稱",
+    "expireDate": "有效期",
+    "expireDateDesc": "客戶端將於此日期停用。留空則為永久有效",
+    "delete": "刪除",
+    "deleteClient": "刪除客戶端",
+    "deleteDialog": "你確定要刪除用戶端 {name} 嗎？此操作無法還原。",
+    "enabled": "已啟用",
+    "address": "IP地址",
+    "serverAllowedIps": "伺服器IP白名單",
+    "otlDesc": "生成短暫單次超連結",
+    "permanent": "永久",
+    "createdOn": "建立於{date}",
+    "lastSeen": "上次活動於{date}",
+    "totalDownload": "總下載量：{total}",
+    "totalUpload": "總上傳量：{total}",
+    "newClient": "新客戶端",
+    "disableClient": "停用客戶端",
+    "enableClient": "啟用客戶端",
+    "noPrivKey": "此客戶端沒有已知的密匙。無法建立配置。",
+    "showQR": "顯示二維碼",
+    "downloadConfig": "下載配置",
+    "allowedIpsDesc": "通過VPN的IP地址（取代全局配置）",
+    "serverAllowedIpsDesc": "伺服器路由到客戶端的IP地址",
+    "mtuDesc": "設定VPN隧道的最大傳輸單位（封包大小）",
+    "persistentKeepaliveDesc": "設定保持連線封包的秒數間隔。0代表停用",
+    "hooks": "掛鉤",
+    "hooksDescription": "掛鉤僅適用於wg-quick",
+    "hooksLeaveEmpty": "僅適用於wg-quick，否則請留空",
+    "dnsDesc": "客戶端使用的域名系統伺服器（取代全局配置）",
+    "notConnected": "客戶端尚未連接",
+    "endpoint": "端點",
+    "endpointDesc": "建立WireGuard連線的客戶端IP地址",
+    "search": "搜尋客戶端...",
+    "config": "配置",
+    "viewConfig": "檢視配置",
+    "firewallIps": "防火牆IP白名單",
+    "firewallIpsDesc": "此客戶端可存取的目的地IP/CIDR（伺服器端強制執行）。留空則使用「IP白名單」。支援選填的連接埠及協定過濾，語法請參閱說明文件。",
+    "downloadPng": "正在下載PNG",
+    "copyPng": "複製PNG"
+  },
+  "dialog": {
+    "change": "更改",
+    "cancel": "取消",
+    "create": "建立"
+  },
+  "toast": {
+    "success": "成功",
+    "saved": "已儲存",
+    "error": "錯誤",
+    "unknown": "未知錯誤。詳情請參閱主控台。"
+  },
+  "form": {
+    "actions": "操作",
+    "save": "儲存",
+    "revert": "重置",
+    "sectionGeneral": "一般設定",
+    "sectionAdvanced": "進階",
+    "noItems": "未有設定",
+    "nullNoItems": "未有設定，使用全局配置",
+    "add": "新增"
+  },
+  "admin": {
+    "general": {
+      "sessionTimeout": "工作階段逾時",
+      "sessionTimeoutDesc": "「保持登入」的工作階段持續時間（秒）",
+      "metrics": "指標",
+      "metricsPassword": "密碼",
+      "metricsPasswordDesc": "指標端點的Bearer密碼（密碼或argon2雜湊）",
+      "json": "JSON",
+      "jsonDesc": "JSON格式指標的路由",
+      "prometheus": "Prometheus",
+      "prometheusDesc": "Prometheus指標的路由"
+    },
+    "config": {
+      "connection": "連線",
+      "hostDesc": "客戶端連接的公共主機名稱（使配置無效）",
+      "portDesc": "客戶端連接的公共UDP連接埠（使配置無效，你可能也想更改介面連接埠）",
+      "allowedIpsDesc": "客戶端使用的IP白名單（全局配置）",
+      "dnsDesc": "客戶端使用的域名系統伺服器（全局配置）",
+      "mtuDesc": "客戶端使用的MTU（僅適用於新客戶端）",
+      "persistentKeepaliveDesc": "向伺服器發送保持連線封包的秒數間隔。0代表停用（僅適用於新客戶端）",
+      "suggest": "建議",
+      "suggestDesc": "選擇一個IP地址或主機名稱"
+    },
+    "interface": {
+      "cidrSuccess": "成功更改CIDR",
+      "device": "裝置",
+      "deviceDesc": "WireGuard流量通過的乙太網路裝置",
+      "mtuDesc": "WireGuard使用的MTU",
+      "portDesc": "WireGuard監聽的UDP連接埠 (你可能也想更改設定連接埠)",
+      "changeCidr": "更改CIDR",
+      "restart": "重啟介面",
+      "restartDesc": "重啟WireGuard介面",
+      "restartWarn": "你確定要重新啟動介面嗎？這將中斷所有客戶端連線。",
+      "restartSuccess": "介面已重啟",
+      "firewall": "流量過濾",
+      "firewallEnabled": "啟用獨立客戶端防火牆",
+      "firewallEnabledDesc": "使用iptables以限制客戶端流量至特定的目的地IP。啟用後，即可為每個客戶端單獨設定允許目的地。"
+    },
+    "introText": "歡迎來到管理員版面。\n\n你可以在側邊欄中管理一般、配置、介面和掛鉤設定。"
+  },
+  "zod": {
+    "generic": {
+      "required": "{field}為必填項",
+      "validNumber": "{field}必須是有效的數字",
+      "validNumberRange": "{field}必須是有效的數字或數字範圍",
+      "validString": "{field}必須是有效的字串",
+      "validBoolean": "{field}必須是有效的布林值",
+      "validArray": "{field}必須是有效的陣列",
+      "stringMin": "{field}至少需要{min}個字元",
+      "numberMin": "{field}至少為{min}"
+    },
+    "client": {
+      "id": "客戶端ID",
+      "name": "名稱",
+      "expiresAt": "到期於",
+      "address4": "IPv4地址",
+      "address6": "IPv6地址",
+      "serverAllowedIps": "伺服器IP白名單",
+      "firewallIps": "防火牆IP白名單",
+      "firewallIpsInvalid": "防火牆IP輸入格式無效。請參閱說明文件以查看支援語法。"
+    },
+    "user": {
+      "username": "用戶名",
+      "password": "密碼",
+      "remember": "保持",
+      "name": "名稱",
+      "email": "電郵",
+      "emailInvalid": "必須是有效的電郵地址",
+      "passwordMatch": "密碼必須一致",
+      "totpEnable": "TOTP啟用",
+      "totpEnableTrue": "TOTP啟用必須為正確",
+      "totpCode": "TOTP驗證碼"
+    },
+    "userConfig": {
+      "host": "主機"
+    },
+    "general": {
+      "sessionTimeout": "工作階段逾時",
+      "metricsEnabled": "指標",
+      "metricsPassword": "指標密碼"
+    },
+    "interface": {
+      "cidr": "CIDR",
+      "device": "裝置",
+      "cidrValid": "CIDR必須有效"
+    },
+    "otl": "單次超連結",
+    "stringMalformed": "字串格式不正確",
+    "body": "主體必須是有效的物件",
+    "hook": "掛鉤",
+    "enabled": "已啟動",
+    "mtu": "MTU",
+    "port": "連接埠",
+    "persistentKeepalive": "保持連線",
+    "address": "IP地址",
+    "dns": "域名系統",
+    "allowedIps": "IP白名單",
+    "file": "文件"
+  },
+  "hooks": {
+    "preUp": "PreUp",
+    "postUp": "PostUp",
+    "preDown": "PreDown",
+    "postDown": "PostDown"
+  },
+  "copy": {
+    "notSupported": "不支援複製",
+    "copied": "已複製！",
+    "failed": "複製失敗",
+    "copy": "複製"
+  },
+  "awg": {
+    "jCLabel": "填充封包數量 (Jc)",
+    "jCDescription": "要傳送的填充封包數量 (1-128，建議: 4-12)",
+    "jMinLabel": "填充封包最小大小 (Jmin)",
+    "jMinDescription": "填充封包的最小大小 (0-1279*，建議: 8，必須<Jmax)",
+    "jMaxLabel": "填充封包最大大小 (Jmax)",
+    "jMaxDescription": "填充封包的最大大小 (1-1280*，建議: 80，必須>Jmin)",
+    "s1Label": "初始封包填充大小 (S1)",
+    "s1Description": "初始封包填充大小 (0-1132 [1280* - 148 = 1132]，建議: 15-150，S1+56 ≠ S2)",
+    "s2Label": "回應封包填充大小 (S2)",
+    "s2Description": "回應封包填充大小 (0-1188 [1280* - 92 = 1188]，建議: 15-150)",
+    "s3Label": "Cookie 回覆封包填充大小 (S3)",
+    "s3Description": "Cookie 回覆封包填充大小",
+    "s4Label": "傳輸封包填充大小 (S4)",
+    "s4Description": "傳輸封包填充大小",
+    "h1Label": "初始特徵標頭 (H1)",
+    "h1Description": "初始封包標頭值 (5-2147483647，必須與 H2-H4 不同)",
+    "h2Label": "回應特徵標頭 (H2)",
+    "h2Description": "回應封包標頭值 (5-2147483647，必須與 H1、H3、H4 不同)",
+    "h3Label": "Cookie 回覆特徵標頭 (H3)",
+    "h3Description": "Cookie 回覆封包標頭值 (5-2147483647，必須與 H1、H2、H4 不同)",
+    "h4Label": "傳輸特徵標頭 (H4)",
+    "h4Description": "傳輸封包標頭值 (5-2147483647，必須與 H1-H3 不同)",
+    "i1Label": "特殊填充封包 1 (I1)",
+    "i1Description": "協定模仿封包 (16 進位格式): <b 0x...>",
+    "i2Label": "特殊填充封包 2 (I2)",
+    "i2Description": "協定模仿封包 (16 進位格式): <b 0x...>",
+    "i3Label": "特殊填充封包 3 (I3)",
+    "i3Description": "協定模仿封包 (16 進位格式): <b 0x...>",
+    "i4Label": "特殊填充封包 4 (I4)",
+    "i4Description": "協定模仿封包 (16 進位格式): <b 0x...>",
+    "i5Label": "特殊填充封包 5 (I5)",
+    "i5Description": "協定模仿封包 (16 進位格式): <b 0x...>",
+    "mtuNote": "數值取決於 MTU",
+    "obfuscationParameters": "AmneziaWG 混淆參數"
+  }
+}

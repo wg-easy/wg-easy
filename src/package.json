@@ -1,33 +1,78 @@
 {
-  "release": 7,
   "name": "wg-easy",
-  "version": "1.0.0",
-  "description": "",
-  "main": "server.js",
+  "version": "15.4.0",
+  "description": "The easiest way to run WireGuard VPN + Web-based Admin UI.",
+  "private": true,
+  "type": "module",
   "scripts": {
-    "serve": "DEBUG=Server,WireGuard nodemon server.js",
-    "serve-with-password": "PASSWORD=wg npm run serve",
-    "lint": "eslint ."
+    "build": "pnpm cli:trace && nuxt build && pnpm cli:build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "lint": "eslint .",
+    "format": "prettier . --write",
+    "format:check": "prettier . --check",
+    "typecheck": "nuxt typecheck",
+    "check:all": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm build",
+    "db:generate": "drizzle-kit generate",
+    "cli:trace": "node cli/build.js --trace",
+    "cli:build": "node cli/build.js",
+    "cli:dev": "tsx cli/index.ts",
+    "test:unit": "vitest run --project unit"
   },
-  "author": "Emile Nijssen",
-  "license": "GPL",
   "dependencies": {
-    "debug": "^4.3.1",
-    "express": "^4.17.1",
-    "express-session": "^1.17.1",
-    "qrcode": "^1.4.4",
-    "uuid": "^8.3.2"
+    "@heroicons/vue": "^2.2.0",
+    "@libsql/client": "^0.18.0",
+    "@nuxtjs/color-mode": "^4.0.1",
+    "@nuxtjs/i18n": "^10.6.0",
+    "@nuxtjs/tailwindcss": "^6.14.0",
+    "@phc/format": "^1.0.0",
+    "@pinia/nuxt": "^1.0.2",
+    "@tailwindcss/forms": "^0.5.11",
+    "@vueuse/core": "^14.4.0",
+    "@vueuse/nuxt": "^14.4.0",
+    "apexcharts": "^7.5.1",
+    "argon2": "^0.45.1",
+    "cidr-tools": "^13.0.1",
+    "citty": "^0.2.2",
+    "consola": "^3.4.2",
+    "crc-32": "^1.2.2",
+    "drizzle-orm": "^0.45.2",
+    "ip-bigint": "^10.0.1",
+    "is-cidr": "^7.0.1",
+    "is-ip": "^5.0.1",
+    "js-sha256": "^1.0.0",
+    "nuxt": "^4.5.2",
+    "obug": "^3.0.0",
+    "openid-client": "^6.8.8",
+    "otpauth": "^9.5.2",
+    "pinia": "^4.0.3",
+    "qr": "^0.7.0",
+    "reka-ui": "^2.10.4",
+    "semver": "^7.8.5",
+    "tailwindcss": "^3.4.19",
+    "vue": "latest",
+    "vue3-apexcharts": "^1.11.1",
+    "zod": "^4.6.4"
   },
   "devDependencies": {
-    "eslint": "^7.27.0",
-    "eslint-config-athom": "^2.1.0"
+    "@nuxt/eslint": "^1.17.0",
+    "@nuxt/test-utils": "^4.3.2",
+    "@types/phc__format": "^1.0.1",
+    "@types/semver": "^7.8.0",
+    "@vitest/coverage-v8": "^4.1.11",
+    "@vitest/ui": "^4.1.11",
+    "drizzle-kit": "^0.31.10",
+    "esbuild": "^0.28.2",
+    "eslint": "^10.10.0",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.9.6",
+    "prettier-plugin-tailwindcss": "^0.8.1",
+    "tsx": "^4.23.13",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.11",
+    "vue-tsc": "^3.3.11"
   },
-  "nodemonConfig": {
-    "ignore": [
-      "www/*"
-    ]
-  },
-  "engines": {
-    "node": "14"
-  }
+  "packageManager": "pnpm@12.4.1"
 }
