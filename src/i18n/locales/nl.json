@@ -247,7 +247,7 @@
       "cidr": "CIDR",
       "device": "Apparaat",
       "cidrValid": "CIDR moet geldig zijn",
-     "routingTable": "Routeringstabel moet zijn autom., uit of het nummer van een tabel",
+      "routingTable": "Routeringstabel moet zijn autom., uit of het nummer van een tabel",
       "headerProtectionJunkSize": "De junk sizes S1-S4 moeten minimaal 12 zijn wanneer een headerbeveiligingssleutel is ingesteld"
     },
     "otl": "Eenmalige link",
