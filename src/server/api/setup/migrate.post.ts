@@ -30,7 +30,7 @@ export default defineSetupEventHandler('migrate', async ({ event }) => {
         address: z.string(),
         privateKey: z.string(),
         publicKey: z.string(),
-        preSharedKey: z.string(),
+        preSharedKey: z.string().optional(),
         createdAt: z.string(),
         updatedAt: z.string(),
         enabled: z.boolean(),
