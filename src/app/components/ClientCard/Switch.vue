@@ -26,7 +26,7 @@ const clientsStore = useClientsStore();
 
 const _disableClient = useSubmit(
   (data) =>
-    $fetch(`/api/client/${props.client.id}/disable`, {
+    $fetch<{ success: boolean }>(`/api/client/${props.client.id}/disable`, {
       method: 'post',
       body: data,
     }),
@@ -40,7 +40,7 @@ const _disableClient = useSubmit(
 
 const _enableClient = useSubmit(
   (data) =>
-    $fetch(`/api/client/${props.client.id}/enable`, {
+    $fetch<{ success: boolean }>(`/api/client/${props.client.id}/enable`, {
       method: 'post',
       body: data,
     }),

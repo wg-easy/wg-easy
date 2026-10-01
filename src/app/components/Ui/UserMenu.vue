@@ -71,7 +71,7 @@ const toggleState = ref(false);
 
 const _submit = useSubmit(
   (data) =>
-    $fetch('/api/session', {
+    $fetch<{ success: boolean }>('/api/session', {
       method: 'delete',
       body: data,
     }),

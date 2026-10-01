@@ -7,6 +7,7 @@ title: Edit Client
 - **Name**: The name of the client.
 - **Enabled**: Whether the client can connect to the VPN.
 - **Expire Date**: The date the client will be disabled.
+- **Tags**: Assign one or more tags to help organize and filter clients. Pick from existing tags, or create a new one on the spot if you have permission to manage tags. Tags themselves are created, edited, and deleted from Admin Panel → Tags.
 
 ## Address
 
