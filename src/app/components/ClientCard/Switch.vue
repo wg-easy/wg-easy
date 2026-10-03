@@ -24,6 +24,15 @@ watch(
 
 const clientsStore = useClientsStore();
 
+async function revertEnabled(success: boolean) {
+  await clientsStore.refresh();
+  // The watch below only runs when enabled changes. A failed request
+  // leaves the server value the same, so put the local switch back.
+  if (!success) {
+    enabled.value = props.client.enabled;
+  }
+}
+
 const _disableClient = useSubmit(
   (data) =>
     $fetch(`/api/client/${props.client.id}/disable`, {
@@ -31,9 +40,7 @@ const _disableClient = useSubmit(
       body: data,
     }),
   {
-    revert: async () => {
-      await clientsStore.refresh();
-    },
+    revert: revertEnabled,
     noSuccessToast: true,
   }
 );
@@ -45,9 +52,7 @@ const _enableClient = useSubmit(
       body: data,
     }),
   {
-    revert: async () => {
-      await clientsStore.refresh();
-    },
+    revert: revertEnabled,
     noSuccessToast: true,
   }
 );
