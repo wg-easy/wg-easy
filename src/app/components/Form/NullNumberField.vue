@@ -7,11 +7,22 @@
       <IconsInfo class="size-4" />
     </BaseTooltip>
   </div>
-  <BaseInput :id="id" v-model.number="data" :name="id" type="number" />
+  <BaseInput
+    :id="id"
+    v-model.number="data"
+    :name="id"
+    type="number"
+    :placeholder="placeholder"
+  />
 </template>
 
 <script lang="ts" setup>
-defineProps<{ id: string; label: string; description?: string }>();
+defineProps<{
+  id: string;
+  label: string;
+  description?: string;
+  placeholder?: string;
+}>();
 
 const data = defineModel<number | null>({
   set(value) {
