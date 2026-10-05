@@ -11,7 +11,7 @@
     "format:check:docs": "prettier --check docs"
   },
   "devDependencies": {
-    "prettier": "^3.9.6"
+    "prettier": "^3.9.9"
   },
-  "packageManager": "pnpm@12.4.1"
+  "packageManager": "pnpm@12.8.2"
 }

@@ -14,6 +14,16 @@ You can set these environment variables to configure the container. They are not
 | `TRUSTED_PROXIES`       |           | `172.18.0.2,fd00:1234::/64` | Proxy IP addresses or CIDRs allowed to forward request metadata |
 | `WG_INTERFACE`          | `wg0`     | `wg1`                       | Name of the WireGuard interface                                 |
 
+/// note | IPv6 Caveats
+
+Disabling IPv6 will disable the creation of the default IPv6 firewall rules and won't add a IPv6 address to the interface and clients.
+
+You will however still see a IPv6 address in the Web UI, but it won't be used.
+
+This option can be removed in the future, as more devices support IPv6.
+
+///
+
 ## Trusted Proxies
 
 Set `TRUSTED_PROXIES` when wg-easy runs behind a reverse proxy and needs to use
@@ -41,13 +51,3 @@ Set `WG_INTERFACE` to specify a custom interface name, useful if you are running
 environment:
     - WG_INTERFACE=wg1
 ```
-
-/// note | IPv6 Caveats
-
-Disabling IPv6 will disable the creation of the default IPv6 firewall rules and won't add a IPv6 address to the interface and clients.
-
-You will however still see a IPv6 address in the Web UI, but it won't be used.
-
-This option can be removed in the future, as more devices support IPv6.
-
-///
