@@ -13,7 +13,7 @@ const props = defineProps<{
   client: LocalClient;
 }>();
 
-const enabled = ref(props.client.enabled);
+const enabled = useClientEnabled(() => props.client.enabled);
 
 watch(
   () => props.client.enabled,
