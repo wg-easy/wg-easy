@@ -38,7 +38,7 @@ export type UserConfigUpdateType = Omit<
 export const UserConfigUpdateSchema = schemaForType<UserConfigUpdateType>()(
   z.object({
     port: PortSchema,
-    defaultMtu: MtuSchema,
+    defaultMtu: MtuSchema.nullable(),
     defaultPersistentKeepalive: PersistentKeepaliveSchema,
     defaultDns: DnsSchema,
     defaultAllowedIps: AllowedIpsSchema,
