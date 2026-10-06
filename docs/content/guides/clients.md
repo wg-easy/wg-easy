@@ -86,6 +86,7 @@ The DNS server that the client will use.
 
 - **MTU**: The maximum transmission unit for the client.
 - **Persistent Keepalive**: The interval for sending keepalive packets to the server.
+- **Pre-Shared Key**: Adds an extra layer of symmetric-key cryptography (post-quantum resistance) to the WireGuard tunnel. Toggle on to generate a key or off to remove it.
 
 ## Hooks
 

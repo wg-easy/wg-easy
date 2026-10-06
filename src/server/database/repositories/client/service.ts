@@ -176,7 +176,6 @@ export class ClientService {
   async create({ name, expiresAt }: ClientCreateType) {
     const privateKey = await wg.generatePrivateKey();
     const publicKey = await wg.getPublicKey(privateKey);
-    const preSharedKey = await wg.generatePreSharedKey();
 
     return this.#db.transaction(async (tx) => {
       const clients = await tx.query.client.findMany().execute();
@@ -199,6 +198,10 @@ export class ClientService {
       if (!clientConfig) {
         throw new Error('WireGuard interface configuration not found');
       }
+
+      const preSharedKey = clientConfig.defaultPreSharedKey
+        ? await wg.generatePreSharedKey()
+        : null;
 
       const ipv4Cidr = parseCidr(clientInterface.ipv4Cidr);
       const ipv4Address = nextIP(4, ipv4Cidr, clients);
@@ -238,6 +241,14 @@ export class ClientService {
 
   toggle(id: ID, enabled: boolean) {
     return this.#statements.toggle.execute({ id, enabled });
+  }
+
+  updatePreSharedKey(id: ID, preSharedKey: string | null) {
+    return this.#db
+      .update(client)
+      .set({ preSharedKey })
+      .where(eq(client.id, id))
+      .execute();
   }
 
   delete(id: ID) {

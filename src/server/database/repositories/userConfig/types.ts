@@ -50,6 +50,7 @@ export const UserConfigUpdateSchema = schemaForType<UserConfigUpdateType>()(
     defaultI3: ISchema,
     defaultI4: ISchema,
     defaultI5: ISchema,
+    defaultPreSharedKey: z.boolean(),
     host: host,
   })
 );

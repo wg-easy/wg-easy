@@ -2,6 +2,18 @@
 title: Admin Panel
 ---
 
+## Configuration Settings
+
+### Client Defaults
+
+Configure default settings applied to newly created clients:
+
+- **Host & Port**: The public hostname and UDP port clients use to connect.
+- **Allowed IPs**: Default IP ranges routed through the VPN for new clients.
+- **DNS**: Default DNS servers assigned to new clients.
+- **MTU & Persistent Keepalive**: Default tunnel parameters.
+- **Generate Pre-Shared Key for new clients**: When enabled, a unique pre-shared key (PSK) is automatically generated for every newly created client for added post-quantum symmetric encryption.
+
 ## Interface Settings
 
 ### Per-Client Firewall

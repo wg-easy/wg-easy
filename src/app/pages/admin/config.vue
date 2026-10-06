@@ -46,6 +46,12 @@
           :label="$t('general.persistentKeepalive')"
           :description="$t('admin.config.persistentKeepaliveDesc')"
         />
+        <FormSwitchField
+          id="defaultPreSharedKey"
+          v-model="data.defaultPreSharedKey"
+          :label="$t('admin.config.defaultPreSharedKey')"
+          :description="$t('admin.config.defaultPreSharedKeyDesc')"
+        />
       </FormGroup>
       <FormGroup v-if="globalStore.information?.isAwg">
         <FormHeading>{{ $t('awg.obfuscationParameters') }}</FormHeading>

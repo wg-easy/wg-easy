@@ -89,6 +89,13 @@
               :description="$t('client.persistentKeepaliveDesc')"
               :label="$t('general.persistentKeepalive')"
             />
+            <FormSwitchField
+              id="preSharedKey"
+              v-model="hasPreSharedKey"
+              :label="$t('client.preSharedKey')"
+              :description="$t('client.preSharedKeyDesc')"
+              @update:model-value="onPskToggle"
+            />
           </FormGroup>
           <FormGroup v-if="globalStore.information?.isAwg">
             <FormHeading>{{ $t('awg.obfuscationParameters') }}</FormHeading>
@@ -267,6 +274,8 @@ const { data: _data, refresh } = await useFetch(`/api/client/${id}`, {
 });
 const data = toRef(_data.value);
 
+const hasPreSharedKey = ref(_data.value?.hasPreSharedKey ?? false);
+
 const _submit = useSubmit(
   (data) =>
     $fetch(`/api/client/${id}`, {
@@ -284,13 +293,38 @@ const _submit = useSubmit(
   }
 );
 
+const _generatePsk = useSubmit(
+  () =>
+    $fetch(`/api/client/${id}/psk`, {
+      method: 'post',
+    }),
+  {
+    revert: async () => {
+      await refresh();
+      hasPreSharedKey.value = _data.value?.hasPreSharedKey ?? false;
+    },
+  }
+);
+
+async function onPskToggle(value?: boolean) {
+  if (value) {
+    // toggled on — generate a new key immediately
+    await _generatePsk(null);
+  }
+  // toggled off — preSharedKey: null is included in the normal save payload
+}
+
 function submit() {
-  return _submit(data.value);
+  return _submit({
+    ...data.value,
+    preSharedKey: hasPreSharedKey.value ? undefined : null,
+  });
 }
 
 async function revert() {
   await refresh();
   data.value = toRef(_data.value).value;
+  hasPreSharedKey.value = _data.value?.hasPreSharedKey ?? false;
 }
 
 const _deleteClient = useSubmit(
