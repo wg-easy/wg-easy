@@ -76,6 +76,11 @@ RUN ln -s /etc/wireguard /etc/amnezia/amneziawg
 # Use iptables-legacy
 RUN update-alternatives --install /usr/sbin/iptables iptables /usr/sbin/iptables-legacy 10 --slave /usr/sbin/iptables-restore iptables-restore /usr/sbin/iptables-legacy-restore --slave /usr/sbin/iptables-save iptables-save /usr/sbin/iptables-legacy-save
 RUN update-alternatives --install /usr/sbin/ip6tables ip6tables /usr/sbin/ip6tables-legacy 10 --slave /usr/sbin/ip6tables-restore ip6tables-restore /usr/sbin/ip6tables-legacy-restore --slave /usr/sbin/ip6tables-save ip6tables-save /usr/sbin/ip6tables-legacy-save
+# Register iptables-nft as fallback, selected by iptables-backend.sh if iptables-legacy is not supported
+RUN update-alternatives --install /usr/sbin/iptables iptables /usr/sbin/iptables-nft 5 --slave /usr/sbin/iptables-restore iptables-restore /usr/sbin/iptables-nft-restore --slave /usr/sbin/iptables-save iptables-save /usr/sbin/iptables-nft-save
+RUN update-alternatives --install /usr/sbin/ip6tables ip6tables /usr/sbin/ip6tables-nft 5 --slave /usr/sbin/ip6tables-restore ip6tables-restore /usr/sbin/ip6tables-nft-restore --slave /usr/sbin/ip6tables-save ip6tables-save /usr/sbin/ip6tables-nft-save
+COPY docker/iptables-backend.sh /usr/local/bin/iptables-backend
+RUN chmod +x /usr/local/bin/iptables-backend
 
 # Set Environment
 ENV DEBUG=Server,WireGuard,Database,CMD,Firewall
@@ -88,4 +93,4 @@ ENV DISABLE_IPV6=false
 LABEL org.opencontainers.image.source=https://github.com/wg-easy/wg-easy
 
 # Run Web UI
-CMD ["/usr/bin/dumb-init", "node", "server/index.mjs"]
+CMD ["/usr/bin/dumb-init", "iptables-backend", "node", "server/index.mjs"]
