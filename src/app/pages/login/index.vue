@@ -101,14 +101,9 @@ watchEffect(() => {
   }
 });
 
-type PasswordLoginResponse =
-  | { status: 'TOTP_REQUIRED' }
-  | { status: 'INVALID_TOTP_CODE' }
-  | { status: 'success' };
-
 const _submit = useSubmit(
   (data) =>
-    $fetch<PasswordLoginResponse>('/api/auth/password', {
+    $fetch('/api/auth/password', {
       method: 'post',
       body: data,
     }),

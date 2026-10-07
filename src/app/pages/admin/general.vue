@@ -47,7 +47,7 @@ const data = toRef(_data.value);
 
 const _submit = useSubmit(
   (data) =>
-    $fetch<{ success: boolean }>(`/api/admin/general`, {
+    $fetch(`/api/admin/general`, {
       method: 'post',
       body: data,
     }),

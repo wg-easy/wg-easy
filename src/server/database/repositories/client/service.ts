@@ -1,4 +1,4 @@
-import { eq, sql, or, like, and, inArray } from 'drizzle-orm';
+import { eq, sql, or, like, and, inArray, type SQL } from 'drizzle-orm';
 import { containsCidr, parseCidr } from 'cidr-tools';
 
 import { client } from './schema';
@@ -60,7 +60,11 @@ export class ClientService {
     this.#statements = createPreparedStatement(db);
   }
 
-  #tagFilter(tagId?: number[], tagName?: string[]) {
+  /**
+   * Explicit return type keeps the inferred `/api/client` response type
+   * shallow; inferring it pushes Nitro's typed `$fetch` past TS2321.
+   */
+  #tagFilter(tagId?: number[], tagName?: string[]): SQL | undefined {
     const tagFilters = [];
 
     if (tagId && tagId.length > 0) {

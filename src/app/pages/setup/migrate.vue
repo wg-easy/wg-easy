@@ -37,7 +37,7 @@ function onChangeFile(evt: Event) {
 
 const _submit = useSubmit(
   (data) =>
-    $fetch<{ success: boolean }>('/api/setup/migrate', {
+    $fetch('/api/setup/migrate', {
       method: 'post',
       body: data,
     }),

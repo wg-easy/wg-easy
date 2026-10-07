@@ -66,7 +66,7 @@ function createClient() {
 
 const _createClient = useSubmit(
   (data) =>
-    $fetch<{ success: boolean; clientId: number }>('/api/client', {
+    $fetch('/api/client', {
       method: 'post',
       body: data,
     }),

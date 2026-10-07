@@ -41,7 +41,7 @@ const data = toRef(_data.value);
 
 const _submit = useSubmit(
   (data) =>
-    $fetch<{ success: boolean }>(`/api/admin/hooks`, {
+    $fetch(`/api/admin/hooks`, {
       method: 'post',
       body: data,
     }),

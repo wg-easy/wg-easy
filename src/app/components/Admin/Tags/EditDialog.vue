@@ -96,7 +96,7 @@ function toggleClient(client: LocalClient) {
 
   const submit = useSubmit(
     () =>
-      $fetch<{ success: boolean }>(`/api/client/${client.id}`, {
+      $fetch(`/api/client/${client.id}`, {
         method: 'post',
         body: { ...client, tagIds },
       }),
@@ -119,7 +119,7 @@ function editTag() {
 
 const _editTag = useSubmit(
   (data) =>
-    $fetch<{ success: boolean }>(`/api/tag/${props.tag.id}`, {
+    $fetch(`/api/tag/${props.tag.id}`, {
       method: 'post',
       body: data,
     }),

@@ -44,7 +44,7 @@ const { t } = useI18n();
 
 function deleteTag(id: number) {
   const submit = useSubmit(
-    () => $fetch<{ success: boolean }>(`/api/tag/${id}`, { method: 'delete' }),
+    () => $fetch(`/api/tag/${id}`, { method: 'delete' }),
     {
       revert: () => tagsStore.refresh(),
       successMsg: t('admin.tags.deleted'),

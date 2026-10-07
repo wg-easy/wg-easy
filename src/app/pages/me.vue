@@ -181,11 +181,6 @@
 <script setup lang="ts">
 import { encodeQR } from 'qr';
 
-type TotpResponse =
-  | { success: boolean; type: 'setup'; key: string; uri: string }
-  | { success: boolean; type: 'created' }
-  | { success: boolean; type: 'deleted' };
-
 const authStore = useAuthStore();
 
 const { data: authMethods } = await useFetch('/api/auth/methods');
@@ -203,7 +198,7 @@ const oauthProviderInfo = computed(() => {
 
 const _submit = useSubmit(
   (data) =>
-    $fetch<{ success: boolean }>(`/api/me`, {
+    $fetch(`/api/me`, {
       method: 'post',
       body: data,
     }),
@@ -224,7 +219,7 @@ const confirmPassword = ref('');
 
 const _updatePassword = useSubmit(
   (data) =>
-    $fetch<{ success: boolean }>(`/api/me/password`, {
+    $fetch(`/api/me/password`, {
       method: 'post',
       body: data,
     }),
@@ -250,7 +245,7 @@ const twofa = ref<{ key: string; qrcode: string } | null>(null);
 
 const _setup2fa = useSubmit(
   (data) =>
-    $fetch<TotpResponse>(`/api/me/totp`, {
+    $fetch(`/api/me/totp`, {
       method: 'post',
       body: data,
     }),
@@ -279,7 +274,7 @@ const code = ref<string>('');
 
 const _enable2fa = useSubmit(
   (data) =>
-    $fetch<TotpResponse>(`/api/me/totp`, {
+    $fetch(`/api/me/totp`, {
       method: 'post',
       body: data,
     }),
@@ -305,7 +300,7 @@ const disable2faPassword = ref('');
 
 const _disable2fa = useSubmit(
   (data) =>
-    $fetch<TotpResponse>(`/api/me/totp`, {
+    $fetch(`/api/me/totp`, {
       method: 'post',
       body: data,
     }),
@@ -328,7 +323,7 @@ async function disable2fa() {
 
 const _unlinkOauth = useSubmit(
   (data) =>
-    $fetch<{ success: boolean }>(`/api/auth/unlink`, {
+    $fetch(`/api/auth/unlink`, {
       method: 'post',
       body: data,
     }),

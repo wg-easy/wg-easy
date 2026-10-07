@@ -44,14 +44,9 @@ if (error.value) {
   await navigateTo('/login');
 }
 
-type Verify2faResponse =
-  | { status: 'PENDING_LOGIN_EXPIRED' }
-  | { status: 'INVALID_TOTP_CODE' }
-  | { status: 'success' };
-
 const _submit = useSubmit(
   (data) =>
-    $fetch<Verify2faResponse>('/api/auth/verify-2fa', {
+    $fetch('/api/auth/verify-2fa', {
       method: 'post',
       body: data,
     }),
@@ -95,7 +90,7 @@ async function submit() {
 
 const _cancel = useSubmit(
   (data) =>
-    $fetch<{ success: boolean }>('/api/auth/cancel', {
+    $fetch('/api/auth/cancel', {
       method: 'post',
       body: data,
     }),

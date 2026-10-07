@@ -44,7 +44,7 @@ const port = ref<number>(51820);
 
 const _submit = useSubmit(
   (data) =>
-    $fetch<{ success: boolean }>('/api/setup/4', {
+    $fetch('/api/setup/4', {
       method: 'post',
       body: data,
     }),
