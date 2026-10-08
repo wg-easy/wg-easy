@@ -150,42 +150,49 @@
             </div>
 
             <FormNullTextField
+              v-if="globalStore.supportsAwg3"
               id="contentPaddingAddition"
               v-model="data.contentPaddingAddition"
               :label="$t('awg.contentPaddingAdditionLabel')"
               :description="$t('awg.contentPaddingAdditionDescription')"
             />
             <FormNullTextField
+              v-if="globalStore.supportsAwg3"
               id="rekeyAfterTime"
               v-model="data.rekeyAfterTime"
               :label="$t('awg.rekeyAfterTimeLabel')"
               :description="$t('awg.rekeyAfterTimeDescription')"
             />
             <FormNullTextField
+              v-if="globalStore.supportsAwg3"
               id="rekeyTimeout"
               v-model="data.rekeyTimeout"
               :label="$t('awg.rekeyTimeoutLabel')"
               :description="$t('awg.rekeyTimeoutDescription')"
             />
             <FormNullTextField
+              v-if="globalStore.supportsAwg3"
               id="rejectAfterTime"
               v-model="data.rejectAfterTime"
               :label="$t('awg.rejectAfterTimeLabel')"
               :description="$t('awg.rejectAfterTimeDescription')"
             />
             <FormNullTextField
+              v-if="globalStore.supportsAwg3"
               id="keepaliveTimeout"
               v-model="data.keepaliveTimeout"
               :label="$t('awg.keepaliveTimeoutLabel')"
               :description="$t('awg.keepaliveTimeoutDescription')"
             />
             <FormNullTextField
+              v-if="globalStore.supportsAwg3"
               id="maxHandshakeAttempts"
               v-model="data.maxHandshakeAttempts"
               :label="$t('awg.maxHandshakeAttemptsLabel')"
               :description="$t('awg.maxHandshakeAttemptsDescription')"
             />
             <FormNullSwitchField
+              v-if="globalStore.supportsAwg31"
               id="disableCookies"
               v-model="data.disableCookies"
               :label="$t('awg.disableCookiesLabel')"

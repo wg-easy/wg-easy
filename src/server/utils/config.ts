@@ -1,6 +1,10 @@
 import { createDebug } from 'obug';
 import packageJson from '@@/package.json';
 
+import {
+  parseAwgVersion,
+  parseAwgAutoGenerate,
+} from '#server/utils/awgProtocol';
 import { exec } from '#server/utils/cmd';
 import { parseInterfaceName } from '#server/utils/interfaceName';
 import { parseTrustedProxies } from '#server/utils/trustedProxy';
@@ -54,6 +58,9 @@ export const WG_ENV = {
   /** Name of the WireGuard interface */
   WG_INTERFACE: parseInterfaceName(process.env.WG_INTERFACE),
   WG_EXECUTABLE: await detectAwg(),
+  AWG_PROTOCOL_VERSION: parseAwgVersion(process.env.AWG_PROTOCOL_VERSION),
+  AWG_PROTOCOL_VERSION_SET: Boolean(process.env.AWG_PROTOCOL_VERSION?.trim()),
+  AWG_AUTO_GENERATE: parseAwgAutoGenerate(process.env.AWG_AUTO_GENERATE),
   DISABLE_VERSION_CHECK: process.env.DISABLE_VERSION_CHECK === 'true',
   /** List of enabled and configured OAuth providers */
   OAUTH_PROVIDERS: oauthProviders,

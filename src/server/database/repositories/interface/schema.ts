@@ -4,6 +4,8 @@ import { int, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import { hooks } from '../hooks/schema';
 import { userConfig } from '../userConfig/schema';
 
+import type { AwgVersion } from '#server/utils/awgProtocol';
+
 // maybe support multiple interfaces in the future
 export const wgInterface = sqliteTable('interfaces_table', {
   name: text().primaryKey(),
@@ -40,6 +42,10 @@ export const wgInterface = sqliteTable('interfaces_table', {
   maxHandshakeAttempts: text('max_handshake_attempts'),
   randomTrailers: int('random_trailers', { mode: 'boolean' }),
   disableCookies: int('disable_cookies', { mode: 'boolean' }),
+  awgProtocolVersion: text('awg_protocol_version').$type<AwgVersion>(),
+  awgProfileGenerated: int('awg_profile_generated', { mode: 'boolean' })
+    .notNull()
+    .default(false),
   // does nothing yet
   enabled: int({ mode: 'boolean' }).notNull(),
   // Enable per-client firewall filtering via iptables

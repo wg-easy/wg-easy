@@ -3,6 +3,7 @@ import { eq, sql } from 'drizzle-orm';
 import { userConfig } from './schema';
 import type { UserConfigUpdateType } from './types';
 
+import { assertAwgParameters } from '#server/utils/awgProtocol';
 import { WG_ENV } from '#server/utils/config';
 import { wgInterface } from '#db/schema';
 import type { DBType } from '#db/sqlite';
@@ -57,7 +58,11 @@ export class UserConfigService {
     });
   }
 
-  update(data: Partial<UserConfigUpdateType>) {
+  async update(data: Partial<UserConfigUpdateType>) {
+    const current = await this.#db.query.wgInterface.findFirst({
+      where: eq(wgInterface.name, WG_ENV.WG_INTERFACE),
+    });
+    assertAwgParameters(current?.awgProtocolVersion, data);
     return this.#db
       .update(userConfig)
       .set(data)

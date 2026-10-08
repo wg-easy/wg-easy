@@ -1,3 +1,4 @@
+import { filterAwgParameters } from '#server/utils/awgProtocol';
 import type { ClientType } from '#db/repositories/client/types';
 import type { InterfaceType } from '#db/repositories/interface/types';
 
@@ -7,7 +8,7 @@ import type { InterfaceType } from '#db/repositories/interface/types';
  */
 type AwgParameters = Record<string, string | number | boolean | null>;
 
-type AwgInterface = Pick<
+export type AwgInterface = Pick<
   InterfaceType,
   | 'jC'
   | 'jMin'
@@ -34,7 +35,8 @@ type AwgInterface = Pick<
   | 'maxHandshakeAttempts'
   | 'randomTrailers'
   | 'disableCookies'
->;
+> &
+  Partial<Pick<InterfaceType, 'awgProtocolVersion'>>;
 
 type AwgClient = Pick<
   ClientType,
@@ -84,33 +86,36 @@ export function buildAwgLines(parameters: AwgParameters) {
 export function interfaceAwgParameters(
   wgInterface: AwgInterface
 ): AwgParameters {
-  return {
-    Jc: wgInterface.jC,
-    Jmin: wgInterface.jMin,
-    Jmax: wgInterface.jMax,
-    S1: wgInterface.s1,
-    S2: wgInterface.s2,
-    S3: wgInterface.s3,
-    S4: wgInterface.s4,
-    H1: wgInterface.h1,
-    H2: wgInterface.h2,
-    H3: wgInterface.h3,
-    H4: wgInterface.h4,
-    I1: wgInterface.i1,
-    I2: wgInterface.i2,
-    I3: wgInterface.i3,
-    I4: wgInterface.i4,
-    I5: wgInterface.i5,
-    HeaderProtectionKey: wgInterface.headerProtectionKey,
-    ContentPaddingAddition: wgInterface.contentPaddingAddition,
-    RekeyAfterTime: wgInterface.rekeyAfterTime,
-    RekeyTimeout: wgInterface.rekeyTimeout,
-    RejectAfterTime: wgInterface.rejectAfterTime,
-    KeepaliveTimeout: wgInterface.keepaliveTimeout,
-    MaxHandshakeAttempts: wgInterface.maxHandshakeAttempts,
-    RandomTrailers: wgInterface.randomTrailers,
-    DisableCookies: wgInterface.disableCookies,
-  };
+  return filterAwgParameters(
+    {
+      Jc: wgInterface.jC,
+      Jmin: wgInterface.jMin,
+      Jmax: wgInterface.jMax,
+      S1: wgInterface.s1,
+      S2: wgInterface.s2,
+      S3: wgInterface.s3,
+      S4: wgInterface.s4,
+      H1: wgInterface.h1,
+      H2: wgInterface.h2,
+      H3: wgInterface.h3,
+      H4: wgInterface.h4,
+      I1: wgInterface.i1,
+      I2: wgInterface.i2,
+      I3: wgInterface.i3,
+      I4: wgInterface.i4,
+      I5: wgInterface.i5,
+      HeaderProtectionKey: wgInterface.headerProtectionKey,
+      ContentPaddingAddition: wgInterface.contentPaddingAddition,
+      RekeyAfterTime: wgInterface.rekeyAfterTime,
+      RekeyTimeout: wgInterface.rekeyTimeout,
+      RejectAfterTime: wgInterface.rejectAfterTime,
+      KeepaliveTimeout: wgInterface.keepaliveTimeout,
+      MaxHandshakeAttempts: wgInterface.maxHandshakeAttempts,
+      RandomTrailers: wgInterface.randomTrailers,
+      DisableCookies: wgInterface.disableCookies,
+    },
+    wgInterface.awgProtocolVersion
+  );
 }
 
 /**
@@ -124,31 +129,34 @@ export function clientAwgParameters(
   wgInterface: AwgInterface,
   client: AwgClient
 ): AwgParameters {
-  return {
-    Jc: client.jC,
-    Jmin: client.jMin,
-    Jmax: client.jMax,
-    S1: wgInterface.s1,
-    S2: wgInterface.s2,
-    S3: wgInterface.s3,
-    S4: wgInterface.s4,
-    H1: wgInterface.h1,
-    H2: wgInterface.h2,
-    H3: wgInterface.h3,
-    H4: wgInterface.h4,
-    I1: client.i1,
-    I2: client.i2,
-    I3: client.i3,
-    I4: client.i4,
-    I5: client.i5,
-    HeaderProtectionKey: wgInterface.headerProtectionKey,
-    ContentPaddingAddition: client.contentPaddingAddition,
-    RekeyAfterTime: client.rekeyAfterTime,
-    RekeyTimeout: client.rekeyTimeout,
-    RejectAfterTime: client.rejectAfterTime,
-    KeepaliveTimeout: client.keepaliveTimeout,
-    MaxHandshakeAttempts: client.maxHandshakeAttempts,
-    RandomTrailers: wgInterface.randomTrailers,
-    DisableCookies: client.disableCookies,
-  };
+  return filterAwgParameters(
+    {
+      Jc: client.jC,
+      Jmin: client.jMin,
+      Jmax: client.jMax,
+      S1: wgInterface.s1,
+      S2: wgInterface.s2,
+      S3: wgInterface.s3,
+      S4: wgInterface.s4,
+      H1: wgInterface.h1,
+      H2: wgInterface.h2,
+      H3: wgInterface.h3,
+      H4: wgInterface.h4,
+      I1: client.i1,
+      I2: client.i2,
+      I3: client.i3,
+      I4: client.i4,
+      I5: client.i5,
+      HeaderProtectionKey: wgInterface.headerProtectionKey,
+      ContentPaddingAddition: client.contentPaddingAddition,
+      RekeyAfterTime: client.rekeyAfterTime,
+      RekeyTimeout: client.rekeyTimeout,
+      RejectAfterTime: client.rejectAfterTime,
+      KeepaliveTimeout: client.keepaliveTimeout,
+      MaxHandshakeAttempts: client.maxHandshakeAttempts,
+      RandomTrailers: wgInterface.randomTrailers,
+      DisableCookies: client.disableCookies,
+    },
+    wgInterface.awgProtocolVersion
+  );
 }

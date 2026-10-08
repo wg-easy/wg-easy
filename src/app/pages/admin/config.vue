@@ -107,42 +107,49 @@
         <div class="col-span-full text-sm">{{ $t('awg.rangeNote') }}</div>
 
         <FormNullTextField
+          v-if="globalStore.supportsAwg3"
           id="defaultContentPaddingAddition"
           v-model="data.defaultContentPaddingAddition"
           :label="$t('awg.contentPaddingAdditionLabel')"
           :description="$t('awg.contentPaddingAdditionDescription')"
         />
         <FormNullTextField
+          v-if="globalStore.supportsAwg3"
           id="defaultRekeyAfterTime"
           v-model="data.defaultRekeyAfterTime"
           :label="$t('awg.rekeyAfterTimeLabel')"
           :description="$t('awg.rekeyAfterTimeDescription')"
         />
         <FormNullTextField
+          v-if="globalStore.supportsAwg3"
           id="defaultRekeyTimeout"
           v-model="data.defaultRekeyTimeout"
           :label="$t('awg.rekeyTimeoutLabel')"
           :description="$t('awg.rekeyTimeoutDescription')"
         />
         <FormNullTextField
+          v-if="globalStore.supportsAwg3"
           id="defaultRejectAfterTime"
           v-model="data.defaultRejectAfterTime"
           :label="$t('awg.rejectAfterTimeLabel')"
           :description="$t('awg.rejectAfterTimeDescription')"
         />
         <FormNullTextField
+          v-if="globalStore.supportsAwg3"
           id="defaultKeepaliveTimeout"
           v-model="data.defaultKeepaliveTimeout"
           :label="$t('awg.keepaliveTimeoutLabel')"
           :description="$t('awg.keepaliveTimeoutDescription')"
         />
         <FormNullTextField
+          v-if="globalStore.supportsAwg3"
           id="defaultMaxHandshakeAttempts"
           v-model="data.defaultMaxHandshakeAttempts"
           :label="$t('awg.maxHandshakeAttemptsLabel')"
           :description="$t('awg.maxHandshakeAttemptsDescription')"
         />
         <FormNullSwitchField
+          v-if="globalStore.supportsAwg31"
           id="defaultDisableCookies"
           v-model="data.defaultDisableCookies"
           :label="$t('awg.disableCookiesLabel')"

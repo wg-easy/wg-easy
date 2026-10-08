@@ -1,7 +1,9 @@
 import fs from 'node:fs/promises';
+import { randomInt } from 'node:crypto';
 
 import { createDebug } from 'obug';
 
+import { prepareAwgProfile } from '#server/utils/awgStartup';
 import Database from '#server/utils/Database';
 import { mergeClientStatuses } from '#server/utils/clientStatus';
 import { OLD_ENV, WG_ENV } from '#server/utils/config';
@@ -15,8 +17,7 @@ import type { ClientQueryType } from '#db/repositories/client/types';
 
 const WG_DEBUG = createDebug('WireGuard');
 
-const generateRandomHeaderValue = () =>
-  Math.floor(Math.random() * 2147483642) + 5;
+const generateRandomHeaderValue = () => randomInt(5, 2 ** 31);
 
 class WireGuard {
   /**
@@ -167,7 +168,7 @@ class WireGuard {
   async Startup() {
     WG_DEBUG('Starting WireGuard...');
     // let as it has to refetch if keys change
-    let wgInterface = await Database.interfaces.get();
+    let wgInterface = await prepareAwgProfile(Database, WG_ENV);
 
     // default interface has no keys
     if (

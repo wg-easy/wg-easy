@@ -8,6 +8,11 @@ services:
     #  - PORT=51821
     #  - HOST=0.0.0.0
     #  - INSECURE=false
+    #  AWG profile for a fresh installation (host kernel module required):
+    #  - EXPERIMENTAL_AWG=true
+    #  - OVERRIDE_AUTO_AWG=awg
+    #  - AWG_PROTOCOL_VERSION=latest
+    #  - AWG_AUTO_GENERATE=true
 
     image: ghcr.io/wg-easy/wg-easy:15
     container_name: wg-easy

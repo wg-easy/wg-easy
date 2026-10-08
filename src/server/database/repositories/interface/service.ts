@@ -1,9 +1,21 @@
 import { eq, sql } from 'drizzle-orm';
 import { parseCidr } from 'cidr-tools';
 
-import { wgInterface } from './schema';
-import type { InterfaceCidrUpdateType, InterfaceUpdateType } from './types';
+import { userConfig } from '../userConfig/schema';
+import { UserConfigUpdateSchema } from '../userConfig/types';
 
+import { wgInterface } from './schema';
+import {
+  InterfaceUpdateSchema,
+  type InterfaceCidrUpdateType,
+  type InterfaceUpdateType,
+} from './types';
+
+import {
+  assertAwgParameters,
+  type AwgVersion,
+} from '#server/utils/awgProtocol';
+import type { AwgProfile } from '#server/utils/awgProfile';
 import { WG_ENV } from '#server/utils/config';
 import { nextIPFromUsedAddresses } from '#server/utils/ip';
 import { client as clientSchema } from '#db/schema';
@@ -59,12 +71,82 @@ export class InterfaceService {
     });
   }
 
-  update(data: InterfaceUpdateType) {
+  async update(data: InterfaceUpdateType) {
+    assertAwgParameters((await this.get()).awgProtocolVersion, data);
+    const {
+      awgProtocolVersion: _version,
+      awgProfileGenerated: _generated,
+      ...editable
+    } = data as typeof data & {
+      awgProtocolVersion?: AwgVersion;
+      awgProfileGenerated?: boolean;
+    };
     return this.#db
       .update(wgInterface)
-      .set(data)
+      .set(editable)
       .where(eq(wgInterface.name, WG_ENV.WG_INTERFACE))
       .execute();
+  }
+
+  /** Save profile and client defaults together, before generating VPN keys. */
+  initializeAwgProfile(version: AwgVersion, profile?: AwgProfile) {
+    return this.#db.transaction(async (tx) => {
+      const current = await tx.query.wgInterface.findFirst({
+        where: eq(wgInterface.name, WG_ENV.WG_INTERFACE),
+      });
+      if (!current) throw new Error('Interface not found');
+      if (
+        current.awgProtocolVersion &&
+        current.awgProtocolVersion !== version
+      ) {
+        throw new Error('Changing an existing AWG profile requires migration');
+      }
+      if (profile) {
+        const clients = await tx.query.client.findMany({ limit: 1 });
+        if (
+          current.privateKey !== '---default---' ||
+          current.publicKey !== '---default---' ||
+          clients.length ||
+          current.awgProfileGenerated
+        ) {
+          throw new Error('AWG_AUTO_GENERATE requires a fresh configuration');
+        }
+        const defaults = await tx.query.userConfig.findFirst({
+          where: eq(userConfig.id, WG_ENV.WG_INTERFACE),
+        });
+        if (!defaults) throw new Error('User config not found');
+        assertAwgParameters(version, profile.parameters);
+        InterfaceUpdateSchema.parse({ ...current, ...profile.parameters });
+        // Host is still empty before the setup wizard; it is not changed here.
+        UserConfigUpdateSchema.parse({
+          ...defaults,
+          host: defaults.host || 'localhost',
+          ...profile.defaults,
+        });
+        await tx
+          .update(userConfig)
+          .set(profile.defaults)
+          .where(eq(userConfig.id, WG_ENV.WG_INTERFACE));
+      }
+      if (!profile) {
+        assertAwgParameters(version, current);
+        const defaults = await tx.query.userConfig.findFirst({
+          where: eq(userConfig.id, WG_ENV.WG_INTERFACE),
+        });
+        if (!defaults) throw new Error('User config not found');
+        assertAwgParameters(version, defaults);
+        for (const client of await tx.query.client.findMany())
+          assertAwgParameters(version, client);
+      }
+      await tx
+        .update(wgInterface)
+        .set({
+          ...profile?.parameters,
+          awgProtocolVersion: version,
+          ...(profile ? { awgProfileGenerated: true } : {}),
+        })
+        .where(eq(wgInterface.name, WG_ENV.WG_INTERFACE));
+    });
   }
 
   setFirewallEnabled(firewallEnabled: boolean) {

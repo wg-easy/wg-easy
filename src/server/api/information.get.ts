@@ -18,6 +18,8 @@ export default defineEventHandler(async () => {
     updateAvailable,
     insecure,
     isAwg,
+    awgProtocolVersion: wgInterface.awgProtocolVersion,
+    awgProfileGenerated: wgInterface.awgProfileGenerated,
     firewallEnabled: wgInterface.firewallEnabled,
   };
 });

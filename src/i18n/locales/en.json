@@ -281,6 +281,9 @@
     "copy": "Copy"
   },
   "awg": {
+    "protocolVersion": "AWG protocol: {version}",
+    "unmanagedProfile": "legacy (unmanaged)",
+    "generatedProfile": "This profile was generated at first startup and is saved in the database.",
     "jCLabel": "Junk packet count (Jc)",
     "jCDescription": "Number of junk packets to send (0-128, 0 disables junk packets, recommended: 4-12)",
     "jMinLabel": "Junk packet min size (Jmin)",

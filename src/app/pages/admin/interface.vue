@@ -29,6 +29,18 @@
       </FormGroup>
       <FormGroup v-if="globalStore.information?.isAwg">
         <FormHeading>{{ $t('awg.obfuscationParameters') }}</FormHeading>
+        <p>
+          {{
+            $t('awg.protocolVersion', {
+              version:
+                globalStore.information.awgProtocolVersion ??
+                $t('awg.unmanagedProfile'),
+            })
+          }}
+        </p>
+        <p v-if="globalStore.information.awgProfileGenerated">
+          {{ $t('awg.generatedProfile') }}
+        </p>
 
         <FormNullNumberField
           id="jC"
@@ -130,6 +142,7 @@
           :description="$t('awg.i5Description')"
         />
         <FormNullTextField
+          v-if="globalStore.supportsAwg3"
           id="headerProtectionKey"
           v-model="data.headerProtectionKey"
           :label="$t('awg.headerProtectionKeyLabel')"
@@ -139,48 +152,56 @@
         <div class="col-span-full text-sm">{{ $t('awg.rangeNote') }}</div>
 
         <FormNullTextField
+          v-if="globalStore.supportsAwg3"
           id="contentPaddingAddition"
           v-model="data.contentPaddingAddition"
           :label="$t('awg.contentPaddingAdditionLabel')"
           :description="$t('awg.contentPaddingAdditionDescription')"
         />
         <FormNullTextField
+          v-if="globalStore.supportsAwg3"
           id="rekeyAfterTime"
           v-model="data.rekeyAfterTime"
           :label="$t('awg.rekeyAfterTimeLabel')"
           :description="$t('awg.rekeyAfterTimeDescription')"
         />
         <FormNullTextField
+          v-if="globalStore.supportsAwg3"
           id="rekeyTimeout"
           v-model="data.rekeyTimeout"
           :label="$t('awg.rekeyTimeoutLabel')"
           :description="$t('awg.rekeyTimeoutDescription')"
         />
         <FormNullTextField
+          v-if="globalStore.supportsAwg3"
           id="rejectAfterTime"
           v-model="data.rejectAfterTime"
           :label="$t('awg.rejectAfterTimeLabel')"
           :description="$t('awg.rejectAfterTimeDescription')"
         />
         <FormNullTextField
+          v-if="globalStore.supportsAwg3"
           id="keepaliveTimeout"
           v-model="data.keepaliveTimeout"
           :label="$t('awg.keepaliveTimeoutLabel')"
           :description="$t('awg.keepaliveTimeoutDescription')"
         />
         <FormNullTextField
+          v-if="globalStore.supportsAwg3"
           id="maxHandshakeAttempts"
           v-model="data.maxHandshakeAttempts"
           :label="$t('awg.maxHandshakeAttemptsLabel')"
           :description="$t('awg.maxHandshakeAttemptsDescription')"
         />
         <FormNullSwitchField
+          v-if="globalStore.supportsAwg31"
           id="randomTrailers"
           v-model="data.randomTrailers"
           :label="$t('awg.randomTrailersLabel')"
           :description="$t('awg.randomTrailersDescription')"
         />
         <FormNullSwitchField
+          v-if="globalStore.supportsAwg31"
           id="disableCookies"
           v-model="data.disableCookies"
           :label="$t('awg.disableCookiesLabel')"

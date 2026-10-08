@@ -29,11 +29,33 @@ Possible values:
 - `awg` — Force use of AmneziaWG
 - `wg` — Force use of standard WireGuard
 
+### Protocol Version and Automatic Generation
+
+For a fresh installation using the kernel module already installed on the host:
+
+```yaml
+environment:
+    EXPERIMENTAL_AWG: 'true'
+    OVERRIDE_AUTO_AWG: 'awg'
+    AWG_PROTOCOL_VERSION: 'latest'
+    AWG_AUTO_GENERATE: 'true'
+```
+
+`AWG_PROTOCOL_VERSION` accepts `2` / `2.0`, `3` / `3.0`, `3.1`, or `latest`. When unset, it defaults to `latest`: a new profile selects the highest supported version from 3.1, 3.0 and 2.0. This checks both the container's `awg` tools and the host kernel module by applying parameters to a temporary interface and verifying their readback. The temporary interface receives no addresses, is never brought up, and is removed after the check. No module installation or upgrade is performed. The container needs `NET_ADMIN` and `iproute2`, which is included in the images.
+
+The selected version is saved in the database. Restarts keep that version, including when `latest` is specified or the module is upgraded. An explicit unsupported version fails startup; it does not fall back. An explicit change to the saved version also fails: changing protocol versions requires migrating server settings and redistributing client configurations. The active version is shown in **Admin → Interface**; forms and exports include only parameters supported by that version. Clients must support the selected version too.
+
+`AWG_AUTO_GENERATE=true` generates a profile only before the initial VPN keys have been created and while there are no clients. It saves the profile and matching client defaults in one database transaction. Headers and the header protection key use cryptographic randomness. Jc/Jmin/Jmax and S1-S4 are generated; 3.0 and 3.1 also enable header protection, content padding and timing ranges. In 3.1, `RandomTrailers` is enabled and `DisableCookies` is explicitly disabled. I1-I5 remain unset because protocol signatures need to be chosen separately. These are starting settings, not a guarantee against a particular DPI system.
+
+Generation is opt-in (`false` by default). The saved profile is reused after restarts even if `AWG_AUTO_GENERATE=true` remains set. Keep `/etc/wireguard` on a persistent volume. Existing configurations without version metadata keep their current behavior when both new variables are unset. Setting a version on an existing installation validates all saved server, default and client parameters before saving the version; incompatible settings cause an error. Enabling generation on an existing configuration causes an error without replacing its parameters. Migrate existing installations manually; changing client defaults alone does not update existing clients.
+
+If the backend resolves to standard WireGuard, explicit version selection or automatic generation fails with an error asking you to enable AWG.
+
 ## AmneziaWG Parameters
 
 Parameter descriptions can be found in the [AmneziaWG documentation](https://docs.amnezia.org/documentation/amnezia-wg) and on the [kernel module page](https://github.com/amnezia-vpn/amneziawg-linux-kernel-module).
 
-H1-H4 are generated at the first AWG startup. Jc, Jmin, Jmax, S1 and S2 have initial defaults; the remaining parameters are unset until configured. For information on how to set I1-I5 parameters, refer to the [AmneziaWG documentation](https://docs.amnezia.org/documentation/instructions/new-amneziawg-selfhosted/#how-to-extract-a-protocol-signature-for-amneziawg-15-manually).
+H1-H4 are generated at the first AWG startup. Without automatic profile generation, Jc, Jmin, Jmax, S1 and S2 have initial defaults; the remaining parameters are unset until configured. For information on how to set I1-I5 parameters, refer to the [AmneziaWG documentation](https://docs.amnezia.org/documentation/instructions/new-amneziawg-selfhosted/#how-to-extract-a-protocol-signature-for-amneziawg-15-manually).
 
 If a parameter is not set, it will not be added to the configuration. If all AmneziaWG-specific parameters are absent, AmneziaWG will be fully compatible with standard WireGuard.
 

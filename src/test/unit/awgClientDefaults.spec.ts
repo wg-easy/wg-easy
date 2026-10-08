@@ -400,6 +400,8 @@ describe('AWG client defaults', () => {
       }
       const migratedClients = new ClientService(previousDb);
       const migratedInterface = await new InterfaceService(previousDb).get();
+      expect(migratedInterface.awgProtocolVersion).toBeNull();
+      expect(migratedInterface.awgProfileGenerated).toBe(false);
       if (!before) throw new Error('Existing client was not found');
       const after = await migratedClients.get(before.id);
       if (!after) throw new Error('Existing client was lost');

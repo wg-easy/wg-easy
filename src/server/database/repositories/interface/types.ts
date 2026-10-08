@@ -33,6 +33,8 @@ export type InterfaceCreateType = Omit<
 
 export type InterfaceUpdateType = Omit<
   InterfaceCreateType,
+  | 'awgProtocolVersion'
+  | 'awgProfileGenerated'
   | 'name'
   | 'createdAt'
   | 'updatedAt'

@@ -9,6 +9,7 @@ import type {
   UpdateClientType,
 } from './types';
 
+import { assertAwgParameters } from '#server/utils/awgProtocol';
 import { WG_ENV } from '#server/utils/config';
 import Database from '#server/utils/Database';
 import { nextIP } from '#server/utils/ip';
@@ -262,6 +263,8 @@ export class ClientService {
       if (!clientInterface) {
         throw new Error('WireGuard interface not found');
       }
+
+      assertAwgParameters(clientInterface.awgProtocolVersion, data);
 
       if (!containsCidr(clientInterface.ipv4Cidr, data.ipv4Address)) {
         throw new Error('IPv4 address is not within the CIDR range');

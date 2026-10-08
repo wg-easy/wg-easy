@@ -3,7 +3,13 @@ import { beforeEach, describe, expect, test, vi } from 'vitest';
 import WireGuard from '#server/utils/WireGuard';
 
 const mocks = vi.hoisted(() => ({
-  env: { WG_EXECUTABLE: 'awg', DISABLE_IPV6: false },
+  env: {
+    WG_EXECUTABLE: 'awg',
+    DISABLE_IPV6: false,
+    AWG_PROTOCOL_VERSION: 'latest',
+    AWG_PROTOCOL_VERSION_SET: false,
+    AWG_AUTO_GENERATE: false,
+  },
   getInterface: vi.fn(),
   updateInterface: vi.fn(),
   writeFile: vi.fn(),
@@ -40,6 +46,9 @@ describe('AWG header initialization at startup', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.env.WG_EXECUTABLE = 'awg';
+    mocks.env.AWG_PROTOCOL_VERSION = 'latest';
+    mocks.env.AWG_PROTOCOL_VERSION_SET = false;
+    mocks.env.AWG_AUTO_GENERATE = false;
     mocks.getInterface.mockResolvedValue({
       name: 'wg0',
       privateKey: 'existing-private-key',
@@ -53,6 +62,22 @@ describe('AWG header initialization at startup', () => {
     mocks.updateInterface.mockResolvedValue(undefined);
     mocks.up.mockResolvedValue(undefined);
     mocks.writeFile.mockResolvedValue(undefined);
+  });
+
+  test('a protocol version change fails before writing configuration or starting the interface', async () => {
+    mocks.env.AWG_PROTOCOL_VERSION = '2.0';
+    mocks.env.AWG_PROTOCOL_VERSION_SET = true;
+    mocks.getInterface.mockResolvedValue({
+      name: 'wg0',
+      privateKey: 'existing',
+      publicKey: 'existing',
+      awgProtocolVersion: '3.1',
+      awgProfileGenerated: true,
+    });
+    await expect(WireGuard.Startup()).rejects.toThrow('requires migration');
+    expect(mocks.updateInterface).not.toHaveBeenCalled();
+    expect(mocks.writeFile).not.toHaveBeenCalled();
+    expect(mocks.up).not.toHaveBeenCalled();
   });
 
   test('waits for headers to be saved before writing or starting the interface', async () => {
