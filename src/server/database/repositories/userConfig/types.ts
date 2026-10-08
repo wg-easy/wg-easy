@@ -5,6 +5,7 @@ import type { userConfig } from './schema';
 
 import {
   AllowedIpsSchema,
+  AwgRangeSchema,
   DnsSchema,
   ISchema,
   JcSchema,
@@ -52,6 +53,13 @@ export const UserConfigUpdateSchema = schemaForType<UserConfigUpdateType>()(
       defaultI3: ISchema,
       defaultI4: ISchema,
       defaultI5: ISchema,
+      defaultContentPaddingAddition: AwgRangeSchema,
+      defaultRekeyAfterTime: AwgRangeSchema,
+      defaultRekeyTimeout: AwgRangeSchema,
+      defaultRejectAfterTime: AwgRangeSchema,
+      defaultKeepaliveTimeout: AwgRangeSchema,
+      defaultMaxHandshakeAttempts: AwgRangeSchema,
+      defaultDisableCookies: z.boolean().nullable(),
       host: host,
     })
     .superRefine((data, ctx) => {

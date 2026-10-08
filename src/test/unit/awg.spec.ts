@@ -346,6 +346,13 @@ describe('client junk packet settings', () => {
       defaultI3: null,
       defaultI4: null,
       defaultI5: null,
+      defaultContentPaddingAddition: null,
+      defaultRekeyAfterTime: null,
+      defaultRekeyTimeout: null,
+      defaultRejectAfterTime: null,
+      defaultKeepaliveTimeout: null,
+      defaultMaxHandshakeAttempts: null,
+      defaultDisableCookies: null,
     };
     expect(() => UserConfigUpdateSchema.parse(defaults)).not.toThrow();
     const result = UserConfigUpdateSchema.safeParse({

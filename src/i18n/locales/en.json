@@ -333,6 +333,7 @@
     "disableCookiesLabel": "Disable cookies",
     "disableCookiesDescription": "Do not answer handshakes with cookie messages when under load. Only affects this side of the tunnel",
     "mtuNote": "Values depend on the MTU",
-    "obfuscationParameters": "AmneziaWG Obfuscation Parameters"
+    "obfuscationParameters": "AmneziaWG Obfuscation Parameters",
+    "clientDefaultsNote": "These values are copied to new clients. Changing them does not update existing clients; edit those clients individually."
   }
 }
