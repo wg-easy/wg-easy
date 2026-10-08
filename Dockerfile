@@ -38,7 +38,8 @@ RUN npm install --no-save --omit=dev libsql
 FROM docker.io/library/node:krypton-alpine@sha256:ebfe2f90462722a7a4de65e91990e97fe0d401c70e0e762c5b53302f905ec1c1
 WORKDIR /app
 
-HEALTHCHECK --interval=1m --timeout=5s --retries=3 CMD /usr/bin/timeout 5s /bin/sh -c "/usr/bin/wg show | /bin/grep -q interface || exit 1"
+COPY --chmod=755 scripts/healthcheck.sh /usr/local/bin/healthcheck
+HEALTHCHECK --interval=1m --timeout=5s --retries=3 CMD /usr/bin/timeout 5s /usr/local/bin/healthcheck
 
 # Copy build
 COPY --from=build /app/.output /app
