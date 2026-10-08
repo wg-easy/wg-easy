@@ -70,7 +70,13 @@ export function assertAwgParameters(
     if (value === null || value === undefined || value === '') continue;
     const name = field.replace(/^default/, '');
     const key = name.charAt(0).toUpperCase() + name.slice(1);
-    if (!supportsAwgParameter(version, key)) {
+    if (
+      !supportsAwgParameter(version, key) ||
+      (key === 'PersistentKeepalive' &&
+        typeof value === 'string' &&
+        value.includes('-') &&
+        version === '2.0')
+    ) {
       throw createError({
         statusCode: 400,
         message: `${key} is not supported by the saved AWG ${version} profile`,

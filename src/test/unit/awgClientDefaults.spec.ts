@@ -172,6 +172,95 @@ async function create(name = 'Client') {
   return created.clientId;
 }
 
+describe('AWG PersistentKeepalive ranges', () => {
+  test.each(['3.0', '3.1'] as const)(
+    'copies and exports ranges with AWG %s and preserves them on restart',
+    async (version) => {
+      // The baseline fixture enables 3.1 trailers; clear them for a 3.0 profile.
+      if (version === '3.0')
+        await db.update(schema.wgInterface).set({ randomTrailers: null });
+      await interfaces.initializeAwgProfile(version);
+      await setDefaults({ defaultPersistentKeepalive: '20-30' });
+      const clientId = await create();
+      expect((await clients.get(clientId))!.persistentKeepalive).toBe('20-30');
+      const config = await WireGuard.getClientConfiguration({ clientId });
+      expect(config).toContain('PersistentKeepalive = 20-30');
+      await WireGuard.getClientQRCodeSVG({ clientId });
+      expect(encodeQRCode).toHaveBeenLastCalledWith(config);
+      await migrate(db, { migrationsFolder });
+      const reloaded = await new UserConfigService(db).get();
+      expect(reloaded.defaultPersistentKeepalive).toBe('20-30');
+      // A default change affects new clients; it does not modify existing clients.
+      await setDefaults({ defaultPersistentKeepalive: 25 });
+      expect((await clients.get(clientId))!.persistentKeepalive).toBe('20-30');
+      const freshId = await create('Another client');
+      expect((await clients.get(freshId))!.persistentKeepalive).toBe(25);
+      const existing = (await clients.get(clientId))!;
+      await clients.update(
+        clientId,
+        ClientUpdateSchema.parse({
+          ...existing,
+          persistentKeepalive: '030-040',
+        })
+      );
+      expect((await clients.get(clientId))!.persistentKeepalive).toBe('30-40');
+    }
+  );
+
+  test('imported clients receive keepalive ranges from defaults', async () => {
+    await interfaces.initializeAwgProfile('3.1');
+    await setDefaults({ defaultPersistentKeepalive: '20-30' });
+    await clients.createFromExisting({
+      name: 'Imported',
+      enabled: true,
+      ipv4Address: '10.8.0.2',
+      ipv6Address: 'fdcc:ad94:bacf:61a4::cafe:2',
+      privateKey: KEY,
+      publicKey: KEY,
+      preSharedKey: KEY,
+    });
+    expect((await clients.getAll())[0]!.persistentKeepalive).toBe('20-30');
+  });
+
+  test('unmanaged AWG profiles cannot save ranges', async () => {
+    await expect(
+      setDefaults({ defaultPersistentKeepalive: '20-30' })
+    ).rejects.toThrow('saved AWG');
+    const clientId = await create();
+    const saved = (await clients.get(clientId))!;
+    await expect(
+      clients.update(
+        clientId,
+        ClientUpdateSchema.parse({ ...saved, persistentKeepalive: '20-30' })
+      )
+    ).rejects.toThrow('saved AWG');
+  });
+
+  test('WireGuard mode rejects ranges even if a 3.1 profile is saved', async () => {
+    await interfaces.initializeAwgProfile('3.1');
+    mocks.env.WG_EXECUTABLE = 'wg';
+    await expect(
+      setDefaults({ defaultPersistentKeepalive: '20-30' })
+    ).rejects.toThrow('saved AWG');
+    // Also reject stale range defaults when creating or importing clients.
+    await db
+      .update(schema.userConfig)
+      .set({ defaultPersistentKeepalive: '20-30' });
+    await expect(create()).rejects.toThrow('saved AWG');
+    await expect(
+      clients.createFromExisting({
+        name: 'Imported',
+        enabled: true,
+        ipv4Address: '10.8.0.2',
+        ipv6Address: 'fdcc:ad94:bacf:61a4::cafe:2',
+        privateKey: KEY,
+        publicKey: KEY,
+        preSharedKey: KEY,
+      })
+    ).rejects.toThrow('saved AWG');
+  });
+});
+
 describe('AWG client defaults', () => {
   test('leaves the new defaults and client parameters unset on a fresh database', async () => {
     const settings = await defaults.get();
@@ -326,14 +415,23 @@ describe('AWG client defaults', () => {
     vi.doUnmock('#server/utils/wgHelper');
     vi.resetModules();
     const { wg: plainWg } = await import('#server/utils/wgHelper');
+    const savedInterface = await interfaces.get();
+    const savedDefaults = await defaults.get();
     const config = plainWg.generateClientConfig(
-      await interfaces.get(),
-      await defaults.get(),
+      savedInterface,
+      savedDefaults,
       saved
     );
     expect(config).not.toMatch(
       /^(Jc|S1|H1|HeaderProtectionKey|ContentPaddingAddition|RekeyAfterTime|RandomTrailers|DisableCookies) =/m
     );
+    expect(() =>
+      plainWg.generateClientConfig(
+        { ...savedInterface, awgProtocolVersion: '3.1' },
+        savedDefaults,
+        { ...saved, persistentKeepalive: '20-30' }
+      )
+    ).toThrow('saved AWG');
   });
 
   test('server settings do not become client defaults', async () => {

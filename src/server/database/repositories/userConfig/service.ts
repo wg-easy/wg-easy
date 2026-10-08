@@ -3,6 +3,7 @@ import { eq, sql } from 'drizzle-orm';
 import { userConfig } from './schema';
 import type { UserConfigUpdateType } from './types';
 
+import { assertPersistentKeepalive } from '#server/utils/persistentKeepalive';
 import { assertAwgParameters } from '#server/utils/awgProtocol';
 import { WG_ENV } from '#server/utils/config';
 import { wgInterface } from '#db/schema';
@@ -63,6 +64,11 @@ export class UserConfigService {
       where: eq(wgInterface.name, WG_ENV.WG_INTERFACE),
     });
     assertAwgParameters(current?.awgProtocolVersion, data);
+    assertPersistentKeepalive(
+      data.defaultPersistentKeepalive,
+      WG_ENV.WG_EXECUTABLE,
+      current?.awgProtocolVersion
+    );
     return this.#db
       .update(userConfig)
       .set(data)

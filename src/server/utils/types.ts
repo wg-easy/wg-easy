@@ -187,10 +187,19 @@ export const RoutingTableSchema = z
     message: t('zod.interface.routingTable'),
   });
 
-export const PersistentKeepaliveSchema = z
-  .number({ message: t('zod.persistentKeepalive') })
-  .min(0, t('zod.persistentKeepalive'))
-  .max(65535, t('zod.persistentKeepalive'));
+export const PersistentKeepaliveSchema = z.union(
+  [
+    z
+      .number({ message: t('zod.persistentKeepalive') })
+      .int()
+      .min(0)
+      .max(65535),
+    rangeSchema(0, 65535)
+      .unwrap()
+      .transform((value) => (value.includes('-') ? value : Number(value))),
+  ],
+  { message: t('zod.persistentKeepalive') }
+);
 
 export const AddressSchema = z
   .string({ message: t('zod.address') })

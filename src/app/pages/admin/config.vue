@@ -40,11 +40,16 @@
           :label="$t('general.mtu')"
           :description="$t('admin.config.mtuDesc')"
         />
-        <FormNumberField
+        <FormKeepaliveField
           id="defaultPersistentKeepalive"
           v-model="data.defaultPersistentKeepalive"
           :label="$t('general.persistentKeepalive')"
-          :description="$t('admin.config.persistentKeepaliveDesc')"
+          :allow-range="Boolean(globalStore.supportsKeepaliveRanges)"
+          :description="
+            globalStore.supportsKeepaliveRanges
+              ? $t('awg.persistentKeepaliveRangeDescription')
+              : $t('admin.config.persistentKeepaliveDesc')
+          "
         />
       </FormGroup>
       <FormGroup v-if="globalStore.information?.isAwg">

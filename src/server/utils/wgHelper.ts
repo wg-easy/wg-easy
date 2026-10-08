@@ -1,6 +1,7 @@
 import { parseCidr } from 'cidr-tools';
 import { stringifyIp } from 'ip-bigint';
 
+import { assertPersistentKeepalive } from '#server/utils/persistentKeepalive';
 import {
   buildAwgLines,
   clientAwgParameters,
@@ -93,6 +94,11 @@ PostDown = ${iptablesTemplate(hooks.postDown, wgInterface)}`;
     options: Options = {}
   ) => {
     const { enableIpv6 = true } = options;
+    assertPersistentKeepalive(
+      client.persistentKeepalive,
+      wgExecutable,
+      wgInterface.awgProtocolVersion
+    );
 
     const address =
       `${client.ipv4Address}/32` +

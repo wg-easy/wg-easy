@@ -97,6 +97,14 @@ Changing defaults does not change existing clients or their exported profiles. L
 
 `HeaderProtectionKey`, S1-S4, H1-H4 and `RandomTrailers` are configured in **Admin → Interface** and copied from the interface whenever a client configuration is exported. Server padding and timing settings affect the server itself; they do not act as client defaults. Downloads and QR codes contain the same client configuration.
 
+### PersistentKeepalive Ranges
+
+For saved AWG 3.0 and 3.1 profiles, **Admin → Config** and the client settings accept either a single keepalive interval such as `25`, or an inclusive range such as `20-30`. Values are seconds, both bounds must be between 0 and 65535, and the lower bound must not exceed the upper bound. `0` disables keepalive; a range containing zero can select a zero-second interval, so use positive bounds for periodic keepalive.
+
+The AWG implementation selects a random interval when scheduling the keepalive timer. Downloads and QR codes retain the range in the `[Peer]` section as `PersistentKeepalive = 20-30`. This controls the client's timer; it is separate from the interface's `KeepaliveTimeout` parameter. The client application must support AWG 3.0/3.1 keepalive ranges.
+
+Standard WireGuard, AWG 2.0, and unmanaged profiles accept single intervals only. Old kernel modules can silently collapse ranges to their lower bound, so startup capability detection verifies range readback on a temporary peer for managed 3.x profiles. Existing numeric settings are preserved during the database upgrade. Defaults apply to newly created or imported clients; changing a default does not change existing clients. Automatic profile generation continues to leave persistent keepalive at its existing default.
+
 ## Client Applications
 
 To be able to connect to wg-easy if AmneziaWG is enabled, you must have an AmneziaWG-compatible client. Where an AmneziaWG app is available for your platform, it is recommended to use it rather than Amnezia VPN.

@@ -9,6 +9,7 @@ import type {
   UpdateClientType,
 } from './types';
 
+import { assertPersistentKeepalive } from '#server/utils/persistentKeepalive';
 import { assertAwgParameters } from '#server/utils/awgProtocol';
 import { WG_ENV } from '#server/utils/config';
 import Database from '#server/utils/Database';
@@ -201,6 +202,12 @@ export class ClientService {
         throw new Error('WireGuard interface configuration not found');
       }
 
+      assertPersistentKeepalive(
+        clientConfig.defaultPersistentKeepalive,
+        WG_ENV.WG_EXECUTABLE,
+        clientInterface.awgProtocolVersion
+      );
+
       const ipv4Cidr = parseCidr(clientInterface.ipv4Cidr);
       const ipv4Address = nextIP(4, ipv4Cidr, clients);
       const ipv6Cidr = parseCidr(clientInterface.ipv6Cidr);
@@ -265,6 +272,11 @@ export class ClientService {
       }
 
       assertAwgParameters(clientInterface.awgProtocolVersion, data);
+      assertPersistentKeepalive(
+        data.persistentKeepalive,
+        WG_ENV.WG_EXECUTABLE,
+        clientInterface.awgProtocolVersion
+      );
 
       if (!containsCidr(clientInterface.ipv4Cidr, data.ipv4Address)) {
         throw new Error('IPv4 address is not within the CIDR range');
@@ -288,6 +300,14 @@ export class ClientService {
     publicKey,
   }: ClientCreateFromExistingType) {
     const clientConfig = await Database.userConfigs.get();
+    const current = await this.#db.query.wgInterface.findFirst({
+      where: eq(wgInterface.name, WG_ENV.WG_INTERFACE),
+    });
+    assertPersistentKeepalive(
+      clientConfig.defaultPersistentKeepalive,
+      WG_ENV.WG_EXECUTABLE,
+      current?.awgProtocolVersion
+    );
 
     return this.#db
       .insert(client)

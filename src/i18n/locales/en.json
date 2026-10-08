@@ -281,6 +281,7 @@
     "copy": "Copy"
   },
   "awg": {
+    "persistentKeepaliveRangeDescription": "Keepalive interval in seconds: one number or an inclusive range (e.g. 20-30), between 0 and 65535. 0 disables keepalive. Ranges require AWG 3.0/3.1 on the client.",
     "protocolVersion": "AWG protocol: {version}",
     "unmanagedProfile": "legacy (unmanaged)",
     "generatedProfile": "This profile was generated at first startup and is saved in the database.",

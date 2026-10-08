@@ -267,6 +267,27 @@ describe('persisted AWG startup profiles', () => {
       })
     ).rejects.toThrow('DisableCookies');
   });
+  test('AWG 2.0 rejects range defaults and client updates without changing them', async () => {
+    detect.mockResolvedValue('2.0');
+    await prepareAwgProfile(services, settings, detect);
+    await expect(
+      services.userConfigs.update({ defaultPersistentKeepalive: '20-30' })
+    ).rejects.toThrow('PersistentKeepalive');
+    const created = await services.clients.create({
+      name: 'Test',
+      expiresAt: null,
+    });
+    const clientId = created[0]!.clientId;
+    const client = (await services.clients.get(clientId))!;
+    await expect(
+      services.clients.update(
+        clientId,
+        ClientUpdateSchema.parse({ ...client, persistentKeepalive: '20-30' })
+      )
+    ).rejects.toThrow('PersistentKeepalive');
+    expect((await services.clients.get(clientId))!.persistentKeepalive).toBe(0);
+  });
+
   test('generation validates profile data before writing either table', async () => {
     const invalid = generateAwgProfile('3.1');
     invalid.parameters.s1 = 0;

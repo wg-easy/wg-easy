@@ -15,6 +15,13 @@ export const useGlobalStore = defineStore('Global', () => {
       information.value.awgProtocolVersion === '3.1'
   );
 
+  const supportsKeepaliveRanges = computed(
+    () =>
+      information.value?.isAwg &&
+      (information.value.awgProtocolVersion === '3.0' ||
+        information.value.awgProtocolVersion === '3.1')
+  );
+
   const sortClient = ref<'asc' | 'desc'>('asc');
 
   const uiShowCharts = useCookie<boolean>('uiShowCharts', {
@@ -34,6 +41,7 @@ export const useGlobalStore = defineStore('Global', () => {
   return {
     sortClient,
     supportsAwg3,
+    supportsKeepaliveRanges,
     supportsAwg31,
     information,
     refreshInformation,

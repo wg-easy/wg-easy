@@ -91,7 +91,12 @@ describe('AWG version constraints', () => {
 /** Models an old module silently ignoring newer attributes. No host interfaces. */
 function simulatedModule(
   supported: AwgVersion,
-  options?: { setError?: boolean; addError?: boolean; deleteError?: boolean }
+  options?: {
+    setError?: boolean;
+    addError?: boolean;
+    deleteError?: boolean;
+    collapseKeepalive?: boolean;
+  }
 ) {
   const files: string[] = [];
   const names = new Set<string>();
@@ -128,7 +133,12 @@ function simulatedModule(
         .join('\n');
       return '';
     }
-    return configuration;
+    return options?.collapseKeepalive
+      ? configuration.replace(
+          'PersistentKeepalive = 20-30',
+          'PersistentKeepalive = 20'
+        )
+      : configuration;
   });
   return { run, files, names };
 }
@@ -172,6 +182,14 @@ describe('AWG tools and kernel capability detection', () => {
       'NET_ADMIN'
     );
     expect(mock.run).toHaveBeenCalledOnce();
+  });
+  test('rejects a module that collapses keepalive ranges to a scalar', async () => {
+    const mock = simulatedModule('3.1', { collapseKeepalive: true });
+    await expect(detectAwgVersion('3.1', mock.run)).rejects.toThrow(
+      'not supported'
+    );
+    expect(mock.names.size).toBe(0);
+    await expect(access(mock.files[0]!)).rejects.toThrow();
   });
   test('cleanup failure stops detection', async () => {
     const mock = simulatedModule('3.1', { deleteError: true });

@@ -1,6 +1,7 @@
 import { sql, relations } from 'drizzle-orm';
 import { int, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core';
 
+import { keepaliveColumn } from '../../keepaliveColumn';
 import { wgInterface } from '../interface/schema';
 import { oneTimeLink } from '../oneTimeLink/schema';
 import { user } from '../user/schema';
@@ -42,7 +43,9 @@ export const client = sqliteTable(
     firewallIps: text('firewall_ips', { mode: 'json' }).$type<
       string[] | null
     >(),
-    persistentKeepalive: int('persistent_keepalive').notNull(),
+    persistentKeepalive: keepaliveColumn('persistent_keepalive')
+      .notNull()
+      .default(0),
     mtu: int().notNull(),
     jC: int('j_c'),
     jMin: int('j_min'),

@@ -52,9 +52,21 @@ async function probeVersion(version: AwgVersion, run: AwgCommand) {
     // Test the enabled state: an older module could silently ignore a false flag.
     if (version === '3.1') parameters.DisableCookies = true;
     const lines = buildAwgLines(parameters);
-    await writeFile(file, `[Interface]\n${lines.join('\n')}\n`, {
-      mode: 0o600,
-    });
+    const peerLines =
+      version === '2.0'
+        ? []
+        : [
+            '[Peer]',
+            `PublicKey = ${randomBytes(32).toString('base64')}`,
+            'PersistentKeepalive = 20-30',
+          ];
+    await writeFile(
+      file,
+      `[Interface]\n${[...lines, ...peerLines].join('\n')}\n`,
+      {
+        mode: 0o600,
+      }
+    );
     try {
       await run('awg', ['setconf', name, file]);
       const readback = await run('awg', ['showconf', name]);
@@ -67,7 +79,9 @@ async function probeVersion(version: AwgVersion, run: AwgCommand) {
           ];
         })
       );
-      return lines.every((line) => {
+      const expected =
+        version === '2.0' ? lines : [...lines, 'PersistentKeepalive = 20-30'];
+      return expected.every((line) => {
         const [key, value] = line.split(' = ');
         return values.get(key!) === value;
       });
