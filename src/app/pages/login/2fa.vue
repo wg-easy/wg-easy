@@ -1,7 +1,11 @@
 <template>
   <div>
     <form class="flex flex-col gap-5" @submit.prevent="submit">
+      <label for="login-totp" class="-mb-3 text-xs font-medium text-muted">{{
+        $t('general.2faCode')
+      }}</label>
       <BaseInput
+        id="login-totp"
         v-model="totp"
         type="text"
         name="totp"
@@ -14,7 +18,7 @@
       />
 
       <button
-        class="rounded bg-red-800 py-2 text-sm text-white shadow transition hover:bg-red-700 disabled:cursor-not-allowed disabled:bg-gray-200 dark:bg-red-800 dark:text-white dark:hover:bg-red-700 disabled:dark:bg-neutral-800"
+        class="ui-button ui-button-primary w-full"
         :disabled="!totp || authenticating"
       >
         <IconsLoading v-if="authenticating" class="mx-auto w-5 animate-spin" />
@@ -23,7 +27,7 @@
 
       <button
         type="button"
-        class="rounded border-2 border-gray-100 py-2 text-sm text-gray-700 transition hover:border-red-800 hover:bg-red-800 hover:text-white dark:border-neutral-600 dark:text-neutral-200"
+        class="ui-button ui-button-secondary w-full"
         @click="cancel"
       >
         {{ $t('dialog.cancel') }}

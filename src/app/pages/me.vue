@@ -1,12 +1,12 @@
 <template>
-  <main>
-    <Panel>
+  <main class="page-container max-w-3xl">
+    <div>
       <PanelHead>
         <PanelHeadTitle>
           {{ $t('pages.me') }}
         </PanelHeadTitle>
       </PanelHead>
-      <PanelBody class="dark:text-neutral-200">
+      <PanelBody>
         <FormElement @submit.prevent="submit">
           <FormGroup>
             <FormHeading>{{ $t('form.sectionGeneral') }}</FormHeading>
@@ -68,11 +68,15 @@
               v-else-if="!authStore.userData?.totpVerified && twofa"
               class="col-span-2"
             >
-              <p class="text-sm text-gray-500 dark:text-gray-400">
+              <p class="text-sm text-subtle">
                 {{ $t('me.enable2faDesc') }}
               </p>
               <div class="mt-2 flex flex-col gap-2">
-                <img :src="twofa.qrcode" size="128" class="bg-white" />
+                <img
+                  :src="twofa.qrcode"
+                  :alt="$t('me.enable2fa')"
+                  class="size-48 rounded-lg bg-white p-2"
+                />
                 <FormTextField
                   id="2fakey"
                   :model-value="twofa.key"
@@ -80,7 +84,7 @@
                   :label="$t('me.2faKey')"
                   :disabled="true"
                 />
-                <p class="text-sm text-gray-500 dark:text-gray-400">
+                <p class="text-sm text-subtle">
                   {{ $t('me.2faCodeDesc') }}
                 </p>
                 <FormTextField
@@ -98,7 +102,7 @@
               v-else-if="authStore.userData?.totpVerified"
               class="col-span-2 flex flex-col gap-2"
             >
-              <p class="text-sm text-gray-500 dark:text-gray-400">
+              <p class="text-sm text-subtle">
                 {{ $t('me.disable2faDesc') }}
               </p>
               <FormPasswordField
@@ -174,7 +178,7 @@
           </FormGroup>
         </FormElement>
       </PanelBody>
-    </Panel>
+    </div>
   </main>
 </template>
 

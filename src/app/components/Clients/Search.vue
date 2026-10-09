@@ -1,31 +1,36 @@
 <template>
   <div class="relative">
-    <div class="relative flex h-full items-center">
-      <IconsMagnifyingGlass
-        class="absolute left-2.5 h-4 w-4 text-gray-400 dark:text-neutral-500"
-      />
-      <input
-        v-model="searchQuery"
-        type="text"
-        :placeholder="$t('client.search')"
-        class="w-full rounded bg-white px-8 py-2 text-sm text-gray-900 shadow-sm ring-1 ring-gray-300 transition-all placeholder:text-gray-400 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-red-600 dark:bg-neutral-800 dark:text-white dark:ring-neutral-700 dark:placeholder:text-neutral-500 dark:focus:ring-red-700"
-        @input="updateSearch"
-      />
-      <button
-        v-if="searchQuery"
-        class="absolute right-2 flex h-5 w-5 items-center justify-center rounded-full bg-gray-200 text-gray-600 hover:bg-gray-300 hover:text-gray-800 dark:bg-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-600 dark:hover:text-neutral-100"
-        aria-label="Clear search"
-        @click="clearSearch"
-      >
-        <IconsClose class="h-3 w-3" />
-      </button>
-    </div>
+    <IconsMagnifyingGlass
+      class="pointer-events-none absolute top-3.5 left-3.5 size-4 text-subtle"
+    />
+    <input
+      v-model="searchQuery"
+      type="search"
+      :placeholder="$t('client.search')"
+      :aria-label="$t('client.search')"
+      class="ui-input h-11 bg-surface pr-10 pl-10 [&::-webkit-search-cancel-button]:appearance-none"
+      @input="updateSearch"
+    />
+    <button
+      v-if="searchQuery"
+      class="absolute top-2 right-2 grid size-7 place-items-center rounded-md text-subtle hover:bg-surface-raised"
+      :aria-label="$t('ui.clearSearch')"
+      @click="clearSearch"
+    >
+      <IconsClose class="size-3" />
+    </button>
   </div>
 </template>
 
 <script setup lang="ts">
 const clientsStore = useClientsStore();
-const searchQuery = ref('');
+const searchQuery = ref(clientsStore.filter ?? '');
+watch(
+  () => clientsStore.filter,
+  (value) => {
+    searchQuery.value = value ?? '';
+  }
+);
 
 const updateSearch = useDebounceFn(() => {
   clientsStore.setSearchQuery(searchQuery.value);

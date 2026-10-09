@@ -1,31 +1,27 @@
 <template>
-  <div>
-    <header class="container mx-auto mt-4 max-w-3xl px-3 xs:mt-6 md:px-0">
-      <div class="mb-5 flex justify-end">
-        <div class="flex grow-0 items-center gap-3 self-end xxs:self-center">
-          <HeaderLangSelector />
-          <HeaderThemeSwitch />
+  <div class="app-shell">
+    <header
+      class="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-6 sm:px-7"
+    >
+      <HeaderLogo />
+      <div class="flex items-center gap-2">
+        <HeaderLangSelector /><HeaderThemeSwitch />
+      </div>
+    </header>
+    <main class="flex flex-1 items-center justify-center px-4 py-10">
+      <div class="surface w-full max-w-lg p-6 shadow-xl sm:p-9">
+        <p class="eyebrow mb-3">{{ $t('ui.setup') }}</p>
+        <h1 class="mb-8 text-2xl font-semibold tracking-tight">
+          {{ $t('setup.welcome') }}
+        </h1>
+        <slot />
+        <div class="mt-9 flex gap-2">
+          <UiStepProgress
+            :step="setupStore.step"
+            :total-steps="setupStore.totalSteps"
+          />
         </div>
       </div>
-      <UiBanner />
-    </header>
-    <main>
-      <Panel>
-        <PanelBody class="m-4 mx-auto mt-10 md:w-[70%] lg:w-[60%]">
-          <h2 class="mb-16 mt-8 text-center text-3xl font-medium">
-            {{ $t('setup.welcome') }}
-          </h2>
-
-          <slot />
-
-          <div class="mt-12 flex">
-            <UiStepProgress
-              :step="setupStore.step"
-              :total-steps="setupStore.totalSteps"
-            />
-          </div>
-        </PanelBody>
-      </Panel>
     </main>
     <UiFooter />
   </div>

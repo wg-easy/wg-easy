@@ -1,10 +1,10 @@
 <template>
-  <div
-    class="break-all text-sm text-gray-700 md:text-base dark:text-neutral-200"
+  <NuxtLink
+    :to="`/clients/${client.id}`"
+    class="truncate text-sm font-semibold tracking-tight text-foreground hover:text-accent sm:text-[15px]"
     :title="$t('client.createdOn', { date: $d(new Date(client.createdAt)) })"
+    >{{ client.name }}</NuxtLink
   >
-    {{ client.name }}
-  </div>
 </template>
 
 <script setup lang="ts">
