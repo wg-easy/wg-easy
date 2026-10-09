@@ -3,9 +3,15 @@
     <template #trigger>
       <slot />
     </template>
+    <template #title>{{ $t('client.showQR') }}</template>
     <template #description>
       <div class="bg-white">
-        <img ref="img" :src="qrCode" />
+        <img
+          ref="img"
+          :src="qrCode"
+          :alt="$t('client.showQR')"
+          class="mx-auto w-full max-w-72"
+        />
       </div>
     </template>
     <template #actions>

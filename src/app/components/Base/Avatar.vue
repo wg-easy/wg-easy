@@ -1,13 +1,13 @@
 <template>
   <AvatarRoot
-    class="mr-2 inline-flex select-none items-center justify-center overflow-hidden rounded-full align-middle"
+    class="inline-flex shrink-0 items-center justify-center overflow-hidden rounded-[inherit] align-middle select-none"
   >
     <AvatarImage
       class="h-full w-full rounded-[inherit] object-cover"
       :src="img ?? ''"
     />
     <AvatarFallback
-      class="leading-1 flex h-full w-full items-center justify-center bg-white text-sm font-medium"
+      class="flex h-full w-full items-center justify-center text-xs font-semibold"
       :delay-ms="600"
     >
       <slot />

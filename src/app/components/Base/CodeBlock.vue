@@ -1,5 +1,7 @@
 <template>
-  <div class="overflow-x-auto rounded border-2 border-red-800 py-2">
+  <div
+    class="overflow-x-auto rounded-lg border border-line bg-input p-4 font-mono text-xs leading-6 text-muted"
+  >
     <pre
       class="mx-2 inline-block"
       @click="selectCode"
