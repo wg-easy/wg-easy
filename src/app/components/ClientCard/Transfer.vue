@@ -1,40 +1,33 @@
 <template>
-  <!-- Transfer TX -->
-  <div v-if="client.transferTx" class="min-w-20 md:min-w-24">
-    <span
-      class="flex gap-1"
-      :title="$t('client.totalDownload', { total: bytes(client.transferTx) })"
+  <div class="flex shrink-0 gap-5 text-[11px] tabular-nums">
+    <div
+      :title="
+        $t('client.totalDownload', { total: bytes(client.transferTx ?? 0) })
+      "
     >
-      <IconsArrowDown class="mt-0.5 inline h-3 align-middle" />
-      <div>
-        <span class="text-gray-700 dark:text-neutral-200"
-          >{{ bytes(client.transferTxCurrent) }}/s</span
-        >
-        <!-- Total TX -->
-        <br /><span class="font-regular" style="font-size: 0.85em">{{
-          bytes(client.transferTx)
-        }}</span>
-      </div>
-    </span>
-  </div>
-
-  <!-- Transfer RX -->
-  <div v-if="client.transferRx" class="min-w-20 md:min-w-24">
-    <span
-      class="flex gap-1"
-      :title="$t('client.totalUpload', { total: bytes(client.transferRx) })"
+      <span class="eyebrow">{{ $t('ui.download') }}</span
+      ><span class="mt-1.5 flex items-center gap-1.5 text-muted"
+        ><IconsArrowDown class="size-3 text-success" />{{
+          bytes(client.transferTxCurrent)
+        }}/s</span
+      ><span class="mt-1 block text-subtle">{{
+        bytes(client.transferTx ?? 0)
+      }}</span>
+    </div>
+    <div
+      :title="
+        $t('client.totalUpload', { total: bytes(client.transferRx ?? 0) })
+      "
     >
-      <IconsArrowUp class="mt-0.5 inline h-3 align-middle" />
-      <div>
-        <span class="text-gray-700 dark:text-neutral-200"
-          >{{ bytes(client.transferRxCurrent) }}/s</span
-        >
-        <!-- Total RX -->
-        <br /><span class="font-regular" style="font-size: 0.85em">{{
-          bytes(client.transferRx)
-        }}</span>
-      </div>
-    </span>
+      <span class="eyebrow">{{ $t('ui.upload') }}</span
+      ><span class="mt-1.5 flex items-center gap-1.5 text-muted"
+        ><IconsArrowUp class="size-3 text-accent" />{{
+          bytes(client.transferRxCurrent)
+        }}/s</span
+      ><span class="mt-1 block text-subtle">{{
+        bytes(client.transferRx ?? 0)
+      }}</span>
+    </div>
   </div>
 </template>
 

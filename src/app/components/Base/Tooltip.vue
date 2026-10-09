@@ -2,20 +2,20 @@
   <TooltipProvider>
     <TooltipRoot :open="open" @update:open="open = $event">
       <TooltipTrigger
-        class="mx-2 inline-flex h-4 w-4 items-center justify-center rounded-full text-gray-400 outline-none focus:shadow-sm focus:shadow-black"
+        class="mx-2 inline-flex h-4 w-4 items-center justify-center rounded-full text-subtle"
         as-child
       >
-        <button type="button" @click="open = !open">
+        <button type="button" :aria-label="text" @click="open = !open">
           <slot />
         </button>
       </TooltipTrigger>
       <TooltipPortal>
         <TooltipContent
-          class="select-none whitespace-pre-line rounded bg-gray-600 px-3 py-2 text-sm leading-none text-white shadow-lg will-change-[transform,opacity]"
+          class="ui-menu z-[100] max-w-xs px-3 py-2 text-xs leading-relaxed whitespace-pre-line"
           :side-offset="5"
         >
           {{ text }}
-          <TooltipArrow class="fill-gray-600" :width="8" />
+          <TooltipArrow class="fill-surface" :width="8" />
         </TooltipContent>
       </TooltipPortal>
     </TooltipRoot>

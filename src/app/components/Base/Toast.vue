@@ -2,26 +2,25 @@
   <ToastRoot
     v-for="(e, i) in count"
     :key="i"
-    :class="[
-      `grid grid-cols-[auto_max-content] items-center gap-x-3 rounded-md p-3 text-neutral-200 shadow-lg [grid-template-areas:_'title_action'_'description_action'] data-[swipe=cancel]:translate-x-0 data-[swipe=move]:translate-x-[var(--reka-toast-swipe-move-x)]`,
-      {
-        'bg-green-800': e.type === 'success',
-        'bg-red-800': e.type === 'error',
-      },
-    ]"
+    class="surface grid grid-cols-[auto_minmax(0,1fr)_auto] items-start gap-3 p-4 shadow-xl data-[swipe=cancel]:translate-x-0 data-[swipe=move]:translate-x-[var(--reka-toast-swipe-move-x)]"
   >
-    <ToastTitle class="mb-1 text-sm font-medium [grid-area:_title]">
-      {{ e.title }}
-    </ToastTitle>
-    <ToastDescription class="m-0 text-sm [grid-area:_description]">{{
-      e.message
-    }}</ToastDescription>
-    <ToastAction as-child alt-text="toast" class="[grid-area:_action]">
-      <slot />
-    </ToastAction>
-    <ToastClose aria-label="Close">
-      <span aria-hidden>×</span>
-    </ToastClose>
+    <IconsCheckCircle
+      v-if="e.type === 'success'"
+      class="mt-0.5 size-5 text-success"
+    /><IconsWarning v-else class="mt-0.5 size-5 text-accent" />
+    <div>
+      <ToastTitle class="text-sm font-semibold text-foreground">{{
+        e.title
+      }}</ToastTitle
+      ><ToastDescription class="mt-1 text-xs leading-relaxed text-muted">{{
+        e.message
+      }}</ToastDescription>
+    </div>
+    <ToastClose
+      :aria-label="$t('dialog.cancel')"
+      class="grid size-6 place-items-center rounded text-subtle hover:bg-surface-raised"
+      ><IconsClose class="size-3"
+    /></ToastClose>
   </ToastRoot>
 </template>
 

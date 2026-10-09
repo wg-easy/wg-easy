@@ -2,10 +2,7 @@
   <div
     v-for="n in totalSteps"
     :key="n"
-    :class="[
-      'step mx-3 h-[3px] grow',
-      step >= n ? 'bg-red-800 dark:bg-white' : 'bg-gray-500',
-    ]"
+    :class="['h-1 grow rounded-full', step >= n ? 'bg-accent' : 'bg-line']"
   ></div>
 </template>
 

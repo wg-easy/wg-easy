@@ -1,5 +1,5 @@
 <template>
-  <main class="flex flex-col gap-3">
+  <div class="surface p-6 text-sm leading-7 text-muted">
     <p class="whitespace-pre-line">{{ $t('admin.introText') }}</p>
-  </main>
+  </div>
 </template>

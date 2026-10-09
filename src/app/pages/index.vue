@@ -1,34 +1,69 @@
 <template>
-  <main>
-    <Panel>
-      <PanelHead>
-        <PanelHeadTitle>
-          {{ $t('pages.clients') }}
-        </PanelHeadTitle>
-        <PanelHeadBoat>
-          <ClientsSearch />
-          <div class="flex gap-2">
-            <ClientsSort />
-            <ClientsNew />
-          </div>
-        </PanelHeadBoat>
-      </PanelHead>
-
+  <main class="page-container">
+    <div class="mb-7 flex items-end justify-between gap-4">
       <div>
-        <ClientsList
-          v-if="clientsStore.clients && clientsStore.clients.length > 0"
-        />
+        <p class="eyebrow mb-3 flex items-center gap-2">
+          <IconsStack class="size-3.5 text-accent" />WireGuard
+          <span class="text-line">/</span> {{ $t('pages.clients') }}
+        </p>
+        <h1 class="page-title">{{ $t('pages.clients') }}</h1>
+        <p class="mt-3 text-sm text-subtle">
+          {{ $t('ui.clientsDescription') }}
+        </p>
       </div>
-      <ClientsEmpty
-        v-if="clientsStore.clients && clientsStore.clients.length === 0"
-      />
       <div
-        v-if="clientsStore.clients === null"
-        class="p-5 text-gray-200 dark:text-red-300"
+        v-if="clientsStore.clients"
+        class="hidden items-baseline gap-2 text-xs text-subtle sm:flex"
       >
-        <IconsLoading class="mx-auto w-5 animate-spin" />
+        <span class="text-3xl font-semibold tracking-tight text-foreground">{{
+          clientsStore.clients.length
+        }}</span
+        >{{ $t('ui.clientsShown') }}
       </div>
-    </Panel>
+    </div>
+    <div class="flex flex-wrap gap-2.5">
+      <ClientsSearch class="w-full sm:min-w-0 sm:flex-1" /><ClientsSort
+        class="flex-1 sm:flex-none"
+      /><ClientsNew trigger-class="flex-1 sm:flex-none" />
+    </div>
+    <div
+      class="mt-6 mb-3 flex items-center justify-between gap-3 text-xs text-subtle"
+    >
+      <span>{{ $t('ui.clientList') }}</span
+      ><span v-if="clientsStore.error" class="text-warning">{{
+        $t('ui.connectionIssue')
+      }}</span
+      ><span v-else class="flex items-center gap-2"
+        ><span
+          class="size-1.5 rounded-full bg-success ring-4 ring-success/10"
+        />{{ $t('ui.autoRefresh') }}</span
+      >
+    </div>
+    <div v-if="clientsStore.error" role="alert" class="callout mb-4">
+      <IconsWarning class="size-5 shrink-0 text-warning" /><span
+        class="flex-1"
+        >{{ $t('ui.loadError') }}</span
+      ><button
+        class="font-semibold text-accent"
+        @click="clientsStore.refresh()"
+      >
+        {{ $t('ui.retry') }}
+      </button>
+    </div>
+    <ClientsList v-if="clientsStore.clients?.length" />
+    <ClientsEmpty v-else-if="clientsStore.clients" />
+    <div
+      v-else-if="!clientsStore.error"
+      role="status"
+      class="surface flex min-h-56 items-center justify-center gap-3 text-subtle"
+    >
+      <IconsLoading class="size-5 animate-spin" />{{ $t('general.loading') }}
+    </div>
+    <p class="mt-5 flex items-start gap-2 text-xs leading-relaxed text-subtle">
+      <IconsInfo class="mt-0.5 size-4 shrink-0 text-accent" />{{
+        $t('ui.clientsHint')
+      }}
+    </p>
   </main>
 </template>
 

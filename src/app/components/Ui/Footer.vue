@@ -1,37 +1,55 @@
 <template>
-  <footer>
-    <p class="m-10 text-center text-xs text-gray-300 dark:text-neutral-600">
+  <footer
+    class="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-4 border-t border-line px-4 py-6 text-[11px] leading-relaxed text-subtle sm:px-7"
+  >
+    <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
       <a
-        class="hover:underline"
-        target="_blank"
         href="https://github.com/wg-easy/wg-easy"
+        target="_blank"
+        rel="noreferrer"
+        class="font-semibold text-muted hover:text-foreground"
         >WireGuard Easy</a
+      ><span
+        v-if="globalStore.information?.currentRelease"
+        class="rounded border border-line px-1.5 py-0.5 font-mono text-[10px]"
+        >{{ globalStore.information.currentRelease }}</span
+      ><span
+        >© 2021–2026
+        <a
+          href="https://emile.nl/?ref=wg-easy"
+          target="_blank"
+          rel="noreferrer"
+          class="hover:text-foreground"
+          >Emile Nijssen</a
+        ></span
       >
-      ({{ globalStore.information?.currentRelease }}) © 2021-2026 by
+    </div>
+    <div class="flex flex-wrap gap-5">
       <a
-        class="hover:underline"
+        :href="documentationUrl"
         target="_blank"
-        href="https://emile.nl/?ref=wg-easy"
-        >Emile Nijssen</a
-      >
-      is licensed under
-      <a
-        class="hover:underline"
-        target="_blank"
+        rel="noreferrer"
+        class="hover:text-foreground"
+        >{{ $t('ui.documentation') }} ↗</a
+      ><a
         href="https://opensource.org/license/agpl-v3"
+        target="_blank"
+        rel="noreferrer"
+        class="hover:text-foreground"
         >AGPL-3.0-only</a
-      >
-      ·
-      <a
-        class="hover:underline"
+      ><a
         href="https://github.com/wg-easy/wg-easy#donate"
         target="_blank"
-        >{{ $t('layout.donate') }}</a
+        rel="noreferrer"
+        class="hover:text-foreground"
+        >{{ $t('layout.donate') }} ↗</a
       >
-    </p>
+    </div>
   </footer>
 </template>
 
 <script lang="ts" setup>
+import { documentationUrl } from '~/utils/documentation';
+
 const globalStore = useGlobalStore();
 </script>

@@ -1,11 +1,16 @@
 <template>
   <div class="flex flex-col items-center">
-    <p class="text-center text-lg">
+    <p class="text-sm leading-relaxed text-muted">
       {{ $t('setup.setupMigrationDesc') }}
     </p>
-    <div class="mt-8 flex gap-3">
+    <div class="mt-8 flex w-full flex-col gap-3">
       <Label for="migration">{{ $t('setup.migration') }}</Label>
-      <input id="migration" type="file" @change="onChangeFile" />
+      <input
+        id="migration"
+        class="ui-input file:mr-3 file:rounded file:border-0 file:bg-surface-raised file:px-3 file:py-1 file:text-muted"
+        type="file"
+        @change="onChangeFile"
+      />
     </div>
     <div class="mt-4">
       <BasePrimaryButton @click="submit">

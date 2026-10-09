@@ -1,5 +1,5 @@
 <template>
-  <main v-if="data">
+  <div v-if="data">
     <FormElement @submit.prevent="submit">
       <FormGroup>
         <FormHeading>{{ $t('admin.config.connection') }}</FormHeading>
@@ -108,7 +108,7 @@
         <FormSecondaryActionField :label="$t('form.revert')" @click="revert" />
       </FormGroup>
     </FormElement>
-  </main>
+  </div>
 </template>
 
 <script lang="ts" setup>

@@ -1,33 +1,31 @@
 <template>
   <SelectRoot v-model="langProxy" :default-value="locale">
     <SelectTrigger
-      class="group inline-flex h-8 items-center justify-around gap-2 rounded bg-gray-200 px-3 text-sm leading-none dark:bg-neutral-700 dark:text-neutral-400"
-      aria-label="Select language"
+      class="header-control group max-w-36 px-2.5"
+      :aria-label="$t('ui.selectLanguage')"
     >
-      <IconsLanguage class="size-3" />
-      <SelectValue />
+      <IconsLanguage class="size-4" /><span class="hidden truncate sm:inline"
+        ><SelectValue /></span
+      ><span class="uppercase sm:hidden">{{ locale }}</span>
       <IconsArrowDown
         class="size-3 transition-transform group-data-[state=open]:rotate-180"
       />
     </SelectTrigger>
-
     <SelectPortal>
       <SelectContent
-        class="min-w-28 rounded bg-gray-300 dark:bg-neutral-500"
+        class="ui-menu min-w-44"
         position="popper"
+        :side-offset="8"
       >
-        <SelectViewport class="p-2">
-          <SelectItem
-            v-for="(option, index) in langs"
-            :key="index"
+        <SelectViewport
+          ><SelectItem
+            v-for="option in langs"
+            :key="option.code"
             :value="option.code"
-            class="relative flex h-6 items-center rounded px-3 text-sm leading-none outline-none hover:bg-red-800 hover:text-white data-[state=checked]:underline dark:text-white"
-          >
-            <SelectItemText>
-              {{ option.name }}
-            </SelectItemText>
-          </SelectItem>
-        </SelectViewport>
+            class="ui-menu-item data-[state=checked]:text-accent"
+            ><SelectItemText>{{ option.name }}</SelectItemText></SelectItem
+          ></SelectViewport
+        >
       </SelectContent>
     </SelectPortal>
   </SelectRoot>

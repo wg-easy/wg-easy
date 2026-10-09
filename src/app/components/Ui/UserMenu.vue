@@ -1,65 +1,54 @@
 <template>
   <DropdownMenuRoot v-model:open="toggleState">
-    <DropdownMenuTrigger>
-      <span
-        class="flex items-center rounded-full pe-1 text-sm font-medium text-gray-400 hover:text-red-800 focus:ring-4 focus:ring-gray-100 md:me-0 dark:text-neutral-400 dark:hover:text-red-800 dark:focus:ring-gray-700"
+    <DropdownMenuTrigger
+      class="header-control gap-2 rounded-full pr-1 pl-1 sm:pr-3"
+      :aria-label="$t('pages.me')"
+    >
+      <BaseAvatar
+        class="size-8 rounded-full bg-surface-hover text-foreground"
+        >{{ fallbackName }}</BaseAvatar
       >
-        <BaseAvatar class="h-8 w-8">
-          {{ fallbackName }}
-        </BaseAvatar>
-        {{ authStore.userData?.name }}
-      </span>
+      <span class="hidden max-w-24 truncate xl:inline">{{
+        authStore.userData?.name
+      }}</span
+      ><IconsArrowDown class="hidden size-3 sm:block" />
     </DropdownMenuTrigger>
-
     <DropdownMenuPortal>
-      <DropdownMenuContent
-        :side-offset="5"
-        class="z-10 w-44 divide-y divide-gray-100 rounded-lg bg-white text-gray-700 shadow dark:divide-neutral-800 dark:bg-neutral-700 dark:text-gray-200"
-      >
-        <DropdownMenuItem>
-          <div class="px-4 py-2">
-            <div class="truncate">{{ authStore.userData?.name }}</div>
-            <div class="truncate">@{{ authStore.userData?.username }}</div>
-          </div>
-        </DropdownMenuItem>
-        <DropdownMenuItem>
-          <NuxtLink
-            to="/"
-            class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-          >
-            {{ $t('pages.clients') }}
-          </NuxtLink>
-        </DropdownMenuItem>
-        <DropdownMenuItem>
-          <NuxtLink
-            to="/me"
-            class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-          >
-            {{ $t('pages.me') }}
-          </NuxtLink>
-        </DropdownMenuItem>
+      <DropdownMenuContent :side-offset="8" align="end" class="ui-menu w-56">
+        <DropdownMenuLabel class="mb-1 border-b border-line px-3 py-3"
+          ><span class="block truncate font-medium text-foreground">{{
+            authStore.userData?.name
+          }}</span
+          ><span class="block truncate text-xs text-subtle"
+            >@{{ authStore.userData?.username }}</span
+          ></DropdownMenuLabel
+        >
+        <DropdownMenuItem as-child
+          ><NuxtLink to="/" class="ui-menu-item">{{
+            $t('pages.clients')
+          }}</NuxtLink></DropdownMenuItem
+        >
+        <DropdownMenuItem as-child
+          ><NuxtLink to="/me" class="ui-menu-item">{{
+            $t('pages.me')
+          }}</NuxtLink></DropdownMenuItem
+        >
         <DropdownMenuItem
           v-if="
             authStore.userData &&
             hasPermissions(authStore.userData, 'admin', 'any')
           "
+          as-child
+          ><NuxtLink to="/admin" class="ui-menu-item">{{
+            $t('pages.admin.panel')
+          }}</NuxtLink></DropdownMenuItem
         >
-          <NuxtLink
-            to="/admin"
-            class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-          >
-            {{ $t('pages.admin.panel') }}
-          </NuxtLink>
-        </DropdownMenuItem>
-        <DropdownMenuItem>
-          <button
-            class="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600 dark:hover:text-white"
-            @click.prevent="submit"
-          >
-            <IconsLogout class="h-5" />
-            {{ $t('general.logout') }}
-          </button>
-        </DropdownMenuItem>
+        <DropdownMenuSeparator class="my-1 h-px bg-line" />
+        <DropdownMenuItem class="ui-menu-item text-accent" @select="submit"
+          ><IconsLogout class="size-4" />{{
+            $t('general.logout')
+          }}</DropdownMenuItem
+        >
       </DropdownMenuContent>
     </DropdownMenuPortal>
   </DropdownMenuRoot>

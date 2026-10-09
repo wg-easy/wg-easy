@@ -1,12 +1,13 @@
 import { fileURLToPath } from 'node:url';
 
+import tailwindcss from '@tailwindcss/vite';
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2026-06-19',
   devtools: { enabled: true },
   modules: [
     '@nuxtjs/i18n',
-    '@nuxtjs/tailwindcss',
     '@pinia/nuxt',
     '@nuxtjs/color-mode',
     'reka-ui/nuxt',
@@ -15,12 +16,14 @@ export default defineNuxtConfig({
     '@nuxt/test-utils/module',
   ],
   colorMode: {
+    classSuffix: '',
     preference: 'system',
     fallback: 'light',
     storage: 'cookie',
     storageKey: 'theme',
   },
   css: ['~/app.css'],
+  vite: { plugins: [tailwindcss()] },
   i18n: {
     // https://i18n.nuxtjs.org/docs/guide/server-side-translations
     experimental: {
