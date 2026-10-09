@@ -9,7 +9,7 @@
   </div>
   <div class="my-auto flex items-center gap-3">
     <template v-if="data === null">
-      <span class="text-gray-500 dark:text-neutral-300">
+      <span class="text-subtle">
         {{ $t('form.nullNotSet') }}
       </span>
       <BaseSecondaryButton

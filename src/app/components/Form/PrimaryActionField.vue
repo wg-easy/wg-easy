@@ -2,7 +2,7 @@
   <input
     :value="label"
     :type="type ?? 'button'"
-    class="col-span-2 rounded-lg border-2 border-red-800 bg-red-800 px-4 py-2 text-white hover:border-red-600 hover:bg-red-600 focus:border-red-800 focus:outline-0 focus:ring-0"
+    class="ui-button ui-button-primary col-span-2"
   />
 </template>
 

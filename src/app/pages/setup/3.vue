@@ -1,6 +1,6 @@
 <template>
   <div>
-    <p class="text-center text-lg">
+    <p class="text-sm leading-relaxed text-muted">
       {{ $t('setup.existingSetup') }}
     </p>
     <div class="mt-4 flex justify-center gap-3">

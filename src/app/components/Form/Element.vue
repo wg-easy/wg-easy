@@ -1,5 +1,3 @@
 <template>
-  <form>
-    <slot />
-  </form>
+  <form class="space-y-4"><slot /></form>
 </template>

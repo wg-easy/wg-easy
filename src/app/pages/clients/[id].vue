@@ -1,13 +1,20 @@
 <template>
   <main v-if="data">
     <Panel>
+      <NuxtLink
+        to="/"
+        class="mb-6 inline-flex items-center gap-2 text-xs text-muted hover:text-foreground"
+        ><IconsArrowLeftCircle class="size-4" />{{
+          $t('pages.clients')
+        }}</NuxtLink
+      >
       <PanelHead>
         <PanelHeadTitle>
           {{ data.name }}
         </PanelHeadTitle>
       </PanelHead>
       <PanelBody>
-        <FormElement @submit.prevent="submit">
+        <FormElement class="settings-grid space-y-0" @submit.prevent="submit">
           <FormGroup>
             <FormHeading>
               {{ $t('form.sectionGeneral') }}

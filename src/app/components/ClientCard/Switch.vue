@@ -4,6 +4,9 @@
     :title="
       client.enabled ? $t('client.disableClient') : $t('client.enableClient')
     "
+    :aria-label="
+      client.enabled ? $t('client.disableClient') : $t('client.enableClient')
+    "
     @update:model-value="toggleClient"
   />
 </template>

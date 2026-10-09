@@ -7,7 +7,7 @@
       {{ $t('client.new') }}
     </template>
     <template #description>
-      <div class="flex flex-col">
+      <div class="flex flex-col gap-2">
         <FormTextField id="name" v-model="name" :label="$t('client.name')" />
         <FormDateField
           id="expiresAt"
@@ -21,7 +21,7 @@
         <BaseSecondaryButton>{{ $t('dialog.cancel') }}</BaseSecondaryButton>
       </DialogClose>
       <DialogClose as-child>
-        <BasePrimaryButton @click="createClient">
+        <BasePrimaryButton :disabled="!name.trim()" @click="createClient">
           {{ $t('client.create') }}
         </BasePrimaryButton>
       </DialogClose>
