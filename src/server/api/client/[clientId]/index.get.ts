@@ -28,8 +28,11 @@ export default definePermissionEventHandler(
     // data can be undefined if the client is disabled
     const data = await WireGuard.dumpByPublicKey(result.publicKey);
 
+    const { preSharedKey, privateKey, ...safeResult } = result;
+
     return {
-      ...result,
+      ...safeResult,
+      hasPreSharedKey: preSharedKey !== null,
       endpoint: data?.endpoint,
     };
   }

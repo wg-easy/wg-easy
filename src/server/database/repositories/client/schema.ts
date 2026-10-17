@@ -32,7 +32,7 @@ export const client = sqliteTable(
     postDown: text('post_down').default('').notNull(),
     privateKey: text('private_key').notNull(),
     publicKey: text('public_key').notNull(),
-    preSharedKey: text('pre_shared_key').notNull(),
+    preSharedKey: text('pre_shared_key'),
     expiresAt: text('expires_at'),
     allowedIps: text('allowed_ips', { mode: 'json' }).$type<string[]>(),
     serverAllowedIps: text('server_allowed_ips', { mode: 'json' })

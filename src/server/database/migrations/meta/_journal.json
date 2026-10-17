@@ -71,6 +71,13 @@
       "when": 1790082534310,
       "tag": "0009_dusty_prodigy",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1790321588992,
+      "tag": "0010_special_hemingway",
+      "breakpoints": true
     }
   ]
 }
