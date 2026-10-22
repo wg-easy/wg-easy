@@ -9,6 +9,8 @@
 </template>
 
 <script setup lang="ts">
+import { $fetch } from '#imports';
+
 const props = defineProps<{
   client: LocalClient;
 }>();

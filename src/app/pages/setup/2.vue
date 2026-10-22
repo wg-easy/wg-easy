@@ -38,6 +38,8 @@
 </template>
 
 <script lang="ts" setup>
+import { $fetch } from '#imports';
+
 definePageMeta({
   layout: 'setup',
 });

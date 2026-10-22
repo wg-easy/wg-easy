@@ -8,7 +8,9 @@
     "skipLibCheck": true,
     "moduleResolution": "bundler",
     "paths": {
+      "@@/*": ["../*"],
       "#cli/*": ["./*"],
+      "#shared/*": ["../shared/*"],
       "#server/*": ["../server/*"],
       "#db/*": ["../server/database/*"]
     }

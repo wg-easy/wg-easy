@@ -228,6 +228,8 @@
 </template>
 
 <script setup lang="ts">
+import { $fetch } from '#imports';
+
 const globalStore = useGlobalStore();
 
 const { t } = useI18n();

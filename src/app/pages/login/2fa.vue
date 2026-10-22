@@ -33,6 +33,8 @@
 </template>
 
 <script setup lang="ts">
+import { $fetch } from '#imports';
+
 const toast = useToast();
 const { t } = useI18n();
 

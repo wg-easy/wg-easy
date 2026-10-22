@@ -1,5 +1,6 @@
 import { createError, getRouterParam } from 'h3';
 import type { H3Event } from 'h3';
+import { $fetch } from 'ofetch';
 import * as client from 'openid-client';
 
 import { WG_ENV } from '#server/utils/config';

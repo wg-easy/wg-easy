@@ -257,6 +257,8 @@
 </template>
 
 <script lang="ts" setup>
+import { $fetch } from '#imports';
+
 const globalStore = useGlobalStore();
 
 const route = useRoute();

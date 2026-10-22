@@ -30,6 +30,8 @@
 </template>
 
 <script lang="ts" setup>
+import { $fetch } from '#imports';
+
 const name = ref<string>('');
 const expiresAt = ref<string | null>(null);
 const clientsStore = useClientsStore();
