@@ -6,7 +6,12 @@ export const useGlobalStore = defineStore('Global', () => {
     }
   );
 
-  const sortClient = ref<'asc' | 'desc'>('asc');
+  const sortClient = useCookie<
+    'name-asc' | 'name-desc' | 'ipv4-asc' | 'ipv4-desc'
+  >('sortClient', {
+    default: () => 'name-asc',
+    maxAge: 365 * 24 * 60 * 60,
+  });
 
   const uiShowCharts = useCookie<boolean>('uiShowCharts', {
     default: () => false,
