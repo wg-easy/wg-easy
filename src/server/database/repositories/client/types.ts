@@ -35,8 +35,8 @@ export type CreateClientType = Omit<
 
 export type UpdateClientType = Omit<
   CreateClientType,
-  'privateKey' | 'publicKey' | 'preSharedKey' | 'userId' | 'interfaceId'
->;
+  'privateKey' | 'publicKey' | 'userId' | 'interfaceId' | 'preSharedKey'
+> & { preSharedKey?: string | null };
 
 const name = z
   .string({ message: t('zod.client.name') })
@@ -89,6 +89,7 @@ export type ClientQueryType = z.infer<typeof ClientQuerySchema>;
 
 export const ClientUpdateSchema = schemaForType<UpdateClientType>()(
   z.object({
+    preSharedKey: z.string().nullable().optional(),
     name: name,
     enabled: EnabledSchema,
     expiresAt: expiresAt,
@@ -135,7 +136,6 @@ export type ClientCreateFromExistingType = Pick<
   | 'ipv4Address'
   | 'ipv6Address'
   | 'privateKey'
-  | 'preSharedKey'
   | 'publicKey'
   | 'enabled'
->;
+> & { preSharedKey?: string | null };

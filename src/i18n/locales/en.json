@@ -129,6 +129,8 @@
     "search": "Search clients...",
     "config": "Configuration",
     "viewConfig": "View Configuration",
+    "preSharedKey": "Pre-Shared Key",
+    "preSharedKeyDesc": "Adds an extra layer of symmetric-key encryption to the tunnel. Toggle on to generate a new key, off to remove it.",
     "firewallIps": "Firewall Allowed IPs",
     "firewallIpsDesc": "Destination IPs/CIDRs this client can access (server-side enforcement). Leave empty to use Allowed IPs. Supports optional port and protocol filtering. See docs for syntax.",
     "downloadPng": "Download PNG",
@@ -178,6 +180,8 @@
       "dnsDesc": "DNS server clients will use (global config)",
       "mtuDesc": "MTU clients will use (only for new clients)",
       "persistentKeepaliveDesc": "Interval in seconds to send keepalives to the server. 0 = disabled (only for new clients)",
+      "defaultPreSharedKey": "Generate Pre-Shared Key for new clients",
+      "defaultPreSharedKeyDesc": "When enabled, a pre-shared key is automatically generated for every new client",
       "suggest": "Suggest",
       "suggestDesc": "Choose a IP-Address or Hostname for the Host field"
     },
