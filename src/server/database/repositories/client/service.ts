@@ -17,6 +17,42 @@ import { wg } from '#server/utils/wgHelper';
 import type { DBType } from '#db/sqlite';
 import { wgInterface, userConfig } from '#db/schema';
 
+type ClientSort = NonNullable<ClientQueryType['sort']>;
+
+function compareClients<T extends { name: string; ipv4Address: string }>(
+  clients: T[],
+  sort: ClientSort | undefined
+): T[] {
+  const mode = sort ?? 'name-asc';
+  const byName = (a: T, b: T) =>
+    a.name.localeCompare(b.name, undefined, { sensitivity: 'base' });
+
+  if (mode === 'ipv4-asc' || mode === 'ipv4-desc') {
+    const direction = mode === 'ipv4-asc' ? 1 : -1;
+    const toNumber = (address: string) => {
+      const parts = address.split('/')[0]?.split('.').map(Number) ?? [];
+      if (
+        parts.length !== 4 ||
+        parts.some((part) => !Number.isInteger(part) || part < 0 || part > 255)
+      ) {
+        return Number.MAX_SAFE_INTEGER;
+      }
+      return parts.reduce((value, part) => value * 256 + part, 0);
+    };
+
+    return [...clients].sort((a, b) => {
+      const difference = toNumber(a.ipv4Address) - toNumber(b.ipv4Address);
+      return difference === 0 ? byName(a, b) : difference * direction;
+    });
+  }
+
+  const descending = mode === 'desc' || mode === 'name-desc';
+  return [...clients].sort((a, b) => {
+    const result = byName(a, b);
+    return descending ? -result : result;
+  });
+}
+
 function createPreparedStatement(db: DBType) {
   return {
     findAll: db.query.client
@@ -64,7 +100,7 @@ export class ClientService {
    */
   async getAll() {
     const result = await this.#statements.findAll.execute();
-    return result.map((row) => ({
+    return compareClients(result, sort).map((row) => ({
       ...row,
       createdAt: new Date(row.createdAt),
       updatedAt: new Date(row.updatedAt),
@@ -98,18 +134,11 @@ export class ClientService {
           privateKey: false,
           preSharedKey: false,
         },
-        orderBy: (t, { asc, desc }) => {
-          if (sort === 'desc') {
-            return desc(t.name);
-          } else {
-            // default to asc
-            return asc(t.name);
-          }
-        },
+
       })
       .execute();
 
-    return result.map((row) => ({
+    return compareClients(result, sort).map((row) => ({
       ...row,
       createdAt: new Date(row.createdAt),
       updatedAt: new Date(row.updatedAt),
@@ -141,14 +170,7 @@ export class ClientService {
           privateKey: false,
           preSharedKey: false,
         },
-        orderBy: (t, { asc, desc }) => {
-          if (sort === 'desc') {
-            return desc(t.name);
-          } else {
-            // default to asc
-            return asc(t.name);
-          }
-        },
+
       })
       .execute();
 
