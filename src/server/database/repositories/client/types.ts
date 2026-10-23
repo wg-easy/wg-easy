@@ -78,7 +78,7 @@ export type ClientCreateType = z.infer<typeof ClientCreateSchema>;
 
 const filter = z.string().pipe(safeStringRefine);
 
-const sort = z.enum(['asc', 'desc']);
+const sort = z.enum(['asc', 'desc', 'name-asc', 'name-desc', 'ipv4-asc', 'ipv4-desc']);
 
 export const ClientQuerySchema = z.object({
   filter: filter.optional(),
