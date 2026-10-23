@@ -6,7 +6,17 @@ import {
   interfaceAwgParameters,
 } from '#server/utils/awg';
 import { InterfaceUpdateSchema } from '#db/repositories/interface/types';
-import { AwgRangeSchema, HSchema, KeySchema } from '#server/utils/types';
+import { ClientUpdateSchema } from '#db/repositories/client/types';
+import { UserConfigUpdateSchema } from '#db/repositories/userConfig/types';
+import {
+  AwgRangeSchema,
+  HSchema,
+  JcSchema,
+  JminSchema,
+  JmaxSchema,
+  KeySchema,
+  SSchema,
+} from '#server/utils/types';
 
 /** Any valid 32 byte base64 key, generated with `wg genkey` */
 const KEY = 'JPJ2DWzJbwrRkY6cPbZaJasL6bHQOM6J2Ollx4D/OHU=';
@@ -59,7 +69,16 @@ const client = {
 
 describe('AmneziaWG config lines', () => {
   test('leaves out parameters that are not set', () => {
-    expect(buildAwgLines({ Jc: null, Jmin: null })).toEqual([]);
+    expect(buildAwgLines({ Jc: null, Jmin: null, I1: '' })).toEqual([]);
+  });
+
+  test('preserves explicit zero values used to disable obfuscation', () => {
+    expect(buildAwgLines({ Jc: 0, Jmin: 0, Jmax: 0, S4: 0 })).toEqual([
+      'Jc = 0',
+      'Jmin = 0',
+      'Jmax = 0',
+      'S4 = 0',
+    ]);
   });
 
   test('writes booleans as on/off, not true/false', () => {
@@ -126,6 +145,18 @@ describe('AmneziaWG config lines', () => {
     expect(lines).not.toContain('Jc = 7');
     expect(lines).not.toContain('MaxHandshakeAttempts = 9');
   });
+});
+
+describe('AWG integer parameters', () => {
+  test.each([JcSchema, JminSchema, JmaxSchema, SSchema])(
+    'accepts zero and rejects negative and fractional values',
+    (schema) => {
+      expect(schema.parse(0)).toBe(0);
+      expect(schema.parse(null)).toBeNull();
+      expect(() => schema.parse(-1)).toThrow();
+      expect(() => schema.parse(1.5)).toThrow();
+    }
+  );
 });
 
 describe('AwgRangeSchema', () => {
@@ -196,6 +227,53 @@ describe('InterfaceUpdateSchema', () => {
     expect(() => InterfaceUpdateSchema.parse(base)).not.toThrow();
   });
 
+  test('rejects intersecting header ranges, including shared boundaries', () => {
+    for (const h2 of ['10', '9-11', '10-20']) {
+      const result = InterfaceUpdateSchema.safeParse({
+        ...base,
+        h1: '5-10',
+        h2,
+      });
+      expect(result.success).toBe(false);
+      expect(result.error?.issues).toContainEqual(
+        expect.objectContaining({
+          path: ['h2'],
+          message: 'zod.awg.headerRangesOverlap',
+        })
+      );
+    }
+  });
+
+  test('accepts disjoint header ranges', () => {
+    expect(() =>
+      InterfaceUpdateSchema.parse({
+        ...base,
+        h1: '5-10',
+        h2: '11-20',
+        h3: '21',
+        h4: '22-30',
+      })
+    ).not.toThrow();
+  });
+
+  test('rejects duplicate single headers without header protection', () => {
+    expect(() =>
+      InterfaceUpdateSchema.parse({ ...base, h3: '5', h4: '5' })
+    ).toThrow();
+  });
+
+  test('rejects reversed junk sizes and treats an unset maximum as zero', () => {
+    for (const jMax of [9, null]) {
+      expect(() => InterfaceUpdateSchema.parse({ ...base, jMax })).toThrow();
+    }
+    expect(() =>
+      InterfaceUpdateSchema.parse({ ...base, jMin: 10, jMax: 10 })
+    ).not.toThrow();
+    expect(() =>
+      InterfaceUpdateSchema.parse({ ...base, jC: 0, jMin: 0, jMax: 0 })
+    ).not.toThrow();
+  });
+
   test('requires S1-S4 to be at least 12 when a key is set', () => {
     const result = InterfaceUpdateSchema.safeParse({
       ...base,
@@ -218,5 +296,64 @@ describe('InterfaceUpdateSchema', () => {
         s4: 40,
       })
     ).not.toThrow();
+  });
+});
+
+describe('client junk packet settings', () => {
+  const base = {
+    ...client,
+    name: 'Client',
+    enabled: true,
+    expiresAt: null,
+    ipv4Address: '10.8.0.2',
+    ipv6Address: 'fd00::2',
+    preUp: '',
+    postUp: '',
+    preDown: '',
+    postDown: '',
+    allowedIps: null,
+    serverAllowedIps: [],
+    firewallIps: null,
+    mtu: 1420,
+    persistentKeepalive: 0,
+    serverEndpoint: null,
+    dns: null,
+  };
+
+  test('validates junk size ordering when editing a client', () => {
+    expect(() => ClientUpdateSchema.parse(base)).not.toThrow();
+    expect(() =>
+      ClientUpdateSchema.parse({ ...base, jMin: 20, jMax: 10 })
+    ).toThrow();
+    expect(() =>
+      ClientUpdateSchema.parse({ ...base, jMin: 20, jMax: null })
+    ).toThrow();
+  });
+
+  test('validates junk size ordering in client defaults', () => {
+    const defaults = {
+      host: 'vpn.example.com',
+      port: 51820,
+      defaultMtu: 1420,
+      defaultPersistentKeepalive: 0,
+      defaultDns: [],
+      defaultAllowedIps: ['0.0.0.0/0'],
+      defaultJC: 0,
+      defaultJMin: 0,
+      defaultJMax: 0,
+      defaultI1: null,
+      defaultI2: null,
+      defaultI3: null,
+      defaultI4: null,
+      defaultI5: null,
+    };
+    expect(() => UserConfigUpdateSchema.parse(defaults)).not.toThrow();
+    const result = UserConfigUpdateSchema.safeParse({
+      ...defaults,
+      defaultJMin: 20,
+      defaultJMax: 10,
+    });
+    expect(result.success).toBe(false);
+    expect(result.error?.issues[0]?.path).toEqual(['defaultJMax']);
   });
 });

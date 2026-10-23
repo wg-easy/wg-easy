@@ -16,6 +16,7 @@ import {
   safeStringRefine,
   schemaForType,
   t,
+  validateJunkPacketRange,
 } from '#server/utils/types';
 
 export type UserConfigType = InferSelectModel<typeof userConfig>;
@@ -36,20 +37,29 @@ export type UserConfigUpdateType = Omit<
 >;
 
 export const UserConfigUpdateSchema = schemaForType<UserConfigUpdateType>()(
-  z.object({
-    port: PortSchema,
-    defaultMtu: MtuSchema,
-    defaultPersistentKeepalive: PersistentKeepaliveSchema,
-    defaultDns: DnsSchema,
-    defaultAllowedIps: AllowedIpsSchema,
-    defaultJC: JcSchema,
-    defaultJMin: JminSchema,
-    defaultJMax: JmaxSchema,
-    defaultI1: ISchema,
-    defaultI2: ISchema,
-    defaultI3: ISchema,
-    defaultI4: ISchema,
-    defaultI5: ISchema,
-    host: host,
-  })
+  z
+    .object({
+      port: PortSchema,
+      defaultMtu: MtuSchema,
+      defaultPersistentKeepalive: PersistentKeepaliveSchema,
+      defaultDns: DnsSchema,
+      defaultAllowedIps: AllowedIpsSchema,
+      defaultJC: JcSchema,
+      defaultJMin: JminSchema,
+      defaultJMax: JmaxSchema,
+      defaultI1: ISchema,
+      defaultI2: ISchema,
+      defaultI3: ISchema,
+      defaultI4: ISchema,
+      defaultI5: ISchema,
+      host: host,
+    })
+    .superRefine((data, ctx) => {
+      validateJunkPacketRange(
+        data.defaultJMin,
+        data.defaultJMax,
+        ctx,
+        'defaultJMax'
+      );
+    })
 );

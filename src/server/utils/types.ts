@@ -38,13 +38,52 @@ export const MtuSchema = z
   .min(1024, { message: t('zod.mtu') })
   .max(9000, { message: t('zod.mtu') });
 
-export const JcSchema = z.number().min(1).max(128).nullable();
+export const JcSchema = z.number().int().min(0).max(128).nullable();
 
-export const JminSchema = z.number().max(1279).nullable();
+export const JminSchema = z.number().int().min(0).max(1279).nullable();
 
-export const JmaxSchema = z.number().max(1280).nullable();
+export const JmaxSchema = z.number().int().min(0).max(1280).nullable();
 
-export const SSchema = z.number().max(1132).nullable();
+export const SSchema = z.number().int().min(0).max(1132).nullable();
+
+/** Unset junk sizes are interpreted as zero by the AWG backend. */
+export function validateJunkPacketRange(
+  minimum: number | null,
+  maximum: number | null,
+  ctx: z.RefinementCtx,
+  path = 'jMax'
+) {
+  if ((minimum ?? 0) > (maximum ?? 0)) {
+    ctx.addIssue({
+      code: 'custom',
+      path: [path],
+      message: t('zod.awg.junkPacketRange'),
+    });
+  }
+}
+
+export function validateHeaderRanges(
+  headers: (string | null)[],
+  ctx: z.RefinementCtx
+) {
+  const ranges = headers.map((header, index) =>
+    parseRange(header ?? String(index + 1))
+  );
+
+  for (let left = 0; left < ranges.length; left++) {
+    for (let right = left + 1; right < ranges.length; right++) {
+      const a = ranges[left];
+      const b = ranges[right];
+      if (a && b && a.lower <= b.upper && b.lower <= a.upper) {
+        ctx.addIssue({
+          code: 'custom',
+          path: [`h${right + 1}`],
+          message: t('zod.awg.headerRangesOverlap'),
+        });
+      }
+    }
+  }
+}
 
 const RANGE_REGEX = /^(\d+)(?:-(\d+))?$/;
 

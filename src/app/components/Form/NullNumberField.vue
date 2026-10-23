@@ -16,9 +16,6 @@ defineProps<{ id: string; label: string; description?: string }>();
 const data = defineModel<number | null>({
   set(value) {
     const temp = value ?? null;
-    if (temp === 0) {
-      return null;
-    }
     if ((temp as string | null) === '') {
       return null;
     }

@@ -72,7 +72,7 @@ export function buildAwgLines(parameters: AwgParameters) {
       continue;
     }
 
-    if (!value) continue;
+    if (value === null || value === '') continue;
 
     lines.push(`${key} = ${value}`);
   }
