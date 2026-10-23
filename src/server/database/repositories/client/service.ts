@@ -100,7 +100,7 @@ export class ClientService {
    */
   async getAll() {
     const result = await this.#statements.findAll.execute();
-    return compareClients(result, sort).map((row) => ({
+    return result.map((row) => ({
       ...row,
       createdAt: new Date(row.createdAt),
       updatedAt: new Date(row.updatedAt),
@@ -174,7 +174,7 @@ export class ClientService {
       })
       .execute();
 
-    return result.map((row) => ({
+    return compareClients(result, sort).map((row) => ({
       ...row,
       createdAt: new Date(row.createdAt),
       updatedAt: new Date(row.updatedAt),
