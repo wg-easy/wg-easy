@@ -26,6 +26,13 @@ export const userConfig = sqliteTable('user_configs_table', {
   defaultI3: text('default_i3'),
   defaultI4: text('default_i4'),
   defaultI5: text('default_i5'),
+  defaultContentPaddingAddition: text('default_content_padding_addition'),
+  defaultRekeyAfterTime: text('default_rekey_after_time'),
+  defaultRekeyTimeout: text('default_rekey_timeout'),
+  defaultRejectAfterTime: text('default_reject_after_time'),
+  defaultKeepaliveTimeout: text('default_keepalive_timeout'),
+  defaultMaxHandshakeAttempts: text('default_max_handshake_attempts'),
+  defaultDisableCookies: int('default_disable_cookies', { mode: 'boolean' }),
   host: text().notNull(),
   port: int().notNull(),
   createdAt: text('created_at')

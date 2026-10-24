@@ -48,7 +48,9 @@
         />
       </FormGroup>
       <FormGroup v-if="globalStore.information?.isAwg">
-        <FormHeading>{{ $t('awg.obfuscationParameters') }}</FormHeading>
+        <FormHeading :description="$t('awg.clientDefaultsNote')">
+          {{ $t('awg.obfuscationParameters') }}
+        </FormHeading>
 
         <FormNullNumberField
           id="jC"
@@ -100,6 +102,51 @@
           v-model="data.defaultI5"
           :label="$t('awg.i5Label')"
           :description="$t('awg.i5Description')"
+        />
+
+        <div class="col-span-full text-sm">{{ $t('awg.rangeNote') }}</div>
+
+        <FormNullTextField
+          id="defaultContentPaddingAddition"
+          v-model="data.defaultContentPaddingAddition"
+          :label="$t('awg.contentPaddingAdditionLabel')"
+          :description="$t('awg.contentPaddingAdditionDescription')"
+        />
+        <FormNullTextField
+          id="defaultRekeyAfterTime"
+          v-model="data.defaultRekeyAfterTime"
+          :label="$t('awg.rekeyAfterTimeLabel')"
+          :description="$t('awg.rekeyAfterTimeDescription')"
+        />
+        <FormNullTextField
+          id="defaultRekeyTimeout"
+          v-model="data.defaultRekeyTimeout"
+          :label="$t('awg.rekeyTimeoutLabel')"
+          :description="$t('awg.rekeyTimeoutDescription')"
+        />
+        <FormNullTextField
+          id="defaultRejectAfterTime"
+          v-model="data.defaultRejectAfterTime"
+          :label="$t('awg.rejectAfterTimeLabel')"
+          :description="$t('awg.rejectAfterTimeDescription')"
+        />
+        <FormNullTextField
+          id="defaultKeepaliveTimeout"
+          v-model="data.defaultKeepaliveTimeout"
+          :label="$t('awg.keepaliveTimeoutLabel')"
+          :description="$t('awg.keepaliveTimeoutDescription')"
+        />
+        <FormNullTextField
+          id="defaultMaxHandshakeAttempts"
+          v-model="data.defaultMaxHandshakeAttempts"
+          :label="$t('awg.maxHandshakeAttemptsLabel')"
+          :description="$t('awg.maxHandshakeAttemptsDescription')"
+        />
+        <FormNullSwitchField
+          id="defaultDisableCookies"
+          v-model="data.defaultDisableCookies"
+          :label="$t('awg.disableCookiesLabel')"
+          :description="$t('awg.disableCookiesDescription')"
         />
       </FormGroup>
       <FormGroup>

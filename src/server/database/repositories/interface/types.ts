@@ -20,6 +20,8 @@ import {
   safeStringRefine,
   schemaForType,
   t,
+  validateHeaderRanges,
+  validateJunkPacketRange,
 } from '#server/utils/types';
 
 export type InterfaceType = InferSelectModel<typeof wgInterface>;
@@ -104,6 +106,9 @@ export const InterfaceUpdateSchema = schemaForType<InterfaceUpdateType>()(
       firewallEnabled: EnabledSchema,
     })
     .superRefine((data, ctx) => {
+      validateJunkPacketRange(data.jMin, data.jMax, ctx);
+      validateHeaderRanges([data.h1, data.h2, data.h3, data.h4], ctx);
+
       if (data.headerProtectionKey === null) return;
 
       for (const junk of ['s1', 's2', 's3', 's4'] as const) {

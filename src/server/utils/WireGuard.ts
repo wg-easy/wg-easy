@@ -183,7 +183,7 @@ class WireGuard {
       WG_DEBUG('New Wireguard Keys generated successfully.');
     }
 
-    if (wgInterface.h1 === '0') {
+    if (WG_ENV.WG_EXECUTABLE === 'awg' && wgInterface.h1 === '0') {
       WG_DEBUG('Generating random AmneziaWG obfuscation parameters...');
       const headers = new Set<number>();
 
@@ -197,7 +197,7 @@ class WireGuard {
       wgInterface.h3 = String(h3)!;
       wgInterface.h4 = String(h4)!;
 
-      Database.interfaces.update(wgInterface);
+      await Database.interfaces.update(wgInterface);
     }
 
     WG_DEBUG(`Starting Wireguard Interface ${wgInterface.name}...`);

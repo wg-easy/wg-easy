@@ -33,7 +33,7 @@ Possible values:
 
 Parameter descriptions can be found in the [AmneziaWG documentation](https://docs.amnezia.org/documentation/amnezia-wg) and on the [kernel module page](https://github.com/amnezia-vpn/amneziawg-linux-kernel-module).
 
-All parameters except I1-I5 will be set at first startup. For information on how to set I1-I5 parameters, refer to the [AmneziaWG documentation](https://docs.amnezia.org/documentation/instructions/new-amneziawg-selfhosted/#how-to-extract-a-protocol-signature-for-amneziawg-15-manually).
+H1-H4 are generated at the first AWG startup. Jc, Jmin, Jmax, S1 and S2 have initial defaults; the remaining parameters are unset until configured. For information on how to set I1-I5 parameters, refer to the [AmneziaWG documentation](https://docs.amnezia.org/documentation/instructions/new-amneziawg-selfhosted/#how-to-extract-a-protocol-signature-for-amneziawg-15-manually).
 
 If a parameter is not set, it will not be added to the configuration. If all AmneziaWG-specific parameters are absent, AmneziaWG will be fully compatible with standard WireGuard.
 
@@ -59,13 +59,21 @@ If a parameter is not set, it will not be added to the configuration. If all Amn
 
 ### AmneziaWG 3.0 and 3.1 Parameters
 
-These parameters require AmneziaWG 3.0 or newer on both ends of the tunnel. Older clients reject configurations that contain them, so leave them unset if you still support AmneziaWG 2.x clients.
+Header protection, content padding and timing parameters require AmneziaWG 3.0 or newer. `RandomTrailers` and `DisableCookies` require AmneziaWG 3.1. Older clients reject configurations that contain unsupported parameters, so leave those fields unset when supporting older clients.
 
 `HeaderProtectionKey` is a 32 byte key in base64, in the same format as a WireGuard key. It encrypts the packet headers, so it has to be identical on both sides and is copied into every client configuration. Header protection uses the first 12 bytes of each junk prefix as its nonce, which means **S1, S2, S3 and S4 all have to be set to at least 12** while a key is configured.
 
 `ContentPaddingAddition`, `RekeyAfterTime`, `RekeyTimeout`, `RejectAfterTime`, `KeepaliveTimeout` and `MaxHandshakeAttempts` accept either a single number or an inclusive range written as `lower-upper` (for example `30-90`, both bounds between 0 and 65535). When a range is given, AmneziaWG picks a random value from it, which removes the fixed timings a DPI system could otherwise fingerprint.
 
 `RandomTrailers` appends a random amount of bytes to handshake packets and has to be enabled on both sides. `DisableCookies` stops this side from answering handshakes with cookie messages when it is under load and only affects the peer it is set on.
+
+### Client Defaults
+
+In **Admin → Config**, set the defaults for `ContentPaddingAddition`, `RekeyAfterTime`, `RekeyTimeout`, `RejectAfterTime`, `KeepaliveTimeout`, `MaxHandshakeAttempts` and `DisableCookies`. These values are copied into each new client's settings, alongside the existing Jc/Jmin/Jmax and I1-I5 defaults. They can then be changed for an individual client.
+
+Changing defaults does not change existing clients or their exported profiles. Leave a field unset to omit it from new client configurations; an explicit `0` or `DisableCookies = off` is preserved. Database upgrades leave all seven new defaults unset.
+
+`HeaderProtectionKey`, S1-S4, H1-H4 and `RandomTrailers` are configured in **Admin → Interface** and copied from the interface whenever a client configuration is exported. Server padding and timing settings affect the server itself; they do not act as client defaults. Downloads and QR codes contain the same client configuration.
 
 ## Client Applications
 

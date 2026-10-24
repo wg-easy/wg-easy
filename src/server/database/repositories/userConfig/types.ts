@@ -5,6 +5,7 @@ import type { userConfig } from './schema';
 
 import {
   AllowedIpsSchema,
+  AwgRangeSchema,
   DnsSchema,
   ISchema,
   JcSchema,
@@ -16,6 +17,7 @@ import {
   safeStringRefine,
   schemaForType,
   t,
+  validateJunkPacketRange,
 } from '#server/utils/types';
 
 export type UserConfigType = InferSelectModel<typeof userConfig>;
@@ -36,20 +38,36 @@ export type UserConfigUpdateType = Omit<
 >;
 
 export const UserConfigUpdateSchema = schemaForType<UserConfigUpdateType>()(
-  z.object({
-    port: PortSchema,
-    defaultMtu: MtuSchema,
-    defaultPersistentKeepalive: PersistentKeepaliveSchema,
-    defaultDns: DnsSchema,
-    defaultAllowedIps: AllowedIpsSchema,
-    defaultJC: JcSchema,
-    defaultJMin: JminSchema,
-    defaultJMax: JmaxSchema,
-    defaultI1: ISchema,
-    defaultI2: ISchema,
-    defaultI3: ISchema,
-    defaultI4: ISchema,
-    defaultI5: ISchema,
-    host: host,
-  })
+  z
+    .object({
+      port: PortSchema,
+      defaultMtu: MtuSchema,
+      defaultPersistentKeepalive: PersistentKeepaliveSchema,
+      defaultDns: DnsSchema,
+      defaultAllowedIps: AllowedIpsSchema,
+      defaultJC: JcSchema,
+      defaultJMin: JminSchema,
+      defaultJMax: JmaxSchema,
+      defaultI1: ISchema,
+      defaultI2: ISchema,
+      defaultI3: ISchema,
+      defaultI4: ISchema,
+      defaultI5: ISchema,
+      defaultContentPaddingAddition: AwgRangeSchema,
+      defaultRekeyAfterTime: AwgRangeSchema,
+      defaultRekeyTimeout: AwgRangeSchema,
+      defaultRejectAfterTime: AwgRangeSchema,
+      defaultKeepaliveTimeout: AwgRangeSchema,
+      defaultMaxHandshakeAttempts: AwgRangeSchema,
+      defaultDisableCookies: z.boolean().nullable(),
+      host: host,
+    })
+    .superRefine((data, ctx) => {
+      validateJunkPacketRange(
+        data.defaultJMin,
+        data.defaultJMax,
+        ctx,
+        'defaultJMax'
+      );
+    })
 );
