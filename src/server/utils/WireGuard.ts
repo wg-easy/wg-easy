@@ -9,6 +9,12 @@ import { firewall } from '#server/utils/firewall';
 import { encodeQRCode } from '#server/utils/qr';
 import type { ID } from '#server/utils/types';
 import { wg } from '#server/utils/wgHelper';
+import { exec } from '#server/utils/cmd';
+import {
+  desiredServerRoutes,
+  diffRoutes,
+  routeCommand,
+} from '#server/utils/routes';
 import { setIntervalImmediately } from '#shared/utils/time';
 import type { InterfaceType } from '#db/repositories/interface/types';
 import type { ClientQueryType } from '#db/repositories/client/types';
@@ -19,6 +25,9 @@ const generateRandomHeaderValue = () =>
   Math.floor(Math.random() * 2147483642) + 5;
 
 class WireGuard {
+  /** Server Allowed IPs routes currently installed for the interface */
+  #syncedRoutes = new Set<string>();
+
   /**
    * Save and sync config
    */
@@ -26,6 +35,7 @@ class WireGuard {
     const wgInterface = await Database.interfaces.get();
     await this.#saveWireguardConfig(wgInterface);
     await this.#syncWireguardConfig(wgInterface);
+    await this.#syncRoutes(wgInterface);
     await this.#applyFirewallRules(wgInterface);
   }
 
@@ -87,6 +97,53 @@ class WireGuard {
     WG_DEBUG('Syncing Config...');
     await wg.sync(wgInterface.name);
     WG_DEBUG('Config synced successfully.');
+  }
+
+  /**
+   * `wg syncconf` does not touch the routing table, only `wg-quick up` adds the
+   * routes for the peers' AllowedIPs. Keep the routes for the Server Allowed IPs
+   * in sync when clients change while the interface is running.
+   */
+  async #syncRoutes(wgInterface: InterfaceType) {
+    const clients = await Database.clients.getAll();
+    const desired = desiredServerRoutes(clients, !WG_ENV.DISABLE_IPV6);
+    const { add, remove } = diffRoutes(this.#syncedRoutes, desired);
+
+    const run = async (
+      action: 'replace' | 'del',
+      cidr: string
+    ): Promise<boolean> => {
+      const cmd = routeCommand(
+        action,
+        cidr,
+        wgInterface.name,
+        wgInterface.routingTable
+      );
+      if (!cmd) {
+        return true;
+      }
+      try {
+        await exec(cmd);
+        return true;
+      } catch (err) {
+        WG_DEBUG(`Route ${action} for ${cidr} failed.`);
+        console.error(err);
+        return false;
+      }
+    };
+
+    for (const cidr of remove) {
+      await run('del', cidr);
+    }
+
+    const synced = new Set(desired);
+    for (const cidr of add) {
+      if (!(await run('replace', cidr))) {
+        // retry on the next sync
+        synced.delete(cidr);
+      }
+    }
+    this.#syncedRoutes = synced;
   }
 
   async getClientsForUser(userId: ID, query: ClientQueryType) {
@@ -218,6 +275,11 @@ class WireGuard {
       throw err;
     });
     await this.#syncWireguardConfig(wgInterface);
+    // `wg-quick up` already added the routes
+    this.#syncedRoutes = desiredServerRoutes(
+      await Database.clients.getAll(),
+      !WG_ENV.DISABLE_IPV6
+    );
     WG_DEBUG(`Wireguard Interface ${wgInterface.name} started successfully.`);
 
     // Check if firewall was enabled but iptables isn't available
@@ -262,6 +324,11 @@ class WireGuard {
   async Restart() {
     const wgInterface = await Database.interfaces.get();
     await wg.restart(wgInterface.name);
+    // `wg-quick up` re-added the routes from the saved config
+    this.#syncedRoutes = desiredServerRoutes(
+      await Database.clients.getAll(),
+      !WG_ENV.DISABLE_IPV6
+    );
   }
 
   async cronJob() {
