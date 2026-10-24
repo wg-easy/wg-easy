@@ -110,6 +110,26 @@ To resolve this issue, you can try the following steps:
      echo "ip6table_filter" | sudo tee -a /etc/modules
     ```
 
+## Warning: Extension comment revision 0 not supported, missing kernel module?
+
+The Per-Client Firewall creates every iptables rule with a `-m comment --comment ...` match to identify the client the rule belongs to. This match needs the `xt_comment` kernel module. If it is not available, enabling the Per-Client Firewall fails with the error above.
+
+To resolve this issue, you can try the following steps:
+
+1. **Load the `xt_comment` kernel module**: If the module exists but is not loaded, you can load it manually by running:
+
+    ```shell
+    sudo modprobe xt_comment
+    ```
+
+2. **Load the `xt_comment` kernel module on boot**: If you want to ensure that the module is loaded automatically on boot, you can add it to the `/etc/modules` file:
+
+    ```shell
+    echo "xt_comment" | sudo tee -a /etc/modules
+    ```
+
+If `modprobe` reports that the module does not exist, your kernel was built without it (for example on some NAS systems like Synology DSM) and the Per-Client Firewall can't be used on that host.
+
 ## Clients lose connectivity after restarting the container when using multiple networks?
 
 When you attach multiple Docker networks (e.g., `wg` and a reverse proxy network like `traefik` or `nginx`) to the `wg-easy` container, Docker might assign the network interfaces randomly (e.g., swapping `eth0` and `eth1`). Since `wg-easy` expects the wireguard interface to act as `eth0` and configures `POSTROUTING` rules for it, connectivity will break if the interfaces are swapped upon container restart.

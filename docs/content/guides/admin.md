@@ -78,6 +78,7 @@ This feature is currently experimental. While functional, it should be thoroughl
 
 - The host kernel must provide the firewall support required by `iptables`, either built in or through loaded kernel modules
 - IPv6 firewall support is also required when IPv6 is enabled (default)
+- The `xt_comment` kernel module must be available, as every rule is created with an `-m comment` match (see the [FAQ](../faq.md#warning-extension-comment-revision-0-not-supported-missing-kernel-module))
 
 **Enable this feature if you want to:**
 
