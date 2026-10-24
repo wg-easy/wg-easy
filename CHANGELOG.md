@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [15.5.0] - 2026-10-24
+
+### Added
+
+- Add trusted proxies (https://github.com/wg-easy/wg-easy/pull/2751)
+- AmneziaWG 3.1 support (https://github.com/wg-easy/wg-easy/pull/2804)
+- Make WireGuard interface name configurable (https://github.com/wg-easy/wg-easy/pull/2826)
+
 ## [15.4.0] - 2026-08-14
 
 ### Added
