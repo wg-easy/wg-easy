@@ -262,6 +262,7 @@
     "address": "IP Address",
     "dns": "DNS",
     "allowedIps": "Allowed IPs",
+    "allowedIpsInvalid": "Each Allowed IPs entry must be a single IP address or CIDR",
     "file": "File"
   },
   "hooks": {
