@@ -1,5 +1,5 @@
 <template>
-  <main v-if="data">
+  <div v-if="data">
     <FormElement @submit.prevent="submit">
       <FormGroup>
         <FormNumberField
@@ -224,7 +224,7 @@
         </AdminRestartInterfaceDialog>
       </FormGroup>
     </FormElement>
-  </main>
+  </div>
 </template>
 
 <script setup lang="ts">

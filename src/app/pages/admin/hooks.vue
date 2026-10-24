@@ -1,5 +1,5 @@
 <template>
-  <main v-if="data">
+  <div v-if="data">
     <FormElement @submit.prevent="submit">
       <FormGroup>
         <FormTextArea
@@ -29,7 +29,7 @@
         <FormSecondaryActionField :label="$t('form.revert')" @click="revert" />
       </FormGroup>
     </FormElement>
-  </main>
+  </div>
 </template>
 
 <script setup lang="ts">

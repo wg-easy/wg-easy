@@ -1,13 +1,12 @@
 <template>
   <Toggle
     :model-value="globalStore.uiShowCharts"
-    class="group flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 transition hover:bg-gray-300 dark:bg-neutral-700 dark:hover:bg-neutral-600"
+    class="header-control group w-10 rounded-full data-[state=on]:border-subtle data-[state=on]:bg-surface-raised"
     :title="$t('layout.toggleCharts')"
+    :aria-label="$t('layout.toggleCharts')"
     @update:model-value="globalStore.toggleCharts"
   >
-    <IconsChart
-      class="h-5 w-5 transition group-data-[state=on]:fill-gray-600 dark:text-neutral-400 dark:group-data-[state=on]:fill-gray-300"
-    />
+    <IconsChart class="size-4 transition group-data-[state=on]:fill-current" />
   </Toggle>
 </template>
 

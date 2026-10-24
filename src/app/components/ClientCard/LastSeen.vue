@@ -9,6 +9,7 @@
   >
     {{ lastSeen }}
   </span>
+  <span v-else>{{ $t('client.notConnected') }}</span>
 </template>
 
 <script setup lang="ts">

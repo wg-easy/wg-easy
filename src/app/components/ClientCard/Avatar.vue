@@ -1,30 +1,34 @@
 <template>
-  <div class="relative mt-2 h-10 w-10 self-start rounded-full bg-gray-50">
-    <BaseAvatar :img="client.avatar" class="h-10 w-10">
-      <IconsAvatar class="h-6 w-6 text-gray-300" />
-    </BaseAvatar>
-
-    <div
-      v-if="
-        isPeerConnected({
-          latestHandshakeAt: client.latestHandshakeAt
-            ? new Date(client.latestHandshakeAt)
-            : null,
-        })
-      "
+  <div class="relative shrink-0">
+    <BaseAvatar
+      :img="client.avatar"
+      class="size-11 rounded-xl border border-accent/20 bg-accent/10 text-accent"
+      >{{ initials }}</BaseAvatar
     >
-      <div
-        class="absolute -bottom-1 -right-1 h-4 w-4 animate-ping rounded-full bg-red-100 p-1 dark:bg-red-100"
-      />
-      <div
-        class="absolute bottom-0 right-0 h-2 w-2 rounded-full bg-red-800 dark:bg-red-600"
-      />
-    </div>
+    <span
+      class="absolute -right-0.5 -bottom-0.5 size-3 rounded-full border-2 border-surface"
+      :class="connected ? 'bg-success' : 'bg-subtle'"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-defineProps<{
-  client: LocalClient;
-}>();
+const props = defineProps<{ client: LocalClient }>();
+const initials = computed(() =>
+  props.client.name
+    .split(/[\s@._-]+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((word) => word[0]?.toUpperCase())
+    .join('')
+);
+const connected = computed(
+  () =>
+    props.client.enabled &&
+    isPeerConnected({
+      latestHandshakeAt: props.client.latestHandshakeAt
+        ? new Date(props.client.latestHandshakeAt)
+        : null,
+    })
+);
 </script>

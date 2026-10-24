@@ -7,13 +7,13 @@
       <IconsInfo class="size-4" />
     </BaseTooltip>
   </div>
-  <div class="flex gap-1">
+  <div class="flex min-w-0 flex-wrap gap-2">
     <BaseInput
       :id="id"
       v-model.trim="data"
       :name="id"
       type="text"
-      class="w-full"
+      class="w-full min-w-24 flex-1"
       :placeholder="placeholder"
     />
     <ClientOnly>

@@ -1,18 +1,24 @@
 <template>
-  <div class="flex flex-col gap-2">
+  <div class="col-span-full flex min-w-0 flex-col gap-2">
     <div v-if="data === null">
       {{ emptyText || $t('form.nullNoItems') }}
     </div>
     <div v-for="(item, i) in data" v-else :key="i">
-      <div class="mt-1 flex flex-row gap-1">
+      <div class="flex min-w-0 gap-2">
         <input
           :value="item"
           :name="name"
           type="text"
-          class="rounded-lg border-2 border-gray-100 text-gray-500 focus:border-red-800 focus:outline-0 focus:ring-0 dark:border-neutral-800 dark:bg-neutral-700 dark:text-neutral-200 dark:placeholder:text-neutral-400"
+          :aria-label="`${name} ${i + 1}`"
+          class="ui-input"
           @input="update($event, i)"
         />
-        <BaseSecondaryButton type="button" class="rounded-lg" @click="del(i)">
+        <BaseSecondaryButton
+          type="button"
+          class="rounded-lg"
+          :aria-label="$t('client.delete')"
+          @click="del(i)"
+        >
           {{ '-' }}
         </BaseSecondaryButton>
       </div>
