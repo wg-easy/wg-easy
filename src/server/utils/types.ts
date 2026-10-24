@@ -161,8 +161,15 @@ export const AddressSchema = z
 
 export const DnsSchema = z.array(AddressSchema, { message: t('zod.dns') });
 
+// Each entry is a single IP or CIDR, anything else breaks the generated
+// WireGuard config and the per-client firewall rules
+const AllowedIpEntrySchema = AddressSchema.refine(
+  (v) => isIP(v) || isCidr(v) !== 0,
+  { message: t('zod.allowedIpsInvalid') }
+);
+
 export const AllowedIpsSchema = z
-  .array(AddressSchema, { message: t('zod.allowedIps') })
+  .array(AllowedIpEntrySchema, { message: t('zod.allowedIps') })
   .min(1, { message: t('zod.allowedIps') });
 
 // Validation for firewall IP entries
