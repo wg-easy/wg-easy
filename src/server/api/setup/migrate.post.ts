@@ -1,12 +1,37 @@
-import { readValidatedBody } from 'h3';
+import { createError, readValidatedBody } from 'h3';
 import { parseCidr } from 'cidr-tools';
 import { stringifyIp } from 'ip-bigint';
 import { z } from 'zod';
 
 import Database from '#server/utils/Database';
 import { defineSetupEventHandler } from '#server/utils/handler';
-import { nextIPFromUsedAddresses } from '#server/utils/ip';
+import {
+  isAssignableClientAddress,
+  nextIPFromUsedAddresses,
+} from '#server/utils/ip';
 import { FileSchema, validateZod } from '#server/utils/types';
+
+function invalidImport(message: string) {
+  return createError({
+    statusCode: 400,
+    statusMessage: 'Invalid Config',
+    message,
+  });
+}
+
+function reservedClientsMessage(bad: { name: string; address: string }[]) {
+  const parts = bad.map(
+    (client) => `client "${client.name}" (${client.address})`
+  );
+  const list =
+    parts.length === 1
+      ? `${parts[0]} is`
+      : `${parts.slice(0, -1).join(', ')} and ${parts[parts.length - 1]} are`;
+  return (
+    `Invalid Config: ${list} not available for a client. ` +
+    'Use an address in the subnet except the network, server, and last address. Nothing was imported.'
+  );
+}
 
 export default defineSetupEventHandler('migrate', async ({ event }) => {
   const { file } = await readValidatedBody(
@@ -44,18 +69,41 @@ export default defineSetupEventHandler('migrate', async ({ event }) => {
 
   const oldConfig = res.data;
 
+  let ipv4Cidr;
+  try {
+    ipv4Cidr = parseCidr(oldConfig.server.address + '/24');
+  } catch {
+    throw invalidImport(
+      'Invalid Config: the server address is not a usable IPv4 network. Nothing was imported.'
+    );
+  }
+  const ipv4CidrText =
+    stringifyIp({ number: ipv4Cidr.start, version: 4 }) + `/${ipv4Cidr.prefix}`;
+  const reserved = [];
+  for (const clientConfig of Object.values(oldConfig.clients)) {
+    if (!clientConfig) {
+      continue;
+    }
+    if (!isAssignableClientAddress(ipv4CidrText, clientConfig.address)) {
+      reserved.push({
+        name: clientConfig.name,
+        address: clientConfig.address,
+      });
+    }
+  }
+  if (reserved.length > 0) {
+    throw invalidImport(reservedClientsMessage(reserved));
+  }
+
   await Database.interfaces.updateKeyPair(
     oldConfig.server.privateKey,
     oldConfig.server.publicKey
   );
 
-  const ipv4Cidr = parseCidr(oldConfig.server.address + '/24');
   const ipv6Cidr = parseCidr('fdcc:ad94:bacf:61a4::cafe:0/112');
 
   await Database.interfaces.updateCidr({
-    ipv4Cidr:
-      stringifyIp({ number: ipv4Cidr.start, version: 4 }) +
-      `/${ipv4Cidr.prefix}`,
+    ipv4Cidr: ipv4CidrText,
     ipv6Cidr: ipv6Cidr.cidr,
   });
   const ipv6Addresses = new Set(
