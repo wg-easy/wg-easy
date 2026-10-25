@@ -24,6 +24,18 @@ export function cacheFunction<T>(fn: () => T, { expiry }: Opts): () => T {
       expiry: now + expiry,
     };
 
+    if (result instanceof Promise) {
+      // A rejected lookup must be tried again. The caller still sees it.
+      void result.then(
+        () => undefined,
+        () => {
+          if (cache?.value === result) {
+            cache = null;
+          }
+        }
+      );
+    }
+
     return result;
   };
 }

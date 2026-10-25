@@ -6,18 +6,36 @@ import { RELEASE, WG_ENV } from '#server/utils/config';
 import { cachedFetchLatestRelease } from '#server/utils/release';
 
 export default defineEventHandler(async () => {
-  const latestRelease = await cachedFetchLatestRelease();
-  const updateAvailable = gt(latestRelease.version, RELEASE);
   const insecure = WG_ENV.INSECURE;
   const isAwg = WG_ENV.WG_EXECUTABLE === 'awg';
   const wgInterface = await Database.interfaces.get();
+  const release = await readLatestRelease();
 
   return {
     currentRelease: RELEASE,
-    latestRelease: latestRelease,
-    updateAvailable,
+    latestRelease: release.latestRelease,
+    updateAvailable: release.updateAvailable,
     insecure,
     isAwg,
     firewallEnabled: wgInterface.firewallEnabled,
   };
 });
+
+async function readLatestRelease() {
+  try {
+    const latestRelease = await cachedFetchLatestRelease();
+    return {
+      latestRelease,
+      updateAvailable: gt(latestRelease.version, RELEASE),
+    };
+  } catch {
+    // GitHub being down must not hide firewall or Amnezia settings.
+    return {
+      latestRelease: {
+        version: RELEASE,
+        changelog: '',
+      },
+      updateAvailable: false,
+    };
+  }
+}
