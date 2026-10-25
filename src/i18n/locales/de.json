@@ -155,7 +155,7 @@
     "nullNoItems": "Keine Einträge. Es wird die globale Konfiguration verwendet",
     "nullNotSet": "Nicht festgelegt",
     "set": "Festgelegt",
-    "unset": "Nicht festgelegt",    
+    "unset": "Nicht festgelegt",
     "add": "Hinzufügen"
   },
   "admin": {
