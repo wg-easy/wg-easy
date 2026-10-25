@@ -1,8 +1,8 @@
 import { Resolver } from 'node:dns/promises';
 import { networkInterfaces } from 'node:os';
 
-import { stringifyIp } from 'ip-bigint';
-import type { parseCidr } from 'cidr-tools';
+import { parseCidr } from 'cidr-tools';
+import { parseIp, stringifyIp } from 'ip-bigint';
 
 import { cacheFunction } from '#server/utils/cache';
 import type { ClientNextIpType } from '#db/repositories/client/types';
@@ -43,6 +43,21 @@ export function nextIPFromUsedAddresses(
   }
 
   return address;
+}
+
+/** Addresses nextIP will hand out: not the network, server, or last address. */
+export function isAssignableClientAddress(cidrText: string, address: string) {
+  const cidr = parseCidr(cidrText);
+  let parsed;
+  try {
+    parsed = parseIp(address);
+  } catch {
+    return false;
+  }
+  if (parsed.version !== cidr.version) {
+    return false;
+  }
+  return parsed.number >= cidr.start + 2n && parsed.number <= cidr.end - 1n;
 }
 
 // use opendns to get public ip

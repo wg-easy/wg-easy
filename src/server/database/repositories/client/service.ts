@@ -11,7 +11,7 @@ import type {
 
 import { WG_ENV } from '#server/utils/config';
 import Database from '#server/utils/Database';
-import { nextIP } from '#server/utils/ip';
+import { isAssignableClientAddress, nextIP } from '#server/utils/ip';
 import type { ID } from '#server/utils/types';
 import { wg } from '#server/utils/wgHelper';
 import type { DBType } from '#db/sqlite';
@@ -259,9 +259,19 @@ export class ClientService {
       if (!containsCidr(clientInterface.ipv4Cidr, data.ipv4Address)) {
         throw new Error('IPv4 address is not within the CIDR range');
       }
+      if (
+        !isAssignableClientAddress(clientInterface.ipv4Cidr, data.ipv4Address)
+      ) {
+        throw new Error('IPv4 address is not available for a client');
+      }
 
       if (!containsCidr(clientInterface.ipv6Cidr, data.ipv6Address)) {
         throw new Error('IPv6 address is not within the CIDR range');
+      }
+      if (
+        !isAssignableClientAddress(clientInterface.ipv6Cidr, data.ipv6Address)
+      ) {
+        throw new Error('IPv6 address is not available for a client');
       }
 
       await tx.update(client).set(data).where(eq(client.id, id)).execute();

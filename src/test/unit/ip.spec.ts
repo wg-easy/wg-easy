@@ -1,7 +1,10 @@
 import { parseCidr } from 'cidr-tools';
 import { describe, expect, test } from 'vitest';
 
-import { nextIPFromUsedAddresses } from '#server/utils/ip';
+import {
+  isAssignableClientAddress,
+  nextIPFromUsedAddresses,
+} from '#server/utils/ip';
 
 describe('nextIPFromUsedAddresses', () => {
   test('returns the first available address without scanning client records', () => {
@@ -36,5 +39,33 @@ describe('nextIPFromUsedAddresses', () => {
 
     expect(firstReplacement).toBe('10.0.0.4');
     expect(nextIPFromUsedAddresses(4, cidr, usedAddresses)).toBe('10.0.0.2');
+  });
+});
+
+describe('isAssignableClientAddress', () => {
+  test('allows addresses the allocator can hand out', () => {
+    expect(isAssignableClientAddress('10.8.0.0/24', '10.8.0.2')).toBe(true);
+    expect(isAssignableClientAddress('10.8.0.0/24', '10.8.0.254')).toBe(true);
+    expect(
+      isAssignableClientAddress(
+        'fdcc:ad94:bacf:61a4::cafe:0/112',
+        'fdcc:ad94:bacf:61a4::cafe:2'
+      )
+    ).toBe(true);
+  });
+
+  test('rejects the network, server, and last address', () => {
+    expect(isAssignableClientAddress('10.8.0.0/24', '10.8.0.0')).toBe(false);
+    expect(isAssignableClientAddress('10.8.0.0/24', '10.8.0.1')).toBe(false);
+    expect(isAssignableClientAddress('10.8.0.0/24', '10.8.0.255')).toBe(false);
+    expect(isAssignableClientAddress('10.8.0.0/24', '192.168.0.1')).toBe(false);
+    expect(isAssignableClientAddress('10.8.0.0/24', 'not-an-ip')).toBe(false);
+    expect(isAssignableClientAddress('10.8.0.0/24', 'fdcc::1')).toBe(false);
+    expect(
+      isAssignableClientAddress(
+        'fdcc:ad94:bacf:61a4::cafe:0/112',
+        'fdcc:ad94:bacf:61a4::cafe:1'
+      )
+    ).toBe(false);
   });
 });
