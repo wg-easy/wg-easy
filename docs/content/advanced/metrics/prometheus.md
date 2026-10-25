@@ -39,4 +39,5 @@ You can use the following Grafana dashboard to visualize the metrics:
 
 The Grafana dashboard is not official and is not maintained by the `wg-easy` team. If you have any issues with the dashboard, please contact the author of the dashboard.
 See [#1299](https://github.com/wg-easy/wg-easy/pull/1299) for more information.
+
 ///

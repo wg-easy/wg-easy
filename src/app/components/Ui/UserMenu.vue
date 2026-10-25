@@ -66,6 +66,8 @@
 </template>
 
 <script setup lang="ts">
+import { $fetch } from '#imports';
+
 const authStore = useAuthStore();
 const toggleState = ref(false);
 

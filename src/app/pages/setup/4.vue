@@ -32,6 +32,8 @@
 </template>
 
 <script setup lang="ts">
+import { $fetch } from '#imports';
+
 definePageMeta({
   layout: 'setup',
 });

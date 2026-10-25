@@ -1,16 +1,32 @@
 <template>
   <span
     v-if="client.latestHandshakeAt"
-    :title="$t('client.lastSeen') + $d(new Date(client.latestHandshakeAt))"
+    :title="
+      $t('client.lastSeen', {
+        date: $d(new Date(client.latestHandshakeAt)),
+      })
+    "
   >
-    {{ timeago(new Date(client.latestHandshakeAt)) }}
+    {{ lastSeen }}
   </span>
 </template>
 
 <script setup lang="ts">
-import { format as timeago } from 'timeago.js';
-
-defineProps<{
+const props = defineProps<{
   client: LocalClient;
 }>();
+
+const { localeProperties } = useI18n();
+
+const lastSeen = computed(() => {
+  const now = Date.now();
+
+  return formatTimeAgoIntl(
+    new Date(props.client.latestHandshakeAt ?? now),
+    {
+      locale: localeProperties.value.language,
+    },
+    now
+  );
+});
 </script>

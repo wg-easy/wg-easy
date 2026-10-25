@@ -1,7 +1,7 @@
 import { sql, relations } from 'drizzle-orm';
 import { int, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
-import { client } from '../../schema';
+import { client } from '../client/schema';
 
 export const oneTimeLink = sqliteTable('one_time_links_table', {
   /** same as `client.id` */

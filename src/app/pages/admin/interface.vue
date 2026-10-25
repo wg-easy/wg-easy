@@ -20,6 +20,12 @@
           :label="$t('admin.interface.device')"
           :description="$t('admin.interface.deviceDesc')"
         />
+        <FormTextField
+          id="routingTable"
+          v-model="data.routingTable"
+          :label="$t('admin.interface.routingTable')"
+          :description="$t('admin.interface.routingTableDesc')"
+        />
       </FormGroup>
       <FormGroup v-if="globalStore.information?.isAwg">
         <FormHeading>{{ $t('awg.obfuscationParameters') }}</FormHeading>
@@ -123,6 +129,63 @@
           :label="$t('awg.i5Label')"
           :description="$t('awg.i5Description')"
         />
+        <FormNullTextField
+          id="headerProtectionKey"
+          v-model="data.headerProtectionKey"
+          :label="$t('awg.headerProtectionKeyLabel')"
+          :description="$t('awg.headerProtectionKeyDescription')"
+        />
+
+        <div class="col-span-full text-sm">{{ $t('awg.rangeNote') }}</div>
+
+        <FormNullTextField
+          id="contentPaddingAddition"
+          v-model="data.contentPaddingAddition"
+          :label="$t('awg.contentPaddingAdditionLabel')"
+          :description="$t('awg.contentPaddingAdditionDescription')"
+        />
+        <FormNullTextField
+          id="rekeyAfterTime"
+          v-model="data.rekeyAfterTime"
+          :label="$t('awg.rekeyAfterTimeLabel')"
+          :description="$t('awg.rekeyAfterTimeDescription')"
+        />
+        <FormNullTextField
+          id="rekeyTimeout"
+          v-model="data.rekeyTimeout"
+          :label="$t('awg.rekeyTimeoutLabel')"
+          :description="$t('awg.rekeyTimeoutDescription')"
+        />
+        <FormNullTextField
+          id="rejectAfterTime"
+          v-model="data.rejectAfterTime"
+          :label="$t('awg.rejectAfterTimeLabel')"
+          :description="$t('awg.rejectAfterTimeDescription')"
+        />
+        <FormNullTextField
+          id="keepaliveTimeout"
+          v-model="data.keepaliveTimeout"
+          :label="$t('awg.keepaliveTimeoutLabel')"
+          :description="$t('awg.keepaliveTimeoutDescription')"
+        />
+        <FormNullTextField
+          id="maxHandshakeAttempts"
+          v-model="data.maxHandshakeAttempts"
+          :label="$t('awg.maxHandshakeAttemptsLabel')"
+          :description="$t('awg.maxHandshakeAttemptsDescription')"
+        />
+        <FormNullSwitchField
+          id="randomTrailers"
+          v-model="data.randomTrailers"
+          :label="$t('awg.randomTrailersLabel')"
+          :description="$t('awg.randomTrailersDescription')"
+        />
+        <FormNullSwitchField
+          id="disableCookies"
+          v-model="data.disableCookies"
+          :label="$t('awg.disableCookiesLabel')"
+          :description="$t('awg.disableCookiesDescription')"
+        />
       </FormGroup>
       <FormGroup>
         <FormHeading>{{ $t('admin.interface.firewall') }}</FormHeading>
@@ -145,8 +208,8 @@
         >
           <FormSecondaryActionField
             :label="$t('admin.interface.changeCidr')"
-            class="w-full"
-            tabindex="-1"
+            class="inline-block w-full"
+            as="span"
           />
         </AdminCidrDialog>
         <AdminRestartInterfaceDialog
@@ -155,8 +218,8 @@
         >
           <FormSecondaryActionField
             :label="$t('admin.interface.restart')"
-            class="w-full"
-            tabindex="-1"
+            class="inline-block w-full"
+            as="span"
           />
         </AdminRestartInterfaceDialog>
       </FormGroup>
@@ -165,6 +228,8 @@
 </template>
 
 <script setup lang="ts">
+import { $fetch } from '#imports';
+
 const globalStore = useGlobalStore();
 
 const { t } = useI18n();

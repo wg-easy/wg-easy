@@ -3,10 +3,9 @@ services:
     build:
       dockerfile: ./Dockerfile.dev
     command: dev
+    tmpfs:
+      - /app/.nuxt
     volumes:
-      - ./src/:/app/
-      - temp:/app/.nuxt/
-      - temp1:/app/node_modules/
       - /lib/modules:/lib/modules:ro
       # - ./data/:/etc/wireguard
     ports:
@@ -22,9 +21,17 @@ services:
       - INIT_USERNAME=testtest
       - INIT_PASSWORD=Qweasdyxcv!2
 
-# folders should be generated inside container
-volumes:
-  temp:
-    driver: local
-  temp1:
-    driver: local
+    develop:
+      watch:
+        - action: sync
+          path: ./src
+          target: /app
+          initial_sync: true
+          ignore:
+            - node_modules/
+            - .nuxt/
+            - .output/
+            - coverage/
+            - package.json
+            - pnpm-lock.yaml
+            - pnpm-workspace.yaml

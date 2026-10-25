@@ -5,6 +5,7 @@ title: Caddy
 /// note | Opinionated
 
 This guide is opinionated. If you use other conventions or folder layouts, feel free to change the commands and paths.
+
 ///
 
 We're using [Caddy](https://caddyserver.com/) here as reverse proxy to serve `wg-easy` on [https://wg-easy.example.com](https://wg-easy.example.com) via TLS.
@@ -100,3 +101,17 @@ sudo docker compose up -d
 ```
 
 You can now access `wg-easy` at [https://wg-easy.example.com](https://wg-easy.example.com) and start the setup.
+
+## Rate Limiting
+
+wg-easy does not implement rate limiting. Configure Caddy, a Caddy rate
+limiting module, or an external security tool such as CrowdSec to limit requests
+to these paths:
+
+- `/api/auth/password`
+- `/api/auth/verify-2fa`
+- `/cnf/*`
+
+Choose limits appropriate for your deployment. When using wg-easy security logs
+for detection, configure [`TRUSTED_PROXIES`](../../advanced/config/optional-config.md#trusted-proxies)
+so that logged events contain the original client IP address.

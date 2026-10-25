@@ -1,6 +1,7 @@
-FROM docker.io/library/node:krypton-alpine
+FROM docker.io/library/node:krypton-alpine@sha256:06d7adf3e0ef61a13f1d28682726366f97a15aa1888c934d3ecec86c33918b53
 WORKDIR /app
 
+ENV PNPM_HOME="/pnpm"
 # update corepack
 RUN npm install --global corepack@latest
 # Install pnpm
@@ -33,7 +34,7 @@ ENV DISABLE_IPV6=false
 
 # Install Dependencies
 COPY src/package.json src/pnpm-lock.yaml src/pnpm-workspace.yaml ./
-RUN pnpm install
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 
 # Copy Project
 COPY src ./

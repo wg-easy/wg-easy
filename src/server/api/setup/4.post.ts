@@ -1,3 +1,8 @@
+import { readValidatedBody } from 'h3';
+
+import Database from '#server/utils/Database';
+import { defineSetupEventHandler } from '#server/utils/handler';
+import { validateZod } from '#server/utils/types';
 import { UserConfigSetupSchema } from '#db/repositories/userConfig/types';
 
 export default defineSetupEventHandler(4, async ({ event }) => {

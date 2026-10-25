@@ -1,4 +1,9 @@
+import { defineEventHandler } from 'h3';
 import { gt } from 'semver';
+
+import Database from '#server/utils/Database';
+import { RELEASE, WG_ENV } from '#server/utils/config';
+import { cachedFetchLatestRelease } from '#server/utils/release';
 
 export default defineEventHandler(async () => {
   const latestRelease = await cachedFetchLatestRelease();

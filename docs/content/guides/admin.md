@@ -23,7 +23,9 @@ This feature is currently experimental. While functional, it should be thoroughl
 - The feature cannot be enabled if these tools are not available
 
 /// note
+
 Most Linux distributions include iptables by default. If you're running in a minimal container environment, you may need to install the `iptables` package on the host system.
+
 ///
 
 **Enable this feature if you want to:**

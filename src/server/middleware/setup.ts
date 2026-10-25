@@ -1,3 +1,7 @@
+import { defineEventHandler, getRequestURL, sendRedirect } from 'h3';
+
+import Database from '#server/utils/Database';
+
 /* First setup of wg-easy */
 export default defineEventHandler(async (event) => {
   const url = getRequestURL(event);

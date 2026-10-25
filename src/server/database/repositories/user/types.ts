@@ -1,6 +1,9 @@
 import type { InferSelectModel } from 'drizzle-orm';
 import z from 'zod';
+
 import type { user } from './schema';
+
+import { safeStringRefine, t } from '#server/utils/types';
 
 export type UserType = InferSelectModel<typeof user>;
 
@@ -18,14 +21,16 @@ const remember = z.boolean({ message: t('zod.user.remember') });
 
 const totpCode = z
   .string({ message: t('zod.user.totpCode') })
+  // min and max to improve error messages
   .min(6, t('zod.user.totpCode'))
+  .max(6, t('zod.user.totpCode'))
+  .regex(/^\d{6}$/, t('zod.user.totpCode'))
   .pipe(safeStringRefine);
 
 export const UserLoginSchema = z.object({
   username: username,
   password: password,
   remember: remember,
-  totpCode: totpCode.optional(),
 });
 
 export const UserSetupSchema = z
@@ -44,9 +49,8 @@ const name = z
   .pipe(safeStringRefine);
 
 const email = z
-  .string({ message: t('zod.user.email') })
-  .min(5, t('zod.user.email'))
   .email({ message: t('zod.user.emailInvalid') })
+  .min(5, t('zod.user.email'))
   .pipe(safeStringRefine)
   .nullable();
 
@@ -57,7 +61,7 @@ export const UserUpdateSchema = z.object({
 
 export const UserUpdatePasswordSchema = z
   .object({
-    currentPassword: password,
+    currentPassword: password.nullable(),
     newPassword: password,
     confirmPassword: password,
   })
@@ -78,3 +82,7 @@ export const UserUpdateTotpSchema = z.union([
     currentPassword: password,
   }),
 ]);
+
+export const Verify2faSchema = z.object({
+  totpCode: totpCode,
+});

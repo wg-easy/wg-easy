@@ -1,3 +1,7 @@
+import WireGuard from '#server/utils/WireGuard';
+import { defineMetricsHandler } from '#server/utils/handler';
+import { isPeerConnected } from '#shared/utils/time';
+
 export default defineMetricsHandler('json', async () => {
   return getMetricsJSON();
 });

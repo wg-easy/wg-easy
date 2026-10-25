@@ -1,3 +1,11 @@
+import {
+  tryCookieLocale,
+  tryHeaderLocale,
+  tryQueryLocale,
+} from '@intlify/utils/h3';
+
+import { defineI18nLocaleDetector } from '#imports';
+
 export default defineI18nLocaleDetector((event, config) => {
   const query = tryQueryLocale(event, { lang: '' });
   if (query) {

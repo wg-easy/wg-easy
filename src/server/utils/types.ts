@@ -1,4 +1,5 @@
-import type { ZodSchema } from 'zod';
+import { useTranslation } from '@intlify/h3';
+import type { ZodType } from 'zod';
 import z from 'zod';
 import type { H3Event, EventHandlerRequest } from 'h3';
 import { isIP } from 'is-ip';
@@ -20,6 +21,15 @@ export const safeStringRefine = z
     { message: t('zod.stringMalformed') }
   );
 
+function hasControlChars(str: string) {
+  // eslint-disable-next-line no-control-regex
+  return /[\x00-\x1F\x7F]/.test(str);
+}
+
+export const controlStringRefine = z
+  .string()
+  .refine((v) => !hasControlChars(v), { message: t('zod.stringMalformed') });
+
 export const EnabledSchema = z.boolean({ message: t('zod.enabled') });
 
 export const MtuSchema = z
@@ -36,46 +46,107 @@ export const JmaxSchema = z.number().max(1280).nullable();
 
 export const SSchema = z.number().max(1132).nullable();
 
+const RANGE_REGEX = /^(\d+)(?:-(\d+))?$/;
+
+function parseRange(value: string) {
+  const match = RANGE_REGEX.exec(value);
+  if (!match) return null;
+
+  const lower = Number(match[1]);
+  const upper = match[2] === undefined ? lower : Number(match[2]);
+
+  if (!Number.isSafeInteger(lower) || !Number.isSafeInteger(upper)) return null;
+
+  return { lower, upper };
+}
+
+/**
+ * AmneziaWG accepts either a single number or an inclusive `lower-upper` range
+ * for several parameters (see `u32_range_from_string` / `u16_range_from_string`
+ * in amneziawg-tools). Values outside of `[min, max]` are silently truncated by
+ * the parser, so they are rejected here instead.
+ */
+function rangeSchema(min: number, max: number) {
+  return z
+    .string()
+    .transform((v) => v.replace(/\s+/g, ''))
+    .refine(
+      (v) => {
+        const range = parseRange(v);
+        if (!range) return false;
+
+        return (
+          range.lower >= min && range.upper <= max && range.lower <= range.upper
+        );
+      },
+      {
+        message: t('zod.generic.validNumberRange'),
+      }
+    )
+    .transform((v) => {
+      const range = parseRange(v);
+      // cannot happen, the refine above already rejected unparsable values
+      if (!range) return v;
+
+      return range.lower === range.upper
+        ? `${range.lower}`
+        : `${range.lower}-${range.upper}`;
+    })
+    .nullable();
+}
+
 const H_MIN = 5;
 const H_MAX = 2 ** 31 - 1;
 
-export const HSchema = z
+/** H1-H4 packet header types, parsed as a uint32 range */
+export const HSchema = rangeSchema(H_MIN, H_MAX);
+
+/**
+ * AmneziaWG 3.0+ parameters that are parsed as a uint16 range:
+ * ContentPaddingAddition, RekeyAfterTime, RekeyTimeout, RejectAfterTime,
+ * KeepaliveTimeout and MaxHandshakeAttempts.
+ */
+export const AwgRangeSchema = rangeSchema(0, 65535);
+
+/** Length of a WireGuard key in bytes */
+const KEY_LENGTH = 32;
+
+/**
+ * A 32 byte key in canonical base64, the same format WireGuard uses for its
+ * own keys. Used by the AmneziaWG 3.0+ `HeaderProtectionKey` parameter.
+ */
+export const KeySchema = z
   .string()
-  .transform((v) => v.replace(/\s+/g, ''))
+  .pipe(safeStringRefine)
+  .pipe(controlStringRefine)
   .refine(
     (v) => {
-      if (!v) return false;
+      const key = Buffer.from(v, 'base64');
 
-      if (!/^\d+(-\d+)?$/.test(v)) return false;
-
-      if (!v.includes('-')) {
-        const num = Number(v);
-        return num >= H_MIN && num <= H_MAX;
-      }
-
-      const [min, max] = v.split('-').map(Number);
-      return min && max && min >= H_MIN && max <= H_MAX && min <= max;
-
-      return false;
+      return key.length === KEY_LENGTH && key.toString('base64') === v;
     },
-    {
-      message: t('zod.generic.validNumberRange'),
-    }
+    { message: t('zod.keyMalformed') }
   )
-  .transform((v) => {
-    if (!v.includes('-')) return `${Number(v)}`;
-
-    const [min, max] = v.split('-').map(Number);
-    return min === max ? `${min}` : `${min}-${max}`;
-  })
   .nullable();
 
-export const ISchema = z.string().nullable();
+export const ISchema = z
+  .string()
+  .pipe(safeStringRefine)
+  .pipe(controlStringRefine)
+  .nullable();
 
 export const PortSchema = z
   .number({ message: t('zod.port') })
   .min(1, { message: t('zod.port') })
   .max(65535, { message: t('zod.port') });
+
+export const RoutingTableSchema = z
+  .string({ message: t('zod.interface.routingTable') })
+  .pipe(safeStringRefine)
+  .pipe(controlStringRefine)
+  .refine((v) => /^(auto|off|\d+)$/.test(v), {
+    message: t('zod.interface.routingTable'),
+  });
 
 export const PersistentKeepaliveSchema = z
   .number({ message: t('zod.persistentKeepalive') })
@@ -85,7 +156,8 @@ export const PersistentKeepaliveSchema = z
 export const AddressSchema = z
   .string({ message: t('zod.address') })
   .min(1, { message: t('zod.address') })
-  .pipe(safeStringRefine);
+  .pipe(safeStringRefine)
+  .pipe(controlStringRefine);
 
 export const DnsSchema = z.array(AddressSchema, { message: t('zod.dns') });
 
@@ -168,7 +240,7 @@ export const schemaForType =
   };
 
 export function validateZod<T>(
-  schema: ZodSchema<T>,
+  schema: ZodType<T>,
   event: H3Event<EventHandlerRequest>
 ) {
   return async (data: unknown) => {
@@ -190,51 +262,70 @@ export function validateZod<T>(
                   case 'too_small':
                     switch (v.origin) {
                       case 'string':
-                        newMessage = t('zod.generic.stringMin', [
-                          t(v.message),
-                          v.minimum,
-                        ]);
+                        newMessage = t('zod.generic.stringMin', {
+                          field: t(v.message),
+                          min: v.minimum,
+                        });
                         break;
                       case 'number':
-                        newMessage = t('zod.generic.numberMin', [
-                          t(v.message),
-                          v.minimum,
-                        ]);
+                        newMessage = t('zod.generic.numberMin', {
+                          field: t(v.message),
+                          min: v.minimum,
+                        });
+                        break;
+                    }
+                    break;
+                  case 'too_big':
+                    switch (v.origin) {
+                      case 'string':
+                        newMessage = t('zod.generic.stringMax', {
+                          field: t(v.message),
+                          max: v.maximum,
+                        });
+                        break;
+                      case 'number':
+                        newMessage = t('zod.generic.numberMax', {
+                          field: t(v.message),
+                          max: v.maximum,
+                        });
                         break;
                     }
                     break;
                   case 'invalid_type': {
                     if (v.input === null || v.input === undefined) {
-                      newMessage = t('zod.generic.required', [
-                        v.path.join('.'),
-                      ]);
+                      newMessage = t('zod.generic.required', {
+                        field: v.path.join('.'),
+                      });
                     } else {
                       switch (v.expected) {
                         case 'string':
-                          newMessage = t('zod.generic.validString', [
-                            t(v.message),
-                          ]);
+                          newMessage = t('zod.generic.validString', {
+                            field: t(v.message),
+                          });
                           break;
                         case 'boolean':
-                          newMessage = t('zod.generic.validBoolean', [
-                            t(v.message),
-                          ]);
+                          newMessage = t('zod.generic.validBoolean', {
+                            field: t(v.message),
+                          });
                           break;
                         case 'number':
-                          newMessage = t('zod.generic.validNumber', [
-                            t(v.message),
-                          ]);
+                          newMessage = t('zod.generic.validNumber', {
+                            field: t(v.message),
+                          });
                           break;
                         case 'array':
-                          newMessage = t('zod.generic.validArray', [
-                            t(v.message),
-                          ]);
+                          newMessage = t('zod.generic.validArray', {
+                            field: t(v.message),
+                          });
                           break;
                       }
                     }
                     break;
                   }
                 }
+              }
+              if (!newMessage && v.message === 'zod.generic.validNumberRange') {
+                newMessage = t(v.message, { field: v.path.join('.') });
               }
               if (newMessage) {
                 m = newMessage;
@@ -247,6 +338,7 @@ export function validateZod<T>(
           })
           .join('; ');
       }
+      // eslint-disable-next-line preserve-caught-error
       throw new Error(message);
     }
   };

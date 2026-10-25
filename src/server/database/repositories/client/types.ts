@@ -1,7 +1,28 @@
 import type { InferSelectModel } from 'drizzle-orm';
 import z from 'zod';
+import { isIPv4, isIPv6 } from 'is-ip';
 
 import type { client } from './schema';
+
+import {
+  AddressSchema,
+  AllowedIpsSchema,
+  AwgRangeSchema,
+  DnsSchema,
+  EnabledSchema,
+  FirewallIpsSchema,
+  HookSchema,
+  ISchema,
+  JcSchema,
+  JmaxSchema,
+  JminSchema,
+  MtuSchema,
+  PersistentKeepaliveSchema,
+  controlStringRefine,
+  safeStringRefine,
+  schemaForType,
+  t,
+} from '#server/utils/types';
 
 export type ClientType = InferSelectModel<typeof client>;
 
@@ -20,7 +41,8 @@ export type UpdateClientType = Omit<
 const name = z
   .string({ message: t('zod.client.name') })
   .min(1, t('zod.client.name'))
-  .pipe(safeStringRefine);
+  .pipe(safeStringRefine)
+  .pipe(controlStringRefine);
 
 // TODO?: validate iso string
 const expiresAt = z
@@ -32,14 +54,16 @@ const expiresAt = z
 const address4 = z
   .string({ message: t('zod.client.address4') })
   .min(1, { message: t('zod.client.address4') })
-  .pipe(safeStringRefine);
+  .pipe(safeStringRefine)
+  .pipe(controlStringRefine)
+  .refine((v) => isIPv4(v));
 
 const address6 = z
   .string({ message: t('zod.client.address6') })
   .min(1, { message: t('zod.client.address6') })
-  .pipe(safeStringRefine);
-
-const filter = z.string().optional();
+  .pipe(safeStringRefine)
+  .pipe(controlStringRefine)
+  .refine((v) => isIPv6(v));
 
 const serverAllowedIps = z.array(AddressSchema, {
   message: t('zod.client.serverAllowedIps'),
@@ -52,8 +76,13 @@ export const ClientCreateSchema = z.object({
 
 export type ClientCreateType = z.infer<typeof ClientCreateSchema>;
 
+const filter = z.string().pipe(safeStringRefine);
+
+const sort = z.enum(['asc', 'desc']);
+
 export const ClientQuerySchema = z.object({
-  filter: filter,
+  filter: filter.optional(),
+  sort: sort.optional(),
 });
 
 export type ClientQueryType = z.infer<typeof ClientQuerySchema>;
@@ -81,13 +110,19 @@ export const ClientUpdateSchema = schemaForType<UpdateClientType>()(
     i3: ISchema,
     i4: ISchema,
     i5: ISchema,
+    contentPaddingAddition: AwgRangeSchema,
+    rekeyAfterTime: AwgRangeSchema,
+    rekeyTimeout: AwgRangeSchema,
+    rejectAfterTime: AwgRangeSchema,
+    keepaliveTimeout: AwgRangeSchema,
+    maxHandshakeAttempts: AwgRangeSchema,
+    disableCookies: z.boolean().nullable(),
     persistentKeepalive: PersistentKeepaliveSchema,
     serverEndpoint: AddressSchema.nullable(),
     dns: DnsSchema.nullable(),
   })
 );
 
-// TODO: investigate if coerce is bad
 const clientId = z.coerce.number({ message: t('zod.client.id') });
 
 export const ClientGetSchema = z.object({

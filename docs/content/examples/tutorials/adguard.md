@@ -9,9 +9,11 @@ This tutorial is a follow-up to the official [Traefik tutorial](./traefik.md). I
 - A working [wg-easy](./basic-installation.md) and [Traefik](./traefik.md) setup from the previous guides.
 
 /// warning | Important: Following this guide will reset your WireGuard configuration.
+
 The process involves re-creating the `wg-easy` container and its data, which means **all existing WireGuard clients and settings will be deleted.**
 
 You will need to create your clients again after completing this guide.
+
 ///
 
 ## Add `adguard` configuration
@@ -125,13 +127,13 @@ networks:
     **_PostUp_**
 
     ```shell
-    iptables -A INPUT -p udp -m udp --dport {{port}} -j ACCEPT; ip6tables -A INPUT -p udp -m udp --dport {{port}} -j ACCEPT; iptables -t nat -A PREROUTING -i wg0 -p udp --dport 53 -j DNAT --to-destination 10.42.42.43; iptables -t nat -A PREROUTING -i wg0 -p tcp --dport 53 -j DNAT --to-destination 10.42.42.43; ip6tables -t nat -A PREROUTING -i wg0 -p udp --dport 53 -j DNAT --to-destination fdcc:ad94:bacf:61a3::2b; ip6tables -t nat -A PREROUTING -i wg0 -p tcp --dport 53 -j DNAT --to-destination fdcc:ad94:bacf:61a3::2b; iptables -A FORWARD -i wg0 -j ACCEPT; iptables -A FORWARD -o wg0 -j ACCEPT; ip6tables -A FORWARD -i wg0 -j ACCEPT; ip6tables -A FORWARD -o wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -s {{ipv4Cidr}} -o {{device}} -j MASQUERADE; ip6tables -t nat -A POSTROUTING -s {{ipv6Cidr}} -o {{device}} -j MASQUERADE;
+    iptables -A INPUT -p udp -m udp --dport {{port}} -j ACCEPT; ip6tables -A INPUT -p udp -m udp --dport {{port}} -j ACCEPT; iptables -t nat -A PREROUTING -i {{interface}} -p udp --dport 53 -j DNAT --to-destination 10.42.42.43; iptables -t nat -A PREROUTING -i {{interface}} -p tcp --dport 53 -j DNAT --to-destination 10.42.42.43; ip6tables -t nat -A PREROUTING -i {{interface}} -p udp --dport 53 -j DNAT --to-destination fdcc:ad94:bacf:61a3::2b; ip6tables -t nat -A PREROUTING -i {{interface}} -p tcp --dport 53 -j DNAT --to-destination fdcc:ad94:bacf:61a3::2b; iptables -A FORWARD -i {{interface}} -j ACCEPT; iptables -A FORWARD -o {{interface}} -j ACCEPT; ip6tables -A FORWARD -i {{interface}} -j ACCEPT; ip6tables -A FORWARD -o {{interface}} -j ACCEPT; iptables -t nat -A POSTROUTING -s {{ipv4Cidr}} -o {{device}} -j MASQUERADE; ip6tables -t nat -A POSTROUTING -s {{ipv6Cidr}} -o {{device}} -j MASQUERADE;
     ```
 
     **_PostDown_**
 
     ```shell
-    iptables -D INPUT -p udp -m udp --dport {{port}} -j ACCEPT || true; ip6tables -D INPUT -p udp -m udp --dport {{port}} -j ACCEPT || true; iptables -t nat -D PREROUTING -i wg0 -p udp --dport 53 -j DNAT --to-destination 10.42.42.43 || true; iptables -t nat -D PREROUTING -i wg0 -p tcp --dport 53 -j DNAT --to-destination 10.42.42.43 || true; ip6tables -t nat -D PREROUTING -i wg0 -p udp --dport 53 -j DNAT --to-destination fdcc:ad94:bacf:61a3::2b || true; ip6tables -t nat -D PREROUTING -i wg0 -p tcp --dport 53 -j DNAT --to-destination fdcc:ad94:bacf:61a3::2b || true; iptables -D FORWARD -i wg0 -j ACCEPT || true; iptables -D FORWARD -o wg0 -j ACCEPT || true; ip6tables -D FORWARD -i wg0 -j ACCEPT || true; ip6tables -D FORWARD -o wg0 -j ACCEPT || true; iptables -t nat -D POSTROUTING -s {{ipv4Cidr}} -o {{device}} -j MASQUERADE || true; ip6tables -t nat -D POSTROUTING -s {{ipv6Cidr}} -o {{device}} -j MASQUERADE || true;
+    iptables -D INPUT -p udp -m udp --dport {{port}} -j ACCEPT || true; ip6tables -D INPUT -p udp -m udp --dport {{port}} -j ACCEPT || true; iptables -t nat -D PREROUTING -i {{interface}} -p udp --dport 53 -j DNAT --to-destination 10.42.42.43 || true; iptables -t nat -D PREROUTING -i {{interface}} -p tcp --dport 53 -j DNAT --to-destination 10.42.42.43 || true; ip6tables -t nat -D PREROUTING -i {{interface}} -p udp --dport 53 -j DNAT --to-destination fdcc:ad94:bacf:61a3::2b || true; ip6tables -t nat -D PREROUTING -i {{interface}} -p tcp --dport 53 -j DNAT --to-destination fdcc:ad94:bacf:61a3::2b || true; iptables -D FORWARD -i {{interface}} -j ACCEPT || true; iptables -D FORWARD -o {{interface}} -j ACCEPT || true; ip6tables -D FORWARD -i {{interface}} -j ACCEPT || true; ip6tables -D FORWARD -o {{interface}} -j ACCEPT || true; iptables -t nat -D POSTROUTING -s {{ipv4Cidr}} -o {{device}} -j MASQUERADE || true; ip6tables -t nat -D POSTROUTING -s {{ipv6Cidr}} -o {{device}} -j MASQUERADE || true;
     ```
 
 3. Restart `wg-easy` to apply changes:
@@ -152,12 +154,14 @@ networks:
 2. Navigate to `https://adguard.$example.com$` to begin the AdGuard Home setup.
 
 /// warning | Important: Configure AdGuard Home Admin Web Interface Port
+
 During the initial AdGuard Home setup on the `Step 2/5` page, you **must** set the **Admin Web Interface Port** to **3000**. Do not use the default port 80, as it will not work with the Traefik configuration.
 
 After completing the setup, the AdGuard UI might appear unresponsive. This is expected. **Simply reload the page**, and the panel will display correctly.
-///
 
 > If you accidentally left it default (80), you will need to manually edit the `docker-compose.yml` file for AdGuard Home (`/etc/docker/containers/adguard/docker-compose.yml`) and change the line `traefik.http.services.adguard.loadbalancer.server.port=3000` to `traefik.http.services.adguard.loadbalancer.server.port=80`. After making this change, restart AdGuard Home by navigating to `/etc/docker/containers/adguard` and running `sudo docker compose up -d`.
+
+///
 
 ## Final System Checks
 

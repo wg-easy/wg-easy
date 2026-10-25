@@ -1,8 +1,24 @@
+import { createError, getHeader, getSession, useSession } from 'h3';
 import type { H3Event } from 'h3';
+
+import Database from '#server/utils/Database';
+import { WG_ENV } from '#server/utils/config';
+import { isPasswordValid } from '#server/utils/password';
+import type { ID } from '#server/utils/types';
 import type { UserType } from '#db/repositories/user/types';
 
 export type WGSession = Partial<{
   userId: ID;
+  pendingLogin: {
+    type: 'password' | 'oauth';
+    userId: ID;
+    remember: boolean;
+    /** in milliseconds */
+    expires_at: number;
+  };
+  oauth_verifier: string;
+  oauth_nonce: string;
+  oauth_state: string;
 }>;
 
 const name = 'wg-easy';
@@ -40,11 +56,18 @@ export async function getCurrentUser(event: H3Event) {
 
   const authorization = getHeader(event, 'Authorization');
 
-  let user: UserType | undefined = undefined;
+  let user: UserType | undefined;
   if (session.data.userId) {
     // Handle if authenticating using Session
     user = await Database.users.get(session.data.userId);
   } else if (authorization) {
+    if (WG_ENV.DISABLE_PASSWORD_AUTH) {
+      throw createError({
+        statusCode: 403,
+        statusMessage: 'Password authentication is disabled',
+      });
+    }
+
     // Handle if authenticating using Header
     const [method, value] = authorization.split(' ');
     // Support Basic Authentication
@@ -70,21 +93,14 @@ export async function getCurrentUser(event: H3Event) {
       });
     }
 
-    // TODO: timing can be used to enumerate usernames
-
     const foundUser = await Database.users.getByUsername(username);
 
-    if (!foundUser) {
-      throw createError({
-        statusCode: 401,
-        statusMessage: 'Session failed',
-      });
-    }
-
-    const userHashPassword = foundUser.password;
+    // always check to avoid timing attack
+    const userHashPassword = foundUser?.password ?? null;
     const passwordValid = await isPasswordValid(password, userHashPassword);
 
-    if (!passwordValid) {
+    // can't login through basic auth if 2fa enabled
+    if (!foundUser || !passwordValid || foundUser.totpVerified) {
       throw createError({
         statusCode: 401,
         statusMessage: 'Session failed',

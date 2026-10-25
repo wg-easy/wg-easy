@@ -1,7 +1,11 @@
 import { eq, sql } from 'drizzle-orm';
 import { parseCidr } from 'cidr-tools';
+
 import { wgInterface } from './schema';
 import type { InterfaceCidrUpdateType, InterfaceUpdateType } from './types';
+
+import { WG_ENV } from '#server/utils/config';
+import { nextIPFromUsedAddresses } from '#server/utils/ip';
 import { client as clientSchema } from '#db/schema';
 import type { DBType } from '#db/sqlite';
 
@@ -39,7 +43,7 @@ export class InterfaceService {
 
   async get() {
     const wgInterface = await this.#statements.get.execute({
-      interface: 'wg0',
+      interface: WG_ENV.WG_INTERFACE,
     });
     if (!wgInterface) {
       throw new Error('Interface not found');
@@ -49,7 +53,7 @@ export class InterfaceService {
 
   updateKeyPair(privateKey: string, publicKey: string) {
     return this.#statements.updateKeyPair.execute({
-      interface: 'wg0',
+      interface: WG_ENV.WG_INTERFACE,
       privateKey,
       publicKey,
     });
@@ -59,13 +63,13 @@ export class InterfaceService {
     return this.#db
       .update(wgInterface)
       .set(data)
-      .where(eq(wgInterface.name, 'wg0'))
+      .where(eq(wgInterface.name, WG_ENV.WG_INTERFACE))
       .execute();
   }
 
   setFirewallEnabled(firewallEnabled: boolean) {
     return this.#statements.setFirewallEnabled.execute({
-      interface: 'wg0',
+      interface: WG_ENV.WG_INTERFACE,
       firewallEnabled,
     });
   }
@@ -74,7 +78,7 @@ export class InterfaceService {
     return this.#db.transaction(async (tx) => {
       const oldCidr = await tx.query.wgInterface
         .findFirst({
-          where: eq(wgInterface.name, 'wg0'),
+          where: eq(wgInterface.name, WG_ENV.WG_INTERFACE),
           columns: { ipv4Cidr: true, ipv6Cidr: true },
         })
         .execute();
@@ -86,25 +90,40 @@ export class InterfaceService {
       await tx
         .update(wgInterface)
         .set(data)
-        .where(eq(wgInterface.name, 'wg0'))
+        .where(eq(wgInterface.name, WG_ENV.WG_INTERFACE))
         .execute();
 
       const clients = await tx.query.client.findMany().execute();
+      const ipv4Addresses = new Set(
+        clients.map((client) => client.ipv4Address)
+      );
+      const ipv6Addresses = new Set(
+        clients.map((client) => client.ipv6Address)
+      );
 
       for (const client of clients) {
-        // TODO: optimize
-        const clients = await tx.query.client.findMany().execute();
-
         // only calculate ip if cidr has changed
 
         let nextIpv4 = client.ipv4Address;
         if (data.ipv4Cidr !== oldCidr.ipv4Cidr) {
-          nextIpv4 = nextIP(4, parseCidr(data.ipv4Cidr), clients);
+          nextIpv4 = nextIPFromUsedAddresses(
+            4,
+            parseCidr(data.ipv4Cidr),
+            ipv4Addresses
+          );
+          ipv4Addresses.add(nextIpv4);
+          ipv4Addresses.delete(client.ipv4Address);
         }
 
         let nextIpv6 = client.ipv6Address;
         if (data.ipv6Cidr !== oldCidr.ipv6Cidr) {
-          nextIpv6 = nextIP(6, parseCidr(data.ipv6Cidr), clients);
+          nextIpv6 = nextIPFromUsedAddresses(
+            6,
+            parseCidr(data.ipv6Cidr),
+            ipv6Addresses
+          );
+          ipv6Addresses.add(nextIpv6);
+          ipv6Addresses.delete(client.ipv6Address);
         }
 
         await tx

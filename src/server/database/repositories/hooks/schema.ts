@@ -1,7 +1,7 @@
 import { sql } from 'drizzle-orm';
 import { sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
-import { wgInterface } from '../../schema';
+import { wgInterface } from '../interface/schema';
 
 export const hooks = sqliteTable('hooks_table', {
   /** same as `wgInterface.name` */

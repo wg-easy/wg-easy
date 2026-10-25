@@ -33,6 +33,8 @@
 </template>
 
 <script setup lang="ts">
+import { $fetch } from '#imports';
+
 const { data: _data, refresh } = await useFetch(`/api/admin/hooks`, {
   method: 'get',
 });

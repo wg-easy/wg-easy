@@ -6,3 +6,10 @@ allowBuilds:
   vue-demi: false
 
 minimumReleaseAgeStrict: true
+
+publicHoistPattern:
+  - '@intlify/utils'
+  - '@intlify/h3'
+  - 'h3'
+  - 'nitropack'
+  - 'ofetch'

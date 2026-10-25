@@ -1,3 +1,6 @@
 .DS_Store
 *.swp
 node_modules
+
+docs/site
+docs/.cache

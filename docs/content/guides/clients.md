@@ -62,7 +62,9 @@ Protocol specifiers (`/tcp` or `/udp`) require a port number. The following form
 - **Disable for specific client**: To disable firewall filtering for a single client while keeping it enabled for others, add `0.0.0.0/0, ::/0` to allow all traffic
 
 /// note
+
 To allow clients to reach the VPN server itself (e.g. for DNS), include the server's VPN address in the firewall allowed IPs.
+
 ///
 
 **Use Case Examples**:

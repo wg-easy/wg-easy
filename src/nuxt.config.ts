@@ -2,17 +2,14 @@ import { fileURLToPath } from 'node:url';
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  future: {
-    compatibilityVersion: 4,
-  },
-  compatibilityDate: '2026-02-06',
+  compatibilityDate: '2026-06-19',
   devtools: { enabled: true },
   modules: [
     '@nuxtjs/i18n',
     '@nuxtjs/tailwindcss',
     '@pinia/nuxt',
-    '@eschricht/nuxt-color-mode',
-    'radix-vue/nuxt',
+    '@nuxtjs/color-mode',
+    'reka-ui/nuxt',
     '@vueuse/nuxt',
     '@nuxt/eslint',
     '@nuxt/test-utils/module',
@@ -20,8 +17,8 @@ export default defineNuxtConfig({
   colorMode: {
     preference: 'system',
     fallback: 'light',
-    classSuffix: '',
-    cookieName: 'theme',
+    storage: 'cookie',
+    storageKey: 'theme',
   },
   css: ['~/app.css'],
   i18n: {
@@ -151,6 +148,16 @@ export default defineNuxtConfig({
         language: 'vi-VN',
         name: 'Tiếng Việt',
       },
+      {
+        code: 'sv',
+        language: 'sv-SE',
+        name: 'Svenska',
+      },
+      {
+        code: 'az',
+        language: 'az-AZ',
+        name: 'Azərbaycan',
+      },
     ],
     defaultLocale: 'en',
     vueI18n: './i18n.config.ts',
@@ -160,21 +167,24 @@ export default defineNuxtConfig({
     },
   },
   nitro: {
+    imports: {
+      autoImport: false,
+    },
     esbuild: {
       options: {
-        // to support big int
-        target: 'node20',
+        target: 'node24',
       },
     },
-    alias: {
-      '#db': fileURLToPath(new URL('./server/database/', import.meta.url)),
-    },
     externals: {
-      traceInclude: [fileURLToPath(new URL('./cli/index.ts', import.meta.url))],
+      traceInclude: [
+        fileURLToPath(
+          new URL('./node_modules/.cache/wg-easy/trace.mjs', import.meta.url)
+        ),
+      ],
     },
   },
   alias: {
-    // for typecheck reasons (https://github.com/nuxt/cli/issues/323)
     '#db': fileURLToPath(new URL('./server/database/', import.meta.url)),
+    '#cli': fileURLToPath(new URL('./cli', import.meta.url)),
   },
 });

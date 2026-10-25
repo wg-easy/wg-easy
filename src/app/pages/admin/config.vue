@@ -112,6 +112,8 @@
 </template>
 
 <script lang="ts" setup>
+import { $fetch } from '#imports';
+
 const globalStore = useGlobalStore();
 
 const { data: _data, refresh } = await useFetch(`/api/admin/userconfig`, {

@@ -1,7 +1,7 @@
 import { sql } from 'drizzle-orm';
 import { int, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
-import { wgInterface } from '../../schema';
+import { wgInterface } from '../interface/schema';
 
 // default* means clients store it themselves
 export const userConfig = sqliteTable('user_configs_table', {

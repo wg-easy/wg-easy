@@ -1,4 +1,4 @@
-// Make sure to not use any Path Aliases in these files
+// ! Do not use Path Aliases in this or any of these files
 export * from './repositories/client/schema';
 export * from './repositories/general/schema';
 export * from './repositories/hooks/schema';

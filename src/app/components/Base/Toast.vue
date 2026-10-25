@@ -3,7 +3,7 @@
     v-for="(e, i) in count"
     :key="i"
     :class="[
-      `grid grid-cols-[auto_max-content] items-center gap-x-3 rounded-md p-3 text-neutral-200 shadow-lg [grid-template-areas:_'title_action'_'description_action'] data-[swipe=cancel]:translate-x-0 data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)]`,
+      `grid grid-cols-[auto_max-content] items-center gap-x-3 rounded-md p-3 text-neutral-200 shadow-lg [grid-template-areas:_'title_action'_'description_action'] data-[swipe=cancel]:translate-x-0 data-[swipe=move]:translate-x-[var(--reka-toast-swipe-move-x)]`,
       {
         'bg-green-800': e.type === 'success',
         'bg-red-800': e.type === 'error',
@@ -26,14 +26,6 @@
 </template>
 
 <script setup lang="ts">
-import {
-  ToastAction,
-  ToastClose,
-  ToastDescription,
-  ToastRoot,
-  ToastTitle,
-} from 'radix-vue';
-
 defineExpose({
   publish,
 });

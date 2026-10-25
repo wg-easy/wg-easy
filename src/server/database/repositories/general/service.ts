@@ -1,6 +1,9 @@
 import { sql } from 'drizzle-orm';
+
 import { general } from './schema';
 import type { GeneralUpdateType } from './types';
+
+import { hashPassword, isValidPasswordHash } from '#server/utils/password';
 import type { DBType } from '#db/sqlite';
 
 function createPreparedStatement(db: DBType) {

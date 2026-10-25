@@ -1,5 +1,5 @@
 <template>
-  <BaseDialog :trigger-class="triggerClass">
+  <BaseDialog :trigger-class="triggerClass" @update:open="resetOnOpen">
     <template #trigger><slot /></template>
     <template #title>{{ $t('admin.interface.changeCidr') }}</template>
     <template #description>
@@ -31,4 +31,11 @@ const props = defineProps<{
 
 const ipv4Cidr = ref(props.ipv4Cidr);
 const ipv6Cidr = ref(props.ipv6Cidr);
+
+function resetOnOpen(open: boolean) {
+  if (!open) return;
+
+  ipv4Cidr.value = props.ipv4Cidr;
+  ipv6Cidr.value = props.ipv6Cidr;
+}
 </script>

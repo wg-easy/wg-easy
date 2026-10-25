@@ -2,8 +2,8 @@ import { defineCommand } from 'citty';
 import { consola } from 'consola';
 import { eq } from 'drizzle-orm';
 
-import { db, schema } from '../db';
-import { hashPassword } from '../../server/utils/password';
+import { db, schema } from '#cli/db';
+import { hashPassword } from '#server/utils/password';
 
 export default defineCommand({
   meta: {

@@ -1,6 +1,12 @@
+import { readValidatedBody } from 'h3';
 import { parseCidr } from 'cidr-tools';
 import { stringifyIp } from 'ip-bigint';
 import { z } from 'zod';
+
+import Database from '#server/utils/Database';
+import { defineSetupEventHandler } from '#server/utils/handler';
+import { nextIPFromUsedAddresses } from '#server/utils/ip';
+import { FileSchema, validateZod } from '#server/utils/types';
 
 export default defineSetupEventHandler('migrate', async ({ event }) => {
   const { file } = await readValidatedBody(
@@ -52,6 +58,9 @@ export default defineSetupEventHandler('migrate', async ({ event }) => {
       `/${ipv4Cidr.prefix}`,
     ipv6Cidr: ipv6Cidr.cidr,
   });
+  const ipv6Addresses = new Set(
+    (await Database.clients.getAll()).map((client) => client.ipv6Address)
+  );
 
   for (const clientId in oldConfig.clients) {
     const clientConfig = oldConfig.clients[clientId];
@@ -60,15 +69,14 @@ export default defineSetupEventHandler('migrate', async ({ event }) => {
       continue;
     }
 
-    const clients = await Database.clients.getAll();
-
-    const ipv6Address = nextIP(6, ipv6Cidr, clients);
+    const ipv6Address = nextIPFromUsedAddresses(6, ipv6Cidr, ipv6Addresses);
 
     await Database.clients.createFromExisting({
       ...clientConfig,
       ipv4Address: clientConfig.address,
       ipv6Address,
     });
+    ipv6Addresses.add(ipv6Address);
   }
 
   await Database.general.setSetupStep(0);

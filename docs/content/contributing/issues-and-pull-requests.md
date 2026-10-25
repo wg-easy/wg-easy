@@ -9,6 +9,7 @@ This project is Open Source. That means that you can contribute on enhancements,
 /// note | Attention
 
 **Before opening an issue**, read the [`README`][github-file-readme] carefully, study the docs for your version (maybe [latest][docs-latest]) and your search engine you trust. The issue tracker is not meant to be used for unrelated questions!
+
 ///
 
 When opening an issue, please provide details use case to let the community reproduce your problem.
@@ -16,6 +17,7 @@ When opening an issue, please provide details use case to let the community repr
 /// note | Attention
 
 **Use the issue templates** to provide the necessary information. Issues which do not use these templates are not worked on and closed.
+
 ///
 
 By raising issues, I agree to these terms and I understand, that the rules set for the issue tracker will help both maintainers as well as everyone to find a solution.
@@ -39,6 +41,7 @@ When an option is marked with "not officially supported" / "unsupported", then s
 /// question | Motivation
 
 You want to add a feature? Feel free to start creating an issue explaining what you want to do and how you're thinking doing it. Other users may have the same need and collaboration may lead to better results.
+
 ///
 
 ### Submit a Pull-Request
