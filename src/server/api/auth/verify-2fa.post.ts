@@ -48,7 +48,8 @@ export default defineEventHandler(async (event) => {
       assertUnreachable(totpStatus);
   }
 
-  await session.update({
+  const authed = await useWGSession(event, pendingLogin.remember);
+  await authed.update({
     userId: pendingLogin.userId,
     pendingLogin: undefined,
     oauth_nonce: undefined,
