@@ -4,8 +4,7 @@ export function bytes(
   kib = false,
   maxunit?: string
 ) {
-  if (bytes === 0) return '0 B';
-  if (Number.isNaN(bytes) && !Number.isFinite(bytes)) return 'NaN';
+  if (!Number.isFinite(bytes) || bytes <= 0) return '0 B';
   const k = kib ? 1024 : 1000;
   const dm =
     decimals != null && !Number.isNaN(decimals) && decimals >= 0 ? decimals : 2;
