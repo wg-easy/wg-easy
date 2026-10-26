@@ -49,6 +49,17 @@ function event(clientId = '1') {
   return event;
 }
 
+// Historical fixtures predate the advanced AWG default columns.
+const laterAwgDefaultColumns = Object.fromEntries([
+  ['defaultContentPaddingAddition', false],
+  ['defaultRekeyAfterTime', false],
+  ['defaultRekeyTimeout', false],
+  ['defaultRejectAfterTime', false],
+  ['defaultKeepaliveTimeout', false],
+  ['defaultMaxHandshakeAttempts', false],
+  ['defaultDisableCookies', false],
+]);
+
 beforeEach(async () => {
   vi.resetAllMocks();
   getCurrentUser.mockResolvedValue({ id: 1, role: 1 });
@@ -132,7 +143,10 @@ describe('client key actions', () => {
     });
     const previousLinks = await migrationDb.select().from(schema.oneTimeLink);
     const previousDefaults = await migrationDb.query.userConfig.findFirst({
-      columns: { defaultGeneratePreSharedKey: false },
+      columns: {
+        defaultGeneratePreSharedKey: false,
+        ...laterAwgDefaultColumns,
+      },
     });
 
     await connection.migrate(
@@ -146,7 +160,7 @@ describe('client key actions', () => {
     expect(await migrationDb.select().from(schema.oneTimeLink)).toEqual(
       previousLinks
     );
-    expect(await new UserConfigService(migrationDb).get()).toEqual({
+    expect(await new UserConfigService(migrationDb).get()).toMatchObject({
       ...previousDefaults,
       defaultGeneratePreSharedKey: true,
     });

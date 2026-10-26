@@ -67,6 +67,14 @@ These parameters require AmneziaWG 3.0 or newer on both ends of the tunnel. Olde
 
 `RandomTrailers` appends a random amount of bytes to handshake packets and has to be enabled on both sides. `DisableCookies` stops this side from answering handshakes with cookie messages when it is under load and only affects the peer it is set on.
 
+## Client Defaults
+
+In **Admin → Config**, configure the defaults for `ContentPaddingAddition`, `RekeyAfterTime`, `RekeyTimeout`, `RejectAfterTime`, `KeepaliveTimeout`, `MaxHandshakeAttempts` and `DisableCookies`. The defaults are copied into new clients and clients imported from existing keys. Each client can override or clear its own values.
+
+Changes to defaults do not modify existing clients. Unset values are omitted from new client configurations; an explicit `0` or `DisableCookies = off` is preserved. Database upgrades leave the seven new defaults unset. Downloads and QR codes use the same client configuration.
+
+`HeaderProtectionKey`, S1-S4, H1-H4 and `RandomTrailers` remain shared interface settings and are copied from the server at export time. Server timing and padding values affect the server itself and do not act as client defaults.
+
 ## Client Applications
 
 To be able to connect to wg-easy if AmneziaWG is enabled, you must have an AmneziaWG-compatible client. Where an AmneziaWG app is available for your platform, it is recommended to use it rather than Amnezia VPN.

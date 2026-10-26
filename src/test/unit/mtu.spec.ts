@@ -29,6 +29,17 @@ describe('MTU validation', () => {
   });
 });
 
+// Historical fixtures predate the advanced AWG default columns.
+const laterAwgDefaultColumns = Object.fromEntries([
+  ['defaultContentPaddingAddition', false],
+  ['defaultRekeyAfterTime', false],
+  ['defaultRekeyTimeout', false],
+  ['defaultRejectAfterTime', false],
+  ['defaultKeepaliveTimeout', false],
+  ['defaultMaxHandshakeAttempts', false],
+  ['defaultDisableCookies', false],
+]);
+
 test.each(['wg', 'awg'])(
   '%s preserves saved MTUs during migration and supports clearing them',
   async (executable) => {
@@ -86,7 +97,10 @@ test.each(['wg', 'awg'])(
       clients: await db.select().from(schema.client),
       interfaces: await db.select().from(schema.wgInterface),
       defaults: await db.query.userConfig.findMany({
-        columns: { defaultGeneratePreSharedKey: false },
+        columns: {
+          defaultGeneratePreSharedKey: false,
+          ...laterAwgDefaultColumns,
+        },
       }),
       hooks: await db.select().from(schema.hooks),
       links: await db.select().from(schema.oneTimeLink),
@@ -98,7 +112,7 @@ test.each(['wg', 'awg'])(
     expect(await db.select().from(schema.wgInterface)).toEqual(
       before.interfaces
     );
-    expect(await db.select().from(schema.userConfig)).toEqual(
+    expect(await db.select().from(schema.userConfig)).toMatchObject(
       before.defaults.map((config) => ({
         ...config,
         defaultGeneratePreSharedKey: true,
