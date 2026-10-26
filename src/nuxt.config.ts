@@ -19,6 +19,7 @@ export default defineNuxtConfig({
     fallback: 'light',
     storage: 'cookie',
     storageKey: 'theme',
+    cookieAttrs: { maxAge: 31536000, path: '/' },
   },
   css: ['~/app.css'],
   i18n: {
