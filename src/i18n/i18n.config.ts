@@ -12,6 +12,7 @@ import zhtw from './locales/zh-TW.json';
 import ko from './locales/ko.json';
 import es from './locales/es.json';
 import ptbr from './locales/pt-BR.json';
+import ptpt from './locales/pt-PT.json';
 import tr from './locales/tr.json';
 import bn from './locales/bn.json';
 import id from './locales/id.json';
@@ -43,6 +44,7 @@ export default defineI18nConfig(() => ({
     ko,
     es,
     'pt-BR': ptbr,
+    'pt-PT': ptpt,
     tr,
     bn,
     id,

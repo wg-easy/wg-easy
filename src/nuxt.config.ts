@@ -104,6 +104,11 @@ export default defineNuxtConfig({
         name: 'Português (Brasil)',
       },
       {
+        code: 'pt-PT',
+        language: 'pt-PT',
+        name: 'Português (Portugal)',
+      },
+      {
         code: 'tr',
         language: 'tr-TR',
         name: 'Türkçe',
