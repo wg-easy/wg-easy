@@ -8,21 +8,26 @@
         target="_blank"
         rel="noreferrer"
         class="font-semibold text-muted hover:text-foreground"
-        >WireGuard Easy</a
-      ><span
+      >
+        WireGuard Easy
+      </a>
+      <span
         v-if="globalStore.information?.currentRelease"
         class="rounded border border-line px-1.5 py-0.5 font-mono text-[10px]"
-        >{{ globalStore.information.currentRelease }}</span
-      ><span
-        >© 2021–2026
+      >
+        {{ globalStore.information.currentRelease }}
+      </span>
+      <span>
+        © 2021–2026
         <a
           href="https://emile.nl/?ref=wg-easy"
           target="_blank"
           rel="noreferrer"
           class="hover:text-foreground"
-          >Emile Nijssen</a
-        ></span
-      >
+        >
+          Emile Nijssen
+        </a>
+      </span>
     </div>
     <div class="flex flex-wrap gap-5">
       <a
@@ -30,20 +35,25 @@
         target="_blank"
         rel="noreferrer"
         class="hover:text-foreground"
-        >{{ $t('ui.documentation') }} ↗</a
-      ><a
+      >
+        {{ $t('ui.documentation') }} ↗
+      </a>
+      <a
         href="https://opensource.org/license/agpl-v3"
         target="_blank"
         rel="noreferrer"
         class="hover:text-foreground"
-        >AGPL-3.0-only</a
-      ><a
+      >
+        AGPL-3.0-only
+      </a>
+      <a
         href="https://github.com/wg-easy/wg-easy#donate"
         target="_blank"
         rel="noreferrer"
         class="hover:text-foreground"
-        >{{ $t('layout.donate') }} ↗</a
       >
+        {{ $t('layout.donate') }} ↗
+      </a>
     </div>
   </footer>
 </template>

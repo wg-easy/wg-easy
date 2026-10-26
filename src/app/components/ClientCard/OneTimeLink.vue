@@ -3,11 +3,13 @@
     v-if="client.oneTimeLink !== null"
     class="mt-4 flex items-start gap-2 border-t border-line pt-3 text-xs text-muted"
   >
-    <LinkIcon class="size-4 shrink-0 text-accent" /><a
+    <LinkIcon class="size-4 shrink-0 text-accent" />
+    <a
       :href="'/cnf/' + client.oneTimeLink.oneTimeLink"
       class="font-mono break-all hover:text-foreground"
-      >{{ path }}</a
     >
+      {{ path }}
+    </a>
   </div>
 </template>
 

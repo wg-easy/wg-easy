@@ -17,15 +17,18 @@
             to="/admin"
             class="nav-link"
             exact-active-class="bg-accent/10 text-accent"
-            >{{ $t('ui.overview') }}</NuxtLink
-          ><NuxtLink
+          >
+            {{ $t('ui.overview') }}
+          </NuxtLink>
+          <NuxtLink
             v-for="item in menuItems"
             :key="item.id"
             :to="`/admin/${item.id}`"
             class="nav-link"
             active-class="bg-accent/10 text-accent"
-            >{{ item.name }}</NuxtLink
           >
+            {{ item.name }}
+          </NuxtLink>
         </nav>
       </aside>
       <section aria-labelledby="admin-section-title" class="min-w-0">

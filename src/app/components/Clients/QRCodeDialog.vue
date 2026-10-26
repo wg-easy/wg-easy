@@ -20,14 +20,16 @@
         :title="$t('client.copyPng')"
         @click="copyPng"
       >
-        <CopyIcon class="size-5" /> PNG
+        <CopyIcon class="size-5" />
+        PNG
       </BaseSecondaryButton>
       <BaseSecondaryButton
         class="flex items-center gap-2"
         :title="$t('client.downloadPng')"
         @click="downloadPng"
       >
-        <DownloadIcon class="size-5" /> PNG
+        <DownloadIcon class="size-5" />
+        PNG
       </BaseSecondaryButton>
       <DialogClose as-child>
         <BaseSecondaryButton>{{ $t('dialog.cancel') }}</BaseSecondaryButton>

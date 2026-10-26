@@ -22,8 +22,9 @@
       target="_blank"
       rel="noreferrer"
       class="ui-button ui-button-secondary"
-      >{{ $t('update.update') }} ↗</a
     >
+      {{ $t('update.update') }} ↗
+    </a>
   </div>
 </template>
 

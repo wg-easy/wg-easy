@@ -1,9 +1,9 @@
 <template>
   <div>
     <form class="flex flex-col gap-5" @submit.prevent="submit">
-      <label for="login-totp" class="-mb-3 text-xs font-medium text-muted">{{
-        $t('general.2faCode')
-      }}</label>
+      <label for="login-totp" class="-mb-3 text-xs font-medium text-muted">
+        {{ $t('general.2faCode') }}
+      </label>
       <BaseInput
         id="login-totp"
         v-model="totp"

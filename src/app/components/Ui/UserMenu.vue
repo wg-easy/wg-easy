@@ -4,51 +4,50 @@
       class="header-control gap-2 rounded-full pr-1 pl-1 sm:pr-3"
       :aria-label="$t('pages.me')"
     >
-      <BaseAvatar
-        class="size-8 rounded-full bg-surface-hover text-foreground"
-        >{{ fallbackName }}</BaseAvatar
-      >
-      <span class="hidden max-w-24 truncate xl:inline">{{
-        authStore.userData?.name
-      }}</span
-      ><ArrowDownIcon class="hidden size-3 sm:block" />
+      <BaseAvatar class="size-8 rounded-full bg-surface-hover text-foreground">
+        {{ fallbackName }}
+      </BaseAvatar>
+      <span class="hidden max-w-24 truncate xl:inline">
+        {{ authStore.userData?.name }}
+      </span>
+      <ArrowDownIcon class="hidden size-3 sm:block" />
     </DropdownMenuTrigger>
     <DropdownMenuPortal>
       <DropdownMenuContent :side-offset="8" align="end" class="ui-menu w-56">
-        <DropdownMenuLabel class="mb-1 border-b border-line px-3 py-3"
-          ><span class="block truncate font-medium text-foreground">{{
-            authStore.userData?.name
-          }}</span
-          ><span class="block truncate text-xs text-subtle"
-            >@{{ authStore.userData?.username }}</span
-          ></DropdownMenuLabel
-        >
-        <DropdownMenuItem as-child
-          ><NuxtLink to="/" class="ui-menu-item">{{
-            $t('pages.clients')
-          }}</NuxtLink></DropdownMenuItem
-        >
-        <DropdownMenuItem as-child
-          ><NuxtLink to="/me" class="ui-menu-item">{{
-            $t('pages.me')
-          }}</NuxtLink></DropdownMenuItem
-        >
+        <DropdownMenuLabel class="mb-1 border-b border-line px-3 py-3">
+          <span class="block truncate font-medium text-foreground">
+            {{ authStore.userData?.name }}
+          </span>
+          <span class="block truncate text-xs text-subtle">
+            @{{ authStore.userData?.username }}
+          </span>
+        </DropdownMenuLabel>
+        <DropdownMenuItem as-child>
+          <NuxtLink to="/" class="ui-menu-item">
+            {{ $t('pages.clients') }}
+          </NuxtLink>
+        </DropdownMenuItem>
+        <DropdownMenuItem as-child>
+          <NuxtLink to="/me" class="ui-menu-item">
+            {{ $t('pages.me') }}
+          </NuxtLink>
+        </DropdownMenuItem>
         <DropdownMenuItem
           v-if="
             authStore.userData &&
             hasPermissions(authStore.userData, 'admin', 'any')
           "
           as-child
-          ><NuxtLink to="/admin" class="ui-menu-item">{{
-            $t('pages.admin.panel')
-          }}</NuxtLink></DropdownMenuItem
         >
+          <NuxtLink to="/admin" class="ui-menu-item">
+            {{ $t('pages.admin.panel') }}
+          </NuxtLink>
+        </DropdownMenuItem>
         <DropdownMenuSeparator class="my-1 h-px bg-line" />
-        <DropdownMenuItem class="ui-menu-item text-accent" @select="submit"
-          ><LogOutIcon class="size-4" />{{
-            $t('general.logout')
-          }}</DropdownMenuItem
-        >
+        <DropdownMenuItem class="ui-menu-item text-accent" @select="submit">
+          <LogOutIcon class="size-4" />
+          {{ $t('general.logout') }}
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenuPortal>
   </DropdownMenuRoot>

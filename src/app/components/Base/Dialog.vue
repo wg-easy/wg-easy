@@ -8,13 +8,15 @@
       >
         <DialogTitle
           class="pr-8 text-xl font-semibold tracking-tight text-foreground"
-          ><slot name="title"
-        /></DialogTitle>
+        >
+          <slot name="title" />
+        </DialogTitle>
         <DialogDescription
           as="div"
           class="mt-5 text-sm leading-relaxed text-muted"
-          ><slot name="description"
-        /></DialogDescription>
+        >
+          <slot name="description" />
+        </DialogDescription>
         <div
           class="mt-6 flex flex-wrap justify-end gap-2 border-t border-line pt-5"
         >
@@ -23,8 +25,9 @@
         <DialogClose
           class="icon-button absolute top-5 right-5"
           :aria-label="$t('dialog.cancel')"
-          ><XIcon class="size-4"
-        /></DialogClose>
+        >
+          <XIcon class="size-4" />
+        </DialogClose>
       </DialogContent>
     </DialogPortal>
   </DialogRoot>

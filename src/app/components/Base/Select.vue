@@ -4,9 +4,8 @@
       class="ui-input inline-flex items-center justify-between gap-2"
       :aria-label="$t('ui.chooseOption')"
     >
-      <SelectValue :placeholder="$t('ui.chooseOption')" /><ArrowDownIcon
-        class="size-3"
-      />
+      <SelectValue :placeholder="$t('ui.chooseOption')" />
+      <ArrowDownIcon class="size-3" />
     </SelectTrigger>
     <SelectPortal>
       <SelectContent
@@ -21,9 +20,9 @@
             :value="option.value"
             class="ui-menu-item"
           >
-            <SelectItemText
-              >{{ option.value }} - {{ option.label }}</SelectItemText
-            >
+            <SelectItemText>
+              {{ option.value }} - {{ option.label }}
+            </SelectItemText>
           </SelectItem>
         </SelectViewport>
       </SelectContent>

@@ -30,11 +30,9 @@
       class="flex flex-col gap-5"
       @submit.prevent="submit"
     >
-      <label
-        for="login-username"
-        class="-mb-3 text-xs font-medium text-muted"
-        >{{ $t('general.username') }}</label
-      >
+      <label for="login-username" class="-mb-3 text-xs font-medium text-muted">
+        {{ $t('general.username') }}
+      </label>
       <BaseInput
         id="login-username"
         v-model="username"
@@ -45,11 +43,9 @@
         name="username"
       />
 
-      <label
-        for="login-password"
-        class="-mb-3 text-xs font-medium text-muted"
-        >{{ $t('general.password') }}</label
-      >
+      <label for="login-password" class="-mb-3 text-xs font-medium text-muted">
+        {{ $t('general.password') }}
+      </label>
       <BaseInput
         id="login-password"
         v-model="password"

@@ -4,10 +4,10 @@
       <NuxtLink
         to="/"
         class="mb-6 inline-flex items-center gap-2 text-xs text-muted hover:text-foreground"
-        ><CircleArrowLeftIcon class="size-4" />{{
-          $t('pages.clients')
-        }}</NuxtLink
       >
+        <CircleArrowLeftIcon class="size-4" />
+        {{ $t('pages.clients') }}
+      </NuxtLink>
       <PanelHead>
         <PanelHeadTitle>
           {{ data.name }}

@@ -13,13 +13,15 @@
     <BaseSecondaryButton
       v-if="clientsStore.filter"
       @click="clientsStore.setSearchQuery('')"
-      >{{ $t('ui.clearSearch') }}</BaseSecondaryButton
     >
-    <ClientsCreateDialog v-else
-      ><BasePrimaryButton as="span"
-        ><PlusIcon class="size-4" />{{ $t('client.new') }}</BasePrimaryButton
-      ></ClientsCreateDialog
-    >
+      {{ $t('ui.clearSearch') }}
+    </BaseSecondaryButton>
+    <ClientsCreateDialog v-else>
+      <BasePrimaryButton as="span">
+        <PlusIcon class="size-4" />
+        {{ $t('client.new') }}
+      </BasePrimaryButton>
+    </ClientsCreateDialog>
   </div>
 </template>
 

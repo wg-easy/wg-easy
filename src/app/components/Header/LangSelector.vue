@@ -4,9 +4,9 @@
       class="header-control group max-w-36 px-2.5"
       :aria-label="$t('ui.selectLanguage')"
     >
-      <LanguagesIcon class="size-4" /><span class="hidden truncate sm:inline"
-        ><SelectValue /></span
-      ><span class="uppercase sm:hidden">{{ locale }}</span>
+      <LanguagesIcon class="size-4" />
+      <span class="hidden truncate sm:inline"><SelectValue /></span>
+      <span class="uppercase sm:hidden">{{ locale }}</span>
       <ArrowDownIcon
         class="size-3 transition-transform group-data-[state=open]:rotate-180"
       />
@@ -17,15 +17,16 @@
         position="popper"
         :side-offset="8"
       >
-        <SelectViewport
-          ><SelectItem
+        <SelectViewport>
+          <SelectItem
             v-for="option in langs"
             :key="option.code"
             :value="option.code"
             class="ui-menu-item data-[state=checked]:text-accent"
-            ><SelectItemText>{{ option.name }}</SelectItemText></SelectItem
-          ></SelectViewport
-        >
+          >
+            <SelectItemText>{{ option.name }}</SelectItemText>
+          </SelectItem>
+        </SelectViewport>
       </SelectContent>
     </SelectPortal>
   </SelectRoot>

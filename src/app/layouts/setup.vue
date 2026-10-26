@@ -5,7 +5,8 @@
     >
       <HeaderLogo />
       <div class="flex items-center gap-2">
-        <HeaderLangSelector /><HeaderThemeSwitch />
+        <HeaderLangSelector />
+        <HeaderThemeSwitch />
       </div>
     </header>
     <main class="flex flex-1 items-center justify-center px-4 py-10">

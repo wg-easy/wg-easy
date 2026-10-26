@@ -7,20 +7,22 @@
     <CircleCheckIcon
       v-if="e.type === 'success'"
       class="mt-0.5 size-5 text-success"
-    /><TriangleAlertIcon v-else class="mt-0.5 size-5 text-accent" />
+    />
+    <TriangleAlertIcon v-else class="mt-0.5 size-5 text-accent" />
     <div>
-      <ToastTitle class="text-sm font-semibold text-foreground">{{
-        e.title
-      }}</ToastTitle
-      ><ToastDescription class="mt-1 text-xs leading-relaxed text-muted">{{
-        e.message
-      }}</ToastDescription>
+      <ToastTitle class="text-sm font-semibold text-foreground">
+        {{ e.title }}
+      </ToastTitle>
+      <ToastDescription class="mt-1 text-xs leading-relaxed text-muted">
+        {{ e.message }}
+      </ToastDescription>
     </div>
     <ToastClose
       :aria-label="$t('dialog.cancel')"
       class="grid size-6 place-items-center rounded text-subtle hover:bg-surface-raised"
-      ><XIcon class="size-3"
-    /></ToastClose>
+    >
+      <XIcon class="size-3" />
+    </ToastClose>
   </ToastRoot>
 </template>
 
