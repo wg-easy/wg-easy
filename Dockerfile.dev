@@ -1,3 +1,11 @@
+FROM docker.io/library/node:krypton-alpine@sha256:06d7adf3e0ef61a13f1d28682726366f97a15aa1888c934d3ecec86c33918b53 AS awg-tools
+WORKDIR /build
+# renovate: datasource=github-releases depName=amnezia-vpn/amneziawg-tools
+ARG AWGTOOLS_BRANCH=v3.1.20260812
+RUN apk add --no-cache linux-headers build-base git && \
+    git clone --depth 1 --branch ${AWGTOOLS_BRANCH} https://github.com/amnezia-vpn/amneziawg-tools.git && \
+    make -C amneziawg-tools/src
+
 FROM docker.io/library/node:krypton-alpine@sha256:06d7adf3e0ef61a13f1d28682726366f97a15aa1888c934d3ecec86c33918b53
 WORKDIR /app
 
@@ -16,9 +24,15 @@ RUN apk add --no-cache \
     iptables \
     ip6tables \
     kmod \
+    iproute2 \
     iptables-legacy \
     wireguard-go \
     wireguard-tools
+
+# Userspace tools configure the kernel module already installed on the host.
+COPY --from=awg-tools --chmod=755 /build/amneziawg-tools/src/wg /usr/bin/awg
+COPY --from=awg-tools --chmod=755 /build/amneziawg-tools/src/wg-quick/linux.bash /usr/bin/awg-quick
+RUN apk add --no-cache bash && mkdir -p /etc/amnezia && ln -s /etc/wireguard /etc/amnezia/amneziawg
 
 # Use iptables-legacy
 RUN update-alternatives --install /usr/sbin/iptables iptables /usr/sbin/iptables-legacy 10 --slave /usr/sbin/iptables-restore iptables-restore /usr/sbin/iptables-legacy-restore --slave /usr/sbin/iptables-save iptables-save /usr/sbin/iptables-legacy-save

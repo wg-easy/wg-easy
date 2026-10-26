@@ -1,9 +1,17 @@
 import { eq, sql } from 'drizzle-orm';
 import { parseCidr } from 'cidr-tools';
 
-import { wgInterface } from './schema';
-import type { InterfaceCidrUpdateType, InterfaceUpdateType } from './types';
+import { userConfig } from '../userConfig/schema';
+import { UserConfigUpdateSchema } from '../userConfig/types';
 
+import { wgInterface } from './schema';
+import {
+  InterfaceUpdateSchema,
+  type InterfaceCidrUpdateType,
+  type InterfaceUpdateType,
+} from './types';
+
+import type { AwgProfile } from '#server/utils/awgProfile';
 import { WG_ENV } from '#server/utils/config';
 import { nextIPFromUsedAddresses } from '#server/utils/ip';
 import { client as clientSchema } from '#db/schema';
@@ -60,11 +68,58 @@ export class InterfaceService {
   }
 
   update(data: InterfaceUpdateType) {
+    const { awgProfileGenerated: _generated, ...editable } =
+      data as typeof data & { awgProfileGenerated?: boolean };
     return this.#db
       .update(wgInterface)
-      .set(data)
+      .set(editable)
       .where(eq(wgInterface.name, WG_ENV.WG_INTERFACE))
       .execute();
+  }
+
+  /** Persist server parameters and available client defaults together. */
+  initializeAwgProfile(profile: AwgProfile) {
+    return this.#db.transaction(async (tx) => {
+      const current = await tx.query.wgInterface.findFirst({
+        where: eq(wgInterface.name, WG_ENV.WG_INTERFACE),
+      });
+      if (!current) throw new Error('Interface not found');
+      const clients = await tx.query.client.findMany({ limit: 1 });
+      if (
+        current.privateKey !== '---default---' ||
+        current.publicKey !== '---default---' ||
+        clients.length ||
+        current.awgProfileGenerated
+      ) {
+        throw new Error('AWG_AUTO_GENERATE requires a fresh configuration');
+      }
+      const defaults = await tx.query.userConfig.findFirst({
+        where: eq(userConfig.id, WG_ENV.WG_INTERFACE),
+      });
+      if (!defaults) throw new Error('User config not found');
+      // Advanced defaults are applied when their corresponding settings exist.
+      const optionalDefaults = Object.fromEntries(
+        Object.entries(profile.clientDefaults).filter(
+          ([key]) => key in defaults
+        )
+      );
+      const changes = { ...profile.defaults, ...optionalDefaults };
+      InterfaceUpdateSchema.parse({ ...current, ...profile.parameters });
+      // The setup wizard has not supplied a host yet; leave its stored value alone.
+      UserConfigUpdateSchema.parse({
+        ...defaults,
+        host: defaults.host || 'localhost',
+        ...changes,
+      });
+      await tx
+        .update(userConfig)
+        .set(changes)
+        .where(eq(userConfig.id, WG_ENV.WG_INTERFACE));
+      await tx
+        .update(wgInterface)
+        .set({ ...profile.parameters, awgProfileGenerated: true })
+        .where(eq(wgInterface.name, WG_ENV.WG_INTERFACE));
+    });
   }
 
   setFirewallEnabled(firewallEnabled: boolean) {

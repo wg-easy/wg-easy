@@ -84,7 +84,9 @@ test.each(['wg', 'awg'])(
 
     const before = {
       clients: await db.select().from(schema.client),
-      interfaces: await db.select().from(schema.wgInterface),
+      interfaces: await db.query.wgInterface.findMany({
+        columns: { awgProfileGenerated: false },
+      }),
       defaults: await db.query.userConfig.findMany({
         columns: { defaultGeneratePreSharedKey: false },
       }),
@@ -95,7 +97,7 @@ test.each(['wg', 'awg'])(
     await connection.migrate(migrations.slice(10).flatMap((m) => m.sql));
 
     expect(await db.select().from(schema.client)).toEqual(before.clients);
-    expect(await db.select().from(schema.wgInterface)).toEqual(
+    expect(await db.select().from(schema.wgInterface)).toMatchObject(
       before.interfaces
     );
     expect(await db.select().from(schema.userConfig)).toEqual(

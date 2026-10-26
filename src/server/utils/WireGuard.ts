@@ -2,6 +2,7 @@ import fs from 'node:fs/promises';
 
 import { createDebug } from 'obug';
 
+import { prepareAwgProfile } from '#server/utils/awgGeneration';
 import Database from '#server/utils/Database';
 import { mergeClientStatuses } from '#server/utils/clientStatus';
 import { OLD_ENV, WG_ENV } from '#server/utils/config';
@@ -167,7 +168,7 @@ class WireGuard {
   async Startup() {
     WG_DEBUG('Starting WireGuard...');
     // let as it has to refetch if keys change
-    let wgInterface = await Database.interfaces.get();
+    let wgInterface = await prepareAwgProfile(Database, WG_ENV);
 
     // default interface has no keys
     if (

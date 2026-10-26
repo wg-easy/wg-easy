@@ -29,6 +29,25 @@ Possible values:
 - `awg` — Force use of AmneziaWG
 - `wg` — Force use of standard WireGuard
 
+## Automatic AWG 3.1 Profile Generation
+
+For a fresh installation with the AWG 3.1 kernel module already installed on the host:
+
+```yaml
+environment:
+    EXPERIMENTAL_AWG: 'true'
+    OVERRIDE_AUTO_AWG: 'awg'
+    AWG_AUTO_GENERATE: 'true'
+```
+
+Only the latest supported AWG protocol, 3.1, is targeted. There is no protocol version selector or fallback to older AWG releases. Before saving a generated profile, wg-easy checks tools/module support using a temporary interface and peer. The interface is never addressed or brought up, and is removed after the check. No kernel module installer is included.
+
+Generation is opt-in and defaults to `false`. It requires placeholder VPN keys and no clients. The header protection key is generated with cryptographic randomness, S1-S4 use the same random padding size of at least 12 bytes, and J parameters are randomized. Standard H1-H4 defaults are retained because HeaderProtectionKey hides message types. Content padding and timing ranges are enabled, RandomTrailers is on, and DisableCookies is off. I1-I5 remain unset because CPS signatures must be chosen separately. These settings are a starting profile, not a guarantee against any particular DPI system.
+
+Server parameters, the generation marker and client junk defaults are saved in one transaction before VPN key generation. Advanced client defaults are also populated when those settings are available. PersistentKeepalive and I1-I5 client defaults are left unchanged. Restarts reuse saved parameters even when AWG_AUTO_GENERATE remains true. Existing configurations are preserved; attempting generation over an existing installation fails with a clear error. Keep `/etc/wireguard` on a persistent volume.
+
+Without automatic generation, the existing manual configuration behavior is preserved.
+
 ## AmneziaWG Parameters
 
 Parameter descriptions can be found in the [AmneziaWG documentation](https://docs.amnezia.org/documentation/amnezia-wg) and on the [kernel module page](https://github.com/amnezia-vpn/amneziawg-linux-kernel-module).

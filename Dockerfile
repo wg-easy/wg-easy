@@ -66,6 +66,7 @@ RUN apk add --no-cache \
     ip6tables \
     nftables \
     kmod \
+    iproute2 \
     iptables-legacy \
     wireguard-go \
     wireguard-tools

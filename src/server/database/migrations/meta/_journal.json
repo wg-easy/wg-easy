@@ -85,6 +85,13 @@
       "when": 1793024793742,
       "tag": "0011_silky_sleepwalker",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "6",
+      "when": 1793033572060,
+      "tag": "0012_striped_silverclaw",
+      "breakpoints": true
     }
   ]
 }
