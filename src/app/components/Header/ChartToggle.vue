@@ -6,14 +6,14 @@
     :aria-label="$t('layout.toggleCharts')"
     @update:model-value="globalStore.toggleCharts"
   >
-    <ChartColumnBigIcon
+    <ChartNoAxesColumnIncreasingIcon
       class="size-4 transition-colors group-data-[state=on]:text-foreground"
     />
   </Toggle>
 </template>
 
 <script lang="ts" setup>
-import { ChartColumnBigIcon } from '@lucide/vue';
+import { ChartNoAxesColumnIncreasingIcon } from '@lucide/vue';
 
 const globalStore = useGlobalStore();
 </script>

@@ -20,7 +20,7 @@
         :title="$t('client.copyPng')"
         @click="copyPng"
       >
-        <CopyIcon class="size-5" />
+        <ClipboardCopyIcon class="size-5" />
         PNG
       </BaseSecondaryButton>
       <BaseSecondaryButton
@@ -39,7 +39,7 @@
 </template>
 
 <script setup lang="ts">
-import { CopyIcon, DownloadIcon } from '@lucide/vue';
+import { ClipboardCopyIcon, DownloadIcon } from '@lucide/vue';
 
 defineProps<{ qrCode: string }>();
 

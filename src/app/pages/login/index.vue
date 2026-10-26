@@ -67,7 +67,10 @@
         class="ui-button ui-button-primary w-full"
         :disabled="!password || !username || authenticating"
       >
-        <IconsLoading v-if="authenticating" class="mx-auto w-5 animate-spin" />
+        <LoaderCircleIcon
+          v-if="authenticating"
+          class="mx-auto size-5 animate-spin"
+        />
         <span v-else>{{ $t('login.signIn') }}</span>
       </button>
     </form>
@@ -75,6 +78,8 @@
 </template>
 
 <script setup lang="ts">
+import { LoaderCircleIcon } from '@lucide/vue';
+
 import { $fetch } from '#imports';
 
 const toast = useToast();

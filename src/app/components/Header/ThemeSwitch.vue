@@ -7,12 +7,12 @@
   >
     <SunIcon v-if="theme.preference === 'light'" class="size-4" />
     <MoonIcon v-else-if="theme.preference === 'dark'" class="size-4" />
-    <IconsHalfMoon v-else class="size-4 fill-current" />
+    <SunMoonIcon v-else class="size-4" />
   </button>
 </template>
 
 <script lang="ts" setup>
-import { MoonIcon, SunIcon } from '@lucide/vue';
+import { MoonIcon, SunIcon, SunMoonIcon } from '@lucide/vue';
 
 const theme = useTheme();
 

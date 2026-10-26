@@ -54,7 +54,7 @@
       role="status"
       class="surface flex min-h-56 items-center justify-center gap-3 text-subtle"
     >
-      <IconsLoading class="size-5 animate-spin" />
+      <LoaderCircleIcon class="size-5 animate-spin" />
       {{ $t('general.loading') }}
     </div>
     <p class="mt-5 flex items-start gap-2 text-xs leading-relaxed text-subtle">
@@ -65,7 +65,12 @@
 </template>
 
 <script setup lang="ts">
-import { InfoIcon, ServerIcon, TriangleAlertIcon } from '@lucide/vue';
+import {
+  InfoIcon,
+  LoaderCircleIcon,
+  ServerIcon,
+  TriangleAlertIcon,
+} from '@lucide/vue';
 
 const globalStore = useGlobalStore();
 const clientsStore = useClientsStore();

@@ -21,7 +21,10 @@
         class="ui-button ui-button-primary w-full"
         :disabled="!totp || authenticating"
       >
-        <IconsLoading v-if="authenticating" class="mx-auto w-5 animate-spin" />
+        <LoaderCircleIcon
+          v-if="authenticating"
+          class="mx-auto size-5 animate-spin"
+        />
         <span v-else>{{ $t('general.continue') }}</span>
       </button>
 
@@ -37,6 +40,8 @@
 </template>
 
 <script setup lang="ts">
+import { LoaderCircleIcon } from '@lucide/vue';
+
 import { $fetch } from '#imports';
 
 const toast = useToast();
