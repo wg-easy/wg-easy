@@ -28,6 +28,13 @@
           </FormActions>
         </FormElement>
         <FormElement @submit.prevent="updatePassword">
+          <input
+            type="text"
+            name="username"
+            :value="authStore.userData?.username"
+            autocomplete="username"
+            hidden
+          />
           <FormGroup>
             <FormHeading>{{ $t('general.password') }}</FormHeading>
             <FormPasswordField
@@ -112,6 +119,13 @@
               <p class="text-sm text-subtle">
                 {{ $t('me.disable2faDesc') }}
               </p>
+              <input
+                type="text"
+                name="username"
+                :value="authStore.userData?.username"
+                autocomplete="username"
+                hidden
+              />
               <FormPasswordField
                 id="2fapassword"
                 v-model="disable2faPassword"
