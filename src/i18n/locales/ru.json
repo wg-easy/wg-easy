@@ -302,6 +302,7 @@
     "i5Label": "Специальный мусорный пакет 5 (I5)",
     "i5Description": "Пакет имитации протокола в hex формате: <b 0x...>",
     "mtuNote": "Значения зависят от MTU",
-    "obfuscationParameters": "Параметры обфускации AmneziaWG"
+    "obfuscationParameters": "Параметры обфускации AmneziaWG",
+    "persistentKeepaliveRangeDescription": "Интервал keepalive в секундах: число или включительный диапазон (например, 20-30), от 0 до 65535. 0 отключает keepalive. Для диапазонов клиент должен поддерживать AWG 3.1."
   }
 }

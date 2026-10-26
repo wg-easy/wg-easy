@@ -67,6 +67,14 @@ These parameters require AmneziaWG 3.0 or newer on both ends of the tunnel. Olde
 
 `RandomTrailers` appends a random amount of bytes to handshake packets and has to be enabled on both sides. `DisableCookies` stops this side from answering handshakes with cookie messages when it is under load and only affects the peer it is set on.
 
+## PersistentKeepalive Ranges
+
+For AmneziaWG 3.1, **Admin → Config** and client settings accept one interval such as `25` or an inclusive range such as `20-30`. Both bounds are seconds between 0 and 65535, with the lower bound no greater than the upper bound. `0` disables keepalive. A range containing zero can select a zero-second interval, so use positive bounds for periodic keepalive.
+
+The client's implementation chooses an interval when scheduling its keepalive timer. The range is exported in the `[Peer]` section and retained in QR codes; the client application must support this syntax. `PersistentKeepalive` is separate from the interface's `KeepaliveTimeout` parameter. Standard WireGuard continues to accept single intervals only.
+
+Database upgrades preserve existing numeric settings, client IDs and one-time links. Defaults are copied only to newly created or imported clients; changing defaults does not update existing clients.
+
 ## Client Applications
 
 To be able to connect to wg-easy if AmneziaWG is enabled, you must have an AmneziaWG-compatible client. Where an AmneziaWG app is available for your platform, it is recommended to use it rather than Amnezia VPN.

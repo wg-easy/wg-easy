@@ -9,6 +9,7 @@ import type {
   UpdateClientType,
 } from './types';
 
+import { assertPersistentKeepalive } from '#server/utils/persistentKeepalive';
 import { WG_ENV } from '#server/utils/config';
 import Database from '#server/utils/Database';
 import { nextIP } from '#server/utils/ip';
@@ -211,6 +212,11 @@ export class ClientService {
         ? await wg.generatePreSharedKey()
         : null;
 
+      assertPersistentKeepalive(
+        clientConfig.defaultPersistentKeepalive,
+        WG_ENV.WG_EXECUTABLE
+      );
+
       const ipv4Cidr = parseCidr(clientInterface.ipv4Cidr);
       const ipv4Address = nextIP(4, ipv4Cidr, clients);
       const ipv6Cidr = parseCidr(clientInterface.ipv6Cidr);
@@ -287,7 +293,8 @@ export class ClientService {
       .execute();
   }
 
-  update(id: ID, data: UpdateClientType) {
+  async update(id: ID, data: UpdateClientType) {
+    assertPersistentKeepalive(data.persistentKeepalive, WG_ENV.WG_EXECUTABLE);
     return this.#db.transaction(async (tx) => {
       const clientInterface = await tx.query.wgInterface
         .findFirst({
@@ -321,6 +328,10 @@ export class ClientService {
     publicKey,
   }: ClientCreateFromExistingType) {
     const clientConfig = await Database.userConfigs.get();
+    assertPersistentKeepalive(
+      clientConfig.defaultPersistentKeepalive,
+      WG_ENV.WG_EXECUTABLE
+    );
 
     return this.#db
       .insert(client)

@@ -109,10 +109,15 @@
               :description="$t('client.mtuDesc')"
               :label="$t('general.mtu')"
             />
-            <FormNumberField
+            <FormKeepaliveField
               id="persistentKeepalive"
               v-model="data.persistentKeepalive"
-              :description="$t('client.persistentKeepaliveDesc')"
+              :allow-range="Boolean(globalStore.information?.isAwg)"
+              :description="
+                globalStore.information?.isAwg
+                  ? $t('awg.persistentKeepaliveRangeDescription')
+                  : $t('client.persistentKeepaliveDesc')
+              "
               :label="$t('general.persistentKeepalive')"
             />
           </FormGroup>

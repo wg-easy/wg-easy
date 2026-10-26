@@ -3,6 +3,7 @@ import { eq, sql } from 'drizzle-orm';
 import { userConfig } from './schema';
 import type { UserConfigUpdateType } from './types';
 
+import { assertPersistentKeepalive } from '#server/utils/persistentKeepalive';
 import { WG_ENV } from '#server/utils/config';
 import { wgInterface } from '#db/schema';
 import type { DBType } from '#db/sqlite';
@@ -57,7 +58,11 @@ export class UserConfigService {
     });
   }
 
-  update(data: Partial<UserConfigUpdateType>) {
+  async update(data: Partial<UserConfigUpdateType>) {
+    assertPersistentKeepalive(
+      data.defaultPersistentKeepalive,
+      WG_ENV.WG_EXECUTABLE
+    );
     return this.#db
       .update(userConfig)
       .set(data)
