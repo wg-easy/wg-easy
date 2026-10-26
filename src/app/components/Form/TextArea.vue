@@ -1,10 +1,10 @@
 <template>
-  <div class="flex items-center">
+  <div class="flex items-center self-start">
     <FormLabel :for="id">
       {{ label }}
     </FormLabel>
     <BaseTooltip v-if="description" :text="description">
-      <IconsInfo class="size-4" />
+      <InfoIcon class="size-4" />
     </BaseTooltip>
   </div>
   <BaseTextArea
@@ -17,6 +17,8 @@
 </template>
 
 <script lang="ts" setup>
+import { InfoIcon } from '@lucide/vue';
+
 defineProps<{
   id: string;
   label: string;

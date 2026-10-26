@@ -1,10 +1,10 @@
 <template>
-  <div
-    v-for="client in clientsStore.clients"
-    :key="client.id"
-    class="relative overflow-hidden border-b border-solid border-gray-100 last:border-b-0 dark:border-neutral-600"
-  >
-    <ClientCard :client="client" />
+  <div class="flex flex-col gap-3">
+    <ClientCard
+      v-for="client in clientsStore.clients"
+      :key="client.id"
+      :client="client"
+    />
   </div>
 </template>
 

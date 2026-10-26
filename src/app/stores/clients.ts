@@ -38,14 +38,20 @@ export const useClientsStore = defineStore('Clients', () => {
     sort: globalStore.sortClient,
   }));
 
-  const { data: _clients, refresh: _refresh } = useFetch('/api/client', {
+  const {
+    data: _clients,
+    refresh: _refresh,
+    error,
+  } = useFetch('/api/client', {
     method: 'get',
     params: searchParams,
+    watch: false,
   });
 
   // TODO: rewrite
   async function refresh({ updateCharts = false } = {}) {
     await _refresh();
+    if (error.value) return;
     const transformedClients = _clients.value?.map((client) => {
       let avatar = undefined;
       if (client.name.includes('@') && client.name.includes('.')) {
@@ -135,7 +141,16 @@ export const useClientsStore = defineStore('Clients', () => {
   function setSearchQuery(query: string) {
     clients.value = null;
     filter.value = query || undefined;
+    void refresh();
   }
 
-  return { clients, clientsPersist, refresh, _clients, setSearchQuery };
+  return {
+    clients,
+    clientsPersist,
+    refresh,
+    _clients,
+    setSearchQuery,
+    filter,
+    error,
+  };
 });

@@ -4,12 +4,12 @@
       {{ label }}
     </FormLabel>
     <BaseTooltip v-if="description" :text="description">
-      <IconsInfo class="size-4" />
+      <InfoIcon class="size-4" />
     </BaseTooltip>
   </div>
   <div class="my-auto flex items-center gap-3">
     <template v-if="data === null">
-      <span class="text-gray-500 dark:text-neutral-300">
+      <span class="text-subtle">
         {{ $t('form.nullNotSet') }}
       </span>
       <BaseSecondaryButton
@@ -34,6 +34,8 @@
 </template>
 
 <script lang="ts" setup>
+import { InfoIcon } from '@lucide/vue';
+
 defineProps<{ id: string; label: string; description?: string }>();
 
 const data = defineModel<boolean | null>();

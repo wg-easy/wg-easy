@@ -1,6 +1,6 @@
 <template>
   <div>
-    <p class="text-center text-lg">
+    <p class="text-sm leading-relaxed text-muted">
       {{ $t('setup.createAdminDesc') }}
     </p>
     <div class="mt-8 flex flex-col gap-3">

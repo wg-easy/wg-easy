@@ -1,13 +1,20 @@
 <template>
   <main v-if="data">
     <Panel>
+      <NuxtLink
+        to="/"
+        class="mb-6 inline-flex items-center gap-2 text-xs text-muted hover:text-foreground"
+      >
+        <CircleArrowLeftIcon class="size-4" />
+        {{ $t('pages.clients') }}
+      </NuxtLink>
       <PanelHead>
         <PanelHeadTitle>
           {{ data.name }}
         </PanelHeadTitle>
       </PanelHead>
       <PanelBody>
-        <FormElement @submit.prevent="submit">
+        <FormElement class="settings-grid space-y-0" @submit.prevent="submit">
           <FormGroup>
             <FormHeading>
               {{ $t('form.sectionGeneral') }}
@@ -221,42 +228,36 @@
               :label="$t('hooks.postDown')"
             />
           </FormGroup>
-          <FormGroup>
-            <FormHeading>{{ $t('form.actions') }}</FormHeading>
-            <FormPrimaryActionField type="submit" :label="$t('form.save')" />
-            <FormSecondaryActionField
-              :label="$t('form.revert')"
-              @click="revert"
-            />
+          <FormSaveControls class="col-span-full" @revert="revert" />
+        </FormElement>
+        <FormGroup class="mt-6">
+          <FormHeading>{{ $t('form.actions') }}</FormHeading>
+          <div
+            class="col-span-full flex flex-col gap-3 sm:flex-row sm:flex-wrap"
+          >
+            <ClientsConfigDialog :client-id="data.id">
+              <BaseSecondaryButton as="span" class="w-full">
+                {{ $t('client.viewConfig') }}
+              </BaseSecondaryButton>
+            </ClientsConfigDialog>
             <ClientsDeleteDialog
-              trigger-class="col-span-2"
               :client-name="data.name"
               @delete="deleteClient"
             >
-              <FormSecondaryActionField
-                :label="$t('client.delete')"
-                class="inline-block w-full"
-                as="span"
-              />
+              <BaseSecondaryButton as="span" class="ui-button-danger w-full">
+                {{ $t('client.delete') }}
+              </BaseSecondaryButton>
             </ClientsDeleteDialog>
-            <ClientsConfigDialog
-              trigger-class="col-span-2"
-              :client-id="data.id"
-            >
-              <FormSecondaryActionField
-                :label="$t('client.viewConfig')"
-                class="inline-block w-full"
-                as="span"
-              />
-            </ClientsConfigDialog>
-          </FormGroup>
-        </FormElement>
+          </div>
+        </FormGroup>
       </PanelBody>
     </Panel>
   </main>
 </template>
 
 <script lang="ts" setup>
+import { CircleArrowLeftIcon } from '@lucide/vue';
+
 import { $fetch } from '#imports';
 
 const globalStore = useGlobalStore();
