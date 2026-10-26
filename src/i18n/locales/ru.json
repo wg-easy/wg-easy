@@ -199,7 +199,7 @@
     "generic": {
       "required": "{field} обязательно для заполнения",
       "validNumber": "{field} должно быть числом",
-      "validNumberRange": "{field} должно быть числом или диапазоном чисел",
+      "validNumberRange": "{field} должен быть корректным числом или диапазоном чисел",
       "validString": "{field} должно быть строкой",
       "validBoolean": "{field} должно быть логическим значением",
       "validArray": "{field} должно быть массивом",
@@ -241,7 +241,8 @@
     "interface": {
       "cidr": "CIDR",
       "device": "Устройство",
-      "cidrValid": "CIDR должен быть корректным"
+      "cidrValid": "CIDR должен быть корректным",
+      "headerProtectionJunkSize": "При заданном ключе защиты заголовков размеры S1–S4 должны быть не меньше 12"
     },
     "otl": "Одноразовая ссылка",
     "stringMalformed": "Строка имеет неверный формат",
@@ -254,7 +255,12 @@
     "address": "IP‑адрес",
     "dns": "DNS",
     "allowedIps": "Разрешённые IP‑адреса",
-    "file": "Файл"
+    "file": "Файл",
+    "awg": {
+      "junkPacketRange": "Jmin не должен превышать Jmax (пустое значение считается нулём)",
+      "headerRangesOverlap": "Диапазоны заголовков H1–H4 не должны пересекаться"
+    },
+    "keyMalformed": "Ключ должен содержать 32 байта в формате Base64"
   },
   "hooks": {
     "preUp": "PreUp",
@@ -270,11 +276,11 @@
   },
   "awg": {
     "jCLabel": "Количество мусорных пакетов (Jc)",
-    "jCDescription": "Число мусорных пакетов для отправки (1-128, рекомендуется: 4-12)",
+    "jCDescription": "Число мусорных пакетов для отправки (0–128, 0 отключает мусорные пакеты, рекомендуется: 4–12)",
     "jMinLabel": "Минимальный размер мусорных пакетов (Jmin)",
-    "jMinDescription": "Минимальный размер мусорных пакетов (0-1279*, рекомендуется: 8, должен быть < Jmax)",
+    "jMinDescription": "Минимальный размер мусорных пакетов (0–1279*, должен быть ≤ Jmax)",
     "jMaxLabel": "Максимальный размер мусорных пакетов (Jmax)",
-    "jMaxDescription": "Максимальный размер мусорных пакетов (1-1280*, рекомендуется: 80, должен быть > Jmin)",
+    "jMaxDescription": "Максимальный размер мусорных пакетов (0–1280*, должен быть ≥ Jmin)",
     "s1Label": "Размер мусорных данных в init-пакете (S1)",
     "s1Description": "Размер мусорных данных в init-пакете (0-1132[1280* - 148 = 1132], рекомендуется: 15-150, S1+56 ≠ S2)",
     "s2Label": "Размер мусорных данных в ответном пакете (S2)",
@@ -302,6 +308,25 @@
     "i5Label": "Специальный мусорный пакет 5 (I5)",
     "i5Description": "Пакет имитации протокола в hex формате: <b 0x...>",
     "mtuNote": "Значения зависят от MTU",
-    "obfuscationParameters": "Параметры обфускации AmneziaWG"
+    "obfuscationParameters": "Параметры обфускации AmneziaWG",
+    "rangeNote": "Следующие параметры принимают число или включительный диапазон (0–65535), например 30 или 30-90",
+    "headerProtectionKeyLabel": "Ключ защиты заголовков",
+    "headerProtectionKeyDescription": "Ключ из 32 байт в формате Base64 для шифрования заголовков. Копируется всем клиентам. Требует S1–S4 не меньше 12",
+    "contentPaddingAdditionLabel": "Дополнительный padding данных",
+    "contentPaddingAdditionDescription": "Случайное количество байт, добавляемых к транспортным пакетам перед шифрованием",
+    "rekeyAfterTimeLabel": "Интервал обновления сессии",
+    "rekeyAfterTimeDescription": "Время до обновления сессии в секундах (по умолчанию в WireGuard: 120)",
+    "rekeyTimeoutLabel": "Интервал повторных попыток handshake",
+    "rekeyTimeoutDescription": "Время между повторными попытками handshake в секундах (по умолчанию в WireGuard: 5)",
+    "rejectAfterTimeLabel": "Срок действия сессии",
+    "rejectAfterTimeDescription": "Срок действия сессии в секундах (по умолчанию в WireGuard: 180)",
+    "keepaliveTimeoutLabel": "Таймаут поддержания соединения",
+    "keepaliveTimeoutDescription": "Время бездействия до отправки keepalive в секундах (по умолчанию в WireGuard: 10)",
+    "maxHandshakeAttemptsLabel": "Максимальное число попыток handshake",
+    "maxHandshakeAttemptsDescription": "Количество попыток handshake до прекращения повторов (по умолчанию в WireGuard: 18)",
+    "randomTrailersLabel": "Случайные добавления к пакетам",
+    "randomTrailersDescription": "Добавлять случайное количество байт к пакетам handshake. Настройка копируется всем клиентам и должна совпадать на обеих сторонах",
+    "disableCookiesLabel": "Отключить cookies",
+    "disableCookiesDescription": "Отключить механизм cookies при высокой нагрузке. Влияет только на эту сторону туннеля"
   }
 }
