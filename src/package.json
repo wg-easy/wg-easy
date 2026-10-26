@@ -22,8 +22,8 @@
     "test:unit": "vitest run --project unit"
   },
   "dependencies": {
-    "@heroicons/vue": "^2.2.0",
     "@libsql/client": "^0.18.0",
+    "@lucide/vue": "^1.61.0",
     "@nuxtjs/color-mode": "^4.0.1",
     "@nuxtjs/i18n": "^10.6.0",
     "@phc/format": "^1.0.0",

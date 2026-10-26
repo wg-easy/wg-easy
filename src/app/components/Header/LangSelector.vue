@@ -4,10 +4,10 @@
       class="header-control group max-w-36 px-2.5"
       :aria-label="$t('ui.selectLanguage')"
     >
-      <IconsLanguage class="size-4" /><span class="hidden truncate sm:inline"
+      <LanguagesIcon class="size-4" /><span class="hidden truncate sm:inline"
         ><SelectValue /></span
       ><span class="uppercase sm:hidden">{{ locale }}</span>
-      <IconsArrowDown
+      <ArrowDownIcon
         class="size-3 transition-transform group-data-[state=open]:rotate-180"
       />
     </SelectTrigger>
@@ -32,6 +32,8 @@
 </template>
 
 <script setup lang="ts">
+import { ArrowDownIcon, LanguagesIcon } from '@lucide/vue';
+
 const { locales, locale, setLocale } = useI18n();
 
 const langProxy = ref(locale);

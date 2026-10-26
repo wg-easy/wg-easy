@@ -19,7 +19,7 @@
           :aria-label="$t('client.delete')"
           @click="del(i)"
         >
-          <IconsMinus class="size-4" aria-hidden="true" />
+          <MinusIcon class="size-4" aria-hidden="true" />
         </BaseSecondaryButton>
       </div>
     </div>
@@ -32,6 +32,8 @@
 </template>
 
 <script lang="ts" setup>
+import { MinusIcon } from '@lucide/vue';
+
 const data = defineModel<string[] | null>();
 defineProps<{ emptyText?: string[]; name: string }>();
 

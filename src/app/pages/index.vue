@@ -3,7 +3,7 @@
     <div class="mb-7 flex items-end justify-between gap-4">
       <div>
         <p class="eyebrow mb-3 flex items-center gap-2">
-          <IconsStack class="size-3.5 text-accent" />WireGuard
+          <ServerIcon class="size-3.5 text-accent" />WireGuard
           <span class="text-line">/</span> {{ $t('pages.clients') }}
         </p>
         <h1 class="page-title">{{ $t('pages.clients') }}</h1>
@@ -40,7 +40,7 @@
       >
     </div>
     <div v-if="clientsStore.error" role="alert" class="callout mb-4">
-      <IconsWarning class="size-5 shrink-0 text-warning" /><span
+      <TriangleAlertIcon class="size-5 shrink-0 text-warning" /><span
         class="flex-1"
         >{{ $t('ui.loadError') }}</span
       ><button
@@ -60,7 +60,7 @@
       <IconsLoading class="size-5 animate-spin" />{{ $t('general.loading') }}
     </div>
     <p class="mt-5 flex items-start gap-2 text-xs leading-relaxed text-subtle">
-      <IconsInfo class="mt-0.5 size-4 shrink-0 text-accent" />{{
+      <InfoIcon class="mt-0.5 size-4 shrink-0 text-accent" />{{
         $t('ui.clientsHint')
       }}
     </p>
@@ -68,6 +68,8 @@
 </template>
 
 <script setup lang="ts">
+import { InfoIcon, ServerIcon, TriangleAlertIcon } from '@lucide/vue';
+
 const globalStore = useGlobalStore();
 const clientsStore = useClientsStore();
 

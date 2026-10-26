@@ -4,7 +4,7 @@
       <NuxtLink
         to="/"
         class="mb-6 inline-flex items-center gap-2 text-xs text-muted hover:text-foreground"
-        ><IconsArrowLeftCircle class="size-4" />{{
+        ><CircleArrowLeftIcon class="size-4" />{{
           $t('pages.clients')
         }}</NuxtLink
       >
@@ -256,6 +256,8 @@
 </template>
 
 <script lang="ts" setup>
+import { CircleArrowLeftIcon } from '@lucide/vue';
+
 import { $fetch } from '#imports';
 
 const globalStore = useGlobalStore();

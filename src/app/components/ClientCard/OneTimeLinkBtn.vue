@@ -5,11 +5,13 @@
     :aria-label="$t('client.otlDesc')"
     @click="showOneTimeLink"
   >
-    <IconsLink class="size-4" />
+    <LinkIcon class="size-4" />
   </button>
 </template>
 
 <script setup lang="ts">
+import { LinkIcon } from '@lucide/vue';
+
 import { $fetch } from '#imports';
 
 const props = defineProps<{ client: LocalClient }>();

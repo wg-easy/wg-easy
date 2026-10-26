@@ -11,7 +11,7 @@
       <span class="hidden max-w-24 truncate xl:inline">{{
         authStore.userData?.name
       }}</span
-      ><IconsArrowDown class="hidden size-3 sm:block" />
+      ><ArrowDownIcon class="hidden size-3 sm:block" />
     </DropdownMenuTrigger>
     <DropdownMenuPortal>
       <DropdownMenuContent :side-offset="8" align="end" class="ui-menu w-56">
@@ -45,7 +45,7 @@
         >
         <DropdownMenuSeparator class="my-1 h-px bg-line" />
         <DropdownMenuItem class="ui-menu-item text-accent" @select="submit"
-          ><IconsLogout class="size-4" />{{
+          ><LogOutIcon class="size-4" />{{
             $t('general.logout')
           }}</DropdownMenuItem
         >
@@ -55,6 +55,8 @@
 </template>
 
 <script setup lang="ts">
+import { ArrowDownIcon, LogOutIcon } from '@lucide/vue';
+
 import { $fetch } from '#imports';
 
 const authStore = useAuthStore();

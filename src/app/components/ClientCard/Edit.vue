@@ -5,11 +5,13 @@
     :aria-label="$t('ui.editClient', { name: client.name })"
     :title="$t('ui.editClient', { name: client.name })"
   >
-    <IconsEdit class="size-4" />
+    <SquarePenIcon class="size-4" />
   </NuxtLink>
 </template>
 
 <script setup lang="ts">
+import { SquarePenIcon } from '@lucide/vue';
+
 defineProps<{
   client: LocalClient;
 }>();

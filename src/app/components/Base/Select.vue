@@ -4,7 +4,7 @@
       class="ui-input inline-flex items-center justify-between gap-2"
       :aria-label="$t('ui.chooseOption')"
     >
-      <SelectValue :placeholder="$t('ui.chooseOption')" /><IconsArrowDown
+      <SelectValue :placeholder="$t('ui.chooseOption')" /><ArrowDownIcon
         class="size-3"
       />
     </SelectTrigger>
@@ -32,6 +32,8 @@
 </template>
 
 <script lang="ts" setup>
+import { ArrowDownIcon } from '@lucide/vue';
+
 defineProps<{
   options: { label: string; value: string }[];
 }>();

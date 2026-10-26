@@ -20,14 +20,14 @@
         :title="$t('client.copyPng')"
         @click="copyPng"
       >
-        <IconsCopy class="size-5" /> PNG
+        <CopyIcon class="size-5" /> PNG
       </BaseSecondaryButton>
       <BaseSecondaryButton
         class="flex items-center gap-2"
         :title="$t('client.downloadPng')"
         @click="downloadPng"
       >
-        <IconsDownload class="size-5" /> PNG
+        <DownloadIcon class="size-5" /> PNG
       </BaseSecondaryButton>
       <DialogClose as-child>
         <BaseSecondaryButton>{{ $t('dialog.cancel') }}</BaseSecondaryButton>
@@ -37,6 +37,8 @@
 </template>
 
 <script setup lang="ts">
+import { CopyIcon, DownloadIcon } from '@lucide/vue';
+
 defineProps<{ qrCode: string }>();
 
 const toast = useToast();

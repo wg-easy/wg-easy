@@ -4,10 +4,10 @@
     :key="i"
     class="surface grid grid-cols-[auto_minmax(0,1fr)_auto] items-start gap-3 p-4 shadow-xl data-[swipe=cancel]:translate-x-0 data-[swipe=move]:translate-x-[var(--reka-toast-swipe-move-x)]"
   >
-    <IconsCheckCircle
+    <CircleCheckIcon
       v-if="e.type === 'success'"
       class="mt-0.5 size-5 text-success"
-    /><IconsWarning v-else class="mt-0.5 size-5 text-accent" />
+    /><TriangleAlertIcon v-else class="mt-0.5 size-5 text-accent" />
     <div>
       <ToastTitle class="text-sm font-semibold text-foreground">{{
         e.title
@@ -19,12 +19,14 @@
     <ToastClose
       :aria-label="$t('dialog.cancel')"
       class="grid size-6 place-items-center rounded text-subtle hover:bg-surface-raised"
-      ><IconsClose class="size-3"
+      ><XIcon class="size-3"
     /></ToastClose>
   </ToastRoot>
 </template>
 
 <script setup lang="ts">
+import { CircleCheckIcon, TriangleAlertIcon, XIcon } from '@lucide/vue';
+
 defineExpose({
   publish,
 });

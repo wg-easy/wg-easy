@@ -5,7 +5,7 @@
     <div
       class="grid size-12 place-items-center rounded-xl bg-surface-raised text-subtle"
     >
-      <IconsStack class="size-6" />
+      <ServerIcon class="size-6" />
     </div>
     <p class="text-sm text-muted">
       {{ $t(clientsStore.filter ? 'ui.noResults' : 'client.empty') }}
@@ -17,12 +17,14 @@
     >
     <ClientsCreateDialog v-else
       ><BasePrimaryButton as="span"
-        ><IconsPlus class="size-4" />{{ $t('client.new') }}</BasePrimaryButton
+        ><PlusIcon class="size-4" />{{ $t('client.new') }}</BasePrimaryButton
       ></ClientsCreateDialog
     >
   </div>
 </template>
 
 <script setup lang="ts">
+import { PlusIcon, ServerIcon } from '@lucide/vue';
+
 const clientsStore = useClientsStore();
 </script>

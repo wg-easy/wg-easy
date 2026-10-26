@@ -23,7 +23,7 @@
         <DialogClose
           class="icon-button absolute top-5 right-5"
           :aria-label="$t('dialog.cancel')"
-          ><IconsClose class="size-4"
+          ><XIcon class="size-4"
         /></DialogClose>
       </DialogContent>
     </DialogPortal>
@@ -31,6 +31,8 @@
 </template>
 
 <script lang="ts" setup>
+import { XIcon } from '@lucide/vue';
+
 defineProps<{ triggerClass?: string }>();
 
 const emit = defineEmits<{

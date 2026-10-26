@@ -7,7 +7,7 @@
     >
       <span class="eyebrow">{{ $t('ui.download') }}</span
       ><span class="mt-1.5 flex items-center gap-1.5 text-muted"
-        ><IconsArrowDown class="size-3 text-success" />{{
+        ><ArrowDownIcon class="size-3 text-success" />{{
           bytes(client.transferTxCurrent)
         }}/s</span
       ><span class="mt-1 block text-subtle">{{
@@ -21,7 +21,7 @@
     >
       <span class="eyebrow">{{ $t('ui.upload') }}</span
       ><span class="mt-1.5 flex items-center gap-1.5 text-muted"
-        ><IconsArrowUp class="size-3 text-accent" />{{
+        ><ArrowUpIcon class="size-3 text-accent" />{{
           bytes(client.transferRxCurrent)
         }}/s</span
       ><span class="mt-1 block text-subtle">{{
@@ -32,6 +32,8 @@
 </template>
 
 <script setup lang="ts">
+import { ArrowDownIcon, ArrowUpIcon } from '@lucide/vue';
+
 defineProps<{
   client: LocalClient;
 }>();

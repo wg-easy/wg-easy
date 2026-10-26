@@ -8,7 +8,7 @@
     class="callout mb-2 items-center border-accent/25"
     :title="`${globalStore.information.currentRelease} → ${globalStore.information.latestRelease.version}`"
   >
-    <IconsSparkles class="size-5 shrink-0 text-accent" />
+    <SparklesIcon class="size-5 shrink-0 text-accent" />
     <div class="min-w-0 flex-1">
       <p class="font-semibold text-foreground">
         {{ $t('update.updateAvailable') }}
@@ -28,6 +28,8 @@
 </template>
 
 <script lang="ts" setup>
+import { SparklesIcon } from '@lucide/vue';
+
 const globalStore = useGlobalStore();
 const authStore = useAuthStore();
 </script>

@@ -6,11 +6,13 @@
     :title="$t('client.downloadConfig')"
     :aria-label="$t('client.downloadConfig')"
   >
-    <IconsDownload class="size-4" />
+    <DownloadIcon class="size-4" />
   </a>
 </template>
 
 <script setup lang="ts">
+import { DownloadIcon } from '@lucide/vue';
+
 defineProps<{
   client: LocalClient;
 }>();

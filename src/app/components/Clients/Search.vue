@@ -1,6 +1,6 @@
 <template>
   <div class="relative">
-    <IconsMagnifyingGlass
+    <SearchIcon
       class="pointer-events-none absolute top-3.5 left-3.5 size-4 text-subtle"
     />
     <input
@@ -17,12 +17,14 @@
       :aria-label="$t('ui.clearSearch')"
       @click="clearSearch"
     >
-      <IconsClose class="size-3" />
+      <XIcon class="size-3" />
     </button>
   </div>
 </template>
 
 <script setup lang="ts">
+import { SearchIcon, XIcon } from '@lucide/vue';
+
 const clientsStore = useClientsStore();
 const searchQuery = ref(clientsStore.filter ?? '');
 watch(
