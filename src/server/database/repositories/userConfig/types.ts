@@ -40,6 +40,7 @@ export const UserConfigUpdateSchema = schemaForType<UserConfigUpdateType>()(
     port: PortSchema,
     defaultMtu: MtuSchema,
     defaultPersistentKeepalive: PersistentKeepaliveSchema,
+    defaultGeneratePreSharedKey: z.boolean(),
     defaultDns: DnsSchema,
     defaultAllowedIps: AllowedIpsSchema,
     defaultJC: JcSchema,

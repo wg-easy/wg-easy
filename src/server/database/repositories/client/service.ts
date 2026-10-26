@@ -36,6 +36,11 @@ function createPreparedStatement(db: DBType) {
           privateKey: false,
           preSharedKey: false,
         },
+        extras: {
+          hasPreSharedKey: sql<number>`${client.preSharedKey} IS NOT NULL`.as(
+            'has_pre_shared_key'
+          ),
+        },
       })
       .prepare(),
     toggle: db
@@ -169,14 +174,16 @@ export class ClientService {
   /**
    * Returns one client without sensitive data
    */
-  getPublic(id: ID) {
-    return this.#statements.findByIdPublic.execute({ id });
+  async getPublic(id: ID) {
+    const result = await this.#statements.findByIdPublic.execute({ id });
+    if (!result) return undefined;
+
+    return { ...result, hasPreSharedKey: Boolean(result.hasPreSharedKey) };
   }
 
   async create({ name, expiresAt }: ClientCreateType) {
     const privateKey = await wg.generatePrivateKey();
     const publicKey = await wg.getPublicKey(privateKey);
-    const preSharedKey = await wg.generatePreSharedKey();
 
     return this.#db.transaction(async (tx) => {
       const clients = await tx.query.client.findMany().execute();
@@ -200,6 +207,10 @@ export class ClientService {
         throw new Error('WireGuard interface configuration not found');
       }
 
+      const preSharedKey = clientConfig.defaultGeneratePreSharedKey
+        ? await wg.generatePreSharedKey()
+        : null;
+
       const ipv4Cidr = parseCidr(clientInterface.ipv4Cidr);
       const ipv4Address = nextIP(4, ipv4Cidr, clients);
       const ipv6Cidr = parseCidr(clientInterface.ipv6Cidr);
@@ -215,7 +226,7 @@ export class ClientService {
           expiresAt,
           privateKey,
           publicKey,
-          preSharedKey,
+          preSharedKey: preSharedKey || null,
           ipv4Address,
           ipv6Address,
           mtu: clientConfig.defaultMtu,
@@ -242,6 +253,38 @@ export class ClientService {
 
   delete(id: ID) {
     return this.#statements.delete.execute({ id });
+  }
+
+  removePreSharedKey(id: ID) {
+    return this.#db
+      .update(client)
+      .set({ preSharedKey: null })
+      .where(eq(client.id, id))
+      .execute();
+  }
+
+  async rotatePreSharedKey(id: ID) {
+    const preSharedKey = await wg.generatePreSharedKey();
+    if (!preSharedKey) {
+      throw new Error('Failed to generate preshared key');
+    }
+
+    await this.#db
+      .update(client)
+      .set({ preSharedKey })
+      .where(eq(client.id, id))
+      .execute();
+  }
+
+  async rotateKeyPair(id: ID) {
+    const privateKey = await wg.generatePrivateKey();
+    const publicKey = await wg.getPublicKey(privateKey);
+
+    await this.#db
+      .update(client)
+      .set({ privateKey, publicKey })
+      .where(eq(client.id, id))
+      .execute();
   }
 
   update(id: ID, data: UpdateClientType) {
@@ -287,7 +330,7 @@ export class ClientService {
         interfaceId: WG_ENV.WG_INTERFACE,
         privateKey,
         publicKey,
-        preSharedKey,
+        preSharedKey: preSharedKey || null,
         ipv4Address,
         ipv6Address,
         mtu: clientConfig.defaultMtu,

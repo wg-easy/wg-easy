@@ -23,6 +23,9 @@ type Options = {
 const wgExecutable =
   typeof WG_ENV !== 'undefined' ? WG_ENV.WG_EXECUTABLE : 'dev';
 
+// WireGuard uses an all-zero key to explicitly clear the active peer's preshared key.
+const unsetPreSharedKey = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=';
+
 export const wg = {
   generateServerPeer: (
     client: Omit<ClientType, 'createdAt' | 'updatedAt'>,
@@ -44,7 +47,7 @@ export const wg = {
     return `# Client: ${client.name} (${client.id})
 [Peer]
 PublicKey = ${client.publicKey}
-PresharedKey = ${client.preSharedKey}
+PresharedKey = ${client.preSharedKey ?? unsetPreSharedKey}
 AllowedIPs = ${allowedIps.join(', ')}${extraLines.length ? `\n${extraLines.join('\n')}` : ''}`;
   },
 
@@ -124,8 +127,7 @@ Address = ${address}
 ${extraLines.length ? `${extraLines.join('\n')}\n` : ''}
 [Peer]
 PublicKey = ${wgInterface.publicKey}
-PresharedKey = ${client.preSharedKey}
-AllowedIPs = ${(client.allowedIps ?? userConfig.defaultAllowedIps).join(', ')}
+${client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''}AllowedIPs = ${(client.allowedIps ?? userConfig.defaultAllowedIps).join(', ')}
 PersistentKeepalive = ${client.persistentKeepalive}
 Endpoint = ${formatEndpoint(userConfig.host, userConfig.port)}`;
   },

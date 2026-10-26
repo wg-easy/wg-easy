@@ -34,6 +34,12 @@
       </FormGroup>
       <FormGroup>
         <FormHeading>{{ $t('form.sectionAdvanced') }}</FormHeading>
+        <FormSwitchField
+          id="defaultGeneratePreSharedKey"
+          v-model="data.defaultGeneratePreSharedKey"
+          :label="$t('admin.config.generatePreSharedKey')"
+          :description="$t('admin.config.generatePreSharedKeyDesc')"
+        />
         <FormNullNumberField
           id="defaultMtu"
           v-model="data.defaultMtu"

@@ -1,6 +1,8 @@
 <template>
   <DialogRoot :modal="true" @update:open="updateOpen">
-    <DialogTrigger :class="triggerClass"><slot name="trigger" /></DialogTrigger>
+    <DialogTrigger :class="triggerClass" :disabled="triggerDisabled">
+      <slot name="trigger" />
+    </DialogTrigger>
     <DialogPortal>
       <DialogOverlay class="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm" />
       <DialogContent
@@ -36,7 +38,7 @@
 <script lang="ts" setup>
 import { XIcon } from '@lucide/vue';
 
-defineProps<{ triggerClass?: string }>();
+defineProps<{ triggerClass?: string; triggerDisabled?: boolean }>();
 
 const emit = defineEmits<{
   'update:open': [open: boolean];
