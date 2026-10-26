@@ -10,11 +10,6 @@
           class="pr-8 text-xl font-semibold tracking-tight text-foreground"
           ><slot name="title"
         /></DialogTitle>
-        <DialogClose
-          class="icon-button absolute top-5 right-5"
-          :aria-label="$t('dialog.cancel')"
-          ><IconsClose class="size-4"
-        /></DialogClose>
         <DialogDescription
           as="div"
           class="mt-5 text-sm leading-relaxed text-muted"
@@ -25,6 +20,11 @@
         >
           <slot name="actions" />
         </div>
+        <DialogClose
+          class="icon-button absolute top-5 right-5"
+          :aria-label="$t('dialog.cancel')"
+          ><IconsClose class="size-4"
+        /></DialogClose>
       </DialogContent>
     </DialogPortal>
   </DialogRoot>

@@ -2,7 +2,9 @@
   <main class="page-container">
     <div class="mb-7">
       <p class="eyebrow mb-3">WireGuard / {{ $t('pages.admin.panel') }}</p>
-      <h1 class="page-title">{{ $t('pages.admin.panel') }}</h1>
+      <h1 id="admin-section-title" class="page-title">
+        {{ activeMenuItem.name }}
+      </h1>
       <p class="mt-3 text-sm text-subtle">{{ $t('ui.adminDescription') }}</p>
     </div>
     <div class="grid items-start gap-6 lg:grid-cols-[220px_minmax(0,1fr)]">
@@ -14,7 +16,7 @@
           <NuxtLink
             to="/admin"
             class="nav-link"
-            exact-active-class="nav-link-active"
+            exact-active-class="bg-accent/10 text-accent"
             >{{ $t('ui.overview') }}</NuxtLink
           ><NuxtLink
             v-for="item in menuItems"
@@ -26,10 +28,7 @@
           >
         </nav>
       </aside>
-      <section class="min-w-0">
-        <h2 class="mb-5 text-xl font-semibold tracking-tight">
-          {{ activeMenuItem.name }}
-        </h2>
+      <section aria-labelledby="admin-section-title" class="min-w-0">
         <NuxtPage />
       </section>
     </div>
@@ -48,12 +47,12 @@ const menuItems = computed(() => [
   { id: 'hooks', name: t('pages.admin.hooks') },
 ]);
 
-const defaultItem = { id: '', name: t('pages.admin.panel') };
-
 const activeMenuItem = computed(() => {
   return (
-    menuItems.value.find((item) => route.path === `/admin/${item.id}`) ??
-    defaultItem
+    menuItems.value.find((item) => route.path === `/admin/${item.id}`) ?? {
+      id: '',
+      name: t('ui.overview'),
+    }
   );
 });
 </script>

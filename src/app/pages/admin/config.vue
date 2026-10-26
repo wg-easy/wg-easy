@@ -102,11 +102,7 @@
           :description="$t('awg.i5Description')"
         />
       </FormGroup>
-      <FormGroup>
-        <FormHeading>{{ $t('form.actions') }}</FormHeading>
-        <FormPrimaryActionField type="submit" :label="$t('form.save')" />
-        <FormSecondaryActionField :label="$t('form.revert')" @click="revert" />
-      </FormGroup>
+      <FormSaveControls @revert="revert" />
     </FormElement>
   </div>
 </template>

@@ -19,7 +19,7 @@
           :aria-label="$t('client.delete')"
           @click="del(i)"
         >
-          {{ '-' }}
+          <IconsMinus class="size-4" aria-hidden="true" />
         </BaseSecondaryButton>
       </div>
     </div>
