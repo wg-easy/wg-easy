@@ -1,5 +1,5 @@
 <template>
-  <main v-if="data">
+  <div v-if="data">
     <FormElement @submit.prevent="submit">
       <FormGroup>
         <FormNumberField
@@ -30,13 +30,9 @@
           :description="$t('admin.general.jsonDesc')"
         />
       </FormGroup>
-      <FormGroup>
-        <FormHeading>{{ $t('form.actions') }}</FormHeading>
-        <FormPrimaryActionField type="submit" :label="$t('form.save')" />
-        <FormSecondaryActionField :label="$t('form.revert')" @click="revert" />
-      </FormGroup>
+      <FormSaveControls @revert="revert" />
     </FormElement>
-  </main>
+  </div>
 </template>
 
 <script setup lang="ts">

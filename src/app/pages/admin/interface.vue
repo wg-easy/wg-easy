@@ -1,5 +1,5 @@
 <template>
-  <main v-if="data">
+  <div v-if="data">
     <FormElement @submit.prevent="submit">
       <FormGroup>
         <FormNumberField
@@ -196,35 +196,28 @@
           :description="$t('admin.interface.firewallEnabledDesc')"
         />
       </FormGroup>
-      <FormGroup>
-        <FormHeading>{{ $t('form.actions') }}</FormHeading>
-        <FormPrimaryActionField type="submit" :label="$t('form.save')" />
-        <FormSecondaryActionField :label="$t('form.revert')" @click="revert" />
+      <FormSaveControls @revert="revert" />
+    </FormElement>
+    <FormGroup class="mt-6">
+      <FormHeading>{{ $t('form.actions') }}</FormHeading>
+      <div class="col-span-full flex flex-col gap-3 sm:flex-row sm:flex-wrap">
         <AdminCidrDialog
-          trigger-class="col-span-2"
           :ipv4-cidr="data.ipv4Cidr"
           :ipv6-cidr="data.ipv6Cidr"
           @change="changeCidr"
         >
-          <FormSecondaryActionField
-            :label="$t('admin.interface.changeCidr')"
-            class="inline-block w-full"
-            as="span"
-          />
+          <BaseSecondaryButton as="span" class="w-full">
+            {{ $t('admin.interface.changeCidr') }}
+          </BaseSecondaryButton>
         </AdminCidrDialog>
-        <AdminRestartInterfaceDialog
-          trigger-class="col-span-2"
-          @restart="restartInterface"
-        >
-          <FormSecondaryActionField
-            :label="$t('admin.interface.restart')"
-            class="inline-block w-full"
-            as="span"
-          />
+        <AdminRestartInterfaceDialog @restart="restartInterface">
+          <BaseSecondaryButton as="span" class="w-full">
+            {{ $t('admin.interface.restart') }}
+          </BaseSecondaryButton>
         </AdminRestartInterfaceDialog>
-      </FormGroup>
-    </FormElement>
-  </main>
+      </div>
+    </FormGroup>
+  </div>
 </template>
 
 <script setup lang="ts">

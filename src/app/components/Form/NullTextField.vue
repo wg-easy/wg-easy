@@ -4,7 +4,7 @@
       {{ label }}
     </FormLabel>
     <BaseTooltip v-if="description" :text="description">
-      <IconsInfo class="size-4" />
+      <InfoIcon class="size-4" />
     </BaseTooltip>
   </div>
   <BaseInput
@@ -18,6 +18,8 @@
 </template>
 
 <script lang="ts" setup>
+import { InfoIcon } from '@lucide/vue';
+
 defineProps<{
   id: string;
   label: string;

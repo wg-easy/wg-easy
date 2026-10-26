@@ -1,5 +1,5 @@
 <template>
-  <div class="block text-xs text-gray-500 dark:text-neutral-400">
+  <div class="text-[11px] text-subtle">
     <span class="inline-block">{{ expiredDateFormat(client.expiresAt) }}</span>
   </div>
 </template>

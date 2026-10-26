@@ -1,10 +1,21 @@
 <template>
-  <div v-if="client.oneTimeLink !== null" class="text-xs text-gray-400">
-    <a :href="'./cnf/' + client.oneTimeLink.oneTimeLink">{{ path }}</a>
+  <div
+    v-if="client.oneTimeLink !== null"
+    class="mt-4 flex items-start gap-2 border-t border-line pt-3 text-xs text-muted"
+  >
+    <LinkIcon class="size-4 shrink-0 text-accent" />
+    <a
+      :href="'/cnf/' + client.oneTimeLink.oneTimeLink"
+      class="font-mono break-all hover:text-foreground"
+    >
+      {{ path }}
+    </a>
   </div>
 </template>
 
 <script setup lang="ts">
+import { LinkIcon } from '@lucide/vue';
+
 const props = defineProps<{ client: LocalClient }>();
 
 const path = ref('Loading...');
