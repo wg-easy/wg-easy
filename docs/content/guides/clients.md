@@ -84,7 +84,7 @@ The DNS server that the client will use.
 
 ## Advanced
 
-- **MTU**: The maximum transmission unit for the client.
+- **MTU**: The maximum transmission unit for the client. Leave empty to use automatic MTU detection.
 - **Persistent Keepalive**: The interval for sending keepalive packets to the server.
 
 ## Hooks
