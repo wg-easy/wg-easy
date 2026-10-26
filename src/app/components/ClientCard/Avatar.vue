@@ -14,7 +14,7 @@
 </template>
 
 <script setup lang="ts">
-const props = defineProps<{ client: LocalClient }>();
+const props = defineProps<{ client: LocalClient; connected: boolean }>();
 const initials = computed(() =>
   props.client.name
     .split(/[\s@._-]+/)
@@ -22,14 +22,5 @@ const initials = computed(() =>
     .slice(0, 2)
     .map((word) => word[0]?.toUpperCase())
     .join('')
-);
-const connected = computed(
-  () =>
-    props.client.enabled &&
-    isPeerConnected({
-      latestHandshakeAt: props.client.latestHandshakeAt
-        ? new Date(props.client.latestHandshakeAt)
-        : null,
-    })
 );
 </script>

@@ -7,7 +7,7 @@
       class="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-5 gap-y-5 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,0.8fr)_auto]"
     >
       <div class="flex min-w-0 items-start gap-3.5">
-        <ClientCardAvatar :client="client" />
+        <ClientCardAvatar :client="client" :connected="connected" />
         <div class="min-w-0 flex-1">
           <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
             <ClientCardName :client="client" />
@@ -65,13 +65,17 @@
 <script setup lang="ts">
 const props = defineProps<{ client: LocalClient }>();
 const globalStore = useGlobalStore();
+const now = useHydrationTime();
 const connected = computed(
   () =>
     props.client.enabled &&
-    isPeerConnected({
-      latestHandshakeAt: props.client.latestHandshakeAt
-        ? new Date(props.client.latestHandshakeAt)
-        : null,
-    })
+    isPeerConnected(
+      {
+        latestHandshakeAt: props.client.latestHandshakeAt
+          ? new Date(props.client.latestHandshakeAt)
+          : null,
+      },
+      now()
+    )
 );
 </script>
