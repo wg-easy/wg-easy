@@ -2,7 +2,7 @@
   <div v-if="data">
     <FormElement @submit.prevent="submit">
       <FormGroup>
-        <FormNumberField
+        <FormNullNumberField
           id="mtu"
           v-model="data.mtu"
           :label="$t('general.mtu')"

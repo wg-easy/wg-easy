@@ -77,8 +77,7 @@ AllowedIPs = ${allowedIps.join(', ')}${extraLines.length ? `\n${extraLines.join(
 PrivateKey = ${wgInterface.privateKey}
 Address = ${address}
 ListenPort = ${wgInterface.port}
-MTU = ${wgInterface.mtu}
-Table = ${wgInterface.routingTable}
+${wgInterface.mtu !== null ? `MTU = ${wgInterface.mtu}\n` : ''}Table = ${wgInterface.routingTable}
 ${extraLines.length ? `${extraLines.join('\n')}\n` : ''}
 PreUp = ${iptablesTemplate(hooks.preUp, wgInterface)}
 PostUp = ${iptablesTemplate(hooks.postUp, wgInterface)}
@@ -108,20 +107,20 @@ PostDown = ${iptablesTemplate(hooks.postDown, wgInterface)}`;
     const dnsServers = client.dns ?? userConfig.defaultDns;
     const dnsLine =
       dnsServers.length > 0 ? `DNS = ${dnsServers.join(', ')}` : null;
+    const mtuLine = client.mtu !== null ? `MTU = ${client.mtu}` : null;
 
     const awgLines =
       wgExecutable === 'awg'
         ? buildAwgLines(clientAwgParameters(wgInterface, client))
         : [];
 
-    const extraLines = [dnsLine, ...hookLines, ...awgLines].filter(
+    const extraLines = [mtuLine, dnsLine, ...hookLines, ...awgLines].filter(
       (v) => v !== null
     );
 
     return `[Interface]
 PrivateKey = ${client.privateKey}
 Address = ${address}
-MTU = ${client.mtu}
 ${extraLines.length ? `${extraLines.join('\n')}\n` : ''}
 [Peer]
 PublicKey = ${wgInterface.publicKey}

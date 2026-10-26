@@ -36,7 +36,8 @@ export const MtuSchema = z
   .number({ message: t('zod.mtu') })
   // min for IPv6 is 1280, but we allow lower for IPv4
   .min(1024, { message: t('zod.mtu') })
-  .max(9000, { message: t('zod.mtu') });
+  .max(9000, { message: t('zod.mtu') })
+  .nullable();
 
 export const JcSchema = z.number().min(1).max(128).nullable();
 
