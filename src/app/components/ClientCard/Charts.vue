@@ -53,6 +53,9 @@ const chartOptions = {
     type: undefined as ApexChart['type'],
     background: 'transparent',
     stacked: false,
+    accessibility: {
+      enabled: false,
+    },
     toolbar: {
       show: false,
     },

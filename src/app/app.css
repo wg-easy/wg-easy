@@ -135,7 +135,7 @@
     @apply flex min-h-10 cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-sm outline-none hover:bg-surface-hover hover:text-foreground focus:bg-surface-hover focus:text-foreground data-[highlighted]:bg-surface-hover data-[highlighted]:text-foreground;
   }
   .form-group {
-    @apply grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)] items-start gap-x-5 gap-y-4 rounded-xl border border-line bg-surface p-5 sm:p-6;
+    @apply grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)] items-center gap-x-5 gap-y-4 rounded-xl border border-line bg-surface p-5 sm:p-6;
   }
   .form-group > * {
     min-width: 0;

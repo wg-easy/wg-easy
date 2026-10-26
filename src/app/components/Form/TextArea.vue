@@ -1,5 +1,5 @@
 <template>
-  <div class="flex items-center">
+  <div class="flex items-center self-start">
     <FormLabel :for="id">
       {{ label }}
     </FormLabel>
