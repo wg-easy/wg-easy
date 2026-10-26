@@ -8,6 +8,11 @@ title: Edit Client
 - **Enabled**: Whether the client can connect to the VPN.
 - **Expire Date**: The date the client will be disabled.
 
+## Keys
+
+- **Public Key**: The client's public key. Select it to copy it.
+- **Preshared Key**: Whether the client has a preshared key configured.
+
 ## Address
 
 - **IPv4**: The IPv4 address of the client.
@@ -100,4 +105,9 @@ This can only be used for clients that use `wg-quick`. Setting this will throw a
 
 - **Save**: Save the changes made in the form.
 - **Revert**: Revert the changes made in the form.
+- **Add Preshared Key**: Generate a preshared key when none is configured, immediately after confirmation.
+- **Rotate Preshared Key**: Replace the existing preshared key with a newly generated key immediately after confirmation.
+- **Remove Preshared Key**: Remove the client's preshared key immediately after confirmation.
+- **Rotate Key Pair**: Generate a new private and public key pair immediately after confirmation. The old keys will stop working.
+- **View Configuration**: View and copy the current client configuration. After adding, rotating, or removing the preshared key, or rotating the key pair, update the configuration on the client device to reconnect.
 - **Delete**: Delete the client.

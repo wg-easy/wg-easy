@@ -85,7 +85,9 @@ test.each(['wg', 'awg'])(
     const before = {
       clients: await db.select().from(schema.client),
       interfaces: await db.select().from(schema.wgInterface),
-      defaults: await db.select().from(schema.userConfig),
+      defaults: await db.query.userConfig.findMany({
+        columns: { defaultGeneratePreSharedKey: false },
+      }),
       hooks: await db.select().from(schema.hooks),
       links: await db.select().from(schema.oneTimeLink),
     };
@@ -96,7 +98,12 @@ test.each(['wg', 'awg'])(
     expect(await db.select().from(schema.wgInterface)).toEqual(
       before.interfaces
     );
-    expect(await db.select().from(schema.userConfig)).toEqual(before.defaults);
+    expect(await db.select().from(schema.userConfig)).toEqual(
+      before.defaults.map((config) => ({
+        ...config,
+        defaultGeneratePreSharedKey: true,
+      }))
+    );
     expect(await db.select().from(schema.hooks)).toEqual(before.hooks);
     expect(await db.select().from(schema.oneTimeLink)).toEqual(before.links);
     expect((await connection.execute('PRAGMA foreign_key_check')).rows).toEqual(

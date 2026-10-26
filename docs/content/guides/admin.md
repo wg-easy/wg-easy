@@ -2,6 +2,10 @@
 title: Admin Panel
 ---
 
+## Client Configuration
+
+In **Admin Panel → Config → Advanced**, disable **Generate Preshared Keys** to create new clients without a preshared key. This setting is enabled by default and only affects new clients. Existing keys remain unchanged, and you can still add or rotate a preshared key on an individual client's page.
+
 ## Interface Settings
 
 ### Per-Client Firewall
