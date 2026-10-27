@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 
 import { toLocalClients, type LocalClient } from '../utils/client';
 
+import type { ClientBulkAction } from '#shared/utils/clientBulk';
 import type {
   ClientExpiryFilter,
   ClientSortField,
@@ -58,10 +59,44 @@ export const useClientsStore = defineStore('Clients', () => {
   });
 
   const isUpdatingList = ref(false);
+  const isApplyingBulk = ref(false);
+  const selectedIds = ref<number[]>([]);
+  const selectedClients = computed(() =>
+    (clients.value ?? []).filter((client) =>
+      selectedIds.value.includes(client.id)
+    )
+  );
+  const pageSelection = computed<boolean | 'indeterminate'>(() => {
+    if (!selectedClients.value.length) return false;
+    return selectedClients.value.length === clients.value?.length
+      ? true
+      : 'indeterminate';
+  });
+
+  function clearSelection() {
+    selectedIds.value = [];
+  }
+
+  function selectClient(id: number, selected: boolean) {
+    if (isUpdatingList.value || isApplyingBulk.value) return;
+    if (!clients.value?.some((client) => client.id === id)) return;
+    selectedIds.value = selected
+      ? [...new Set([...selectedIds.value, id])]
+      : selectedIds.value.filter((selectedId) => selectedId !== id);
+  }
+
+  function selectPage(selected: boolean) {
+    if (isUpdatingList.value || isApplyingBulk.value) return;
+    selectedIds.value = selected
+      ? (clients.value ?? []).map((client) => client.id)
+      : [];
+  }
+
   let refreshId = 0;
   let appliedQuery: ClientListQuery | undefined;
 
   async function refresh({ updateCharts = false } = {}) {
+    if (isApplyingBulk.value) return;
     const id = ++refreshId;
     const requestedQuery = query.value;
     isUpdatingList.value = requestedQuery !== appliedQuery;
@@ -82,6 +117,12 @@ export const useClientsStore = defineStore('Clients', () => {
         clients.value,
         updateCharts
       );
+      const remainingIds = selectedIds.value.filter((id) =>
+        result.clients.some((client) => client.id === id)
+      );
+      if (remainingIds.length !== selectedIds.value.length) {
+        selectedIds.value = remainingIds;
+      }
       pagination.value = {
         page: result.page,
         pageSize: result.pageSize,
@@ -100,6 +141,7 @@ export const useClientsStore = defineStore('Clients', () => {
     if (!Number.isInteger(page) || isUpdatingList.value) return;
     const nextPage = Math.min(Math.max(1, page), totalPages.value);
     if (nextPage === pagination.value.page) return;
+    clearSelection();
     query.value = { ...query.value, page: nextPage };
     await refresh();
   }
@@ -113,12 +155,38 @@ export const useClientsStore = defineStore('Clients', () => {
     )
       return;
     nextQuery.filter = nextQuery.filter?.trim() || undefined;
+    clearSelection();
     query.value = nextQuery;
     return refresh().catch(console.error);
   }
 
   function clearFilters() {
     return updateQuery({ filter: undefined, status: 'all', expiry: 'all' });
+  }
+
+  async function applyBulkAction(action: ClientBulkAction) {
+    if (
+      isApplyingBulk.value ||
+      isUpdatingList.value ||
+      !selectedIds.value.length
+    )
+      return false;
+
+    const clientIds = [...selectedIds.value];
+    isApplyingBulk.value = true;
+    // Ignore any poll that started before this mutation.
+    ++refreshId;
+    try {
+      await $fetch('/api/client/bulk', {
+        method: 'post',
+        body: { action, clientIds },
+      });
+      clearSelection();
+      return true;
+    } finally {
+      isApplyingBulk.value = false;
+      await refresh().catch(console.error);
+    }
   }
 
   return {
@@ -128,6 +196,14 @@ export const useClientsStore = defineStore('Clients', () => {
     totalPages,
     hasActiveFilters,
     isUpdatingList,
+    isApplyingBulk,
+    selectedIds,
+    selectedClients,
+    pageSelection,
+    selectClient,
+    selectPage,
+    clearSelection,
+    applyBulkAction,
     error,
     refresh,
     setPage,

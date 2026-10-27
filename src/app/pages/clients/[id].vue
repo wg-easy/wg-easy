@@ -302,7 +302,7 @@ import { $fetch } from '#imports';
 const globalStore = useGlobalStore();
 
 const route = useRoute();
-const id = route.params.id as string;
+const id = Number(route.params.id);
 
 const { data: _data, refresh } = await useFetch(`/api/client/${id}`, {
   method: 'get',

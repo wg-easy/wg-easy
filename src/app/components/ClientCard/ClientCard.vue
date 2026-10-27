@@ -1,12 +1,16 @@
 <template>
   <article
     class="surface group p-4 transition-colors hover:border-subtle/50 sm:p-5"
-    :class="{ 'bg-surface/60': !client.enabled }"
+    :class="{
+      'bg-surface/60': !client.enabled,
+      'ring-1 ring-accent/50': selected,
+    }"
   >
     <div
       class="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-5 gap-y-5 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,0.8fr)_auto]"
     >
       <div class="flex min-w-0 items-start gap-3.5">
+        <slot name="selection" />
         <ClientCardAvatar :client="client" :connected="connected" />
         <div class="min-w-0 flex-1">
           <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
@@ -63,7 +67,7 @@
 </template>
 
 <script setup lang="ts">
-const props = defineProps<{ client: LocalClient }>();
+const props = defineProps<{ client: LocalClient; selected?: boolean }>();
 const globalStore = useGlobalStore();
 const now = useHydrationTime();
 const connected = computed(

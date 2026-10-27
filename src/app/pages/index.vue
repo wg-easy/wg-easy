@@ -36,6 +36,18 @@
       <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
         <span>{{ $t('ui.clientList') }}</span>
         <button
+          v-if="clientsStore.clients?.length || bulkMode"
+          type="button"
+          class="inline-flex min-h-8 items-center gap-1.5 text-subtle hover:text-foreground disabled:opacity-45"
+          :aria-pressed="bulkMode"
+          :disabled="clientsStore.isApplyingBulk"
+          @click="toggleBulkMode"
+        >
+          <XIcon v-if="bulkMode" class="size-3.5" aria-hidden="true" />
+          <ListChecksIcon v-else class="size-3.5" aria-hidden="true" />
+          {{ $t(bulkMode ? 'bulk.done' : 'bulk.actions') }}
+        </button>
+        <button
           v-if="clientsStore.hasActiveFilters"
           type="button"
           class="inline-flex min-h-8 items-center gap-1 font-medium text-accent hover:text-accent-hover"
@@ -68,7 +80,8 @@
         {{ $t('ui.retry') }}
       </button>
     </div>
-    <ClientsList v-if="clientsStore.clients?.length" />
+    <ClientsBulkActions v-if="bulkMode" />
+    <ClientsList v-if="clientsStore.clients?.length" :selectable="bulkMode" />
     <ClientsEmpty v-else-if="clientsStore.clients" />
     <div
       v-else-if="!clientsStore.error"
@@ -89,6 +102,7 @@
 <script setup lang="ts">
 import {
   InfoIcon,
+  ListChecksIcon,
   LoaderCircleIcon,
   ServerIcon,
   TriangleAlertIcon,
@@ -97,6 +111,12 @@ import {
 
 const globalStore = useGlobalStore();
 const clientsStore = useClientsStore();
+const bulkMode = ref(false);
+
+function toggleBulkMode() {
+  bulkMode.value = !bulkMode.value;
+  clientsStore.clearSelection();
+}
 
 // TODO?: use hover card to show more detailed info without leaving the page
 // or do something like a accordion
@@ -131,5 +151,6 @@ onMounted(() => {
 
 onUnmounted(() => {
   pageMounted = false;
+  clientsStore.clearSelection();
 });
 </script>

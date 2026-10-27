@@ -4,6 +4,7 @@ import { isIPv4, isIPv6 } from 'is-ip';
 
 import type { client } from './schema';
 
+import { clientBulkActions } from '#shared/utils/clientBulk';
 import {
   clientExpiryFilters,
   clientSortFields,
@@ -92,6 +93,17 @@ export const ClientQuerySchema = z.object({
 });
 
 export type ClientQueryType = z.infer<typeof ClientQuerySchema>;
+
+export const ClientBulkSchema = z.object({
+  action: z.enum(clientBulkActions),
+  clientIds: z
+    .array(z.number().int().positive())
+    .min(1)
+    .max(100)
+    .transform((ids) => [...new Set(ids)]),
+});
+
+export type ClientBulkType = z.infer<typeof ClientBulkSchema>;
 
 export const ClientUpdateSchema = schemaForType<UpdateClientType>()(
   z.object({

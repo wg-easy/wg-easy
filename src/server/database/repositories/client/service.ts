@@ -14,9 +14,11 @@ import { containsCidr, parseCidr } from 'cidr-tools';
 
 import { client } from './schema';
 import type {
+  ClientBulkType,
   ClientCreateFromExistingType,
   ClientCreateType,
   ClientQueryType,
+  ClientType,
   UpdateClientType,
 } from './types';
 
@@ -312,6 +314,33 @@ export class ClientService {
 
   delete(id: ID) {
     return this.#statements.delete.execute({ id });
+  }
+
+  async bulkAction(
+    { action, clientIds }: ClientBulkType,
+    validate: (
+      clients: Pick<ClientType, 'id' | 'userId' | 'expiresAt'>[]
+    ) => void
+  ) {
+    // Validate the entire batch and write against the same snapshot.
+    return this.#db.transaction(async (tx) => {
+      const where = inArray(client.id, clientIds);
+      const clients = await tx.query.client.findMany({
+        where,
+        columns: { id: true, userId: true, expiresAt: true },
+      });
+      validate(clients);
+
+      if (action === 'delete') {
+        await tx.delete(client).where(where);
+      } else {
+        await tx
+          .update(client)
+          .set({ enabled: action === 'enable' })
+          .where(where);
+      }
+      return clients.length;
+    });
   }
 
   removePreSharedKey(id: ID) {

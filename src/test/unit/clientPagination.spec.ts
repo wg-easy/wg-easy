@@ -25,6 +25,7 @@ type Page = {
 const data = ref<Page>();
 const error = ref<Error | null>(null);
 const refresh = vi.fn(async () => {});
+const bulkFetch = vi.fn();
 let params: ComputedRef<Query>;
 let pinia: ReturnType<typeof createPinia>;
 
@@ -53,6 +54,9 @@ beforeEach(() => {
   error.value = null;
   refresh.mockReset();
   refresh.mockResolvedValue(undefined);
+  bulkFetch.mockReset();
+  bulkFetch.mockResolvedValue({ success: true });
+  vi.stubGlobal('$fetch', bulkFetch);
   vi.stubGlobal('ref', ref);
   vi.stubGlobal('computed', computed);
   vi.stubGlobal(
@@ -67,6 +71,112 @@ beforeEach(() => {
 afterEach(() => {
   disposePinia(pinia);
   vi.unstubAllGlobals();
+});
+
+describe('client bulk selection', () => {
+  test('selects individual clients and only the displayed page, with mixed state', async () => {
+    const store = useClientsStore();
+    await store.refresh();
+    expect(store.pageSelection).toBe(false);
+    store.selectClient(1, true);
+    store.selectClient(1, true);
+    store.selectClient(26, true);
+    expect(store.selectedIds).toEqual([1]);
+    expect(store.pageSelection).toBe('indeterminate');
+    store.selectPage(true);
+    expect(store.selectedClients).toHaveLength(25);
+    expect(store.pageSelection).toBe(true);
+    store.selectClient(1, false);
+    expect(store.selectedIds).not.toContain(1);
+    expect(store.pageSelection).toBe('indeterminate');
+    store.selectPage(false);
+    expect(store.selectedIds).toEqual([]);
+  });
+
+  test('preserves selection on polls and drops clients that disappear', async () => {
+    const store = useClientsStore();
+    await store.refresh();
+    store.selectClient(1, true);
+    store.selectClient(2, true);
+    const selection = store.selectedIds;
+    await store.refresh();
+    expect(store.selectedIds).toBe(selection);
+    data.value!.clients = data.value!.clients.filter(({ id }) => id !== 1);
+    await store.refresh();
+    expect(store.selectedIds).toEqual([2]);
+  });
+
+  test('clears selection on page, search, filter, sort, and page size changes', async () => {
+    const store = useClientsStore();
+    await store.refresh();
+    store.selectClient(1, true);
+    data.value = page(2);
+    await store.setPage(2);
+    expect(store.selectedIds).toEqual([]);
+    for (const query of [
+      { filter: 'Client' },
+      { status: 'disabled' as const },
+      { expiry: 'expired' as const },
+      { sortOrder: 'name:desc' as const },
+      { pageSize: 10 },
+    ]) {
+      store.selectPage(true);
+      expect(store.selectedIds.length).toBeGreaterThan(0);
+      await store.updateQuery(query);
+      expect(store.selectedIds).toEqual([]);
+    }
+  });
+
+  test('blocks duplicate submissions, selection changes, and polls during an action', async () => {
+    const store = useClientsStore();
+    await store.refresh();
+    store.selectClient(1, true);
+    let finish!: () => void;
+    bulkFetch.mockReturnValueOnce(
+      new Promise<void>((resolve) => {
+        finish = resolve;
+      })
+    );
+    const action = store.applyBulkAction('disable');
+    expect(store.isApplyingBulk).toBe(true);
+    store.selectClient(2, true);
+    store.selectPage(true);
+    await store.refresh();
+    expect(refresh).toHaveBeenCalledTimes(1);
+    expect(await store.applyBulkAction('delete')).toBe(false);
+    expect(bulkFetch).toHaveBeenCalledExactlyOnceWith('/api/client/bulk', {
+      method: 'post',
+      body: { action: 'disable', clientIds: [1] },
+    });
+    finish();
+    expect(await action).toBe(true);
+    expect(store.isApplyingBulk).toBe(false);
+    expect(store.selectedIds).toEqual([]);
+    expect(refresh).toHaveBeenCalledTimes(2);
+  });
+
+  test('retains selection after a rejected action and refreshes the displayed state', async () => {
+    const store = useClientsStore();
+    await store.refresh();
+    store.selectClient(1, true);
+    bulkFetch.mockRejectedValueOnce(new Error('Permission denied'));
+    await expect(store.applyBulkAction('delete')).rejects.toThrow(
+      'Permission denied'
+    );
+    expect(store.selectedIds).toEqual([1]);
+    expect(store.isApplyingBulk).toBe(false);
+    expect(refresh).toHaveBeenCalledTimes(2);
+  });
+
+  test('does not submit an empty selection or a selection while the view is loading', async () => {
+    const store = useClientsStore();
+    await store.refresh();
+    expect(await store.applyBulkAction('delete')).toBe(false);
+    store.selectClient(1, true);
+    store.isUpdatingList = true;
+    expect(await store.applyBulkAction('delete')).toBe(false);
+    expect(bulkFetch).not.toHaveBeenCalled();
+  });
 });
 
 describe('client list pagination', () => {

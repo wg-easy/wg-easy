@@ -350,6 +350,30 @@
     "mtuNote": "Values depend on the MTU",
     "obfuscationParameters": "AmneziaWG Obfuscation Parameters"
   },
+  "bulk": {
+    "actions": "Bulk actions",
+    "done": "Done selecting",
+    "selectPage": "Select this page",
+    "selectClient": "Select {name}",
+    "selected": "{count} selected",
+    "clearSelection": "Clear selection",
+    "enable": "Enable selected",
+    "disable": "Disable selected",
+    "delete": "Delete selected",
+    "enableTitle": "Enable {count} selected clients?",
+    "enableDescription": "The selected clients will be allowed to connect to the VPN. Expired clients must have their expiration dates updated first.",
+    "disableTitle": "Disable {count} selected clients?",
+    "disableDescription": "The selected clients will lose VPN access. You can enable them again later.",
+    "deleteTitle": "Delete {count} selected clients?",
+    "deleteDescription": "These clients will lose VPN access and their configurations and one-time links will be permanently deleted. This cannot be undone.",
+    "applying": "Applying changes to selected clients…",
+    "failed": "Unable to apply the bulk action. Refresh the list and try again.",
+    "success": {
+      "enable": "Enabled {count} clients.",
+      "disable": "Disabled {count} clients.",
+      "delete": "Deleted {count} clients."
+    }
+  },
   "ui": {
     "documentation": "Documentation",
     "chooseOption": "Choose an option",
