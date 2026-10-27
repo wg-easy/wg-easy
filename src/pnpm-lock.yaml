@@ -250,12 +250,12 @@ importers:
       reka-ui:
         specifier: ^2.11.0
         version: 2.11.0(vue@3.5.44(typescript@6.0.3))
-      semver:
-        specifier: ^7.8.5
-        version: 7.8.5
       tailwindcss:
         specifier: ^3.4.19
         version: 3.4.19(tsx@4.23.15)(yaml@2.9.1)
+      verkit:
+        specifier: ^0.5.0
+        version: 0.5.0
       vue:
         specifier: latest
         version: 3.5.44(typescript@6.0.3)
@@ -275,9 +275,6 @@ importers:
       '@types/phc__format':
         specifier: ^1.0.1
         version: 1.0.1
-      '@types/semver':
-        specifier: ^7.8.0
-        version: 7.8.0
       '@vitest/coverage-v8':
         specifier: ^5.0.5
         version: 5.0.5(vitest@5.0.5)
@@ -2225,9 +2222,6 @@ packages:
 
   '@types/resolve@1.20.2':
     resolution: {integrity: sha512-60BCwRFOZCQhDncwQdxxeOEEkbc5dIMccYLwbxsS4TUNeVECQ/pBJ0j09mrHOl/JJvpRPGwO9SvE4nR2Nb/a4Q==}
-
-  '@types/semver@7.8.0':
-    resolution: {integrity: sha512-1mAINjtQCXXeLkJ9ehXkwOcBpqtLxiVtKhpUf83DdRNdQKV0iXZpaHYqRr7nj+wvxuJzoAmAwXI+sCNMv1CzLQ==}
 
   '@types/web-bluetooth@0.0.21':
     resolution: {integrity: sha512-oIQLCGWtcFZy2JW77j9k8nHzAOpqMHLQejDA48XXMWH6tjCQHz5RCFz1bzsmROyL6PUm+LLnUiI4BCn221inxA==}
@@ -8067,8 +8061,6 @@ snapshots:
       '@types/node': 26.6.5
 
   '@types/resolve@1.20.2': {}
-
-  '@types/semver@7.8.0': {}
 
   '@types/web-bluetooth@0.0.21': {}
 
