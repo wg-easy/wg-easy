@@ -38,8 +38,26 @@ type FirewallClient = Pick<
   | 'ipv6Address'
   | 'allowedIps'
   | 'firewallIps'
+  | 'serverAllowedIps'
   | 'enabled'
 >;
+
+/**
+ * Additional subnets a client routes beyond its own tunnel address(es) --
+ * i.e. Server Allowed IPs entries that aren't just the client's own /32 or
+ * /128 identity. A client with such entries is acting as a site-to-site
+ * gateway, routing a LAN or other network (e.g. Kubernetes Pod/Service
+ * CIDRs) behind it.
+ */
+function getRoutedSubnets(client: FirewallClient): string[] {
+  const ownAddresses = new Set([
+    `${client.ipv4Address}/32`,
+    `${client.ipv6Address}/128`,
+  ]);
+  return (client.serverAllowedIps ?? []).filter(
+    (entry) => !ownAddresses.has(entry)
+  );
+}
 
 /**
  * Sanitize a client identifier for use in an iptables comment.
@@ -216,7 +234,9 @@ export const firewall = {
     interfaceName: string,
     client: FirewallClient,
     defaultAllowedIps: string[],
-    enableIpv6: boolean
+    enableIpv6: boolean,
+    ipv4Cidr: string,
+    ipv6Cidr: string
   ): Promise<void> {
     // Determine which IPs to use for firewall rules
     // Priority: firewallIps > allowedIps > defaultAllowedIps
@@ -255,6 +275,36 @@ export const firewall = {
           parsed,
           comment
         );
+        for (const rule of rules) {
+          await exec(`iptables ${rule}`);
+        }
+      }
+    }
+
+    // A client acting as a site-to-site gateway routes additional subnets
+    // behind it (Server Allowed IPs beyond its own tunnel address). Return
+    // traffic from those subnets has that subnet as its source, not the
+    // gateway's own tunnel IP -- without an explicit rule for it, the
+    // above per-client rules never match it and it falls through to the
+    // chain's final DROP, even though the original outbound request (and
+    // the requesting client's own rules) allowed it.
+    //
+    // These rules only permit that return traffic to reach the VPN's own
+    // address pool: access control for who may reach the routed subnet in
+    // the first place is still enforced by the requesting client's own
+    // rules above, unaffected by this.
+    for (const subnet of getRoutedSubnets(client)) {
+      const subnetIsIpv6 = isIPv6(subnet.split('/')[0] ?? subnet);
+
+      if (subnetIsIpv6) {
+        if (enableIpv6 && ipv6Cidr) {
+          const rules = generateRuleArgs(subnet, { ip: ipv6Cidr }, comment);
+          for (const rule of rules) {
+            await exec(`ip6tables ${rule}`);
+          }
+        }
+      } else if (ipv4Cidr) {
+        const rules = generateRuleArgs(subnet, { ip: ipv4Cidr }, comment);
         for (const rule of rules) {
           await exec(`iptables ${rule}`);
         }
@@ -302,7 +352,9 @@ export const firewall = {
           wgInterface.name,
           client,
           userConfig.defaultAllowedIps,
-          enableIpv6
+          enableIpv6,
+          wgInterface.ipv4Cidr,
+          wgInterface.ipv6Cidr
         );
       }
 
@@ -407,4 +459,5 @@ export const firewallTestExports = {
   parseFirewallEntry,
   generateRuleArgs,
   sanitizeComment,
+  getRoutedSubnets,
 };
