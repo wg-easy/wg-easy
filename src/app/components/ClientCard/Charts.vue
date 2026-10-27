@@ -13,44 +13,27 @@
 </template>
 
 <script setup lang="ts">
-import type { ApexChart, ApexOptions } from 'apexcharts';
+import type { ApexOptions } from 'apexcharts';
 
 defineProps<{
   client: LocalClient;
 }>();
 
-const globalStore = useGlobalStore();
 const theme = useTheme();
 
-const chartOptionsTX = computed(() => {
-  const opts = {
-    ...chartOptions,
-    colors: [CHART_COLORS.tx[theme.value]],
-  };
-  opts.chart = { ...chartOptions.chart, type: globalStore.uiChartType };
-  opts.stroke = {
-    ...chartOptions.stroke,
-    width: UI_CHART_PROPS[globalStore.uiChartType].strokeWidth,
-  };
-  return opts;
-});
+const chartOptionsTX = computed(() => ({
+  ...chartOptions,
+  colors: [CHART_COLORS.tx[theme.value]],
+}));
 
-const chartOptionsRX = computed(() => {
-  const opts = {
-    ...chartOptions,
-    colors: [CHART_COLORS.rx[theme.value]],
-  };
-  opts.chart = { ...chartOptions.chart, type: globalStore.uiChartType };
-  opts.stroke = {
-    ...chartOptions.stroke,
-    width: UI_CHART_PROPS[globalStore.uiChartType].strokeWidth,
-  };
-  return opts;
-});
+const chartOptionsRX = computed(() => ({
+  ...chartOptions,
+  colors: [CHART_COLORS.rx[theme.value]],
+}));
 
 const chartOptions = {
   chart: {
-    type: undefined as ApexChart['type'],
+    type: 'area',
     background: 'transparent',
     stacked: false,
     accessibility: {
@@ -86,11 +69,6 @@ const chartOptions = {
   },
   dataLabels: {
     enabled: false,
-  },
-  plotOptions: {
-    bar: {
-      horizontal: false,
-    },
   },
   xaxis: {
     labels: {

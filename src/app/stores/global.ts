@@ -15,16 +15,10 @@ export const useGlobalStore = defineStore('Global', () => {
     uiShowCharts.value = !uiShowCharts.value;
   }
 
-  const uiChartType = useCookie<'area' | 'bar' | 'line'>('uiChartType', {
-    default: () => 'area',
-    maxAge: 365 * 24 * 60 * 60,
-  });
-
   return {
     information,
     refreshInformation,
     uiShowCharts,
     toggleCharts,
-    uiChartType,
   };
 });

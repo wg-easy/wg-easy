@@ -37,10 +37,9 @@ import { ArrowDownIcon, LanguagesIcon } from '@lucide/vue';
 
 const { locales, locale, setLocale } = useI18n();
 
-const langProxy = ref(locale);
-
-watchEffect(() => {
-  setLocale(langProxy.value);
+const langProxy = computed({
+  get: () => locale.value,
+  set: (value) => setLocale(value),
 });
 
 const langs = locales.value.sort((a, b) => a.code.localeCompare(b.code));
