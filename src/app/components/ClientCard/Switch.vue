@@ -63,10 +63,15 @@ async function toggleClient(nextEnabled: boolean | undefined) {
   // Update immediately while the request and store refresh are in progress.
   enabled.value = nextEnabled;
 
-  if (nextEnabled) {
-    await _enableClient(undefined);
-  } else {
-    await _disableClient(undefined);
+  try {
+    if (nextEnabled) {
+      await _enableClient(undefined);
+    } else {
+      await _disableClient(undefined);
+    }
+  } finally {
+    // A failed toggle leaves the server value unchanged, so the watcher won't run.
+    enabled.value = props.client.enabled;
   }
 }
 </script>
