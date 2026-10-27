@@ -36,13 +36,19 @@ export type CreateClientType = Omit<
 export type UpdateClientType = Omit<
   CreateClientType,
   'privateKey' | 'publicKey' | 'preSharedKey' | 'userId' | 'interfaceId'
->;
+> & { tagIds: number[] };
 
 const name = z
   .string({ message: t('zod.client.name') })
   .min(1, t('zod.client.name'))
   .pipe(safeStringRefine)
   .pipe(controlStringRefine);
+
+const description = z
+  .string()
+  .pipe(safeStringRefine)
+  .pipe(controlStringRefine)
+  .nullable();
 
 // TODO?: validate iso string
 const expiresAt = z
@@ -71,7 +77,9 @@ const serverAllowedIps = z.array(AddressSchema, {
 
 export const ClientCreateSchema = z.object({
   name: name,
+  description: description,
   expiresAt: expiresAt,
+  tagIds: z.array(z.number()).default([]),
 });
 
 export type ClientCreateType = z.infer<typeof ClientCreateSchema>;
@@ -80,9 +88,21 @@ const filter = z.string().pipe(safeStringRefine);
 
 const sort = z.enum(['asc', 'desc']);
 
+const tagId = z
+  .union([z.coerce.number(), z.array(z.coerce.number())])
+  .transform((v) => (Array.isArray(v) ? v : [v]));
+
+const tagNameValue = z.string().pipe(safeStringRefine);
+
+const tagName = z
+  .union([tagNameValue, z.array(tagNameValue)])
+  .transform((v) => (Array.isArray(v) ? v : [v]));
+
 export const ClientQuerySchema = z.object({
   filter: filter.optional(),
   sort: sort.optional(),
+  tagId: tagId.optional(),
+  tagName: tagName.optional(),
 });
 
 export type ClientQueryType = z.infer<typeof ClientQuerySchema>;
@@ -90,6 +110,7 @@ export type ClientQueryType = z.infer<typeof ClientQuerySchema>;
 export const ClientUpdateSchema = schemaForType<UpdateClientType>()(
   z.object({
     name: name,
+    description: description,
     enabled: EnabledSchema,
     expiresAt: expiresAt,
     ipv4Address: address4,
@@ -120,6 +141,7 @@ export const ClientUpdateSchema = schemaForType<UpdateClientType>()(
     persistentKeepalive: PersistentKeepaliveSchema,
     serverEndpoint: AddressSchema.nullable(),
     dns: DnsSchema.nullable(),
+    tagIds: z.array(z.number()),
   })
 );
 

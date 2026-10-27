@@ -9,6 +9,12 @@
     <template #description>
       <div class="flex flex-col">
         <FormTextField id="name" v-model="name" :label="$t('client.name')" />
+        <FormNullTextField
+          id="description"
+          v-model="description"
+          :label="$t('general.description')"
+        />
+        <FormTagsField id="tags" v-model="tagIds" :label="$t('general.tags')" />
         <FormDateField
           id="expiresAt"
           v-model="expiresAt"
@@ -33,6 +39,8 @@
 import { $fetch } from '#imports';
 
 const name = ref<string>('');
+const description = ref<string | null>(null);
+const tagIds = ref<number[]>([]);
 const expiresAt = ref<string | null>(null);
 const clientsStore = useClientsStore();
 
@@ -44,11 +52,18 @@ function resetOnOpen(open: boolean) {
   if (!open) return;
 
   name.value = '';
+  description.value = null;
+  tagIds.value = [];
   expiresAt.value = null;
 }
 
 function createClient() {
-  return _createClient({ name: name.value, expiresAt: expiresAt.value });
+  return _createClient({
+    name: name.value,
+    description: description.value,
+    tagIds: tagIds.value,
+    expiresAt: expiresAt.value,
+  });
 }
 
 const _createClient = useSubmit(
