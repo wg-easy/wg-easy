@@ -170,7 +170,9 @@
     "nullNotSet": "Not set",
     "set": "Set",
     "unset": "Unset",
-    "add": "Add"
+    "add": "Add",
+    "moveUp": "Move up",
+    "moveDown": "Move down"
   },
   "admin": {
     "general": {
