@@ -13,6 +13,7 @@
           id="expiresAt"
           v-model="expiresAt"
           :label="$t('client.expireDate')"
+          :description="$t('client.expireDateDesc')"
         />
       </div>
     </template>

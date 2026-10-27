@@ -9,8 +9,13 @@ import { beforeEach, describe, expect, onTestFinished, test, vi } from 'vitest';
 
 import * as schema from '#db/schema';
 import { ClientService } from '#db/repositories/client/service';
-import { ClientQuerySchema } from '#db/repositories/client/types';
+import {
+  ClientCreateSchema,
+  ClientQuerySchema,
+  ClientUpdateSchema,
+} from '#db/repositories/client/types';
 import listClients from '#server/api/client/index.get';
+import enableClient from '#server/api/client/[clientId]/enable.post';
 import WireGuard from '#server/utils/WireGuard';
 
 const { getCurrentUser, dump } = vi.hoisted(() => ({
@@ -259,6 +264,8 @@ describe('paginated client API', () => {
       [3, '2026-10-27T12:00:01Z'],
       [4, '2026-11-03T12:00:00Z'],
       [5, '2026-11-03T12:00:01Z'],
+      [6, '2026-10-27'],
+      [7, '2026-10-28'],
     ] as const) {
       await db
         .update(schema.client)
@@ -267,11 +274,66 @@ describe('paginated client API', () => {
     }
     expect(
       (await request('?expiry=expired')).clients.map(({ id }) => id)
-    ).toEqual([1, 2]);
+    ).toEqual([1, 2, 6]);
     expect(
       (await request('?expiry=expiring')).clients.map(({ id }) => id)
-    ).toEqual([3, 4]);
-    expect((await request('?expiry=permanent')).total).toBe(55);
+    ).toEqual([3, 4, 7]);
+    expect((await request('?expiry=permanent')).total).toBe(53);
+  });
+
+  test.each(['2026-10-27', '2026-10-27T14:35:00.000Z', null])(
+    'accepts and preserves expiry %s when saving a client',
+    async (expiresAt) => {
+      expect(
+        ClientCreateSchema.parse({ name: 'Test client', expiresAt }).expiresAt
+      ).toBe(expiresAt);
+      const client = await clients.get(1);
+      await clients.update(
+        1,
+        ClientUpdateSchema.parse({
+          ...client,
+          expiresAt,
+          ipv6Address: 'fdcc:ad94:bacf:61a4::cafe:2',
+        })
+      );
+      expect((await clients.getPublic(1))?.expiresAt).toBe(expiresAt);
+    }
+  );
+
+  test.each([
+    ['2026-10-27', '2026-10-27T00:00:00.000Z'],
+    ['2026-10-27T14:35:00.000Z', '2026-10-27T14:35:00.000Z'],
+  ])('enforces expiry %s at the same instant', async (expiresAt, instant) => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    const saveConfig = vi.spyOn(WireGuard, 'saveConfig').mockResolvedValue();
+    onTestFinished(() => {
+      vi.useRealTimers();
+      saveConfig.mockRestore();
+    });
+    await db
+      .update(schema.client)
+      .set({ expiresAt })
+      .where(eq(schema.client.id, 1));
+
+    vi.setSystemTime(new Date(instant).getTime() - 1000);
+    await WireGuard.cronJob();
+    expect((await clients.get(1))?.enabled).toBe(true);
+    expect(saveConfig).not.toHaveBeenCalled();
+
+    const event = mockEvent('http://localhost/api/client/1/enable');
+    event.context.params = { clientId: '1' };
+    expect(await enableClient(event)).toEqual({ success: true });
+    saveConfig.mockClear();
+
+    vi.setSystemTime(new Date(instant).getTime() + 1000);
+    await WireGuard.cronJob();
+    expect((await clients.get(1))?.enabled).toBe(false);
+    expect((await clients.get(2))?.enabled).toBe(true);
+    expect(saveConfig).toHaveBeenCalledOnce();
+    await expect(enableClient(event)).rejects.toMatchObject({
+      statusCode: 422,
+    });
+    expect((await clients.get(1))?.enabled).toBe(false);
   });
 
   test.each(['asc', 'desc'])(

@@ -6,7 +6,7 @@ title: Edit Client
 
 - **Name**: The name of the client.
 - **Enabled**: Whether the client can connect to the VPN.
-- **Expire Date**: The date the client will be disabled.
+- **Expires At**: The date and time the client will be disabled, shown and entered in your local timezone. Leave empty for permanent access. Existing date-only values remain supported and keep their original midnight-UTC expiration.
 
 ## Keys
 
