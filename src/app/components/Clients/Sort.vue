@@ -1,31 +1,25 @@
 <template>
-  <BaseSecondaryButton
-    :aria-label="
-      $t(
-        globalStore.sortClient === 'asc'
-          ? 'ui.sortAscending'
-          : 'ui.sortDescending'
-      )
-    "
-    @click="toggleSort"
-  >
-    <ArrowDownIcon
-      v-if="globalStore.sortClient === 'asc'"
-      class="mr-2 size-4"
-    />
-    <ArrowUpIcon v-else class="mr-2 size-4" />
-    <span class="text-sm">{{ $t('client.sort') }}</span>
-  </BaseSecondaryButton>
+  <ClientsSelect
+    :model-value="clientsStore.query.sortOrder"
+    :label="$t('ui.sortBy')"
+    :options="options"
+    @update:model-value="clientsStore.updateQuery({ sortOrder: $event })"
+  />
 </template>
 
 <script setup lang="ts">
-import { ArrowDownIcon, ArrowUpIcon } from '@lucide/vue';
+import type { ClientSortOrder } from '#shared/utils/clientList';
 
-const globalStore = useGlobalStore();
 const clientsStore = useClientsStore();
-
-function toggleSort() {
-  globalStore.sortClient = globalStore.sortClient === 'asc' ? 'desc' : 'asc';
-  clientsStore.refresh().catch(console.error);
-}
+const { t } = useI18n();
+const options = computed<{ value: ClientSortOrder; label: string }[]>(() => [
+  { value: 'name:asc', label: t('ui.sortOptions.nameAsc') },
+  { value: 'name:desc', label: t('ui.sortOptions.nameDesc') },
+  { value: 'createdAt:desc', label: t('ui.sortOptions.newest') },
+  { value: 'createdAt:asc', label: t('ui.sortOptions.oldest') },
+  { value: 'ipv4Address:asc', label: t('ui.sortOptions.addressAsc') },
+  { value: 'ipv4Address:desc', label: t('ui.sortOptions.addressDesc') },
+  { value: 'expiresAt:asc', label: t('ui.sortOptions.expiryAsc') },
+  { value: 'expiresAt:desc', label: t('ui.sortOptions.expiryDesc') },
+]);
 </script>

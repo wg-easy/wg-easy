@@ -26,20 +26,20 @@
 import { SearchIcon, XIcon } from '@lucide/vue';
 
 const clientsStore = useClientsStore();
-const searchQuery = ref(clientsStore.filter ?? '');
+const searchQuery = ref(clientsStore.query.filter ?? '');
 watch(
-  () => clientsStore.filter,
+  () => clientsStore.query.filter,
   (value) => {
     searchQuery.value = value ?? '';
   }
 );
 
 const updateSearch = useDebounceFn(() => {
-  clientsStore.setSearchQuery(searchQuery.value);
+  clientsStore.updateQuery({ filter: searchQuery.value });
 }, 300);
 
 function clearSearch() {
   searchQuery.value = '';
-  clientsStore.setSearchQuery('');
+  clientsStore.updateQuery({ filter: undefined });
 }
 </script>

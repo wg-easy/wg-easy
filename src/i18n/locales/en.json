@@ -355,14 +355,19 @@
     "skipToContent": "Skip to content",
     "setup": "Getting started",
     "clientsDescription": "Your devices. Your network. Securely connected.",
-    "clientsShown": "clients shown",
+    "clientsTotal": "clients",
+    "clientPagination": "Client list pagination",
+    "clientRange": "Showing {start}–{end} of {total} clients",
+    "previousPage": "Previous",
+    "nextPage": "Next",
+    "pageOf": "Page {page} of {total}",
     "clientList": "Your clients",
     "autoRefresh": "Updates automatically",
     "connectionIssue": "Connection interrupted",
     "loadError": "Unable to refresh your clients. Check your connection and try again.",
     "retry": "Retry",
     "clientsHint": "Download a configuration or scan a QR code to connect a device. One-time links let you share configurations securely.",
-    "noResults": "No clients match your search.",
+    "noResults": "No clients match your search or filters.",
     "clearSearch": "Clear search",
     "sortAscending": "Sort: name ascending",
     "sortDescending": "Sort: name descending",
@@ -375,6 +380,34 @@
     "adminDescription": "Configure your network and manage your server.",
     "overview": "Overview",
     "welcomeBack": "Welcome back",
-    "signInDescription": "Sign in to manage your private network."
+    "signInDescription": "Sign in to manage your private network.",
+    "perPage": "Per page",
+    "filterStatus": "Status",
+    "filterExpiry": "Expiry",
+    "sortBy": "Sort by",
+    "clearFilters": "Clear filters",
+    "statusOptions": {
+      "all": "All statuses",
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "online": "Online",
+      "offline": "Offline"
+    },
+    "expiryOptions": {
+      "all": "Any expiry",
+      "permanent": "Never expires",
+      "expiring": "Expires in 7 days",
+      "expired": "Expired"
+    },
+    "sortOptions": {
+      "nameAsc": "Name: A–Z",
+      "nameDesc": "Name: Z–A",
+      "newest": "Newest first",
+      "oldest": "Oldest first",
+      "addressAsc": "IPv4 address: low to high",
+      "addressDesc": "IPv4 address: high to low",
+      "expiryAsc": "Expiry: soonest first",
+      "expiryDesc": "Expiry: latest first"
+    }
   }
 }

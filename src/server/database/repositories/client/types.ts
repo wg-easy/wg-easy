@@ -5,6 +5,11 @@ import { isIPv4, isIPv6 } from 'is-ip';
 import type { client } from './schema';
 
 import {
+  clientExpiryFilters,
+  clientSortFields,
+  clientStatusFilters,
+} from '#shared/utils/clientList';
+import {
   AddressSchema,
   AllowedIpsSchema,
   AwgRangeSchema,
@@ -76,13 +81,14 @@ export const ClientCreateSchema = z.object({
 
 export type ClientCreateType = z.infer<typeof ClientCreateSchema>;
 
-const filter = z.string().pipe(safeStringRefine);
-
-const sort = z.enum(['asc', 'desc']);
-
 export const ClientQuerySchema = z.object({
-  filter: filter.optional(),
-  sort: sort.optional(),
+  filter: z.string().pipe(safeStringRefine).optional(),
+  sort: z.enum(['asc', 'desc']).optional(),
+  status: z.enum(clientStatusFilters).optional(),
+  expiry: z.enum(clientExpiryFilters).optional(),
+  sortBy: z.enum(clientSortFields).optional(),
+  page: z.coerce.number().int().min(1).default(1),
+  pageSize: z.coerce.number().int().min(1).max(100).default(25),
 });
 
 export type ClientQueryType = z.infer<typeof ClientQuerySchema>;

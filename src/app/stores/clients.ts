@@ -1,156 +1,137 @@
 import { defineStore } from 'pinia';
-import { sha256 } from 'js-sha256';
-import type { TypedInternalResponse } from 'nitropack/types';
 
-type WGClientReturn = TypedInternalResponse<
-  '/api/client',
-  unknown,
-  'get'
->[number];
+import { toLocalClients, type LocalClient } from '../utils/client';
 
-export type LocalClient = WGClientReturn & {
-  avatar?: string;
-  transferMax?: number;
-} & Omit<ClientPersist, 'transferRxPrevious' | 'transferTxPrevious'>;
+import type {
+  ClientExpiryFilter,
+  ClientSortField,
+  ClientSortOrder,
+  ClientStatusFilter,
+} from '#shared/utils/clientList';
 
-export type ClientPersist = {
-  transferRxHistory: number[];
-  transferRxPrevious: number;
-  transferRxCurrent: number;
-  transferRxSeries: { name: string; data: number[] }[];
-  hoverRx?: unknown;
-  transferTxHistory: number[];
-  transferTxPrevious: number;
-  transferTxCurrent: number;
-  transferTxSeries: { name: string; data: number[] }[];
-  hoverTx?: unknown;
+type ClientListQuery = {
+  filter?: string;
+  status: ClientStatusFilter;
+  expiry: ClientExpiryFilter;
+  sortOrder: ClientSortOrder;
+  page: number;
+  pageSize: number;
 };
 
 export const useClientsStore = defineStore('Clients', () => {
-  const globalStore = useGlobalStore();
-  const clients = ref<null | LocalClient[]>(null);
-  const clientsPersist = ref<Record<string, ClientPersist>>({});
-
-  const filter = ref<string | undefined>(undefined);
-
-  const searchParams = computed(() => ({
-    filter: filter.value,
-    sort: globalStore.sortClient,
-  }));
-
+  const query = ref<ClientListQuery>({
+    status: 'all',
+    expiry: 'all',
+    sortOrder: 'name:asc',
+    page: 1,
+    pageSize: 25,
+  });
+  // Keep the displayed page intact while a different query is loading.
+  const clients = ref<LocalClient[] | null>(null);
+  const pagination = ref({ page: 1, pageSize: 25, total: 0 });
+  const totalPages = computed(() =>
+    Math.max(1, Math.ceil(pagination.value.total / pagination.value.pageSize))
+  );
+  const hasActiveFilters = computed(
+    () =>
+      Boolean(query.value.filter) ||
+      query.value.status !== 'all' ||
+      query.value.expiry !== 'all'
+  );
+  const searchParams = computed(() => {
+    const { sortOrder, ...params } = query.value;
+    const [sortBy, sort] = sortOrder.split(':') as [
+      ClientSortField,
+      'asc' | 'desc',
+    ];
+    return { ...params, sortBy, sort };
+  });
   const {
-    data: _clients,
-    refresh: _refresh,
+    data,
+    refresh: fetchClients,
     error,
   } = useFetch('/api/client', {
+    key: 'clients',
     method: 'get',
     params: searchParams,
     watch: false,
   });
 
-  // TODO: rewrite
+  const isUpdatingList = ref(false);
+  let refreshId = 0;
+  let appliedQuery: ClientListQuery | undefined;
+
   async function refresh({ updateCharts = false } = {}) {
-    await _refresh();
-    if (error.value) return;
-    const transformedClients = _clients.value?.map((client) => {
-      let avatar = undefined;
-      if (client.name.includes('@') && client.name.includes('.')) {
-        avatar = `https://gravatar.com/avatar/${sha256(client.name.toLowerCase().trim())}.jpg`;
-      }
+    const id = ++refreshId;
+    const requestedQuery = query.value;
+    isUpdatingList.value = requestedQuery !== appliedQuery;
+    try {
+      await fetchClients();
+      // A poll or navigation may have superseded this request.
+      if (
+        id !== refreshId ||
+        requestedQuery !== query.value ||
+        error.value ||
+        !data.value
+      )
+        return;
 
-      if (!clientsPersist.value[client.id]) {
-        clientsPersist.value[client.id] = {
-          transferRxHistory: Array(50).fill(0),
-          transferRxPrevious: client.transferRx ?? 0,
-          transferTxHistory: Array(50).fill(0),
-          transferTxPrevious: client.transferTx ?? 0,
-          transferRxCurrent: 0,
-          transferTxCurrent: 0,
-          transferRxSeries: [],
-          transferTxSeries: [],
-        };
-      }
-
-      // We know that this can't be undefined
-      const clientPersist = clientsPersist.value[client.id]!;
-
-      // Debug
-      /* client.transferRx =
-        clientPersist.transferRxPrevious + Math.random() * 1000;
-      client.transferTx =
-        clientPersist.transferTxPrevious + Math.random() * 1000;
-      client.latestHandshakeAt = new Date().toISOString(); */
-
-      clientPersist.transferRxCurrent =
-        (client.transferRx ?? 0) - clientPersist.transferRxPrevious;
-
-      clientPersist.transferRxPrevious = client.transferRx ?? 0;
-
-      clientPersist.transferTxCurrent =
-        (client.transferTx ?? 0) - clientPersist.transferTxPrevious;
-
-      clientPersist.transferTxPrevious = client.transferTx ?? 0;
-
-      let transferMax = undefined;
-
-      if (updateCharts) {
-        clientPersist.transferRxHistory.push(clientPersist.transferRxCurrent);
-        clientPersist.transferRxHistory.shift();
-
-        clientPersist.transferTxHistory.push(clientPersist.transferTxCurrent);
-        clientPersist.transferTxHistory.shift();
-
-        clientPersist.transferTxSeries = [
-          {
-            name: 'Tx',
-            data: clientPersist.transferTxHistory,
-          },
-        ];
-
-        clientPersist.transferRxSeries = [
-          {
-            name: 'Rx',
-            data: clientPersist.transferRxHistory,
-          },
-        ];
-
-        transferMax = Math.max(
-          ...clientPersist.transferTxHistory,
-          ...clientPersist.transferRxHistory
-        );
-      }
-
-      return {
-        ...client,
-        avatar,
-        transferTxHistory: clientPersist.transferTxHistory,
-        transferRxHistory: clientPersist.transferRxHistory,
-        transferMax,
-        transferTxSeries: clientPersist.transferTxSeries,
-        transferRxSeries: clientPersist.transferRxSeries,
-        transferTxCurrent: clientPersist.transferTxCurrent,
-        transferRxCurrent: clientPersist.transferRxCurrent,
-        hoverTx: clientPersist.hoverTx,
-        hoverRx: clientPersist.hoverRx,
+      const result = data.value;
+      clients.value = toLocalClients(
+        result.clients,
+        clients.value,
+        updateCharts
+      );
+      pagination.value = {
+        page: result.page,
+        pageSize: result.pageSize,
+        total: result.total,
       };
-    });
-
-    clients.value = transformedClients ?? null;
+      if (query.value.page !== result.page) {
+        query.value = { ...query.value, page: result.page };
+      }
+      appliedQuery = query.value;
+    } finally {
+      if (id === refreshId) isUpdatingList.value = false;
+    }
   }
 
-  function setSearchQuery(query: string) {
-    clients.value = null;
-    filter.value = query || undefined;
-    void refresh();
+  async function setPage(page: number) {
+    if (!Number.isInteger(page) || isUpdatingList.value) return;
+    const nextPage = Math.min(Math.max(1, page), totalPages.value);
+    if (nextPage === pagination.value.page) return;
+    query.value = { ...query.value, page: nextPage };
+    await refresh();
+  }
+
+  function updateQuery(updates: Partial<Omit<ClientListQuery, 'page'>>) {
+    const nextQuery = { ...query.value, ...updates, page: 1 };
+    if (
+      !Number.isInteger(nextQuery.pageSize) ||
+      nextQuery.pageSize < 1 ||
+      nextQuery.pageSize > 100
+    )
+      return;
+    nextQuery.filter = nextQuery.filter?.trim() || undefined;
+    query.value = nextQuery;
+    return refresh().catch(console.error);
+  }
+
+  function clearFilters() {
+    return updateQuery({ filter: undefined, status: 'all', expiry: 'all' });
   }
 
   return {
     clients,
-    clientsPersist,
-    refresh,
-    _clients,
-    setSearchQuery,
-    filter,
+    query,
+    pagination,
+    totalPages,
+    hasActiveFilters,
+    isUpdatingList,
     error,
+    refresh,
+    setPage,
+    updateQuery,
+    clearFilters,
   };
 });

@@ -1,4 +1,15 @@
-import { eq, sql, or, like, and } from 'drizzle-orm';
+import {
+  eq,
+  sql,
+  or,
+  like,
+  and,
+  inArray,
+  notInArray,
+  isNull,
+  gt,
+  lte,
+} from 'drizzle-orm';
 import { containsCidr, parseCidr } from 'cidr-tools';
 
 import { client } from './schema';
@@ -16,6 +27,51 @@ import type { ID } from '#server/utils/types';
 import { wg } from '#server/utils/wgHelper';
 import type { DBType } from '#db/sqlite';
 import { wgInterface, userConfig } from '#db/schema';
+
+function clientFilter(
+  query: ClientQueryType,
+  onlinePublicKeys: string[],
+  now: number
+) {
+  const pattern = query.filter?.trim()
+    ? `%${query.filter.trim().toLowerCase()}%`
+    : undefined;
+  const expiry = sql`julianday(${client.expiresAt})`;
+  const today = sql`julianday(${new Date(now).toISOString()})`;
+  const nextWeek = sql`julianday(${new Date(now + 7 * 86400000).toISOString()})`;
+
+  return and(
+    pattern === undefined
+      ? undefined
+      : or(
+          like(client.name, pattern),
+          like(client.ipv4Address, pattern),
+          like(client.ipv6Address, pattern)
+        ),
+    query.status === 'enabled'
+      ? eq(client.enabled, true)
+      : query.status === 'disabled'
+        ? eq(client.enabled, false)
+        : query.status === 'online'
+          ? and(
+              eq(client.enabled, true),
+              inArray(client.publicKey, onlinePublicKeys)
+            )
+          : query.status === 'offline'
+            ? and(
+                eq(client.enabled, true),
+                notInArray(client.publicKey, onlinePublicKeys)
+              )
+            : undefined,
+    query.expiry === 'permanent'
+      ? isNull(client.expiresAt)
+      : query.expiry === 'expired'
+        ? lte(expiry, today)
+        : query.expiry === 'expiring'
+          ? and(gt(expiry, today), lte(expiry, nextWeek))
+          : undefined
+  );
+}
 
 function createPreparedStatement(db: DBType) {
   return {
@@ -79,38 +135,17 @@ export class ClientService {
   /**
    * Returns all clients without sensitive data
    */
-  async getAllPublic({ filter, sort }: ClientQueryType) {
-    const filters = [];
-
-    if (filter?.trim()) {
-      const filterPattern = `%${filter?.toLowerCase()}%`;
-      filters.push(
-        or(
-          like(client.name, filterPattern),
-          like(client.ipv4Address, filterPattern),
-          like(client.ipv6Address, filterPattern)
-        )
-      );
-    }
-
+  async getAllPublic() {
     const result = await this.#db.query.client
       .findMany({
         with: {
           oneTimeLink: true,
         },
-        where: and(...filters),
         columns: {
           privateKey: false,
           preSharedKey: false,
         },
-        orderBy: (t, { asc, desc }) => {
-          if (sort === 'desc') {
-            return desc(t.name);
-          } else {
-            // default to asc
-            return asc(t.name);
-          }
-        },
+        orderBy: (t, { asc }) => asc(t.name),
       })
       .execute();
 
@@ -122,46 +157,70 @@ export class ClientService {
   }
 
   /**
-   * Returns all clients without sensitive data belonging to user
+   * Counts and pages the same filtered, permission-scoped snapshot.
    */
-  async getAllForUser(userId: ID, { filter, sort }: ClientQueryType) {
-    const filters = [];
-
-    if (filter?.trim()) {
-      const filterPattern = `%${filter?.toLowerCase()}%`;
-      filters.push(
-        or(
-          like(client.name, filterPattern),
-          like(client.ipv4Address, filterPattern),
-          like(client.ipv6Address, filterPattern)
-        )
+  async getPage(
+    query: ClientQueryType,
+    userId?: ID,
+    onlinePublicKeys: string[] = [],
+    now = Date.now()
+  ) {
+    const where = and(
+      userId === undefined ? undefined : eq(client.userId, userId),
+      clientFilter(query, onlinePublicKeys, now)
+    );
+    return this.#db.transaction(async (tx) => {
+      const total = await tx.$count(client, where);
+      const page = Math.min(
+        query.page,
+        Math.max(1, Math.ceil(total / query.pageSize))
       );
-    }
-
-    const result = await this.#db.query.client
-      .findMany({
-        where: and(eq(client.userId, userId), ...filters),
+      const result = await tx.query.client.findMany({
+        where,
         with: { oneTimeLink: true },
         columns: {
           privateKey: false,
           preSharedKey: false,
         },
         orderBy: (t, { asc, desc }) => {
-          if (sort === 'desc') {
-            return desc(t.name);
-          } else {
-            // default to asc
-            return asc(t.name);
+          const order = query.sort === 'desc' ? desc : asc;
+          if (query.sortBy === 'createdAt') {
+            return [order(sql`julianday(${t.createdAt})`), order(t.id)];
           }
+          if (query.sortBy === 'expiresAt') {
+            // Keep permanent clients last in either direction.
+            return [
+              asc(isNull(t.expiresAt)),
+              order(sql`julianday(${t.expiresAt})`),
+              order(t.id),
+            ];
+          }
+          if (query.sortBy === 'ipv4Address') {
+            // Compare numeric octets, so .2 sorts before .10.
+            const octets = [0, 1, 2, 3].map((index) =>
+              order(
+                sql`json_extract('[' || replace(${t.ipv4Address}, '.', ',') || ']', ${`$[${index}]`})`
+              )
+            );
+            return [...octets, order(t.id)];
+          }
+          return [order(t.name), order(t.id)];
         },
-      })
-      .execute();
+        limit: query.pageSize,
+        offset: (page - 1) * query.pageSize,
+      });
 
-    return result.map((row) => ({
-      ...row,
-      createdAt: new Date(row.createdAt),
-      updatedAt: new Date(row.updatedAt),
-    }));
+      return {
+        clients: result.map((row) => ({
+          ...row,
+          createdAt: new Date(row.createdAt),
+          updatedAt: new Date(row.updatedAt),
+        })),
+        total,
+        page,
+        pageSize: query.pageSize,
+      };
+    });
   }
 
   /**

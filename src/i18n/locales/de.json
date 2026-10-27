@@ -338,14 +338,19 @@
     "skipToContent": "Zum Inhalt springen",
     "setup": "Erste Schritte",
     "clientsDescription": "Deine Geräte. Dein Netzwerk. Sicher verbunden.",
-    "clientsShown": "Clients angezeigt",
+    "clientsTotal": "Clients",
+    "clientPagination": "Seitennavigation der Clientliste",
+    "clientRange": "{start}–{end} von {total} Clients",
+    "previousPage": "Zurück",
+    "nextPage": "Weiter",
+    "pageOf": "Seite {page} von {total}",
     "clientList": "Deine Clients",
     "autoRefresh": "Wird automatisch aktualisiert",
     "connectionIssue": "Verbindung unterbrochen",
     "loadError": "Deine Clients konnten nicht aktualisiert werden. Prüfe die Verbindung und versuche es erneut.",
     "retry": "Erneut versuchen",
     "clientsHint": "Lade eine Konfiguration herunter oder scanne einen QR-Code, um ein Gerät zu verbinden. Einmal-Links ermöglichen das sichere Teilen von Konfigurationen.",
-    "noResults": "Keine Clients entsprechen deiner Suche.",
+    "noResults": "Keine Clients entsprechen deiner Suche oder deinen Filtern.",
     "clearSearch": "Suche löschen",
     "sortAscending": "Sortierung: Name aufsteigend",
     "sortDescending": "Sortierung: Name absteigend",
@@ -358,6 +363,34 @@
     "adminDescription": "Konfiguriere dein Netzwerk und verwalte deinen Server.",
     "overview": "Übersicht",
     "welcomeBack": "Willkommen zurück",
-    "signInDescription": "Melde dich an, um dein privates Netzwerk zu verwalten."
+    "signInDescription": "Melde dich an, um dein privates Netzwerk zu verwalten.",
+    "perPage": "Pro Seite",
+    "filterStatus": "Status",
+    "filterExpiry": "Ablauf",
+    "sortBy": "Sortieren nach",
+    "clearFilters": "Filter zurücksetzen",
+    "statusOptions": {
+      "all": "Alle Status",
+      "enabled": "Aktiviert",
+      "disabled": "Deaktiviert",
+      "online": "Online",
+      "offline": "Offline"
+    },
+    "expiryOptions": {
+      "all": "Beliebiger Ablauf",
+      "permanent": "Läuft nie ab",
+      "expiring": "In 7 Tagen ablaufend",
+      "expired": "Abgelaufen"
+    },
+    "sortOptions": {
+      "nameAsc": "Name: A–Z",
+      "nameDesc": "Name: Z–A",
+      "newest": "Neueste zuerst",
+      "oldest": "Älteste zuerst",
+      "addressAsc": "IPv4-Adresse: aufsteigend",
+      "addressDesc": "IPv4-Adresse: absteigend",
+      "expiryAsc": "Frühester Ablauf zuerst",
+      "expiryDesc": "Spätester Ablauf zuerst"
+    }
   }
 }

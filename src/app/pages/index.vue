@@ -18,22 +18,43 @@
         class="hidden items-baseline gap-2 text-xs text-subtle sm:flex"
       >
         <span class="text-3xl font-semibold tracking-tight text-foreground">
-          {{ clientsStore.clients.length }}
+          {{ clientsStore.pagination.total }}
         </span>
-        {{ $t('ui.clientsShown') }}
+        {{ $t('ui.clientsTotal') }}
       </div>
     </div>
-    <div class="flex flex-wrap gap-2.5">
-      <ClientsSearch class="w-full sm:min-w-0 sm:flex-1" />
-      <ClientsSort class="flex-1 sm:flex-none" />
-      <ClientsNew trigger-class="flex-1 sm:flex-none" />
+    <div class="surface p-4 sm:p-5">
+      <div class="flex flex-wrap gap-3">
+        <ClientsSearch class="w-full sm:min-w-0 sm:flex-1" />
+        <ClientsNew trigger-class="w-full sm:w-auto" />
+      </div>
+      <ClientsFilters class="mt-4 border-t border-line pt-4" />
     </div>
     <div
       class="mt-6 mb-3 flex items-center justify-between gap-3 text-xs text-subtle"
     >
-      <span>{{ $t('ui.clientList') }}</span>
+      <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+        <span>{{ $t('ui.clientList') }}</span>
+        <button
+          v-if="clientsStore.hasActiveFilters"
+          type="button"
+          class="inline-flex min-h-8 items-center gap-1 font-medium text-accent hover:text-accent-hover"
+          @click="clientsStore.clearFilters()"
+        >
+          <XIcon class="size-3.5" aria-hidden="true" />
+          {{ $t('ui.clearFilters') }}
+        </button>
+      </div>
       <span v-if="clientsStore.error" class="text-warning">
         {{ $t('ui.connectionIssue') }}
+      </span>
+      <span
+        v-else-if="clientsStore.isUpdatingList"
+        role="status"
+        class="flex items-center gap-2"
+      >
+        <LoaderCircleIcon class="size-3 animate-spin" aria-hidden="true" />
+        {{ $t('general.loading') }}
       </span>
       <span v-else class="flex items-center gap-2">
         <span class="size-1.5 rounded-full bg-success ring-4 ring-success/10" />
@@ -57,6 +78,7 @@
       <LoaderCircleIcon class="size-5 animate-spin" />
       {{ $t('general.loading') }}
     </div>
+    <ClientsPagination v-if="clientsStore.clients" />
     <p class="mt-5 flex items-start gap-2 text-xs leading-relaxed text-subtle">
       <InfoIcon class="mt-0.5 size-4 shrink-0 text-accent" />
       {{ $t('ui.clientsHint') }}
@@ -70,6 +92,7 @@ import {
   LoaderCircleIcon,
   ServerIcon,
   TriangleAlertIcon,
+  XIcon,
 } from '@lucide/vue';
 
 const globalStore = useGlobalStore();

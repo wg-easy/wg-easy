@@ -9,7 +9,7 @@ import { firewall } from '#server/utils/firewall';
 import { encodeQRCode } from '#server/utils/qr';
 import type { ID } from '#server/utils/types';
 import { wg } from '#server/utils/wgHelper';
-import { setIntervalImmediately } from '#shared/utils/time';
+import { isPeerConnected, setIntervalImmediately } from '#shared/utils/time';
 import type { InterfaceType } from '#db/repositories/interface/types';
 import type { ClientQueryType } from '#db/repositories/client/types';
 
@@ -89,12 +89,24 @@ class WireGuard {
     WG_DEBUG('Config synced successfully.');
   }
 
-  async getClientsForUser(userId: ID, query: ClientQueryType) {
+  async getClientsPage(query: ClientQueryType, userId?: ID) {
     const wgInterface = await Database.interfaces.get();
+    const dump = await wg.dump(wgInterface.name);
+    const now = Date.now();
+    const onlinePublicKeys =
+      query.status === 'online' || query.status === 'offline'
+        ? dump
+            .filter((peer) => isPeerConnected(peer, now))
+            .map((peer) => peer.publicKey)
+        : [];
+    const result = await Database.clients.getPage(
+      query,
+      userId,
+      onlinePublicKeys,
+      now
+    );
 
-    const dbClients = await Database.clients.getAllForUser(userId, query);
-
-    const clients = dbClients.map((client) => ({
+    const clients = result.clients.map((client) => ({
       ...client,
       latestHandshakeAt: null as Date | null,
       endpoint: null as string | null,
@@ -102,9 +114,7 @@ class WireGuard {
       transferTx: null as number | null,
     }));
 
-    // Loop WireGuard status
-    const dump = await wg.dump(wgInterface.name);
-    return mergeClientStatuses(clients, dump);
+    return { ...result, clients: mergeClientStatuses(clients, dump) };
   }
 
   async dumpByPublicKey(publicKey: string) {
@@ -118,10 +128,10 @@ class WireGuard {
     return clientDump;
   }
 
-  async getAllClients(query: ClientQueryType = {}) {
+  async getAllClients() {
     const wgInterface = await Database.interfaces.get();
 
-    const dbClients = await Database.clients.getAllPublic(query);
+    const dbClients = await Database.clients.getAllPublic();
 
     const clients = dbClients.map((client) => ({
       ...client,

@@ -8,13 +8,13 @@
       <ServerIcon class="size-6" />
     </div>
     <p class="text-sm text-muted">
-      {{ $t(clientsStore.filter ? 'ui.noResults' : 'client.empty') }}
+      {{ $t(clientsStore.hasActiveFilters ? 'ui.noResults' : 'client.empty') }}
     </p>
     <BaseSecondaryButton
-      v-if="clientsStore.filter"
-      @click="clientsStore.setSearchQuery('')"
+      v-if="clientsStore.hasActiveFilters"
+      @click="clientsStore.clearFilters()"
     >
-      {{ $t('ui.clearSearch') }}
+      {{ $t('ui.clearFilters') }}
     </BaseSecondaryButton>
     <ClientsCreateDialog v-else>
       <BasePrimaryButton as="span">
