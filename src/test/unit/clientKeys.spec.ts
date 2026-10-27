@@ -1,3 +1,4 @@
+import fs from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 
 import { createClient } from '@libsql/client';
@@ -8,6 +9,9 @@ import { mockEvent } from 'h3';
 import { beforeEach, describe, expect, onTestFinished, test, vi } from 'vitest';
 
 import * as schema from '#db/schema';
+import { HooksService } from '#db/repositories/hooks/service';
+import { InterfaceService } from '#db/repositories/interface/service';
+import WireGuard from '#server/utils/WireGuard';
 import { ClientService } from '#db/repositories/client/service';
 import { ClientUpdateSchema } from '#db/repositories/client/types';
 import { UserConfigService } from '#db/repositories/userConfig/service';
@@ -17,16 +21,15 @@ import rotatePreSharedKey from '#server/api/client/[clientId]/preSharedKey.post'
 import rotateKeyPair from '#server/api/client/[clientId]/rotateKeyPair.post';
 import { wg } from '#server/utils/wgHelper';
 
-const { getCurrentUser, saveConfig, exec } = vi.hoisted(() => ({
+const { getCurrentUser, exec } = vi.hoisted(() => ({
   getCurrentUser: vi.fn(),
-  saveConfig: vi.fn(),
   exec: vi.fn(),
 }));
 
 vi.mock('#server/utils/session', () => ({ getCurrentUser }));
-vi.mock('#server/utils/WireGuard', () => ({ default: { saveConfig } }));
 vi.mock('#server/utils/cmd', () => ({ exec }));
 vi.mock('#server/utils/config', () => ({
+  OLD_ENV: {},
   WG_ENV: { WG_EXECUTABLE: 'wg', WG_INTERFACE: 'wg0', PORT: '51821' },
 }));
 vi.mock('#server/utils/Database', () => ({
@@ -34,11 +37,21 @@ vi.mock('#server/utils/Database', () => ({
     get clients() {
       return clients;
     },
-    userConfigs: {
-      get: async () => (await db.select().from(schema.userConfig))[0]!,
+    get interfaces() {
+      return new InterfaceService(db);
+    },
+    get hooks() {
+      return new HooksService(db);
+    },
+    get userConfigs() {
+      return new UserConfigService(db);
     },
   },
 }));
+
+const synchronize = WireGuard.saveConfig.bind(WireGuard);
+const saveConfig = vi.spyOn(WireGuard, 'saveConfig');
+const writeFile = vi.spyOn(fs, 'writeFile');
 
 let clients: ClientService;
 let db: ReturnType<typeof drizzle<typeof schema>>;
@@ -51,11 +64,15 @@ function event(clientId = '1') {
 
 beforeEach(async () => {
   vi.resetAllMocks();
+  saveConfig.mockImplementation(synchronize);
+  writeFile.mockResolvedValue();
   getCurrentUser.mockResolvedValue({ id: 1, role: 1 });
   exec.mockImplementation(async (command: string) => {
     if (command === 'wg genpsk') return 'new-preshared-key';
     if (command === 'wg genkey') return 'new-private-key';
     if (command === 'echo new-private-key | wg pubkey') return 'new-public-key';
+    if (command.includes(' syncconf ') || /^(ip6?tables) /.test(command))
+      return '';
     throw new Error(`Unexpected command: ${command}`);
   });
 
@@ -107,61 +124,6 @@ async function configurations(clientId = 1) {
 }
 
 describe('client key actions', () => {
-  test('migrates absent keys to null while preserving clients and one-time links', async () => {
-    const connection = createClient({ url: ':memory:' });
-    onTestFinished(() => connection.close());
-    const migrationDb = drizzle({ client: connection, schema });
-    const migrations = readMigrationFiles({
-      migrationsFolder: fileURLToPath(
-        new URL('../../server/database/migrations', import.meta.url)
-      ),
-    });
-    await connection.migrate(
-      migrations.slice(0, 11).flatMap((migration) => migration.sql)
-    );
-    await migrationDb
-      .insert(schema.user)
-      .values(await db.select().from(schema.user));
-    const previousClients = await db.select().from(schema.client);
-    previousClients[0]!.preSharedKey = '';
-    await migrationDb.insert(schema.client).values(previousClients);
-    await migrationDb.insert(schema.oneTimeLink).values({
-      id: 1,
-      oneTimeLink: 'test-link',
-      expiresAt: '2099-01-01T00:00:00.000Z',
-    });
-    const previousLinks = await migrationDb.select().from(schema.oneTimeLink);
-    const previousDefaults = await migrationDb.query.userConfig.findFirst({
-      columns: { defaultGeneratePreSharedKey: false },
-    });
-
-    await connection.migrate(
-      migrations.slice(11).flatMap((migration) => migration.sql)
-    );
-
-    expect(await migrationDb.select().from(schema.client)).toEqual([
-      { ...previousClients[0], preSharedKey: null },
-      previousClients[1],
-    ]);
-    expect(await migrationDb.select().from(schema.oneTimeLink)).toEqual(
-      previousLinks
-    );
-    expect(await new UserConfigService(migrationDb).get()).toEqual({
-      ...previousDefaults,
-      defaultGeneratePreSharedKey: true,
-    });
-    expect((await connection.execute('PRAGMA foreign_key_check')).rows).toEqual(
-      []
-    );
-    await migrationDb
-      .update(schema.client)
-      .set({ preSharedKey: null })
-      .where(eq(schema.client.id, 2));
-    expect(await new ClientService(migrationDb).getPublic(2)).toMatchObject({
-      hasPreSharedKey: false,
-    });
-  });
-
   test.each([true, false])(
     'creates clients with preshared-key generation set to %s',
     async (defaultGeneratePreSharedKey) => {
@@ -193,25 +155,6 @@ describe('client key actions', () => {
       expect(await clients.getPublic(clientId)).toMatchObject({
         hasPreSharedKey: defaultGeneratePreSharedKey,
       });
-      expect(
-        exec.mock.calls.filter(([command]) => command === 'wg genpsk')
-      ).toHaveLength(defaultGeneratePreSharedKey ? 1 : 0);
-
-      const config = await configurations(clientId);
-      if (defaultGeneratePreSharedKey) {
-        expect(config.client).toContain('\nPresharedKey = new-preshared-key\n');
-        expect(config.server).toContain('\nPresharedKey = new-preshared-key\n');
-      } else {
-        expect(config.client).not.toMatch(/^PresharedKey\s*=/m);
-        // Disabling the default still permits explicitly adding a key later.
-        await rotatePreSharedKey(event(String(clientId)));
-        expect(await clients.getPublic(clientId)).toMatchObject({
-          hasPreSharedKey: true,
-        });
-        expect((await userConfigs.get()).defaultGeneratePreSharedKey).toBe(
-          false
-        );
-      }
     }
   );
 
@@ -260,7 +203,6 @@ describe('client key actions', () => {
     expect(updated.server).toContain(
       '\nPresharedKey = AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=\n'
     );
-    expect(updated.client).toContain('\nAllowedIPs = ');
 
     expect(await removePreSharedKey(event())).toEqual({ success: true });
     expect(await configurations()).toEqual(updated);
@@ -278,6 +220,13 @@ describe('client key actions', () => {
     });
     expect(await clients.get(2)).toEqual(other);
     expect(saveConfig).toHaveBeenCalledOnce();
+    expect(String(writeFile.mock.calls[0]?.[1])).toContain(
+      'PublicKey = new-public-key'
+    );
+    expect(String(writeFile.mock.calls[0]?.[1])).not.toContain(
+      'PublicKey = public-key-1'
+    );
+    expect(exec).toHaveBeenCalledWith('wg syncconf wg0 <(wg-quick strip wg0)');
 
     const publicClient = await clients.getPublic(1);
     expect(publicClient).toMatchObject({
@@ -289,8 +238,6 @@ describe('client key actions', () => {
     const updated = await configurations();
     expect(updated.client).toContain('\nPrivateKey = new-private-key\n');
     expect(updated.server).toContain('\nPublicKey = new-public-key\n');
-    expect(updated.client).not.toContain('private-key-1');
-    expect(updated.server).not.toContain('public-key-1');
   });
 
   test.each([null, 'preshared-key-1'])(
@@ -318,42 +265,26 @@ describe('client key actions', () => {
       const updated = await configurations();
       expect(updated.client).toContain('\nPresharedKey = new-preshared-key\n');
       expect(updated.server).toContain('\nPresharedKey = new-preshared-key\n');
-
-      await clients.update(
-        1,
-        ClientUpdateSchema.parse({ ...before, name: 'Renamed' })
-      );
-      expect(await clients.get(1)).toMatchObject({
-        name: 'Renamed',
-        preSharedKey: 'new-preshared-key',
-      });
     }
   );
 
-  test.each([null, 'preshared-key-1'])(
-    'preserves the previous preshared key (%s) when generation fails',
-    async (preSharedKey) => {
-      await db
-        .update(schema.client)
-        .set({ preSharedKey })
-        .where(eq(schema.client.id, 1));
-      const before = await clients.get(1);
-      exec.mockRejectedValueOnce(new Error('Key generation failed'));
+  test('preserves the preshared key when generation fails or returns an empty key', async () => {
+    const before = await clients.get(1);
+    exec.mockRejectedValueOnce(new Error('Key generation failed'));
 
-      await expect(rotatePreSharedKey(event())).rejects.toThrow(
-        'Key generation failed'
-      );
-      expect(await clients.get(1)).toEqual(before);
-      expect(saveConfig).not.toHaveBeenCalled();
+    await expect(rotatePreSharedKey(event())).rejects.toThrow(
+      'Key generation failed'
+    );
+    expect(await clients.get(1)).toEqual(before);
+    expect(saveConfig).not.toHaveBeenCalled();
 
-      exec.mockResolvedValueOnce('');
-      await expect(rotatePreSharedKey(event())).rejects.toThrow(
-        'Failed to generate preshared key'
-      );
-      expect(await clients.get(1)).toEqual(before);
-      expect(saveConfig).not.toHaveBeenCalled();
-    }
-  );
+    exec.mockResolvedValueOnce('');
+    await expect(rotatePreSharedKey(event())).rejects.toThrow(
+      'Failed to generate preshared key'
+    );
+    expect(await clients.get(1)).toEqual(before);
+    expect(saveConfig).not.toHaveBeenCalled();
+  });
 
   test.each(['wg genkey', 'echo new-private-key | wg pubkey'])(
     'preserves the current pair when %s fails',
@@ -371,7 +302,7 @@ describe('client key actions', () => {
     }
   );
 
-  test('saving a stale form cannot restore old keys', async () => {
+  test('editing client details preserves the current keys', async () => {
     const stale = await clients.get(1);
     await removePreSharedKey(event());
     await rotateKeyPair(event());

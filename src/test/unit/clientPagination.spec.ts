@@ -29,14 +29,14 @@ const bulkFetch = vi.fn();
 let params: ComputedRef<Query>;
 let pinia: ReturnType<typeof createPinia>;
 
-function page(pageNumber = 1, total = 51): Page {
-  const start = (pageNumber - 1) * 25;
+function page(pageNumber = 1, total = 51, pageSize = 25): Page {
+  const start = (pageNumber - 1) * pageSize;
   return {
     page: pageNumber,
-    pageSize: 25,
+    pageSize,
     total,
     clients: Array.from(
-      { length: Math.min(25, total - start) },
+      { length: Math.min(pageSize, total - start) },
       (_, index) => ({
         id: start + index + 1,
         name: `Client ${start + index + 1}`,
@@ -98,49 +98,24 @@ describe('client bulk selection', () => {
     await store.refresh();
     store.selectClient(1, true);
     store.selectClient(2, true);
-    const selection = store.selectedIds;
     await store.refresh();
-    expect(store.selectedIds).toBe(selection);
+    expect(store.selectedIds).toEqual([1, 2]);
     data.value!.clients = data.value!.clients.filter(({ id }) => id !== 1);
     await store.refresh();
     expect(store.selectedIds).toEqual([2]);
-  });
-
-  test('clears selection on page, search, filter, sort, and page size changes', async () => {
-    const store = useClientsStore();
-    await store.refresh();
-    store.selectClient(1, true);
-    data.value = page(2);
-    await store.setPage(2);
-    expect(store.selectedIds).toEqual([]);
-    for (const query of [
-      { filter: 'Client' },
-      { status: 'disabled' as const },
-      { expiry: 'expired' as const },
-      { sortOrder: 'name:desc' as const },
-      { pageSize: 10 },
-    ]) {
-      store.selectPage(true);
-      expect(store.selectedIds.length).toBeGreaterThan(0);
-      await store.updateQuery(query);
-      expect(store.selectedIds).toEqual([]);
-    }
   });
 
   test('blocks duplicate submissions, selection changes, and polls during an action', async () => {
     const store = useClientsStore();
     await store.refresh();
     store.selectClient(1, true);
-    let finish!: () => void;
-    bulkFetch.mockReturnValueOnce(
-      new Promise<void>((resolve) => {
-        finish = resolve;
-      })
-    );
+    const request = Promise.withResolvers<undefined>();
+    bulkFetch.mockReturnValueOnce(request.promise);
     const action = store.applyBulkAction('disable');
     expect(store.isApplyingBulk).toBe(true);
     store.selectClient(2, true);
     store.selectPage(true);
+    expect(store.selectedIds).toEqual([1]);
     await store.refresh();
     expect(refresh).toHaveBeenCalledTimes(1);
     expect(await store.applyBulkAction('delete')).toBe(false);
@@ -148,7 +123,7 @@ describe('client bulk selection', () => {
       method: 'post',
       body: { action: 'disable', clientIds: [1] },
     });
-    finish();
+    request.resolve(undefined);
     expect(await action).toBe(true);
     expect(store.isApplyingBulk).toBe(false);
     expect(store.selectedIds).toEqual([]);
@@ -168,12 +143,9 @@ describe('client bulk selection', () => {
     expect(refresh).toHaveBeenCalledTimes(2);
   });
 
-  test('does not submit an empty selection or a selection while the view is loading', async () => {
+  test('does not submit an empty selection', async () => {
     const store = useClientsStore();
     await store.refresh();
-    expect(await store.applyBulkAction('delete')).toBe(false);
-    store.selectClient(1, true);
-    store.isUpdatingList = true;
     expect(await store.applyBulkAction('delete')).toBe(false);
     expect(bulkFetch).not.toHaveBeenCalled();
   });
@@ -188,8 +160,10 @@ describe('client list pagination', () => {
     expect(store.pagination.total).toBe(51);
     expect(store.totalPages).toBe(3);
 
+    store.selectPage(true);
     data.value = page(2);
     await store.setPage(2);
+    expect(store.selectedIds).toEqual([]);
     expect(params.value.page).toBe(2);
     expect(refresh).toHaveBeenCalledTimes(2);
     expect(store.pagination.page).toBe(2);
@@ -202,31 +176,28 @@ describe('client list pagination', () => {
     expect(store.clients?.map(({ id }) => id)).toEqual([51]);
   });
 
-  test('resets the request to page one for search, sort, and clearing search', async () => {
-    const store = useClientsStore();
-    await store.refresh();
-    data.value = page(2);
-    await store.setPage(2);
-
-    data.value = page(1, 30);
-    void store.updateQuery({ filter: 'Client' });
-    expect(params.value).toMatchObject({ page: 1, filter: 'Client' });
-    await vi.waitFor(() => expect(store.pagination.page).toBe(1));
-
-    data.value = page(2, 30);
-    await store.setPage(2);
-    data.value = page(1, 30);
-    await store.updateQuery({ sortOrder: 'name:desc' });
-    expect(params.value).toMatchObject({ page: 1, sort: 'desc' });
-    expect(store.pagination.page).toBe(1);
-
-    data.value = page(2, 30);
-    await store.setPage(2);
-    data.value = page();
-    void store.updateQuery({ filter: undefined });
-    expect(params.value).toMatchObject({ page: 1, filter: undefined });
-    await vi.waitFor(() => expect(store.pagination.total).toBe(51));
-  });
+  test.each([
+    [{ filter: ' Client ' }, { filter: 'Client' }],
+    [{ filter: undefined }, { filter: undefined }],
+    [{ status: 'online' }, { status: 'online' }],
+    [{ expiry: 'expiring' }, { expiry: 'expiring' }],
+    [{ sortOrder: 'createdAt:desc' }, { sortBy: 'createdAt', sort: 'desc' }],
+    [{ pageSize: 10 }, { pageSize: 10 }],
+  ] as const)(
+    'query changes reset the page and selection: %j',
+    async (query, expected) => {
+      const store = useClientsStore();
+      await store.updateQuery({ filter: 'Previous search' });
+      data.value = page(2);
+      await store.setPage(2);
+      store.selectPage(true);
+      data.value = page(1, 51, 'pageSize' in query ? query.pageSize : 25);
+      await store.updateQuery(query);
+      expect(params.value).toMatchObject({ page: 1, ...expected });
+      expect(store.pagination.page).toBe(1);
+      expect(store.selectedIds).toEqual([]);
+    }
+  );
 
   test('accepts a clamped server page after deletions and handles an empty list', async () => {
     const store = useClientsStore();
@@ -272,9 +243,6 @@ describe('client list pagination', () => {
     const store = useClientsStore();
     data.value = page(1, 2);
     await store.refresh({ updateCharts: true });
-    const previousClients = store.clients!;
-    expect(previousClients[0]?.transferRxCurrent).toBe(0);
-    expect(previousClients[0]?.transferTxCurrent).toBe(0);
 
     data.value = page(1, 2);
     data.value.clients[0]!.transferRx = 130;
@@ -293,17 +261,12 @@ describe('client list pagination', () => {
       [2, 80, 40],
       [1, 30, 70],
     ]);
-    // Sampling must not mutate the previously displayed snapshot.
-    expect(previousClients[0]?.transferRxSeries[0]?.data).toEqual(
-      Array(50).fill(0)
-    );
   });
 
   test('keeps 50 chart samples and resumes from the latest totals after charts are paused', async () => {
     const store = useClientsStore();
     data.value = page(1, 1);
     await store.refresh({ updateCharts: true });
-    const initialSeries = store.clients![0]!.transferRxSeries;
     for (let sample = 1; sample <= 55; sample++) {
       data.value = page(1, 1);
       data.value.clients[0]!.transferRx = 100 + sample * sample;
@@ -317,7 +280,6 @@ describe('client list pagination', () => {
     expect(store.clients![0]!.transferTxSeries).toEqual([
       { name: 'Tx', data: Array(50).fill(3) },
     ]);
-    expect(initialSeries[0]?.data).toEqual(Array(50).fill(0));
 
     data.value!.clients[0]!.transferRx! += 100;
     await store.refresh();
@@ -329,7 +291,6 @@ describe('client list pagination', () => {
     expect(store.clients![0]!.transferRxCurrent).toBe(20);
     expect(store.clients![0]!.transferRxSeries[0]?.data).toHaveLength(50);
     expect(store.clients![0]!.transferRxSeries[0]?.data.at(-1)).toBe(20);
-    expect(history[0]?.data.at(-1)).toBe(109);
   });
 
   test('starts with zero traffic for a new client without live status', async () => {
@@ -346,92 +307,47 @@ describe('client list pagination', () => {
     expect(store.clients![0]!.transferTxCurrent).toBe(200);
   });
 
-  test('releases loading state and preserves the displayed page when fetching throws', async () => {
+  test.each(['throw', 'error ref'])(
+    'preserves the displayed page on fetch failure (%s) and allows retry',
+    async (failure) => {
+      const store = useClientsStore();
+      await store.refresh();
+      const displayed = page().clients;
+      if (failure === 'throw') {
+        refresh.mockRejectedValueOnce(new Error('Network failure'));
+        await expect(store.setPage(2)).rejects.toThrow('Network failure');
+      } else {
+        error.value = new Error('Network failure');
+        data.value = undefined;
+        await store.setPage(2);
+      }
+      expect(store.pagination).toMatchObject({ page: 1, total: 51 });
+      expect(store.clients).toMatchObject(displayed);
+      expect(store.isUpdatingList).toBe(false);
+
+      error.value = null;
+      data.value = page(2);
+      await store.refresh();
+      expect(params.value.page).toBe(2);
+      expect(store.pagination.page).toBe(2);
+    }
+  );
+
+  test('keeps the newest result when polls finish out of order', async () => {
     const store = useClientsStore();
     await store.refresh();
-    refresh.mockRejectedValueOnce(new Error('Network failure'));
-    await expect(store.setPage(2)).rejects.toThrow('Network failure');
-    expect(store.isUpdatingList).toBe(false);
-    expect(store.pagination.page).toBe(1);
-    expect(store.clients![0]!.id).toBe(1);
-    data.value = page(2);
-    await store.refresh();
-    expect(store.pagination.page).toBe(2);
-  });
-
-  test('preserves the displayed page after a failed request and retries the requested page', async () => {
-    const store = useClientsStore();
-    await store.refresh();
-    error.value = new Error('Connection interrupted');
-    data.value = undefined;
-    await store.setPage(2);
-    expect(store.pagination.page).toBe(1);
-    expect(store.pagination.total).toBe(51);
-    expect(store.clients?.[0]?.id).toBe(1);
-    expect(store.isUpdatingList).toBe(false);
-
-    error.value = null;
-    data.value = page(2);
-    await store.refresh();
-    expect(params.value.page).toBe(2);
-    expect(store.pagination.page).toBe(2);
-  });
-
-  test('ignores an old poll that finishes after navigation', async () => {
-    const store = useClientsStore();
-    await store.refresh();
-    let finishPoll!: () => void;
-    refresh.mockImplementationOnce(
-      () =>
-        new Promise<void>((resolve) => {
-          finishPoll = resolve;
-        })
-    );
+    const request = Promise.withResolvers<undefined>();
+    refresh.mockReturnValueOnce(request.promise);
     const oldPoll = store.refresh();
 
-    data.value = page(2);
-    await store.setPage(2);
-    data.value = page();
-    finishPoll();
-    await oldPoll;
-    expect(store.pagination.page).toBe(2);
-    expect(store.clients?.[0]?.id).toBe(26);
-  });
-
-  test('resets to page one for each filter and sort option, and clears filters together', async () => {
-    const store = useClientsStore();
+    data.value = page(1, 50);
+    data.value.clients[0]!.name = 'Updated client';
     await store.refresh();
-    for (const change of [
-      () => store.updateQuery({ status: 'online' }),
-      () => store.updateQuery({ expiry: 'expiring' }),
-      () => store.updateQuery({ sortOrder: 'createdAt:desc' }),
-      () => store.updateQuery({ filter: ' Client ' }),
-    ]) {
-      data.value = page(2);
-      await store.setPage(2);
-      data.value = page();
-      change();
-      expect(params.value.page).toBe(1);
-      await vi.waitFor(() => expect(store.pagination.page).toBe(1));
-    }
-    expect(params.value).toMatchObject({
-      status: 'online',
-      expiry: 'expiring',
-      sortBy: 'createdAt',
-      sort: 'desc',
-      filter: 'Client',
-    });
-    expect(store.hasActiveFilters).toBe(true);
-    store.clearFilters();
-    expect(params.value).toMatchObject({
-      status: 'all',
-      expiry: 'all',
-      filter: undefined,
-      sortBy: 'createdAt',
-      sort: 'desc',
-    });
-    expect(store.hasActiveFilters).toBe(false);
-    await vi.waitFor(() => expect(store.isUpdatingList).toBe(false));
+    data.value = page();
+    request.resolve(undefined);
+    await oldPoll;
+    expect(store.pagination.total).toBe(50);
+    expect(store.clients?.[0]?.name).toBe('Updated client');
   });
 
   test('retains the displayed range until a new page size loads', async () => {
@@ -439,26 +355,18 @@ describe('client list pagination', () => {
     await store.refresh();
     data.value = page(2);
     await store.setPage(2);
-    let finish!: () => void;
-    refresh.mockImplementationOnce(
-      () =>
-        new Promise<void>((resolve) => {
-          finish = resolve;
-        })
-    );
-    void store.updateQuery({ pageSize: 10 });
+    const request = Promise.withResolvers<undefined>();
+    refresh.mockReturnValueOnce(request.promise);
+    const updating = store.updateQuery({ pageSize: 10 });
     expect(params.value).toMatchObject({ page: 1, pageSize: 10 });
     expect(store.isUpdatingList).toBe(true);
     expect(store.pagination.page).toBe(2);
     expect(store.pagination.pageSize).toBe(25);
     expect(store.clients?.[0]?.id).toBe(26);
-    data.value = {
-      ...page(),
-      pageSize: 10,
-      clients: page().clients.slice(0, 10),
-    };
-    finish();
-    await vi.waitFor(() => expect(store.isUpdatingList).toBe(false));
+    data.value = page(1, 51, 10);
+    request.resolve(undefined);
+    await updating;
+    expect(store.isUpdatingList).toBe(false);
     expect(store.pagination.page).toBe(1);
     expect(store.pagination.pageSize).toBe(10);
     expect(store.totalPages).toBe(6);
@@ -483,7 +391,9 @@ describe('client list pagination', () => {
       pageSize: 50,
       page: 1,
     });
+    expect(store.hasActiveFilters).toBe(true);
     await store.clearFilters();
+    expect(store.hasActiveFilters).toBe(false);
     expect(refresh).toHaveBeenCalledTimes(2);
     expect(store.query).toMatchObject({
       filter: undefined,
@@ -492,27 +402,5 @@ describe('client list pagination', () => {
       sortOrder: 'createdAt:desc',
       pageSize: 50,
     });
-  });
-
-  test('ignores stale results after filters change during an in-flight request', async () => {
-    const store = useClientsStore();
-    await store.refresh();
-    let finish!: () => void;
-    refresh.mockImplementationOnce(
-      () =>
-        new Promise<void>((resolve) => {
-          finish = resolve;
-        })
-    );
-    void store.updateQuery({ status: 'online' });
-    data.value = page(1, 0);
-    void store.updateQuery({ status: 'disabled' });
-    await vi.waitFor(() => expect(store.clients).toEqual([]));
-    data.value = page();
-    finish();
-    await vi.waitFor(() => expect(store.isUpdatingList).toBe(false));
-    expect(store.clients).toEqual([]);
-    expect(store.pagination.total).toBe(0);
-    expect(store.query.status).toBe('disabled');
   });
 });

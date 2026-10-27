@@ -10,7 +10,7 @@ You can set these environment variables to configure the container. They are not
 | `HOST`                  | `0.0.0.0` | `localhost`                 | IP address web UI binds to.                                     |
 | `INSECURE`              | `false`   | `true`                      | If access over http is allowed                                  |
 | `DISABLE_IPV6`          | `false`   | `true`                      | If IPv6 support should be disabled                              |
-| `DISABLE_VERSION_CHECK` | `false`   | `true`                      | If wg-easy should check for new updates                         |
+| `DISABLE_VERSION_CHECK` | `false`   | `true`                      | Disable checks for new wg-easy releases                         |
 | `TRUSTED_PROXIES`       |           | `172.18.0.2,fd00:1234::/64` | Proxy IP addresses or CIDRs allowed to forward request metadata |
 | `WG_INTERFACE`          | `wg0`     | `wg1`                       | Name of the WireGuard interface                                 |
 

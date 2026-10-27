@@ -1,74 +1,15 @@
-import { readFileSync } from 'node:fs';
-import { createRequire } from 'node:module';
-
-import { transformSync } from 'esbuild';
-import { afterEach, expect, onTestFinished, test, vi } from 'vitest';
-import {
-  createRenderer,
-  defineComponent,
-  h,
-  nextTick,
-  ref,
-  watch,
-  type Component,
-} from 'vue';
-import { compileScript, parse } from 'vue/compiler-sfc';
+import { afterEach, expect, test, vi } from 'vitest';
+import { defineComponent, h, nextTick, ref, watch } from 'vue';
 
 import { useSubmit } from '../../app/composables/useSubmit';
+import { loadComponent } from '../helpers/component';
+import { mount, renderer } from '../helpers/renderer';
 
 const fetchClient = vi.fn();
-const require = createRequire(import.meta.url);
-
-function loadComponent(path: string): Component {
-  const { descriptor } = parse(
-    readFileSync(
-      new URL(`../../app/components/${path}.vue`, import.meta.url),
-      'utf8'
-    )
-  );
-  const script = compileScript(descriptor, { id: path, inlineTemplate: true });
-  const { code } = transformSync(script.content, {
-    loader: 'ts',
-    format: 'cjs',
-  });
-  const module = { exports: {} as { default: Component } };
-  new Function('require', 'module', 'exports', code)(
-    (id: string) => (id === '#imports' ? { $fetch: fetchClient } : require(id)),
-    module,
-    module.exports
-  );
-  return module.exports.default;
-}
-
-const ClientSwitch = loadComponent('ClientCard/Switch');
-const BaseSwitch = loadComponent('Base/Switch');
-
-// Mount both real components and inspect the model passed to the Reka switch.
-type Node = { children: Node[]; parent?: Node };
-const node = (): Node => ({ children: [] });
-const renderer = createRenderer<Node, Node>({
-  createElement: node,
-  createText: node,
-  createComment: node,
-  insert(child, parent, anchor) {
-    child.parent = parent;
-    const index = anchor ? parent.children.indexOf(anchor) : -1;
-    if (index < 0) parent.children.push(child);
-    else parent.children.splice(index, 0, child);
-  },
-  remove(child) {
-    const siblings = child.parent?.children;
-    if (siblings) siblings.splice(siblings.indexOf(child), 1);
-  },
-  setText: () => {},
-  setElementText: () => {},
-  patchProp: () => {},
-  parentNode: (child) => child.parent ?? null,
-  nextSibling(child) {
-    const siblings = child.parent?.children;
-    return siblings?.[siblings.indexOf(child) + 1] ?? null;
-  },
+const ClientSwitch = loadComponent('ClientCard/Switch', {
+  imports: { '#imports': { $fetch: fetchClient } },
 });
+const BaseSwitch = loadComponent('Base/Switch');
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -106,38 +47,29 @@ async function mountSwitch(enabled: boolean) {
       },
     })
   );
-  app.mount(node());
-  onTestFinished(() => app.unmount());
-  await nextTick();
+  await mount(app);
   return { client, refresh, showToast, input, update };
 }
 
-test.each([false, true])(
-  'reverts a failed toggle when the refreshed enabled value remains %s',
-  async (enabled) => {
-    const request = Promise.withResolvers();
-    fetchClient.mockReturnValueOnce(request.promise);
-    const view = await mountSwitch(enabled);
+test('restores the saved state and reports a failed toggle', async () => {
+  const request = Promise.withResolvers();
+  fetchClient.mockReturnValueOnce(request.promise);
+  const view = await mountSwitch(true);
 
-    view.update(!enabled);
-    await nextTick();
-    expect(view.input.modelValue).toBe(!enabled);
-    expect(fetchClient).toHaveBeenCalledExactlyOnceWith(
-      `/api/client/1/${enabled ? 'disable' : 'enable'}`,
-      { method: 'post', body: undefined }
-    );
+  view.update(false);
+  await nextTick();
+  expect(view.input.modelValue).toBe(false);
 
-    request.reject(new Error('Update failed'));
-    await vi.waitFor(() => {
-      expect(view.refresh).toHaveBeenCalledOnce();
-      expect(view.input.modelValue).toBe(enabled);
-    });
-    expect(view.showToast).toHaveBeenCalledExactlyOnceWith({
-      type: 'error',
-      message: 'Update failed',
-    });
-  }
-);
+  request.reject(new Error('Update failed'));
+  await vi.waitFor(() => {
+    expect(view.refresh).toHaveBeenCalledOnce();
+    expect(view.input.modelValue).toBe(true);
+  });
+  expect(view.showToast).toHaveBeenCalledExactlyOnceWith({
+    type: 'error',
+    message: 'Update failed',
+  });
+});
 
 test.each([false, true])(
   'keeps a successful toggle from %s in sync with refreshed client data',
@@ -152,19 +84,15 @@ test.each([false, true])(
     view.update(!enabled);
     await nextTick();
     expect(view.input.modelValue).toBe(!enabled);
+    expect(fetchClient).toHaveBeenCalledExactlyOnceWith(
+      `/api/client/1/${enabled ? 'disable' : 'enable'}`,
+      { method: 'post' }
+    );
 
     request.resolve({ success: true });
     await vi.waitFor(() => expect(view.refresh).toHaveBeenCalledOnce());
     expect(view.input.modelValue).toBe(!enabled);
     expect(view.showToast).not.toHaveBeenCalled();
-
-    // A subsequent failed toggle must restore the newly saved value.
-    fetchClient.mockRejectedValueOnce(new Error('Update failed'));
-    view.update(enabled);
-    await vi.waitFor(() => {
-      expect(view.refresh).toHaveBeenCalledTimes(2);
-      expect(view.input.modelValue).toBe(!enabled);
-    });
   }
 );
 

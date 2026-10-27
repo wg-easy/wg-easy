@@ -1,6 +1,4 @@
-import type { IncomingMessage, ServerResponse } from 'node:http';
-
-import { createEvent, type H3Event } from 'h3';
+import { mockEvent } from 'h3';
 import { describe, expect, test } from 'vitest';
 
 import {
@@ -45,8 +43,8 @@ describe('trusted request helpers', () => {
     expect(getTrustedRequestURL(event, ['10.0.0.0/8']).origin).toBe(
       'http://wg-easy:51821'
     );
-    expect(event.node.req.headers['x-forwarded-host']).toBe('vpn.example.com');
-    expect(event.node.req.headers['x-forwarded-proto']).toBe('https');
+    expect(event.req.headers.get('x-forwarded-host')).toBe('vpn.example.com');
+    expect(event.req.headers.get('x-forwarded-proto')).toBe('https');
   });
 
   test('uses host information from a trusted peer', () => {
@@ -64,10 +62,10 @@ describe('trusted request helpers', () => {
     expect(getTrustedRequestURL(event, ['10.0.0.0/8']).origin).toBe(
       'http://vpn.example.com:8443'
     );
-    expect(event.node.req.headers['x-forwarded-host']).toBe(
+    expect(event.req.headers.get('x-forwarded-host')).toBe(
       'vpn.example.com:8443, wg-easy:51821'
     );
-    expect(event.node.req.headers['x-forwarded-proto']).toBe('HTTPS, http');
+    expect(event.req.headers.get('x-forwarded-proto')).toBe('HTTPS, http');
   });
 
   test('returns undefined when no request address is available', () => {
@@ -79,14 +77,11 @@ describe('trusted request helpers', () => {
 
 function createTestEvent(
   remoteAddress: string | undefined,
-  headers: IncomingMessage['headers']
-): H3Event {
-  const request = {
-    connection: {},
-    headers: { ...headers },
-    socket: { remoteAddress },
-    url: '/api/auth/oidc/callback',
-  } as unknown as IncomingMessage;
-
-  return createEvent(request, {} as ServerResponse);
+  headers: Record<string, string>
+) {
+  const event = mockEvent('http://wg-easy:51821/api/auth/oidc/callback', {
+    headers,
+  });
+  event.context.clientAddress = remoteAddress;
+  return event;
 }

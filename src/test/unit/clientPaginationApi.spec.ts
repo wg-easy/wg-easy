@@ -11,7 +11,6 @@ import * as schema from '#db/schema';
 import { ClientService } from '#db/repositories/client/service';
 import {
   ClientCreateSchema,
-  ClientQuerySchema,
   ClientUpdateSchema,
 } from '#db/repositories/client/types';
 import listClients from '#server/api/client/index.get';
@@ -40,7 +39,6 @@ vi.mock('#server/utils/Database', () => ({
 
 let clients: ClientService;
 let db: ReturnType<typeof drizzle<typeof schema>>;
-const logQuery = vi.fn();
 
 function request(query = '') {
   return listClients(mockEvent(`http://localhost/api/client${query}`));
@@ -53,7 +51,7 @@ beforeEach(async () => {
 
   const connection = createClient({ url: ':memory:' });
   onTestFinished(() => connection.close());
-  db = drizzle({ client: connection, schema, logger: { logQuery } });
+  db = drizzle({ client: connection, schema });
   const migrations = readMigrationFiles({
     migrationsFolder: fileURLToPath(
       new URL('../../server/database/migrations', import.meta.url)
@@ -90,7 +88,6 @@ beforeEach(async () => {
     })
   );
   clients = new ClientService(db);
-  logQuery.mockClear();
 });
 
 describe('paginated client API', () => {
@@ -106,7 +103,7 @@ describe('paginated client API', () => {
     }
   });
 
-  test('uses SQL limit and offset for subsequent pages and merges their live status', async () => {
+  test('returns the requested page with live status matched to each client', async () => {
     const handshake = new Date('2026-10-26T10:00:00Z');
     dump.mockResolvedValue([
       {
@@ -127,14 +124,12 @@ describe('paginated client API', () => {
       transferTx: 456,
     });
     expect(result.clients.at(-1)?.id).toBe(50);
-    expect(logQuery.mock.calls).toEqual(
-      expect.arrayContaining([
-        [
-          expect.stringContaining('limit ? offset ?'),
-          expect.arrayContaining([25]),
-        ],
-      ])
-    );
+    expect(result.clients[1]).toMatchObject({
+      id: 27,
+      latestHandshakeAt: null,
+      transferRx: null,
+      transferTx: null,
+    });
     expect((await request('?page=3')).clients).toHaveLength(10);
   });
 
@@ -424,30 +419,21 @@ describe('paginated client API', () => {
   });
 });
 
-describe('client pagination query validation', () => {
-  test('accepts numeric query strings and defaults to 25', () => {
-    expect(ClientQuerySchema.parse({})).toEqual({ page: 1, pageSize: 25 });
-    expect(ClientQuerySchema.parse({ page: '2', pageSize: '100' })).toEqual({
-      page: 2,
-      pageSize: 100,
-    });
-  });
-
+describe('client list query validation', () => {
   test.each([
-    { page: '0' },
-    { page: '-1' },
-    { page: '1.5' },
-    { page: 'invalid' },
-    { pageSize: '0' },
-    { pageSize: '-1' },
-    { pageSize: '1.5' },
-    { pageSize: '101' },
-    { pageSize: 'Infinity' },
-    { status: 'unknown' },
-    { expiry: 'unknown' },
-    { sortBy: 'privateKey' },
-    { sort: 'unknown' },
-  ])('rejects invalid pagination %j', (query) => {
-    expect(ClientQuerySchema.safeParse(query).success).toBe(false);
+    'page=0',
+    'page=1.5',
+    'page=invalid',
+    'pageSize=0',
+    'pageSize=1.5',
+    'pageSize=101',
+    'status=unknown',
+    'expiry=unknown',
+    'sortBy=privateKey',
+    'sort=unknown',
+  ])('rejects invalid queries: %s', async (query) => {
+    await expect(request(`?${query}`)).rejects.toMatchObject({
+      statusCode: 400,
+    });
   });
 });

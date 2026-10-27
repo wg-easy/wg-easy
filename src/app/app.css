@@ -97,7 +97,10 @@
   .eyebrow {
     @apply text-[10px] font-semibold tracking-widest text-subtle uppercase;
   }
-  .surface {
+  .surface,
+  .ui-menu,
+  .form-group,
+  .callout {
     @apply rounded-xl border border-line bg-surface;
   }
   .ui-button {
@@ -128,14 +131,14 @@
     @apply min-h-11 w-full min-w-0 rounded-lg border border-line bg-input px-3 py-2.5 text-sm text-foreground shadow-none transition-colors outline-none placeholder:text-subtle focus:border-subtle focus:ring-2 focus:ring-accent/15 disabled:cursor-not-allowed disabled:opacity-50;
   }
   .ui-menu {
-    @apply z-50 overflow-y-auto rounded-xl border border-line bg-surface p-1.5 text-sm text-muted shadow-xl;
+    @apply z-50 overflow-y-auto p-1.5 text-sm text-muted shadow-xl;
     max-height: var(--reka-select-content-available-height, 24rem);
   }
   .ui-menu-item {
     @apply flex min-h-10 cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-sm outline-none hover:bg-surface-hover hover:text-foreground focus:bg-surface-hover focus:text-foreground data-[highlighted]:bg-surface-hover data-[highlighted]:text-foreground;
   }
   .form-group {
-    @apply grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)] items-center gap-x-5 gap-y-4 rounded-xl border border-line bg-surface p-5 sm:p-6;
+    @apply grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)] items-center gap-x-5 gap-y-4 p-5 sm:p-6;
   }
   .form-group > * {
     min-width: 0;
@@ -150,7 +153,7 @@
     @apply lg:col-span-2;
   }
   .callout {
-    @apply flex items-start gap-3 rounded-xl border border-line bg-surface px-4 py-3 text-sm text-muted;
+    @apply flex items-start gap-3 px-4 py-3 text-sm text-muted;
   }
 }
 

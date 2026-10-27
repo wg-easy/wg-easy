@@ -29,6 +29,14 @@ If you're new to wg-easy, make sure to read the [_Getting Started_ chapter][docs
 [docs-getting-started]: ./getting-started.md
 [docs-examples]: ./examples/tutorials/basic-installation.md
 
+### Using the App
+
+- [Setup](./guides/setup.md): Create an administrator, configure the server endpoint, or import a v14 configuration.
+- [Clients](./guides/clients.md): Create and share configurations, monitor traffic, search and filter clients, and apply bulk actions.
+- [Admin Panel](./guides/admin.md): Manage client defaults, interface settings, firewall rules, hooks, and metrics.
+- [Account](./guides/account.md): Update your profile, password, two-factor authentication, and external sign-in provider.
+- [CLI](./guides/cli.md) and [API](./advanced/api.md): Manage wg-easy from the command line or scripts.
+
 ### Contributing
 
 We are always happy to welcome new contributors. For guidelines and entrypoints please have a look at the [Contributing section][docs-contributing].

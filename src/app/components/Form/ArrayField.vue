@@ -1,8 +1,9 @@
 <template>
   <div class="col-span-full flex min-w-0 flex-col gap-2">
-    <div v-if="data?.length === 0">
-      {{ emptyText || $t('form.noItems') }}
-    </div>
+    <template v-if="data?.length === 0">
+      <slot v-if="$slots.empty" name="empty" />
+      <div v-else>{{ emptyText || $t('form.noItems') }}</div>
+    </template>
     <div v-for="(item, i) in data" v-else :key="i">
       <div class="flex min-w-0 gap-2">
         <input
@@ -15,7 +16,7 @@
         />
         <BaseSecondaryButton
           type="button"
-          class="rounded-lg px-3"
+          class="px-3"
           :aria-label="$t('form.moveUp')"
           :title="$t('form.moveUp')"
           :disabled="i === 0"
@@ -25,7 +26,7 @@
         </BaseSecondaryButton>
         <BaseSecondaryButton
           type="button"
-          class="rounded-lg px-3"
+          class="px-3"
           :aria-label="$t('form.moveDown')"
           :title="$t('form.moveDown')"
           :disabled="i === (data?.length ?? 0) - 1"
@@ -35,7 +36,6 @@
         </BaseSecondaryButton>
         <BaseSecondaryButton
           type="button"
-          class="rounded-lg"
           :aria-label="$t('client.delete')"
           @click="del(i)"
         >
@@ -44,7 +44,7 @@
       </div>
     </div>
     <div class="mt-2">
-      <BasePrimaryButton type="button" class="rounded-lg" @click="add">
+      <BasePrimaryButton type="button" @click="add">
         {{ $t('form.add') }}
       </BasePrimaryButton>
     </div>
@@ -57,21 +57,18 @@ import { ArrowDownIcon, ArrowUpIcon, MinusIcon } from '@lucide/vue';
 const data = defineModel<string[]>();
 defineProps<{ emptyText?: string[]; name: string }>();
 
-function update(e: Event, i: number) {
-  const v = (e.target as HTMLInputElement).value;
-  if (!data.value) {
-    return;
-  }
-  data.value[i] = v;
+function update(event: Event, index: number) {
+  const value = (event.target as HTMLInputElement).value;
+  data.value = data.value?.map((item, i) => (i === index ? value : item));
 }
 
 function add() {
-  data.value?.push('');
+  if (data.value) data.value = [...data.value, ''];
 }
 
 function move(i: number, direction: -1 | 1) {
   const target = i + direction;
-  const items = data.value;
+  const items = data.value?.slice();
   if (!items || target < 0 || target >= items.length) {
     return;
   }
@@ -81,12 +78,10 @@ function move(i: number, direction: -1 | 1) {
   }
   items.splice(i, 1);
   items.splice(target, 0, item);
+  data.value = items;
 }
 
-function del(i: number) {
-  if (!data.value) {
-    return;
-  }
-  data.value.splice(i, 1);
+function del(index: number) {
+  data.value = data.value?.filter((_, i) => i !== index);
 }
 </script>

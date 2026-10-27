@@ -1,12 +1,5 @@
 <template>
-  <div class="flex items-center">
-    <FormLabel :for="id">
-      {{ label }}
-    </FormLabel>
-    <BaseTooltip v-if="description" :text="description">
-      <InfoIcon class="size-4" />
-    </BaseTooltip>
-  </div>
+  <FormFieldLabel :id="id" :label="label" :description="description" />
   <div class="flex min-w-0 flex-wrap gap-2">
     <BaseInput
       :id="id"
@@ -32,7 +25,7 @@
 </template>
 
 <script lang="ts" setup>
-import { InfoIcon, SparklesIcon } from '@lucide/vue';
+import { SparklesIcon } from '@lucide/vue';
 
 defineProps<{
   id: string;
@@ -44,11 +37,7 @@ defineProps<{
 
 const data = defineModel<string | null>({
   set(value) {
-    const temp = value?.trim() ?? null;
-    if (temp === '') {
-      return null;
-    }
-    return temp;
+    return value?.trim() || null;
   },
 });
 </script>

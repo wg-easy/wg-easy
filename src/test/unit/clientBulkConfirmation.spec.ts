@@ -1,93 +1,20 @@
-import { readFileSync } from 'node:fs';
-import { createRequire } from 'node:module';
-
-import { transformSync } from 'esbuild';
-import { afterEach, expect, onTestFinished, test, vi } from 'vitest';
+import { afterEach, expect, test, vi } from 'vitest';
 import {
   computed,
-  createRenderer,
   defineComponent,
   h,
   nextTick,
   reactive,
   ref,
   watch,
-  type Component,
 } from 'vue';
-import { compileScript, parse } from 'vue/compiler-sfc';
 
-const { descriptor } = parse(
-  readFileSync(
-    new URL('../../app/components/Clients/BulkActions.vue', import.meta.url),
-    'utf8'
-  )
-);
-const script = compileScript(descriptor, {
-  id: 'bulk-actions',
-  inlineTemplate: true,
-});
-const { code } = transformSync(script.content, { loader: 'ts', format: 'cjs' });
-const module = { exports: {} as { default: Component } };
-new Function('require', 'module', 'exports', code)(
-  createRequire(import.meta.url),
-  module,
-  module.exports
-);
+import { loadComponent } from '../helpers/component';
+import { descendants, mount, renderer, textOf } from '../helpers/renderer';
 
-// Exercise the real event bindings at the Reka component boundary.
-type Node = {
-  tag: string;
-  text: string;
-  props: Record<string, unknown>;
-  children: Node[];
-  parent?: Node;
-};
-const node = (tag = '', text = ''): Node => ({
-  tag,
-  text,
-  props: {},
-  children: [],
-});
-const renderer = createRenderer<Node, Node>({
-  createElement: (tag) => node(tag),
-  createText: (text) => node('', text),
-  createComment: () => node(),
-  insert(child, parent, anchor) {
-    child.parent = parent;
-    const index = anchor ? parent.children.indexOf(anchor) : -1;
-    if (index < 0) parent.children.push(child);
-    else parent.children.splice(index, 0, child);
-  },
-  remove(child) {
-    const siblings = child.parent?.children;
-    if (siblings) siblings.splice(siblings.indexOf(child), 1);
-  },
-  setText: (node, text) => {
-    node.text = text;
-  },
-  setElementText: (node, text) => {
-    node.text = text;
-    node.children = [];
-  },
-  patchProp: (node, key, _old, value) => {
-    node.props[key] = value;
-  },
-  parentNode: (child) => child.parent ?? null,
-  nextSibling(child) {
-    const siblings = child.parent?.children;
-    return siblings?.[siblings.indexOf(child) + 1] ?? null;
-  },
-});
+const BulkActions = loadComponent('Clients/BulkActions');
 
 afterEach(() => vi.unstubAllGlobals());
-
-function textOf(node: Node): string {
-  return node.text + node.children.map(textOf).join('');
-}
-
-function descendants(node: Node): Node[] {
-  return [node, ...node.children.flatMap(descendants)];
-}
 
 async function mountActions() {
   const applyBulkAction = vi.fn().mockResolvedValue(true);
@@ -105,7 +32,7 @@ async function mountActions() {
   vi.stubGlobal('useI18n', () => ({ t: (key: string) => key }));
   for (const [name, value] of Object.entries({ computed, ref, watch }))
     vi.stubGlobal(name, value);
-  const app = renderer.createApp(module.exports.default);
+  const app = renderer.createApp(BulkActions);
   app.config.globalProperties.$t = (key: string, params?: { count: number }) =>
     `${key}${params ? ` ${params.count}` : ''}`;
   const Wrapper = defineComponent({
@@ -168,10 +95,7 @@ async function mountActions() {
           ),
     })
   );
-  const root = node();
-  app.mount(root);
-  onTestFinished(() => app.unmount());
-  await nextTick();
+  const root = await mount(app);
   function button(label: string, menuItem = false) {
     const found = descendants(root).find(
       (node) =>
@@ -190,6 +114,38 @@ async function mountActions() {
   }
   return { store, applyBulkAction, root, button, click };
 }
+
+test('offers actions appropriate to the selected clients', async () => {
+  const view = await mountActions();
+  for (const selected of [[true], [false], [true, false], []]) {
+    view.store.selectedIds = selected.map((_, index) => index + 1);
+    view.store.selectedClients = selected.map((enabled) => ({ enabled }));
+    await nextTick();
+    expect(view.button('bulk.actions').props.disabled).toBe(!selected.length);
+    expect(view.button('bulk.enable', true).props.disabled).toBe(
+      !selected.includes(false)
+    );
+    expect(view.button('bulk.disable', true).props.disabled).toBe(
+      !selected.includes(true)
+    );
+    expect(view.button('bulk.delete', true).props.disabled).toBe(
+      !selected.length
+    );
+  }
+});
+
+test.each(['isUpdatingList', 'isApplyingBulk'] as const)(
+  'blocks actions while %s',
+  async (busy) => {
+    const view = await mountActions();
+    view.store[busy] = true;
+    await nextTick();
+    expect(view.button('bulk.actions').props.disabled).toBe(true);
+    for (const action of ['enable', 'disable', 'delete']) {
+      expect(view.button(`bulk.${action}`, true).props.disabled).toBe(true);
+    }
+  }
+);
 
 test.each(['enable', 'disable', 'delete'])(
   '%s only runs after explicit confirmation and can be cancelled',

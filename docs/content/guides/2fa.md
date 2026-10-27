@@ -2,7 +2,7 @@
 title: 2FA
 ---
 
-The user can enable 2FA from the Account page. The Account page is accessible from the dropdown menu in the top right corner of the application.
+Enable 2FA from the [Account page](./account.md), accessible from the user menu in the top-right corner of the application.
 
 ## Enable TOTP
 

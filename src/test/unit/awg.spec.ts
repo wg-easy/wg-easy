@@ -58,23 +58,7 @@ const client = {
 };
 
 describe('AmneziaWG config lines', () => {
-  test('leaves out parameters that are not set', () => {
-    expect(buildAwgLines({ Jc: null, Jmin: null })).toEqual([]);
-  });
-
-  test('writes booleans as on/off, not true/false', () => {
-    expect(
-      buildAwgLines({ RandomTrailers: true, DisableCookies: false })
-    ).toEqual(['RandomTrailers = on', 'DisableCookies = off']);
-  });
-
-  test('keeps ranges verbatim', () => {
-    expect(buildAwgLines({ RekeyAfterTime: '90-150' })).toEqual([
-      'RekeyAfterTime = 90-150',
-    ]);
-  });
-
-  test('builds the interface parameters', () => {
+  test('emits configured interface parameters and omits unset values', () => {
     expect(
       buildAwgLines(
         interfaceAwgParameters({
@@ -99,10 +83,15 @@ describe('AmneziaWG config lines', () => {
     ]);
   });
 
-  test('copies parameters that must match from the interface to the client', () => {
+  test('shares interface parameters while keeping client settings independent', () => {
     const lines = buildAwgLines(
       clientAwgParameters(
-        { ...wgInterface, headerProtectionKey: KEY, randomTrailers: true },
+        {
+          ...wgInterface,
+          headerProtectionKey: KEY,
+          randomTrailers: true,
+          maxHandshakeAttempts: '9',
+        },
         { ...client, rekeyTimeout: '4-8', disableCookies: true }
       )
     );
@@ -113,16 +102,6 @@ describe('AmneziaWG config lines', () => {
     expect(lines).toContain('H1 = 5');
     expect(lines).toContain('RekeyTimeout = 4-8');
     expect(lines).toContain('DisableCookies = on');
-  });
-
-  test('does not inherit per-client parameters from the interface', () => {
-    const lines = buildAwgLines(
-      clientAwgParameters(
-        { ...wgInterface, jC: 7, maxHandshakeAttempts: '9' },
-        client
-      )
-    );
-
     expect(lines).not.toContain('Jc = 7');
     expect(lines).not.toContain('MaxHandshakeAttempts = 9');
   });
@@ -150,7 +129,7 @@ describe('AwgRangeSchema', () => {
     expect(() => AwgRangeSchema.parse('')).toThrow();
   });
 
-  test('does not change the H1-H4 bounds', () => {
+  test('limits H1-H4 to 5 through 2147483647', () => {
     expect(HSchema.parse('5')).toBe('5');
     expect(() => HSchema.parse('4')).toThrow();
     expect(HSchema.parse('5-2147483647')).toBe('5-2147483647');

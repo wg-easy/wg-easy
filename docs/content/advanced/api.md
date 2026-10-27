@@ -8,14 +8,15 @@ This API is not yet stable and may change in the future. The API is currently in
 
 ///
 
-You can use the API to interact with the application programmatically. The API is available at `/api` and supports both GET and POST requests. The API is designed to be simple and easy to use, with a focus on providing a consistent interface for all endpoints.
+You can use the API to interact with the application programmatically. The API is available at `/api` and supports GET, POST, and DELETE requests. The API is designed to be simple and easy to use, with a focus on providing a consistent interface for all endpoints.
 
 There is no documentation for the API yet, but this will be added as the underlying library supports it.
 
 ## Authentication
 
-To use the API, you need to authenticate using Basic Authentication. The username and password are the same as the ones you use to log in to the web application.
-If you use 2FA, the API will not work. You need to disable 2FA in the web application to use the API.
+Authenticated endpoints accept the Web UI's session cookie or HTTP Basic Authentication with your login username and password.
+
+Basic Authentication is unavailable for accounts with 2FA enabled and when `DISABLE_PASSWORD_AUTH=true`. A session established through the normal sign-in flow, including 2FA when required, can still access the API. API requests follow the signed-in user's permissions.
 
 ### Authentication Example
 
@@ -38,7 +39,7 @@ The Endpoints are not yet documented. But as file-based routing is used, you can
 
 ### Endpoints Example
 
-| File Name                        | Endpoint       | Method |
-| -------------------------------- | -------------- | ------ |
-| `src/server/api/client.get.ts`   | `/api/client`  | GET    |
-| `src/server/api/setup/2.post.ts` | `/api/setup/2` | POST   |
+| File Name                            | Endpoint       | Method |
+| ------------------------------------ | -------------- | ------ |
+| `src/server/api/client/index.get.ts` | `/api/client`  | GET    |
+| `src/server/api/setup/2.post.ts`     | `/api/setup/2` | POST   |

@@ -1,29 +1,20 @@
-import { createError, getValidatedRouterParams } from 'h3';
+import { getValidatedRouterParams } from 'h3';
 
-import Database from '#server/utils/Database';
-import WireGuard from '#server/utils/WireGuard';
+import clientMutations from '#server/utils/clientMutations';
 import { definePermissionEventHandler } from '#server/utils/handler';
 import { validateZod } from '#server/utils/types';
 import { ClientGetSchema } from '#db/repositories/client/types';
 
 export default definePermissionEventHandler(
   'clients',
-  'update',
-  async ({ event, checkPermissions }) => {
+  'custom',
+  async ({ event, user }) => {
     const { clientId } = await getValidatedRouterParams(
       event,
       validateZod(ClientGetSchema, event)
     );
 
-    const client = await Database.clients.getPublic(clientId);
-    checkPermissions(client);
-    if (!client) {
-      throw createError({ statusCode: 404, statusMessage: 'Client not found' });
-    }
-
-    await Database.clients.rotatePreSharedKey(clientId);
-    await WireGuard.saveConfig();
-
+    await clientMutations.apply(user, clientId, 'rotatePreSharedKey');
     return { success: true };
   }
 );

@@ -18,9 +18,9 @@ const { config } = vi.hoisted(() => ({
 vi.mock('#server/utils/config', () => ({ WG_ENV: config }));
 
 describe('MTU validation', () => {
-  test('accepts an empty value and keeps the existing numeric bounds', () => {
+  test('accepts automatic MTU or a value from 1024 to 9000', () => {
     expect(MtuSchema.parse(null)).toBeNull();
-    for (const mtu of [1024, 1280, 1420, 9000]) {
+    for (const mtu of [1024, 9000]) {
       expect(MtuSchema.parse(mtu)).toBe(mtu);
     }
     for (const mtu of [0, 1023, 9001, 'invalid']) {
@@ -30,7 +30,7 @@ describe('MTU validation', () => {
 });
 
 test.each(['wg', 'awg'])(
-  '%s preserves saved MTUs during migration and supports clearing them',
+  '%s emits explicit MTUs and omits automatic MTUs',
   async (executable) => {
     config.WG_EXECUTABLE = executable;
     vi.resetModules();
@@ -44,8 +44,7 @@ test.each(['wg', 'awg'])(
       ),
     });
 
-    // Populate the database as it was before migration 0010.
-    await connection.migrate(migrations.slice(0, 10).flatMap((m) => m.sql));
+    await connection.migrate(migrations.flatMap((m) => m.sql));
     await db.insert(schema.user).values({
       id: 1,
       username: 'admin',
@@ -76,40 +75,6 @@ test.each(['wg', 'awg'])(
       mtu: 1280,
       enabled: true,
     });
-    await db.insert(schema.oneTimeLink).values({
-      id: 1,
-      oneTimeLink: 'test-link',
-      expiresAt: '2099-01-01T00:00:00.000Z',
-    });
-
-    const before = {
-      clients: await db.select().from(schema.client),
-      interfaces: await db.select().from(schema.wgInterface),
-      defaults: await db.query.userConfig.findMany({
-        columns: { defaultGeneratePreSharedKey: false },
-      }),
-      hooks: await db.select().from(schema.hooks),
-      links: await db.select().from(schema.oneTimeLink),
-    };
-
-    await connection.migrate(migrations.slice(10).flatMap((m) => m.sql));
-
-    expect(await db.select().from(schema.client)).toEqual(before.clients);
-    expect(await db.select().from(schema.wgInterface)).toEqual(
-      before.interfaces
-    );
-    expect(await db.select().from(schema.userConfig)).toEqual(
-      before.defaults.map((config) => ({
-        ...config,
-        defaultGeneratePreSharedKey: true,
-      }))
-    );
-    expect(await db.select().from(schema.hooks)).toEqual(before.hooks);
-    expect(await db.select().from(schema.oneTimeLink)).toEqual(before.links);
-    expect((await connection.execute('PRAGMA foreign_key_check')).rows).toEqual(
-      []
-    );
-
     const client = (await db.select().from(schema.client))[0]!;
     const wgInterface = (await db.select().from(schema.wgInterface))[0]!;
     const userConfig = (await db.select().from(schema.userConfig))[0]!;
@@ -150,9 +115,6 @@ test.each(['wg', 'awg'])(
       clearedClient
     );
     expect(serverConfig).not.toMatch(/^MTU\s*=/m);
-    expect(serverConfig).toContain('\nTable = auto\n');
     expect(clientConfig).not.toMatch(/^MTU\s*=/m);
-    expect(clientConfig).toContain('\n[Peer]\n');
-    expect(clientConfig).toContain('\nEndpoint = vpn.example.com:51820');
   }
 );

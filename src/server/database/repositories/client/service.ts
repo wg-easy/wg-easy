@@ -106,10 +106,6 @@ function createPreparedStatement(db: DBType) {
       .set({ enabled: sql.placeholder('enabled') as never as boolean })
       .where(eq(client.id, sql.placeholder('id')))
       .prepare(),
-    delete: db
-      .delete(client)
-      .where(eq(client.id, sql.placeholder('id')))
-      .prepare(),
   };
 }
 
@@ -310,10 +306,6 @@ export class ClientService {
 
   toggle(id: ID, enabled: boolean) {
     return this.#statements.toggle.execute({ id, enabled });
-  }
-
-  delete(id: ID) {
-    return this.#statements.delete.execute({ id });
   }
 
   async bulkAction(

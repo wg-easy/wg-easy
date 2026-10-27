@@ -10,13 +10,13 @@ type SubmitOpts<T> = {
 
 type Body = Record<string, unknown> | null | undefined;
 
-export function useSubmit<T>(
-  fetcher: (data: Body) => Promise<T>,
+export function useSubmit<T, Input = Body>(
+  fetcher: (data: Input) => Promise<T>,
   opts: SubmitOpts<T>
 ) {
   const toast = useToast();
 
-  return async (data: Body) => {
+  return async (data: Input) => {
     try {
       const res = await fetcher(data);
 
@@ -27,18 +27,15 @@ export function useSubmit<T>(
         });
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await opts.revert(true, res as any);
+      await opts.revert(true, res);
     } catch (e) {
-      if (e instanceof FetchError) {
+      if (e instanceof Error) {
         toast.showToast({
           type: 'error',
-          message: e.data?.message ?? e.message,
-        });
-      } else if (e instanceof Error) {
-        toast.showToast({
-          type: 'error',
-          message: e.message,
+          message:
+            e instanceof FetchError
+              ? (e.data?.message ?? e.message)
+              : e.message,
         });
       } else {
         console.error(e);

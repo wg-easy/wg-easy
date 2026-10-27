@@ -1,32 +1,17 @@
 <template>
-  <div class="flex items-center">
-    <FormLabel :for="id">
-      {{ label }}
-    </FormLabel>
-    <BaseTooltip v-if="description" :text="description">
-      <InfoIcon class="size-4" />
-    </BaseTooltip>
-  </div>
+  <FormFieldLabel :id="id" :label="label" :description="description" />
   <div class="my-auto flex items-center gap-3">
     <template v-if="data === null">
       <span class="text-subtle">
         {{ $t('form.nullNotSet') }}
       </span>
-      <BaseSecondaryButton
-        type="button"
-        class="rounded-lg"
-        @click="data = false"
-      >
+      <BaseSecondaryButton type="button" @click="data = false">
         {{ $t('form.set') }}
       </BaseSecondaryButton>
     </template>
     <template v-else>
       <BaseSwitch :id="id" v-model="enabled" />
-      <BaseSecondaryButton
-        type="button"
-        class="rounded-lg"
-        @click="data = null"
-      >
+      <BaseSecondaryButton type="button" @click="data = null">
         {{ $t('form.unset') }}
       </BaseSecondaryButton>
     </template>
@@ -34,8 +19,6 @@
 </template>
 
 <script lang="ts" setup>
-import { InfoIcon } from '@lucide/vue';
-
 defineProps<{ id: string; label: string; description?: string }>();
 
 const data = defineModel<boolean | null>();
