@@ -1,7 +1,7 @@
 import { Resolver } from 'node:dns/promises';
 import { networkInterfaces } from 'node:os';
 
-import { stringifyIp } from 'ip-bigint';
+import { normalizeIp, parseIp, stringifyIp } from 'ip-bigint';
 import type { parseCidr } from 'cidr-tools';
 
 import { cacheFunction } from '#server/utils/cache';
@@ -9,13 +9,25 @@ import type { ClientNextIpType } from '#db/repositories/client/types';
 
 type ParsedCidr = ReturnType<typeof parseCidr>;
 
+export function normalizeAddress(address: string) {
+  return normalizeIp(address, { hexify: true });
+}
+
+/** Match the allocation pool: reserve the network, server, and last address. */
+export function isClientAddress(address: string, cidr: ParsedCidr) {
+  const { number, version } = parseIp(address);
+  return (
+    version === cidr.version && number >= cidr.start + 2n && number < cidr.end
+  );
+}
+
 export function nextIP(
   version: 4 | 6,
   cidr: ParsedCidr,
   clients: ClientNextIpType[]
 ) {
   const usedAddresses = new Set(
-    clients.map((client) => client[`ipv${version}Address`])
+    clients.map((client) => normalizeAddress(client[`ipv${version}Address`]))
   );
 
   return nextIPFromUsedAddresses(version, cidr, usedAddresses);
@@ -28,7 +40,7 @@ export function nextIPFromUsedAddresses(
 ) {
   let address;
   for (let i = cidr.start + 2n; i <= cidr.end - 1n; i++) {
-    const currentIp = stringifyIp({ number: i, version: version });
+    const currentIp = stringifyIp({ number: i, version }, { hexify: true });
 
     if (!usedAddresses.has(currentIp)) {
       address = currentIp;

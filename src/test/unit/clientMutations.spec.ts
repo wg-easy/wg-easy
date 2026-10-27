@@ -1,19 +1,13 @@
 import fs from 'node:fs/promises';
-import { fileURLToPath } from 'node:url';
 
-import { createClient } from '@libsql/client';
 import { eq } from 'drizzle-orm';
-import { drizzle } from 'drizzle-orm/libsql';
-import { readMigrationFiles } from 'drizzle-orm/migrator';
 import { mockEvent } from 'h3';
-import { beforeEach, describe, expect, onTestFinished, test, vi } from 'vitest';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
+
+import { databaseFixture } from '../helpers/database';
 
 import * as schema from '#db/schema';
-import { HooksService } from '#db/repositories/hooks/service';
-import { InterfaceService } from '#db/repositories/interface/service';
-import WireGuard from '#server/utils/WireGuard';
-import { UserConfigService } from '#db/repositories/userConfig/service';
-import { ClientService } from '#db/repositories/client/service';
+import { ClientRepository } from '#db/repositories/client/repository';
 import bulkAction from '#server/api/client/bulk.post';
 import createClientRoute from '#server/api/client/index.post';
 import updateClient from '#server/api/client/[clientId]/index.post';
@@ -26,35 +20,17 @@ const { getCurrentUser, exec } = vi.hoisted(() => ({
   exec: vi.fn(),
 }));
 
-vi.mock('#server/utils/session', () => ({ getCurrentUser }));
+vi.mock('#server/features/identity/session', () => ({ getCurrentUser }));
 vi.mock('#server/utils/config', () => ({
   OLD_ENV: {},
   WG_ENV: { WG_EXECUTABLE: 'wg', WG_INTERFACE: 'wg0', PORT: '51821' },
 }));
 vi.mock('#server/utils/cmd', () => ({ exec }));
-vi.mock('#server/utils/Database', () => ({
-  default: {
-    get clients() {
-      return clients;
-    },
-    get interfaces() {
-      return new InterfaceService(db);
-    },
-    get hooks() {
-      return new HooksService(db);
-    },
-    get userConfigs() {
-      return new UserConfigService(db);
-    },
-  },
-}));
-
-const synchronize = WireGuard.saveConfig.bind(WireGuard);
-const saveConfig = vi.spyOn(WireGuard, 'saveConfig');
+vi.mock('@intlify/h3', () => ({ useTranslation: () => (key: string) => key }));
 const writeFile = vi.spyOn(fs, 'writeFile');
 
-let clients: ClientService;
-let db: ReturnType<typeof drizzle<typeof schema>>;
+let clients: ClientRepository;
+let db: Awaited<ReturnType<typeof databaseFixture>>['db'];
 
 function request(action: string, clientIds: unknown[]) {
   return bulkAction(
@@ -78,7 +54,6 @@ function clientEvent(clientId = 1, body?: unknown) {
 
 beforeEach(async () => {
   vi.resetAllMocks();
-  saveConfig.mockImplementation(synchronize);
   writeFile.mockResolvedValue();
   exec.mockImplementation(async (command: string) => {
     if (command === 'wg genkey') return 'new-private-key';
@@ -87,16 +62,7 @@ beforeEach(async () => {
     return '';
   });
   getCurrentUser.mockResolvedValue({ id: 1, role: 1 });
-  const connection = createClient({ url: ':memory:' });
-  onTestFinished(() => connection.close());
-  db = drizzle({ client: connection, schema });
-  const migrations = readMigrationFiles({
-    migrationsFolder: fileURLToPath(
-      new URL('../../server/database/migrations', import.meta.url)
-    ),
-  });
-  await connection.migrate(migrations.flatMap((migration) => migration.sql));
-  await connection.execute('PRAGMA foreign_keys = ON');
+  ({ db } = await databaseFixture());
   await db.insert(schema.user).values(
     [1, 2].map((id) => ({
       id,
@@ -113,7 +79,7 @@ beforeEach(async () => {
       userId: id === 3 ? 1 : 2,
       interfaceId: 'wg0',
       name: `Client ${id}`,
-      ipv4Address: `10.8.0.${id}`,
+      ipv4Address: `10.8.0.${id + 1}`,
       ipv6Address: `fd00::${id}`,
       privateKey: `private-${id}`,
       publicKey: `public-${id}`,
@@ -122,7 +88,7 @@ beforeEach(async () => {
       enabled: true,
     }))
   );
-  clients = new ClientService(db);
+  clients = new ClientRepository(db);
 });
 
 describe.each([
@@ -233,7 +199,9 @@ describe('client mutation sequencing', () => {
     writeFile.mockRejectedValueOnce(new Error('Disk full'));
     await expect(disableClient(clientEvent())).rejects.toThrow('Disk full');
     expect((await clients.get(1))?.enabled).toBe(false);
-    expect(exec).not.toHaveBeenCalled();
+    expect(exec).not.toHaveBeenCalledWith(
+      'wg syncconf wg0 <(wg-quick strip wg0)'
+    );
   });
 
   test('reports firewall failures after saving and syncing the configuration', async () => {
@@ -327,33 +295,95 @@ describe('client creation and settings', () => {
     expect(writeFile).not.toHaveBeenCalled();
     expect(exec).not.toHaveBeenCalled();
   });
+
+  test.each([
+    ['routes', { serverAllowedIps: ['10.0.0.1:443'] }],
+    ['endpoint', { serverEndpoint: 'vpn.example.com' }],
+  ] as const)(
+    'invalid peer %s cannot change saved or running state',
+    async (_field, invalid) => {
+      const before = await clients.get(1);
+      await expect(
+        updateClient(clientEvent(1, { ...(await settings()), ...invalid }))
+      ).rejects.toMatchObject({ statusCode: 400 });
+      expect(await clients.get(1)).toEqual(before);
+      expect(writeFile).not.toHaveBeenCalled();
+      expect(exec).not.toHaveBeenCalled();
+    }
+  );
+
+  test.each(
+    [[], ['192.0.2.0/24', '2001:db8::/64', '192.0.2.1']].map(
+      (serverAllowedIps) => ({ serverAllowedIps })
+    )
+  )(
+    'accepts optional valid server routes: $serverAllowedIps',
+    async ({ serverAllowedIps }) => {
+      await updateClient(
+        clientEvent(1, { ...(await settings()), serverAllowedIps })
+      );
+      expect((await clients.get(1))?.serverAllowedIps).toEqual(
+        serverAllowedIps
+      );
+    }
+  );
 });
 
 describe('bulk client API', () => {
-  test('disables and enables only the selected clients, syncing once per batch', async () => {
-    expect(await request('disable', [1, 2, 2])).toEqual({
-      success: true,
-      count: 2,
-    });
-    expect((await clients.get(1))?.enabled).toBe(false);
-    expect((await clients.get(2))?.enabled).toBe(false);
-    expect((await clients.get(3))?.enabled).toBe(true);
-    expect(saveConfig).toHaveBeenCalledTimes(1);
-    const savedConfig = String(writeFile.mock.calls[0]?.[1]);
-    expect(savedConfig).not.toContain('PublicKey = public-1');
-    expect(savedConfig).not.toContain('PublicKey = public-2');
-    expect(savedConfig).toContain('PublicKey = public-3');
-    expect(exec).toHaveBeenCalledWith('wg syncconf wg0 <(wg-quick strip wg0)');
-    expect(await request('enable', [1, 2])).toEqual({
-      success: true,
-      count: 2,
-    });
-    expect((await clients.get(1))?.enabled).toBe(true);
-    expect((await clients.get(2))?.enabled).toBe(true);
-    expect(saveConfig).toHaveBeenCalledTimes(2);
-    const enabledConfig = String(writeFile.mock.calls[1]?.[1]);
-    expect(enabledConfig).toContain('PublicKey = public-1');
-    expect(enabledConfig).toContain('PublicKey = public-2');
+  describe.each(['enable', 'disable', 'delete'] as const)('%s', (action) => {
+    test.each(
+      [
+        [1, 2],
+        [2, 1],
+        [1, 2, 2],
+        [2, 1, 2, 1],
+      ].map((ids) => ({ ids }))
+    )(
+      'changes only selected clients regardless of order or duplicates: $ids',
+      async ({ ids }) => {
+        getCurrentUser.mockResolvedValue({ id: 2, role: 2 });
+        await db.update(schema.client).set({ enabled: action !== 'enable' });
+        const before = await clients.getAll();
+        const selected = new Set(ids);
+        const expected = before.flatMap((client) => {
+          if (!selected.has(client.id)) return [client];
+          if (action === 'delete') return [];
+          return [
+            {
+              ...client,
+              enabled: action === 'enable',
+              updatedAt: expect.any(Date),
+            },
+          ];
+        });
+
+        expect(await request(action, ids)).toEqual({
+          success: true,
+          count: selected.size,
+        });
+        expect(await clients.getAll()).toEqual(expected);
+        expect(writeFile).toHaveBeenCalledOnce();
+        const configuration = String(writeFile.mock.lastCall?.[1]);
+        const peerKeys = [
+          ...configuration.matchAll(/^PublicKey = (.+)$/gm),
+        ].map((match) => match[1]);
+        expect(peerKeys.sort()).toEqual(
+          expected
+            .filter(({ enabled }) => enabled)
+            .map(({ publicKey }) => publicKey)
+            .sort()
+        );
+        expect(exec).toHaveBeenCalledWith(
+          'wg syncconf wg0 <(wg-quick strip wg0)'
+        );
+
+        if (action !== 'delete') {
+          await request(action, ids);
+          expect(await clients.getAll()).toEqual(expected);
+          expect(writeFile.mock.lastCall?.[1]).toBe(configuration);
+        }
+      }
+    );
   });
 
   test('deletes selected clients and cascades their one-time links', async () => {
@@ -370,42 +400,46 @@ describe('bulk client API', () => {
     expect(await clients.get(2)).toBeUndefined();
     expect(await clients.get(3)).toBeDefined();
     expect(await db.select().from(schema.oneTimeLink)).toEqual([]);
-    expect(saveConfig).toHaveBeenCalledTimes(1);
+    expect(writeFile).toHaveBeenCalledTimes(1);
   });
 
   test.each(['enable', 'disable', 'delete'])(
     'rejects the whole %s batch if any client belongs to another user',
     async (action) => {
       getCurrentUser.mockResolvedValue({ id: 2, role: 2 });
-      await clients.toggle(1, false);
-      await expect(request(action, [1, 3])).rejects.toMatchObject({
-        statusCode: 403,
-      });
-      expect((await clients.get(1))?.enabled).toBe(false);
-      expect((await clients.get(3))?.enabled).toBe(true);
-      expect(saveConfig).not.toHaveBeenCalled();
+      await clients.update(1, { enabled: false });
+      const before = await clients.getAll();
+      for (const ids of [
+        [1, 3],
+        [3, 1],
+      ]) {
+        await expect(request(action, ids)).rejects.toMatchObject({
+          statusCode: 403,
+        });
+        expect(await clients.getAll()).toEqual(before);
+      }
+      expect(writeFile).not.toHaveBeenCalled();
+      expect(exec).not.toHaveBeenCalled();
     }
   );
 
   test.each(['enable', 'disable', 'delete'])(
-    'lets clients %s their own selections',
+    'rejects a missing client without changing any rows during %s',
     async (action) => {
-      getCurrentUser.mockResolvedValue({ id: 2, role: 2 });
-      expect(await request(action, [1, 2])).toEqual({
-        success: true,
-        count: 2,
-      });
-      expect(saveConfig).toHaveBeenCalledTimes(1);
+      const before = await clients.getAll();
+      for (const ids of [
+        [1, 999],
+        [999, 1],
+      ]) {
+        await expect(request(action, ids)).rejects.toMatchObject({
+          statusCode: 404,
+        });
+        expect(await clients.getAll()).toEqual(before);
+      }
+      expect(writeFile).not.toHaveBeenCalled();
+      expect(exec).not.toHaveBeenCalled();
     }
   );
-
-  test('rejects missing clients before mutating any selected clients', async () => {
-    await expect(request('delete', [1, 999])).rejects.toMatchObject({
-      statusCode: 404,
-    });
-    expect(await clients.get(1)).toBeDefined();
-    expect(saveConfig).not.toHaveBeenCalled();
-  });
 
   test('rejects the whole enable batch if any client is expired', async () => {
     await db.update(schema.client).set({ enabled: false });
@@ -413,11 +447,18 @@ describe('bulk client API', () => {
       .update(schema.client)
       .set({ expiresAt: '2000-01-01' })
       .where(eq(schema.client.id, 2));
-    await expect(request('enable', [1, 2])).rejects.toMatchObject({
-      statusCode: 422,
-    });
-    expect((await clients.get(1))?.enabled).toBe(false);
-    expect(saveConfig).not.toHaveBeenCalled();
+    const before = await clients.getAll();
+    for (const ids of [
+      [1, 2],
+      [2, 1],
+    ]) {
+      await expect(request('enable', ids)).rejects.toMatchObject({
+        statusCode: 422,
+      });
+      expect(await clients.getAll()).toEqual(before);
+    }
+    expect(writeFile).not.toHaveBeenCalled();
+    expect(exec).not.toHaveBeenCalled();
     expect(await request('disable', [1, 2])).toEqual({
       success: true,
       count: 2,
@@ -432,11 +473,13 @@ describe('bulk client API', () => {
     ['unknown', [1]],
     ['delete', Array.from({ length: 101 }, (_, i) => i + 1)],
   ])('rejects invalid batches (%s)', async (action, ids) => {
+    const before = await clients.getAll();
     await expect(
       request(action as string, ids as unknown[])
     ).rejects.toMatchObject({ statusCode: 400 });
-    expect(await clients.get(1)).toBeDefined();
-    expect(saveConfig).not.toHaveBeenCalled();
+    expect(await clients.getAll()).toEqual(before);
+    expect(writeFile).not.toHaveBeenCalled();
+    expect(exec).not.toHaveBeenCalled();
   });
 
   test('reports synchronization failures instead of claiming success', async () => {

@@ -18,6 +18,8 @@ Authenticated endpoints accept the Web UI's session cookie or HTTP Basic Authent
 
 Basic Authentication is unavailable for accounts with 2FA enabled and when `DISABLE_PASSWORD_AUTH=true`. A session established through the normal sign-in flow, including 2FA when required, can still access the API. API requests follow the signed-in user's permissions.
 
+Basic Authentication failures are logged as `Security failure: type=basic`. wg-easy does not implement rate limiting. Configure your reverse proxy or an external security tool to protect requests using Basic Authentication on **all API routes**, as limiting only `/api/auth/password` does not cover them. Configure [`TRUSTED_PROXIES`](./config/optional-config.md#trusted-proxies) so that security logs contain the original client IP address.
+
 ### Authentication Example
 
 ```python

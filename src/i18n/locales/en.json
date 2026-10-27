@@ -281,6 +281,7 @@
     "dns": "DNS",
     "allowedIps": "Allowed IPs",
     "allowedIpsInvalid": "Each Allowed IPs entry must be a single IP address or CIDR",
+    "endpointInvalid": "Use a hostname or IPv4 address followed by :port, or [IPv6]:port (1–65535)",
     "file": "File"
   },
   "hooks": {

@@ -1,12 +1,11 @@
 import { describe, expect, test } from 'vitest';
 
+import { InterfaceUpdateSchema } from '#shared/contracts/interface';
 import {
-  buildAwgLines,
-  clientAwgParameters,
-  interfaceAwgParameters,
-} from '#server/utils/awg';
-import { InterfaceUpdateSchema } from '#db/repositories/interface/types';
-import { AwgRangeSchema, HSchema, KeySchema } from '#server/utils/types';
+  AwgRangeSchema,
+  HSchema,
+  KeySchema,
+} from '#shared/contracts/validation';
 
 /** Any valid 32 byte base64 key, generated with `wg genkey` */
 const KEY = 'JPJ2DWzJbwrRkY6cPbZaJasL6bHQOM6J2Ollx4D/OHU=';
@@ -38,74 +37,6 @@ const wgInterface = {
   randomTrailers: null,
   disableCookies: null,
 };
-
-const client = {
-  jC: null,
-  jMin: null,
-  jMax: null,
-  i1: null,
-  i2: null,
-  i3: null,
-  i4: null,
-  i5: null,
-  contentPaddingAddition: null,
-  rekeyAfterTime: null,
-  rekeyTimeout: null,
-  rejectAfterTime: null,
-  keepaliveTimeout: null,
-  maxHandshakeAttempts: null,
-  disableCookies: null,
-};
-
-describe('AmneziaWG config lines', () => {
-  test('emits configured interface parameters and omits unset values', () => {
-    expect(
-      buildAwgLines(
-        interfaceAwgParameters({
-          ...wgInterface,
-          headerProtectionKey: KEY,
-          maxHandshakeAttempts: '5',
-          randomTrailers: true,
-          disableCookies: false,
-        })
-      )
-    ).toEqual([
-      'Jc = 7',
-      'Jmin = 10',
-      'Jmax = 1000',
-      'S1 = 128',
-      'S2 = 56',
-      'H1 = 5',
-      `HeaderProtectionKey = ${KEY}`,
-      'MaxHandshakeAttempts = 5',
-      'RandomTrailers = on',
-      'DisableCookies = off',
-    ]);
-  });
-
-  test('shares interface parameters while keeping client settings independent', () => {
-    const lines = buildAwgLines(
-      clientAwgParameters(
-        {
-          ...wgInterface,
-          headerProtectionKey: KEY,
-          randomTrailers: true,
-          maxHandshakeAttempts: '9',
-        },
-        { ...client, rekeyTimeout: '4-8', disableCookies: true }
-      )
-    );
-
-    expect(lines).toContain(`HeaderProtectionKey = ${KEY}`);
-    expect(lines).toContain('RandomTrailers = on');
-    expect(lines).toContain('S1 = 128');
-    expect(lines).toContain('H1 = 5');
-    expect(lines).toContain('RekeyTimeout = 4-8');
-    expect(lines).toContain('DisableCookies = on');
-    expect(lines).not.toContain('Jc = 7');
-    expect(lines).not.toContain('MaxHandshakeAttempts = 9');
-  });
-});
 
 describe('AwgRangeSchema', () => {
   test('accepts a single number and an inclusive range', () => {

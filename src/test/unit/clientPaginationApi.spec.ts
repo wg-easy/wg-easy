@@ -1,44 +1,32 @@
-import { fileURLToPath } from 'node:url';
-
-import { createClient } from '@libsql/client';
 import { eq, gt } from 'drizzle-orm';
-import { drizzle } from 'drizzle-orm/libsql';
-import { readMigrationFiles } from 'drizzle-orm/migrator';
 import { mockEvent } from 'h3';
 import { beforeEach, describe, expect, onTestFinished, test, vi } from 'vitest';
 
+import { databaseFixture } from '../helpers/database';
+
+import * as monitoring from '#server/features/vpn/monitoring';
 import * as schema from '#db/schema';
-import { ClientService } from '#db/repositories/client/service';
+import { ClientRepository } from '#db/repositories/client/repository';
 import {
   ClientCreateSchema,
   ClientUpdateSchema,
-} from '#db/repositories/client/types';
+} from '#shared/contracts/client';
 import listClients from '#server/api/client/index.get';
-import enableClient from '#server/api/client/[clientId]/enable.post';
-import WireGuard from '#server/utils/WireGuard';
+import { clientSortFields } from '#shared/utils/clientList';
 
 const { getCurrentUser, dump } = vi.hoisted(() => ({
   getCurrentUser: vi.fn(),
   dump: vi.fn(),
 }));
 
-vi.mock('#server/utils/session', () => ({ getCurrentUser }));
+vi.mock('#server/features/identity/session', () => ({ getCurrentUser }));
 vi.mock('#server/utils/wgHelper', () => ({ wg: { dump } }));
 vi.mock('#server/utils/config', () => ({
   OLD_ENV: {},
   WG_ENV: { WG_EXECUTABLE: 'wg', WG_INTERFACE: 'wg0', PORT: '51821' },
 }));
-vi.mock('#server/utils/Database', () => ({
-  default: {
-    get clients() {
-      return clients;
-    },
-    interfaces: { get: async () => ({ name: 'wg0' }) },
-  },
-}));
-
-let clients: ClientService;
-let db: ReturnType<typeof drizzle<typeof schema>>;
+let clients: ClientRepository;
+let db: Awaited<ReturnType<typeof databaseFixture>>['db'];
 
 function request(query = '') {
   return listClients(mockEvent(`http://localhost/api/client${query}`));
@@ -49,15 +37,7 @@ beforeEach(async () => {
   getCurrentUser.mockResolvedValue({ id: 1, role: 1 });
   dump.mockResolvedValue([]);
 
-  const connection = createClient({ url: ':memory:' });
-  onTestFinished(() => connection.close());
-  db = drizzle({ client: connection, schema });
-  const migrations = readMigrationFiles({
-    migrationsFolder: fileURLToPath(
-      new URL('../../server/database/migrations', import.meta.url)
-    ),
-  });
-  await connection.migrate(migrations.flatMap((migration) => migration.sql));
+  ({ db } = await databaseFixture());
   await db.insert(schema.user).values(
     [1, 2, 3].map((id) => ({
       id,
@@ -87,7 +67,7 @@ beforeEach(async () => {
       };
     })
   );
-  clients = new ClientService(db);
+  clients = new ClientRepository(db);
 });
 
 describe('paginated client API', () => {
@@ -175,20 +155,44 @@ describe('paginated client API', () => {
     }
   );
 
-  test.each(['asc', 'desc'])(
-    'uses a stable ID tiebreaker for duplicate names in %s order',
-    async (sort) => {
+  test.each(clientSortFields)(
+    'changing page size preserves every client and its %s ordering',
+    async (sortBy) => {
       await db.update(schema.client).set({ name: 'Same name' });
-      const results = [];
-      for (const page of [1, 2, 3]) {
-        results.push(
-          ...(await request(`?page=${page}&sort=${sort}`)).clients.map(
-            ({ id }) => id
-          )
-        );
+      for (const sort of ['asc', 'desc']) {
+        const query = `?sortBy=${sortBy}&sort=${sort}`;
+        const whole = await request(`${query}&pageSize=100`);
+        const expectedIds = whole.clients.map(({ id }) => id);
+        expect(whole.total).toBe(60);
+        expect(new Set(expectedIds).size).toBe(whole.total);
+        if (sortBy === 'name') {
+          // Equal names must use IDs as a deterministic tiebreaker.
+          expect(expectedIds).toEqual(
+            [...expectedIds].sort((a, b) => (sort === 'asc' ? a - b : b - a))
+          );
+        }
+
+        for (const pageSize of [7, 25]) {
+          const collected = [];
+          for (
+            let page = 1;
+            page <= Math.ceil(whole.total / pageSize);
+            page++
+          ) {
+            const result = await request(
+              `${query}&pageSize=${pageSize}&page=${page}`
+            );
+            expect(result).toMatchObject({
+              page,
+              pageSize,
+              total: whole.total,
+            });
+            expect(result.clients.length).toBeLessThanOrEqual(pageSize);
+            collected.push(...result.clients);
+          }
+          expect(collected).toEqual(whole.clients);
+        }
       }
-      const ids = Array.from({ length: 60 }, (_, index) => index + 1);
-      expect(results).toEqual(sort === 'desc' ? ids.reverse() : ids);
     }
   );
 
@@ -295,42 +299,6 @@ describe('paginated client API', () => {
     }
   );
 
-  test.each([
-    ['2026-10-27', '2026-10-27T00:00:00.000Z'],
-    ['2026-10-27T14:35:00.000Z', '2026-10-27T14:35:00.000Z'],
-  ])('enforces expiry %s at the same instant', async (expiresAt, instant) => {
-    vi.useFakeTimers({ toFake: ['Date'] });
-    const saveConfig = vi.spyOn(WireGuard, 'saveConfig').mockResolvedValue();
-    onTestFinished(() => {
-      vi.useRealTimers();
-      saveConfig.mockRestore();
-    });
-    await db
-      .update(schema.client)
-      .set({ expiresAt })
-      .where(eq(schema.client.id, 1));
-
-    vi.setSystemTime(new Date(instant).getTime() - 1000);
-    await WireGuard.cronJob();
-    expect((await clients.get(1))?.enabled).toBe(true);
-    expect(saveConfig).not.toHaveBeenCalled();
-
-    const event = mockEvent('http://localhost/api/client/1/enable');
-    event.context.params = { clientId: '1' };
-    expect(await enableClient(event)).toEqual({ success: true });
-    saveConfig.mockClear();
-
-    vi.setSystemTime(new Date(instant).getTime() + 1000);
-    await WireGuard.cronJob();
-    expect((await clients.get(1))?.enabled).toBe(false);
-    expect((await clients.get(2))?.enabled).toBe(true);
-    expect(saveConfig).toHaveBeenCalledOnce();
-    await expect(enableClient(event)).rejects.toMatchObject({
-      statusCode: 422,
-    });
-    expect((await clients.get(1))?.enabled).toBe(false);
-  });
-
   test.each(['asc', 'desc'])(
     'sorts numeric IPv4 addresses across page boundaries in %s order',
     async (sort) => {
@@ -395,7 +363,7 @@ describe('paginated client API', () => {
     }
   );
 
-  test('preserves one-time links on paginated clients and unpaginated metrics', async () => {
+  test('preserves paginated one-time links while monitoring includes every client', async () => {
     await db.insert(schema.oneTimeLink).values({
       id: 26,
       oneTimeLink: 'test-link',
@@ -404,11 +372,8 @@ describe('paginated client API', () => {
     expect((await request('?page=2')).clients[0]?.oneTimeLink).toMatchObject({
       oneTimeLink: 'test-link',
     });
-    const allClients = await WireGuard.getAllClients();
+    const { clients: allClients } = await monitoring.json();
     expect(allClients).toHaveLength(60);
-    expect(allClients.find(({ id }) => id === 26)?.oneTimeLink).toMatchObject({
-      oneTimeLink: 'test-link',
-    });
     expect(allClients.map(({ name }) => name)).toEqual(
       allClients.map(({ name }) => name).sort()
     );

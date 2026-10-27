@@ -1,14 +1,10 @@
-import { createError } from 'h3';
-
-import type { ClientType } from '#db/repositories/client/types';
-import type { UserType } from '#db/repositories/user/types';
-
-type BrandedRole = {
-  readonly __role: unique symbol;
-};
-
-export type Role = number & BrandedRole;
-
+import type {
+  Actor,
+  Role,
+  PublicUser,
+  BrandedRole,
+} from '#shared/contracts/identity';
+export type { Role } from '#shared/contracts/identity';
 export const roles = {
   ADMIN: 1 as Role,
   CLIENT: 2 as Role,
@@ -20,7 +16,7 @@ type Roles = keyof typeof roles;
  * convert role to key
  * @example roleToKey(roles.ADMIN) => 'ADMIN'
  */
-function roleToKey(role: Role) {
+export function roleToKey(role: Role) {
   const roleKey = Object.keys(roles).find(
     (key) => roles[key as Roles] === role
   );
@@ -43,20 +39,17 @@ type BrandedNumber = {
   toLocaleString: unknown;
 } & BrandedRole;
 
-type SharedUserType =
-  | Pick<UserType, 'id' | 'role'>
-  | (Pick<UserType, 'id'> & { role: BrandedNumber });
+type SharedUserType = Actor | (Pick<Actor, 'id'> & { role: BrandedNumber });
 
-export type SharedPublicUser = Pick<
-  UserType,
-  'id' | 'username' | 'name' | 'email' | 'totpVerified' | 'oauthProvider'
-> & { role: BrandedNumber; hasPassword: boolean };
+export type SharedPublicUser = Omit<PublicUser, 'role'> & {
+  role: BrandedNumber;
+};
 
 type PermissionCheck<Key extends keyof Permissions> =
   | boolean
   | ((user: SharedUserType, data: Permissions[Key]['dataType']) => boolean);
 
-type RolesWithPermissions = {
+export type RolesWithPermissions = {
   [R in Roles]: {
     [Key in keyof Permissions]: {
       [Action in Permissions[Key]['action']]: PermissionCheck<Key>;
@@ -66,7 +59,7 @@ type RolesWithPermissions = {
 
 export type Permissions = {
   clients: {
-    dataType: Pick<ClientType, 'id' | 'userId'>;
+    dataType: { id: number; userId: number };
     action: 'view' | 'create' | 'update' | 'delete' | 'custom';
   };
   admin: {
@@ -74,7 +67,7 @@ export type Permissions = {
     action: 'any';
   };
   me: {
-    dataType: UserType;
+    dataType: { id: number };
     action: 'update';
   };
 };
@@ -132,37 +125,4 @@ export function hasPermissions<Resource extends keyof Permissions>(
   }
 
   return permission(user, data);
-}
-
-export function hasPermissionsWithData<Resource extends keyof Permissions>(
-  user: UserType,
-  resource: Resource,
-  action: Permissions[Resource]['action']
-) {
-  let checked = false;
-  return {
-    check(data?: Permissions[Resource]['dataType']) {
-      checked = true;
-      const isAllowed = hasPermissions(user, resource, action, data);
-
-      if (!isAllowed) {
-        throw createError({
-          statusCode: 403,
-          statusMessage: 'Permission denied',
-        });
-      }
-
-      return isAllowed;
-    },
-    isBoolean() {
-      return (
-        typeof (ROLES as RolesWithPermissions)[roleToKey(user.role)][resource][
-          action
-        ] === 'boolean'
-      );
-    },
-    get checked() {
-      return checked;
-    },
-  };
 }

@@ -1,23 +1,16 @@
 import { getValidatedRouterParams } from 'h3';
 
-import Database from '#server/utils/Database';
-import { definePermissionEventHandler } from '#server/utils/handler';
-import { validateZod } from '#server/utils/types';
-import { ClientGetSchema } from '#db/repositories/client/types';
+import * as provisioning from '#server/features/vpn/provisioning';
+import { defineAuthenticatedEventHandler } from '#server/utils/handler';
+import { validateZod } from '#server/http/validation';
+import { ClientGetSchema } from '#shared/contracts/client';
 
-export default definePermissionEventHandler(
-  'clients',
-  'update',
-  async ({ event, checkPermissions }) => {
-    const { clientId } = await getValidatedRouterParams(
-      event,
-      validateZod(ClientGetSchema, event)
-    );
+export default defineAuthenticatedEventHandler(async ({ event, user }) => {
+  const { clientId } = await getValidatedRouterParams(
+    event,
+    validateZod(ClientGetSchema, event)
+  );
 
-    const client = await Database.clients.get(clientId);
-    checkPermissions(client);
-
-    await Database.oneTimeLinks.generate(clientId);
-    return { success: true };
-  }
-);
+  await provisioning.generateOneTimeLink(user, clientId);
+  return { success: true };
+});

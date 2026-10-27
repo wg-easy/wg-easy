@@ -1,8 +1,10 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
+import { databaseFixture } from '../helpers/database';
+
 import { exec } from '#server/utils/cmd';
 import { firewall } from '#server/utils/firewall';
-import { typesTestExports } from '#server/utils/types';
+import { typesTestExports } from '#shared/contracts/validation';
 
 vi.mock('#server/utils/cmd', () => ({ exec: vi.fn().mockResolvedValue('') }));
 
@@ -18,10 +20,84 @@ const client = {
 };
 
 beforeEach(() => {
-  execMock.mockClear();
+  execMock.mockReset().mockResolvedValue('');
 });
 
 describe('firewall chains', () => {
+  test.each(['new', 'existing'])(
+    '%s filtering stays protected throughout a failed rebuild and its retry',
+    async (state) => {
+      const { store } = await databaseFixture();
+      const network = {
+        ...(await store.interfaces.get()),
+        firewallEnabled: true,
+      };
+      const defaults = await store.userConfigs.get();
+      const guard = '-i wg0 -m comment --comment "wg-easy rebuild wg0" -j DROP';
+      const jump = '-i wg0 -j WG_CLIENTS_wg0';
+      const rules = new Map<string, string[]>();
+      for (const family of ['iptables', 'ip6tables']) {
+        for (const parent of ['INPUT', 'FORWARD'])
+          rules.set(`${family}:${parent}`, state === 'existing' ? [jump] : []);
+      }
+      const complete = new Set<string>();
+      const expectProtected = () => {
+        for (const [key, entries] of rules) {
+          const family = key.split(':')[0]!;
+          expect(
+            entries[0] === guard ||
+              (entries[0] === jump && complete.has(family))
+          ).toBe(true);
+        }
+      };
+      let fail = true;
+      execMock.mockImplementation(async (command) => {
+        const [family, action, chain] = command.split(' ');
+        const entries = rules.get(`${family}:${chain}`);
+        if (action === '-S' && entries)
+          return [
+            `-P ${chain} ACCEPT`,
+            ...entries.map((rule) => `-A ${chain} ${rule}`),
+          ].join('\n');
+        const insertion = command.match(/-I \w+ (\d+) (.+)$/);
+        if (entries && insertion) {
+          const [, position, rule] = insertion;
+          if (action === '-I' || !entries.includes(rule!))
+            entries.splice(Number(position) - 1, 0, rule!);
+          if (action === '-C') expectProtected();
+        }
+        if (action === '-D' && entries) {
+          expect(complete.size).toBe(2);
+          const rule = command.split(' ').slice(3).join(' ');
+          const index = entries.indexOf(rule);
+          expect(index).toBeGreaterThanOrEqual(0);
+          entries.splice(index, 1);
+          expectProtected();
+        }
+        if (
+          chain === 'WG_CLIENTS_wg0' &&
+          (action === '-F' || action === '-A')
+        ) {
+          if (action === '-F') complete.delete(family!);
+          expectProtected();
+          if (command.endsWith('-j DROP')) {
+            if (fail && family === 'ip6tables')
+              throw new Error('Firewall unavailable');
+            complete.add(family!);
+          }
+        }
+        return '';
+      });
+      await expect(
+        firewall.rebuildRules(network, [client], defaults, true)
+      ).rejects.toThrow('Firewall unavailable');
+      for (const entries of rules.values()) expect(entries[0]).toBe(guard);
+      fail = false;
+      await firewall.rebuildRules(network, [client], defaults, true);
+      for (const entries of rules.values()) expect(entries).toEqual([jump]);
+    }
+  );
+
   test('scopes chain creation and removal to the requested interface', async () => {
     await firewall.initChain('wg1', false);
     await firewall.flushChain('wg1', false);
@@ -42,12 +118,98 @@ describe('firewall chains', () => {
     expect(execMock).not.toHaveBeenCalledWith(
       expect.stringContaining('ip6tables')
     );
+    expect(execMock).toHaveBeenCalledWith(
+      expect.stringContaining('iptables -C INPUT -i wg1 -j WG_CLIENTS_wg1')
+    );
+    expect(execMock).toHaveBeenCalledWith(
+      expect.stringContaining('iptables -D INPUT -i wg1 -j WG_CLIENTS_wg1')
+    );
+  });
+
+  test('removes failed-rebuild guards and INPUT filtering when disabled', async () => {
+    const { store } = await databaseFixture();
+    await firewall.rebuildRules(
+      { ...(await store.interfaces.get()), firewallEnabled: false },
+      [],
+      await store.userConfigs.get(),
+      true
+    );
+    for (const family of ['iptables', 'ip6tables']) {
+      for (const parent of ['INPUT', 'FORWARD']) {
+        expect(execMock).toHaveBeenCalledWith(
+          expect.stringContaining(
+            `${family} -D ${parent} -i wg0 -j WG_CLIENTS_wg0`
+          )
+        );
+        expect(execMock).toHaveBeenCalledWith(
+          expect.stringContaining(
+            `${family} -D ${parent} -i wg0 -m comment --comment "wg-easy rebuild wg0" -j DROP`
+          )
+        );
+      }
+    }
+  });
+
+  test('waits for each concurrent rebuild and applies its own snapshot', async () => {
+    const { store } = await databaseFixture();
+    const network = {
+      ...(await store.interfaces.get()),
+      firewallEnabled: true,
+    };
+    const defaults = await store.userConfigs.get();
+    const gate = Promise.withResolvers<string>();
+    const entered = Promise.withResolvers<undefined>();
+    execMock.mockImplementationOnce(() => {
+      entered.resolve(undefined);
+      return gate.promise;
+    });
+    const first = firewall.rebuildRules(
+      network,
+      [{ ...client, firewallIps: ['192.0.2.1'] }],
+      defaults,
+      false
+    );
+    await entered.promise;
+    let complete = false;
+    const second = firewall
+      .rebuildRules(
+        network,
+        [{ ...client, firewallIps: ['192.0.2.2'] }],
+        defaults,
+        false
+      )
+      .then(() => {
+        complete = true;
+      });
+    expect(complete).toBe(false);
+    gate.resolve('');
+    await Promise.all([first, second]);
+    const destinations = execMock.mock.calls
+      .filter(([command]) => command.includes(' -d '))
+      .map(([command]) => command);
+    expect(destinations).toHaveLength(2);
+    expect(destinations[0]).toContain(' -d 192.0.2.1 ');
+    expect(destinations[1]).toContain(' -d 192.0.2.2 ');
   });
 });
 
 describe('firewall entries', () => {
   test.each([
     ['10.0.0.1', 'iptables', '10.8.0.2', '10.0.0.1', ['']],
+    [
+      '10.0.0.1:443/TCP',
+      'iptables',
+      '10.8.0.2',
+      '10.0.0.1',
+      [' -p tcp --dport 443'],
+    ],
+    [
+      '[2001:db8::1]:53/UDP',
+      'ip6tables',
+      'fd00::2',
+      '2001:db8::1',
+      [' -p udp --dport 53'],
+    ],
     [
       '10.0.0.0/24:443/tcp',
       'iptables',
@@ -117,6 +279,7 @@ describe('firewall entries', () => {
     '1.1.1.1/33',
     '1.1.1.1/tcp',
     '[2001:db8::1]/udp',
+    '2001:db8::1:443/tcp',
   ])('rejects invalid destinations, ports, and protocols: %s', (entry) => {
     expect(
       typesTestExports.FirewallIpEntrySchema.safeParse(entry).success

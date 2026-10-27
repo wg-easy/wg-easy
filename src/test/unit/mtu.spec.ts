@@ -1,21 +1,16 @@
-import { fileURLToPath } from 'node:url';
+import { describe, expect, test } from 'vitest';
 
-import { createClient } from '@libsql/client';
-import { drizzle } from 'drizzle-orm/libsql';
-import { readMigrationFiles } from 'drizzle-orm/migrator';
-import { describe, expect, onTestFinished, test, vi } from 'vitest';
+import { databaseFixture } from '../helpers/database';
 
+import {
+  generateClientConfig,
+  generateServerConfig,
+} from '#server/features/vpn/configuration';
 import * as schema from '#db/schema';
-import { ClientUpdateSchema } from '#db/repositories/client/types';
-import { InterfaceUpdateSchema } from '#db/repositories/interface/types';
-import { UserConfigUpdateSchema } from '#db/repositories/userConfig/types';
-import { MtuSchema } from '#server/utils/types';
-
-const { config } = vi.hoisted(() => ({
-  config: { WG_EXECUTABLE: 'wg', PORT: '51821' },
-}));
-
-vi.mock('#server/utils/config', () => ({ WG_ENV: config }));
+import { ClientUpdateSchema } from '#shared/contracts/client';
+import { InterfaceUpdateSchema } from '#shared/contracts/interface';
+import { UserConfigUpdateSchema } from '#shared/contracts/userConfig';
+import { MtuSchema } from '#shared/contracts/validation';
 
 describe('MTU validation', () => {
   test('accepts automatic MTU or a value from 1024 to 9000', () => {
@@ -32,19 +27,8 @@ describe('MTU validation', () => {
 test.each(['wg', 'awg'])(
   '%s emits explicit MTUs and omits automatic MTUs',
   async (executable) => {
-    config.WG_EXECUTABLE = executable;
-    vi.resetModules();
-    const { wg } = await import('#server/utils/wgHelper');
-    const connection = createClient({ url: ':memory:' });
-    onTestFinished(() => connection.close());
-    const db = drizzle({ client: connection, schema });
-    const migrations = readMigrationFiles({
-      migrationsFolder: fileURLToPath(
-        new URL('../../server/database/migrations', import.meta.url)
-      ),
-    });
-
-    await connection.migrate(migrations.flatMap((m) => m.sql));
+    const options = { amnezia: executable === 'awg' };
+    const { db } = await databaseFixture();
     await db.insert(schema.user).values({
       id: 1,
       username: 'admin',
@@ -80,12 +64,12 @@ test.each(['wg', 'awg'])(
     const userConfig = (await db.select().from(schema.userConfig))[0]!;
     const hooks = (await db.select().from(schema.hooks))[0]!;
 
-    expect(wg.generateServerInterface(wgInterface, hooks)).toContain(
-      '\nMTU = 1420\n'
-    );
-    expect(wg.generateClientConfig(wgInterface, userConfig, client)).toContain(
-      '\nMTU = 1280\n'
-    );
+    expect(
+      generateServerConfig(wgInterface, hooks, [client], options)
+    ).toContain('\nMTU = 1420\n');
+    expect(
+      generateClientConfig(wgInterface, userConfig, client, options)
+    ).toContain('\nMTU = 1280\n');
 
     await db
       .update(schema.wgInterface)
@@ -107,12 +91,18 @@ test.each(['wg', 'awg'])(
     expect(clearedClient.mtu).toBeNull();
     expect(clearedDefaults.defaultMtu).toBeNull();
 
-    const serverConfig = wg.generateServerInterface(clearedInterface, hooks);
+    const serverConfig = generateServerConfig(
+      clearedInterface,
+      hooks,
+      [clearedClient],
+      options
+    );
     // A cleared client MTU must not fall back to a nonempty default.
-    const clientConfig = wg.generateClientConfig(
+    const clientConfig = generateClientConfig(
       clearedInterface,
       userConfig,
-      clearedClient
+      clearedClient,
+      options
     );
     expect(serverConfig).not.toMatch(/^MTU\s*=/m);
     expect(clientConfig).not.toMatch(/^MTU\s*=/m);

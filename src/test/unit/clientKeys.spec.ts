@@ -1,60 +1,43 @@
 import fs from 'node:fs/promises';
-import { fileURLToPath } from 'node:url';
 
-import { createClient } from '@libsql/client';
 import { eq } from 'drizzle-orm';
-import { drizzle } from 'drizzle-orm/libsql';
-import { readMigrationFiles } from 'drizzle-orm/migrator';
 import { mockEvent } from 'h3';
-import { beforeEach, describe, expect, onTestFinished, test, vi } from 'vitest';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
 
+import { databaseFixture } from '../helpers/database';
+
+import * as clientOperations from '#server/features/vpn/clients';
+import { UserConfigRepository } from '#db/repositories/userConfig/repository';
+import { roles } from '#shared/utils/permissions';
+import { importConfiguration } from '#server/features/setup';
 import * as schema from '#db/schema';
-import { HooksService } from '#db/repositories/hooks/service';
-import { InterfaceService } from '#db/repositories/interface/service';
-import WireGuard from '#server/utils/WireGuard';
-import { ClientService } from '#db/repositories/client/service';
-import { ClientUpdateSchema } from '#db/repositories/client/types';
-import { UserConfigService } from '#db/repositories/userConfig/service';
-import { UserConfigUpdateSchema } from '#db/repositories/userConfig/types';
+import { ClientRepository } from '#db/repositories/client/repository';
+import { ClientUpdateSchema } from '#shared/contracts/client';
+import { UserConfigUpdateSchema } from '#shared/contracts/userConfig';
 import removePreSharedKey from '#server/api/client/[clientId]/preSharedKey.delete';
 import rotatePreSharedKey from '#server/api/client/[clientId]/preSharedKey.post';
 import rotateKeyPair from '#server/api/client/[clientId]/rotateKeyPair.post';
-import { wg } from '#server/utils/wgHelper';
+import {
+  generateClientConfig,
+  generateServerConfig,
+} from '#server/features/vpn/configuration';
 
 const { getCurrentUser, exec } = vi.hoisted(() => ({
   getCurrentUser: vi.fn(),
   exec: vi.fn(),
 }));
 
-vi.mock('#server/utils/session', () => ({ getCurrentUser }));
+vi.mock('#server/features/identity/session', () => ({ getCurrentUser }));
 vi.mock('#server/utils/cmd', () => ({ exec }));
 vi.mock('#server/utils/config', () => ({
   OLD_ENV: {},
   WG_ENV: { WG_EXECUTABLE: 'wg', WG_INTERFACE: 'wg0', PORT: '51821' },
 }));
-vi.mock('#server/utils/Database', () => ({
-  default: {
-    get clients() {
-      return clients;
-    },
-    get interfaces() {
-      return new InterfaceService(db);
-    },
-    get hooks() {
-      return new HooksService(db);
-    },
-    get userConfigs() {
-      return new UserConfigService(db);
-    },
-  },
-}));
-
-const synchronize = WireGuard.saveConfig.bind(WireGuard);
-const saveConfig = vi.spyOn(WireGuard, 'saveConfig');
 const writeFile = vi.spyOn(fs, 'writeFile');
 
-let clients: ClientService;
-let db: ReturnType<typeof drizzle<typeof schema>>;
+let clients: ClientRepository;
+let store: Awaited<ReturnType<typeof databaseFixture>>['store'];
+let db: Awaited<ReturnType<typeof databaseFixture>>['db'];
 
 function event(clientId = '1') {
   const event = mockEvent(`http://localhost/api/client/${clientId}`);
@@ -64,27 +47,23 @@ function event(clientId = '1') {
 
 beforeEach(async () => {
   vi.resetAllMocks();
-  saveConfig.mockImplementation(synchronize);
   writeFile.mockResolvedValue();
   getCurrentUser.mockResolvedValue({ id: 1, role: 1 });
   exec.mockImplementation(async (command: string) => {
     if (command === 'wg genpsk') return 'new-preshared-key';
     if (command === 'wg genkey') return 'new-private-key';
     if (command === 'echo new-private-key | wg pubkey') return 'new-public-key';
-    if (command.includes(' syncconf ') || /^(ip6?tables) /.test(command))
+    if (command === 'wg-quick down wg0; wg-quick up wg0') return '';
+    if (command === 'wg show wg0 dump') return '';
+    if (
+      command.includes(' syncconf ') ||
+      /^(?:while )?ip6?tables /.test(command)
+    )
       return '';
     throw new Error(`Unexpected command: ${command}`);
   });
 
-  const connection = createClient({ url: ':memory:' });
-  onTestFinished(() => connection.close());
-  db = drizzle({ client: connection, schema });
-  const migrations = readMigrationFiles({
-    migrationsFolder: fileURLToPath(
-      new URL('../../server/database/migrations', import.meta.url)
-    ),
-  });
-  await connection.migrate(migrations.flatMap((migration) => migration.sql));
+  ({ db, store } = await databaseFixture());
   await db.insert(schema.user).values({
     id: 1,
     username: 'admin',
@@ -110,7 +89,7 @@ beforeEach(async () => {
       enabled: true,
     }))
   );
-  clients = new ClientService(db);
+  clients = new ClientRepository(db);
 });
 
 async function configurations(clientId = 1) {
@@ -118,8 +97,10 @@ async function configurations(clientId = 1) {
   const wgInterface = (await db.select().from(schema.wgInterface))[0]!;
   const userConfig = (await db.select().from(schema.userConfig))[0]!;
   return {
-    server: wg.generateServerPeer(client),
-    client: wg.generateClientConfig(wgInterface, userConfig, client),
+    server: generateServerConfig(wgInterface, await store.hooks.get(), [
+      client,
+    ]),
+    client: generateClientConfig(wgInterface, userConfig, client),
   };
 }
 
@@ -127,7 +108,7 @@ describe('client key actions', () => {
   test.each([true, false])(
     'creates clients with preshared-key generation set to %s',
     async (defaultGeneratePreSharedKey) => {
-      const userConfigs = new UserConfigService(db);
+      const userConfigs = new UserConfigRepository(db, 'wg0');
       const defaults = await userConfigs.get();
       expect(defaults.defaultGeneratePreSharedKey).toBe(true);
       const existing = await clients.getAll();
@@ -142,11 +123,13 @@ describe('client key actions', () => {
       );
       expect(await clients.getAll()).toEqual(existing);
 
-      const created = await clients.create({
-        name: 'New client',
-        expiresAt: null,
-      });
-      const clientId = created[0]!.clientId;
+      const clientId = await clientOperations.create(
+        { id: 1, role: roles.ADMIN },
+        {
+          name: 'New client',
+          expiresAt: null,
+        }
+      );
       expect(await clients.get(clientId)).toMatchObject({
         privateKey: 'new-private-key',
         publicKey: 'new-public-key',
@@ -161,15 +144,28 @@ describe('client key actions', () => {
   test.each(['', null])(
     'normalizes an imported absent key (%s) to null',
     async (preSharedKey) => {
-      await clients.createFromExisting({
-        name: 'Imported client',
-        enabled: true,
-        ipv4Address: '10.8.0.4',
-        ipv6Address: 'fdcc:ad94:bacf:61a4::cafe:4',
-        privateKey: 'imported-private-key',
-        publicKey: 'imported-public-key',
-        preSharedKey,
-      });
+      await store.general.update({ setupStep: 3 });
+      await importConfiguration(
+        JSON.stringify({
+          server: {
+            privateKey: 'server-private',
+            publicKey: 'server-public',
+            address: '10.8.0.1',
+          },
+          clients: {
+            imported: {
+              name: 'Imported client',
+              enabled: true,
+              address: '10.8.0.4',
+              privateKey: 'imported-private-key',
+              publicKey: 'imported-public-key',
+              preSharedKey,
+              createdAt: '2026-01-01',
+              updatedAt: '2026-01-01',
+            },
+          },
+        })
+      );
       expect(await clients.get(3)).toMatchObject({ preSharedKey: null });
       expect(await clients.getPublic(3)).toMatchObject({
         hasPreSharedKey: false,
@@ -195,7 +191,7 @@ describe('client key actions', () => {
     expect(await clients.getPublic(1)).toMatchObject({
       hasPreSharedKey: false,
     });
-    expect(saveConfig).toHaveBeenCalledOnce();
+    expect(writeFile).toHaveBeenCalledOnce();
 
     const updated = await configurations();
     expect(updated.client).not.toMatch(/^PresharedKey\s*=/m);
@@ -219,7 +215,7 @@ describe('client key actions', () => {
       updatedAt: expect.any(String),
     });
     expect(await clients.get(2)).toEqual(other);
-    expect(saveConfig).toHaveBeenCalledOnce();
+    expect(writeFile).toHaveBeenCalledOnce();
     expect(String(writeFile.mock.calls[0]?.[1])).toContain(
       'PublicKey = new-public-key'
     );
@@ -257,7 +253,7 @@ describe('client key actions', () => {
         updatedAt: expect.any(String),
       });
       expect(await clients.get(2)).toEqual(other);
-      expect(saveConfig).toHaveBeenCalledOnce();
+      expect(writeFile).toHaveBeenCalledOnce();
 
       const publicClient = await clients.getPublic(1);
       expect(publicClient).toMatchObject({ hasPreSharedKey: true });
@@ -276,14 +272,14 @@ describe('client key actions', () => {
       'Key generation failed'
     );
     expect(await clients.get(1)).toEqual(before);
-    expect(saveConfig).not.toHaveBeenCalled();
+    expect(writeFile).not.toHaveBeenCalled();
 
     exec.mockResolvedValueOnce('');
     await expect(rotatePreSharedKey(event())).rejects.toThrow(
       'Failed to generate preshared key'
     );
     expect(await clients.get(1)).toEqual(before);
-    expect(saveConfig).not.toHaveBeenCalled();
+    expect(writeFile).not.toHaveBeenCalled();
   });
 
   test.each(['wg genkey', 'echo new-private-key | wg pubkey'])(
@@ -298,7 +294,7 @@ describe('client key actions', () => {
         'Key generation failed'
       );
       expect(await clients.get(1)).toEqual(before);
-      expect(saveConfig).not.toHaveBeenCalled();
+      expect(writeFile).not.toHaveBeenCalled();
     }
   );
 
@@ -326,7 +322,7 @@ describe('client key actions', () => {
     test('allows the client owner', async () => {
       getCurrentUser.mockResolvedValue({ id: 1, role: 2 });
       expect(await action(event())).toEqual({ success: true });
-      expect(saveConfig).toHaveBeenCalledOnce();
+      expect(writeFile).toHaveBeenCalledOnce();
     });
 
     test('rejects a different owner without modifying keys', async () => {
@@ -335,7 +331,7 @@ describe('client key actions', () => {
       await expect(action(event())).rejects.toMatchObject({ statusCode: 403 });
       expect(await clients.get(1)).toEqual(before);
       expect(exec).not.toHaveBeenCalled();
-      expect(saveConfig).not.toHaveBeenCalled();
+      expect(writeFile).not.toHaveBeenCalled();
     });
 
     test('reports a missing client without generating keys or syncing', async () => {
@@ -343,7 +339,7 @@ describe('client key actions', () => {
         statusCode: 404,
       });
       expect(exec).not.toHaveBeenCalled();
-      expect(saveConfig).not.toHaveBeenCalled();
+      expect(writeFile).not.toHaveBeenCalled();
     });
   });
 });

@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import { AllowedIpsSchema } from '#server/utils/types';
+import { AllowedIpsSchema } from '#shared/contracts/validation';
 
 describe('AllowedIpsSchema', () => {
   test('accepts plain IPs and CIDRs', () => {

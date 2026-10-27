@@ -1,8 +1,7 @@
 import { defineEventHandler } from 'h3';
 
-import { WG_ENV } from '#server/utils/config';
-import { OAUTH_PROVIDERS } from '#server/utils/oauth';
-import type { OAUTH_PROVIDER } from '#server/utils/oauth';
+import { WG_ENV, OAUTH_PROVIDERS } from '#server/utils/config';
+import type { OAuthProvider } from '#shared/contracts/identity';
 
 export default defineEventHandler(() => {
   return {
@@ -14,7 +13,7 @@ export default defineEventHandler(() => {
         };
         return acc;
       },
-      {} as Record<OAUTH_PROVIDER, { enabled: true; friendlyName: string }>
+      {} as Record<OAuthProvider, { enabled: true; friendlyName: string }>
     ),
     oauthEnabled:
       WG_ENV.OAUTH_PROVIDERS !== undefined && WG_ENV.OAUTH_PROVIDERS.length > 0,

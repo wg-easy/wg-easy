@@ -1,43 +1,16 @@
-import { createError, readValidatedBody } from 'h3';
+import { readValidatedBody } from 'h3';
 
-import Database from '#server/utils/Database';
-import WireGuard from '#server/utils/WireGuard';
-import { WG_ENV } from '#server/utils/config';
-import { firewall } from '#server/utils/firewall';
-import { definePermissionEventHandler } from '#server/utils/handler';
-import { validateZod } from '#server/utils/types';
-import { InterfaceUpdateSchema } from '#db/repositories/interface/types';
+import * as vpnSettings from '#server/features/vpn/interface';
+import { defineAuthenticatedEventHandler } from '#server/utils/handler';
+import { validateZod } from '#server/http/validation';
+import { InterfaceUpdateSchema } from '#shared/contracts/interface';
 
-export default definePermissionEventHandler(
-  'admin',
-  'any',
-  async ({ event }) => {
-    const data = await readValidatedBody(
-      event,
-      validateZod(InterfaceUpdateSchema, event)
-    );
+export default defineAuthenticatedEventHandler(async ({ event, user }) => {
+  const data = await readValidatedBody(
+    event,
+    validateZod(InterfaceUpdateSchema, event)
+  );
 
-    // If enabling firewall, check if iptables is available
-    if (data.firewallEnabled) {
-      // Clear cache to force fresh check
-      firewall.clearAvailabilityCache();
-
-      const iptablesAvailable = await firewall.isAvailable(
-        !WG_ENV.DISABLE_IPV6
-      );
-      if (!iptablesAvailable) {
-        const requiredTools = WG_ENV.DISABLE_IPV6
-          ? 'iptables'
-          : 'iptables and ip6tables';
-        throw createError({
-          statusCode: 400,
-          statusMessage: `Per-Client Firewall requires ${requiredTools} to be installed on the host system. Please install ${requiredTools} before enabling this feature.`,
-        });
-      }
-    }
-
-    await Database.interfaces.update(data);
-    await WireGuard.saveConfig();
-    return { success: true };
-  }
-);
+  await vpnSettings.update(user, data);
+  return { success: true };
+});

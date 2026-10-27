@@ -1,20 +1,19 @@
 import { readValidatedBody } from 'h3';
 
-import clientMutations from '#server/utils/clientMutations';
-import { definePermissionEventHandler } from '#server/utils/handler';
-import { validateZod } from '#server/utils/types';
-import { ClientCreateSchema } from '#db/repositories/client/types';
+import * as clients from '#server/features/vpn/clients';
+import { defineAuthenticatedEventHandler } from '#server/utils/handler';
+import { validateZod } from '#server/http/validation';
+import { ClientCreateSchema } from '#shared/contracts/client';
 
-export default definePermissionEventHandler(
-  'clients',
-  'custom',
-  async ({ event, user }) => {
-    const { name, expiresAt } = await readValidatedBody(
-      event,
-      validateZod(ClientCreateSchema, event)
-    );
+export default defineAuthenticatedEventHandler(async ({ event, user }) => {
+  const { name, expiresAt } = await readValidatedBody(
+    event,
+    validateZod(ClientCreateSchema, event)
+  );
 
-    const clientId = await clientMutations.create(user, { name, expiresAt });
-    return { success: true, clientId };
-  }
-);
+  const clientId = await clients.create(user, {
+    name,
+    expiresAt,
+  });
+  return { success: true, clientId };
+});

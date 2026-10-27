@@ -77,7 +77,7 @@ List fields use one entry per row. Use **Add**, the remove button, and the up/do
 - **IPv6**: The IPv6 address of the client.
 - **Endpoint**: The most recently observed address and port from which the client connected. This is read-only.
 
-Client addresses must be within the interface's configured CIDRs. Choose unused addresses to avoid conflicts with the server or other clients.
+Client addresses must be within the interface's configured CIDRs and must not use reserved addresses or an address assigned to another client. IPv6 addresses are normalized when saved, so alternate spellings cannot bypass the duplicate-address check.
 
 ### Allowed IPs
 

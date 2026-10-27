@@ -48,7 +48,7 @@ When AmneziaWG is active, **Config** also provides default obfuscation parameter
 - **Routing Table**: `auto`, `off`, or a routing table number.
 - **AmneziaWG Obfuscation Parameters**: Server-side AmneziaWG settings, shown when AmneziaWG is active.
 
-**Change CIDR** updates the VPN address ranges and reassigns client addresses for any changed range. Distribute updated client configurations afterward. **Restart Interface** brings the interface down and back up, disconnecting all clients. Restart after changes to settings applied by `wg-quick`, such as interface addresses, MTU, routing table, or hooks.
+**Change CIDR** updates the VPN address ranges, preserves client addresses that remain usable, and reassigns addresses that fall outside the new pool or become reserved. Distribute updated configurations to clients whose addresses changed. **Restart Interface** brings the interface down and back up, disconnecting all clients. Restart after changes to settings applied by `wg-quick`, such as interface addresses, MTU, routing table, or hooks.
 
 ### Per-Client Firewall
 
@@ -82,6 +82,8 @@ This feature is currently experimental. While functional, it should be thoroughl
 4. Server enforces these rules automatically
 
 See [Clients → Firewall Allowed IPs](./clients.md#firewall-allowed-ips) for detailed configuration syntax and examples.
+
+Filtering covers forwarded traffic and traffic addressed to the VPN server itself. Traffic may pause briefly while rules are rebuilt. If a rebuild fails, blocking rules remain in place until a successful retry or until filtering is explicitly disabled.
 
 ## Hooks
 

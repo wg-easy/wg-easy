@@ -1,9 +1,9 @@
 import { readValidatedBody } from 'h3';
 
-import Database from '#server/utils/Database';
+import * as setupSteps from '#server/features/setup';
 import { defineSetupEventHandler } from '#server/utils/handler';
-import { validateZod } from '#server/utils/types';
-import { UserConfigSetupSchema } from '#db/repositories/userConfig/types';
+import { validateZod } from '#server/http/validation';
+import { UserConfigSetupSchema } from '#shared/contracts/userConfig';
 
 export default defineSetupEventHandler(4, async ({ event }) => {
   const { host, port } = await readValidatedBody(
@@ -11,8 +11,6 @@ export default defineSetupEventHandler(4, async ({ event }) => {
     validateZod(UserConfigSetupSchema, event)
   );
 
-  await Database.userConfigs.updateHostPort(host, port);
-
-  await Database.general.setSetupStep(0);
+  await setupSteps.configureEndpoint(host, port);
   return { success: true };
 });

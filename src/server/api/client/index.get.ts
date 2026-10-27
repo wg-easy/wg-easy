@@ -1,23 +1,15 @@
 import { getValidatedQuery } from 'h3';
 
-import WireGuard from '#server/utils/WireGuard';
-import { definePermissionEventHandler } from '#server/utils/handler';
-import { validateZod } from '#server/utils/types';
-import { roles } from '#shared/utils/permissions';
-import { ClientQuerySchema } from '#db/repositories/client/types';
+import * as clientQueries from '#server/features/vpn/queries';
+import { defineAuthenticatedEventHandler } from '#server/utils/handler';
+import { validateZod } from '#server/http/validation';
+import { ClientQuerySchema } from '#shared/contracts/client';
 
-export default definePermissionEventHandler(
-  'clients',
-  'custom',
-  async ({ event, user }) => {
-    const query = await getValidatedQuery(
-      event,
-      validateZod(ClientQuerySchema, event)
-    );
+export default defineAuthenticatedEventHandler(async ({ event, user }) => {
+  const query = await getValidatedQuery(
+    event,
+    validateZod(ClientQuerySchema, event)
+  );
 
-    return WireGuard.getClientsPage(
-      query,
-      user.role === roles.ADMIN ? undefined : user.id
-    );
-  }
-);
+  return clientQueries.list(user, query);
+});

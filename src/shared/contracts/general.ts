@@ -1,0 +1,24 @@
+import z from 'zod';
+
+import { safeStringRefine, t } from '#shared/contracts/validation';
+
+const sessionTimeout = z.number({ message: t('zod.general.sessionTimeout') });
+
+const metricsEnabled = z.boolean({ message: t('zod.general.metricsEnabled') });
+
+const metricsPassword = z
+  .string({ message: t('zod.general.metricsPassword') })
+  .min(1, { message: t('zod.general.metricsPassword') })
+  .pipe(safeStringRefine)
+  .nullable();
+
+export const GeneralUpdateSchema = z.object({
+  sessionTimeout: sessionTimeout,
+  metricsPrometheus: metricsEnabled,
+  metricsJson: metricsEnabled,
+  metricsPassword: metricsPassword,
+});
+
+export type GeneralUpdateType = z.infer<typeof GeneralUpdateSchema>;
+
+export type SetupStepType = { step: number; done: boolean };

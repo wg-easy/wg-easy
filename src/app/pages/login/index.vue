@@ -82,8 +82,6 @@ import { LoaderCircleIcon } from '@lucide/vue';
 
 import { $fetch } from '#imports';
 
-const toast = useToast();
-const { t } = useI18n();
 const route = useRoute();
 
 const authenticating = ref(false);
@@ -130,14 +128,6 @@ const _submit = useSubmit(
         } else if (data?.status === 'TOTP_REQUIRED') {
           authenticating.value = false;
           await navigateTo('/login/2fa');
-          return;
-        } else if (data?.status === 'INVALID_TOTP_CODE') {
-          authenticating.value = false;
-          toast.showToast({
-            title: t('general.2fa'),
-            message: t('login.2faWrong'),
-            type: 'error',
-          });
           return;
         }
       }

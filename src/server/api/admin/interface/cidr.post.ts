@@ -1,22 +1,16 @@
 import { readValidatedBody } from 'h3';
 
-import Database from '#server/utils/Database';
-import WireGuard from '#server/utils/WireGuard';
-import { definePermissionEventHandler } from '#server/utils/handler';
-import { validateZod } from '#server/utils/types';
-import { InterfaceCidrUpdateSchema } from '#db/repositories/interface/types';
+import * as vpnSettings from '#server/features/vpn/interface';
+import { defineAuthenticatedEventHandler } from '#server/utils/handler';
+import { validateZod } from '#server/http/validation';
+import { InterfaceCidrUpdateSchema } from '#shared/contracts/interface';
 
-export default definePermissionEventHandler(
-  'admin',
-  'any',
-  async ({ event }) => {
-    const data = await readValidatedBody(
-      event,
-      validateZod(InterfaceCidrUpdateSchema, event)
-    );
+export default defineAuthenticatedEventHandler(async ({ event, user }) => {
+  const data = await readValidatedBody(
+    event,
+    validateZod(InterfaceCidrUpdateSchema, event)
+  );
 
-    await Database.interfaces.updateCidr(data);
-    await WireGuard.saveConfig();
-    return { success: true };
-  }
-);
+  await vpnSettings.updateCidr(user, data);
+  return { success: true };
+});
