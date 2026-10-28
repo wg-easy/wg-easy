@@ -64,8 +64,8 @@ export async function create(actor: Actor, data: ClientCreateType) {
       privateKey,
       publicKey,
       preSharedKey: preSharedKey || null,
-      ipv4Address: nextIP(4, parseCidr(network.ipv4Cidr), clients),
-      ipv6Address: nextIP(6, parseCidr(network.ipv6Cidr), clients),
+      ipv4Address: nextIP(parseCidr(network.ipv4Cidr), clients),
+      ipv6Address: nextIP(parseCidr(network.ipv6Cidr), clients),
       enabled: true,
     });
     return created!.clientId;

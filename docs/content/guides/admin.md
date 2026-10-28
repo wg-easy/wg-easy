@@ -50,6 +50,8 @@ When AmneziaWG is active, **Config** also provides default obfuscation parameter
 
 **Change CIDR** updates the VPN address ranges, preserves client addresses that remain usable, and reassigns addresses that fall outside the new pool or become reserved. Distribute updated configurations to clients whose addresses changed. **Restart Interface** brings the interface down and back up, disconnecting all clients. Restart after changes to settings applied by `wg-quick`, such as interface addresses, MTU, routing table, or hooks.
 
+The address in the CIDR selects the server's gateway address. A network address keeps the first host as the gateway, preserving existing setups: `10.8.0.0/24` uses `10.8.0.1`. To choose another gateway, enter it directly, for example `10.8.0.15/24`. Clients then use available addresses from `10.8.0.1` through `10.8.0.254`, excluding `10.8.0.15`. The same rule applies to IPv6 and unattended setup CIDRs. The network and last address remain reserved for both address families.
+
 ### Per-Client Firewall
 
 Enable server-side firewall filtering to enforce network access restrictions per client.
@@ -94,4 +96,4 @@ Filtering covers forwarded traffic and traffic addressed to the VPN server itsel
 - **PreDown**: Before the interface stops.
 - **PostDown**: After the interface stops.
 
-The default hooks set up forwarding and NAT. Templates can use `{{ipv4Cidr}}`, `{{ipv6Cidr}}`, `{{device}}`, `{{interface}}`, `{{port}}`, and `{{uiPort}}`, which are replaced with the current server settings. Saved hooks run at the corresponding interface lifecycle event. Hooks on an individual client's page instead run on that client device.
+The default hooks set up forwarding and NAT. Templates can use `{{ipv4Cidr}}`, `{{ipv6Cidr}}`, `{{device}}`, `{{interface}}`, `{{port}}`, and `{{uiPort}}`, which are replaced with the current server settings. CIDR placeholders use the network address, so `10.8.0.15/24` becomes `10.8.0.0/24` in hooks. Saved hooks run at the corresponding interface lifecycle event. Hooks on an individual client's page instead run on that client device.

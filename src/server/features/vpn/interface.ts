@@ -43,7 +43,7 @@ export async function changeCidr(
       data.ipv4Cidr !== previous.ipv4Cidr &&
       !isClientAddress(ipv4Address, cidr4)
     ) {
-      ipv4Address = nextIPFromUsedAddresses(4, cidr4, ipv4Addresses);
+      ipv4Address = nextIPFromUsedAddresses(cidr4, ipv4Addresses);
       ipv4Addresses.add(ipv4Address);
       ipv4Addresses.delete(normalizeAddress(client.ipv4Address));
     }
@@ -51,7 +51,7 @@ export async function changeCidr(
       data.ipv6Cidr !== previous.ipv6Cidr &&
       !isClientAddress(ipv6Address, cidr6)
     ) {
-      ipv6Address = nextIPFromUsedAddresses(6, cidr6, ipv6Addresses);
+      ipv6Address = nextIPFromUsedAddresses(cidr6, ipv6Addresses);
       ipv6Addresses.add(ipv6Address);
       ipv6Addresses.delete(normalizeAddress(client.ipv6Address));
     }

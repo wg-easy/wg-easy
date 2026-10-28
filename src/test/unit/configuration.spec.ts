@@ -39,6 +39,24 @@ async function fixture() {
   };
 }
 
+test.each([
+  ['10.8.0.0/24', 'fd00::/64', '10.8.0.1/24, fd00::1/64'],
+  ['10.8.0.15/24', 'fd00::f/64', '10.8.0.15/24, fd00::f/64'],
+])(
+  'renders gateway addresses and network hooks for %s and %s',
+  async (ipv4Cidr, ipv6Cidr, address) => {
+    const { network, hooks } = await fixture();
+    const configured = { ...network, ipv4Cidr, ipv6Cidr };
+    const configuredHooks = {
+      ...hooks,
+      postUp: 'echo {{ipv4Cidr}} {{ipv6Cidr}}',
+    };
+    const server = generateServerConfig(configured, configuredHooks, []);
+    expect(server).toContain(`Address = ${address}\n`);
+    expect(server).toContain('PostUp = echo 10.8.0.0/24 fd00::/64');
+  }
+);
+
 test.each([false, true])(
   'renders complete configurations with Amnezia=%s',
   async (amnezia) => {
@@ -93,6 +111,7 @@ test('assembles only enabled peers and formats IPv4-only hooks and defaults', as
     [client, { ...client, id: 2, publicKey: 'disabled', enabled: false }],
     { enableIpv6: false, uiPort: '8080' }
   );
+  expect(server).toContain('Address = 10.8.0.1/24\n');
   expect(server).toContain('PostUp = echo wg0 51820 8080 {{unknown}}');
   expect(server).toContain('AllowedIPs = 10.8.0.2/32');
   expect(server).not.toContain('fd00::2/128');

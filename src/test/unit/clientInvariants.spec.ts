@@ -6,6 +6,7 @@ import * as clients from '#server/features/vpn/clients';
 import * as settings from '#server/features/vpn/interface';
 import { roles } from '#shared/utils/permissions';
 import { ClientUpdateSchema } from '#shared/contracts/client';
+import { InterfaceCidrUpdateSchema } from '#shared/contracts/interface';
 
 const admin = { id: 1, role: roles.ADMIN };
 
@@ -146,6 +147,79 @@ describe('client access and addresses', () => {
 });
 
 describe('CIDR changes', () => {
+  test('allows the former gateway as a client address but rejects the current gateway', async () => {
+    const { store, writeConfiguration } = await vpnFixture();
+    const before = await store.clients.get(1);
+    await settings.updateCidr(
+      admin,
+      InterfaceCidrUpdateSchema.parse({
+        ipv4Cidr: '10.8.0.15/24',
+        ipv6Cidr: 'fdcc:ad94:bacf:61a4::cafe:f/112',
+      })
+    );
+    expect(await store.clients.get(1)).toMatchObject({
+      ipv4Address: before!.ipv4Address,
+      ipv6Address: before!.ipv6Address,
+    });
+    const id = await clients.create(admin, { name: 'Second', expiresAt: null });
+    const created = (await store.clients.get(id))!;
+    expect(created).toMatchObject({
+      ipv4Address: '10.8.0.1',
+      ipv6Address: 'fdcc:ad94:bacf:61a4::cafe:1',
+    });
+    await clients.update(
+      admin,
+      id,
+      ClientUpdateSchema.parse({ ...created, name: 'Edited' })
+    );
+    const edited = await store.clients.get(id);
+    expect(edited?.name).toBe('Edited');
+    writeConfiguration.mockClear();
+
+    for (const addresses of [
+      { ipv4Address: '10.8.0.15' },
+      { ipv6Address: 'FDCC:AD94:BACF:61A4:0:0:CAFE:F' },
+    ]) {
+      await expect(
+        clients.update(
+          admin,
+          id,
+          ClientUpdateSchema.parse({
+            ...edited,
+            ...addresses,
+          })
+        )
+      ).rejects.toMatchObject({ statusCode: 422 });
+    }
+    expect(await store.clients.get(id)).toEqual(edited);
+    expect(writeConfiguration).not.toHaveBeenCalled();
+  });
+
+  test('moves a client off a new gateway even when the pool is full', async () => {
+    const { store } = await vpnFixture();
+    await settings.updateCidr(admin, {
+      ipv4Cidr: '10.8.0.0/30',
+      ipv6Cidr: 'fdcc:ad94:bacf:61a4::cafe:0/126',
+    });
+    await settings.updateCidr(admin, {
+      ipv4Cidr: '10.8.0.2/30',
+      ipv6Cidr: 'fdcc:ad94:bacf:61a4::cafe:2/126',
+    });
+    expect(await store.clients.get(1)).toMatchObject({
+      ipv4Address: '10.8.0.1',
+      ipv6Address: 'fdcc:ad94:bacf:61a4::cafe:1',
+    });
+
+    await settings.updateCidr(admin, {
+      ipv4Cidr: '10.8.0.0/30',
+      ipv6Cidr: 'fdcc:ad94:bacf:61a4::cafe:0/126',
+    });
+    expect(await store.clients.get(1)).toMatchObject({
+      ipv4Address: '10.8.0.2',
+      ipv6Address: 'fdcc:ad94:bacf:61a4::cafe:2',
+    });
+  });
+
   test('shrinks a fully occupied address pool without needing an extra address', async () => {
     const { store } = await vpnFixture();
     const network = await store.interfaces.get();

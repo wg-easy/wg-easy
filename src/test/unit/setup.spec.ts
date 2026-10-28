@@ -105,15 +105,15 @@ describe('setup', () => {
     expect(await setup.status()).toEqual({ step: 3, done: false });
   });
 
-  test('initializes all supplied defaults atomically and skips completed setup', async () => {
+  test('persists initial defaults without changing explicit gateways and skips completed setup', async () => {
     const { store } = await fixture();
     const config = {
       username: 'admin',
       password: 'a-long-password',
       host: 'vpn.example.com',
       port: 51900,
-      ipv4Cidr: '10.9.0.0/24',
-      ipv6Cidr: 'fd00::/64',
+      ipv4Cidr: '10.9.0.15/24',
+      ipv6Cidr: 'fd00::f/64',
       dns: ['1.1.1.1'],
     };
     await setup.initialize(config);
@@ -127,7 +127,11 @@ describe('setup', () => {
       host: config.host,
       defaultDns: config.dns,
     });
-    await setup.initialize({ ...config, username: 'replacement', port: 51901 });
+    await setup.initialize({
+      ...config,
+      username: 'replacement',
+      port: 51901,
+    });
     expect(await store.users.count()).toBe(1);
     expect((await store.interfaces.get()).port).toBe(51900);
   });
@@ -212,7 +216,7 @@ describe('setup', () => {
   });
 
   test.each([false, true])(
-    'applies imported keys, peers, and addresses (retry=%s)',
+    'preserves imported keys, client addresses, and the gateway (retry=%s)',
     async (failRestart) => {
       const { store, writeConfiguration, restart, sync } = await fixture();
       await setup.createAdministrator('admin', 'a-long-password');
@@ -220,12 +224,12 @@ describe('setup', () => {
         server: {
           privateKey: 'imported-private',
           publicKey: 'imported-public',
-          address: '10.9.0.1',
+          address: '10.9.0.15',
         },
         clients: {
           peer: {
             name: 'Imported',
-            address: '10.9.0.2',
+            address: '10.9.0.1',
             privateKey: 'peer-private',
             publicKey: 'peer-public',
             preSharedKey: null,
@@ -251,12 +255,15 @@ describe('setup', () => {
         'PrivateKey = imported-private'
       );
       expect(writeConfiguration.mock.lastCall?.[1]).toContain(
-        'Address = 10.9.0.1/24'
+        'Address = 10.9.0.15/24'
       );
       expect(writeConfiguration.mock.lastCall?.[1]).toContain(
         'PublicKey = peer-public'
       );
-      expect(await store.clients.getAll()).toHaveLength(1);
+      expect((await store.interfaces.get()).ipv4Cidr).toBe('10.9.0.15/24');
+      expect(await store.clients.getAll()).toMatchObject([
+        { ipv4Address: '10.9.0.1' },
+      ]);
       expect(await setup.status()).toEqual({ step: 0, done: true });
     }
   );

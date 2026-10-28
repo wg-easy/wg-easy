@@ -1,7 +1,7 @@
-import { parseCidr } from 'cidr-tools';
-import { stringifyIp } from 'ip-bigint';
+import { normalizeCidr, parseCidr } from 'cidr-tools';
 
 import { formatEndpoint } from '#server/utils/endpoint';
+import { getGatewayAddress } from '#server/utils/ip';
 import type { ClientType } from '#db/repositories/client/types';
 import type { InterfaceType } from '#db/repositories/interface/types';
 import type { UserConfigType } from '#db/repositories/userConfig/types';
@@ -65,8 +65,8 @@ function generateServerInterface(
 
   const cidr4 = parseCidr(wgInterface.ipv4Cidr);
   const cidr6 = parseCidr(wgInterface.ipv6Cidr);
-  const ipv4Addr = stringifyIp({ number: cidr4.start + 1n, version: 4 });
-  const ipv6Addr = stringifyIp({ number: cidr6.start + 1n, version: 6 });
+  const ipv4Addr = getGatewayAddress(cidr4);
+  const ipv6Addr = getGatewayAddress(cidr6);
 
   const address =
     `${ipv4Addr}/${cidr4.prefix}` +
@@ -179,8 +179,8 @@ function iptablesTemplate(
   uiPort: string
 ) {
   const values: Record<string, string> = {
-    ipv4Cidr: network.ipv4Cidr,
-    ipv6Cidr: network.ipv6Cidr,
+    ipv4Cidr: normalizeCidr(network.ipv4Cidr),
+    ipv6Cidr: normalizeCidr(network.ipv6Cidr),
     device: network.device,
     interface: network.name,
     port: network.port.toString(),

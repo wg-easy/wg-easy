@@ -13,48 +13,56 @@ export function normalizeAddress(address: string) {
   return normalizeIp(address, { hexify: true });
 }
 
+function gatewayNumber(cidr: ParsedCidr) {
+  const { number } = parseIp(cidr.ip);
+  // Network-address CIDRs keep the first host as the gateway for older setups.
+  return number === cidr.start ? cidr.start + 1n : number;
+}
+
+export function getGatewayAddress(cidr: ParsedCidr) {
+  return stringifyIp(
+    { number: gatewayNumber(cidr), version: cidr.version },
+    { hexify: true }
+  );
+}
+
 /** Match the allocation pool: reserve the network, server, and last address. */
 export function isClientAddress(address: string, cidr: ParsedCidr) {
   const { number, version } = parseIp(address);
   return (
-    version === cidr.version && number >= cidr.start + 2n && number < cidr.end
+    version === cidr.version &&
+    number > cidr.start &&
+    number < cidr.end &&
+    number !== gatewayNumber(cidr)
   );
 }
 
-export function nextIP(
-  version: 4 | 6,
-  cidr: ParsedCidr,
-  clients: ClientNextIpType[]
-) {
+export function nextIP(cidr: ParsedCidr, clients: ClientNextIpType[]) {
   const usedAddresses = new Set(
-    clients.map((client) => normalizeAddress(client[`ipv${version}Address`]))
+    clients.map((client) =>
+      normalizeAddress(client[`ipv${cidr.version}Address`])
+    )
   );
 
-  return nextIPFromUsedAddresses(version, cidr, usedAddresses);
+  return nextIPFromUsedAddresses(cidr, usedAddresses);
 }
 
 export function nextIPFromUsedAddresses(
-  version: 4 | 6,
   cidr: ParsedCidr,
   usedAddresses: Set<string>
 ) {
-  let address;
-  for (let i = cidr.start + 2n; i <= cidr.end - 1n; i++) {
+  const { version } = cidr;
+  const gateway = gatewayNumber(cidr);
+  for (let i = cidr.start + 1n; i < cidr.end; i++) {
+    if (i === gateway) continue;
     const currentIp = stringifyIp({ number: i, version }, { hexify: true });
 
-    if (!usedAddresses.has(currentIp)) {
-      address = currentIp;
-      break;
-    }
+    if (!usedAddresses.has(currentIp)) return currentIp;
   }
 
-  if (!address) {
-    throw new Error('Maximum number of clients reached', {
-      cause: `IPv${version} Address Pool exhausted`,
-    });
-  }
-
-  return address;
+  throw new Error('Maximum number of clients reached', {
+    cause: `IPv${version} Address Pool exhausted`,
+  });
 }
 
 // use opendns to get public ip

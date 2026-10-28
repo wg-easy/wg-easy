@@ -1,5 +1,4 @@
 import { parseCidr } from 'cidr-tools';
-import { stringifyIp } from 'ip-bigint';
 import { z } from 'zod';
 
 import type { Repositories } from '#db/store';
@@ -11,7 +10,7 @@ const legacyConfigSchema = z.object({
   server: z.object({
     privateKey: z.string(),
     publicKey: z.string(),
-    // only used for cidr
+    // Used for the gateway and its /24 CIDR.
     address: z.string(),
   }),
   clients: z.record(
@@ -50,9 +49,7 @@ export async function importLegacyConfiguration(
   const ipv6Cidr = parseCidr('fdcc:ad94:bacf:61a4::cafe:0/112');
 
   await changeCidr(tx, {
-    ipv4Cidr:
-      stringifyIp({ number: ipv4Cidr.start, version: 4 }) +
-      `/${ipv4Cidr.prefix}`,
+    ipv4Cidr: ipv4Cidr.cidr,
     ipv6Cidr: ipv6Cidr.cidr,
   });
   const ipv6Addresses = new Set(
@@ -64,7 +61,7 @@ export async function importLegacyConfiguration(
   const defaults = await tx.userConfigs.get();
   const network = await tx.interfaces.get();
   for (const clientConfig of Object.values(oldConfig.clients)) {
-    const ipv6Address = nextIPFromUsedAddresses(6, ipv6Cidr, ipv6Addresses);
+    const ipv6Address = nextIPFromUsedAddresses(ipv6Cidr, ipv6Addresses);
 
     await tx.clients.insert({
       ...clientDefaults(defaults),
