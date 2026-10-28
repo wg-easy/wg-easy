@@ -8,7 +8,10 @@ import { authorize } from '#server/features/authorization';
 import type { Actor } from '#shared/contracts/identity';
 
 export async function information() {
-  const latestRelease = await cachedFetchLatestRelease();
+  const latestRelease = await cachedFetchLatestRelease().catch(() => ({
+    version: RELEASE,
+    changelog: '',
+  }));
   const network = await getDatabase().interfaces.get();
   return {
     currentRelease: RELEASE,
