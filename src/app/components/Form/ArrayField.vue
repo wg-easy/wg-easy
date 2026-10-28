@@ -65,12 +65,27 @@ const items = computed({
     data.value = value;
   },
 });
+let dragNextSibling: ChildNode | null = null;
 
 useSortable(list, items, {
   draggable: '[data-array-item]',
   handle: '[data-drag-handle]:not(:disabled)',
   ghostClass: 'opacity-50',
   animation: 150,
+  onStart({ item }) {
+    dragNextSibling = item.nextSibling;
+  },
+  onUpdate({ from, item, oldIndex, newIndex }) {
+    // Element indices skip Vue's text anchors and can restore a row outside
+    // the v-for fragment. Restore its exact position before updating the model.
+    from.insertBefore(item, dragNextSibling);
+    if (oldIndex !== undefined && newIndex !== undefined) {
+      moveArrayElement(items, oldIndex, newIndex);
+    }
+  },
+  onEnd() {
+    dragNextSibling = null;
+  },
 });
 
 function update(event: Event, index: number) {
