@@ -243,7 +243,14 @@ describe('VPN operations', () => {
     expect(download.contents).toContain('PrivateKey = private');
   });
 
-  test('renews an existing one-time link and preserves its redemption grace period', async () => {
+  test('rejects unknown one-time links', async () => {
+    await vpnFixture();
+    await expect(
+      provisioning.redeemOneTimeLink("' OR 1=1 --")
+    ).rejects.toMatchObject({ status: 404 });
+  });
+
+  test('only explicit reissue renews a one-time link for five minutes', async () => {
     const { store } = await vpnFixture();
     const now = Date.now();
     const clock = vi.spyOn(Date, 'now').mockReturnValue(now);
@@ -251,26 +258,50 @@ describe('VPN operations', () => {
     const [client] = await store.clients.getAll();
     const token = client!.oneTimeLink!.oneTimeLink;
 
-    clock.mockReturnValue(now + 60_000);
+    clock.mockReturnValue(now + 300_000);
+    await expect(provisioning.redeemOneTimeLink(token)).rejects.toMatchObject({
+      status: 410,
+    });
+
     await provisioning.generateOneTimeLink(admin, 1);
-    expect(await store.oneTimeLinks.getByToken(token)).toMatchObject({
-      id: 1,
-      expiresAt: new Date(now + 360_000).toISOString(),
-    });
-    await expect(
-      provisioning.redeemOneTimeLink("' OR 1=1 --")
-    ).rejects.toMatchObject({ status: 404 });
-    expect((await provisioning.redeemOneTimeLink(token)).contents).toContain(
-      'PrivateKey = private'
-    );
-    expect(await store.oneTimeLinks.getByToken(token)).toMatchObject({
-      expiresAt: new Date(now + 70_000).toISOString(),
-    });
-    clock.mockReturnValue(now + 70_000);
+    clock.mockReturnValue(now + 599_999);
+    await provisioning.redeemOneTimeLink(token);
+    clock.mockReturnValue(now + 600_000);
     await expect(provisioning.redeemOneTimeLink(token)).rejects.toMatchObject({
       status: 410,
     });
   });
+
+  test.each([
+    {
+      deadline: 'redemption grace period',
+      firstDownload: 60_000,
+      expiry: 70_000,
+    },
+    { deadline: 'original lifetime', firstDownload: 299_000, expiry: 300_000 },
+  ])(
+    'repeated downloads cannot extend the $deadline',
+    async ({ firstDownload, expiry }) => {
+      const { store } = await vpnFixture();
+      const now = Date.now();
+      const clock = vi.spyOn(Date, 'now').mockReturnValue(now);
+      await provisioning.generateOneTimeLink(admin, 1);
+      const [client] = await store.clients.getAll();
+      const token = client!.oneTimeLink!.oneTimeLink;
+
+      const expected = await provisioning.download(admin, 1);
+      clock.mockReturnValue(now + firstDownload);
+      expect(await provisioning.redeemOneTimeLink(token)).toEqual(expected);
+      clock.mockReturnValue(now + expiry - 1);
+      expect(await provisioning.redeemOneTimeLink(token)).toEqual(expected);
+      clock.mockReturnValue(now + expiry);
+      await expect(provisioning.redeemOneTimeLink(token)).rejects.toMatchObject(
+        {
+          status: 410,
+        }
+      );
+    }
+  );
 
   test('initializes keys and AWG parameters before starting the runtime', async () => {
     const { commands, writeConfiguration, firewall, store } =

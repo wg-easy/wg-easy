@@ -37,7 +37,9 @@ The buttons on each client card let you:
 
 - **Show QR Code**: Scan the code with a compatible VPN app. The dialog also supports downloading or copying the QR code as a PNG.
 - **Download Configuration**: Download the client's configuration file.
-- **Generate short one time link**: Display a temporary download link below the card, with a countdown. The link is valid for five minutes. After a download, it remains available for a short ten-second grace period before expiring.
+- **Generate short one time link**: Display a temporary download link below the card, with a countdown. The link is valid for five minutes. After the first download, it remains available for up to ten seconds to accommodate duplicate browser requests, without exceeding the original expiry. Further downloads do not extend this grace period.
+
+One-time links are intentionally short for manual entry. The current token scheme has only 1,000 possible values per client ID, so links can be guessed. Anyone with an active link can download the complete configuration, including its private key, without signing in. Generate a link when the recipient is ready to use it and share it privately. Authenticated downloads and QR codes are also available.
 
 On the client's edit page, **View Configuration** displays the saved configuration and lets you copy it. Save form changes before viewing or sharing the configuration. Configuration changes are not pushed to devices; import the updated file or QR code on the device when its settings change.
 

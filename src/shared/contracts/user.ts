@@ -4,8 +4,7 @@ import { safeStringRefine, t } from '#shared/contracts/validation';
 
 const username = z
   .string({ message: t('validation.user.username') })
-  .min(2, t('validation.user.username'))
-  .pipe(safeStringRefine);
+  .min(1, t('validation.user.username'));
 
 const password = z
   .string({ message: t('validation.user.password') })

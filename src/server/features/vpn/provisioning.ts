@@ -46,7 +46,7 @@ export function download(actor: Actor, clientId: number) {
 export function generateOneTimeLink(actor: Actor, clientId: number) {
   return getDatabase().transaction(async (tx) => {
     authorizeClient(actor, 'update', await tx.clients.getPublic(clientId));
-    // Preserve the existing short-link format and five-minute lifetime.
+    // Short for manual entry; the sharing guide documents the guessing risk.
     const key = `${clientId}-${Math.floor(Math.random() * 1000)}`;
     const token = Math.abs(CRC32.str(key)).toString(16);
     await tx.oneTimeLinks.save(
@@ -65,7 +65,8 @@ export function redeemOneTimeLink(token: string) {
         status: 404,
         statusText: 'Invalid One Time Link',
       });
-    if (isExpired(link.expiresAt, Date.now()))
+    const now = Date.now();
+    if (isExpired(link.expiresAt, now))
       throw createError({
         status: 410,
         statusText: 'One Time Link has expired',
@@ -77,11 +78,9 @@ export function redeemOneTimeLink(token: string) {
         statusText: 'Invalid One Time Link',
       });
     const result = await configuration(tx, client);
-    // Keep the existing grace period for browsers that request twice.
-    await tx.oneTimeLinks.setExpiry(
-      link.id,
-      new Date(Date.now() + 10 * 1000).toISOString()
-    );
+    // Downloads may shorten the lifetime, but must never extend it.
+    const expiresAt = Math.min(Date.parse(link.expiresAt), now + 10_000);
+    await tx.oneTimeLinks.setExpiry(link.id, new Date(expiresAt).toISOString());
     return result;
   });
 }

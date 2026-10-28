@@ -24,6 +24,7 @@ import { getIpInformation } from '#server/utils/ip';
 import beginOAuth from '#server/api/auth/[provider]/index.get';
 import oauthCallback from '#server/api/auth/[provider]/callback.get';
 import oauthLink from '#server/api/auth/[provider]/link.get';
+import createAdministrator from '#server/api/setup/2.post';
 import { logSecurityEvent } from '#server/utils/securityLogger';
 
 vi.mock('#server/utils/ip', async (original) => ({
@@ -104,6 +105,9 @@ beforeEach(async () => {
   resetCryptoMocks();
   const clock = vi.spyOn(Date, 'now').mockImplementation(() => now);
   onTestFinished(() => clock.mockRestore());
+});
+
+async function existingAdministrator() {
   await fixture.store.users.insert({
     id: 1,
     username: credentials.username,
@@ -113,9 +117,51 @@ beforeEach(async () => {
     enabled: true,
     totpVerified: false,
   });
+}
+
+describe('username contract', () => {
+  test.each(['a', '__proto__'])(
+    'can log in with username %s accepted during setup',
+    async (username) => {
+      await createAdministrator(
+        request('/api/setup/2', {
+          username,
+          password: credentials.password,
+          confirmPassword: credentials.password,
+        })
+      );
+      const login = request('/api/auth/password', { ...credentials, username });
+      await passwordLogin(login);
+      expect(
+        await sessionUser(
+          request('/api/session', undefined, sessionCookie(login))
+        )
+      ).toMatchObject({ id: 1, username });
+    }
+  );
+
+  test('rejects empty usernames during setup and login', async () => {
+    await expect(
+      createAdministrator(
+        request('/api/setup/2', {
+          username: '',
+          password: credentials.password,
+          confirmPassword: credentials.password,
+        })
+      )
+    ).rejects.toMatchObject({ status: 400 });
+    expect(await fixture.store.users.count()).toBe(0);
+    await expect(
+      passwordLogin(
+        request('/api/auth/password', { ...credentials, username: '' })
+      )
+    ).rejects.toMatchObject({ status: 400 });
+  });
 });
 
 describe('identity HTTP contract', () => {
+  beforeEach(existingAdministrator);
+
   function basicRequest(password: string) {
     return requestEvent('https://localhost/api/admin/general', {
       headers: {
@@ -414,6 +460,8 @@ function oauthRequest(path: string, cookie = '') {
 }
 
 describe('OAuth workflow', () => {
+  beforeEach(existingAdministrator);
+
   test('exchanges verified claims and replaces transient state with an authenticated session', async () => {
     await fixture.store.users.update(1, { email: 'admin@example.com' });
     const start = oauthRequest('');
