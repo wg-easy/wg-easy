@@ -5,8 +5,8 @@
         <FormNumberField
           id="session"
           v-model="data.sessionTimeout"
-          :label="$t('admin.general.sessionTimeout')"
-          :description="$t('admin.general.sessionTimeoutDesc')"
+          :label="$t('admin.general.sessionTimeout.label')"
+          :description="$t('admin.general.sessionTimeout.description')"
         />
       </FormGroup>
       <FormGroup>
@@ -14,20 +14,20 @@
         <FormNullTextField
           id="password"
           v-model="data.metricsPassword"
-          :label="$t('admin.general.metricsPassword')"
-          :description="$t('admin.general.metricsPasswordDesc')"
+          :label="$t('admin.general.metricsPassword.label')"
+          :description="$t('admin.general.metricsPassword.description')"
         />
         <FormSwitchField
           id="prometheus"
           v-model="data.metricsPrometheus"
-          :label="$t('admin.general.prometheus')"
-          :description="$t('admin.general.prometheusDesc')"
+          :label="$t('admin.general.prometheus.label')"
+          :description="$t('admin.general.prometheus.description')"
         />
         <FormSwitchField
           id="json"
           v-model="data.metricsJson"
-          :label="$t('admin.general.json')"
-          :description="$t('admin.general.jsonDesc')"
+          :label="$t('admin.general.json.label')"
+          :description="$t('admin.general.json.description')"
         />
       </FormGroup>
       <FormSaveControls @revert="revert" />

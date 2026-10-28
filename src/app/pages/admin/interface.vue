@@ -5,186 +5,198 @@
         <FormNullNumberField
           id="mtu"
           v-model="data.mtu"
-          :label="$t('general.mtu')"
-          :description="$t('admin.interface.mtuDesc')"
+          :label="$t('wireguard.fields.mtu')"
+          :description="$t('admin.interface.mtu.description')"
         />
         <FormNumberField
           id="port"
           v-model="data.port"
-          :label="$t('general.port')"
-          :description="$t('admin.interface.portDesc')"
+          :label="$t('wireguard.fields.port')"
+          :description="$t('admin.interface.port.description')"
         />
         <FormTextField
           id="device"
           v-model="data.device"
-          :label="$t('admin.interface.device')"
-          :description="$t('admin.interface.deviceDesc')"
+          :label="$t('admin.interface.device.label')"
+          :description="$t('admin.interface.device.description')"
         />
         <FormTextField
           id="routingTable"
           v-model="data.routingTable"
-          :label="$t('admin.interface.routingTable')"
-          :description="$t('admin.interface.routingTableDesc')"
+          :label="$t('admin.interface.routingTable.label')"
+          :description="$t('admin.interface.routingTable.description')"
         />
       </FormGroup>
       <FormGroup v-if="globalStore.information?.isAwg">
-        <FormHeading>{{ $t('awg.obfuscationParameters') }}</FormHeading>
+        <FormHeading>{{ $t('wireguard.obfuscation.title') }}</FormHeading>
 
         <FormNullNumberField
           id="jC"
           v-model="data.jC"
-          :label="$t('awg.jCLabel')"
-          :description="$t('awg.jCDescription')"
+          :label="$t('wireguard.obfuscation.jC.label')"
+          :description="$t('wireguard.obfuscation.jC.description')"
         />
         <FormNullNumberField
           id="jMin"
           v-model="data.jMin"
-          :label="$t('awg.jMinLabel')"
-          :description="$t('awg.jMinDescription')"
+          :label="$t('wireguard.obfuscation.jMin.label')"
+          :description="$t('wireguard.obfuscation.jMin.description')"
         />
         <FormNullNumberField
           id="jMax"
           v-model="data.jMax"
-          :label="$t('awg.jMaxLabel')"
-          :description="$t('awg.jMaxDescription')"
+          :label="$t('wireguard.obfuscation.jMax.label')"
+          :description="$t('wireguard.obfuscation.jMax.description')"
         />
         <FormNullNumberField
           id="s1"
           v-model="data.s1"
-          :label="$t('awg.s1Label')"
-          :description="$t('awg.s1Description')"
+          :label="$t('wireguard.obfuscation.s1.label')"
+          :description="$t('wireguard.obfuscation.s1.description')"
         />
         <FormNullNumberField
           id="s2"
           v-model="data.s2"
-          :label="$t('awg.s2Label')"
-          :description="$t('awg.s2Description')"
+          :label="$t('wireguard.obfuscation.s2.label')"
+          :description="$t('wireguard.obfuscation.s2.description')"
         />
 
-        <div class="col-span-full text-sm">* {{ $t('awg.mtuNote') }}</div>
+        <div class="col-span-full text-sm">
+          * {{ $t('wireguard.obfuscation.mtuNote') }}
+        </div>
 
         <FormNullNumberField
           id="s3"
           v-model="data.s3"
-          :label="$t('awg.s3Label')"
-          :description="$t('awg.s3Description')"
+          :label="$t('wireguard.obfuscation.s3.label')"
+          :description="$t('wireguard.obfuscation.s3.description')"
         />
         <FormNullNumberField
           id="s4"
           v-model="data.s4"
-          :label="$t('awg.s4Label')"
-          :description="$t('awg.s4Description')"
+          :label="$t('wireguard.obfuscation.s4.label')"
+          :description="$t('wireguard.obfuscation.s4.description')"
         />
         <FormNullTextField
           id="h1"
           v-model="data.h1"
-          :label="$t('awg.h1Label')"
-          :description="$t('awg.h1Description')"
+          :label="$t('wireguard.obfuscation.h1.label')"
+          :description="$t('wireguard.obfuscation.h1.description')"
         />
         <FormNullTextField
           id="h2"
           v-model="data.h2"
-          :label="$t('awg.h2Label')"
-          :description="$t('awg.h2Description')"
+          :label="$t('wireguard.obfuscation.h2.label')"
+          :description="$t('wireguard.obfuscation.h2.description')"
         />
         <FormNullTextField
           id="h3"
           v-model="data.h3"
-          :label="$t('awg.h3Label')"
-          :description="$t('awg.h3Description')"
+          :label="$t('wireguard.obfuscation.h3.label')"
+          :description="$t('wireguard.obfuscation.h3.description')"
         />
         <FormNullTextField
           id="h4"
           v-model="data.h4"
-          :label="$t('awg.h4Label')"
-          :description="$t('awg.h4Description')"
+          :label="$t('wireguard.obfuscation.h4.label')"
+          :description="$t('wireguard.obfuscation.h4.description')"
         />
         <FormNullTextField
           id="i1"
           v-model="data.i1"
-          :label="$t('awg.i1Label')"
-          :description="$t('awg.i1Description')"
+          :label="$t('wireguard.obfuscation.i1.label')"
+          :description="$t('wireguard.obfuscation.i1.description')"
         />
         <FormNullTextField
           id="i2"
           v-model="data.i2"
-          :label="$t('awg.i2Label')"
-          :description="$t('awg.i2Description')"
+          :label="$t('wireguard.obfuscation.i2.label')"
+          :description="$t('wireguard.obfuscation.i2.description')"
         />
         <FormNullTextField
           id="i3"
           v-model="data.i3"
-          :label="$t('awg.i3Label')"
-          :description="$t('awg.i3Description')"
+          :label="$t('wireguard.obfuscation.i3.label')"
+          :description="$t('wireguard.obfuscation.i3.description')"
         />
         <FormNullTextField
           id="i4"
           v-model="data.i4"
-          :label="$t('awg.i4Label')"
-          :description="$t('awg.i4Description')"
+          :label="$t('wireguard.obfuscation.i4.label')"
+          :description="$t('wireguard.obfuscation.i4.description')"
         />
         <FormNullTextField
           id="i5"
           v-model="data.i5"
-          :label="$t('awg.i5Label')"
-          :description="$t('awg.i5Description')"
+          :label="$t('wireguard.obfuscation.i5.label')"
+          :description="$t('wireguard.obfuscation.i5.description')"
         />
         <FormNullTextField
           id="headerProtectionKey"
           v-model="data.headerProtectionKey"
-          :label="$t('awg.headerProtectionKeyLabel')"
-          :description="$t('awg.headerProtectionKeyDescription')"
+          :label="$t('wireguard.obfuscation.headerProtectionKey.label')"
+          :description="
+            $t('wireguard.obfuscation.headerProtectionKey.description')
+          "
         />
 
-        <div class="col-span-full text-sm">{{ $t('awg.rangeNote') }}</div>
+        <div class="col-span-full text-sm">
+          {{ $t('wireguard.obfuscation.rangeNote') }}
+        </div>
 
         <FormNullTextField
           id="contentPaddingAddition"
           v-model="data.contentPaddingAddition"
-          :label="$t('awg.contentPaddingAdditionLabel')"
-          :description="$t('awg.contentPaddingAdditionDescription')"
+          :label="$t('wireguard.obfuscation.contentPaddingAddition.label')"
+          :description="
+            $t('wireguard.obfuscation.contentPaddingAddition.description')
+          "
         />
         <FormNullTextField
           id="rekeyAfterTime"
           v-model="data.rekeyAfterTime"
-          :label="$t('awg.rekeyAfterTimeLabel')"
-          :description="$t('awg.rekeyAfterTimeDescription')"
+          :label="$t('wireguard.obfuscation.rekeyAfterTime.label')"
+          :description="$t('wireguard.obfuscation.rekeyAfterTime.description')"
         />
         <FormNullTextField
           id="rekeyTimeout"
           v-model="data.rekeyTimeout"
-          :label="$t('awg.rekeyTimeoutLabel')"
-          :description="$t('awg.rekeyTimeoutDescription')"
+          :label="$t('wireguard.obfuscation.rekeyTimeout.label')"
+          :description="$t('wireguard.obfuscation.rekeyTimeout.description')"
         />
         <FormNullTextField
           id="rejectAfterTime"
           v-model="data.rejectAfterTime"
-          :label="$t('awg.rejectAfterTimeLabel')"
-          :description="$t('awg.rejectAfterTimeDescription')"
+          :label="$t('wireguard.obfuscation.rejectAfterTime.label')"
+          :description="$t('wireguard.obfuscation.rejectAfterTime.description')"
         />
         <FormNullTextField
           id="keepaliveTimeout"
           v-model="data.keepaliveTimeout"
-          :label="$t('awg.keepaliveTimeoutLabel')"
-          :description="$t('awg.keepaliveTimeoutDescription')"
+          :label="$t('wireguard.obfuscation.keepaliveTimeout.label')"
+          :description="
+            $t('wireguard.obfuscation.keepaliveTimeout.description')
+          "
         />
         <FormNullTextField
           id="maxHandshakeAttempts"
           v-model="data.maxHandshakeAttempts"
-          :label="$t('awg.maxHandshakeAttemptsLabel')"
-          :description="$t('awg.maxHandshakeAttemptsDescription')"
+          :label="$t('wireguard.obfuscation.maxHandshakeAttempts.label')"
+          :description="
+            $t('wireguard.obfuscation.maxHandshakeAttempts.description')
+          "
         />
         <FormNullSwitchField
           id="randomTrailers"
           v-model="data.randomTrailers"
-          :label="$t('awg.randomTrailersLabel')"
-          :description="$t('awg.randomTrailersDescription')"
+          :label="$t('wireguard.obfuscation.randomTrailers.label')"
+          :description="$t('wireguard.obfuscation.randomTrailers.description')"
         />
         <FormNullSwitchField
           id="disableCookies"
           v-model="data.disableCookies"
-          :label="$t('awg.disableCookiesLabel')"
-          :description="$t('awg.disableCookiesDescription')"
+          :label="$t('wireguard.obfuscation.disableCookies.label')"
+          :description="$t('wireguard.obfuscation.disableCookies.description')"
         />
       </FormGroup>
       <FormGroup>
@@ -192,14 +204,14 @@
         <FormSwitchField
           id="firewallEnabled"
           v-model="data.firewallEnabled"
-          :label="$t('admin.interface.firewallEnabled')"
-          :description="$t('admin.interface.firewallEnabledDesc')"
+          :label="$t('admin.interface.firewallEnabled.label')"
+          :description="$t('admin.interface.firewallEnabled.description')"
         />
       </FormGroup>
       <FormSaveControls @revert="revert" />
     </FormElement>
     <FormGroup class="mt-6">
-      <FormHeading>{{ $t('form.actions') }}</FormHeading>
+      <FormHeading>{{ $t('common.form.actions') }}</FormHeading>
       <div class="col-span-full flex flex-col gap-3 sm:flex-row sm:flex-wrap">
         <AdminCidrDialog
           :ipv4-cidr="data.ipv4Cidr"
@@ -212,7 +224,7 @@
         </AdminCidrDialog>
         <AdminRestartInterfaceDialog @restart="restartInterface">
           <BaseSecondaryButton as="span" class="w-full">
-            {{ $t('admin.interface.restart') }}
+            {{ $t('admin.interface.restart.label') }}
           </BaseSecondaryButton>
         </AdminRestartInterfaceDialog>
       </div>

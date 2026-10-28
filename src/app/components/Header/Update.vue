@@ -11,7 +11,7 @@
     <SparklesIcon class="size-5 shrink-0 text-accent" />
     <div class="min-w-0 flex-1">
       <p class="font-semibold text-foreground">
-        {{ $t('update.updateAvailable') }}
+        {{ $t('common.update.available') }}
       </p>
       <p class="mt-1 text-xs leading-relaxed">
         {{ globalStore.information.latestRelease.changelog }}
@@ -23,7 +23,7 @@
       rel="noreferrer"
       class="ui-button ui-button-secondary"
     >
-      {{ $t('update.update') }} ↗
+      {{ $t('common.update.action') }} ↗
     </a>
   </div>
 </template>

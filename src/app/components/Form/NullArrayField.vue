@@ -2,7 +2,7 @@
   <FormArrayField v-model="items" :name="name">
     <template #empty>
       <div v-if="data === null">
-        {{ emptyText || $t('form.nullNoItems') }}
+        {{ emptyText || $t('common.form.nullNoItems') }}
       </div>
     </template>
   </FormArrayField>

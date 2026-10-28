@@ -2,10 +2,14 @@
   <BaseSwitch
     :model-value="enabled"
     :title="
-      client.enabled ? $t('client.disableClient') : $t('client.enableClient')
+      client.enabled
+        ? $t('clients.status.disable')
+        : $t('clients.status.enable')
     "
     :aria-label="
-      client.enabled ? $t('client.disableClient') : $t('client.enableClient')
+      client.enabled
+        ? $t('clients.status.disable')
+        : $t('clients.status.enable')
     "
     @update:model-value="toggleClient"
   />

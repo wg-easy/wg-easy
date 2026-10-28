@@ -5,13 +5,13 @@
     :items-per-page="clientsStore.pagination.pageSize"
     :total="clientsStore.pagination.total"
     :disabled="clientsStore.isUpdatingList"
-    :aria-label="$t('ui.clientPagination')"
+    :aria-label="$t('clients.pagination.label')"
     class="mt-4 flex flex-wrap items-center justify-between gap-x-5 gap-y-3 border-t border-line pt-4"
     @update:page="clientsStore.setPage"
   >
     <p class="text-xs text-subtle tabular-nums" role="status">
       {{
-        $t('ui.clientRange', {
+        $t('clients.pagination.range', {
           start:
             clientsStore.pagination.total === 0
               ? 0
@@ -31,12 +31,12 @@
     >
       <div class="flex items-center gap-2">
         <RLabel :for="pageSizeId" class="text-xs text-subtle">
-          {{ $t('ui.perPage') }}
+          {{ $t('clients.pagination.perPage') }}
         </RLabel>
         <BaseSelect
           :id="pageSizeId"
           v-model="selectedPageSize"
-          :label="$t('ui.perPage')"
+          :label="$t('clients.pagination.perPage')"
           :options="pageSizeOptions"
           :show-value="false"
           compact
@@ -45,14 +45,14 @@
       <div class="flex items-center gap-1">
         <PaginationPrev
           class="grid size-9 place-items-center rounded-lg text-muted transition-colors hover:bg-surface-raised disabled:opacity-30 disabled:hover:bg-transparent"
-          :aria-label="$t('ui.previousPage')"
-          :title="$t('ui.previousPage')"
+          :aria-label="$t('clients.pagination.previous')"
+          :title="$t('clients.pagination.previous')"
         >
           <ChevronLeftIcon class="size-4" aria-hidden="true" />
         </PaginationPrev>
         <span class="px-2 text-xs text-muted tabular-nums">
           {{
-            $t('ui.pageOf', {
+            $t('clients.pagination.pageOf', {
               page,
               total: pageCount,
             })
@@ -60,8 +60,8 @@
         </span>
         <PaginationNext
           class="grid size-9 place-items-center rounded-lg text-muted transition-colors hover:bg-surface-raised disabled:opacity-30 disabled:hover:bg-transparent"
-          :aria-label="$t('ui.nextPage')"
-          :title="$t('ui.nextPage')"
+          :aria-label="$t('clients.pagination.next')"
+          :title="$t('clients.pagination.next')"
         >
           <ChevronRightIcon class="size-4" aria-hidden="true" />
         </PaginationNext>

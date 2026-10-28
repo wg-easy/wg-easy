@@ -3,16 +3,16 @@
   <div class="my-auto flex items-center gap-3">
     <template v-if="data === null">
       <span class="text-subtle">
-        {{ $t('form.nullNotSet') }}
+        {{ $t('common.form.nullNotSet') }}
       </span>
       <BaseSecondaryButton type="button" @click="data = false">
-        {{ $t('form.set') }}
+        {{ $t('common.form.set') }}
       </BaseSecondaryButton>
     </template>
     <template v-else>
       <BaseSwitch :id="id" v-model="enabled" />
       <BaseSecondaryButton type="button" @click="data = null">
-        {{ $t('form.unset') }}
+        {{ $t('common.form.unset') }}
       </BaseSecondaryButton>
     </template>
   </div>

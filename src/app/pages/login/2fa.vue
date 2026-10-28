@@ -2,14 +2,14 @@
   <div>
     <form class="flex flex-col gap-5" @submit.prevent="submit">
       <label for="login-totp" class="-mb-3 text-xs font-medium text-muted">
-        {{ $t('general.2faCode') }}
+        {{ $t('auth.twoFactor.code') }}
       </label>
       <BaseInput
         id="login-totp"
         v-model="totp"
         type="text"
         name="totp"
-        :placeholder="$t('general.2faCode')"
+        :placeholder="$t('auth.twoFactor.code')"
         autocomplete="one-time-code"
         inputmode="numeric"
         maxlength="6"
@@ -25,7 +25,7 @@
           v-if="authenticating"
           class="mx-auto size-5 animate-spin"
         />
-        <span v-else>{{ $t('general.continue') }}</span>
+        <span v-else>{{ $t('common.actions.continue') }}</span>
       </button>
 
       <button
@@ -33,7 +33,7 @@
         class="ui-button ui-button-secondary w-full"
         @click="cancel"
       >
-        {{ $t('dialog.cancel') }}
+        {{ $t('common.actions.cancel') }}
       </button>
     </form>
   </div>
@@ -71,15 +71,15 @@ const _submit = useSubmit(
           authenticating.value = false;
           totp.value = '';
           toast.showToast({
-            title: t('general.2fa'),
-            message: t('login.2faWrong'),
+            title: t('auth.twoFactor.title'),
+            message: t('auth.login.twoFactor.invalid'),
             type: 'error',
           });
           return;
         } else if (data?.status === 'PENDING_LOGIN_EXPIRED') {
           toast.showToast({
-            title: t('general.2fa'),
-            message: t('login.loginExpired'),
+            title: t('auth.twoFactor.title'),
+            message: t('auth.login.expired'),
             type: 'error',
           });
           await navigateTo('/login');

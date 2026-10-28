@@ -5,22 +5,22 @@
         <FormTextArea
           id="PreUp"
           v-model="data.preUp"
-          :label="$t('hooks.preUp')"
+          :label="$t('wireguard.hooks.preUp')"
         />
         <FormTextArea
           id="PostUp"
           v-model="data.postUp"
-          :label="$t('hooks.postUp')"
+          :label="$t('wireguard.hooks.postUp')"
         />
         <FormTextArea
           id="PreDown"
           v-model="data.preDown"
-          :label="$t('hooks.preDown')"
+          :label="$t('wireguard.hooks.preDown')"
         />
         <FormTextArea
           id="PostDown"
           v-model="data.postDown"
-          :label="$t('hooks.postDown')"
+          :label="$t('wireguard.hooks.postDown')"
         />
       </FormGroup>
       <FormSaveControls @revert="revert" />

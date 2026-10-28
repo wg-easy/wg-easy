@@ -18,7 +18,7 @@
       </ToastDescription>
     </div>
     <ToastClose
-      :aria-label="$t('dialog.cancel')"
+      :aria-label="$t('common.actions.cancel')"
       class="grid size-6 place-items-center rounded text-subtle hover:bg-surface-raised"
     >
       <XIcon class="size-3" />

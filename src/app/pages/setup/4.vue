@@ -1,16 +1,16 @@
 <template>
   <div>
     <p class="text-sm leading-relaxed text-muted">
-      {{ $t('setup.setupConfigDesc') }}
+      {{ $t('setup.setupConfigDescription') }}
     </p>
     <div class="mt-8 flex flex-col gap-3">
       <div class="flex flex-col">
         <FormHostField
           id="host"
           v-model="host"
-          :label="$t('general.host')"
+          :label="$t('wireguard.fields.host')"
           placeholder="vpn.example.com"
-          :description="$t('setup.hostDesc')"
+          :description="$t('setup.hostDescription')"
           url="/api/setup/4"
         />
       </div>
@@ -18,13 +18,13 @@
         <FormNumberField
           id="port"
           v-model="port"
-          :label="$t('general.port')"
-          :description="$t('setup.portDesc')"
+          :label="$t('wireguard.fields.port')"
+          :description="$t('setup.portDescription')"
         />
       </div>
       <div class="mt-4 flex justify-center">
         <BasePrimaryButton @click="submit">
-          {{ $t('general.continue') }}
+          {{ $t('common.actions.continue') }}
         </BasePrimaryButton>
       </div>
     </div>

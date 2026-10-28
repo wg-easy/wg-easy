@@ -2,7 +2,7 @@
   <DropdownMenuRoot v-model:open="toggleState">
     <DropdownMenuTrigger
       class="header-control gap-2 rounded-full pr-1 pl-1 sm:pr-3"
-      :aria-label="$t('pages.me')"
+      :aria-label="$t('account.title')"
     >
       <BaseAvatar class="size-8 rounded-full bg-surface-hover text-foreground">
         {{ fallbackName }}
@@ -24,12 +24,12 @@
         </DropdownMenuLabel>
         <DropdownMenuItem as-child>
           <NuxtLink to="/" class="ui-menu-item">
-            {{ $t('pages.clients') }}
+            {{ $t('clients.title') }}
           </NuxtLink>
         </DropdownMenuItem>
         <DropdownMenuItem as-child>
           <NuxtLink to="/me" class="ui-menu-item">
-            {{ $t('pages.me') }}
+            {{ $t('account.title') }}
           </NuxtLink>
         </DropdownMenuItem>
         <DropdownMenuItem
@@ -40,13 +40,13 @@
           as-child
         >
           <NuxtLink to="/admin" class="ui-menu-item">
-            {{ $t('pages.admin.panel') }}
+            {{ $t('admin.title') }}
           </NuxtLink>
         </DropdownMenuItem>
         <DropdownMenuSeparator class="my-1 h-px bg-line" />
         <DropdownMenuItem class="ui-menu-item text-accent" @select="submit">
           <LogOutIcon class="size-4" />
-          {{ $t('general.logout') }}
+          {{ $t('auth.logout') }}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenuPortal>

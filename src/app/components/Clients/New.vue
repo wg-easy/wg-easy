@@ -2,7 +2,7 @@
   <ClientsCreateDialog :trigger-class="triggerClass">
     <BasePrimaryButton as="span" class="w-full">
       <PlusIcon class="size-4" />
-      {{ $t('client.new') }}
+      {{ $t('clients.create.title') }}
     </BasePrimaryButton>
   </ClientsCreateDialog>
 </template>

@@ -3,7 +3,7 @@
     v-if="!globalStore.information?.insecure && !https"
     class="callout border-accent/30 text-accent"
   >
-    <p class="text-center">{{ $t('login.insecure') }}</p>
+    <p class="text-center">{{ $t('auth.login.insecure') }}</p>
   </div>
 </template>
 

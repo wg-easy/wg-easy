@@ -2,7 +2,9 @@
   <div class="flex flex-col items-center">
     <p>{{ $t('setup.successful') }}</p>
     <NuxtLink to="/login" class="mt-4">
-      <BasePrimaryButton as="span">{{ $t('login.signIn') }}</BasePrimaryButton>
+      <BasePrimaryButton as="span">
+        {{ $t('auth.login.signIn') }}
+      </BasePrimaryButton>
     </NuxtLink>
   </div>
 </template>

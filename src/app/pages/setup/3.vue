@@ -6,12 +6,12 @@
     <div class="mt-4 flex justify-center gap-3">
       <NuxtLink to="/setup/4" class="w-20">
         <BasePrimaryButton as="span" class="w-full justify-center">
-          {{ $t('general.no') }}
+          {{ $t('common.no') }}
         </BasePrimaryButton>
       </NuxtLink>
       <NuxtLink to="/setup/migrate" class="w-20">
         <BaseSecondaryButton as="span" class="w-full justify-center">
-          {{ $t('general.yes') }}
+          {{ $t('common.yes') }}
         </BaseSecondaryButton>
       </NuxtLink>
     </div>

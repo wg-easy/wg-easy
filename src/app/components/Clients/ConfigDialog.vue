@@ -4,23 +4,25 @@
       <slot />
     </template>
     <template #title>
-      {{ $t('client.config') }}
+      {{ $t('clients.configuration.title') }}
     </template>
     <template #description>
       <div v-if="status === 'success'">
         <BaseCodeBlock :code="config ?? ''" />
       </div>
       <div v-else>
-        <span>{{ $t('general.loading') }}</span>
+        <span>{{ $t('common.loading') }}</span>
       </div>
     </template>
     <template #actions>
       <DialogClose as-child>
-        <BaseSecondaryButton>{{ $t('dialog.cancel') }}</BaseSecondaryButton>
+        <BaseSecondaryButton>
+          {{ $t('common.actions.cancel') }}
+        </BaseSecondaryButton>
       </DialogClose>
       <DialogClose as-child>
         <BasePrimaryButton @click="copyCode">
-          {{ $t('copy.copy') }}
+          {{ $t('common.clipboard.copy') }}
         </BasePrimaryButton>
       </DialogClose>
     </template>
@@ -60,7 +62,7 @@ async function copyCode() {
   if (!isSupported.value) {
     toast.showToast({
       type: 'error',
-      message: $t('copy.notSupported'),
+      message: $t('common.clipboard.notSupported'),
     });
     return;
   }
@@ -70,12 +72,12 @@ async function copyCode() {
   if (copied.value) {
     toast.showToast({
       type: 'success',
-      message: $t('copy.copied'),
+      message: $t('common.clipboard.copied'),
     });
   } else {
     toast.showToast({
       type: 'error',
-      message: $t('copy.failed'),
+      message: $t('common.clipboard.failed'),
     });
   }
 }

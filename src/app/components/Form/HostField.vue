@@ -15,7 +15,7 @@
           <div class="flex items-center gap-3">
             <SparklesIcon class="size-4" />
             <span class="whitespace-nowrap">
-              {{ $t('admin.config.suggest') }}
+              {{ $t('admin.config.suggest.label') }}
             </span>
           </div>
         </BasePrimaryButton>

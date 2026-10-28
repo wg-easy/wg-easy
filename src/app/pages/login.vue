@@ -6,10 +6,16 @@
         <img src="/logo.png" alt="" class="mb-6 size-10" />
         <p class="eyebrow mb-3">WireGuard Easy</p>
         <h1 class="text-2xl font-semibold tracking-tight">
-          {{ $t(isTwoFactor ? 'general.2fa' : 'ui.welcomeBack') }}
+          {{ $t(isTwoFactor ? 'auth.twoFactor.title' : 'auth.login.title') }}
         </h1>
         <p class="mt-3 text-sm leading-relaxed text-subtle">
-          {{ $t(isTwoFactor ? 'me.2faCodeDesc' : 'ui.signInDescription') }}
+          {{
+            $t(
+              isTwoFactor
+                ? 'account.twoFactor.codeDescription'
+                : 'auth.login.description'
+            )
+          }}
         </p>
       </div>
       <NuxtPage />

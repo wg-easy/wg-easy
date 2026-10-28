@@ -6,11 +6,11 @@
           <ServerIcon class="size-3.5 text-accent" />
           WireGuard
           <span class="text-line">/</span>
-          {{ $t('pages.clients') }}
+          {{ $t('clients.title') }}
         </p>
-        <h1 class="page-title">{{ $t('pages.clients') }}</h1>
+        <h1 class="page-title">{{ $t('clients.title') }}</h1>
         <p class="mt-3 text-sm text-subtle">
-          {{ $t('ui.clientsDescription') }}
+          {{ $t('clients.description') }}
         </p>
       </div>
       <div
@@ -20,7 +20,7 @@
         <span class="text-3xl font-semibold tracking-tight text-foreground">
           {{ clientsStore.pagination.total }}
         </span>
-        {{ $t('ui.clientsTotal') }}
+        {{ $t('clients.list.total') }}
       </div>
     </div>
     <div class="surface p-4 sm:p-5">
@@ -34,7 +34,7 @@
       class="mt-6 mb-3 flex items-center justify-between gap-3 text-xs text-subtle"
     >
       <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
-        <span>{{ $t('ui.clientList') }}</span>
+        <span>{{ $t('clients.list.title') }}</span>
         <button
           v-if="clientsStore.clients?.length || bulkMode"
           type="button"
@@ -45,7 +45,7 @@
         >
           <XIcon v-if="bulkMode" class="size-3.5" aria-hidden="true" />
           <ListChecksIcon v-else class="size-3.5" aria-hidden="true" />
-          {{ $t(bulkMode ? 'bulk.done' : 'bulk.actions') }}
+          {{ $t(bulkMode ? 'clients.bulk.done' : 'clients.bulk.title') }}
         </button>
         <button
           v-if="clientsStore.hasActiveFilters"
@@ -54,11 +54,11 @@
           @click="clientsStore.clearFilters()"
         >
           <XIcon class="size-3.5" aria-hidden="true" />
-          {{ $t('ui.clearFilters') }}
+          {{ $t('clients.filters.clear') }}
         </button>
       </div>
       <span v-if="clientsStore.error" class="text-warning">
-        {{ $t('ui.connectionIssue') }}
+        {{ $t('clients.list.connectionIssue') }}
       </span>
       <span
         v-else-if="clientsStore.isUpdatingList"
@@ -66,18 +66,18 @@
         class="flex items-center gap-2"
       >
         <LoaderCircleIcon class="size-3 animate-spin" aria-hidden="true" />
-        {{ $t('general.loading') }}
+        {{ $t('common.loading') }}
       </span>
       <span v-else class="flex items-center gap-2">
         <span class="size-1.5 rounded-full bg-success ring-4 ring-success/10" />
-        {{ $t('ui.autoRefresh') }}
+        {{ $t('clients.list.autoRefresh') }}
       </span>
     </div>
     <div v-if="clientsStore.error" role="alert" class="callout mb-4">
       <TriangleAlertIcon class="size-5 shrink-0 text-warning" />
-      <span class="flex-1">{{ $t('ui.loadError') }}</span>
+      <span class="flex-1">{{ $t('clients.list.loadError') }}</span>
       <button class="font-semibold text-accent" @click="clientsStore.refresh()">
-        {{ $t('ui.retry') }}
+        {{ $t('common.actions.retry') }}
       </button>
     </div>
     <ClientsBulkActions v-if="bulkMode" />
@@ -89,12 +89,12 @@
       class="surface flex min-h-56 items-center justify-center gap-3 text-subtle"
     >
       <LoaderCircleIcon class="size-5 animate-spin" />
-      {{ $t('general.loading') }}
+      {{ $t('common.loading') }}
     </div>
     <ClientsPagination v-if="clientsStore.clients" />
     <p class="mt-5 flex items-start gap-2 text-xs leading-relaxed text-subtle">
       <InfoIcon class="mt-0.5 size-4 shrink-0 text-accent" />
-      {{ $t('ui.clientsHint') }}
+      {{ $t('clients.list.hint') }}
     </p>
   </main>
 </template>

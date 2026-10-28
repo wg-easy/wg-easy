@@ -5,12 +5,12 @@
   >
     <template #trigger>
       <BaseSecondaryButton as="span" class="w-full">
-        {{ $t(`client.${action}`) }}
+        {{ $t(`clients.keys.actions.${action}.label`) }}
       </BaseSecondaryButton>
     </template>
-    <template #title>{{ $t(`client.${action}`) }}</template>
+    <template #title>{{ $t(`clients.keys.actions.${action}.label`) }}</template>
     <template #description>
-      <i18n-t :keypath="`client.${action}Dialog`">
+      <i18n-t :keypath="`clients.keys.actions.${action}.description`">
         <template #name>
           <strong>{{ clientName }}</strong>
         </template>
@@ -18,7 +18,9 @@
     </template>
     <template #actions>
       <DialogClose as-child>
-        <BaseSecondaryButton>{{ $t('dialog.cancel') }}</BaseSecondaryButton>
+        <BaseSecondaryButton>
+          {{ $t('common.actions.cancel') }}
+        </BaseSecondaryButton>
       </DialogClose>
       <DialogClose as-child>
         <BaseSecondaryButton
@@ -26,7 +28,7 @@
           :disabled="disabled"
           @click="$emit('confirm')"
         >
-          {{ $t(`client.${action}`) }}
+          {{ $t(`clients.keys.actions.${action}.label`) }}
         </BaseSecondaryButton>
       </DialogClose>
     </template>

@@ -2,7 +2,7 @@
   <div class="col-span-full flex min-w-0 flex-col gap-2">
     <template v-if="data?.length === 0">
       <slot v-if="$slots.empty" name="empty" />
-      <div v-else>{{ emptyText || $t('form.noItems') }}</div>
+      <div v-else>{{ emptyText || $t('common.form.noItems') }}</div>
     </template>
     <div v-for="(item, i) in data" v-else :key="i">
       <div class="flex min-w-0 gap-2">
@@ -17,8 +17,8 @@
         <BaseSecondaryButton
           type="button"
           class="px-3"
-          :aria-label="$t('form.moveUp')"
-          :title="$t('form.moveUp')"
+          :aria-label="$t('common.actions.moveUp')"
+          :title="$t('common.actions.moveUp')"
           :disabled="i === 0"
           @click="move(i, -1)"
         >
@@ -27,8 +27,8 @@
         <BaseSecondaryButton
           type="button"
           class="px-3"
-          :aria-label="$t('form.moveDown')"
-          :title="$t('form.moveDown')"
+          :aria-label="$t('common.actions.moveDown')"
+          :title="$t('common.actions.moveDown')"
           :disabled="i === (data?.length ?? 0) - 1"
           @click="move(i, 1)"
         >
@@ -36,7 +36,7 @@
         </BaseSecondaryButton>
         <BaseSecondaryButton
           type="button"
-          :aria-label="$t('client.delete')"
+          :aria-label="$t('common.actions.delete')"
           @click="del(i)"
         >
           <MinusIcon class="size-4" aria-hidden="true" />
@@ -45,7 +45,7 @@
     </div>
     <div class="mt-2">
       <BasePrimaryButton type="button" @click="add">
-        {{ $t('form.add') }}
+        {{ $t('common.actions.add') }}
       </BasePrimaryButton>
     </div>
   </div>

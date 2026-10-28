@@ -1,8 +1,8 @@
 <template>
   <button
     class="header-control w-10 rounded-full"
-    :title="$t(`theme.${theme.preference}`)"
-    :aria-label="$t(`theme.${theme.preference}`)"
+    :title="$t(`common.theme.${theme.preference}`)"
+    :aria-label="$t(`common.theme.${theme.preference}`)"
     @click="toggleTheme"
   >
     <SunIcon v-if="theme.preference === 'light'" class="size-4" />

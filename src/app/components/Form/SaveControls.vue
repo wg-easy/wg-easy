@@ -1,10 +1,10 @@
 <template>
   <FormActions>
     <BaseSecondaryButton type="button" @click="$emit('revert')">
-      {{ $t('form.revert') }}
+      {{ $t('common.actions.revert') }}
     </BaseSecondaryButton>
     <BasePrimaryButton type="submit">
-      {{ $t('form.save') }}
+      {{ $t('common.actions.save') }}
     </BasePrimaryButton>
   </FormActions>
 </template>

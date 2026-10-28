@@ -10,7 +10,7 @@
         <BaseCheckbox
           class="mt-2"
           :model-value="clientsStore.selectedIds.includes(client.id)"
-          :label="$t('bulk.selectClient', { name: client.name })"
+          :label="$t('clients.bulk.selectClient', { name: client.name })"
           :disabled="clientsStore.isUpdatingList || clientsStore.isApplyingBulk"
           @update:model-value="
             clientsStore.selectClient(client.id, $event === true)

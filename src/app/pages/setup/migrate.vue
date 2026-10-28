@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col items-center">
     <p class="text-sm leading-relaxed text-muted">
-      {{ $t('setup.setupMigrationDesc') }}
+      {{ $t('setup.setupMigrationDescription') }}
     </p>
     <div class="mt-8 flex w-full flex-col gap-3">
       <Label for="migration">{{ $t('setup.migration') }}</Label>

@@ -2,8 +2,8 @@
   <NuxtLink
     class="icon-button"
     :to="`/clients/${client.id}`"
-    :aria-label="$t('ui.editClient', { name: client.name })"
-    :title="$t('ui.editClient', { name: client.name })"
+    :aria-label="$t('clients.edit', { name: client.name })"
+    :title="$t('clients.edit', { name: client.name })"
   >
     <SquarePenIcon class="size-4" />
   </NuxtLink>

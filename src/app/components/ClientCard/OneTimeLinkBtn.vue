@@ -1,8 +1,8 @@
 <template>
   <button
     class="icon-button"
-    :title="$t('client.otlDesc')"
-    :aria-label="$t('client.otlDesc')"
+    :title="$t('clients.configuration.oneTimeLink')"
+    :aria-label="$t('clients.configuration.oneTimeLink')"
     @click="showOneTimeLink"
   >
     <LinkIcon class="size-4" />

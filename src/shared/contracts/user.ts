@@ -3,23 +3,23 @@ import z from 'zod';
 import { safeStringRefine, t } from '#shared/contracts/validation';
 
 const username = z
-  .string({ message: t('zod.user.username') })
-  .min(2, t('zod.user.username'))
+  .string({ message: t('validation.user.username') })
+  .min(2, t('validation.user.username'))
   .pipe(safeStringRefine);
 
 const password = z
-  .string({ message: t('zod.user.password') })
-  .min(12, t('zod.user.password'))
+  .string({ message: t('validation.user.password') })
+  .min(12, t('validation.user.password'))
   .pipe(safeStringRefine);
 
-const remember = z.boolean({ message: t('zod.user.remember') });
+const remember = z.boolean({ message: t('validation.user.remember') });
 
 const totpCode = z
-  .string({ message: t('zod.user.totpCode') })
+  .string({ message: t('validation.user.totpCode') })
   // min and max to improve error messages
-  .min(6, t('zod.user.totpCode'))
-  .max(6, t('zod.user.totpCode'))
-  .regex(/^\d{6}$/, t('zod.user.totpCode'))
+  .min(6, t('validation.user.totpCode'))
+  .max(6, t('validation.user.totpCode'))
+  .regex(/^\d{6}$/, t('validation.user.totpCode'))
   .pipe(safeStringRefine);
 
 export const UserLoginSchema = z.object({
@@ -35,17 +35,17 @@ export const UserSetupSchema = z
     confirmPassword: password,
   })
   .refine((val) => val.password === val.confirmPassword, {
-    message: t('zod.user.passwordMatch'),
+    message: t('validation.user.passwordMatch'),
   });
 
 const name = z
-  .string({ message: t('zod.user.name') })
-  .min(1, 'zod.user.name')
+  .string({ message: t('validation.user.name') })
+  .min(1, 'validation.user.name')
   .pipe(safeStringRefine);
 
 const email = z
-  .email({ message: t('zod.user.emailInvalid') })
-  .min(5, t('zod.user.email'))
+  .email({ message: t('validation.user.emailInvalid') })
+  .min(5, t('validation.user.email'))
   .pipe(safeStringRefine)
   .nullable();
 
@@ -61,7 +61,7 @@ export const UserUpdatePasswordSchema = z
     confirmPassword: password,
   })
   .refine((val) => val.newPassword === val.confirmPassword, {
-    message: t('zod.user.passwordMatch'),
+    message: t('validation.user.passwordMatch'),
   });
 
 export const UserUpdateTotpSchema = z.union([

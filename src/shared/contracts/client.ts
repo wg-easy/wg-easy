@@ -28,34 +28,34 @@ import {
 } from '#shared/contracts/validation';
 
 const name = z
-  .string({ message: t('zod.client.name') })
-  .min(1, t('zod.client.name'))
+  .string({ message: t('validation.client.name') })
+  .min(1, t('validation.client.name'))
   .pipe(safeStringRefine)
   .pipe(controlStringRefine);
 
 // TODO?: validate iso string
 const expiresAt = z
-  .string({ message: t('zod.client.expiresAt') })
-  .min(1, t('zod.client.expiresAt'))
+  .string({ message: t('validation.client.expiresAt') })
+  .min(1, t('validation.client.expiresAt'))
   .pipe(safeStringRefine)
   .nullable();
 
 const address4 = z
-  .string({ message: t('zod.client.address4') })
-  .min(1, { message: t('zod.client.address4') })
+  .string({ message: t('validation.client.address4') })
+  .min(1, { message: t('validation.client.address4') })
   .pipe(safeStringRefine)
   .pipe(controlStringRefine)
   .refine((v) => isIPv4(v));
 
 const address6 = z
-  .string({ message: t('zod.client.address6') })
-  .min(1, { message: t('zod.client.address6') })
+  .string({ message: t('validation.client.address6') })
+  .min(1, { message: t('validation.client.address6') })
   .pipe(safeStringRefine)
   .pipe(controlStringRefine)
   .refine((v) => isIPv6(v));
 
 const serverAllowedIps = z.array(AllowedIpEntrySchema, {
-  message: t('zod.client.serverAllowedIps'),
+  message: t('validation.client.serverAllowedIps'),
 });
 
 export const ClientCreateSchema = z.object({
@@ -122,7 +122,7 @@ export const ClientUpdateSchema = z.object({
   dns: DnsSchema.nullable(),
 });
 
-const clientId = z.coerce.number({ message: t('zod.client.id') });
+const clientId = z.coerce.number({ message: t('validation.client.id') });
 
 export const ClientGetSchema = z.object({
   clientId: clientId,

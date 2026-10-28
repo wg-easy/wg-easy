@@ -2,8 +2,8 @@
   <Toggle
     :model-value="globalStore.uiShowCharts"
     class="header-control group w-10 rounded-full data-[state=on]:border-subtle data-[state=on]:bg-surface-raised"
-    :title="$t('layout.toggleCharts')"
-    :aria-label="$t('layout.toggleCharts')"
+    :title="$t('clients.list.toggleCharts')"
+    :aria-label="$t('clients.list.toggleCharts')"
     @update:model-value="globalStore.toggleCharts"
   >
     <ChartNoAxesColumnIncreasingIcon

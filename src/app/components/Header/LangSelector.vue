@@ -2,7 +2,7 @@
   <SelectRoot v-model="langProxy" :default-value="locale">
     <SelectTrigger
       class="header-control group max-w-36 px-2.5"
-      :aria-label="$t('ui.selectLanguage')"
+      :aria-label="$t('common.selectLanguage')"
     >
       <LanguagesIcon class="size-4" />
       <span class="hidden truncate sm:inline"><SelectValue /></span>

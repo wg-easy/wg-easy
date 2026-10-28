@@ -1,7 +1,7 @@
 <template>
   <div>
     <p class="text-sm leading-relaxed text-muted">
-      {{ $t('setup.createAdminDesc') }}
+      {{ $t('setup.createAdminDescription') }}
     </p>
     <div class="mt-8 flex flex-col gap-3">
       <div class="flex flex-col">
@@ -9,7 +9,7 @@
           id="username"
           v-model="username"
           autocomplete="username"
-          :label="$t('general.username')"
+          :label="$t('common.fields.username')"
         />
       </div>
       <div class="flex flex-col">
@@ -17,7 +17,7 @@
           id="password"
           v-model="password"
           autocomplete="new-password"
-          :label="$t('general.password')"
+          :label="$t('common.fields.password')"
         />
       </div>
       <div class="flex flex-col">
@@ -25,7 +25,7 @@
           id="confirmPassword"
           v-model="confirmPassword"
           autocomplete="new-password"
-          :label="$t('general.confirmPassword')"
+          :label="$t('common.fields.confirmPassword')"
         />
       </div>
       <div class="mt-4 flex justify-center">

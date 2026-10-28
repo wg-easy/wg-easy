@@ -44,7 +44,7 @@ async function mountField(nullable: boolean, value?: string[] | null) {
     },
     async add() {
       const button = descendants(root).find(
-        (node) => node.tag === 'button' && textOf(node) === 'form.add'
+        (node) => node.tag === 'button' && textOf(node) === 'common.actions.add'
       );
       expect(button).toBeDefined();
       (button!.props.onClick as () => void)();
@@ -57,12 +57,14 @@ test.each([false, true])(
   'edits, reorders, removes, and adds array items (nullable: %s)',
   async (nullable) => {
     const view = await mountField(nullable, ['first', 'second']);
-    expect(view.buttons('form.moveUp')[0]?.props.disabled).toBe(true);
-    expect(view.buttons('form.moveDown')[1]?.props.disabled).toBe(true);
+    expect(view.buttons('common.actions.moveUp')[0]?.props.disabled).toBe(true);
+    expect(view.buttons('common.actions.moveDown')[1]?.props.disabled).toBe(
+      true
+    );
 
-    await view.click('form.moveUp', 1);
+    await view.click('common.actions.moveUp', 1);
     expect(view.model.value).toEqual(['second', 'first']);
-    await view.click('form.moveDown');
+    await view.click('common.actions.moveDown');
     expect(view.model.value).toEqual(['first', 'second']);
 
     const input = descendants(view.root).find((node) => node.tag === 'input');
@@ -73,12 +75,12 @@ test.each([false, true])(
     await nextTick();
     expect(view.model.value).toEqual(['edited', 'second']);
 
-    await view.click('client.delete');
+    await view.click('common.actions.delete');
     expect(view.model.value).toEqual(['second']);
-    await view.click('client.delete');
+    await view.click('common.actions.delete');
     expect(view.model.value).toEqual(nullable ? null : []);
     expect(textOf(view.root)).toContain(
-      nullable ? 'form.nullNoItems' : 'form.noItems'
+      nullable ? 'common.form.nullNoItems' : 'common.form.noItems'
     );
 
     await view.add();
@@ -92,7 +94,7 @@ test.each([false, true])(
     const view = await mountField(nullable);
     await view.add();
     expect(view.model.value).toBeUndefined();
-    expect(textOf(view.root)).toBe('form.add');
+    expect(textOf(view.root)).toBe('common.actions.add');
   }
 );
 
@@ -102,7 +104,9 @@ test.each([{ value: null }, { value: [] }])(
     const view = await mountField(true, value);
     expect(view.model.value).toEqual(value);
     expect(textOf(view.root)).toBe(
-      value === null ? 'form.nullNoItemsform.add' : 'form.add'
+      value === null
+        ? 'common.form.nullNoItemscommon.actions.add'
+        : 'common.actions.add'
     );
     await view.add();
     expect(view.model.value).toEqual(['']);

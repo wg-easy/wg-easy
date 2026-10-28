@@ -26,7 +26,7 @@
         </div>
         <DialogClose
           class="icon-button absolute top-5 right-5"
-          :aria-label="$t('dialog.cancel')"
+          :aria-label="$t('common.actions.cancel')"
         >
           <XIcon class="size-4" />
         </DialogClose>

@@ -11,7 +11,9 @@
       hour="2-digit"
       minute="2-digit"
     />
-    <span v-else class="inline-block">{{ $t('client.permanent') }}</span>
+    <span v-else class="inline-block">
+      {{ $t('clients.status.permanent') }}
+    </span>
   </div>
 </template>
 

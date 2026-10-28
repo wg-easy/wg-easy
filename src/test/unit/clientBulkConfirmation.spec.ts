@@ -121,16 +121,18 @@ test('offers actions appropriate to the selected clients', async () => {
     view.store.selectedIds = selected.map((_, index) => index + 1);
     view.store.selectedClients = selected.map((enabled) => ({ enabled }));
     await nextTick();
-    expect(view.button('bulk.actions').props.disabled).toBe(!selected.length);
-    expect(view.button('bulk.enable', true).props.disabled).toBe(
-      !selected.includes(false)
-    );
-    expect(view.button('bulk.disable', true).props.disabled).toBe(
-      !selected.includes(true)
-    );
-    expect(view.button('bulk.delete', true).props.disabled).toBe(
+    expect(view.button('clients.bulk.title').props.disabled).toBe(
       !selected.length
     );
+    expect(
+      view.button('clients.bulk.actions.enable.label', true).props.disabled
+    ).toBe(!selected.includes(false));
+    expect(
+      view.button('clients.bulk.actions.disable.label', true).props.disabled
+    ).toBe(!selected.includes(true));
+    expect(
+      view.button('clients.bulk.actions.delete.label', true).props.disabled
+    ).toBe(!selected.length);
   }
 });
 
@@ -140,9 +142,11 @@ test.each(['isUpdatingList', 'isApplyingBulk'] as const)(
     const view = await mountActions();
     view.store[busy] = true;
     await nextTick();
-    expect(view.button('bulk.actions').props.disabled).toBe(true);
+    expect(view.button('clients.bulk.title').props.disabled).toBe(true);
     for (const action of ['enable', 'disable', 'delete']) {
-      expect(view.button(`bulk.${action}`, true).props.disabled).toBe(true);
+      expect(
+        view.button(`clients.bulk.actions.${action}.label`, true).props.disabled
+      ).toBe(true);
     }
   }
 );
@@ -151,36 +155,44 @@ test.each(['enable', 'disable', 'delete'])(
   '%s only runs after explicit confirmation and can be cancelled',
   async (action) => {
     const view = await mountActions();
-    await view.click(`bulk.${action}`, true);
-    expect(textOf(view.root)).toContain(`bulk.${action}Title 2`);
-    expect(textOf(view.root)).toContain(`bulk.${action}Description`);
+    await view.click(`clients.bulk.actions.${action}.label`, true);
+    expect(textOf(view.root)).toContain(
+      `clients.bulk.actions.${action}.title 2`
+    );
+    expect(textOf(view.root)).toContain(
+      `clients.bulk.actions.${action}.description`
+    );
     expect(view.applyBulkAction).not.toHaveBeenCalled();
-    await view.click('dialog.cancel');
-    expect(textOf(view.root)).not.toContain(`bulk.${action}Title`);
+    await view.click('common.actions.cancel');
+    expect(textOf(view.root)).not.toContain(
+      `clients.bulk.actions.${action}.title`
+    );
     expect(view.applyBulkAction).not.toHaveBeenCalled();
-    await view.click(`bulk.${action}`, true);
-    await view.click(`bulk.${action}`);
+    await view.click(`clients.bulk.actions.${action}.label`, true);
+    await view.click(`clients.bulk.actions.${action}.label`);
     expect(view.applyBulkAction).toHaveBeenCalledExactlyOnceWith(action);
-    expect(textOf(view.root)).not.toContain(`bulk.${action}Title`);
+    expect(textOf(view.root)).not.toContain(
+      `clients.bulk.actions.${action}.title`
+    );
   }
 );
 
 test('invalidates an open confirmation when selection changes', async () => {
   const view = await mountActions();
-  await view.click('bulk.delete', true);
+  await view.click('clients.bulk.actions.delete.label', true);
   view.store.selectedIds = [2];
   await nextTick();
-  expect(textOf(view.root)).not.toContain('bulk.deleteTitle');
+  expect(textOf(view.root)).not.toContain('clients.bulk.actions.delete.title');
   expect(view.applyBulkAction).not.toHaveBeenCalled();
 });
 
 test('keeps a failed action in the confirmation dialog for retry', async () => {
   const view = await mountActions();
   view.applyBulkAction.mockRejectedValueOnce(new Error('Failed'));
-  await view.click('bulk.disable', true);
-  await view.click('bulk.disable');
-  expect(textOf(view.root)).toContain('bulk.disableTitle 2');
-  expect(textOf(view.root)).toContain('bulk.failed');
-  await view.click('bulk.disable');
+  await view.click('clients.bulk.actions.disable.label', true);
+  await view.click('clients.bulk.actions.disable.label');
+  expect(textOf(view.root)).toContain('clients.bulk.actions.disable.title 2');
+  expect(textOf(view.root)).toContain('clients.bulk.failed');
+  await view.click('clients.bulk.actions.disable.label');
   expect(view.applyBulkAction).toHaveBeenCalledTimes(2);
 });

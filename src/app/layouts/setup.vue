@@ -11,7 +11,7 @@
     </header>
     <main class="flex flex-1 items-center justify-center px-4 py-10">
       <div class="surface w-full max-w-lg p-6 shadow-xl sm:p-9">
-        <p class="eyebrow mb-3">{{ $t('ui.setup') }}</p>
+        <p class="eyebrow mb-3">{{ $t('setup.title') }}</p>
         <h1 class="mb-8 text-2xl font-semibold tracking-tight">
           {{ $t('setup.welcome') }}
         </h1>

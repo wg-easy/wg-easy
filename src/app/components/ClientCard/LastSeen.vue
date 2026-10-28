@@ -2,14 +2,14 @@
   <span
     v-if="client.latestHandshakeAt"
     :title="
-      $t('client.lastSeen', {
+      $t('clients.status.lastSeen', {
         date: $d(new Date(client.latestHandshakeAt)),
       })
     "
   >
     {{ lastSeen }}
   </span>
-  <span v-else>{{ $t('client.notConnected') }}</span>
+  <span v-else>{{ $t('clients.status.notConnected') }}</span>
 </template>
 
 <script setup lang="ts">

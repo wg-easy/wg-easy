@@ -24,6 +24,19 @@ const nuxt = await loadNuxt({
 });
 const localesDir = new URL('../../i18n/locales/', import.meta.url);
 
+function messageKeys(messages: Record<string, unknown>, prefix = ''): string[] {
+  return Object.entries(messages).flatMap(([key, value]) => {
+    const path = prefix ? `${prefix}.${key}` : key;
+    return typeof value === 'string'
+      ? [path]
+      : messageKeys(value as Record<string, unknown>, path);
+  });
+}
+
+const englishKeys = new Set(
+  messageKeys(JSON.parse(readFileSync(new URL('en.json', localesDir), 'utf8')))
+);
+
 test.each(readdirSync(localesDir).filter((file) => file.endsWith('.json')))(
   'compiles %s for lazy loading and preserves protocol syntax',
   async (file) => {
@@ -47,10 +60,19 @@ test.each(readdirSync(localesDir).filter((file) => file.endsWith('.json')))(
       warnHtmlMessage: false,
     });
     const original = JSON.parse(source);
+    for (const key of messageKeys(original)) {
+      expect(englishKeys.has(key), `${file}: unknown key ${key}`).toBe(true);
+      expect(i18n.global.te(key), `${file}: missing compiled key ${key}`).toBe(
+        true
+      );
+    }
     for (let index = 1; index <= 5; index++) {
-      const key = `i${index}Description`;
-      if (original.awg?.[key]) {
-        expect(i18n.global.t(`awg.${key}`)).toBe(original.awg[key]);
+      const key = `i${index}`;
+      const description = original.wireguard?.obfuscation?.[key]?.description;
+      if (description) {
+        expect(i18n.global.t(`wireguard.obfuscation.${key}.description`)).toBe(
+          description
+        );
       }
     }
   }

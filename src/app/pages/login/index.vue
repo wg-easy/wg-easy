@@ -18,7 +18,7 @@
       >
         <div class="h-px flex-1 bg-line"></div>
         <span class="text-xs text-subtle">
-          {{ $t('login.or') }}
+          {{ $t('auth.login.or') }}
         </span>
         <div class="h-px flex-1 bg-line"></div>
       </div>
@@ -31,36 +31,36 @@
       @submit.prevent="submit"
     >
       <label for="login-username" class="-mb-3 text-xs font-medium text-muted">
-        {{ $t('general.username') }}
+        {{ $t('common.fields.username') }}
       </label>
       <BaseInput
         id="login-username"
         v-model="username"
         type="text"
-        :placeholder="$t('general.username')"
+        :placeholder="$t('common.fields.username')"
         autocomplete="username"
         autofocus
         name="username"
       />
 
       <label for="login-password" class="-mb-3 text-xs font-medium text-muted">
-        {{ $t('general.password') }}
+        {{ $t('common.fields.password') }}
       </label>
       <BaseInput
         id="login-password"
         v-model="password"
         type="password"
         name="password"
-        :placeholder="$t('general.password')"
+        :placeholder="$t('common.fields.password')"
         autocomplete="current-password"
       />
 
       <label
         class="flex gap-2 whitespace-nowrap"
-        :title="$t('login.rememberMeDesc')"
+        :title="$t('auth.login.rememberMeDescription')"
       >
         <BaseSwitch v-model="remember" />
-        <span class="text-sm">{{ $t('login.rememberMe') }}</span>
+        <span class="text-sm">{{ $t('auth.login.rememberMe') }}</span>
       </label>
 
       <button
@@ -71,7 +71,7 @@
           v-if="authenticating"
           class="mx-auto size-5 animate-spin"
         />
-        <span v-else>{{ $t('login.signIn') }}</span>
+        <span v-else>{{ $t('auth.login.signIn') }}</span>
       </button>
     </form>
   </div>

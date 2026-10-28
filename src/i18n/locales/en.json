@@ -1,225 +1,546 @@
 {
-  "pages": {
-    "me": "Account",
-    "clients": "Clients",
-    "admin": {
-      "panel": "Admin Panel",
-      "general": "General",
-      "config": "Config",
-      "interface": "Interface",
-      "hooks": "Hooks"
-    }
-  },
-  "user": {
-    "email": "E-Mail"
-  },
-  "me": {
-    "currentPassword": "Current Password",
-    "enable2fa": "Enable Two Factor Authentication",
-    "enable2faDesc": "Scan the QR code with your authenticator app or enter the key manually.",
-    "2faKey": "TOTP Key",
-    "2faCodeDesc": "Enter the code from your authenticator app.",
-    "disable2fa": "Disable Two Factor Authentication",
-    "disable2faDesc": "Enter your password to disable Two Factor Authentication.",
-    "linkOauth": "Link your account with an external provider",
-    "unlinkOauth": "Unlink",
-    "linkedWith": "Linked with {provider}",
-    "providerDisabled": "Your currently linked provider is not enabled"
-  },
-  "general": {
-    "name": "Name",
-    "username": "Username",
-    "password": "Password",
-    "newPassword": "New Password",
-    "updatePassword": "Update Password",
-    "addPassword": "Add Password",
-    "mtu": "MTU",
-    "allowedIps": "Allowed IPs",
-    "dns": "DNS",
-    "persistentKeepalive": "Persistent Keepalive",
-    "logout": "Logout",
-    "continue": "Continue",
-    "host": "Host",
-    "port": "Port",
+  "common": {
+    "fields": {
+      "email": "E-Mail",
+      "name": "Name",
+      "username": "Username",
+      "password": "Password",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm Password"
+    },
+    "actions": {
+      "continue": "Continue",
+      "delete": "Delete",
+      "change": "Change",
+      "cancel": "Cancel",
+      "create": "Create",
+      "save": "Save",
+      "revert": "Revert",
+      "add": "Add",
+      "moveUp": "Move up",
+      "moveDown": "Move down",
+      "retry": "Retry"
+    },
     "yes": "Yes",
     "no": "No",
-    "confirmPassword": "Confirm Password",
     "loading": "Loading...",
-    "2fa": "Two Factor Authentication",
-    "2faCode": "TOTP Code",
-    "externalAuth": "External Authentication"
+    "update": {
+      "available": "There is an update available!",
+      "action": "Update"
+    },
+    "theme": {
+      "dark": "Dark theme",
+      "light": "Light theme",
+      "system": "System theme"
+    },
+    "donate": "Donate",
+    "notifications": {
+      "success": "Success",
+      "saved": "Saved",
+      "error": "Error",
+      "unknown": "Unknown error. See console for more details"
+    },
+    "form": {
+      "actions": "Actions",
+      "sections": {
+        "general": "General",
+        "advanced": "Advanced"
+      },
+      "noItems": "No items",
+      "nullNoItems": "No items. Using global config",
+      "nullNotSet": "Not set",
+      "set": "Set",
+      "unset": "Unset",
+      "chooseOption": "Choose an option"
+    },
+    "clipboard": {
+      "notSupported": "Copy is not supported",
+      "copied": "Copied!",
+      "failed": "Copy failed",
+      "copy": "Copy"
+    },
+    "documentation": "Documentation",
+    "selectLanguage": "Select language",
+    "skipToContent": "Skip to content"
+  },
+  "auth": {
+    "logout": "Logout",
+    "twoFactor": {
+      "title": "Two Factor Authentication",
+      "code": "TOTP Code"
+    },
+    "external": {
+      "title": "External Authentication"
+    },
+    "login": {
+      "signIn": "Sign In",
+      "signInWith": "Sign in with {provider}",
+      "or": "or",
+      "rememberMe": "Remember me",
+      "rememberMeDescription": "Stay logged after closing the browser",
+      "insecure": "You can't log in with an insecure connection. Use HTTPS.",
+      "twoFactor": {
+        "required": "Two Factor Authentication is required",
+        "invalid": "Two Factor Authentication is wrong"
+      },
+      "expired": "Login expired. Try again",
+      "title": "Welcome back",
+      "description": "Sign in to manage your private network."
+    }
+  },
+  "account": {
+    "title": "Account",
+    "password": {
+      "current": "Current Password",
+      "update": "Update Password",
+      "add": "Add Password"
+    },
+    "twoFactor": {
+      "enable": {
+        "label": "Enable Two Factor Authentication",
+        "description": "Scan the QR code with your authenticator app or enter the key manually."
+      },
+      "key": "TOTP Key",
+      "codeDescription": "Enter the code from your authenticator app.",
+      "disable": {
+        "label": "Disable Two Factor Authentication",
+        "description": "Enter your password to disable Two Factor Authentication."
+      }
+    },
+    "external": {
+      "link": "Link your account with an external provider",
+      "unlink": "Unlink",
+      "linkedWith": "Linked with {provider}",
+      "providerDisabled": "Your currently linked provider is not enabled"
+    }
   },
   "setup": {
     "welcome": "Welcome to your first setup of wg-easy",
-    "welcomeDesc": "You have found the easiest way to install and manage WireGuard on any Linux host",
+    "welcomeDescription": "You have found the easiest way to install and manage WireGuard on any Linux host",
     "existingSetup": "Do you have an existing setup?",
-    "createAdminDesc": "Please first enter an admin username and a strong secure password. This information will be used to log in to your administration panel.",
-    "setupConfigDesc": "Please enter the host and port information. This will be used for the client configuration when setting up WireGuard on their devices.",
-    "setupMigrationDesc": "Please provide the backup file if you want to migrate your data from your previous wg-easy version to your new setup.",
+    "createAdminDescription": "Please first enter an admin username and a strong secure password. This information will be used to log in to your administration panel.",
+    "setupConfigDescription": "Please enter the host and port information. This will be used for the client configuration when setting up WireGuard on their devices.",
+    "setupMigrationDescription": "Please provide the backup file if you want to migrate your data from your previous wg-easy version to your new setup.",
     "upload": "Upload",
     "migration": "Restore the backup:",
     "createAccount": "Create Account",
     "successful": "Setup successful",
-    "hostDesc": "Public hostname clients will connect to",
-    "portDesc": "Public UDP port clients will connect to and WireGuard will listen on"
+    "hostDescription": "Public hostname clients will connect to",
+    "portDescription": "Public UDP port clients will connect to and WireGuard will listen on",
+    "title": "Getting started"
   },
-  "update": {
-    "updateAvailable": "There is an update available!",
-    "update": "Update"
-  },
-  "theme": {
-    "dark": "Dark theme",
-    "light": "Light theme",
-    "system": "System theme"
-  },
-  "layout": {
-    "toggleCharts": "Show/hide Charts",
-    "donate": "Donate"
-  },
-  "login": {
-    "signIn": "Sign In",
-    "signInWith": "Sign in with {provider}",
-    "or": "or",
-    "rememberMe": "Remember me",
-    "rememberMeDesc": "Stay logged after closing the browser",
-    "insecure": "You can't log in with an insecure connection. Use HTTPS.",
-    "2faRequired": "Two Factor Authentication is required",
-    "2faWrong": "Two Factor Authentication is wrong",
-    "loginExpired": "Login expired. Try again"
-  },
-  "client": {
-    "empty": "There are no clients yet.",
-    "newShort": "New",
-    "sort": "Sort",
-    "create": "Create Client",
-    "created": "Client created",
-    "new": "New Client",
-    "name": "Name",
-    "expireDate": "Expires At",
-    "expireDateDesc": "Date and time the client will be disabled, in your local timezone. Blank for permanent",
-    "delete": "Delete",
-    "deleteClient": "Delete Client",
-    "deleteDialog": "Are you sure you want to delete {name}? This action cannot be undone.",
-    "enabled": "Enabled",
-    "address": "Address",
-    "keys": "Keys",
-    "publicKey": "Public Key",
-    "preSharedKey": "Preshared Key",
-    "preSharedKeySet": "Configured",
-    "preSharedKeyNone": "Not configured",
-    "addPreSharedKey": "Add Preshared Key",
-    "addPreSharedKeyDialog": "Generate a preshared key for {name}?",
-    "rotatePreSharedKey": "Rotate Preshared Key",
-    "rotatePreSharedKeyDialog": "Generate a new preshared key for {name}?",
-    "removePreSharedKey": "Remove Preshared Key",
-    "removePreSharedKeyDialog": "Remove the preshared key for {name}?",
-    "rotateKeyPair": "Rotate Key Pair",
-    "rotateKeyPairDialog": "Generate a new key pair for {name}?",
-    "keysUpdated": "Keys updated",
-    "serverAllowedIps": "Server Allowed IPs",
-    "otlDesc": "Generate short one time link",
-    "permanent": "Permanent",
-    "createdOn": "Created on {date}",
-    "lastSeen": "Last seen on {date}",
-    "totalDownload": "Total Download: {total}",
-    "totalUpload": "Total Upload: {total}",
-    "newClient": "New Client",
-    "disableClient": "Disable Client",
-    "enableClient": "Enable Client",
-    "noPrivKey": "This client has no known private key. Cannot create Configuration.",
-    "showQR": "Show QR Code",
-    "downloadConfig": "Download Configuration",
-    "allowedIpsDesc": "Which IPs will be routed through the VPN (overrides global config)",
-    "serverAllowedIpsDesc": "Which IPs the server will route to the client",
-    "mtuDesc": "Sets the maximum transmission unit (packet size) for the VPN tunnel. Leave empty for automatic detection",
-    "persistentKeepaliveDesc": "Sets the interval (in seconds) for keep-alive packets. 0 disables it",
-    "hooks": "Hooks",
-    "hooksDescription": "Hooks only work with wg-quick",
-    "hooksLeaveEmpty": "Only for wg-quick. Otherwise, leave it empty",
-    "dnsDesc": "DNS server clients will use (overrides global config)",
-    "notConnected": "Client not connected",
-    "endpoint": "Endpoint",
-    "endpointDesc": "IP of the client from which the WireGuard connection is established",
-    "search": "Search clients...",
-    "config": "Configuration",
-    "viewConfig": "View Configuration",
-    "firewallIps": "Firewall Allowed IPs",
-    "firewallIpsDesc": "Destination IPs/CIDRs this client can access (server-side enforcement). Leave empty to use Allowed IPs. Supports optional port and protocol filtering. See docs for syntax.",
-    "downloadPng": "Download PNG",
-    "copyPng": "Copy PNG"
-  },
-  "dialog": {
-    "change": "Change",
-    "cancel": "Cancel",
-    "create": "Create"
-  },
-  "toast": {
-    "success": "Success",
-    "saved": "Saved",
-    "error": "Error",
-    "unknown": "Unknown error. See console for more details"
-  },
-  "form": {
-    "actions": "Actions",
-    "save": "Save",
-    "revert": "Revert",
-    "sectionGeneral": "General",
-    "sectionAdvanced": "Advanced",
-    "noItems": "No items",
-    "nullNoItems": "No items. Using global config",
-    "nullNotSet": "Not set",
-    "set": "Set",
-    "unset": "Unset",
-    "add": "Add",
-    "moveUp": "Move up",
-    "moveDown": "Move down"
+  "clients": {
+    "title": "Clients",
+    "list": {
+      "toggleCharts": "Show/hide Charts",
+      "empty": "There are no clients yet.",
+      "new": "New",
+      "sort": "Sort",
+      "newClient": "New Client",
+      "search": "Search clients...",
+      "total": "clients",
+      "title": "Your clients",
+      "autoRefresh": "Updates automatically",
+      "connectionIssue": "Connection interrupted",
+      "loadError": "Unable to refresh your clients. Check your connection and try again.",
+      "hint": "Download a configuration or scan a QR code to connect a device. One-time links let you share configurations securely.",
+      "noResults": "No clients match your search or filters.",
+      "clearSearch": "Clear search"
+    },
+    "create": {
+      "action": "Create Client",
+      "success": "Client created",
+      "title": "New Client"
+    },
+    "fields": {
+      "name": {
+        "label": "Name"
+      },
+      "expiresAt": {
+        "label": "Expires At",
+        "description": "Date and time the client will be disabled, in your local timezone. Blank for permanent"
+      },
+      "address": {
+        "label": "Address"
+      },
+      "serverAllowedIps": {
+        "label": "Server Allowed IPs",
+        "description": "Which IPs the server will route to the client"
+      },
+      "allowedIps": {
+        "description": "Which IPs will be routed through the VPN (overrides global config)"
+      },
+      "mtu": {
+        "description": "Sets the maximum transmission unit (packet size) for the VPN tunnel. Leave empty for automatic detection"
+      },
+      "persistentKeepalive": {
+        "description": "Sets the interval (in seconds) for keep-alive packets. 0 disables it"
+      },
+      "dns": {
+        "description": "DNS server clients will use (overrides global config)"
+      },
+      "endpoint": {
+        "label": "Endpoint",
+        "description": "IP of the client from which the WireGuard connection is established"
+      },
+      "firewallIps": {
+        "label": "Firewall Allowed IPs",
+        "description": "Destination IPs/CIDRs this client can access (server-side enforcement). Leave empty to use Allowed IPs. Supports optional port and protocol filtering. See docs for syntax."
+      }
+    },
+    "delete": {
+      "title": "Delete Client",
+      "description": "Are you sure you want to delete {name}? This action cannot be undone."
+    },
+    "status": {
+      "enabled": "Enabled",
+      "permanent": "Permanent",
+      "createdOn": "Created on {date}",
+      "lastSeen": "Last seen on {date}",
+      "disable": "Disable Client",
+      "enable": "Enable Client",
+      "notConnected": "Client not connected",
+      "disabled": "Disabled",
+      "online": "Online",
+      "offline": "Offline"
+    },
+    "keys": {
+      "title": "Keys",
+      "publicKey": "Public Key",
+      "preSharedKey": "Preshared Key",
+      "preSharedKeySet": "Configured",
+      "preSharedKeyNone": "Not configured",
+      "actions": {
+        "addPreSharedKey": {
+          "label": "Add Preshared Key",
+          "description": "Generate a preshared key for {name}?"
+        },
+        "rotatePreSharedKey": {
+          "label": "Rotate Preshared Key",
+          "description": "Generate a new preshared key for {name}?"
+        },
+        "removePreSharedKey": {
+          "label": "Remove Preshared Key",
+          "description": "Remove the preshared key for {name}?"
+        },
+        "rotateKeyPair": {
+          "label": "Rotate Key Pair",
+          "description": "Generate a new key pair for {name}?"
+        }
+      },
+      "updated": "Keys updated"
+    },
+    "configuration": {
+      "oneTimeLink": "Generate short one time link",
+      "noPrivateKey": "This client has no known private key. Cannot create Configuration.",
+      "showQrCode": "Show QR Code",
+      "download": "Download Configuration",
+      "title": "Configuration",
+      "view": "View Configuration",
+      "downloadPng": "Download PNG",
+      "copyPng": "Copy PNG"
+    },
+    "traffic": {
+      "totalDownload": "Total Download: {total}",
+      "totalUpload": "Total Upload: {total}",
+      "download": "Download",
+      "upload": "Upload"
+    },
+    "hooks": {
+      "title": "Hooks",
+      "description": "Hooks only work with wg-quick",
+      "fieldDescription": "Only for wg-quick. Otherwise, leave it empty"
+    },
+    "bulk": {
+      "title": "Bulk actions",
+      "done": "Done selecting",
+      "selectPage": "Select this page",
+      "selectClient": "Select {name}",
+      "selected": "{count} selected",
+      "clearSelection": "Clear selection",
+      "actions": {
+        "enable": {
+          "label": "Enable selected",
+          "title": "Enable {count} selected clients?",
+          "description": "The selected clients will be allowed to connect to the VPN. Expired clients must have their expiration dates updated first.",
+          "success": "Enabled {count} clients."
+        },
+        "disable": {
+          "label": "Disable selected",
+          "title": "Disable {count} selected clients?",
+          "description": "The selected clients will lose VPN access. You can enable them again later.",
+          "success": "Disabled {count} clients."
+        },
+        "delete": {
+          "label": "Delete selected",
+          "title": "Delete {count} selected clients?",
+          "description": "These clients will lose VPN access and their configurations and one-time links will be permanently deleted. This cannot be undone.",
+          "success": "Deleted {count} clients."
+        }
+      },
+      "applying": "Applying changes to selected clients…",
+      "failed": "Unable to apply the bulk action. Refresh the list and try again."
+    },
+    "description": "Your devices. Your network. Securely connected.",
+    "pagination": {
+      "label": "Client list pagination",
+      "range": "Showing {start}–{end} of {total} clients",
+      "previous": "Previous",
+      "next": "Next",
+      "pageOf": "Page {page} of {total}",
+      "perPage": "Per page"
+    },
+    "sort": {
+      "ascending": "Sort: name ascending",
+      "descending": "Sort: name descending",
+      "label": "Sort by",
+      "options": {
+        "nameAsc": "Name: A–Z",
+        "nameDesc": "Name: Z–A",
+        "newest": "Newest first",
+        "oldest": "Oldest first",
+        "addressAsc": "IPv4 address: low to high",
+        "addressDesc": "IPv4 address: high to low",
+        "expiryAsc": "Expiry: soonest first",
+        "expiryDesc": "Expiry: latest first"
+      }
+    },
+    "edit": "Edit {name}",
+    "filters": {
+      "status": {
+        "label": "Status",
+        "options": {
+          "all": "All statuses",
+          "enabled": "Enabled",
+          "disabled": "Disabled",
+          "online": "Online",
+          "offline": "Offline"
+        }
+      },
+      "expiry": {
+        "label": "Expiry",
+        "options": {
+          "all": "Any expiry",
+          "permanent": "Never expires",
+          "expiring": "Expires in 7 days",
+          "expired": "Expired"
+        }
+      },
+      "clear": "Clear filters"
+    }
   },
   "admin": {
+    "title": "Admin Panel",
     "general": {
-      "sessionTimeout": "Session Timeout",
-      "sessionTimeoutDesc": "Session duration for Remember Me (seconds)",
+      "title": "General",
+      "sessionTimeout": {
+        "label": "Session Timeout",
+        "description": "Session duration for Remember Me (seconds)"
+      },
       "metrics": "Metrics",
-      "metricsPassword": "Password",
-      "metricsPasswordDesc": "Bearer Password for the metrics endpoint (password or argon2 hash)",
-      "json": "JSON",
-      "jsonDesc": "Route for metrics in JSON format",
-      "prometheus": "Prometheus",
-      "prometheusDesc": "Route for Prometheus metrics"
+      "metricsPassword": {
+        "label": "Password",
+        "description": "Bearer Password for the metrics endpoint (password or argon2 hash)"
+      },
+      "json": {
+        "label": "JSON",
+        "description": "Route for metrics in JSON format"
+      },
+      "prometheus": {
+        "label": "Prometheus",
+        "description": "Route for Prometheus metrics"
+      }
     },
     "config": {
+      "title": "Config",
       "connection": "Connection",
-      "hostDesc": "Public hostname clients will connect to (invalidates config)",
-      "portDesc": "Public UDP port clients will connect to (invalidates config, you probably want to change Interface Port too)",
-      "allowedIpsDesc": "Allowed IPs clients will use (global config)",
-      "dnsDesc": "DNS server clients will use (global config)",
-      "mtuDesc": "MTU clients will use (only for new clients). Leave empty for automatic detection",
-      "persistentKeepaliveDesc": "Interval in seconds to send keepalives to the server. 0 = disabled (only for new clients)",
-      "generatePreSharedKey": "Generate Preshared Keys",
-      "generatePreSharedKeyDesc": "Automatically generate preshared keys for new clients",
-      "suggest": "Suggest",
-      "suggestDesc": "Choose a IP-Address or Hostname for the Host field"
+      "host": {
+        "description": "Public hostname clients will connect to (invalidates config)"
+      },
+      "port": {
+        "description": "Public UDP port clients will connect to (invalidates config, you probably want to change Interface Port too)"
+      },
+      "allowedIps": {
+        "description": "Allowed IPs clients will use (global config)"
+      },
+      "dns": {
+        "description": "DNS server clients will use (global config)"
+      },
+      "mtu": {
+        "description": "MTU clients will use (only for new clients). Leave empty for automatic detection"
+      },
+      "persistentKeepalive": {
+        "description": "Interval in seconds to send keepalives to the server. 0 = disabled (only for new clients)"
+      },
+      "generatePreSharedKey": {
+        "label": "Generate Preshared Keys",
+        "description": "Automatically generate preshared keys for new clients"
+      },
+      "suggest": {
+        "label": "Suggest",
+        "description": "Choose a IP-Address or Hostname for the Host field"
+      }
     },
     "interface": {
+      "title": "Interface",
       "cidrSuccess": "Changed CIDR",
-      "device": "Device",
-      "deviceDesc": "Ethernet device the wireguard traffic should be forwarded through",
-      "routingTable": "Routing Table",
-      "routingTableDesc": "Routing table for WireGuard routes. Set to auto, off, or a table number.",
-      "mtuDesc": "MTU WireGuard will use. Leave empty for automatic detection",
-      "portDesc": "UDP Port WireGuard will listen on (you probably want to change Config Port too)",
+      "device": {
+        "label": "Device",
+        "description": "Ethernet device the wireguard traffic should be forwarded through"
+      },
+      "routingTable": {
+        "label": "Routing Table",
+        "description": "Routing table for WireGuard routes. Set to auto, off, or a table number."
+      },
+      "mtu": {
+        "description": "MTU WireGuard will use. Leave empty for automatic detection"
+      },
+      "port": {
+        "description": "UDP Port WireGuard will listen on (you probably want to change Config Port too)"
+      },
       "changeCidr": "Change CIDR",
-      "restart": "Restart Interface",
-      "restartDesc": "Restart the WireGuard interface",
+      "restart": {
+        "label": "Restart Interface",
+        "description": "Restart the WireGuard interface"
+      },
       "restartWarn": "Are you sure to restart the interface? This will disconnect all clients.",
       "restartSuccess": "Interface restarted",
       "firewall": "Traffic Filtering",
-      "firewallEnabled": "Enable Per-Client Firewall",
-      "firewallEnabledDesc": "Restrict client traffic to specific destination IPs using iptables. When enabled, each client can be configured with allowed destinations."
+      "firewallEnabled": {
+        "label": "Enable Per-Client Firewall",
+        "description": "Restrict client traffic to specific destination IPs using iptables. When enabled, each client can be configured with allowed destinations."
+      }
     },
-    "introText": "Welcome to the admin panel.\n\nHere you can manage the general settings, the configuration, the interface settings and the hooks.\n\nStart by choosing one of the sections in the sidebar."
+    "hooks": {
+      "title": "Hooks"
+    },
+    "introduction": "Welcome to the admin panel.\n\nHere you can manage the general settings, the configuration, the interface settings and the hooks.\n\nStart by choosing one of the sections in the sidebar.",
+    "description": "Configure your network and manage your server.",
+    "overview": "Overview"
   },
-  "zod": {
-    "generic": {
+  "wireguard": {
+    "fields": {
+      "mtu": "MTU",
+      "allowedIps": "Allowed IPs",
+      "dns": "DNS",
+      "persistentKeepalive": "Persistent Keepalive",
+      "host": "Host",
+      "port": "Port"
+    },
+    "hooks": {
+      "preUp": "PreUp",
+      "postUp": "PostUp",
+      "preDown": "PreDown",
+      "postDown": "PostDown"
+    },
+    "obfuscation": {
+      "jC": {
+        "label": "Junk packet count (Jc)",
+        "description": "Number of junk packets to send (1-128, recommended: 4-12)"
+      },
+      "jMin": {
+        "label": "Junk packet min size (Jmin)",
+        "description": "Minimum size of junk packets (0-1279*, recommended: 8, must be < Jmax)"
+      },
+      "jMax": {
+        "label": "Junk packet max size (Jmax)",
+        "description": "Maximum size of junk packets (1-1280*, recommended: 80, must be > Jmin)"
+      },
+      "s1": {
+        "label": "Init packet junk size (S1)",
+        "description": "Init packet junk size (0-1132[1280* - 148 = 1132], recommended: 15-150, S1+56 ≠ S2)"
+      },
+      "s2": {
+        "label": "Response packet junk size (S2)",
+        "description": "Response packet junk size (0-1188[1280* - 92 = 1188], recommended: 15-150)"
+      },
+      "s3": {
+        "label": "Cookie reply packet junk size (S3)",
+        "description": "Cookie reply packet junk size"
+      },
+      "s4": {
+        "label": "Transport packet junk size (S4)",
+        "description": "Transport packet junk size"
+      },
+      "h1": {
+        "label": "Init magic header (H1)",
+        "description": "Init packet header value or range (X or X-Y, where X<Y. Min 5, max 2147483647. Value or range must not overlap with other headers)"
+      },
+      "h2": {
+        "label": "Response magic header (H2)",
+        "description": "Response packet header value or range (X or X-Y, where X<Y. Min 5, max 2147483647. Value or range must not overlap with other headers)"
+      },
+      "h3": {
+        "label": "Cookie reply magic header (H3)",
+        "description": "Cookie reply packet header value or range (X or X-Y, where X<Y. Min 5, max 2147483647. Value or range must not overlap with other headers)"
+      },
+      "h4": {
+        "label": "Transport magic header (H4)",
+        "description": "Transport packet header value or range (X or X-Y, where X<Y. Min 5, max 2147483647. Value or range must not overlap with other headers)"
+      },
+      "i1": {
+        "label": "Special junk packet 1 (I1)",
+        "description": "Protocol mimic packet in hex format: <b 0x...>"
+      },
+      "i2": {
+        "label": "Special junk packet 2 (I2)",
+        "description": "Protocol mimic packet in hex format: <b 0x...>"
+      },
+      "i3": {
+        "label": "Special junk packet 3 (I3)",
+        "description": "Protocol mimic packet in hex format: <b 0x...>"
+      },
+      "i4": {
+        "label": "Special junk packet 4 (I4)",
+        "description": "Protocol mimic packet in hex format: <b 0x...>"
+      },
+      "i5": {
+        "label": "Special junk packet 5 (I5)",
+        "description": "Protocol mimic packet in hex format: <b 0x...>"
+      },
+      "rangeNote": "The following parameters accept a single number or an inclusive range (0-65535), for example 30 or 30-90",
+      "headerProtectionKey": {
+        "label": "Header protection key",
+        "description": "32 byte base64 key used to encrypt packet headers. Must match on both sides, so it is copied to every client. Requires S1-S4 to be at least 12"
+      },
+      "contentPaddingAddition": {
+        "label": "Content padding addition",
+        "description": "Random amount of bytes appended to transport packets before encryption"
+      },
+      "rekeyAfterTime": {
+        "label": "Rekey after time",
+        "description": "Seconds before a session is renegotiated (WireGuard default: 120)"
+      },
+      "rekeyTimeout": {
+        "label": "Rekey timeout",
+        "description": "Seconds between handshake retries (WireGuard default: 5)"
+      },
+      "rejectAfterTime": {
+        "label": "Reject after time",
+        "description": "Session lifetime in seconds (WireGuard default: 180)"
+      },
+      "keepaliveTimeout": {
+        "label": "Keepalive timeout",
+        "description": "Idle seconds before a keepalive is sent (WireGuard default: 10)"
+      },
+      "maxHandshakeAttempts": {
+        "label": "Max handshake attempts",
+        "description": "Handshake attempts before giving up (WireGuard default: 18)"
+      },
+      "randomTrailers": {
+        "label": "Random trailers",
+        "description": "Append a random amount of bytes to handshake packets. Must match on both sides, so it is copied to every client"
+      },
+      "disableCookies": {
+        "label": "Disable cookies",
+        "description": "Do not answer handshakes with cookie messages when under load. Only affects this side of the tunnel"
+      },
+      "mtuNote": "Values depend on the MTU",
+      "title": "AmneziaWG Obfuscation Parameters"
+    }
+  },
+  "validation": {
+    "messages": {
       "required": "{field} is required",
       "validNumber": "{field} must be a valid number",
       "validNumberRange": "{field} must be a valid number or number range",
@@ -283,158 +604,5 @@
     "allowedIpsInvalid": "Each Allowed IPs entry must be a single IP address or CIDR",
     "endpointInvalid": "Use a hostname or IPv4 address followed by :port, or [IPv6]:port (1–65535)",
     "file": "File"
-  },
-  "hooks": {
-    "preUp": "PreUp",
-    "postUp": "PostUp",
-    "preDown": "PreDown",
-    "postDown": "PostDown"
-  },
-  "copy": {
-    "notSupported": "Copy is not supported",
-    "copied": "Copied!",
-    "failed": "Copy failed",
-    "copy": "Copy"
-  },
-  "awg": {
-    "jCLabel": "Junk packet count (Jc)",
-    "jCDescription": "Number of junk packets to send (1-128, recommended: 4-12)",
-    "jMinLabel": "Junk packet min size (Jmin)",
-    "jMinDescription": "Minimum size of junk packets (0-1279*, recommended: 8, must be < Jmax)",
-    "jMaxLabel": "Junk packet max size (Jmax)",
-    "jMaxDescription": "Maximum size of junk packets (1-1280*, recommended: 80, must be > Jmin)",
-    "s1Label": "Init packet junk size (S1)",
-    "s1Description": "Init packet junk size (0-1132[1280* - 148 = 1132], recommended: 15-150, S1+56 ≠ S2)",
-    "s2Label": "Response packet junk size (S2)",
-    "s2Description": "Response packet junk size (0-1188[1280* - 92 = 1188], recommended: 15-150)",
-    "s3Label": "Cookie reply packet junk size (S3)",
-    "s3Description": "Cookie reply packet junk size",
-    "s4Label": "Transport packet junk size (S4)",
-    "s4Description": "Transport packet junk size",
-    "h1Label": "Init magic header (H1)",
-    "h1Description": "Init packet header value or range (X or X-Y, where X<Y. Min 5, max 2147483647. Value or range must not overlap with other headers)",
-    "h2Label": "Response magic header (H2)",
-    "h2Description": "Response packet header value or range (X or X-Y, where X<Y. Min 5, max 2147483647. Value or range must not overlap with other headers)",
-    "h3Label": "Cookie reply magic header (H3)",
-    "h3Description": "Cookie reply packet header value or range (X or X-Y, where X<Y. Min 5, max 2147483647. Value or range must not overlap with other headers)",
-    "h4Label": "Transport magic header (H4)",
-    "h4Description": "Transport packet header value or range (X or X-Y, where X<Y. Min 5, max 2147483647. Value or range must not overlap with other headers)",
-    "i1Label": "Special junk packet 1 (I1)",
-    "i1Description": "Protocol mimic packet in hex format: <b 0x...>",
-    "i2Label": "Special junk packet 2 (I2)",
-    "i2Description": "Protocol mimic packet in hex format: <b 0x...>",
-    "i3Label": "Special junk packet 3 (I3)",
-    "i3Description": "Protocol mimic packet in hex format: <b 0x...>",
-    "i4Label": "Special junk packet 4 (I4)",
-    "i4Description": "Protocol mimic packet in hex format: <b 0x...>",
-    "i5Label": "Special junk packet 5 (I5)",
-    "i5Description": "Protocol mimic packet in hex format: <b 0x...>",
-    "rangeNote": "The following parameters accept a single number or an inclusive range (0-65535), for example 30 or 30-90",
-    "headerProtectionKeyLabel": "Header protection key",
-    "headerProtectionKeyDescription": "32 byte base64 key used to encrypt packet headers. Must match on both sides, so it is copied to every client. Requires S1-S4 to be at least 12",
-    "contentPaddingAdditionLabel": "Content padding addition",
-    "contentPaddingAdditionDescription": "Random amount of bytes appended to transport packets before encryption",
-    "rekeyAfterTimeLabel": "Rekey after time",
-    "rekeyAfterTimeDescription": "Seconds before a session is renegotiated (WireGuard default: 120)",
-    "rekeyTimeoutLabel": "Rekey timeout",
-    "rekeyTimeoutDescription": "Seconds between handshake retries (WireGuard default: 5)",
-    "rejectAfterTimeLabel": "Reject after time",
-    "rejectAfterTimeDescription": "Session lifetime in seconds (WireGuard default: 180)",
-    "keepaliveTimeoutLabel": "Keepalive timeout",
-    "keepaliveTimeoutDescription": "Idle seconds before a keepalive is sent (WireGuard default: 10)",
-    "maxHandshakeAttemptsLabel": "Max handshake attempts",
-    "maxHandshakeAttemptsDescription": "Handshake attempts before giving up (WireGuard default: 18)",
-    "randomTrailersLabel": "Random trailers",
-    "randomTrailersDescription": "Append a random amount of bytes to handshake packets. Must match on both sides, so it is copied to every client",
-    "disableCookiesLabel": "Disable cookies",
-    "disableCookiesDescription": "Do not answer handshakes with cookie messages when under load. Only affects this side of the tunnel",
-    "mtuNote": "Values depend on the MTU",
-    "obfuscationParameters": "AmneziaWG Obfuscation Parameters"
-  },
-  "bulk": {
-    "actions": "Bulk actions",
-    "done": "Done selecting",
-    "selectPage": "Select this page",
-    "selectClient": "Select {name}",
-    "selected": "{count} selected",
-    "clearSelection": "Clear selection",
-    "enable": "Enable selected",
-    "disable": "Disable selected",
-    "delete": "Delete selected",
-    "enableTitle": "Enable {count} selected clients?",
-    "enableDescription": "The selected clients will be allowed to connect to the VPN. Expired clients must have their expiration dates updated first.",
-    "disableTitle": "Disable {count} selected clients?",
-    "disableDescription": "The selected clients will lose VPN access. You can enable them again later.",
-    "deleteTitle": "Delete {count} selected clients?",
-    "deleteDescription": "These clients will lose VPN access and their configurations and one-time links will be permanently deleted. This cannot be undone.",
-    "applying": "Applying changes to selected clients…",
-    "failed": "Unable to apply the bulk action. Refresh the list and try again.",
-    "success": {
-      "enable": "Enabled {count} clients.",
-      "disable": "Disabled {count} clients.",
-      "delete": "Deleted {count} clients."
-    }
-  },
-  "ui": {
-    "documentation": "Documentation",
-    "chooseOption": "Choose an option",
-    "selectLanguage": "Select language",
-    "skipToContent": "Skip to content",
-    "setup": "Getting started",
-    "clientsDescription": "Your devices. Your network. Securely connected.",
-    "clientsTotal": "clients",
-    "clientPagination": "Client list pagination",
-    "clientRange": "Showing {start}–{end} of {total} clients",
-    "previousPage": "Previous",
-    "nextPage": "Next",
-    "pageOf": "Page {page} of {total}",
-    "clientList": "Your clients",
-    "autoRefresh": "Updates automatically",
-    "connectionIssue": "Connection interrupted",
-    "loadError": "Unable to refresh your clients. Check your connection and try again.",
-    "retry": "Retry",
-    "clientsHint": "Download a configuration or scan a QR code to connect a device. One-time links let you share configurations securely.",
-    "noResults": "No clients match your search or filters.",
-    "clearSearch": "Clear search",
-    "sortAscending": "Sort: name ascending",
-    "sortDescending": "Sort: name descending",
-    "disabled": "Disabled",
-    "online": "Online",
-    "offline": "Offline",
-    "download": "Download",
-    "upload": "Upload",
-    "editClient": "Edit {name}",
-    "adminDescription": "Configure your network and manage your server.",
-    "overview": "Overview",
-    "welcomeBack": "Welcome back",
-    "signInDescription": "Sign in to manage your private network.",
-    "perPage": "Per page",
-    "filterStatus": "Status",
-    "filterExpiry": "Expiry",
-    "sortBy": "Sort by",
-    "clearFilters": "Clear filters",
-    "statusOptions": {
-      "all": "All statuses",
-      "enabled": "Enabled",
-      "disabled": "Disabled",
-      "online": "Online",
-      "offline": "Offline"
-    },
-    "expiryOptions": {
-      "all": "Any expiry",
-      "permanent": "Never expires",
-      "expiring": "Expires in 7 days",
-      "expired": "Expired"
-    },
-    "sortOptions": {
-      "nameAsc": "Name: A–Z",
-      "nameDesc": "Name: Z–A",
-      "newest": "Newest first",
-      "oldest": "Oldest first",
-      "addressAsc": "IPv4 address: low to high",
-      "addressDesc": "IPv4 address: high to low",
-      "expiryAsc": "Expiry: soonest first",
-      "expiryDesc": "Expiry: latest first"
-    }
   }
 }

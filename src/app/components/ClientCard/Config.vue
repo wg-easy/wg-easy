@@ -3,8 +3,8 @@
     :href="'/api/client/' + client.id + '/configuration'"
     download
     class="icon-button"
-    :title="$t('client.downloadConfig')"
-    :aria-label="$t('client.downloadConfig')"
+    :title="$t('clients.configuration.download')"
+    :aria-label="$t('clients.configuration.download')"
   >
     <DownloadIcon class="size-4" />
   </a>

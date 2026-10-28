@@ -3,27 +3,27 @@
     <div>
       <PanelHead>
         <PanelHeadTitle>
-          {{ $t('pages.me') }}
+          {{ $t('account.title') }}
         </PanelHeadTitle>
       </PanelHead>
       <PanelBody>
         <FormElement @submit.prevent="submit">
           <FormGroup>
-            <FormHeading>{{ $t('form.sectionGeneral') }}</FormHeading>
+            <FormHeading>{{ $t('common.form.sections.general') }}</FormHeading>
             <FormTextField
               id="name"
               v-model="name"
-              :label="$t('general.name')"
+              :label="$t('common.fields.name')"
             />
             <FormNullTextField
               id="email"
               v-model="email"
-              :label="$t('user.email')"
+              :label="$t('common.fields.email')"
             />
           </FormGroup>
           <FormActions>
             <BasePrimaryButton type="submit">
-              {{ $t('form.save') }}
+              {{ $t('common.actions.save') }}
             </BasePrimaryButton>
           </FormActions>
         </FormElement>
@@ -36,44 +36,44 @@
             hidden
           />
           <FormGroup>
-            <FormHeading>{{ $t('general.password') }}</FormHeading>
+            <FormHeading>{{ $t('common.fields.password') }}</FormHeading>
             <FormPasswordField
               v-if="hasPassword"
               id="current-password"
               v-model="currentPassword"
               autocomplete="current-password"
-              :label="$t('me.currentPassword')"
+              :label="$t('account.password.current')"
             />
             <FormPasswordField
               id="new-password"
               v-model="newPassword"
               autocomplete="new-password"
-              :label="$t('general.newPassword')"
+              :label="$t('common.fields.newPassword')"
             />
             <FormPasswordField
               id="confirm-password"
               v-model="confirmPassword"
               autocomplete="new-password"
-              :label="$t('general.confirmPassword')"
+              :label="$t('common.fields.confirmPassword')"
             />
           </FormGroup>
           <FormActions>
             <BasePrimaryButton type="submit">
               {{
                 hasPassword
-                  ? $t('general.updatePassword')
-                  : $t('general.addPassword')
+                  ? $t('account.password.update')
+                  : $t('account.password.add')
               }}
             </BasePrimaryButton>
           </FormActions>
         </FormElement>
         <FormElement @submit.prevent>
           <FormGroup>
-            <FormHeading>{{ $t('general.2fa') }}</FormHeading>
+            <FormHeading>{{ $t('auth.twoFactor.title') }}</FormHeading>
             <template v-if="!authStore.userData?.totpVerified && !twofa">
               <div class="col-span-full flex justify-end">
                 <BaseSecondaryButton type="button" @click="setup2fa">
-                  {{ $t('me.enable2fa') }}
+                  {{ $t('account.twoFactor.enable.label') }}
                 </BaseSecondaryButton>
               </div>
             </template>
@@ -82,32 +82,32 @@
               class="col-span-2"
             >
               <p class="text-sm text-subtle">
-                {{ $t('me.enable2faDesc') }}
+                {{ $t('account.twoFactor.enable.description') }}
               </p>
               <div class="mt-2 flex flex-col gap-2">
                 <img
                   :src="twofa.qrcode"
-                  :alt="$t('me.enable2fa')"
+                  :alt="$t('account.twoFactor.enable.label')"
                   class="size-48 rounded-lg bg-white p-2"
                 />
                 <FormTextField
                   id="2fakey"
                   :model-value="twofa.key"
                   :on-update:model-value="() => {}"
-                  :label="$t('me.2faKey')"
+                  :label="$t('account.twoFactor.key')"
                   :disabled="true"
                 />
                 <p class="text-sm text-subtle">
-                  {{ $t('me.2faCodeDesc') }}
+                  {{ $t('account.twoFactor.codeDescription') }}
                 </p>
                 <FormTextField
                   id="2facode"
                   v-model="code"
-                  :label="$t('general.2faCode')"
+                  :label="$t('auth.twoFactor.code')"
                 />
                 <FormActions>
                   <BasePrimaryButton type="button" @click="enable2fa">
-                    {{ $t('me.enable2fa') }}
+                    {{ $t('account.twoFactor.enable.label') }}
                   </BasePrimaryButton>
                 </FormActions>
               </div>
@@ -117,7 +117,7 @@
               class="col-span-2 flex flex-col gap-2"
             >
               <p class="text-sm text-subtle">
-                {{ $t('me.disable2faDesc') }}
+                {{ $t('account.twoFactor.disable.description') }}
               </p>
               <input
                 type="text"
@@ -129,13 +129,13 @@
               <FormPasswordField
                 id="2fapassword"
                 v-model="disable2faPassword"
-                :label="$t('me.currentPassword')"
+                :label="$t('account.password.current')"
                 type="password"
                 autocomplete="current-password"
               />
               <FormActions>
                 <BaseSecondaryButton type="button" @click="disable2fa">
-                  {{ $t('me.disable2fa') }}
+                  {{ $t('account.twoFactor.disable.label') }}
                 </BaseSecondaryButton>
               </FormActions>
             </div>
@@ -143,7 +143,7 @@
         </FormElement>
         <FormElement v-if="authMethods?.oauthEnabled" @submit.prevent>
           <FormGroup>
-            <FormHeading>{{ $t('general.externalAuth') }}</FormHeading>
+            <FormHeading>{{ $t('auth.external.title') }}</FormHeading>
             <template v-if="oauthProvider && oauthProviderInfo?.enabled">
               <div class="flex items-center gap-2 self-center">
                 <IconsBrandsProvider
@@ -152,7 +152,7 @@
                 />
                 <span>
                   {{
-                    $t('me.linkedWith', {
+                    $t('account.external.linkedWith', {
                       provider: oauthProviderInfo.friendlyName,
                     })
                   }}
@@ -164,13 +164,13 @@
                   :disabled="!hasPassword"
                   @click="unlinkOauth"
                 >
-                  {{ $t('me.unlinkOauth') }}
+                  {{ $t('account.external.unlink') }}
                 </BaseSecondaryButton>
               </div>
             </template>
             <template v-else-if="oauthProvider && !oauthProviderInfo?.enabled">
               <span class="flex items-center self-center">
-                {{ $t('me.providerDisabled') }}
+                {{ $t('account.external.providerDisabled') }}
               </span>
               <div class="flex justify-end">
                 <BaseSecondaryButton
@@ -178,13 +178,13 @@
                   :disabled="!hasPassword"
                   @click="unlinkOauth"
                 >
-                  {{ $t('me.unlinkOauth') }}
+                  {{ $t('account.external.unlink') }}
                 </BaseSecondaryButton>
               </div>
             </template>
             <template v-else>
               <div class="flex items-center self-center">
-                <span>{{ $t('me.linkOauth') }}</span>
+                <span>{{ $t('account.external.link') }}</span>
               </div>
               <div class="flex flex-wrap justify-end gap-2">
                 <BaseSecondaryButton

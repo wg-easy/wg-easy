@@ -15,7 +15,7 @@ export const safeStringRefine = z
   .string()
   .refine(
     (v) => v !== '__proto__' && v !== 'constructor' && v !== 'prototype',
-    { message: t('zod.stringMalformed') }
+    { message: t('validation.stringMalformed') }
   );
 
 function hasControlChars(str: string) {
@@ -25,15 +25,17 @@ function hasControlChars(str: string) {
 
 export const controlStringRefine = z
   .string()
-  .refine((v) => !hasControlChars(v), { message: t('zod.stringMalformed') });
+  .refine((v) => !hasControlChars(v), {
+    message: t('validation.stringMalformed'),
+  });
 
-export const EnabledSchema = z.boolean({ message: t('zod.enabled') });
+export const EnabledSchema = z.boolean({ message: t('validation.enabled') });
 
 export const MtuSchema = z
-  .number({ message: t('zod.mtu') })
+  .number({ message: t('validation.mtu') })
   // min for IPv6 is 1280, but we allow lower for IPv4
-  .min(1024, { message: t('zod.mtu') })
-  .max(9000, { message: t('zod.mtu') })
+  .min(1024, { message: t('validation.mtu') })
+  .max(9000, { message: t('validation.mtu') })
   .nullable();
 
 export const JcSchema = z.number().min(1).max(128).nullable();
@@ -78,7 +80,7 @@ function rangeSchema(min: number, max: number) {
         );
       },
       {
-        message: t('zod.generic.validNumberRange'),
+        message: t('validation.messages.validNumberRange'),
       }
     )
     .transform((v) => {
@@ -119,7 +121,7 @@ export const KeySchema = z
       // 32 bytes occupy 43 base64 symbols; the last symbol has two zero padding bits.
       return /^[A-Za-z0-9+/]{42}[AEIMQUYcgkosw048]=$/.test(v);
     },
-    { message: t('zod.keyMalformed') }
+    { message: t('validation.keyMalformed') }
   )
   .nullable();
 
@@ -130,26 +132,26 @@ export const ISchema = z
   .nullable();
 
 export const PortSchema = z
-  .number({ message: t('zod.port') })
-  .min(1, { message: t('zod.port') })
-  .max(65535, { message: t('zod.port') });
+  .number({ message: t('validation.port') })
+  .min(1, { message: t('validation.port') })
+  .max(65535, { message: t('validation.port') });
 
 export const RoutingTableSchema = z
-  .string({ message: t('zod.interface.routingTable') })
+  .string({ message: t('validation.interface.routingTable') })
   .pipe(safeStringRefine)
   .pipe(controlStringRefine)
   .refine((v) => /^(auto|off|\d+)$/.test(v), {
-    message: t('zod.interface.routingTable'),
+    message: t('validation.interface.routingTable'),
   });
 
 export const PersistentKeepaliveSchema = z
-  .number({ message: t('zod.persistentKeepalive') })
-  .min(0, t('zod.persistentKeepalive'))
-  .max(65535, t('zod.persistentKeepalive'));
+  .number({ message: t('validation.persistentKeepalive') })
+  .min(0, t('validation.persistentKeepalive'))
+  .max(65535, t('validation.persistentKeepalive'));
 
 export const AddressSchema = z
-  .string({ message: t('zod.address') })
-  .min(1, { message: t('zod.address') })
+  .string({ message: t('validation.address') })
+  .min(1, { message: t('validation.address') })
   .pipe(safeStringRefine)
   .pipe(controlStringRefine);
 
@@ -172,26 +174,28 @@ export const EndpointSchema = AddressSchema.refine(
         .every((label) => /^[a-z\d](?:[a-z\d-]{0,61}[a-z\d])?$/i.test(label))
     );
   },
-  { message: t('zod.endpointInvalid') }
+  { message: t('validation.endpointInvalid') }
 );
 
-export const DnsSchema = z.array(AddressSchema, { message: t('zod.dns') });
+export const DnsSchema = z.array(AddressSchema, {
+  message: t('validation.dns'),
+});
 
 // Each entry is a single IP or CIDR, anything else breaks the generated
 // WireGuard config and the per-client firewall rules
 export const AllowedIpEntrySchema = AddressSchema.refine(
   (v) => isIP(v) || isCidr(v) !== 0,
-  { message: t('zod.allowedIpsInvalid') }
+  { message: t('validation.allowedIpsInvalid') }
 );
 
 export const AllowedIpsSchema = z
-  .array(AllowedIpEntrySchema, { message: t('zod.allowedIps') })
-  .min(1, { message: t('zod.allowedIps') });
+  .array(AllowedIpEntrySchema, { message: t('validation.allowedIps') })
+  .min(1, { message: t('validation.allowedIps') });
 
 // Validation for firewall IP entries
 const FirewallIpEntrySchema = z
-  .string({ message: t('zod.client.firewallIps') })
-  .min(1, { message: t('zod.client.firewallIps') })
+  .string({ message: t('validation.client.firewallIps') })
+  .min(1, { message: t('validation.client.firewallIps') })
   .refine(
     (entry) => {
       // Check if protocol suffix is present
@@ -240,20 +244,20 @@ const FirewallIpEntrySchema = z
       return false;
     },
     {
-      message: t('zod.client.firewallIpsInvalid'),
+      message: t('validation.client.firewallIpsInvalid'),
     }
   );
 
 export const FirewallIpsSchema = z.array(FirewallIpEntrySchema, {
-  message: t('zod.client.firewallIps'),
+  message: t('validation.client.firewallIps'),
 });
 
 export const FileSchema = z.object({
-  file: z.string({ message: t('zod.file') }),
+  file: z.string({ message: t('validation.file') }),
 });
 
 export const HookSchema = z
-  .string({ message: t('zod.hook') })
+  .string({ message: t('validation.hook') })
   .pipe(safeStringRefine);
 
 /**

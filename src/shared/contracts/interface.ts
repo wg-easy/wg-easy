@@ -19,23 +19,23 @@ import {
 } from '#shared/contracts/validation';
 
 const device = z
-  .string({ message: t('zod.interface.device') })
-  .min(1, t('zod.interface.device'))
+  .string({ message: t('validation.interface.device') })
+  .min(1, t('validation.interface.device'))
   .pipe(safeStringRefine);
 
 const cidr4 = z
-  .string({ message: t('zod.interface.cidr') })
-  .min(1, { message: t('zod.interface.cidr') })
+  .string({ message: t('validation.interface.cidr') })
+  .min(1, { message: t('validation.interface.cidr') })
   .refine((value) => isCidr.v4(value), {
-    message: t('zod.interface.cidrValid'),
+    message: t('validation.interface.cidrValid'),
   })
   .pipe(safeStringRefine);
 
 const cidr6 = z
-  .string({ message: t('zod.interface.cidr') })
-  .min(1, { message: t('zod.interface.cidr') })
+  .string({ message: t('validation.interface.cidr') })
+  .min(1, { message: t('validation.interface.cidr') })
   .refine((value) => isCidr.v6(value), {
-    message: t('zod.interface.cidrValid'),
+    message: t('validation.interface.cidrValid'),
   })
   .pipe(safeStringRefine);
 
@@ -90,7 +90,7 @@ export const InterfaceUpdateSchema = z
         ctx.addIssue({
           code: 'custom',
           path: [junk],
-          message: t('zod.interface.headerProtectionJunkSize'),
+          message: t('validation.interface.headerProtectionJunkSize'),
         });
       }
     }

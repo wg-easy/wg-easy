@@ -2,21 +2,23 @@
   <div
     ref="toolbar"
     role="group"
-    :aria-label="$t('bulk.actions')"
+    :aria-label="$t('clients.bulk.title')"
     tabindex="-1"
     class="mb-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted"
   >
     <label class="flex min-h-8 items-center gap-3">
       <BaseCheckbox
         :model-value="clientsStore.pageSelection"
-        :label="$t('bulk.selectPage')"
+        :label="$t('clients.bulk.selectPage')"
         :disabled="busy || !clientsStore.clients?.length"
         @update:model-value="clientsStore.selectPage($event === true)"
       />
-      {{ $t('bulk.selectPage') }}
+      {{ $t('clients.bulk.selectPage') }}
     </label>
     <span role="status">
-      {{ $t('bulk.selected', { count: clientsStore.selectedIds.length }) }}
+      {{
+        $t('clients.bulk.selected', { count: clientsStore.selectedIds.length })
+      }}
     </span>
     <DropdownMenuRoot>
       <DropdownMenuTrigger as-child>
@@ -26,7 +28,7 @@
           class="ml-auto inline-flex min-h-8 items-center gap-1.5 hover:text-foreground disabled:opacity-45"
           :disabled="busy || !clientsStore.selectedIds.length"
         >
-          {{ $t('bulk.actions') }}
+          {{ $t('clients.bulk.title') }}
           <ChevronDownIcon class="size-3.5" aria-hidden="true" />
         </button>
       </DropdownMenuTrigger>
@@ -43,7 +45,7 @@
             @select="requestConfirmation('enable')"
           >
             <PowerIcon class="size-4" aria-hidden="true" />
-            {{ $t('bulk.enable') }}
+            {{ $t('clients.bulk.actions.enable.label') }}
           </DropdownMenuItem>
           <DropdownMenuItem
             class="ui-menu-item data-[disabled]:pointer-events-none data-[disabled]:opacity-45"
@@ -51,7 +53,7 @@
             @select="requestConfirmation('disable')"
           >
             <PowerOffIcon class="size-4" aria-hidden="true" />
-            {{ $t('bulk.disable') }}
+            {{ $t('clients.bulk.actions.disable.label') }}
           </DropdownMenuItem>
           <DropdownMenuSeparator class="my-1 h-px bg-line" />
           <DropdownMenuItem
@@ -60,7 +62,7 @@
             @select="requestConfirmation('delete')"
           >
             <Trash2Icon class="size-4" aria-hidden="true" />
-            {{ $t('bulk.delete') }}
+            {{ $t('clients.bulk.actions.delete.label') }}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenuPortal>
@@ -72,7 +74,7 @@
       :disabled="busy"
       @click="clientsStore.clearSelection()"
     >
-      {{ $t('bulk.clearSelection') }}
+      {{ $t('clients.bulk.clearSelection') }}
     </button>
     <AlertDialogRoot
       :open="confirmation !== null"
@@ -92,7 +94,7 @@
             class="text-xl font-semibold tracking-tight text-foreground"
           >
             {{
-              $t(`bulk.${confirmation.action}Title`, {
+              $t(`clients.bulk.actions.${confirmation.action}.title`, {
                 count: confirmation.count,
               })
             }}
@@ -100,7 +102,7 @@
           <AlertDialogDescription
             class="mt-5 text-sm leading-relaxed text-muted"
           >
-            {{ $t(`bulk.${confirmation.action}Description`) }}
+            {{ $t(`clients.bulk.actions.${confirmation.action}.description`) }}
           </AlertDialogDescription>
           <p v-if="errorMessage" role="alert" class="mt-4 text-sm text-accent">
             {{ errorMessage }}
@@ -112,7 +114,7 @@
               class="ui-button ui-button-secondary"
               :disabled="pending"
             >
-              {{ $t('dialog.cancel') }}
+              {{ $t('common.actions.cancel') }}
             </AlertDialogCancel>
             <button
               type="button"
@@ -131,7 +133,11 @@
                 aria-hidden="true"
               />
               {{
-                $t(pending ? 'general.loading' : `bulk.${confirmation.action}`)
+                $t(
+                  pending
+                    ? 'common.loading'
+                    : `clients.bulk.actions.${confirmation.action}.label`
+                )
               }}
             </button>
           </div>
@@ -144,7 +150,7 @@
       class="flex w-full items-center gap-2 text-subtle"
     >
       <LoaderCircleIcon class="size-3.5 animate-spin" aria-hidden="true" />
-      {{ $t('bulk.applying') }}
+      {{ $t('clients.bulk.applying') }}
     </p>
     <p
       v-if="errorMessage && !confirmation"
@@ -229,14 +235,14 @@ async function runConfirmedAction() {
       confirmation.value = null;
       toast.showToast({
         type: 'success',
-        message: t(`bulk.success.${action}`, { count }),
+        message: t(`clients.bulk.actions.${action}.success`, { count }),
       });
     }
   } catch (error) {
     errorMessage.value =
       error instanceof FetchError
-        ? error.data?.message || t('bulk.failed')
-        : t('bulk.failed');
+        ? error.data?.message || t('clients.bulk.failed')
+        : t('clients.bulk.failed');
   } finally {
     pending.value = false;
     if (clientsStore.selectedIds.length !== count) confirmation.value = null;

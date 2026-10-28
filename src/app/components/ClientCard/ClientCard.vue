@@ -23,10 +23,10 @@
               {{
                 $t(
                   !client.enabled
-                    ? 'ui.disabled'
+                    ? 'clients.status.disabled'
                     : connected
-                      ? 'ui.online'
-                      : 'ui.offline'
+                      ? 'clients.status.online'
+                      : 'clients.status.offline'
                 )
               }}
             </span>
@@ -52,7 +52,7 @@
       >
         <label class="flex items-center gap-2 text-[11px] text-subtle">
           <ClientCardSwitch :client="client" />
-          <span>{{ $t('client.enabled') }}</span>
+          <span>{{ $t('clients.status.enabled') }}</span>
         </label>
         <div class="flex gap-1.5">
           <ClientCardEdit :client="client" />

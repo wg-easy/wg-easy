@@ -6,20 +6,20 @@
         <FormHostField
           id="host"
           v-model="data.host"
-          :label="$t('general.host')"
-          :description="$t('admin.config.hostDesc')"
+          :label="$t('wireguard.fields.host')"
+          :description="$t('admin.config.host.description')"
           url="/api/admin/ip-info"
         />
         <FormNumberField
           id="port"
           v-model="data.port"
-          :label="$t('general.port')"
-          :description="$t('admin.config.portDesc')"
+          :label="$t('wireguard.fields.port')"
+          :description="$t('admin.config.port.description')"
         />
       </FormGroup>
       <FormGroup>
-        <FormHeading :description="$t('admin.config.allowedIpsDesc')">
-          {{ $t('general.allowedIps') }}
+        <FormHeading :description="$t('admin.config.allowedIps.description')">
+          {{ $t('wireguard.fields.allowedIps') }}
         </FormHeading>
         <FormArrayField
           v-model="data.defaultAllowedIps"
@@ -27,85 +27,87 @@
         />
       </FormGroup>
       <FormGroup>
-        <FormHeading :description="$t('admin.config.dnsDesc')">
-          {{ $t('general.dns') }}
+        <FormHeading :description="$t('admin.config.dns.description')">
+          {{ $t('wireguard.fields.dns') }}
         </FormHeading>
         <FormArrayField v-model="data.defaultDns" name="defaultDns" />
       </FormGroup>
       <FormGroup>
-        <FormHeading>{{ $t('form.sectionAdvanced') }}</FormHeading>
+        <FormHeading>{{ $t('common.form.sections.advanced') }}</FormHeading>
         <FormSwitchField
           id="defaultGeneratePreSharedKey"
           v-model="data.defaultGeneratePreSharedKey"
-          :label="$t('admin.config.generatePreSharedKey')"
-          :description="$t('admin.config.generatePreSharedKeyDesc')"
+          :label="$t('admin.config.generatePreSharedKey.label')"
+          :description="$t('admin.config.generatePreSharedKey.description')"
         />
         <FormNullNumberField
           id="defaultMtu"
           v-model="data.defaultMtu"
-          :label="$t('general.mtu')"
-          :description="$t('admin.config.mtuDesc')"
+          :label="$t('wireguard.fields.mtu')"
+          :description="$t('admin.config.mtu.description')"
         />
         <FormNumberField
           id="defaultPersistentKeepalive"
           v-model="data.defaultPersistentKeepalive"
-          :label="$t('general.persistentKeepalive')"
-          :description="$t('admin.config.persistentKeepaliveDesc')"
+          :label="$t('wireguard.fields.persistentKeepalive')"
+          :description="$t('admin.config.persistentKeepalive.description')"
         />
       </FormGroup>
       <FormGroup v-if="globalStore.information?.isAwg">
-        <FormHeading>{{ $t('awg.obfuscationParameters') }}</FormHeading>
+        <FormHeading>{{ $t('wireguard.obfuscation.title') }}</FormHeading>
 
         <FormNullNumberField
           id="jC"
           v-model="data.defaultJC"
-          :label="$t('awg.jCLabel')"
-          :description="$t('awg.jCDescription')"
+          :label="$t('wireguard.obfuscation.jC.label')"
+          :description="$t('wireguard.obfuscation.jC.description')"
         />
         <FormNullNumberField
           id="jMin"
           v-model="data.defaultJMin"
-          :label="$t('awg.jMinLabel')"
-          :description="$t('awg.jMinDescription')"
+          :label="$t('wireguard.obfuscation.jMin.label')"
+          :description="$t('wireguard.obfuscation.jMin.description')"
         />
         <FormNullNumberField
           id="jMax"
           v-model="data.defaultJMax"
-          :label="$t('awg.jMaxLabel')"
-          :description="$t('awg.jMaxDescription')"
+          :label="$t('wireguard.obfuscation.jMax.label')"
+          :description="$t('wireguard.obfuscation.jMax.description')"
         />
 
-        <div class="col-span-full text-sm">* {{ $t('awg.mtuNote') }}</div>
+        <div class="col-span-full text-sm">
+          * {{ $t('wireguard.obfuscation.mtuNote') }}
+        </div>
 
         <FormNullTextField
           id="i1"
           v-model="data.defaultI1"
-          :label="$t('awg.i1Label')"
-          :description="$t('awg.i1Description')"
+          :label="$t('wireguard.obfuscation.i1.label')"
+          :description="$t('wireguard.obfuscation.i1.description')"
         />
         <FormNullTextField
           id="i2"
           v-model="data.defaultI2"
-          :label="$t('awg.i2Label')"
-          :description="$t('awg.i2Description')"
+          :label="$t('wireguard.obfuscation.i2.label')"
+          :description="$t('wireguard.obfuscation.i2.description')"
         />
         <FormNullTextField
           id="i3"
           v-model="data.defaultI3"
-          :label="$t('awg.i3Label')"
-          :description="$t('awg.i3Description')"
+          :label="$t('wireguard.obfuscation.i3.label')"
+          :description="$t('wireguard.obfuscation.i3.description')"
         />
         <FormNullTextField
           id="i4"
           v-model="data.defaultI4"
-          :label="$t('awg.i4Label')"
-          :description="$t('awg.i4Description')"
+          :label="$t('wireguard.obfuscation.i4.label')"
+          :description="$t('wireguard.obfuscation.i4.description')"
         />
         <FormNullTextField
           id="i5"
           v-model="data.defaultI5"
-          :label="$t('awg.i5Label')"
-          :description="$t('awg.i5Description')"
+          :label="$t('wireguard.obfuscation.i5.label')"
+          :description="$t('wireguard.obfuscation.i5.description')"
         />
       </FormGroup>
       <FormSaveControls @revert="revert" />

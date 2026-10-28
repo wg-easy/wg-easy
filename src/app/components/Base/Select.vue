@@ -2,7 +2,7 @@
   <SelectRoot v-model="selected" :disabled="disabled">
     <SelectTrigger
       v-bind="$attrs"
-      :aria-label="label ?? $t('ui.chooseOption')"
+      :aria-label="label ?? $t('common.form.chooseOption')"
       class="inline-flex min-w-0 items-center justify-between gap-2 text-left"
       :class="
         compact
@@ -12,7 +12,9 @@
     >
       <SelectValue class="truncate">
         {{
-          selectedOption ? optionText(selectedOption) : $t('ui.chooseOption')
+          selectedOption
+            ? optionText(selectedOption)
+            : $t('common.form.chooseOption')
         }}
       </SelectValue>
       <SelectIcon as-child>

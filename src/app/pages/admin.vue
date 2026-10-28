@@ -1,24 +1,24 @@
 <template>
   <main class="page-container">
     <div class="mb-7">
-      <p class="eyebrow mb-3">WireGuard / {{ $t('pages.admin.panel') }}</p>
+      <p class="eyebrow mb-3">WireGuard / {{ $t('admin.title') }}</p>
       <h1 id="admin-section-title" class="page-title">
         {{ activeMenuItem.name }}
       </h1>
-      <p class="mt-3 text-sm text-subtle">{{ $t('ui.adminDescription') }}</p>
+      <p class="mt-3 text-sm text-subtle">{{ $t('admin.description') }}</p>
     </div>
     <div class="grid items-start gap-6 lg:grid-cols-[220px_minmax(0,1fr)]">
       <aside class="surface p-3 lg:sticky lg:top-6">
         <nav
           class="flex flex-wrap gap-1 lg:flex-col"
-          :aria-label="$t('pages.admin.panel')"
+          :aria-label="$t('admin.title')"
         >
           <NuxtLink
             to="/admin"
             class="nav-link"
             exact-active-class="bg-accent/10 text-accent"
           >
-            {{ $t('ui.overview') }}
+            {{ $t('admin.overview') }}
           </NuxtLink>
           <NuxtLink
             v-for="item in menuItems"
@@ -44,17 +44,17 @@ const { t } = useI18n();
 const route = useRoute();
 
 const menuItems = computed(() => [
-  { id: 'general', name: t('pages.admin.general') },
-  { id: 'config', name: t('pages.admin.config') },
-  { id: 'interface', name: t('pages.admin.interface') },
-  { id: 'hooks', name: t('pages.admin.hooks') },
+  { id: 'general', name: t('admin.general.title') },
+  { id: 'config', name: t('admin.config.title') },
+  { id: 'interface', name: t('admin.interface.title') },
+  { id: 'hooks', name: t('admin.hooks.title') },
 ]);
 
 const activeMenuItem = computed(() => {
   return (
     menuItems.value.find((item) => route.path === `/admin/${item.id}`) ?? {
       id: '',
-      name: t('ui.overview'),
+      name: t('admin.overview'),
     }
   );
 });

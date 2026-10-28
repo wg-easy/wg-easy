@@ -15,8 +15,8 @@ import {
 } from '#shared/contracts/validation';
 
 const host = z
-  .string({ message: t('zod.userConfig.host') })
-  .min(1, t('zod.userConfig.host'))
+  .string({ message: t('validation.userConfig.host') })
+  .min(1, t('validation.userConfig.host'))
   .pipe(safeStringRefine);
 
 export const UserConfigSetupSchema = z.object({

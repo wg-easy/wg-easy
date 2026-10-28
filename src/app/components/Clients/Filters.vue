@@ -2,14 +2,14 @@
   <div class="grid grid-cols-2 gap-3 sm:flex sm:flex-wrap sm:items-end">
     <ClientsSelect
       :model-value="clientsStore.query.status"
-      :label="$t('ui.filterStatus')"
+      :label="$t('clients.filters.status.label')"
       :options="statusOptions"
       class="sm:w-40"
       @update:model-value="clientsStore.updateQuery({ status: $event })"
     />
     <ClientsSelect
       :model-value="clientsStore.query.expiry"
-      :label="$t('ui.filterExpiry')"
+      :label="$t('clients.filters.expiry.label')"
       :options="expiryOptions"
       class="sm:w-48"
       @update:model-value="clientsStore.updateQuery({ expiry: $event })"
@@ -29,13 +29,13 @@ const { t } = useI18n();
 const statusOptions = computed(() =>
   clientStatusFilters.map((value) => ({
     value,
-    label: t(`ui.statusOptions.${value}`),
+    label: t(`clients.filters.status.options.${value}`),
   }))
 );
 const expiryOptions = computed(() =>
   clientExpiryFilters.map((value) => ({
     value,
-    label: t(`ui.expiryOptions.${value}`),
+    label: t(`clients.filters.expiry.options.${value}`),
   }))
 );
 </script>

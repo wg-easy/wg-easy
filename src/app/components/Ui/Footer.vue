@@ -36,7 +36,7 @@
         rel="noreferrer"
         class="hover:text-foreground"
       >
-        {{ $t('ui.documentation') }} ↗
+        {{ $t('common.documentation') }} ↗
       </a>
       <a
         href="https://opensource.org/license/agpl-v3"
@@ -52,7 +52,7 @@
         rel="noreferrer"
         class="hover:text-foreground"
       >
-        {{ $t('layout.donate') }} ↗
+        {{ $t('common.donate') }} ↗
       </a>
     </div>
   </footer>

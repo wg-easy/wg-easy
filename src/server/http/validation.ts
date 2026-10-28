@@ -20,18 +20,18 @@ export function validateZod<T>(
 
             if (t) {
               let newMessage = null;
-              if (v.message.startsWith('zod.')) {
+              if (v.message.startsWith('validation.')) {
                 switch (v.code) {
                   case 'too_small':
                     switch (v.origin) {
                       case 'string':
-                        newMessage = t('zod.generic.stringMin', {
+                        newMessage = t('validation.messages.stringMin', {
                           field: t(v.message),
                           min: v.minimum,
                         });
                         break;
                       case 'number':
-                        newMessage = t('zod.generic.numberMin', {
+                        newMessage = t('validation.messages.numberMin', {
                           field: t(v.message),
                           min: v.minimum,
                         });
@@ -41,13 +41,13 @@ export function validateZod<T>(
                   case 'too_big':
                     switch (v.origin) {
                       case 'string':
-                        newMessage = t('zod.generic.stringMax', {
+                        newMessage = t('validation.messages.stringMax', {
                           field: t(v.message),
                           max: v.maximum,
                         });
                         break;
                       case 'number':
-                        newMessage = t('zod.generic.numberMax', {
+                        newMessage = t('validation.messages.numberMax', {
                           field: t(v.message),
                           max: v.maximum,
                         });
@@ -56,28 +56,28 @@ export function validateZod<T>(
                     break;
                   case 'invalid_type': {
                     if (v.input === null || v.input === undefined) {
-                      newMessage = t('zod.generic.required', {
+                      newMessage = t('validation.messages.required', {
                         field: v.path.join('.'),
                       });
                     } else {
                       switch (v.expected) {
                         case 'string':
-                          newMessage = t('zod.generic.validString', {
+                          newMessage = t('validation.messages.validString', {
                             field: t(v.message),
                           });
                           break;
                         case 'boolean':
-                          newMessage = t('zod.generic.validBoolean', {
+                          newMessage = t('validation.messages.validBoolean', {
                             field: t(v.message),
                           });
                           break;
                         case 'number':
-                          newMessage = t('zod.generic.validNumber', {
+                          newMessage = t('validation.messages.validNumber', {
                             field: t(v.message),
                           });
                           break;
                         case 'array':
-                          newMessage = t('zod.generic.validArray', {
+                          newMessage = t('validation.messages.validArray', {
                             field: t(v.message),
                           });
                           break;
@@ -87,7 +87,10 @@ export function validateZod<T>(
                   }
                 }
               }
-              if (!newMessage && v.message === 'zod.generic.validNumberRange') {
+              if (
+                !newMessage &&
+                v.message === 'validation.messages.validNumberRange'
+              ) {
                 newMessage = t(v.message, { field: v.path.join('.') });
               }
               if (newMessage) {

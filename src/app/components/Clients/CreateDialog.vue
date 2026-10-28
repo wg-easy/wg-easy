@@ -4,26 +4,32 @@
       <slot />
     </template>
     <template #title>
-      {{ $t('client.new') }}
+      {{ $t('clients.create.title') }}
     </template>
     <template #description>
       <div class="flex flex-col gap-2">
-        <FormTextField id="name" v-model="name" :label="$t('client.name')" />
+        <FormTextField
+          id="name"
+          v-model="name"
+          :label="$t('clients.fields.name.label')"
+        />
         <FormDateField
           id="expiresAt"
           v-model="expiresAt"
-          :label="$t('client.expireDate')"
-          :description="$t('client.expireDateDesc')"
+          :label="$t('clients.fields.expiresAt.label')"
+          :description="$t('clients.fields.expiresAt.description')"
         />
       </div>
     </template>
     <template #actions>
       <DialogClose as-child>
-        <BaseSecondaryButton>{{ $t('dialog.cancel') }}</BaseSecondaryButton>
+        <BaseSecondaryButton>
+          {{ $t('common.actions.cancel') }}
+        </BaseSecondaryButton>
       </DialogClose>
       <DialogClose as-child>
         <BasePrimaryButton :disabled="!name.trim()" @click="createClient">
-          {{ $t('client.create') }}
+          {{ $t('clients.create.action') }}
         </BasePrimaryButton>
       </DialogClose>
     </template>
@@ -60,7 +66,7 @@ const _createClient = useSubmit(
     }),
   {
     revert: () => clientsStore.refresh(),
-    successMsg: t('client.created'),
+    successMsg: t('clients.create.success'),
   }
 );
 </script>
