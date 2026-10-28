@@ -21,10 +21,10 @@ describe('client access and addresses', () => {
         1,
         ClientUpdateSchema.parse({ ...before, enabled: true })
       )
-    ).rejects.toMatchObject({ statusCode: 422 });
+    ).rejects.toMatchObject({ status: 422 });
     await expect(
       clients.create(admin, { name: 'Expired', expiresAt: '2000-01-01' })
-    ).rejects.toMatchObject({ statusCode: 422 });
+    ).rejects.toMatchObject({ status: 422 });
     expect(await store.clients.get(1)).toEqual(before);
     expect(await store.clients.getAll()).toHaveLength(1);
     expect(writeConfiguration).not.toHaveBeenCalled();
@@ -86,7 +86,7 @@ describe('client access and addresses', () => {
         1,
         ClientUpdateSchema.parse({ ...before, [field]: address })
       )
-    ).rejects.toMatchObject({ statusCode: 422 });
+    ).rejects.toMatchObject({ status: 422 });
     expect(await store.clients.get(1)).toEqual(before);
     expect(writeConfiguration).not.toHaveBeenCalled();
   });
@@ -110,7 +110,7 @@ describe('client access and addresses', () => {
           ipv6Address: 'fdcc:ad94:bacf:61a4::cafe:2',
         })
       )
-    ).rejects.toMatchObject({ statusCode: 409 });
+    ).rejects.toMatchObject({ status: 409 });
     expect(writeConfiguration).not.toHaveBeenCalled();
     await clients.update(
       admin,
@@ -142,7 +142,7 @@ describe('client access and addresses', () => {
     ).toHaveLength(1);
     expect(
       results.filter((result) => result.status === 'rejected')
-    ).toMatchObject([{ reason: { statusCode: 409 } }]);
+    ).toMatchObject([{ reason: { status: 409 } }]);
   });
 });
 
@@ -189,7 +189,7 @@ describe('CIDR changes', () => {
             ...addresses,
           })
         )
-      ).rejects.toMatchObject({ statusCode: 422 });
+      ).rejects.toMatchObject({ status: 422 });
     }
     expect(await store.clients.get(id)).toEqual(edited);
     expect(writeConfiguration).not.toHaveBeenCalled();

@@ -1,4 +1,4 @@
-import { defineEventHandler, sendRedirect } from 'h3';
+import { defineEventHandler, sendRedirect } from 'nuxt/server';
 
 import { completeOAuth } from '#server/features/identity/session';
 

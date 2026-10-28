@@ -1,4 +1,4 @@
-import { defineEventHandler, readValidatedBody } from 'h3';
+import { defineEventHandler, readValidatedBody } from 'nuxt/server';
 
 import { completeSecondFactor } from '#server/features/identity/session';
 import { validateZod } from '#server/http/validation';

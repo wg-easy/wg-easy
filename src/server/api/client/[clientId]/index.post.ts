@@ -1,8 +1,8 @@
-import { getValidatedRouterParams, readValidatedBody } from 'h3';
+import { readValidatedBody } from 'nuxt/server';
 
 import * as clients from '#server/features/vpn/clients';
 import { defineAuthenticatedEventHandler } from '#server/utils/handler';
-import { validateZod } from '#server/http/validation';
+import { validateZod, getValidatedRouterParams } from '#server/http/validation';
 import { ClientGetSchema, ClientUpdateSchema } from '#shared/contracts/client';
 
 export default defineAuthenticatedEventHandler(async ({ event, user }) => {

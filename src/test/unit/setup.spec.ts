@@ -43,7 +43,7 @@ describe('setup', () => {
     const { store, writeConfiguration, sync } = await fixture();
     await expect(
       setup.configureEndpoint('vpn.example.com', 51820)
-    ).rejects.toMatchObject({ statusCode: 400 });
+    ).rejects.toMatchObject({ status: 400 });
     await setup.createAdministrator('admin', 'a-long-password');
     expect(await setup.status()).toEqual({ step: 3, done: false });
     expect(await store.users.get(1)).toMatchObject({
@@ -52,7 +52,7 @@ describe('setup', () => {
     });
     await expect(
       setup.createAdministrator('another', 'a-long-password')
-    ).rejects.toMatchObject({ statusCode: 400 });
+    ).rejects.toMatchObject({ status: 400 });
     await setup.configureEndpoint('vpn.example.com', 51900);
     expect(await setup.status()).toEqual({ step: 0, done: true });
     expect(await store.userConfigs.get()).toMatchObject({
@@ -66,7 +66,7 @@ describe('setup', () => {
     expect(sync).toHaveBeenCalledExactlyOnceWith('wg0');
     await expect(
       setup.configureEndpoint('changed', 51901)
-    ).rejects.toMatchObject({ statusCode: 400 });
+    ).rejects.toMatchObject({ status: 400 });
   });
 
   test('rolls back account creation when the setup transition cannot be saved', async () => {
@@ -205,7 +205,7 @@ describe('setup', () => {
   test('checks the setup stage before discovering host addresses', async () => {
     const { ipInformation } = await fixture();
     await expect(setup.ipInformation()).rejects.toMatchObject({
-      statusCode: 400,
+      status: 400,
     });
     expect(ipInformation).not.toHaveBeenCalled();
     await setup.createAdministrator('admin', 'a-long-password');

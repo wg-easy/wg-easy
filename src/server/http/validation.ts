@@ -1,18 +1,16 @@
-import { useTranslation } from '@intlify/h3';
+import { createError, getRouterParams, type RequestEvent } from 'nuxt/server';
 import z, { type ZodType } from 'zod';
-import type { H3Event, EventHandlerRequest } from 'h3';
 
-export function validateZod<T>(
-  schema: ZodType<T>,
-  event: H3Event<EventHandlerRequest>
-) {
+import { useRequestTranslation } from '#server/http/translation';
+
+export function validateZod<T>(schema: ZodType<T>, event: RequestEvent) {
   return async (data: unknown) => {
     try {
       return await schema.parseAsync(data);
     } catch (error) {
       let message = 'Unexpected Error';
       if (error instanceof z.ZodError) {
-        const t = await useTranslation(event);
+        const t = await useRequestTranslation(event);
 
         message = error.issues
           .map((v) => {
@@ -104,8 +102,33 @@ export function validateZod<T>(
           })
           .join('; ');
       }
-      // eslint-disable-next-line preserve-caught-error
-      throw new Error(message);
+      throw createError({
+        status: 400,
+        statusText: 'Validation Error',
+        message,
+        cause: error,
+      });
     }
   };
+}
+
+export async function getValidatedRouterParams<T>(
+  event: RequestEvent,
+  validate: (data: unknown) => Promise<T>
+) {
+  let params: ReturnType<typeof getRouterParams>;
+  try {
+    // Decode ordinary escapes (e.g. %31 -> 1), as Nitro 2 did for IDs/tokens.
+    // Nuxt preserves encoded path separators; schemas validate the result.
+    params = getRouterParams(event, { decode: true });
+  } catch (error) {
+    if (!(error instanceof URIError)) throw error;
+    throw createError({
+      status: 400,
+      statusText: 'Validation Error',
+      message: 'Malformed route parameter encoding',
+      cause: error,
+    });
+  }
+  return validate(params);
 }

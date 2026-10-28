@@ -1,4 +1,4 @@
-import { createError } from 'h3';
+import { createError } from 'nuxt/server';
 import { parseCidr } from 'cidr-tools';
 
 import { commit, restart as restartVpn } from './lifecycle';
@@ -76,8 +76,8 @@ export async function update(actor: Actor, data: InterfaceUpdateType) {
         ? 'iptables and ip6tables'
         : 'iptables';
       throw createError({
-        statusCode: 400,
-        statusMessage: `Per-Client Firewall requires ${tools} to be installed on the host system. Please install ${tools} before enabling this feature.`,
+        status: 400,
+        statusText: `Per-Client Firewall requires ${tools} to be installed on the host system. Please install ${tools} before enabling this feature.`,
       });
     }
   }

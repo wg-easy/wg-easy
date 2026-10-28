@@ -16,7 +16,7 @@ describe('general settings', () => {
     };
     await expect(
       settings.update({ id: 2, role: roles.CLIENT }, data)
-    ).rejects.toMatchObject({ statusCode: 403 });
+    ).rejects.toMatchObject({ status: 403 });
     expect(crypto.hashPassword).not.toHaveBeenCalled();
     await settings.update({ id: 1, role: roles.ADMIN }, data);
     expect(data.metricsPassword).toBe('secret');
@@ -43,7 +43,7 @@ describe('general settings', () => {
       }
     );
     await expect(settings.authorizeMetrics('json')).rejects.toMatchObject({
-      statusCode: 401,
+      status: 401,
       message: 'Unauthorized',
     });
     await expect(

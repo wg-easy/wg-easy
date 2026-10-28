@@ -1,4 +1,4 @@
-import { getValidatedQuery } from 'h3';
+import { getValidatedQuery } from 'nuxt/server';
 
 import * as clientQueries from '#server/features/vpn/queries';
 import { defineAuthenticatedEventHandler } from '#server/utils/handler';

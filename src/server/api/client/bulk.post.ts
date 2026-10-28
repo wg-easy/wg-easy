@@ -1,4 +1,4 @@
-import { readValidatedBody } from 'h3';
+import { readValidatedBody } from 'nuxt/server';
 
 import { ClientBulkSchema } from '#shared/contracts/client';
 import * as clients from '#server/features/vpn/clients';

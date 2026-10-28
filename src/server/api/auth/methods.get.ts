@@ -1,4 +1,4 @@
-import { defineEventHandler } from 'h3';
+import { defineEventHandler } from 'nuxt/server';
 
 import { WG_ENV, OAUTH_PROVIDERS } from '#server/utils/config';
 import type { OAuthProvider } from '#shared/contracts/identity';

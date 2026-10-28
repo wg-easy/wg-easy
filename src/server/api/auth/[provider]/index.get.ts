@@ -1,4 +1,8 @@
-import { defineEventHandler, getValidatedQuery, sendRedirect } from 'h3';
+import {
+  defineEventHandler,
+  getValidatedQuery,
+  sendRedirect,
+} from 'nuxt/server';
 import { z } from 'zod';
 
 import { beginOAuth } from '#server/features/identity/session';

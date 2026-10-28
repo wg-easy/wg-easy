@@ -1,4 +1,4 @@
-import { defineEventHandler } from 'h3';
+import { defineEventHandler } from 'nuxt/server';
 
 import * as system from '#server/features/system';
 

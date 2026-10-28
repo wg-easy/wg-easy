@@ -12,6 +12,16 @@ export default withNuxt([
         {
           paths: [
             { name: 'drizzle-orm', message: 'Keep SQL in the repositories.' },
+            {
+              name: 'h3',
+              message:
+                'Use nuxt/server. H3 is only needed by server/http/translation.ts.',
+            },
+            {
+              name: '@intlify/h3',
+              message:
+                'Use the validation helpers in server/http/validation.ts.',
+            },
           ],
         },
       ],
@@ -25,6 +35,7 @@ export default withNuxt([
         {
           paths: [
             'h3',
+            'nuxt/server',
             '#server/utils/config',
             '#server/utils/wgHelper',
             '#server/utils/cmd',
@@ -45,7 +56,7 @@ export default withNuxt([
       'no-restricted-imports': [
         'error',
         {
-          paths: ['h3', '@intlify/h3', 'drizzle-orm'],
+          paths: ['h3', 'nuxt/server', '@intlify/h3', 'drizzle-orm'],
           patterns: ['#server/**', '#db/**', 'node:*'],
         },
       ],

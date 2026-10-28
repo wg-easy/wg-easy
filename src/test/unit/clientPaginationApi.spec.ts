@@ -1,7 +1,7 @@
 import { eq, gt } from 'drizzle-orm';
-import { mockEvent } from 'h3';
 import { beforeEach, describe, expect, onTestFinished, test, vi } from 'vitest';
 
+import { requestEvent } from '../helpers/request';
 import { databaseFixture } from '../helpers/database';
 
 import * as monitoring from '#server/features/vpn/monitoring';
@@ -25,11 +25,15 @@ vi.mock('#server/utils/config', () => ({
   OLD_ENV: {},
   WG_ENV: { WG_EXECUTABLE: 'wg', WG_INTERFACE: 'wg0', PORT: '51821' },
 }));
+vi.mock('#server/http/translation', () => ({
+  useRequestTranslation: () => (key: string) => key,
+}));
+
 let clients: ClientRepository;
 let db: Awaited<ReturnType<typeof databaseFixture>>['db'];
 
 function request(query = '') {
-  return listClients(mockEvent(`http://localhost/api/client${query}`));
+  return listClients(requestEvent(`http://localhost/api/client${query}`));
 }
 
 beforeEach(async () => {
@@ -398,7 +402,8 @@ describe('client list query validation', () => {
     'sort=unknown',
   ])('rejects invalid queries: %s', async (query) => {
     await expect(request(`?${query}`)).rejects.toMatchObject({
-      statusCode: 400,
+      status: 400,
+      statusText: 'Validation Error',
     });
   });
 });

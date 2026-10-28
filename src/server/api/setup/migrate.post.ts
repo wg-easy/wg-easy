@@ -1,4 +1,4 @@
-import { readValidatedBody } from 'h3';
+import { readValidatedBody } from 'nuxt/server';
 
 import * as setupSteps from '#server/features/setup';
 import { defineSetupEventHandler } from '#server/utils/handler';

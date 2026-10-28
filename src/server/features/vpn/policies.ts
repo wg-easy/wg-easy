@@ -1,5 +1,5 @@
 import { containsCidr, parseCidr } from 'cidr-tools';
-import { createError } from 'h3';
+import { createError } from 'nuxt/server';
 
 import { authorize } from '#server/features/authorization';
 import type { Actor } from '#shared/contracts/identity';
@@ -15,7 +15,7 @@ export function authorizeClient<T extends { id: number; userId: number }>(
   // Check ownership first so a missing client does not disclose existence.
   authorize(actor, 'clients', action, client);
   if (!client)
-    throw createError({ statusCode: 404, statusMessage: 'Client not found' });
+    throw createError({ status: 404, statusText: 'Client not found' });
   return client;
 }
 
@@ -29,9 +29,8 @@ export function assertClientEnabled(
 ) {
   if (enabled && isExpired(expiresAt, Date.now())) {
     throw createError({
-      statusCode: 422,
-      statusMessage:
-        'Client is expired. Please update the expiration date first.',
+      status: 422,
+      statusText: 'Client is expired. Please update the expiration date first.',
     });
   }
 }
@@ -60,8 +59,8 @@ export function assertClientAddresses(
       )
     ) {
       throw createError({
-        statusCode: 422,
-        statusMessage: `IPv${version} address is reserved`,
+        status: 422,
+        statusText: `IPv${version} address is reserved`,
       });
     }
     if (
@@ -70,8 +69,8 @@ export function assertClientAddresses(
       )
     ) {
       throw createError({
-        statusCode: 409,
-        statusMessage: `IPv${version} address is already in use`,
+        status: 409,
+        statusText: `IPv${version} address is already in use`,
       });
     }
   }

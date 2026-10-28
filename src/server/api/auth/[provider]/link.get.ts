@@ -1,4 +1,4 @@
-import { sendRedirect } from 'h3';
+import { sendRedirect } from 'nuxt/server';
 
 import { completeOAuth } from '#server/features/identity/session';
 import { defineAuthenticatedEventHandler } from '#server/utils/handler';

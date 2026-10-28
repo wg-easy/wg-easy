@@ -1,4 +1,4 @@
-import { createError } from 'h3';
+import { createError } from 'nuxt/server';
 
 import { importLegacyConfiguration } from './import';
 
@@ -13,11 +13,11 @@ export type SetupAction = 2 | 4 | 'migrate';
 
 function checkStep(state: SetupStepType, action: SetupAction) {
   if (state.done)
-    throw createError({ statusCode: 400, statusMessage: 'Invalid state' });
+    throw createError({ status: 400, statusText: 'Invalid state' });
   if (state.step !== 1 && state.step !== 3)
-    throw createError({ statusCode: 500, statusMessage: 'Invalid setup step' });
+    throw createError({ status: 500, statusText: 'Invalid setup step' });
   if (state.step === 1 ? action !== 2 : action !== 4 && action !== 'migrate') {
-    throw createError({ statusCode: 400, statusMessage: 'Invalid step' });
+    throw createError({ status: 400, statusText: 'Invalid step' });
   }
   return state;
 }

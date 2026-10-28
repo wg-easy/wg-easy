@@ -1,14 +1,15 @@
-import { defineEventHandler, getHeader } from 'h3';
-import type { EventHandlerResponse, H3Event } from 'h3';
+import { defineEventHandler, type RequestEvent } from 'nuxt/server';
 
 import * as setup from '#server/features/setup';
 import { authorizeMetrics } from '#server/features/settings';
 import { getCurrentUser } from '#server/features/identity/session';
 import type { PublicUser } from '#shared/contracts/identity';
 
-/** Authentication belongs here; feature functions enforce resource permissions. */
-export function defineAuthenticatedEventHandler<T extends EventHandlerResponse>(
-  handler: (params: { event: H3Event; user: PublicUser }) => T
+/**
+ * Authentication belongs here; feature functions enforce resource permissions.
+ */
+export function defineAuthenticatedEventHandler<T>(
+  handler: (params: { event: RequestEvent; user: PublicUser }) => T
 ) {
   return defineEventHandler(async (event) => {
     const user = await getCurrentUser(event);
@@ -16,9 +17,9 @@ export function defineAuthenticatedEventHandler<T extends EventHandlerResponse>(
   });
 }
 
-export function defineSetupEventHandler<T extends EventHandlerResponse>(
+export function defineSetupEventHandler<T>(
   step: setup.SetupAction,
-  handler: (params: { event: H3Event }) => T
+  handler: (params: { event: RequestEvent }) => T
 ) {
   return defineEventHandler(async (event) => {
     await setup.assertStep(step);
@@ -26,12 +27,12 @@ export function defineSetupEventHandler<T extends EventHandlerResponse>(
   });
 }
 
-export function defineMetricsHandler<T extends EventHandlerResponse>(
+export function defineMetricsHandler<T>(
   type: 'prometheus' | 'json',
-  handler: (params: { event: H3Event }) => T
+  handler: (params: { event: RequestEvent }) => T
 ) {
   return defineEventHandler(async (event) => {
-    const authorization = getHeader(event, 'Authorization');
+    const authorization = event.req.headers.get('authorization');
     const [method, value] = authorization?.split(' ') ?? [];
     await authorizeMetrics(
       type,

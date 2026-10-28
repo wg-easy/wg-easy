@@ -1,4 +1,4 @@
-import { readValidatedBody } from 'h3';
+import { readValidatedBody } from 'nuxt/server';
 
 import * as clients from '#server/features/vpn/clients';
 import { defineAuthenticatedEventHandler } from '#server/utils/handler';

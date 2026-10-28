@@ -1,5 +1,5 @@
-import { createError, getRouterParam } from 'h3';
-import type { H3Event } from 'h3';
+import { getRouterParam, createError } from 'nuxt/server';
+import type { RequestEvent } from 'nuxt/server';
 import { $fetch } from 'ofetch';
 import * as client from 'openid-client';
 
@@ -9,14 +9,14 @@ import {
   isValidOauthProvider,
   type OAuthConfig,
 } from '#server/utils/config';
-import { getTrustedRequestURL } from '#server/utils/trustedProxy';
+import { getTrustedRequestURL } from '#server/http/request';
 
-export async function buildOauthConfig(event: H3Event) {
-  const provider = getRouterParam(event, 'provider');
+export async function buildOauthConfig(event: RequestEvent) {
+  const provider = getRouterParam(event, 'provider', { decode: true });
   if (!provider || !isValidOauthProvider(provider)) {
     throw createError({
-      statusCode: 400,
-      statusMessage: 'Invalid provider',
+      status: 400,
+      statusText: 'Invalid provider',
     });
   }
 
@@ -27,8 +27,8 @@ export async function buildOauthConfig(event: H3Event) {
     !oauthProvider.clientSecret
   ) {
     throw createError({
-      statusCode: 403,
-      statusMessage: 'Provider is not enabled',
+      status: 403,
+      statusText: 'Provider is not enabled',
     });
   }
 
@@ -100,7 +100,7 @@ type OauthState = {
 };
 
 export async function getUserInfo(
-  event: H3Event,
+  event: RequestEvent,
   config: client.Configuration,
   state: OauthState,
   providerConfig: OAuthConfig
@@ -124,8 +124,8 @@ export async function getUserInfo(
 
   if (!subject) {
     throw createError({
-      statusCode: 400,
-      statusMessage: "Can't get subject",
+      status: 400,
+      statusText: "Can't get subject",
     });
   }
 
@@ -140,8 +140,8 @@ export async function getUserInfo(
 
   if (!isAllowedDomain(userInfo.email)) {
     throw createError({
-      statusCode: 401,
-      statusMessage: 'Email domain not allowed',
+      status: 401,
+      statusText: 'Email domain not allowed',
     });
   }
 
@@ -155,22 +155,22 @@ function assertHasOauthProps<T extends client.UserInfoResponse>(
 ): asserts userInfo is T & RequireKeys<T, 'sub' | 'email' | 'email_verified'> {
   if (!userInfo.sub) {
     throw createError({
-      statusCode: 400,
-      statusMessage: 'No sub set',
+      status: 400,
+      statusText: 'No sub set',
     });
   }
 
   if (!userInfo.email) {
     throw createError({
-      statusCode: 400,
-      statusMessage: 'No email set',
+      status: 400,
+      statusText: 'No email set',
     });
   }
 
   if (!userInfo.email_verified) {
     throw createError({
-      statusCode: 401,
-      statusMessage: 'Email is not verified',
+      status: 401,
+      statusText: 'Email is not verified',
     });
   }
 }

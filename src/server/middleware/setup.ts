@@ -1,4 +1,4 @@
-import { defineEventHandler, getRequestURL, sendRedirect } from 'h3';
+import { defineEventHandler, getRequestURL, sendRedirect } from 'nuxt/server';
 
 import * as setupSteps from '#server/features/setup';
 

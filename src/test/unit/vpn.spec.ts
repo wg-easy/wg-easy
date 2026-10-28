@@ -190,7 +190,7 @@ describe('VPN operations', () => {
           () => clients.bulk(admin, { action: 'enable', clientIds: [1] }),
         ]) {
           if (expired)
-            await expect(enable()).rejects.toMatchObject({ statusCode: 422 });
+            await expect(enable()).rejects.toMatchObject({ status: 422 });
           else await enable();
         }
         await vpn.maintain();
@@ -226,8 +226,8 @@ describe('VPN operations', () => {
       const actor = { id: 2, role: roles.CLIENT };
       for (const id of [1, 999]) {
         await expect(operation(actor, id)).rejects.toMatchObject({
-          statusCode: 403,
-          statusMessage: 'Permission denied',
+          status: 403,
+          statusText: 'Permission denied',
         });
       }
       expect(await store.clients.getAll()).toEqual(before);
@@ -259,7 +259,7 @@ describe('VPN operations', () => {
     });
     await expect(
       provisioning.redeemOneTimeLink("' OR 1=1 --")
-    ).rejects.toMatchObject({ statusCode: 404 });
+    ).rejects.toMatchObject({ status: 404 });
     expect((await provisioning.redeemOneTimeLink(token)).contents).toContain(
       'PrivateKey = private'
     );
@@ -268,7 +268,7 @@ describe('VPN operations', () => {
     });
     clock.mockReturnValue(now + 70_000);
     await expect(provisioning.redeemOneTimeLink(token)).rejects.toMatchObject({
-      statusCode: 410,
+      status: 410,
     });
   });
 
@@ -298,7 +298,7 @@ describe('VPN operations', () => {
   test('preserves status codes when a client is missing', async () => {
     await vpnFixture();
     await expect(clients.apply(admin, 999, 'disable')).rejects.toMatchObject({
-      statusCode: 404,
+      status: 404,
       message: 'Client not found',
     });
   });

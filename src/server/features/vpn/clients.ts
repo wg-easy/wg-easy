@@ -1,4 +1,4 @@
-import { createError } from 'h3';
+import { createError } from 'nuxt/server';
 import { parseCidr } from 'cidr-tools';
 
 import { commit } from './lifecycle';
@@ -137,7 +137,7 @@ function changeAccess(actor: Actor, data: ClientBulkType, single: boolean) {
         authorize(actor, 'clients', permission, client);
     if (clients.length !== data.clientIds.length) {
       throw createError({
-        statusCode: 404,
+        status: 404,
         message:
           'Some selected clients no longer exist. Refresh and try again.',
       });
@@ -151,9 +151,9 @@ function changeAccess(actor: Actor, data: ClientBulkType, single: boolean) {
         ? 'Client is expired. Please update the expiration date first.'
         : 'Some selected clients are expired. Update their expiration dates before enabling them.';
       throw createError({
-        statusCode: 422,
+        status: 422,
         message,
-        statusMessage: single ? message : undefined,
+        statusText: single ? message : undefined,
       });
     }
     if (data.action === 'delete') await tx.clients.deleteMany(data.clientIds);

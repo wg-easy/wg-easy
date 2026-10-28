@@ -1,6 +1,6 @@
-import { createError, getHeader, getSession, isError, useSession } from 'h3';
+import { createError, getSession, isNuxtError, useSession } from 'nuxt/server';
 import * as oauthClient from 'openid-client';
-import type { H3Event } from 'h3';
+import type { RequestEvent } from 'nuxt/server';
 
 import { buildOauthConfig, getUserInfo } from './oauth';
 
@@ -8,22 +8,20 @@ import * as identity from '#server/features/identity';
 import { getDatabase } from '#db';
 import { WG_ENV, SERVER_DEBUG } from '#server/utils/config';
 import { logSecurityEvent } from '#server/utils/securityLogger';
-import { getTrustedRequestHost } from '#server/utils/trustedProxy';
+import { getTrustedRequestHost } from '#server/http/request';
 import type {
   Actor,
   PendingLogin,
   PublicUser,
 } from '#shared/contracts/identity';
 
-export type WGSession = Partial<{
+type WGSession = Partial<{
   userId: number;
   pendingLogin: PendingLogin;
   oauth_verifier: string;
   oauth_nonce: string;
   oauth_state: string;
 }>;
-
-const name = 'wg-easy';
 
 const clearTransientState = {
   pendingLogin: undefined,
@@ -33,7 +31,7 @@ const clearTransientState = {
 };
 
 async function authenticate(
-  event: H3Event,
+  event: RequestEvent,
   result: Awaited<
     ReturnType<typeof identity.login | typeof identity.loginWithOAuth>
   >,
@@ -49,8 +47,8 @@ async function authenticate(
       UNEXPECTED_ERROR: 'Unexpected error',
     };
     throw createError({
-      statusCode: result.error === 'UNEXPECTED_ERROR' ? 500 : 401,
-      statusMessage: messages[result.error],
+      status: result.error === 'UNEXPECTED_ERROR' ? 500 : 401,
+      statusText: messages[result.error],
     });
   }
   const session = await useWGSession(event, remember);
@@ -70,7 +68,7 @@ async function authenticate(
 }
 
 export async function login(
-  event: H3Event,
+  event: RequestEvent,
   credentials: { username: string; password: string; remember?: boolean }
 ) {
   const { username, password, remember } = credentials;
@@ -80,7 +78,7 @@ export async function login(
   return authenticate(event, result, remember);
 }
 
-export async function completeSecondFactor(event: H3Event, code: string) {
+export async function completeSecondFactor(event: RequestEvent, code: string) {
   const { data } = await getWGSession(event);
   const pendingLogin = data.pendingLogin;
   const result = await identity.completeSecondFactor(pendingLogin, code);
@@ -89,7 +87,7 @@ export async function completeSecondFactor(event: H3Event, code: string) {
     return { status: result.status };
   }
   if (result.status === 'USER_DISABLED')
-    throw createError({ statusCode: 401, statusMessage: 'User disabled' });
+    throw createError({ status: 401, statusText: 'User disabled' });
   const session = await useWGSession(event, pendingLogin?.remember);
   await session.update({
     ...clearTransientState,
@@ -98,26 +96,26 @@ export async function completeSecondFactor(event: H3Event, code: string) {
   return { status: result.status };
 }
 
-export async function pendingLogin(event: H3Event) {
+export async function pendingLogin(event: RequestEvent) {
   const session = await useWGSession(event);
   const pending = identity.pending(session.data.pendingLogin);
   if (!pending) {
     await session.update(clearTransientState);
     throw createError({
-      statusCode: 401,
-      statusMessage: 'No pending authentication',
+      status: 401,
+      statusText: 'No pending authentication',
     });
   }
   return { type: pending.type };
 }
 
-export async function cancelLogin(event: H3Event) {
+export async function cancelLogin(event: RequestEvent) {
   const session = await useWGSession(event);
   await session.update(clearTransientState);
   return { success: true as const };
 }
 
-export async function beginOAuth(event: H3Event, link = false) {
+export async function beginOAuth(event: RequestEvent, link = false) {
   if (link) await getCurrentUser(event);
   const { config, provider, providerConfig } = await buildOauthConfig(event);
   const host = getTrustedRequestHost(event, WG_ENV.TRUSTED_PROXIES);
@@ -146,14 +144,14 @@ export async function beginOAuth(event: H3Event, link = false) {
     .toString();
 }
 
-export async function completeOAuth(event: H3Event, actor?: Actor) {
+export async function completeOAuth(event: RequestEvent, actor?: Actor) {
   const { config, provider, providerConfig } = await buildOauthConfig(event);
   const session = await useWGSession(event);
   const { oauth_nonce, oauth_verifier, oauth_state } = session.data;
   if (!oauth_nonce || !oauth_verifier || !oauth_state)
     throw createError({
-      statusCode: 400,
-      statusMessage: 'Missing OAuth State',
+      status: 400,
+      statusText: 'Missing OAuth State',
     });
   // Consume transient state on both successful and rejected exchanges.
   await session.update(clearTransientState);
@@ -178,65 +176,60 @@ export async function completeOAuth(event: H3Event, actor?: Actor) {
   return login.status === 'TOTP_REQUIRED' ? '/login/2fa' : '/';
 }
 
-export async function currentSessionUser(event: H3Event) {
+export async function currentSessionUser(event: RequestEvent) {
   const session = await getWGSession(event);
   if (!session.data.userId || session.data.pendingLogin)
-    throw createError({ statusCode: 401, statusMessage: 'Not authenticated' });
+    throw createError({ status: 401, statusText: 'Not authenticated' });
   const user = await identity.sessionUser(session.data.userId);
   if (!user)
     throw createError({
-      statusCode: 404,
-      statusMessage: 'Not found in Database',
+      status: 404,
+      statusText: 'Not found in Database',
     });
   return user;
 }
 
-export async function logout(event: H3Event) {
+export async function logout(event: RequestEvent) {
   const session = await useWGSession(event);
   const sessionId = session.id;
-  if (sessionId === undefined)
-    throw createError({ statusCode: 401, statusMessage: 'Not logged in' });
   await session.clear();
   SERVER_DEBUG(`Deleted Session: ${sessionId}`);
   return { success: true };
 }
 
-async function useWGSession(event: H3Event, rememberMe = false) {
-  const sessionConfig = await getDatabase().general.getSessionConfig();
-  return useSession<WGSession>(event, {
-    password: sessionConfig.sessionPassword,
-    name,
-    // TODO: add session expiration
-    // maxAge: undefined
+async function sessionConfig(rememberMe = false) {
+  const { sessionPassword, sessionTimeout } =
+    await getDatabase().general.getSessionConfig();
+  const maxAge = rememberMe ? sessionTimeout : undefined;
+  return {
+    password: sessionPassword,
+    name: 'wg-easy',
+    // Expire both the remembered cookie and its sealed contents.
+    maxAge,
     cookie: {
-      maxAge: rememberMe ? sessionConfig.sessionTimeout : undefined,
+      // Preserve Max-Age=0 too; Nuxt only applies a truthy top-level maxAge.
+      maxAge,
       secure: !WG_ENV.INSECURE,
     },
-  });
+  };
 }
 
-export async function getWGSession(event: H3Event) {
-  const sessionConfig = await getDatabase().general.getSessionConfig();
-  return getSession<WGSession>(event, {
-    password: sessionConfig.sessionPassword,
-    name,
-    cookie: {
-      secure: !WG_ENV.INSECURE,
-    },
-  });
+async function useWGSession(event: RequestEvent, rememberMe = false) {
+  return useSession<WGSession>(event, await sessionConfig(rememberMe));
 }
 
-/**
- * @throws
- */
-export async function getCurrentUser(event: H3Event) {
+async function getWGSession(event: RequestEvent) {
+  return getSession<WGSession>(event, await sessionConfig());
+}
+
+export async function getCurrentUser(event: RequestEvent) {
   const session = await getWGSession(event);
-  const authorization = getHeader(event, 'Authorization');
+  const authorization = event.req.headers.get('Authorization');
   let user: PublicUser | undefined;
   if (session.data.pendingLogin) {
     throw createError({
-      statusCode: 401,
-      statusMessage: 'Authentication pending',
+      status: 401,
+      statusText: 'Authentication pending',
     });
   }
   if (session.data.userId) {
@@ -252,8 +245,8 @@ export async function getCurrentUser(event: H3Event) {
     if (method !== 'Basic' || !value) {
       logSecurityEvent(event, 'basic');
       throw createError({
-        statusCode: 400,
-        statusMessage: 'Invalid Basic Authorization',
+        status: 400,
+        statusText: 'Invalid Basic Authorization',
       });
     }
 
@@ -267,28 +260,28 @@ export async function getCurrentUser(event: H3Event) {
     if (!username || !password) {
       logSecurityEvent(event, 'basic', username);
       throw createError({
-        statusCode: 400,
-        statusMessage: 'Invalid Basic Authorization',
+        status: 400,
+        statusText: 'Invalid Basic Authorization',
       });
     }
 
     try {
       user = await identity.authenticateBasic(username, password);
     } catch (error) {
-      if (isError(error) && [401, 403].includes(error.statusCode))
+      if (isNuxtError(error) && [401, 403].includes(error.status))
         logSecurityEvent(event, 'basic', username);
       throw error;
     }
   } else {
     throw createError({
-      statusCode: 401,
-      statusMessage: 'Session failed. No Authorization',
+      status: 401,
+      statusText: 'Session failed. No Authorization',
     });
   }
   if (!user) {
     throw createError({
-      statusCode: 401,
-      statusMessage: 'Session failed. User not found',
+      status: 401,
+      statusText: 'Session failed. User not found',
     });
   }
   return user;

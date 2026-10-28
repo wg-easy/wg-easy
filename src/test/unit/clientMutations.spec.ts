@@ -1,9 +1,9 @@
 import fs from 'node:fs/promises';
 
 import { eq } from 'drizzle-orm';
-import { mockEvent } from 'h3';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
+import { requestEvent } from '../helpers/request';
 import { databaseFixture } from '../helpers/database';
 
 import * as schema from '#db/schema';
@@ -26,7 +26,9 @@ vi.mock('#server/utils/config', () => ({
   WG_ENV: { WG_EXECUTABLE: 'wg', WG_INTERFACE: 'wg0', PORT: '51821' },
 }));
 vi.mock('#server/utils/cmd', () => ({ exec }));
-vi.mock('@intlify/h3', () => ({ useTranslation: () => (key: string) => key }));
+vi.mock('#server/http/translation', () => ({
+  useRequestTranslation: () => (key: string) => key,
+}));
 const writeFile = vi.spyOn(fs, 'writeFile');
 
 let clients: ClientRepository;
@@ -34,7 +36,7 @@ let db: Awaited<ReturnType<typeof databaseFixture>>['db'];
 
 function request(action: string, clientIds: unknown[]) {
   return bulkAction(
-    mockEvent('http://localhost/api/client/bulk', {
+    requestEvent('http://localhost/api/client/bulk', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ action, clientIds }),
@@ -43,7 +45,7 @@ function request(action: string, clientIds: unknown[]) {
 }
 
 function clientEvent(clientId = 1, body?: unknown) {
-  const event = mockEvent(`http://localhost/api/client/${clientId}`, {
+  const event = requestEvent(`http://localhost/api/client/${clientId}`, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: body === undefined ? undefined : JSON.stringify(body),
@@ -117,7 +119,7 @@ describe.each([
     getCurrentUser.mockResolvedValue({ id: 2, role: 2 });
     const before = await clients.get(3);
     await expect(mutate(clientEvent(3))).rejects.toMatchObject({
-      statusCode: 403,
+      status: 403,
     });
     expect(await clients.get(3)).toEqual(before);
     expect(writeFile).not.toHaveBeenCalled();
@@ -126,7 +128,7 @@ describe.each([
 
   test('reports a missing client to an administrator without synchronizing', async () => {
     await expect(mutate(clientEvent(999))).rejects.toMatchObject({
-      statusCode: 404,
+      status: 404,
     });
     expect(writeFile).not.toHaveBeenCalled();
     expect(exec).not.toHaveBeenCalled();
@@ -135,7 +137,7 @@ describe.each([
   test('does not disclose a missing client to a non-owner', async () => {
     getCurrentUser.mockResolvedValue({ id: 2, role: 2 });
     await expect(mutate(clientEvent(999))).rejects.toMatchObject({
-      statusCode: 403,
+      status: 403,
     });
     expect(writeFile).not.toHaveBeenCalled();
     expect(exec).not.toHaveBeenCalled();
@@ -152,7 +154,7 @@ describe('client mutation sequencing', () => {
         .where(eq(schema.client.id, 1));
       await expect(
         mode === 'single' ? enableClient(clientEvent()) : request('enable', [1])
-      ).rejects.toMatchObject({ statusCode: 422 });
+      ).rejects.toMatchObject({ status: 422 });
       expect((await clients.get(1))?.enabled).toBe(false);
       expect(writeFile).not.toHaveBeenCalled();
       expect(exec).not.toHaveBeenCalled();
@@ -235,7 +237,7 @@ describe('client creation and settings', () => {
     getCurrentUser.mockResolvedValue({ id: 2, role: 2 });
     await expect(
       createClientRoute(clientEvent(1, { name: 'New client', expiresAt: null }))
-    ).rejects.toMatchObject({ statusCode: 403 });
+    ).rejects.toMatchObject({ status: 403 });
     expect(await clients.get(4)).toBeUndefined();
     expect(exec).not.toHaveBeenCalled();
     expect(writeFile).not.toHaveBeenCalled();
@@ -270,7 +272,7 @@ describe('client creation and settings', () => {
     const before = await clients.get(1);
     await expect(
       updateClient(clientEvent(1, await settings()))
-    ).rejects.toMatchObject({ statusCode: 403 });
+    ).rejects.toMatchObject({ status: 403 });
     expect(await clients.get(1)).toEqual(before);
     expect(writeFile).not.toHaveBeenCalled();
     expect(exec).not.toHaveBeenCalled();
@@ -279,7 +281,7 @@ describe('client creation and settings', () => {
   test('rejects settings for a missing client before synchronization', async () => {
     await expect(
       updateClient(clientEvent(999, await settings()))
-    ).rejects.toMatchObject({ statusCode: 404 });
+    ).rejects.toMatchObject({ status: 404 });
     expect(writeFile).not.toHaveBeenCalled();
     expect(exec).not.toHaveBeenCalled();
   });
@@ -305,7 +307,7 @@ describe('client creation and settings', () => {
       const before = await clients.get(1);
       await expect(
         updateClient(clientEvent(1, { ...(await settings()), ...invalid }))
-      ).rejects.toMatchObject({ statusCode: 400 });
+      ).rejects.toMatchObject({ status: 400 });
       expect(await clients.get(1)).toEqual(before);
       expect(writeFile).not.toHaveBeenCalled();
       expect(exec).not.toHaveBeenCalled();
@@ -414,7 +416,7 @@ describe('bulk client API', () => {
         [3, 1],
       ]) {
         await expect(request(action, ids)).rejects.toMatchObject({
-          statusCode: 403,
+          status: 403,
         });
         expect(await clients.getAll()).toEqual(before);
       }
@@ -432,7 +434,7 @@ describe('bulk client API', () => {
         [999, 1],
       ]) {
         await expect(request(action, ids)).rejects.toMatchObject({
-          statusCode: 404,
+          status: 404,
         });
         expect(await clients.getAll()).toEqual(before);
       }
@@ -453,7 +455,7 @@ describe('bulk client API', () => {
       [2, 1],
     ]) {
       await expect(request('enable', ids)).rejects.toMatchObject({
-        statusCode: 422,
+        status: 422,
       });
       expect(await clients.getAll()).toEqual(before);
     }
@@ -476,7 +478,7 @@ describe('bulk client API', () => {
     const before = await clients.getAll();
     await expect(
       request(action as string, ids as unknown[])
-    ).rejects.toMatchObject({ statusCode: 400 });
+    ).rejects.toMatchObject({ status: 400 });
     expect(await clients.getAll()).toEqual(before);
     expect(writeFile).not.toHaveBeenCalled();
     expect(exec).not.toHaveBeenCalled();

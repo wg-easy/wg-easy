@@ -1,12 +1,13 @@
-import { mockEvent } from 'h3';
 import { describe, expect, test } from 'vitest';
 
+import { requestEvent } from '../helpers/request';
+
+import { parseTrustedProxies } from '#server/utils/trustedProxy';
 import {
   getTrustedRequestIP,
   getTrustedRequestHost,
   getTrustedRequestURL,
-  parseTrustedProxies,
-} from '#server/utils/trustedProxy';
+} from '#server/http/request';
 
 describe('parseTrustedProxies', () => {
   test('returns no proxies when the setting is absent', () => {
@@ -79,9 +80,9 @@ function createTestEvent(
   remoteAddress: string | undefined,
   headers: Record<string, string>
 ) {
-  const event = mockEvent('http://wg-easy:51821/api/auth/oidc/callback', {
-    headers,
-  });
-  event.context.clientAddress = remoteAddress;
-  return event;
+  return requestEvent(
+    'http://wg-easy:51821/api/auth/oidc/callback',
+    { headers },
+    remoteAddress
+  );
 }

@@ -1,4 +1,4 @@
-import { defineEventHandler, readValidatedBody } from 'h3';
+import { defineEventHandler, readValidatedBody } from 'nuxt/server';
 
 import { assertPasswordEnabled } from '#server/features/identity';
 import { login } from '#server/features/identity/session';

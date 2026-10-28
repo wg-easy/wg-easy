@@ -64,7 +64,7 @@ describe('identity', () => {
     );
     await expect(
       identity.authenticateBasic('admin', 'old-password')
-    ).rejects.toMatchObject({ statusCode: 403 });
+    ).rejects.toMatchObject({ status: 403 });
     expect(crypto.isPasswordValid).not.toHaveBeenCalled();
   });
 
@@ -77,9 +77,9 @@ describe('identity', () => {
     });
     await expect(
       identity.authenticateBasic('admin', 'old-password')
-    ).rejects.toMatchObject({ statusCode: 403 });
+    ).rejects.toMatchObject({ status: 403 });
     await expect(identity.sessionUser(1)).rejects.toMatchObject({
-      statusCode: 403,
+      status: 403,
     });
   });
 
@@ -131,9 +131,9 @@ describe('identity', () => {
     ).toEqual({ status: 'success', userId: 1 });
     await expect(
       identity.authenticateBasic('admin', 'old-password')
-    ).rejects.toMatchObject({ statusCode: 401 });
+    ).rejects.toMatchObject({ status: 401 });
     await expect(identity.setupTotp(actor)).rejects.toMatchObject({
-      statusCode: 409,
+      status: 409,
     });
   });
 

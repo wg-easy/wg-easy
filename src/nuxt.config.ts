@@ -1,10 +1,19 @@
 import { fileURLToPath } from 'node:url';
 
+import { defineNuxtConfig } from 'nuxt/config';
 import tailwindcss from '@tailwindcss/vite';
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2026-06-19',
+  future: {
+    compatibilityVersion: 5,
+  },
+  experimental: {
+    // @nuxtjs/i18n still imports Nitro's useRuntimeConfig from #imports.
+    // Application server code keeps explicit imports via nitro.imports below.
+    nitroAutoImports: true,
+  },
   devtools: { enabled: true },
   modules: [
     '@nuxtjs/i18n',

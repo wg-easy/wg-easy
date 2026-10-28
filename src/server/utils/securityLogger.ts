@@ -1,12 +1,12 @@
-import type { H3Event } from 'h3';
+import type { RequestEvent } from 'nuxt/server';
 
 import { WG_ENV } from '#server/utils/config';
-import { getTrustedRequestIP } from '#server/utils/trustedProxy';
+import { getTrustedRequestIP } from '#server/http/request';
 
 type SecurityEvent = 'password' | 'basic' | '2fa' | 'one-time-link';
 
 export function logSecurityEvent(
-  event: H3Event,
+  event: RequestEvent,
   type: SecurityEvent,
   username?: string
 ) {

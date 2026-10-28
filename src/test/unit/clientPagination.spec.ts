@@ -61,8 +61,8 @@ beforeEach(() => {
   vi.stubGlobal('computed', computed);
   vi.stubGlobal(
     'useFetch',
-    (_url: string, options: { params: ComputedRef<Query> }) => {
-      params = options.params;
+    (_url: string, options: { query: ComputedRef<Query> }) => {
+      params = options.query;
       return { data, error, refresh };
     }
   );

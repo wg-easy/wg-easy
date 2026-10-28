@@ -1,4 +1,4 @@
-import { createError } from 'h3';
+import { createError } from 'nuxt/server';
 import CRC32 from 'crc-32';
 
 import { authorizeClient, isExpired, type Actor } from './policies';
@@ -62,19 +62,19 @@ export function redeemOneTimeLink(token: string) {
     const link = await tx.oneTimeLinks.getByToken(token);
     if (!link)
       throw createError({
-        statusCode: 404,
-        statusMessage: 'Invalid One Time Link',
+        status: 404,
+        statusText: 'Invalid One Time Link',
       });
     if (isExpired(link.expiresAt, Date.now()))
       throw createError({
-        statusCode: 410,
-        statusMessage: 'One Time Link has expired',
+        status: 410,
+        statusText: 'One Time Link has expired',
       });
     const client = await tx.clients.get(link.id);
     if (!client)
       throw createError({
-        statusCode: 404,
-        statusMessage: 'Invalid One Time Link',
+        status: 404,
+        statusText: 'Invalid One Time Link',
       });
     const result = await configuration(tx, client);
     // Keep the existing grace period for browsers that request twice.

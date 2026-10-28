@@ -1,4 +1,4 @@
-import { defineEventHandler } from 'h3';
+import { defineEventHandler } from 'nuxt/server';
 
 import { logout } from '#server/features/identity/session';
 

@@ -54,7 +54,7 @@ export const useClientsStore = defineStore('Clients', () => {
   } = useFetch('/api/client', {
     key: 'clients',
     method: 'get',
-    params: searchParams,
+    query: searchParams,
     watch: false,
   });
 

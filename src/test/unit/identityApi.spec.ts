@@ -1,17 +1,19 @@
-import { getResponseHeader, mockEvent, type H3Event } from 'h3';
+import type { RequestEvent } from 'nuxt/server';
 import { beforeEach, onTestFinished, describe, expect, test, vi } from 'vitest';
 import * as oauthClient from 'openid-client';
 
+import { requestEvent } from '../helpers/request';
 import { databaseFixture } from '../helpers/database';
 import { resetCryptoMocks } from '../helpers/crypto';
 
-import {
-  getCurrentUser,
-  getWGSession,
-} from '#server/features/identity/session';
+import { getCurrentUser } from '#server/features/identity/session';
 import passwordLogin from '#server/api/auth/password.post';
 import verifySecondFactor from '#server/api/auth/verify-2fa.post';
 import sessionUser from '#server/api/session.get';
+import logout from '#server/api/session.delete';
+import pendingLogin from '#server/api/auth/pending.get';
+import cancelLogin from '#server/api/auth/cancel.post';
+import { WG_ENV } from '#server/utils/config';
 import { roles } from '#shared/utils/permissions';
 import generalSettings from '#server/api/admin/general.get';
 import interfaceSettings from '#server/api/admin/interface/index.get';
@@ -66,26 +68,25 @@ vi.mock('openid-client', async (original) => ({
   })),
 }));
 vi.mock('#server/utils/securityLogger', () => ({ logSecurityEvent: vi.fn() }));
-vi.mock('@intlify/h3', () => ({ useTranslation: () => (key: string) => key }));
+vi.mock('#server/http/translation', () => ({
+  useRequestTranslation: () => (key: string) => key,
+}));
 
 let fixture: Awaited<ReturnType<typeof databaseFixture>>;
 let now: number;
 
 function request(path: string, body?: unknown, cookie = '') {
-  return mockEvent(`https://localhost${path}`, {
+  return requestEvent(`https://localhost${path}`, {
     method: body === undefined ? 'GET' : 'POST',
     headers: { 'content-type': 'application/json', host: 'localhost', cookie },
     body: body === undefined ? undefined : JSON.stringify(body),
   });
 }
 
-function sessionCookie(event: H3Event) {
-  const header = getResponseHeader(event, 'set-cookie');
-  const cookies = Array.isArray(header) ? header : [String(header)];
+function sessionCookie(event: RequestEvent) {
+  const cookies = event.res.headers.getSetCookie();
   const session = cookies.find((cookie) => cookie.startsWith('wg-easy='));
   expect(session).toBeDefined();
-  expect(session).toContain('HttpOnly');
-  expect(session).toContain('Secure');
   return session!.split(';')[0]!;
 }
 
@@ -97,6 +98,7 @@ const credentials = {
 
 beforeEach(async () => {
   vi.resetAllMocks();
+  WG_ENV.INSECURE = false;
   fixture = await databaseFixture();
   now = Date.now();
   resetCryptoMocks();
@@ -115,7 +117,7 @@ beforeEach(async () => {
 
 describe('identity HTTP contract', () => {
   function basicRequest(password: string) {
-    return mockEvent('https://localhost/api/admin/general', {
+    return requestEvent('https://localhost/api/admin/general', {
       headers: {
         authorization: `Basic ${Buffer.from(`${credentials.username}:${password}`).toString('base64')}`,
       },
@@ -125,7 +127,7 @@ describe('identity HTTP contract', () => {
   test('logs rejected Basic credentials', async () => {
     const event = basicRequest('wrong');
     await expect(getCurrentUser(event)).rejects.toMatchObject({
-      statusCode: 401,
+      status: 401,
     });
     expect(logSecurityEvent).toHaveBeenCalledExactlyOnceWith(
       event,
@@ -145,7 +147,7 @@ describe('identity HTTP contract', () => {
     await fixture.store.users.update(1, { enabled: false });
     const event = basicRequest(credentials.password);
     await expect(getCurrentUser(event)).rejects.toMatchObject({
-      statusCode: 403,
+      status: 403,
     });
     expect(logSecurityEvent).toHaveBeenCalledExactlyOnceWith(
       event,
@@ -162,14 +164,14 @@ describe('identity HTTP contract', () => {
     ['ip-info', ipInformation],
   ] as const)('protects the %s admin route', async (path, handler) => {
     await expect(handler(request(`/api/admin/${path}`))).rejects.toMatchObject({
-      statusCode: 401,
+      status: 401,
     });
     await fixture.store.users.update(1, { role: roles.CLIENT });
     const login = request('/api/auth/password', credentials);
     await passwordLogin(login);
     await expect(
       handler(request(`/api/admin/${path}`, undefined, sessionCookie(login)))
-    ).rejects.toMatchObject({ statusCode: 403 });
+    ).rejects.toMatchObject({ status: 403 });
     expect(getIpInformation).not.toHaveBeenCalled();
   });
 
@@ -211,70 +213,147 @@ describe('identity HTTP contract', () => {
   });
 
   test.each([true, false])(
-    'keeps TOTP unauthenticated and preserves remember=%s on completion',
+    'sets cookie lifetime for remember=%s and expires remembered session data',
     async (remember) => {
-      const previous = request('/api/auth/password', credentials);
-      await passwordLogin(previous);
-      await fixture.store.users.update(1, {
-        totpVerified: true,
-        totpKey: 'secret',
-      });
-      const login = request(
-        '/api/auth/password',
-        { ...credentials, remember },
-        sessionCookie(previous)
-      );
-      expect(await passwordLogin(login)).toEqual({ status: 'TOTP_REQUIRED' });
+      const sessionTimeout = 3600;
+      await fixture.store.general.update({ sessionTimeout });
+      const login = request('/api/auth/password', { ...credentials, remember });
+      await passwordLogin(login);
       const cookie = sessionCookie(login);
-      const pending = await getWGSession(
-        request('/api/session', undefined, cookie)
-      );
-      expect(pending.data).toEqual({
-        pendingLogin: {
-          type: 'password',
-          userId: 1,
-          remember,
-          expires_at: now + 300000,
-        },
-      });
-      await expect(
-        sessionUser(request('/api/session', undefined, cookie))
-      ).rejects.toMatchObject({ statusCode: 401 });
-      await expect(
-        getCurrentUser(request('/api/me', undefined, cookie))
-      ).rejects.toMatchObject({ statusCode: 401 });
-      expect(
-        await verifySecondFactor(
-          request('/api/auth/verify-2fa', { totpCode: '000000' }, cookie)
-        )
-      ).toEqual({ status: 'INVALID_TOTP_CODE' });
-
-      const verified = request(
-        '/api/auth/verify-2fa',
-        { totpCode: '123456' },
-        cookie
-      );
-      expect(await verifySecondFactor(verified)).toEqual({ status: 'success' });
-      const cookieHeader = String(getResponseHeader(verified, 'set-cookie'));
-      if (remember) {
-        const { sessionTimeout } =
-          await fixture.store.general.getSessionConfig();
-        expect(cookieHeader).toContain(`Max-Age=${sessionTimeout}`);
-      } else {
-        expect(cookieHeader).not.toContain('Max-Age=');
+      const header = login.res.headers.get('set-cookie');
+      if (remember) expect(header).toContain(`Max-Age=${sessionTimeout}`);
+      else {
+        expect(header).not.toContain('Max-Age=');
+        expect(header).not.toContain('Expires=');
       }
-      const authenticatedCookie = sessionCookie(verified);
-      const authenticated = await getWGSession(
-        request('/api/session', undefined, authenticatedCookie)
-      );
-      expect(authenticated.data).toEqual({ userId: 1 });
-      expect(
-        await sessionUser(
-          request('/api/session', undefined, authenticatedCookie)
-        )
-      ).toMatchObject({ id: 1, totpVerified: true });
+
+      // Advance beyond the sealing library's clock-skew allowance too.
+      now += (sessionTimeout + 61) * 1000;
+      const read = sessionUser(request('/api/session', undefined, cookie));
+      if (remember) await expect(read).rejects.toMatchObject({ status: 401 });
+      else await expect(read).resolves.toMatchObject({ id: 1 });
     }
   );
+
+  test('preserves an immediately expired cookie when the remembered timeout is zero', async () => {
+    await fixture.store.general.update({ sessionTimeout: 0 });
+    const login = request('/api/auth/password', credentials);
+    await passwordLogin(login);
+    expect(login.res.headers.get('set-cookie')).toContain('Max-Age=0');
+  });
+
+  test('rejects an unusable cookie and replaces it on successful login', async () => {
+    const invalid = 'wg-easy=invalid';
+    await expect(
+      sessionUser(request('/api/session', undefined, invalid))
+    ).rejects.toMatchObject({ status: 401 });
+    const login = request('/api/auth/password', credentials, invalid);
+    expect(await passwordLogin(login)).toEqual({ status: 'success' });
+    await expect(
+      sessionUser(request('/api/session', undefined, sessionCookie(login)))
+    ).resolves.toMatchObject({ id: 1 });
+  });
+
+  test.each([false, true])(
+    'sets the login cookie policy for INSECURE=%s',
+    async (insecure) => {
+      WG_ENV.INSECURE = insecure;
+      const login = request('/api/auth/password', credentials);
+      await passwordLogin(login);
+      const cookies = login.res.headers
+        .getSetCookie()
+        .filter((value) => value.startsWith('wg-easy='));
+      expect(cookies).toHaveLength(1);
+      expect(cookies[0]).toContain('HttpOnly');
+      expect(cookies[0]).toContain('SameSite=Lax');
+      expect(cookies[0]).toContain('Path=/');
+      expect(cookies[0]?.includes('Secure')).toBe(!insecure);
+    }
+  );
+
+  test('logs out by clearing session data and expiring the cookie', async () => {
+    const login = request('/api/auth/password', credentials);
+    await passwordLogin(login);
+    const event = request('/api/session', undefined, sessionCookie(login));
+    expect(await logout(event)).toEqual({ success: true });
+    const cleared = sessionCookie(event);
+    expect(cleared).toBe('wg-easy=');
+    expect(event.res.headers.get('set-cookie')).toContain('Max-Age=0');
+    await expect(
+      sessionUser(request('/api/session', undefined, cleared))
+    ).rejects.toMatchObject({ status: 401 });
+  });
+
+  test('requires the second factor even with an existing session, then preserves remember-me', async () => {
+    const previous = request('/api/auth/password', credentials);
+    await passwordLogin(previous);
+    await fixture.store.users.update(1, {
+      totpVerified: true,
+      totpKey: 'secret',
+    });
+    const login = request(
+      '/api/auth/password',
+      credentials,
+      sessionCookie(previous)
+    );
+    expect(await passwordLogin(login)).toEqual({ status: 'TOTP_REQUIRED' });
+    const cookie = sessionCookie(login);
+    expect(
+      await pendingLogin(request('/api/auth/pending', undefined, cookie))
+    ).toEqual({ type: 'password' });
+    await expect(
+      sessionUser(request('/api/session', undefined, cookie))
+    ).rejects.toMatchObject({ status: 401 });
+    await expect(
+      getCurrentUser(request('/api/me', undefined, cookie))
+    ).rejects.toMatchObject({ status: 401 });
+    expect(
+      await verifySecondFactor(
+        request('/api/auth/verify-2fa', { totpCode: '000000' }, cookie)
+      )
+    ).toEqual({ status: 'INVALID_TOTP_CODE' });
+
+    const verified = request(
+      '/api/auth/verify-2fa',
+      { totpCode: '123456' },
+      cookie
+    );
+    expect(await verifySecondFactor(verified)).toEqual({ status: 'success' });
+    const { sessionTimeout } = await fixture.store.general.getSessionConfig();
+    expect(verified.res.headers.get('set-cookie')).toContain(
+      `Max-Age=${sessionTimeout}`
+    );
+    const authenticatedCookie = sessionCookie(verified);
+    expect(
+      await sessionUser(request('/api/session', undefined, authenticatedCookie))
+    ).toMatchObject({ id: 1, totpVerified: true });
+    await expect(
+      pendingLogin(request('/api/auth/pending', undefined, authenticatedCookie))
+    ).rejects.toMatchObject({ status: 401 });
+  });
+
+  test('a cancelled second-factor challenge cannot authenticate', async () => {
+    await fixture.store.users.update(1, {
+      totpVerified: true,
+      totpKey: 'secret',
+    });
+    const login = request('/api/auth/password', credentials);
+    await passwordLogin(login);
+    const cancelled = request('/api/auth/cancel', {}, sessionCookie(login));
+    await cancelLogin(cancelled);
+    const cookie = sessionCookie(cancelled);
+    await expect(
+      pendingLogin(request('/api/auth/pending', undefined, cookie))
+    ).rejects.toMatchObject({ status: 401 });
+    await expect(
+      verifySecondFactor(
+        request('/api/auth/verify-2fa', { totpCode: '123456' }, cookie)
+      )
+    ).rejects.toMatchObject({ status: 401 });
+    await expect(
+      getCurrentUser(request('/api/me', undefined, cookie))
+    ).rejects.toMatchObject({ status: 401 });
+  });
 
   test('clears an expired challenge without granting a session', async () => {
     await fixture.store.users.update(1, {
@@ -292,10 +371,9 @@ describe('identity HTTP contract', () => {
     expect(await verifySecondFactor(expired)).toEqual({
       status: 'PENDING_LOGIN_EXPIRED',
     });
-    const session = await getWGSession(
-      request('/api/session', undefined, sessionCookie(expired))
-    );
-    expect(session.data).toEqual({});
+    await expect(
+      getCurrentUser(request('/api/me', undefined, sessionCookie(expired)))
+    ).rejects.toMatchObject({ status: 401 });
   });
 
   test('maps disabled-account errors and rejects stale sessions', async () => {
@@ -305,19 +383,19 @@ describe('identity HTTP contract', () => {
     await fixture.store.users.update(1, { enabled: false });
     await expect(
       sessionUser(request('/api/session', undefined, cookie))
-    ).rejects.toMatchObject({ statusCode: 403 });
+    ).rejects.toMatchObject({ status: 403 });
     await expect(
       getCurrentUser(request('/api/me', undefined, cookie))
-    ).rejects.toMatchObject({ statusCode: 403 });
+    ).rejects.toMatchObject({ status: 403 });
     await expect(
       passwordLogin(request('/api/auth/password', credentials))
-    ).rejects.toMatchObject({ statusCode: 401 });
+    ).rejects.toMatchObject({ status: 401 });
   });
 
   test('validates requests before authenticating and maps bad credentials to 401', async () => {
     await expect(
       passwordLogin(request('/api/auth/password', {}))
-    ).rejects.toMatchObject({ statusCode: 400 });
+    ).rejects.toMatchObject({ status: 400 });
     await expect(
       passwordLogin(
         request('/api/auth/password', {
@@ -325,7 +403,7 @@ describe('identity HTTP contract', () => {
           password: 'another-long-password',
         })
       )
-    ).rejects.toMatchObject({ statusCode: 401 });
+    ).rejects.toMatchObject({ status: 401 });
   });
 });
 
@@ -339,8 +417,8 @@ describe('OAuth workflow', () => {
   test('exchanges verified claims and replaces transient state with an authenticated session', async () => {
     await fixture.store.users.update(1, { email: 'admin@example.com' });
     const start = oauthRequest('');
-    const redirectResponse = await beginOAuth(start);
-    const redirect = new URL(redirectResponse.headers.get('location')!);
+    await beginOAuth(start);
+    const redirect = new URL(start.res.headers.get('location')!);
     expect(redirect.searchParams.get('redirect_uri')).toBe(
       'https://localhost/api/auth/oidc/callback'
     );
@@ -350,7 +428,7 @@ describe('OAuth workflow', () => {
       '/callback?code=code&state=state',
       sessionCookie(start)
     );
-    const response = await oauthCallback(callback);
+    await oauthCallback(callback);
     expect(oauthClient.authorizationCodeGrant).toHaveBeenCalledWith(
       expect.anything(),
       expect.any(URL),
@@ -361,11 +439,12 @@ describe('OAuth workflow', () => {
         idTokenExpected: true,
       }
     );
-    expect(response.headers.get('location')).toBe('/');
+    expect(callback.res.headers.get('location')).toBe('/');
     const cookie = sessionCookie(callback);
-    expect(
-      (await getWGSession(request('/api/session', undefined, cookie))).data
-    ).toEqual({ userId: 1 });
+    await expect(
+      oauthCallback(oauthRequest('/callback?code=code&state=state', cookie))
+    ).rejects.toMatchObject({ status: 400 });
+    expect(oauthClient.authorizationCodeGrant).toHaveBeenCalledOnce();
     expect(
       await getCurrentUser(request('/api/me', undefined, cookie))
     ).toMatchObject({ id: 1 });
@@ -375,9 +454,9 @@ describe('OAuth workflow', () => {
     const login = request('/api/auth/password', credentials);
     await passwordLogin(login);
     const start = oauthRequest('?link=true', sessionCookie(login));
-    const redirectResponse = await beginOAuth(start);
+    await beginOAuth(start);
     expect(
-      new URL(redirectResponse.headers.get('location')!).searchParams.get(
+      new URL(start.res.headers.get('location')!).searchParams.get(
         'redirect_uri'
       )
     ).toBe('https://localhost/api/auth/oidc/link');
@@ -385,19 +464,18 @@ describe('OAuth workflow', () => {
       '/link?code=code&state=state',
       sessionCookie(start)
     );
-    const response = await oauthLink(callback);
-    expect(response.headers.get('location')).toBe('/me');
+    await oauthLink(callback);
+    expect(callback.res.headers.get('location')).toBe('/me');
     expect(await fixture.store.users.get(1)).toMatchObject({
       oauthProvider: 'oidc',
       oauthId: 'external-user',
     });
-    expect(
-      (
-        await getWGSession(
-          request('/api/session', undefined, sessionCookie(callback))
-        )
-      ).data
-    ).toEqual({ userId: 1 });
+    await expect(
+      oauthLink(
+        oauthRequest('/link?code=code&state=state', sessionCookie(callback))
+      )
+    ).rejects.toMatchObject({ status: 400 });
+    expect(oauthClient.authorizationCodeGrant).toHaveBeenCalledOnce();
   });
 
   test('hands OAuth authentication to TOTP without granting a session early', async () => {
@@ -412,22 +490,15 @@ describe('OAuth workflow', () => {
       '/callback?code=code&state=state',
       sessionCookie(start)
     );
-    const response = await oauthCallback(callback);
-    expect(response.headers.get('location')).toBe('/login/2fa');
+    await oauthCallback(callback);
+    expect(callback.res.headers.get('location')).toBe('/login/2fa');
     const cookie = sessionCookie(callback);
     expect(
-      (await getWGSession(request('/api/session', undefined, cookie))).data
-    ).toEqual({
-      pendingLogin: {
-        type: 'oauth',
-        userId: 1,
-        remember: false,
-        expires_at: now + 300000,
-      },
-    });
+      await pendingLogin(request('/api/auth/pending', undefined, cookie))
+    ).toEqual({ type: 'oauth' });
     await expect(
       getCurrentUser(request('/api/me', undefined, cookie))
-    ).rejects.toMatchObject({ statusCode: 401 });
+    ).rejects.toMatchObject({ status: 401 });
     const secondFactor = request(
       '/api/auth/verify-2fa',
       { totpCode: '123456' },
@@ -436,6 +507,9 @@ describe('OAuth workflow', () => {
     expect(await verifySecondFactor(secondFactor)).toEqual({
       status: 'success',
     });
+    expect(secondFactor.res.headers.get('set-cookie')).not.toContain(
+      'Max-Age='
+    );
     expect(
       await getCurrentUser(
         request('/api/me', undefined, sessionCookie(secondFactor))
@@ -466,20 +540,21 @@ describe('OAuth workflow', () => {
         failure === 'exchange' ? 'Invalid state' : 'Email is not verified'
       );
       const cookie = sessionCookie(callback);
-      expect(
-        (await getWGSession(request('/api/session', undefined, cookie))).data
-      ).toEqual({});
+      await expect(
+        oauthCallback(oauthRequest('/callback?code=code&state=state', cookie))
+      ).rejects.toMatchObject({ status: 400 });
+      expect(oauthClient.authorizationCodeGrant).toHaveBeenCalledOnce();
       expect(await fixture.store.users.count()).toBe(1);
       await expect(
         getCurrentUser(request('/api/me', undefined, cookie))
-      ).rejects.toMatchObject({ statusCode: 401 });
+      ).rejects.toMatchObject({ status: 401 });
     }
   );
 
   test('rejects callbacks without state before exchanging a code', async () => {
     await expect(
       oauthCallback(oauthRequest('/callback?code=code'))
-    ).rejects.toMatchObject({ statusCode: 400 });
+    ).rejects.toMatchObject({ status: 400 });
     expect(oauthClient.authorizationCodeGrant).not.toHaveBeenCalled();
   });
 });

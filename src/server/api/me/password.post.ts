@@ -1,4 +1,4 @@
-import { readValidatedBody } from 'h3';
+import { readValidatedBody } from 'nuxt/server';
 
 import * as identity from '#server/features/identity';
 import { defineAuthenticatedEventHandler } from '#server/utils/handler';

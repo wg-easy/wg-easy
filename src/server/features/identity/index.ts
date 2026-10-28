@@ -1,4 +1,4 @@
-import { createError } from 'h3';
+import { createError } from 'nuxt/server';
 
 import { WG_ENV } from '#server/utils/config';
 import { hashPassword, isPasswordValid } from '#server/utils/password';
@@ -55,8 +55,8 @@ type OAuthLoginResult =
 export function assertPasswordEnabled() {
   if (WG_ENV.DISABLE_PASSWORD_AUTH)
     throw createError({
-      statusCode: 403,
-      statusMessage: 'Password authentication is disabled',
+      status: 403,
+      statusText: 'Password authentication is disabled',
     });
 }
 
@@ -92,7 +92,7 @@ async function requireUser(id: number, users = getDatabase().users) {
 export async function sessionUser(id: number) {
   const user = await getDatabase().users.get(id);
   if (user && !user.enabled)
-    throw createError({ statusCode: 403, statusMessage: 'User is disabled' });
+    throw createError({ status: 403, statusText: 'User is disabled' });
   return user ? publicUser(user) : undefined;
 }
 
@@ -102,9 +102,9 @@ export async function authenticateBasic(username: string, password: string) {
   // Verify missing users against the dummy hash as well.
   const valid = await isPasswordValid(password, user?.password ?? null);
   if (!user || !valid || user.totpVerified)
-    throw createError({ statusCode: 401, statusMessage: 'Session failed' });
+    throw createError({ status: 401, statusText: 'Session failed' });
   if (!user.enabled)
-    throw createError({ statusCode: 403, statusMessage: 'User is disabled' });
+    throw createError({ status: 403, statusText: 'User is disabled' });
   return publicUser(user);
 }
 
@@ -173,8 +173,8 @@ export async function completeSecondFactor(
 ) {
   if (!login)
     throw createError({
-      statusCode: 401,
-      statusMessage: 'No pending authentication',
+      status: 401,
+      statusText: 'No pending authentication',
     });
   if (!pending(login)) return { status: 'PENDING_LOGIN_EXPIRED' as const };
   return getDatabase().transaction(async ({ users }) => {
@@ -227,8 +227,8 @@ export function setupTotp(actor: Actor) {
     const user = await requireUser(actor.id, users);
     if (user.totpVerified)
       throw createError({
-        statusCode: 409,
-        statusMessage: 'TOTP is already enabled',
+        status: 409,
+        statusText: 'TOTP is already enabled',
       });
     const setup = createTotp(user.username);
     await users.update(user.id, {
@@ -258,8 +258,8 @@ export function deleteTotp(actor: Actor, currentPassword: string) {
     const user = await requireUser(actor.id, users);
     if (!user.totpVerified)
       throw createError({
-        statusCode: 409,
-        statusMessage: 'TOTP is not enabled',
+        status: 409,
+        statusText: 'TOTP is not enabled',
       });
     if (!(await isPasswordValid(currentPassword, user.password)))
       throw new Error('Invalid password');

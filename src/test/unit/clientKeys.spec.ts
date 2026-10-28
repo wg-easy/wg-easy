@@ -1,9 +1,9 @@
 import fs from 'node:fs/promises';
 
 import { eq } from 'drizzle-orm';
-import { mockEvent } from 'h3';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
+import { requestEvent } from '../helpers/request';
 import { databaseFixture } from '../helpers/database';
 
 import * as clientOperations from '#server/features/vpn/clients';
@@ -40,7 +40,7 @@ let store: Awaited<ReturnType<typeof databaseFixture>>['store'];
 let db: Awaited<ReturnType<typeof databaseFixture>>['db'];
 
 function event(clientId = '1') {
-  const event = mockEvent(`http://localhost/api/client/${clientId}`);
+  const event = requestEvent(`http://localhost/api/client/${clientId}`);
   event.context.params = { clientId };
   return event;
 }
@@ -328,7 +328,7 @@ describe('client key actions', () => {
     test('rejects a different owner without modifying keys', async () => {
       const before = await clients.get(1);
       getCurrentUser.mockResolvedValue({ id: 2, role: 2 });
-      await expect(action(event())).rejects.toMatchObject({ statusCode: 403 });
+      await expect(action(event())).rejects.toMatchObject({ status: 403 });
       expect(await clients.get(1)).toEqual(before);
       expect(exec).not.toHaveBeenCalled();
       expect(writeFile).not.toHaveBeenCalled();
@@ -336,7 +336,7 @@ describe('client key actions', () => {
 
     test('reports a missing client without generating keys or syncing', async () => {
       await expect(action(event('999'))).rejects.toMatchObject({
-        statusCode: 404,
+        status: 404,
       });
       expect(exec).not.toHaveBeenCalled();
       expect(writeFile).not.toHaveBeenCalled();

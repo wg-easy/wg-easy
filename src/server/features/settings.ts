@@ -1,4 +1,4 @@
-import { createError } from 'h3';
+import { createError } from 'nuxt/server';
 
 import {
   hashPassword,
@@ -32,18 +32,18 @@ export async function authorizeMetrics(
   const config = await getDatabase().general.getMetricsConfig();
   if (config.password) {
     if (!credentials)
-      throw createError({ statusCode: 401, statusMessage: 'Unauthorized' });
+      throw createError({ status: 401, statusText: 'Unauthorized' });
     if (credentials.method !== 'Bearer' || !credentials.value)
       throw createError({
-        statusCode: 401,
-        statusMessage: 'Bearer Auth required',
+        status: 401,
+        statusText: 'Bearer Auth required',
       });
     if (!(await isPasswordValid(credentials.value, config.password)))
-      throw createError({ statusCode: 401, statusMessage: 'Incorrect token' });
+      throw createError({ status: 401, statusText: 'Incorrect token' });
   }
   if (!config[type])
     throw createError({
-      statusCode: 400,
-      statusMessage: 'Metrics not enabled',
+      status: 400,
+      statusText: 'Metrics not enabled',
     });
 }

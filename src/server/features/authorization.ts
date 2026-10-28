@@ -1,4 +1,4 @@
-import { createError } from 'h3';
+import { createError } from 'nuxt/server';
 
 import { hasPermissions, type Permissions } from '#shared/utils/permissions';
 import type { Actor } from '#shared/contracts/identity';
@@ -10,6 +10,6 @@ export function authorize<Resource extends keyof Permissions>(
   data?: Permissions[Resource]['dataType']
 ) {
   if (!hasPermissions(actor, resource, action, data)) {
-    throw createError({ statusCode: 403, statusMessage: 'Permission denied' });
+    throw createError({ status: 403, statusText: 'Permission denied' });
   }
 }

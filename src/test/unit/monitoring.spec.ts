@@ -1,8 +1,8 @@
-import { getResponseHeader, mockEvent } from 'h3';
 import { expect, test, vi } from 'vitest';
 
 import { vpnFixture } from '../helpers/vpn';
 import { resetCryptoMocks } from '../helpers/crypto';
+import { requestEvent } from '../helpers/request';
 
 import jsonMetrics from '#server/routes/metrics/json.get';
 import prometheusMetrics from '#server/routes/metrics/prometheus.get';
@@ -47,7 +47,7 @@ test('uses the same counts and peer status for both monitoring formats', async (
     { ...peer, publicKey: 'unknown', transferTx: 999 },
   ]);
 
-  const json = await jsonMetrics(mockEvent('http://localhost/metrics/json'));
+  const json = await jsonMetrics(requestEvent('http://localhost/metrics/json'));
   expect(json).toMatchObject({
     wireguard_configured_peers: 2,
     wireguard_enabled_peers: 1,
@@ -72,9 +72,9 @@ test('uses the same counts and peer status for both monitoring formats', async (
     expect(client).not.toHaveProperty('privateKey');
     expect(client).not.toHaveProperty('preSharedKey');
   }
-  const event = mockEvent('http://localhost/metrics/prometheus');
+  const event = requestEvent('http://localhost/metrics/prometheus');
   const text = await prometheusMetrics(event);
-  expect(getResponseHeader(event, 'content-type')).toBe('text/plain');
+  expect(event.res.headers.get('content-type')).toBe('text/plain');
   expect(text).toContain('wireguard_configured_peers{interface="wg0"} 2');
   expect(text).toContain('wireguard_enabled_peers{interface="wg0"} 1');
   expect(text).toContain('wireguard_connected_peers{interface="wg0"} 1');
@@ -95,16 +95,16 @@ test('uses the same counts and peer status for both monitoring formats', async (
 test('renders empty monitoring output without inventing peers', async () => {
   const { store } = await fixture();
   await store.clients.deleteMany([1]);
-  expect(await jsonMetrics(mockEvent('http://localhost/metrics/json'))).toEqual(
-    {
-      wireguard_configured_peers: 0,
-      wireguard_enabled_peers: 0,
-      wireguard_connected_peers: 0,
-      clients: [],
-    }
-  );
+  expect(
+    await jsonMetrics(requestEvent('http://localhost/metrics/json'))
+  ).toEqual({
+    wireguard_configured_peers: 0,
+    wireguard_enabled_peers: 0,
+    wireguard_connected_peers: 0,
+    clients: [],
+  });
   const text = await prometheusMetrics(
-    mockEvent('http://localhost/metrics/prometheus')
+    requestEvent('http://localhost/metrics/prometheus')
   );
   expect(text).toContain('wireguard_configured_peers{interface="wg0"} 0');
   expect(text).not.toMatch(/^wireguard_sent_bytes\{/m);
@@ -119,11 +119,11 @@ test.each([
     const { store, commands } = await fixture();
     await store.general.update({ metricsPassword: 'hash:secret' });
     await expect(
-      handler(mockEvent(`http://localhost/metrics/${format}`))
-    ).rejects.toMatchObject({ statusCode: 401 });
+      handler(requestEvent(`http://localhost/metrics/${format}`))
+    ).rejects.toMatchObject({ status: 401 });
     expect(commands.dump).not.toHaveBeenCalled();
     await handler(
-      mockEvent(`http://localhost/metrics/${format}`, {
+      requestEvent(`http://localhost/metrics/${format}`, {
         headers: { authorization: 'Bearer secret' },
       })
     );
