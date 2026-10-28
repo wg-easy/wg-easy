@@ -17,8 +17,7 @@
       "save": "Save",
       "revert": "Revert",
       "add": "Add",
-      "moveUp": "Move up",
-      "moveDown": "Move down",
+      "reorder": "Drag to reorder, or use the up and down arrow keys",
       "retry": "Retry"
     },
     "yes": "Yes",

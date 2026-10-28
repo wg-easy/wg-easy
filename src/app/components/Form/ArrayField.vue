@@ -1,47 +1,44 @@
 <template>
-  <div class="col-span-full flex min-w-0 flex-col gap-2">
+  <div ref="list" class="col-span-full flex min-w-0 flex-col gap-2">
     <template v-if="data?.length === 0">
       <slot v-if="$slots.empty" name="empty" />
       <div v-else>{{ emptyText || $t('common.form.noItems') }}</div>
     </template>
-    <div v-for="(item, i) in data" v-else :key="i">
-      <div class="flex min-w-0 gap-2">
-        <input
-          :value="item"
-          :name="name"
-          type="text"
-          :aria-label="`${name} ${i + 1}`"
-          class="ui-input"
-          @input="update($event, i)"
-        />
-        <BaseSecondaryButton
-          type="button"
-          class="px-3"
-          :aria-label="$t('common.actions.moveUp')"
-          :title="$t('common.actions.moveUp')"
-          :disabled="i === 0"
-          @click="move(i, -1)"
-        >
-          <ArrowUpIcon class="size-4" aria-hidden="true" />
-        </BaseSecondaryButton>
-        <BaseSecondaryButton
-          type="button"
-          class="px-3"
-          :aria-label="$t('common.actions.moveDown')"
-          :title="$t('common.actions.moveDown')"
-          :disabled="i === (data?.length ?? 0) - 1"
-          @click="move(i, 1)"
-        >
-          <ArrowDownIcon class="size-4" aria-hidden="true" />
-        </BaseSecondaryButton>
-        <BaseSecondaryButton
-          type="button"
-          :aria-label="$t('common.actions.delete')"
-          @click="del(i)"
-        >
-          <MinusIcon class="size-4" aria-hidden="true" />
-        </BaseSecondaryButton>
-      </div>
+    <div
+      v-for="(item, i) in data"
+      v-else
+      :key="i"
+      data-array-item
+      class="flex min-w-0 gap-2 rounded-lg"
+    >
+      <BaseSecondaryButton
+        type="button"
+        class="cursor-grab touch-none px-3 active:cursor-grabbing"
+        data-drag-handle
+        :aria-label="$t('common.actions.reorder')"
+        :title="$t('common.actions.reorder')"
+        aria-keyshortcuts="ArrowUp ArrowDown"
+        :disabled="(data?.length ?? 0) < 2"
+        @keydown.up.prevent="move(i, i - 1)"
+        @keydown.down.prevent="move(i, i + 1)"
+      >
+        <GripVerticalIcon class="size-4" aria-hidden="true" />
+      </BaseSecondaryButton>
+      <input
+        :value="item"
+        :name="name"
+        type="text"
+        :aria-label="`${name} ${i + 1}`"
+        class="ui-input"
+        @input="update($event, i)"
+      />
+      <BaseSecondaryButton
+        type="button"
+        :aria-label="$t('common.actions.delete')"
+        @click="del(i)"
+      >
+        <MinusIcon class="size-4" aria-hidden="true" />
+      </BaseSecondaryButton>
     </div>
     <div class="mt-2">
       <BasePrimaryButton type="button" @click="add">
@@ -52,10 +49,29 @@
 </template>
 
 <script lang="ts" setup>
-import { ArrowDownIcon, ArrowUpIcon, MinusIcon } from '@lucide/vue';
+import { GripVerticalIcon, MinusIcon } from '@lucide/vue';
+import {
+  moveArrayElement,
+  useSortable,
+} from '@vueuse/integrations/useSortable';
 
 const data = defineModel<string[]>();
 defineProps<{ emptyText?: string[]; name: string }>();
+
+const list = useTemplateRef('list');
+const items = computed({
+  get: () => data.value ?? [],
+  set: (value: string[]) => {
+    data.value = value;
+  },
+});
+
+useSortable(list, items, {
+  draggable: '[data-array-item]',
+  handle: '[data-drag-handle]:not(:disabled)',
+  ghostClass: 'opacity-50',
+  animation: 150,
+});
 
 function update(event: Event, index: number) {
   const value = (event.target as HTMLInputElement).value;
@@ -66,19 +82,15 @@ function add() {
   if (data.value) data.value = [...data.value, ''];
 }
 
-function move(i: number, direction: -1 | 1) {
-  const target = i + direction;
-  const items = data.value?.slice();
-  if (!items || target < 0 || target >= items.length) {
+async function move(index: number, target: number) {
+  if (target < 0 || target >= items.value.length) {
     return;
   }
-  const item = items[i];
-  if (item === undefined) {
-    return;
-  }
-  items.splice(i, 1);
-  items.splice(target, 0, item);
-  data.value = items;
+  moveArrayElement(items, index, target);
+  await nextTick();
+  list.value
+    ?.querySelectorAll<HTMLButtonElement>('[data-drag-handle]')
+    [target]?.focus();
 }
 
 function del(index: number) {
