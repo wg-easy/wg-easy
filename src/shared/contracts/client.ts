@@ -33,11 +33,11 @@ const name = z
   .pipe(safeStringRefine)
   .pipe(controlStringRefine);
 
-// TODO?: validate iso string
+// Keep legacy date-only expirations; timestamps must identify a timezone.
 const expiresAt = z
-  .string({ message: t('validation.client.expiresAt') })
-  .min(1, t('validation.client.expiresAt'))
-  .pipe(safeStringRefine)
+  .union([z.iso.date(), z.iso.datetime({ offset: true })], {
+    message: t('validation.client.expiresAtInvalid'),
+  })
   .nullable();
 
 const address4 = z

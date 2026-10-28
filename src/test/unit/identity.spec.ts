@@ -237,7 +237,7 @@ describe('identity', () => {
       if (oauthAutoRegister) {
         expect(result).toMatchObject({
           success: true,
-          user: { role: roles.ADMIN, hasPassword: false },
+          user: { username: 'new-user', role: roles.ADMIN, hasPassword: false },
         });
         expect(await store.users.count()).toBe(2);
       } else {
@@ -249,6 +249,63 @@ describe('identity', () => {
       }
     }
   );
+
+  test('allocates an available OAuth username without linking or changing its current owner', async () => {
+    const { store } = await fixture({ oauthAutoRegister: true });
+    const existing = await store.users.get(1);
+    const first = await identity.loginWithOAuth(
+      'oidc',
+      'first-subject',
+      'admin',
+      'first@example.com',
+      'First'
+    );
+    expect(first).toMatchObject({
+      success: true,
+      user: { username: 'admin-1', email: 'first@example.com' },
+    });
+    const second = await identity.loginWithOAuth(
+      'github',
+      'second-subject',
+      'admin',
+      'second@example.com',
+      'Second'
+    );
+    expect(second).toMatchObject({
+      success: true,
+      user: { username: 'admin-2', email: 'second@example.com' },
+    });
+    expect(await store.users.get(1)).toEqual(existing);
+    expect(await store.users.count()).toBe(3);
+
+    // Subsequent logins identify the account by provider/subject, not its name.
+    expect(
+      await identity.loginWithOAuth(
+        'oidc',
+        'first-subject',
+        'renamed-at-provider',
+        'first@example.com',
+        'First'
+      )
+    ).toEqual(first);
+    expect(await store.users.count()).toBe(3);
+  });
+
+  test('does not link a colliding username when OAuth auto-registration is disabled', async () => {
+    const { store } = await fixture();
+    const existing = await store.users.get(1);
+    expect(
+      await identity.loginWithOAuth(
+        'oidc',
+        'new-subject',
+        'admin',
+        'new@example.com',
+        'New'
+      )
+    ).toEqual({ success: false, error: 'AUTO_REGISTER_DISABLED' });
+    expect(await store.users.get(1)).toEqual(existing);
+    expect(await store.users.count()).toBe(1);
+  });
 
   test('prevents unlinking the only login method and conflicting OAuth ownership', async () => {
     const { store } = await fixture();

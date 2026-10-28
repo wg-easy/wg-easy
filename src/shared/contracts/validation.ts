@@ -132,7 +132,7 @@ export const ISchema = z
   .nullable();
 
 export const PortSchema = z
-  .number({ message: t('validation.port') })
+  .int({ message: t('validation.portInteger') })
   .min(1, { message: t('validation.port') })
   .max(65535, { message: t('validation.port') });
 

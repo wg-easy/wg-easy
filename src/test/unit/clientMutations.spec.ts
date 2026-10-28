@@ -221,6 +221,55 @@ describe('client mutation sequencing', () => {
 });
 
 describe('client creation and settings', () => {
+  test.each([
+    'not-a-date',
+    '2026-13-01',
+    '2026-02-29',
+    '2026-04-31T12:00:00Z',
+    '2026-10-28T25:00:00Z',
+    '2026-10-28T12:00:00',
+    '2026-10-28T12:00:00+25:00',
+    '',
+  ])(
+    'rejects invalid expiry %j on create and update before any effects',
+    async (expiresAt) => {
+      const before = await clients.getAll();
+      await expect(
+        createClientRoute(clientEvent(1, { name: 'Invalid expiry', expiresAt }))
+      ).rejects.toMatchObject({ status: 400 });
+      await expect(
+        updateClient(clientEvent(1, { ...(await settings()), expiresAt }))
+      ).rejects.toMatchObject({ status: 400 });
+      expect(await clients.getAll()).toEqual(before);
+      expect(writeFile).not.toHaveBeenCalled();
+      expect(exec).not.toHaveBeenCalled();
+    }
+  );
+
+  test.each([
+    null,
+    '2096-02-29',
+    '2096-02-29T12:34:56.789Z',
+    '2096-02-29T18:19:56+05:45',
+    '2096-02-29T07:34:56-05:00',
+  ])('preserves valid expiry %j on create and update', async (expiresAt) => {
+    const { clientId } = await createClientRoute(
+      clientEvent(1, { name: 'Valid expiry', expiresAt })
+    );
+    expect((await clients.get(clientId))?.expiresAt).toBe(expiresAt);
+    await updateClient(
+      clientEvent(clientId, {
+        ...(await clients.get(clientId)),
+        name: 'Updated expiry',
+        expiresAt,
+      })
+    );
+    expect(await clients.get(clientId)).toMatchObject({
+      name: 'Updated expiry',
+      expiresAt,
+    });
+  });
+
   test('creates a client and synchronizes its generated keys', async () => {
     const response = await createClientRoute(
       clientEvent(1, { name: 'New client', expiresAt: null })

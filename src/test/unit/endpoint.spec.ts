@@ -2,6 +2,29 @@ import { describe, expect, test } from 'vitest';
 
 import { formatEndpoint } from '#server/utils/endpoint';
 import { ClientUpdateSchema } from '#shared/contracts/client';
+import { InterfaceUpdateSchema } from '#shared/contracts/interface';
+import {
+  UserConfigSetupSchema,
+  UserConfigUpdateSchema,
+} from '#shared/contracts/userConfig';
+
+describe.each([
+  ['interface', InterfaceUpdateSchema.shape.port],
+  ['setup', UserConfigSetupSchema.shape.port],
+  ['client defaults', UserConfigUpdateSchema.shape.port],
+] as const)('%s port validation', (_name, schema) => {
+  test('accepts integer ports including both boundaries', () => {
+    for (const port of [1, 51820, 65535]) {
+      expect(schema.parse(port)).toBe(port);
+    }
+  });
+
+  test('rejects fractional and out-of-range ports', () => {
+    for (const port of [0, -1, 65536, 1.5, 51820.5, 65534.9]) {
+      expect(schema.safeParse(port).success, String(port)).toBe(false);
+    }
+  });
+});
 
 describe('client server endpoint validation', () => {
   const schema = ClientUpdateSchema.shape.serverEndpoint;

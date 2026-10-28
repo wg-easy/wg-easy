@@ -151,8 +151,16 @@ export function loginWithOAuth(
     }
     if (!WG_ENV.OAUTH_AUTO_REGISTER)
       return { success: false, error: 'AUTO_REGISTER_DISABLED' };
+    let availableUsername = username;
+    for (
+      let suffix = 1;
+      await users.getByUsername(availableUsername);
+      suffix++
+    ) {
+      availableUsername = `${username}-${suffix}`;
+    }
     const [created] = await users.insert({
-      username,
+      username: availableUsername,
       password: null,
       email,
       name,
