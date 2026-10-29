@@ -8,7 +8,7 @@ import * as identity from '#server/features/identity';
 import { getDatabase } from '#db';
 import { WG_ENV, SERVER_DEBUG } from '#server/utils/config';
 import { logSecurityEvent } from '#server/utils/securityLogger';
-import { getTrustedRequestHost } from '#server/http/request';
+import { getTrustedRequestURL } from '#server/http/request';
 import type {
   Actor,
   PendingLogin,
@@ -118,8 +118,11 @@ export async function cancelLogin(event: RequestEvent) {
 export async function beginOAuth(event: RequestEvent, link = false) {
   if (link) await getCurrentUser(event);
   const { config, provider, providerConfig } = await buildOauthConfig(event);
-  const host = getTrustedRequestHost(event, WG_ENV.TRUSTED_PROXIES);
-  const protocol = WG_ENV.INSECURE ? 'http' : 'https';
+  const { origin } = getTrustedRequestURL(
+    event,
+    WG_ENV.TRUSTED_PROXIES,
+    WG_ENV.INSECURE ? 'http' : 'https'
+  );
   const verifier = oauthClient.randomPKCECodeVerifier();
   const challenge = await oauthClient.calculatePKCECodeChallenge(verifier);
   const nonce = oauthClient.randomNonce();
@@ -134,7 +137,7 @@ export async function beginOAuth(event: RequestEvent, link = false) {
   return oauthClient
     .buildAuthorizationUrl(config, {
       ...providerConfig.params,
-      redirect_uri: `${protocol}://${host}/api/auth/${provider}/${link ? 'link' : 'callback'}`,
+      redirect_uri: `${origin}/api/auth/${provider}/${link ? 'link' : 'callback'}`,
       scope: providerConfig.scope,
       code_challenge: challenge,
       code_challenge_method: 'S256',

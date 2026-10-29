@@ -100,6 +100,7 @@ const credentials = {
 beforeEach(async () => {
   vi.resetAllMocks();
   WG_ENV.INSECURE = false;
+  WG_ENV.TRUSTED_PROXIES = [];
   fixture = await databaseFixture();
   now = Date.now();
   resetCryptoMocks();
@@ -461,6 +462,77 @@ function oauthRequest(path: string, cookie = '') {
 
 describe('OAuth workflow', () => {
   beforeEach(existingAdministrator);
+
+  describe.each([
+    { protocol: 'https, http', insecure: true, scheme: 'https' },
+    { protocol: 'http', insecure: false, scheme: 'http' },
+    { protocol: undefined, insecure: false, scheme: 'https' },
+    { protocol: undefined, insecure: true, scheme: 'http' },
+  ])(
+    'forwarded protocol=$protocol, INSECURE=$insecure',
+    ({ insecure, protocol, scheme }) => {
+      test.each([false, true])(
+        'uses the same public URL for authorization and exchange with link=%s',
+        async (link) => {
+          WG_ENV.INSECURE = insecure;
+          WG_ENV.TRUSTED_PROXIES = ['10.0.0.0/8'];
+          const origin = `${scheme}://vpn.example.com:8443`;
+          await fixture.store.users.update(1, { email: 'admin@example.com' });
+
+          function proxyRequest(path: string, cookie = '') {
+            const event = requestEvent(
+              `http://wg-easy:51821/api/auth/oidc${path}`,
+              {
+                headers: {
+                  host: 'wg-easy:51821',
+                  'x-forwarded-host': 'vpn.example.com:8443',
+                  ...(protocol === undefined
+                    ? {}
+                    : { 'x-forwarded-proto': protocol }),
+                  cookie,
+                },
+              },
+              '10.0.0.2'
+            );
+            event.context.params = { provider: 'oidc' };
+            return event;
+          }
+
+          let cookie = '';
+          if (link) {
+            const login = request('/api/auth/password', credentials);
+            await passwordLogin(login);
+            cookie = sessionCookie(login);
+          }
+          const start = proxyRequest(link ? '?link=true' : '', cookie);
+          await beginOAuth(start);
+          const callbackPath = link ? '/link' : '/callback';
+          const redirectUri = `${origin}/api/auth/oidc${callbackPath}`;
+          expect(
+            new URL(start.res.headers.get('location')!).searchParams.get(
+              'redirect_uri'
+            )
+          ).toBe(redirectUri);
+          expect(start.res.headers.get('set-cookie')?.includes('Secure')).toBe(
+            !insecure
+          );
+
+          const callback = proxyRequest(
+            `${callbackPath}?code=code&state=state`,
+            sessionCookie(start)
+          );
+          await (link ? oauthLink(callback) : oauthCallback(callback));
+          expect(oauthClient.authorizationCodeGrant).toHaveBeenCalledOnce();
+          const exchangeUrl = vi.mocked(oauthClient.authorizationCodeGrant).mock
+            .calls[0]![1];
+          expect(exchangeUrl.toString()).toBe(
+            `${redirectUri}?code=code&state=state`
+          );
+          expect(callback.res.headers.get('location')).toBe(link ? '/me' : '/');
+        }
+      );
+    }
+  );
 
   test('exchanges verified claims and replaces transient state with an authenticated session', async () => {
     await fixture.store.users.update(1, { email: 'admin@example.com' });

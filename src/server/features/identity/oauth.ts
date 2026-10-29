@@ -105,8 +105,11 @@ export async function getUserInfo(
   state: OauthState,
   providerConfig: OAuthConfig
 ) {
-  const currentUrl = getTrustedRequestURL(event, WG_ENV.TRUSTED_PROXIES);
-  currentUrl.protocol = WG_ENV.INSECURE ? 'http' : 'https';
+  const currentUrl = getTrustedRequestURL(
+    event,
+    WG_ENV.TRUSTED_PROXIES,
+    WG_ENV.INSECURE ? 'http' : 'https'
+  );
 
   const tokens = await client.authorizationCodeGrant(config, currentUrl, {
     pkceCodeVerifier: state.oauth_verifier,

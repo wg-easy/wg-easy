@@ -1,29 +1,25 @@
-import {
-  getRequestHost,
-  getRequestIP,
-  getRequestURL,
-  type RequestEvent,
-} from 'nuxt/server';
+import { getRequestIP, getRequestURL, type RequestEvent } from 'nuxt/server';
 
 import { isTrustedProxy } from '#server/utils/trustedProxy';
 
-export function getTrustedRequestHost(
-  event: RequestEvent,
-  trustedProxies: readonly string[]
-): string {
-  return getRequestHost(event, {
-    xForwardedHost: isRequestFromTrustedProxy(event, trustedProxies),
-  });
-}
-
 export function getTrustedRequestURL(
   event: RequestEvent,
-  trustedProxies: readonly string[]
+  trustedProxies: readonly string[],
+  fallbackProtocol: 'http' | 'https'
 ): URL {
-  return getRequestURL(event, {
-    xForwardedHost: isRequestFromTrustedProxy(event, trustedProxies),
-    xForwardedProto: false,
+  const trusted = isRequestFromTrustedProxy(event, trustedProxies);
+  const forwardedProtocol = trusted
+    ? event.req.headers.get('x-forwarded-proto')?.split(',')[0]?.trim()
+    : undefined;
+  const url = getRequestURL(event, {
+    xForwardedHost: trusted,
+    xForwardedProto: trusted,
   });
+  // Keep the legacy scheme for missing, invalid, or untrusted headers.
+  if (forwardedProtocol !== 'http' && forwardedProtocol !== 'https') {
+    url.protocol = `${fallbackProtocol}:`;
+  }
+  return url;
 }
 
 export function getTrustedRequestIP(

@@ -29,7 +29,37 @@ async function check(
 
 beforeEach(() => {
   WG_ENV.INSECURE = false;
-  WG_ENV.TRUSTED_PROXIES = [];
+  WG_ENV.TRUSTED_PROXIES = ['10.0.0.0/8'];
+});
+
+describe('CSRF activation', () => {
+  test.each(['POST', 'PUT', 'PATCH', 'DELETE'])(
+    'skips %s origin checks when no trusted proxies are configured',
+    async (method) => {
+      WG_ENV.TRUSTED_PROXIES = [];
+      await expect(check({}, method)).resolves.toBeUndefined();
+      await expect(
+        check(
+          {
+            origin: 'https://attacker.example',
+            cookie: 'wg-easy=session',
+            authorization: 'Basic dXNlcjpwYXNzd29yZA==',
+          },
+          method
+        )
+      ).resolves.toBeUndefined();
+    }
+  );
+
+  test('enforces origins on direct requests when enabled', async () => {
+    const url = `${origin}/api/client`;
+    await expect(check({}, 'POST', url, '192.0.2.1')).rejects.toMatchObject(
+      forbidden
+    );
+    await expect(
+      check({ origin }, 'POST', url, '192.0.2.1')
+    ).resolves.toBeUndefined();
+  });
 });
 
 describe('CSRF middleware', () => {
@@ -98,7 +128,7 @@ describe('CSRF middleware', () => {
 });
 
 describe('CSRF deployment origins', () => {
-  test('requires HTTP when INSECURE is enabled', async () => {
+  test('falls back to HTTP when INSECURE is enabled without a trusted protocol', async () => {
     WG_ENV.INSECURE = true;
     const url = 'http://localhost:51821/api/client';
     await expect(
@@ -109,24 +139,45 @@ describe('CSRF deployment origins', () => {
     ).rejects.toMatchObject(forbidden);
   });
 
-  test('uses the public host from a trusted proxy and the configured protocol', async () => {
-    WG_ENV.TRUSTED_PROXIES = ['10.0.0.0/8'];
+  test.each([
+    { protocol: 'https', insecure: true },
+    { protocol: 'http', insecure: false },
+  ])(
+    'uses trusted $protocol with INSECURE=$insecure',
+    async ({ protocol, insecure }) => {
+      WG_ENV.INSECURE = insecure;
+      const publicOrigin = `${protocol}://vpn.example.com:8443`;
+      const headers = {
+        'x-forwarded-host': 'vpn.example.com:8443, wg-easy:51821',
+        'x-forwarded-proto': protocol,
+      };
+      const url = 'http://wg-easy:51821/api/client';
+      await expect(
+        check({ ...headers, origin: publicOrigin }, 'POST', url, '10.0.0.2')
+      ).resolves.toBeUndefined();
+      const wrongOrigin = `${insecure ? 'http' : 'https'}://vpn.example.com:8443`;
+      await expect(
+        check({ ...headers, origin: wrongOrigin }, 'POST', url, '10.0.0.2')
+      ).rejects.toMatchObject(forbidden);
+    }
+  );
+
+  test('does not allow an untrusted peer to override the origin scheme', async () => {
+    const url = `${origin}/api/client`;
     await expect(
       check(
-        {
-          origin: 'https://vpn.example.com:8443',
-          'x-forwarded-host': 'vpn.example.com:8443, wg-easy:51821',
-          'x-forwarded-proto': 'http',
-        },
+        { 'x-forwarded-proto': 'http', origin: 'http://vpn.example.com' },
         'POST',
-        'http://wg-easy:51821/api/client',
-        '10.0.0.2'
+        url,
+        '192.0.2.1'
       )
+    ).rejects.toMatchObject(forbidden);
+    await expect(
+      check({ 'x-forwarded-proto': 'http', origin }, 'POST', url, '192.0.2.1')
     ).resolves.toBeUndefined();
   });
 
   test('does not let an untrusted peer declare itself a trusted proxy', async () => {
-    WG_ENV.TRUSTED_PROXIES = ['10.0.0.0/8'];
     await expect(
       check(
         {

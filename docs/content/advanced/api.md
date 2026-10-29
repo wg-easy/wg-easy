@@ -37,21 +37,25 @@ else:
 
 ## CSRF Protection
 
-wg-easy checks the origin before processing state-changing requests. If a page
-on `attacker.example` submits a request to `vpn.example.com`, the browser sends
-the attacker's origin even if it includes a session cookie. The origins do not
-match, so the request is rejected before the action runs. Website JavaScript
-cannot forge another site's origin. See [OWASP's origin validation guidance](https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#using-standard-headers-to-verify-origin).
+In this major release, CSRF origin checks are enabled only when
+[`TRUSTED_PROXIES`](./config/optional-config.md#trusted-proxies) contains at least
+one address or CIDR. Enabling the check protects **all state-changing requests**,
+including direct requests, login, setup, and Basic Authentication.
 
-State-changing requests (including POST, PUT, PATCH, and DELETE) must include an
-`Origin` header matching the public URL's scheme, host, and port, without a path
-or trailing slash. This applies to login, setup, session cookies, and Basic
-Authentication. If `Origin` is absent, a same-origin `Referer` is also accepted.
-Requests without a matching source origin are rejected with HTTP 403. An empty,
-`null`, or mismatched `Origin` is rejected even if `Referer` matches.
+An unset or empty list preserves compatibility by disabling this check.
+Authentication still applies, but malicious websites may be able to trigger
+actions using credentials automatically supplied by a browser.
 
-Browsers send these headers automatically. Scripts must provide the origin when
-making changes, for example:
+**The check will be enabled by default in the next major release, including
+when `TRUSTED_PROXIES` is unset.** Update proxies and API scripts before upgrading.
+
+When enabled, POST, PUT, PATCH, and DELETE requests require an `Origin` matching
+the public URL's scheme, host, and port, without a path or trailing slash.
+Only an absent `Origin` may fall back to a same-origin `Referer`. Missing,
+empty, `null`, or mismatched source origins cause HTTP 403, even with valid credentials.
+
+Browsers normally supply these headers. API scripts should send `Origin` on
+writes:
 
 ```python
 response = requests.post(
@@ -61,14 +65,9 @@ response = requests.post(
 )
 ```
 
-Behind a reverse proxy, preserve the public host or configure
-[`TRUSTED_PROXIES`](./config/optional-config.md#trusted-proxies) so wg-easy can use
-`X-Forwarded-Host`. The expected scheme is HTTPS unless `INSECURE=true` is set.
-GET, HEAD, and OPTIONS requests do not require an origin header; OAuth callbacks
-continue to validate their OAuth state. New state-changing endpoints must use
-an unsafe method such as POST or DELETE. Origin validation does not protect
-against JavaScript already executing on wg-easy's own origin, such as through
-an XSS vulnerability.
+Behind a proxy, follow the [public URL configuration](./config/optional-config.md#public-urls-and-cookies).
+An incorrect host, port, or scheme causes HTTP 403 on legitimate writes,
+including login and setup.
 
 ## Endpoints
 

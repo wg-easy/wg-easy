@@ -119,3 +119,4 @@ request, so limiting the password sign-in path alone does not cover them.
 Choose limits appropriate for your deployment. When using wg-easy security logs
 for detection, configure [`TRUSTED_PROXIES`](../../advanced/config/optional-config.md#trusted-proxies)
 so that logged events contain the original client IP address.
+Configuring this also enables [CSRF origin checks](../../advanced/api.md#csrf-protection).
