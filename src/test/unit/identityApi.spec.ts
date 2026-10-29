@@ -101,6 +101,7 @@ beforeEach(async () => {
   vi.resetAllMocks();
   WG_ENV.INSECURE = false;
   WG_ENV.TRUSTED_PROXIES = [];
+  WG_ENV.OAUTH_ALLOWED_DOMAINS = undefined;
   fixture = await databaseFixture();
   now = Date.now();
   resetCryptoMocks();
@@ -637,37 +638,118 @@ describe('OAuth workflow', () => {
     ).toMatchObject({ id: 1 });
   });
 
-  test.each(['exchange', 'claims'])(
-    'clears OAuth state when %s is rejected',
-    async (failure) => {
+  test.each([
+    ['exchange', 'Invalid state'],
+    ['missing subject', 'No sub set'],
+    ['missing email', 'No email set'],
+    ['unverified email', 'Email is not verified'],
+    ['disallowed domain', 'Email domain not allowed'],
+  ])('clears OAuth state when %s is rejected', async (failure, message) => {
+    await fixture.store.users.update(1, { email: 'admin@example.com' });
+    const before = await fixture.store.users.get(1);
+    const start = oauthRequest('');
+    await beginOAuth(start);
+    if (failure === 'disallowed domain')
+      WG_ENV.OAUTH_ALLOWED_DOMAINS = ['allowed.example.com'];
+    if (failure === 'exchange')
+      vi.mocked(oauthClient.authorizationCodeGrant).mockRejectedValueOnce(
+        new Error('Invalid state')
+      );
+    else
+      vi.mocked(oauthClient.fetchUserInfo).mockResolvedValueOnce({
+        sub: failure === 'missing subject' ? '' : 'external-user',
+        email: failure === 'missing email' ? undefined : 'admin@example.com',
+        email_verified: failure !== 'unverified email',
+      });
+    const callback = oauthRequest(
+      '/callback?code=code&state=state',
+      sessionCookie(start)
+    );
+    await expect(oauthCallback(callback)).rejects.toThrow(message);
+    const cookie = sessionCookie(callback);
+    await expect(
+      oauthCallback(oauthRequest('/callback?code=code&state=state', cookie))
+    ).rejects.toMatchObject({ status: 400 });
+    expect(oauthClient.authorizationCodeGrant).toHaveBeenCalledOnce();
+    expect(await fixture.store.users.count()).toBe(1);
+    expect(await fixture.store.users.get(1)).toEqual(before);
+    await expect(
+      getCurrentUser(request('/api/me', undefined, cookie))
+    ).rejects.toMatchObject({ status: 401 });
+  });
+
+  test('rejects an OIDC token without a subject before fetching user info or linking an account', async () => {
+    await fixture.store.users.update(1, { email: 'admin@example.com' });
+    const before = await fixture.store.users.get(1);
+    const start = oauthRequest('');
+    await beginOAuth(start);
+    vi.mocked(oauthClient.authorizationCodeGrant).mockResolvedValueOnce(
+      Object.assign<
+        oauthClient.TokenEndpointResponse,
+        oauthClient.TokenEndpointResponseHelpers
+      >(
+        { access_token: 'token', token_type: 'bearer' },
+        { claims: () => undefined, expiresIn: () => undefined }
+      )
+    );
+    const callback = oauthRequest(
+      '/callback?code=code&state=state',
+      sessionCookie(start)
+    );
+
+    await expect(oauthCallback(callback)).rejects.toMatchObject({
+      status: 400,
+      statusText: "Can't get subject",
+    });
+    expect(oauthClient.fetchUserInfo).not.toHaveBeenCalled();
+    expect(await fixture.store.users.get(1)).toEqual(before);
+    await expect(
+      getCurrentUser(request('/api/me', undefined, sessionCookie(callback)))
+    ).rejects.toMatchObject({ status: 401 });
+  });
+
+  test.each([
+    ['example.com', true],
+    ['sub.example.com', false],
+    ['notexample.com', false],
+    ['example.com.attacker.test', false],
+  ])(
+    'only allows explicitly listed email domains (%s)',
+    async (domain, allowed) => {
+      WG_ENV.OAUTH_ALLOWED_DOMAINS = ['example.com'];
+      const email = `admin@${domain}`;
+      await fixture.store.users.update(1, { email });
+      const before = await fixture.store.users.get(1);
+      vi.mocked(oauthClient.fetchUserInfo).mockResolvedValueOnce({
+        sub: 'external-user',
+        email,
+        email_verified: true,
+      });
       const start = oauthRequest('');
       await beginOAuth(start);
-      if (failure === 'exchange')
-        vi.mocked(oauthClient.authorizationCodeGrant).mockRejectedValueOnce(
-          new Error('Invalid state')
-        );
-      else
-        vi.mocked(oauthClient.fetchUserInfo).mockResolvedValueOnce({
-          sub: 'external-user',
-          email: 'admin@example.com',
-          email_verified: false,
-        });
       const callback = oauthRequest(
         '/callback?code=code&state=state',
         sessionCookie(start)
       );
-      await expect(oauthCallback(callback)).rejects.toThrow(
-        failure === 'exchange' ? 'Invalid state' : 'Email is not verified'
-      );
-      const cookie = sessionCookie(callback);
-      await expect(
-        oauthCallback(oauthRequest('/callback?code=code&state=state', cookie))
-      ).rejects.toMatchObject({ status: 400 });
-      expect(oauthClient.authorizationCodeGrant).toHaveBeenCalledOnce();
+
+      if (allowed) {
+        await oauthCallback(callback);
+        expect(
+          await getCurrentUser(
+            request('/api/me', undefined, sessionCookie(callback))
+          )
+        ).toMatchObject({ id: 1, email, oauthProvider: 'oidc' });
+      } else {
+        await expect(oauthCallback(callback)).rejects.toMatchObject({
+          status: 401,
+          statusText: 'Email domain not allowed',
+        });
+        expect(await fixture.store.users.get(1)).toEqual(before);
+        await expect(
+          getCurrentUser(request('/api/me', undefined, sessionCookie(callback)))
+        ).rejects.toMatchObject({ status: 401 });
+      }
       expect(await fixture.store.users.count()).toBe(1);
-      await expect(
-        getCurrentUser(request('/api/me', undefined, cookie))
-      ).rejects.toMatchObject({ status: 401 });
     }
   );
 

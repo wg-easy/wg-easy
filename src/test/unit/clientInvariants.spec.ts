@@ -147,6 +147,32 @@ describe('client access and addresses', () => {
 });
 
 describe('CIDR changes', () => {
+  test('rolls back both networks and earlier peer reassignments if the IPv6 pool runs out', async () => {
+    const { store, commands, writeConfiguration, firewall } =
+      await vpnFixture();
+    await clients.create(admin, { name: 'Second', expiresAt: null });
+    const network = await store.interfaces.get();
+    const peers = await store.clients.getAll();
+    writeConfiguration.mockClear();
+    commands.sync.mockClear();
+    firewall.rebuildRules.mockClear();
+
+    // IPv4 fits both clients; IPv6 fits only the first. The second allocation
+    // must undo the first client's already-completed address changes too.
+    await expect(
+      settings.updateCidr(admin, {
+        ipv4Cidr: '192.0.2.0/29',
+        ipv6Cidr: 'fd00::/126',
+      })
+    ).rejects.toThrow('Maximum number of clients reached');
+
+    expect(await store.interfaces.get()).toEqual(network);
+    expect(await store.clients.getAll()).toEqual(peers);
+    expect(writeConfiguration).not.toHaveBeenCalled();
+    expect(commands.sync).not.toHaveBeenCalled();
+    expect(firewall.rebuildRules).not.toHaveBeenCalled();
+  });
+
   test('allows the former gateway as a client address but rejects the current gateway', async () => {
     const { store, writeConfiguration } = await vpnFixture();
     const before = await store.clients.get(1);

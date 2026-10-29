@@ -160,6 +160,53 @@ describe('VPN operations', () => {
     expect(commands.sync).toHaveBeenCalledOnce();
   });
 
+  test('retries a failed start without replacing the initialized server identity', async () => {
+    const { store, commands } = await vpnFixture();
+    commands.up.mockRejectedValueOnce(new Error('Device unavailable'));
+    await expect(vpn.start()).rejects.toThrow('Device unavailable');
+    const initialized = await store.interfaces.get();
+    expect(initialized).toMatchObject({
+      privateKey: 'new-private',
+      publicKey: 'new-public',
+    });
+
+    await vpn.maintain();
+
+    expect(commands.up).toHaveBeenCalledTimes(2);
+    expect(commands.sync).toHaveBeenCalledOnce();
+    expect(commands.generatePrivateKey).toHaveBeenCalledOnce();
+    expect(await store.interfaces.get()).toEqual(initialized);
+    await vpn.maintain();
+    expect(commands.up).toHaveBeenCalledTimes(2);
+    expect(commands.sync).toHaveBeenCalledOnce();
+  });
+
+  test.each([-1, 0, 1])(
+    'cleans up one-time links at their deadline without changing peer access (offset %i ms)',
+    async (offset) => {
+      const { store, commands, writeConfiguration, firewall } =
+        await vpnFixture();
+      const deadline = Date.parse('2026-10-27T00:00:00Z');
+      vi.spyOn(Date, 'now').mockReturnValue(deadline + offset);
+      await store.oneTimeLinks.save(
+        1,
+        'download-token',
+        new Date(deadline).toISOString()
+      );
+      const peer = await store.clients.get(1);
+
+      await vpn.maintain();
+
+      const link = await store.oneTimeLinks.getByToken('download-token');
+      if (offset < 0) expect(link).toBeDefined();
+      else expect(link).toBeUndefined();
+      expect(await store.clients.get(1)).toEqual(peer);
+      expect(writeConfiguration).not.toHaveBeenCalled();
+      expect(commands.sync).not.toHaveBeenCalled();
+      expect(firewall.rebuildRules).not.toHaveBeenCalled();
+    }
+  );
+
   describe.each([
     '2026-10-27',
     '2026-10-27T00:00:00.000Z',
