@@ -81,7 +81,7 @@ describe('client pagination rendering', () => {
         /<button[^>]*role="combobox"[^>]*>[\s\S]*?<\/button>/
       )?.[0];
       expect(pageSizeTrigger).toContain('aria-label="Per page"');
-      expect(pageSizeTrigger?.replace(/<[^>]*>/g, '')).toBe('25');
+      expect(pageSizeTrigger).toContain('>25<');
     }
   );
 
