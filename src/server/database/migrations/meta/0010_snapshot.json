@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "8db99604-af31-4c8a-90f2-f4cd211a5d2c",
+  "id": "4f51ca3b-41f6-470d-a93e-8a1f84e84440",
   "prevId": "209191ca-75c3-4821-93f5-255119b9a351",
   "tables": {
     "clients_table": {
@@ -99,7 +99,7 @@
           "name": "pre_shared_key",
           "type": "text",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false
         },
         "expires_at": {
@@ -1005,6 +1005,14 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
+        },
+        "default_generate_pre_shared_key": {
+          "name": "default_generate_pre_shared_key",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": true
         },
         "default_dns": {
           "name": "default_dns",
