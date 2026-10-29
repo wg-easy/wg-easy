@@ -42,13 +42,14 @@
         </div>
       </div>
       <div
+        v-if="client.transferTx || client.transferRx"
         class="col-span-2 flex min-w-0 items-center justify-between gap-3 border-t border-line pt-4 lg:col-span-1 lg:border-0 lg:pt-0"
       >
         <ClientCardTransfer :client="client" />
         <ClientCardCharts v-if="globalStore.uiShowCharts" :client="client" />
       </div>
       <div
-        class="col-span-2 flex items-center justify-between gap-4 border-t border-line pt-4 lg:col-span-1 lg:flex-col lg:items-end lg:gap-3 lg:border-0 lg:pt-0"
+        class="col-span-2 flex items-center justify-between gap-4 border-t border-line pt-4 lg:col-span-1 lg:col-start-3 lg:flex-col lg:items-end lg:gap-3 lg:border-0 lg:pt-0"
       >
         <label class="flex items-center gap-2 text-[11px] text-subtle">
           <ClientCardSwitch :client="client" />

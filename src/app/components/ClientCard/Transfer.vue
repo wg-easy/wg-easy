@@ -1,6 +1,7 @@
 <template>
   <div class="flex shrink-0 gap-5 text-[11px] tabular-nums">
     <div
+      v-if="client.transferTx"
       :title="
         $t('clients.traffic.totalDownload', {
           total: bytes(client.transferTx ?? 0),
@@ -17,6 +18,7 @@
       </span>
     </div>
     <div
+      v-if="client.transferRx"
       :title="
         $t('clients.traffic.totalUpload', {
           total: bytes(client.transferRx ?? 0),
