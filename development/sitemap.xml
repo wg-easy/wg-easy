@@ -4,12 +4,6 @@
         <loc>https://wg-easy.github.io/development/</loc>
       </url>
       <url>
-        <loc>https://wg-easy.github.io/development/faq/</loc>
-      </url>
-      <url>
-        <loc>https://wg-easy.github.io/development/getting-started/</loc>
-      </url>
-      <url>
         <loc>https://wg-easy.github.io/development/advanced/api/</loc>
       </url>
       <url>
@@ -76,7 +70,16 @@
         <loc>https://wg-easy.github.io/development/examples/tutorials/traefik/</loc>
       </url>
       <url>
+        <loc>https://wg-easy.github.io/development/faq/</loc>
+      </url>
+      <url>
+        <loc>https://wg-easy.github.io/development/getting-started/</loc>
+      </url>
+      <url>
         <loc>https://wg-easy.github.io/development/guides/2fa/</loc>
+      </url>
+      <url>
+        <loc>https://wg-easy.github.io/development/guides/account/</loc>
       </url>
       <url>
         <loc>https://wg-easy.github.io/development/guides/admin/</loc>
