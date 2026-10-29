@@ -61,7 +61,6 @@ const chartOptions = {
       shade: 'dark',
       type: 'vertical',
       shadeIntensity: 0,
-      gradientToColors: CHART_COLORS.gradient[theme.value],
       inverseColors: false,
       opacityTo: 0,
       stops: [0, 100],
