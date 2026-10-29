@@ -3,7 +3,7 @@
     "me": "Conta",
     "clients": "Clientes",
     "admin": {
-      "panel": "Panel de administração.",
+      "panel": "Painel de administração",
       "general": "Geral",
       "config": "Configuração",
       "interface": "Interface",
@@ -15,12 +15,16 @@
   },
   "me": {
     "currentPassword": "Senha atual",
-    "enable2fa": "Habilitar autenticação em dois fatores",
+    "enable2fa": "Habilitar autenticação de dois fatores",
     "enable2faDesc": "Escaneie o QR Code com seu aplicativo autenticador ou insira a chave manualmente.",
     "2faKey": "Chave TOTP",
     "2faCodeDesc": "Digite o código do seu aplicativo autenticador.",
-    "disable2fa": "Desativar autenticação de dois fatores.",
-    "disable2faDesc": "Digite sua senha para desativar a autenticação de dois fatores."
+    "disable2fa": "Desativar autenticação de dois fatores",
+    "disable2faDesc": "Digite sua senha para desativar a autenticação de dois fatores.",
+    "linkOauth": "Vincule sua conta a um provedor externo",
+    "unlinkOauth": "Desvincular",
+    "linkedWith": "Vinculado com {provider}",
+    "providerDisabled": "O seu provedor vinculado atualmente não está habilitado"
   },
   "general": {
     "name": "Nome",
@@ -28,12 +32,13 @@
     "password": "Senha",
     "newPassword": "Nova senha",
     "updatePassword": "Atualizar senha",
+    "addPassword": "Adicionar senha",
     "mtu": "MTU",
     "allowedIps": "IPs permitidos",
     "dns": "DNS",
     "persistentKeepalive": "Keepalive persistente",
     "logout": "Sair",
-    "continue": "Continue",
+    "continue": "Continuar",
     "host": "Host",
     "port": "Porta",
     "yes": "Sim",
@@ -41,7 +46,8 @@
     "confirmPassword": "Confirmar senha",
     "loading": "Carregando...",
     "2fa": "Autenticação de dois fatores",
-    "2faCode": "Código TOTP"
+    "2faCode": "Código TOTP",
+    "externalAuth": "Autenticação externa"
   },
   "setup": {
     "welcome": "Bem-vindo à sua primeira configuração do wg-easy",
@@ -72,11 +78,14 @@
   },
   "login": {
     "signIn": "Entrar",
+    "signInWith": "Entrar com {provider}",
+    "or": "ou",
     "rememberMe": "Lembrar de mim",
     "rememberMeDesc": "Permanecer conectado após fechar o navegador",
     "insecure": "Não é possível fazer login com uma conexão insegura. Use HTTPS.",
     "2faRequired": "É necessária autenticação de dois fatores",
-    "2faWrong": "A autenticação de dois fatores está errada"
+    "2faWrong": "A autenticação de dois fatores está incorreta",
+    "loginExpired": "Sessão expirada. Tente novamente"
   },
   "client": {
     "empty": "Ainda não há clientes.",
@@ -88,7 +97,8 @@
     "name": "Nome",
     "expireDate": "Data de expiração",
     "expireDateDesc": "Data em que o cliente será desativado. Em branco para permanente",
-    "deleteClient": "Deletar cliente",
+    "delete": "Excluir",
+    "deleteClient": "Excluir cliente",
     "deleteDialog": "Tem certeza de que deseja excluir {name}? Esta ação não pode ser desfeita.",
     "enabled": "Ativado",
     "address": "Endereço",
@@ -112,10 +122,17 @@
     "hooks": "Hooks",
     "hooksDescription": "Os hooks só funcionam com wg-quick",
     "hooksLeaveEmpty": "Somente para wg-quick. Caso contrário, deixe em branco.",
-    "dnsDesc": "Os clientes do servidor DNS usarão (substitui a configuração global)",
-    "notConnected": "Client não conectado",
+    "dnsDesc": "Servidor DNS que os clientes usarão (substitui a configuração global)",
+    "notConnected": "Cliente não conectado",
     "endpoint": "Endpoint",
-    "endpointDesc": "IP do cliente a partir do qual a conexão WireGuard é estabelecida"
+    "endpointDesc": "IP do cliente a partir do qual a conexão WireGuard é estabelecida",
+    "search": "Buscar clientes...",
+    "config": "Configuração",
+    "viewConfig": "Ver configuração",
+    "firewallIps": "IPs permitidos no Firewall",
+    "firewallIpsDesc": "IPs/CIDRs de destino que este cliente pode acessar (aplicado no servidor). Deixe em branco para usar os IPs permitidos. Suporta filtragem opcional de porta e protocolo. Consulte a documentação para ver a sintaxe.",
+    "downloadPng": "Baixar PNG",
+    "copyPng": "Copiar PNG"
   },
   "dialog": {
     "change": "Mudar",
@@ -125,16 +142,20 @@
   "toast": {
     "success": "Sucesso",
     "saved": "Salvo",
-    "error": "Erro"
+    "error": "Erro",
+    "unknown": "Erro desconhecido. Veja o console para mais detalhes"
   },
   "form": {
-    "actions": "Ação",
+    "actions": "Ações",
     "save": "Salvar",
     "revert": "Reverter",
     "sectionGeneral": "Geral",
     "sectionAdvanced": "Avançado",
-    "noItems": "Sem items",
-    "nullNoItems": "Sem items. Usando configuração global",
+    "noItems": "Sem itens",
+    "nullNoItems": "Sem itens. Usando configuração global",
+    "nullNotSet": "Não definido",
+    "set": "Definir",
+    "unset": "Limpar",
     "add": "Adicionar"
   },
   "admin": {
@@ -143,7 +164,7 @@
       "sessionTimeoutDesc": "Duração da sessão para Lembrar de mim (segundos)",
       "metrics": "Métricas",
       "metricsPassword": "Senha",
-      "metricsPasswordDesc": "Senha do portador para o ponto final de métricas (senha ou hash argon2)",
+      "metricsPasswordDesc": "Senha Bearer para o endpoint de métricas (senha ou hash argon2)",
       "json": "JSON",
       "jsonDesc": "Rota para métricas em formato JSON",
       "prometheus": "Prometheus",
@@ -154,23 +175,28 @@
       "hostDesc": "Nome de host público ao qual os clientes se conectarão (invalida a configuração)",
       "portDesc": "Porta UDP pública à qual os clientes se conectarão (invalida a configuração, você provavelmente desejará alterar a porta da interface também)",
       "allowedIpsDesc": "IPs permitidos que os clientes usarão (configuração global)",
-      "dnsDesc": "Os clientes do servidor DNS usarão (configuração global)",
-      "mtuDesc": "Os clientes da MTU usarão (somente para novos clientes)",
+      "dnsDesc": "Servidor DNS que os clientes usarão (configuração global)",
+      "mtuDesc": "MTU que os clientes usarão (somente para novos clientes)",
       "persistentKeepaliveDesc": "Intervalo em segundos para enviar keepalives para o servidor. 0 = desabilitado (somente para novos clientes)",
-      "suggest": "Sugestão",
+      "suggest": "Sugerir",
       "suggestDesc": "Escolha um endereço IP ou nome de host para o campo Host"
     },
     "interface": {
-      "cidrSuccess": "Mudar CIDR",
+      "cidrSuccess": "CIDR alterado",
       "device": "Dispositivo",
-      "deviceDesc": "Dispositivo Ethernet que o tráfego wireguard deve ser encaminhado",
+      "deviceDesc": "Dispositivo Ethernet pelo qual o tráfego do WireGuard deve ser encaminhado",
+      "routingTable": "Tabela de roteamento",
+      "routingTableDesc": "Tabela de roteamento para as rotas do WireGuard. Defina como auto, off ou um número de tabela.",
       "mtuDesc": "MTU que o WireGuard usará",
       "portDesc": "A porta UDP que o WireGuard irá escutar (você provavelmente vai querer mudar a porta de configuração também)",
       "changeCidr": "Mudar CIDR",
       "restart": "Reiniciar interface",
       "restartDesc": "Reiniciar a interface do WireGuard",
       "restartWarn": "Tem certeza de que deseja reiniciar a interface? Isso desconectará todos os clientes.",
-      "restartSuccess": "Interface reiniciada"
+      "restartSuccess": "Interface reiniciada",
+      "firewall": "Filtragem de tráfego",
+      "firewallEnabled": "Ativar Firewall por cliente",
+      "firewallEnabledDesc": "Restringe o tráfego do cliente a IPs de destino específicos usando iptables. Quando ativado, cada cliente pode ser configurado com destinos permitidos."
     },
     "introText": "Bem-vindo ao painel de administração.\n\nAqui você pode gerenciar as configurações gerais, a configuração, as configurações da interface e os hooks.\n\nComece escolhendo uma das seções na barra lateral."
   },
@@ -178,11 +204,14 @@
     "generic": {
       "required": "{field} é obrigatório",
       "validNumber": "{field} deve ser um número válido",
+      "validNumberRange": "{field} deve ser um número ou intervalo numérico válido",
       "validString": "{field} deve ser uma string válida",
       "validBoolean": "{field} deve ser um booleano válido",
       "validArray": "{field} deve ser uma matriz válida",
       "stringMin": "{field} deve ter pelo menos {min} caracteres",
-      "numberMin": "{field} deve ter pelo menos {min}"
+      "stringMax": "{field} deve ter no máximo {max} caracteres",
+      "numberMin": "{field} deve ter pelo menos {min}",
+      "numberMax": "{field} deve ser no máximo {max}"
     },
     "client": {
       "id": "ID do cliente",
@@ -190,7 +219,9 @@
       "expiresAt": "Expira em",
       "address4": "Endereço IPv4",
       "address6": "Endereço IPv6",
-      "serverAllowedIps": "IPs permitidos do servidor"
+      "serverAllowedIps": "IPs permitidos do servidor",
+      "firewallIps": "IPs permitidos no Firewall",
+      "firewallIpsInvalid": "Entrada de IP de firewall inválida. Consulte a documentação para ver a sintaxe suportada."
     },
     "user": {
       "username": "Usuário",
@@ -215,10 +246,13 @@
     "interface": {
       "cidr": "CIDR",
       "device": "Dispositivo",
-      "cidrValid": "O CIDR deve ser válido"
+      "cidrValid": "O CIDR deve ser válido",
+      "routingTable": "A tabela de roteamento deve ser auto, off ou um número de tabela",
+      "headerProtectionJunkSize": "Os tamanhos de pacotes lixo S1-S4 devem ser de pelo menos 12 quando uma chave de proteção de cabeçalho estiver definida"
     },
     "otl": "Link de uso único",
     "stringMalformed": "A string está malformada",
+    "keyMalformed": "A chave deve ser uma chave de 32 bytes codificada em base64",
     "body": "O corpo deve ser um objeto válido",
     "hook": "Hook",
     "enabled": "Ativado",
@@ -228,6 +262,7 @@
     "address": "Endereço IP",
     "dns": "DNS",
     "allowedIps": "IPs permitidos",
+    "allowedIpsInvalid": "Cada entrada de IPs permitidos deve ser um único endereço IP ou CIDR",
     "file": "Arquivo"
   },
   "hooks": {
@@ -235,5 +270,66 @@
     "postUp": "PostUp",
     "preDown": "PreDown",
     "postDown": "PostDown"
+  },
+  "copy": {
+    "notSupported": "Copiar não é suportado",
+    "copied": "Copiado!",
+    "failed": "Falha ao copiar",
+    "copy": "Copiar"
+  },
+  "awg": {
+    "jCLabel": "Contagem de pacotes lixo (Jc)",
+    "jCDescription": "Número de pacotes lixo a enviar (1-128, recomendado: 4-12)",
+    "jMinLabel": "Tamanho mínimo de pacote lixo (Jmin)",
+    "jMinDescription": "Tamanho mínimo dos pacotes lixo (0-1279*, recomendado: 8, deve ser < Jmax)",
+    "jMaxLabel": "Tamanho máximo de pacote lixo (Jmax)",
+    "jMaxDescription": "Tamanho máximo dos pacotes lixo (1-1280*, recomendado: 80, deve ser > Jmin)",
+    "s1Label": "Tamanho do lixo do pacote inicial (S1)",
+    "s1Description": "Tamanho do lixo do pacote inicial (0-1132[1280* - 148 = 1132], recomendado: 15-150, S1+56 ≠ S2)",
+    "s2Label": "Tamanho do lixo do pacote de resposta (S2)",
+    "s2Description": "Tamanho do lixo do pacote de resposta (0-1188[1280* - 92 = 1188], recomendado: 15-150)",
+    "s3Label": "Tamanho do lixo do pacote de resposta de cookie (S3)",
+    "s3Description": "Tamanho do lixo do pacote de resposta de cookie",
+    "s4Label": "Tamanho do lixo do pacote de transporte (S4)",
+    "s4Description": "Tamanho do lixo do pacote de transporte",
+    "h1Label": "Cabeçalho mágico inicial (H1)",
+    "h1Description": "Valor ou intervalo do cabeçalho do pacote inicial (X ou X-Y, onde X<Y. Mín 5, máx 2147483647. O valor ou intervalo não deve se sobrepor a outros cabeçalhos)",
+    "h2Label": "Cabeçalho mágico de resposta (H2)",
+    "h2Description": "Valor ou intervalo do cabeçalho do pacote de resposta (X ou X-Y, onde X<Y. Mín 5, máx 2147483647. O valor ou intervalo não deve se sobrepor a outros cabeçalhos)",
+    "h3Label": "Cabeçalho mágico de resposta de cookie (H3)",
+    "h3Description": "Valor ou intervalo do cabeçalho do pacote de resposta de cookie (X ou X-Y, onde X<Y. Mín 5, máx 2147483647. O valor ou intervalo não deve se sobrepor a outros cabeçalhos)",
+    "h4Label": "Cabeçalho mágico de transporte (H4)",
+    "h4Description": "Valor ou intervalo do cabeçalho do pacote de transporte (X ou X-Y, onde X<Y. Mín 5, máx 2147483647. O valor ou intervalo não deve se sobrepor a outros cabeçalhos)",
+    "i1Label": "Pacote lixo especial 1 (I1)",
+    "i1Description": "Pacote de imitação de protocolo em formato hexadecimal: <b 0x...>",
+    "i2Label": "Pacote lixo especial 2 (I2)",
+    "i2Description": "Pacote de imitação de protocolo em formato hexadecimal: <b 0x...>",
+    "i3Label": "Pacote lixo especial 3 (I3)",
+    "i3Description": "Pacote de imitação de protocolo em formato hexadecimal: <b 0x...>",
+    "i4Label": "Pacote lixo especial 4 (I4)",
+    "i4Description": "Pacote de imitação de protocolo em formato hexadecimal: <b 0x...>",
+    "i5Label": "Pacote lixo especial 5 (I5)",
+    "i5Description": "Pacote de imitação de protocolo em formato hexadecimal: <b 0x...>",
+    "rangeNote": "Os parâmetros a seguir aceitam um único número ou um intervalo inclusivo (0-65535), por exemplo, 30 ou 30-90",
+    "headerProtectionKeyLabel": "Chave de proteção de cabeçalho",
+    "headerProtectionKeyDescription": "Chave base64 de 32 bytes usada para criptografar cabeçalhos de pacotes. Deve coincidir em ambos os lados, por isso é copiada para cada cliente. Requer que S1-S4 sejam pelo menos 12",
+    "contentPaddingAdditionLabel": "Adição de preenchimento de conteúdo",
+    "contentPaddingAdditionDescription": "Quantidade aleatória de bytes anexada aos pacotes de transporte antes da criptografia",
+    "rekeyAfterTimeLabel": "Renegociar chave após tempo",
+    "rekeyAfterTimeDescription": "Segundos antes que uma sessão seja renegociada (padrão do WireGuard: 120)",
+    "rekeyTimeoutLabel": "Tempo limite de renegociação de chave",
+    "rekeyTimeoutDescription": "Segundos entre novas tentativas de handshake (padrão do WireGuard: 5)",
+    "rejectAfterTimeLabel": "Rejeitar após tempo",
+    "rejectAfterTimeDescription": "Tempo de vida da sessão em segundos (padrão do WireGuard: 180)",
+    "keepaliveTimeoutLabel": "Tempo limite de keepalive",
+    "keepaliveTimeoutDescription": "Segundos de inatividade antes de um keepalive ser enviado (padrão do WireGuard: 10)",
+    "maxHandshakeAttemptsLabel": "Máximo de tentativas de handshake",
+    "maxHandshakeAttemptsDescription": "Tentativas de handshake antes de desistir (padrão do WireGuard: 18)",
+    "randomTrailersLabel": "Trailers aleatórios",
+    "randomTrailersDescription": "Anexa uma quantidade aleatória de bytes ao final dos pacotes de handshake. Deve coincidir em ambos os lados, por isso é copiado para cada cliente",
+    "disableCookiesLabel": "Desativar cookies",
+    "disableCookiesDescription": "Não responder a handshakes com mensagens de cookie quando sob carga. Afeta apenas este lado do túnel",
+    "mtuNote": "Os valores dependem do MTU",
+    "obfuscationParameters": "Parâmetros de ofuscação do AmneziaWG"
   }
 }
