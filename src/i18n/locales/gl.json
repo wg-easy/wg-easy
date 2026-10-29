@@ -153,6 +153,9 @@
     "sectionAdvanced": "Avanzado",
     "noItems": "Sen elementos",
     "nullNoItems": "Sen elementos. Usando a configuración global",
+    "nullNotSet": "Non definido",
+    "set": "Definir",
+    "unset": "Quitar",
     "add": "Engadir"
   },
   "admin": {
@@ -244,10 +247,12 @@
       "cidr": "CIDR",
       "device": "Dispositivo",
       "cidrValid": "O CIDR debe ser válido",
-      "routingTable": "A táboa de encamiñamento debe ser auto, off ou un número de táboa"
+      "routingTable": "A táboa de encamiñamento debe ser auto, off ou un número de táboa",
+      "headerProtectionJunkSize": "S1-S4 deben ser como mínimo 12 se se usa unha chave de protección de cabeceira"
     },
     "otl": "Ligazón dun só uso",
     "stringMalformed": "A cadea está mal formada",
+    "keyMalformed": "A chave debe ser unha chave de 32 bytes codificada en base64",
     "body": "O corpo debe ser un obxecto válido",
     "hook": "Hook",
     "enabled": "Activado",
@@ -257,6 +262,7 @@
     "address": "Enderezo IP",
     "dns": "DNS",
     "allowedIps": "IPs permitidas",
+    "allowedIpsInvalid": "Cada entrada de IPs permitidas debe ser un único enderezo IP ou un CIDR",
     "file": "Ficheiro"
   },
   "hooks": {
@@ -304,6 +310,25 @@
     "i4Description": "Paquete de simulación de protocolo en formato hexadecimal: <b 0x...>",
     "i5Label": "Paquete lixo especial 5 (I5)",
     "i5Description": "Paquete de simulación de protocolo en formato hexadecimal: <b 0x...>",
+    "rangeNote": "Os seguintes parámetros aceptan un único número ou un rango inclusivo (0-65535), por exemplo 30 ou 30-90",
+    "headerProtectionKeyLabel": "Chave de protección de cabeceira",
+    "headerProtectionKeyDescription": "Chave base64 de 32 bytes usada para cifrar as cabeceiras dos paquetes. Debe coincidir en ambos os lados, polo que se copia a todos os clientes. Require que S1-S4 sexan polo menos 12",
+    "contentPaddingAdditionLabel": "Recheo de contido adicional",
+    "contentPaddingAdditionDescription": "Cantidade aleatoria de bytes engadidos aos paquetes de transporte antes do cifrado",
+    "rekeyAfterTimeLabel": "Tempo para renovar chaves",
+    "rekeyAfterTimeDescription": "Segundos antes de renegociar unha sesión (predeterminado de WireGuard: 120)",
+    "rekeyTimeoutLabel": "Tempo de espera da renovación de chaves",
+    "rekeyTimeoutDescription": "Segundos entre reintentos de handshake (predeterminado de WireGuard: 5)",
+    "rejectAfterTimeLabel": "Tempo para rexeitar",
+    "rejectAfterTimeDescription": "Duración da sesión en segundos (predeterminado de WireGuard: 180)",
+    "keepaliveTimeoutLabel": "Tempo de espera de keepalive",
+    "keepaliveTimeoutDescription": "Segundos de inactividade antes de enviar un keepalive (predeterminado de WireGuard: 10)",
+    "maxHandshakeAttemptsLabel": "Intentos máximos de handshake",
+    "maxHandshakeAttemptsDescription": "Intentos de handshake antes de desistir (predeterminado de WireGuard: 18)",
+    "randomTrailersLabel": "Bytes finais aleatorios",
+    "randomTrailersDescription": "Engade unha cantidade aleatoria de bytes aos paquetes de handshake. Debe coincidir en ambos os lados, polo que se copia a todos os clientes",
+    "disableCookiesLabel": "Desactivar cookies",
+    "disableCookiesDescription": "Non responder aos handshakes con mensaxes cookie cando hai carga. Só afecta a este lado do túnel",
     "mtuNote": "Os valores dependen da MTU",
     "obfuscationParameters": "Parámetros de ofuscación de AmneziaWG"
   }
