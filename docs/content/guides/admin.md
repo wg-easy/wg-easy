@@ -20,6 +20,7 @@ This feature is currently experimental. While functional, it should be thoroughl
 
 - `iptables` must be installed on the host system
 - `ip6tables` must be installed if IPv6 is enabled (default)
+- The `xt_comment` kernel module must be available, as every rule is created with an `-m comment` match (see the [FAQ](../faq.md#warning-extension-comment-revision-0-not-supported-missing-kernel-module))
 - The feature cannot be enabled if these tools are not available
 
 /// note
