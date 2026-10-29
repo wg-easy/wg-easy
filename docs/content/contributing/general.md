@@ -4,20 +4,41 @@ title: General Information
 
 ## Coding Style
 
-When refactoring, writing or altering files, adhere to these rules:
+Follow the surrounding code style and use the included VS Code settings.
+Run `pnpm lint` from `src` before submitting changes.
 
-1. **Adjust your style of coding to the style that is already present**! Even if you do not like it, this is due to consistency. There was a lot of work involved in making all files consistent.
-2. **Use `pnpm lint` to check your scripts**! Your contributions are checked by GitHub Actions too, so you will need to do this.
-3. **Use the provided `.vscode/settings.json`** file.
+## Tests
+
+From the repository root, install dependencies and run the unit tests:
+
+```sh
+cd src
+pnpm install
+pnpm test:unit
+```
+
+Browser tests cover setup, login, client management, VPN connectivity, and restarts.
+They require Docker Compose v2 and WireGuard support in Docker's Linux kernel.
+Still in `src`, run:
+
+```sh
+pnpm exec playwright install chromium
+pnpm test:e2e
+```
+
+The tests build the app and clean up their containers and data afterward.
+To inspect a failure, run `pnpm exec playwright show-report` from `src`.
+
+Add tests for meaningful behavior and regressions. CI runs both suites on pull requests.
 
 ## Documentation
 
-Make sure to select `edge` in the dropdown menu at the top. Navigate to the page you would like to edit and click the edit button in the top right. This allows you to make changes and create a pull-request.
+To edit a page online, select `edge` in the version dropdown and click the edit button.
 
-Alternatively you can make the changes locally. For that you'll need to have Docker installed. Run
+To preview local changes, start Docker and run this from the repository root:
 
 ```sh
-pnpm docs:serve
+pnpm docs:preview
 ```
 
-This serves the documentation on your local machine on port `8080`. Each change will be hot-reloaded onto the page you view, just edit, save and look at the result.
+Open <http://localhost:8080>. The preview reloads when you save changes.

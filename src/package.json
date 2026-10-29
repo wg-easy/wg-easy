@@ -19,7 +19,9 @@
     "cli:trace": "node cli/build.js --trace",
     "cli:build": "node cli/build.js",
     "cli:dev": "tsx cli/index.ts",
-    "test:unit": "vitest run --project unit"
+    "test:unit": "vitest run --project unit",
+    "test:e2e": "bash ../scripts/test-e2e.sh",
+    "test:e2e:typecheck": "tsc -p test/e2e/tsconfig.json"
   },
   "dependencies": {
     "@libsql/client": "^0.18.0",
@@ -61,6 +63,8 @@
   "devDependencies": {
     "@nuxt/eslint": "^1.17.0",
     "@nuxt/test-utils": "^4.3.4",
+    "@playwright/test": "^1.64.1",
+    "@types/node": "^26.6.5",
     "@types/phc__format": "^1.0.1",
     "@types/sortablejs": "^1.15.9",
     "@vitest/coverage-v8": "^5.0.5",
