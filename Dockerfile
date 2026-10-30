@@ -29,6 +29,10 @@ RUN apk add linux-headers build-base go git && \
     make && \
     sed -i 's|\[\[ $proto == -4 \]\] && cmd sysctl -q net\.ipv4\.conf\.all\.src_valid_mark=1|[[ $proto == -4 ]] \&\& [[ $(sysctl -n net.ipv4.conf.all.src_valid_mark) != 1 ]] \&\& cmd sysctl -q net.ipv4.conf.all.src_valid_mark=1|' ./wg-quick/linux.bash
 
+# Build ambient-caps
+COPY docker/ambient-caps.c ./
+RUN cc -O2 -Wall -Wextra -Werror -static -o ambient-caps ambient-caps.c
+
 FROM docker.io/library/node:krypton-alpine@sha256:06d7adf3e0ef61a13f1d28682726366f97a15aa1888c934d3ecec86c33918b53 AS build-libsql
 WORKDIR /app
 RUN npm install --no-save --omit=dev libsql
@@ -38,7 +42,7 @@ RUN npm install --no-save --omit=dev libsql
 FROM docker.io/library/node:krypton-alpine@sha256:06d7adf3e0ef61a13f1d28682726366f97a15aa1888c934d3ecec86c33918b53
 WORKDIR /app
 
-HEALTHCHECK --interval=1m --timeout=5s --retries=3 CMD /usr/bin/timeout 5s /bin/sh -c "/usr/bin/wg show | /bin/grep -q interface || exit 1"
+HEALTHCHECK --interval=1m --timeout=5s --retries=3 CMD ["/usr/local/bin/ambient-caps", "/usr/bin/timeout", "5s", "/bin/sh", "-c", "/usr/bin/wg show | /bin/grep -q interface || exit 1"]
 
 # Copy build
 COPY --from=build /app/.output /app
@@ -70,6 +74,16 @@ RUN apk add --no-cache \
     wireguard-go \
     wireguard-tools
 
+# Optional non-root operation, see docs/content/examples/tutorials/non-root.md. ambient-caps keeps NET_ADMIN and NET_RAW
+# across exec when the container grants them, and the patch lets wg-quick and awg-quick skip sudo once they hold NET_ADMIN
+COPY --from=build /app/ambient-caps /usr/local/bin/ambient-caps
+COPY docker/wg-quick-non-root.patch /tmp/wg-quick-non-root.patch
+RUN apk add --no-cache libcap-setcap patch && \
+    setcap cap_net_admin,cap_net_raw+p /usr/local/bin/ambient-caps && \
+    patch --directory=/ --strip=1 --fuzz=0 --input=/tmp/wg-quick-non-root.patch && \
+    rm /tmp/wg-quick-non-root.patch && \
+    apk del --no-cache libcap-setcap patch
+
 RUN mkdir -p /etc/amnezia
 RUN ln -s /etc/wireguard /etc/amnezia/amneziawg
 
@@ -93,4 +107,5 @@ ENV DISABLE_IPV6=false
 LABEL org.opencontainers.image.source=https://github.com/wg-easy/wg-easy
 
 # Run Web UI
+ENTRYPOINT ["/usr/local/bin/ambient-caps", "docker-entrypoint.sh"]
 CMD ["/usr/bin/dumb-init", "iptables-backend", "node", "server/index.mjs"]

@@ -1,0 +1,28 @@
+--- a/usr/bin/wg-quick
++++ b/usr/bin/wg-quick
+@@ -83,6 +83,11 @@
+ }
+ 
+ auto_su() {
++	# A non-root process that already holds CAP_NET_ADMIN (bit 12 of CapEff)
++	# can configure the interface itself, so it needs no sudo.
++	local cap_eff
++	cap_eff=$(sed -n 's/^CapEff:[[:space:]]*//p' /proc/self/status)
++	(( UID != 0 && (0x$cap_eff >> 12 & 1) )) && return
+ 	[[ $UID == 0 ]] || exec "${SUDO:-sudo}" "$BASH" -- "$SELF" "${ARGS[@]}"
+ }
+ 
+--- a/usr/bin/awg-quick
++++ b/usr/bin/awg-quick
+@@ -82,6 +82,11 @@
+ }
+ 
+ auto_su() {
++	# A non-root process that already holds CAP_NET_ADMIN (bit 12 of CapEff)
++	# can configure the interface itself, so it needs no sudo.
++	local cap_eff
++	cap_eff=$(sed -n 's/^CapEff:[[:space:]]*//p' /proc/self/status)
++	(( UID != 0 && (0x$cap_eff >> 12 & 1) )) && return
+ 	[[ $UID == 0 ]] || exec sudo -p "$PROGRAM must be run as root. Please enter the password for %u to continue: " -- "$BASH" -- "$SELF" "${ARGS[@]}"
+ }
+ 
