@@ -1092,6 +1092,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Tests
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#documentation" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -1647,6 +1658,33 @@
   
   
     <li class="md-nav__item">
+      <a href="../../guides/account/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Account
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../guides/admin/" class="md-nav__link">
         
   
@@ -1708,7 +1746,7 @@
   <span class="md-ellipsis">
     
   
-  Edit Client
+  Clients
 
     
   </span>
@@ -1797,6 +1835,17 @@
     <span class="md-ellipsis">
       <span class="md-typeset">
         Coding Style
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Tests
       </span>
     </span>
   </a>
@@ -1903,18 +1952,29 @@
   <h1>General Information</h1>
 
 <h2 id="coding-style">Coding Style<a class="headerlink" href="#coding-style" title="Permanent link">&para;</a></h2>
-<p>When refactoring, writing or altering files, adhere to these rules:</p>
-<ol>
-<li><strong>Adjust your style of coding to the style that is already present</strong>! Even if you do not like it, this is due to consistency. There was a lot of work involved in making all files consistent.</li>
-<li><strong>Use <code>pnpm lint</code> to check your scripts</strong>! Your contributions are checked by GitHub Actions too, so you will need to do this.</li>
-<li><strong>Use the provided <code>.vscode/settings.json</code></strong> file.</li>
-</ol>
-<h2 id="documentation">Documentation<a class="headerlink" href="#documentation" title="Permanent link">&para;</a></h2>
-<p>Make sure to select <code>edge</code> in the dropdown menu at the top. Navigate to the page you would like to edit and click the edit button in the top right. This allows you to make changes and create a pull-request.</p>
-<p>Alternatively you can make the changes locally. For that you'll need to have Docker installed. Run</p>
-<div class="language-sh highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pnpm<span class="w"> </span>docs:serve
+<p>Follow the surrounding code style and use the included VS Code settings.
+Run <code>pnpm lint</code> from <code>src</code> before submitting changes.</p>
+<h2 id="tests">Tests<a class="headerlink" href="#tests" title="Permanent link">&para;</a></h2>
+<p>From the repository root, install dependencies and run the unit tests:</p>
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">cd</span><span class="w"> </span>src
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>pnpm<span class="w"> </span>install
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>pnpm<span class="w"> </span>test:unit
 </span></code></pre></div>
-<p>This serves the documentation on your local machine on port <code>8080</code>. Each change will be hot-reloaded onto the page you view, just edit, save and look at the result.</p>
+<p>Browser tests cover setup, login, client management, VPN connectivity, and restarts.
+They require Docker Compose v2 and WireGuard support in Docker's Linux kernel.
+Still in <code>src</code>, run:</p>
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>pnpm<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>playwright<span class="w"> </span>install<span class="w"> </span>chromium
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>pnpm<span class="w"> </span>test:e2e
+</span></code></pre></div>
+<p>The tests build the app and clean up their containers and data afterward.
+To inspect a failure, run <code>pnpm exec playwright show-report</code> from <code>src</code>.</p>
+<p>Add tests for meaningful behavior and regressions. CI runs both suites on pull requests.</p>
+<h2 id="documentation">Documentation<a class="headerlink" href="#documentation" title="Permanent link">&para;</a></h2>
+<p>To edit a page online, select <code>edge</code> in the version dropdown and click the edit button.</p>
+<p>To preview local changes, start Docker and run this from the repository root:</p>
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>pnpm<span class="w"> </span>docs:preview
+</span></code></pre></div>
+<p>Open <a href="http://localhost:8080">http://localhost:8080</a>. The preview reloads when you save changes.</p>
 
 
 

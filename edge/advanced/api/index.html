@@ -627,6 +627,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#csrf-protection" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        CSRF Protection
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#endpoints" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -1681,6 +1692,33 @@
   
   
     <li class="md-nav__item">
+      <a href="../../guides/account/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Account
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../guides/admin/" class="md-nav__link">
         
   
@@ -1742,7 +1780,7 @@
   <span class="md-ellipsis">
     
   
-  Edit Client
+  Clients
 
     
   </span>
@@ -1851,6 +1889,17 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#csrf-protection" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        CSRF Protection
+      </span>
+    </span>
+  </a>
   
 </li>
       
@@ -1974,11 +2023,12 @@
 <p class="admonition-title">Breaking Changes</p>
 <p>This API is not yet stable and may change in the future. The API is currently in development and is subject to change without notice. The API is not yet documented, but we will add documentation as the API stabilizes.</p>
 </div>
-<p>You can use the API to interact with the application programmatically. The API is available at <code>/api</code> and supports both GET and POST requests. The API is designed to be simple and easy to use, with a focus on providing a consistent interface for all endpoints.</p>
+<p>You can use the API to interact with the application programmatically. The API is available at <code>/api</code> and supports GET, POST, and DELETE requests. The API is designed to be simple and easy to use, with a focus on providing a consistent interface for all endpoints.</p>
 <p>There is no documentation for the API yet, but this will be added as the underlying library supports it.</p>
 <h2 id="authentication">Authentication<a class="headerlink" href="#authentication" title="Permanent link">&para;</a></h2>
-<p>To use the API, you need to authenticate using Basic Authentication. The username and password are the same as the ones you use to log in to the web application.
-If you use 2FA, the API will not work. You need to disable 2FA in the web application to use the API.</p>
+<p>Authenticated endpoints accept the Web UI's session cookie or HTTP Basic Authentication with your login username and password.</p>
+<p>Basic Authentication is unavailable for accounts with 2FA enabled and when <code>DISABLE_PASSWORD_AUTH=true</code>. A session established through the normal sign-in flow, including 2FA when required, can still access the API. API requests follow the signed-in user's permissions.</p>
+<p>Basic Authentication failures are logged as <code>Security failure: type=basic</code>. wg-easy does not implement rate limiting. Configure your reverse proxy or an external security tool to protect requests using Basic Authentication on <strong>all API routes</strong>, as limiting only <code>/api/auth/password</code> does not cover them. Configure <a href=".././config/optional-config/#trusted-proxies"><code>TRUSTED_PROXIES</code></a> so that security logs contain the original client IP address.</p>
 <h3 id="authentication-example">Authentication Example<a class="headerlink" href="#authentication-example" title="Permanent link">&para;</a></h3>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">requests.auth</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTTPBasicAuth</span>
@@ -1991,6 +2041,31 @@ If you use 2FA, the API will not work. You need to disable 2FA in the web applic
 </span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="k">else</span><span class="p">:</span>
 </span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Error: </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </span></code></pre></div>
+<h2 id="csrf-protection">CSRF Protection<a class="headerlink" href="#csrf-protection" title="Permanent link">&para;</a></h2>
+<p>In this major release, CSRF origin checks are enabled only when
+<a href=".././config/optional-config/#trusted-proxies"><code>TRUSTED_PROXIES</code></a> contains at least
+one address or CIDR. Enabling the check protects <strong>all state-changing requests</strong>,
+including direct requests, login, setup, and Basic Authentication.</p>
+<p>An unset or empty list preserves compatibility by disabling this check.
+Authentication still applies, but malicious websites may be able to trigger
+actions using credentials automatically supplied by a browser.</p>
+<p><strong>The check will be enabled by default in the next major release, including
+when <code>TRUSTED_PROXIES</code> is unset.</strong> Update proxies and API scripts before upgrading.</p>
+<p>When enabled, POST, PUT, PATCH, and DELETE requests require an <code>Origin</code> matching
+the public URL's scheme, host, and port, without a path or trailing slash.
+Only an absent <code>Origin</code> may fall back to a same-origin <code>Referer</code>. Missing,
+empty, <code>null</code>, or mismatched source origins cause HTTP 403, even with valid credentials.</p>
+<p>Browsers normally supply these headers. API scripts should send <code>Origin</code> on
+writes:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="s2">"https://vpn.example.com/api/client/1/enable"</span><span class="p">,</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="n">auth</span><span class="o">=</span><span class="n">HTTPBasicAuth</span><span class="p">(</span><span class="s1">'username'</span><span class="p">,</span> <span class="s1">'password'</span><span class="p">),</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">"Origin"</span><span class="p">:</span> <span class="s2">"https://vpn.example.com"</span><span class="p">},</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="p">)</span>
+</span></code></pre></div>
+<p>Behind a proxy, follow the <a href=".././config/optional-config/#public-urls-and-cookies">public URL configuration</a>.
+An incorrect host, port, or scheme causes HTTP 403 on legitimate writes,
+including login and setup.</p>
 <h2 id="endpoints">Endpoints<a class="headerlink" href="#endpoints" title="Permanent link">&para;</a></h2>
 <p>The Endpoints are not yet documented. But as file-based routing is used, you can find the endpoints in the <code>src/server/api</code> folder. The method is defined in the file name.</p>
 <h3 id="endpoints-example">Endpoints Example<a class="headerlink" href="#endpoints-example" title="Permanent link">&para;</a></h3>
@@ -2004,7 +2079,7 @@ If you use 2FA, the API will not work. You need to disable 2FA in the web applic
 </thead>
 <tbody>
 <tr>
-<td><code>src/server/api/client.get.ts</code></td>
+<td><code>src/server/api/client/index.get.ts</code></td>
 <td><code>/api/client</code></td>
 <td>GET</td>
 </tr>

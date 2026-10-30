@@ -1660,6 +1660,33 @@
   
   
     <li class="md-nav__item">
+      <a href="../../../guides/account/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Account
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../../guides/admin/" class="md-nav__link">
         
   
@@ -1721,7 +1748,7 @@
   <span class="md-ellipsis">
     
   
-  Edit Client
+  Clients
 
     
   </span>
@@ -2048,9 +2075,13 @@ to these paths:</p>
 <li><code>/api/auth/verify-2fa</code></li>
 <li><code>/cnf/*</code></li>
 </ul>
+<p>Also protect requests using <a href="../../../advanced/api/">Basic Authentication</a> on
+all <code>/api/*</code> routes. Basic credentials are checked on each authenticated API
+request, so limiting the password sign-in path alone does not cover them.</p>
 <p>Choose limits appropriate for your deployment. When using wg-easy security logs
 for detection, configure <a href="../../../advanced/config/optional-config/#trusted-proxies"><code>TRUSTED_PROXIES</code></a>
-so that logged events contain the original client IP address.</p>
+so that logged events contain the original client IP address.
+Configuring this also enables <a href="../../../advanced/api/#csrf-protection">CSRF origin checks</a>.</p>
 
 
 

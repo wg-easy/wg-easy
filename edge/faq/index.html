@@ -1701,6 +1701,33 @@
   
   
     <li class="md-nav__item">
+      <a href="../guides/account/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Account
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../guides/admin/" class="md-nav__link">
         
   
@@ -1762,7 +1789,7 @@
   <span class="md-ellipsis">
     
   
-  Edit Client
+  Clients
 
     
   </span>
@@ -1973,9 +2000,9 @@
 <p>Here are some frequently asked questions or errors about <code>wg-easy</code>. If you have a question that is not answered here, please feel free to open a discussion on GitHub.</p>
 <h2 id="how-do-i-restrict-client-access-to-specific-networks-or-servers">How do I restrict client access to specific networks or servers?<a class="headerlink" href="#how-do-i-restrict-client-access-to-specific-networks-or-servers" title="Permanent link">&para;</a></h2>
 <p>Use the <strong>Per-Client Firewall</strong> feature to enforce server-side restrictions on what each client can access.</p>
-<p><strong>Requirements:</strong> This feature requires <code>iptables</code> (and <code>ip6tables</code> for IPv6) to be installed on the host system.</p>
+<p><strong>Requirements:</strong> The host kernel must provide the firewall support required by <code>iptables</code> (and <code>ip6tables</code> for IPv6), either built in or through loaded kernel modules.</p>
 <ol>
-<li>Enable "Per-Client Firewall" in <strong>Admin Panel → Interface</strong></li>
+<li>Turn on <strong>Enable Per-Client Firewall</strong> in <strong>Admin Panel → Interface → Traffic Filtering</strong> and select <strong>Save</strong></li>
 <li>Edit a client and configure "Firewall Allowed IPs"</li>
 <li>Specify which destinations the client should be allowed to access</li>
 </ol>

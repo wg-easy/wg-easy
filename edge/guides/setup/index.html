@@ -1580,6 +1580,33 @@
   
   
     <li class="md-nav__item">
+      <a href="../account/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Account
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../admin/" class="md-nav__link">
         
   
@@ -1641,7 +1668,7 @@
   <span class="md-ellipsis">
     
   
-  Edit Client
+  Clients
 
     
   </span>
@@ -1765,6 +1792,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#after-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        After Setup
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1868,6 +1906,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#after-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        After Setup
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1956,22 +2005,27 @@
 
   <h1>Setup</h1>
 
+<p>On the first visit to the Web UI, the setup wizard guides you through creating an administrator and configuring the VPN. Select <strong>Continue</strong> on the welcome screen to begin. For automated deployments, see <a href="../../advanced/config/unattended-setup/">Unattended Setup</a>.</p>
 <h2 id="user-setup">User Setup<a class="headerlink" href="#user-setup" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Username</strong>: The username of the user.</li>
-<li><strong>Password</strong>: The password of the user.</li>
-<li><strong>Confirm Password</strong>: The password of the user.</li>
+<li><strong>Username</strong>: Your administrator login name, at least two characters long.</li>
+<li><strong>Password</strong>: Your administrator password, at least 12 characters long.</li>
+<li><strong>Confirm Password</strong>: Enter the same password again.</li>
 </ul>
+<p>Select <strong>Create Account</strong> to continue.</p>
 <h2 id="existing-setup">Existing Setup<a class="headerlink" href="#existing-setup" title="Permanent link">&para;</a></h2>
 <p>If you have the config from the previous version, you can import it by clicking "Yes". This currently expects a config from v14.</p>
 <p>If this is the first time you are using this, you can click "No" to create a new config.</p>
 <h3 id="no-host-setup">No - Host Setup<a class="headerlink" href="#no-host-setup" title="Permanent link">&para;</a></h3>
 <ul>
-<li><strong>Host</strong>: The host of the server. The clients will connect to this address. This can be a domain name or an IP address. Make sure to wrap it in brackets if it is an IPv6 address. For example: <code>[::1]</code> or <code>[2001:db8::1]</code>.</li>
-<li><strong>Port</strong>: The port of the server. The clients will connect to this port. The server will listen on this port.</li>
+<li><strong>Host</strong>: The public hostname or IP address clients will connect to, such as <code>vpn.example.com</code>. IPv6 addresses may be entered with or without brackets, for example <code>2001:db8::1</code> or <code>[2001:db8::1]</code>. Use <strong>Suggest</strong> to choose a detected address or hostname.</li>
+<li><strong>Port</strong>: The UDP port clients connect to and the server initially listens on. The default is <code>51820</code>. Make sure your container port mapping and any router port forwarding match your configuration.</li>
 </ul>
+<p>Select <strong>Continue</strong> to finish setup.</p>
 <h3 id="yes-migration">Yes - Migration<a class="headerlink" href="#yes-migration" title="Permanent link">&para;</a></h3>
 <p>Select the <code>wg0.json</code> file from the previous version. Read <a href="../../advanced/migrate/from-14-to-15/">Migrate from v14 to v15</a> for more information.</p>
+<h2 id="after-setup">After Setup<a class="headerlink" href="#after-setup" title="Permanent link">&para;</a></h2>
+<p>Sign in and <a href=".././clients/#create-a-client">create your first client</a>. Use the user menu to open the <a href=".././admin/">Admin Panel</a> or manage your <a href=".././account/">Account</a>, including <a href=".././2fa/">two-factor authentication</a>.</p>
 
 
 

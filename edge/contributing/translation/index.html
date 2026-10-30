@@ -1658,6 +1658,33 @@
   
   
     <li class="md-nav__item">
+      <a href="../../guides/account/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Account
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../guides/admin/" class="md-nav__link">
         
   
@@ -1719,7 +1746,7 @@
   <span class="md-ellipsis">
     
   
-  Edit Client
+  Clients
 
     
   </span>
@@ -1927,9 +1954,9 @@
 <p>This project supports multiple languages. If you would like to contribute a translation, please follow these steps:</p>
 <h2 id="add-new-translation">Add new Translation<a class="headerlink" href="#add-new-translation" title="Permanent link">&para;</a></h2>
 <p>Create a new file in <code>src/i18n/locales</code>. Name it <code>&lt;locale_code&gt;.json</code> (e.g. <code>fr.json</code> for French).</p>
-<p>Import and add the newly created file in <code>src/i18n/i18n.config.ts</code>.</p>
-<p>Add your language in the <code>src/nuxt.config.ts</code> file. You have to specify code, language and name.</p>
+<p>Add your language in the <code>src/nuxt.config.ts</code> file. You have to specify code, file, language and name.</p>
 <p><code>code</code> is the name of the translation file without the extension (e.g. <code>fr</code> for <code>fr.json</code>).</p>
+<p><code>file</code> is the translation filename (e.g. <code>fr.json</code>), which Nuxt loads on demand.</p>
 <p><code>language</code> is the BCP 47 language tag with region (e.g. <code>fr-FR</code> for French). See <a href="http://www.lingoes.net/en/translator/langcode.htm">www.lingoes.net</a> for a list of language codes.</p>
 <p><code>name</code> is the display name of the language (e.g. <code>Français</code> for French).</p>
 <h2 id="update-existing-translation">Update existing Translation<a class="headerlink" href="#update-existing-translation" title="Permanent link">&para;</a></h2>

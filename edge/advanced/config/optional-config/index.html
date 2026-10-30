@@ -766,6 +766,34 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Trusted Proxies">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#public-urls-and-cookies" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Public URLs and cookies
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#csrf-implications" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        CSRF implications
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1647,6 +1675,33 @@
   
   
     <li class="md-nav__item">
+      <a href="../../../guides/account/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Account
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../../guides/admin/" class="md-nav__link">
         
   
@@ -1708,7 +1763,7 @@
   <span class="md-ellipsis">
     
   
-  Edit Client
+  Clients
 
     
   </span>
@@ -1800,6 +1855,34 @@
       </span>
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Trusted Proxies">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#public-urls-and-cookies" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Public URLs and cookies
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#csrf-implications" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        CSRF implications
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1951,7 +2034,7 @@
 <td><code>INSECURE</code></td>
 <td><code>false</code></td>
 <td><code>true</code></td>
-<td>If access over http is allowed</td>
+<td>Allow cookies over HTTP; also selects the fallback public URL scheme</td>
 </tr>
 <tr>
 <td><code>DISABLE_IPV6</code></td>
@@ -1963,13 +2046,13 @@
 <td><code>DISABLE_VERSION_CHECK</code></td>
 <td><code>false</code></td>
 <td><code>true</code></td>
-<td>If wg-easy should check for new updates</td>
+<td>Disable checks for new wg-easy releases</td>
 </tr>
 <tr>
 <td><code>TRUSTED_PROXIES</code></td>
 <td></td>
 <td><code>172.18.0.2,fd00:1234::/64</code></td>
-<td>Proxy IP addresses or CIDRs allowed to forward request metadata</td>
+<td>Trusted proxy IPs/CIDRs; a nonempty list also enables CSRF origin checks</td>
 </tr>
 <tr>
 <td><code>WG_INTERFACE</code></td>
@@ -1987,18 +2070,41 @@
 </div>
 <h2 id="trusted-proxies">Trusted Proxies<a class="headerlink" href="#trusted-proxies" title="Permanent link">&para;</a></h2>
 <p>Set <code>TRUSTED_PROXIES</code> when wg-easy runs behind a reverse proxy and needs to use
-the original host. Multiple IPv4 or IPv6 addresses and CIDRs can be provided as
-a comma-separated list:</p>
+the public host, protocol, or client IP. Supply a comma-separated list of the
+proxy's source IPv4/IPv6 addresses or CIDRs:</p>
 <div class="language-yaml highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nt">environment</span><span class="p">:</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">TRUSTED_PROXIES=172.18.0.2,fd00:1234::/64</span>
 </span></code></pre></div>
-<p>Only add the source addresses used by your reverse proxy. wg-easy only uses
-<code>X-Forwarded-Host</code> and <code>X-Forwarded-For</code> when the request comes from one of
-these addresses. The forwarded client address is included in security logs so
-that tools such as CrowdSec can identify failed authentication attempts. The
-request protocol remains controlled by <code>INSECURE</code>. Invalid addresses prevent
-wg-easy from starting so that configuration errors are not silently ignored.
-Restart the container after changing this setting.</p>
+<p>Only requests from these addresses may supply <code>X-Forwarded-Host</code>,
+<code>X-Forwarded-Proto</code>, and <code>X-Forwarded-For</code>. The forwarded client IP is used in
+security logs. Proxies must replace client-supplied forwarded headers and
+report the public scheme, including when there are multiple proxy layers.
+Only trust actual proxy addresses; invalid entries prevent startup. Restart
+the container after changing this setting.</p>
+<h3 id="public-urls-and-cookies">Public URLs and cookies<a class="headerlink" href="#public-urls-and-cookies" title="Permanent link">&para;</a></h3>
+<p>CSRF checks and OAuth redirects/callbacks use the same public URL rules:</p>
+<ul>
+<li>Preserve the public <code>Host</code>, or supply <code>X-Forwarded-Host</code> from a trusted proxy.
+  Include any non-default public port.</li>
+<li>A trusted <code>X-Forwarded-Proto</code> supplies the scheme when its first
+  comma-separated value is <code>http</code> or <code>https</code>.</li>
+<li>Missing, invalid, or untrusted protocol headers retain the existing fallback:
+  HTTPS with <code>INSECURE=false</code>, HTTP with <code>INSECURE=true</code>.</li>
+</ul>
+<p>An incorrect public URL can cause CSRF rejections or OAuth redirect URI
+mismatches. Existing proxies without protocol forwarding retain the fallback.</p>
+<p><code>INSECURE</code> still controls the session cookie's <code>Secure</code> attribute independently:
+<code>true</code> permits cookies over HTTP. Trusted <code>X-Forwarded-Proto: https</code> allows
+HTTPS writes with that setting, but does not secure the cookie. Keep
+<code>INSECURE=false</code> for HTTPS deployments, even over an HTTP upstream connection.</p>
+<h3 id="csrf-implications">CSRF implications<a class="headerlink" href="#csrf-implications" title="Permanent link">&para;</a></h3>
+<p>In this major release, a nonempty list also enables <a href="../../api/#csrf-protection">CSRF origin checks</a>
+for all writes, including direct requests. This applies even when proxies were
+configured only for logging. API scripts must then supply a matching <code>Origin</code>
+or a same-origin <code>Referer</code> when <code>Origin</code> is absent.</p>
+<p>Leaving the list unset or empty ignores forwarded headers and disables the
+origin check. See <a href="../../api/#csrf-protection">CSRF protection</a> for the security
+implications and the planned default enforcement in the next major release.</p>
 <h2 id="wireguard-interface">WireGuard Interface<a class="headerlink" href="#wireguard-interface" title="Permanent link">&para;</a></h2>
 <p>Set <code>WG_INTERFACE</code> to specify a custom interface name, useful if you are running multiple wg-easy instances on the same host with <code>network_mode: host</code>:</p>
 <div class="language-yaml highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nt">environment</span><span class="p">:</span>
