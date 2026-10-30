@@ -1,29 +1,48 @@
-type Opts = {
-  /**
-   * Expiry time in milliseconds
-   */
+// Adapted from p-memoize v8.0.0 (MIT), by Sindre Sorhus:
+// https://github.com/sindresorhus/p-memoize/blob/a006ac3224bbeb344cb62976e7f18bbc5ad61d14/index.ts
+// Simplified to one no-argument loader, with expiration after successful loads.
+
+type CacheOptions = {
+  /** Finite, non-negative lifetime in milliseconds; 0 only shares pending work. */
   expiry: number;
 };
 
 /**
- * Cache the result of a function for the given expiry time in milliseconds
+ * Share one pending load and retain its successful value in memory for `expiry` ms.
+ * Lifetime starts at completion, measured with a monotonic clock. Failures retry.
+ * Always returns a promise; values are shared by reference. Loaders own timeouts.
  */
-export function cacheFunction<T>(fn: () => T, { expiry }: Opts): () => T {
-  let cache: { value: T; expiry: number } | null = null;
+export function cacheFunction<T>(
+  load: () => T | PromiseLike<T>,
+  { expiry }: CacheOptions
+): () => Promise<T> {
+  if (!Number.isFinite(expiry) || expiry < 0) {
+    throw new RangeError('Cache expiry must be a finite, non-negative number');
+  }
 
-  return (): T => {
-    const now = Date.now();
+  let entry: { value: T; expiresAt: number } | undefined;
+  let pending: Promise<T> | undefined;
 
-    if (cache && cache.expiry > now) {
-      return cache.value;
+  return () => {
+    if (pending) return pending;
+    if (entry && performance.now() < entry.expiresAt) {
+      return Promise.resolve(entry.value);
     }
+    entry = undefined;
 
-    const result = fn();
-    cache = {
-      value: result,
-      expiry: now + expiry,
-    };
+    // Register pending work before invoking the loader, including synchronous ones.
+    pending = Promise.resolve()
+      .then(load)
+      .then((value) => {
+        if (expiry > 0) {
+          entry = { value, expiresAt: performance.now() + expiry };
+        }
+        return value;
+      })
+      .finally(() => {
+        pending = undefined;
+      });
 
-    return result;
+    return pending;
   };
 }

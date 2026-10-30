@@ -1,33 +1,18 @@
 <template>
-  <div class="flex items-center">
-    <FormLabel :for="id">
-      {{ label }}
-    </FormLabel>
-    <BaseTooltip v-if="description" :text="description">
-      <IconsInfo class="size-4" />
-    </BaseTooltip>
-  </div>
+  <FormFieldLabel :id="id" :label="label" :description="description" />
   <div class="my-auto flex items-center gap-3">
     <template v-if="data === null">
-      <span class="text-gray-500 dark:text-neutral-300">
-        {{ $t('form.nullNotSet') }}
+      <span class="text-subtle">
+        {{ $t('common.form.nullNotSet') }}
       </span>
-      <BaseSecondaryButton
-        type="button"
-        class="rounded-lg"
-        @click="data = false"
-      >
-        {{ $t('form.set') }}
+      <BaseSecondaryButton type="button" @click="data = false">
+        {{ $t('common.form.set') }}
       </BaseSecondaryButton>
     </template>
     <template v-else>
       <BaseSwitch :id="id" v-model="enabled" />
-      <BaseSecondaryButton
-        type="button"
-        class="rounded-lg"
-        @click="data = null"
-      >
-        {{ $t('form.unset') }}
+      <BaseSecondaryButton type="button" @click="data = null">
+        {{ $t('common.form.unset') }}
       </BaseSecondaryButton>
     </template>
   </div>

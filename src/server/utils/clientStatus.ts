@@ -6,25 +6,21 @@ type StatusFields = {
   transferTx: number | null;
 };
 
-export function mergeClientStatuses<T extends StatusFields>(
+export function mergeClientStatuses<T extends { publicKey: string }>(
   clients: T[],
   statuses: readonly StatusFields[]
-): T[] {
-  const clientsByPublicKey = new Map(
-    clients.map((client) => [client.publicKey, client])
+) {
+  const byPublicKey = new Map(
+    statuses.map((status) => [status.publicKey, status])
   );
-
-  for (const status of statuses) {
-    const client = clientsByPublicKey.get(status.publicKey);
-    if (!client) {
-      continue;
-    }
-
-    client.latestHandshakeAt = status.latestHandshakeAt;
-    client.endpoint = status.endpoint;
-    client.transferRx = status.transferRx;
-    client.transferTx = status.transferTx;
-  }
-
-  return clients;
+  return clients.map((client) => {
+    const status = byPublicKey.get(client.publicKey);
+    return {
+      ...client,
+      latestHandshakeAt: status?.latestHandshakeAt ?? null,
+      endpoint: status?.endpoint ?? null,
+      transferRx: status?.transferRx ?? null,
+      transferTx: status?.transferTx ?? null,
+    };
+  });
 }

@@ -1,9 +1,9 @@
-import { readValidatedBody } from 'h3';
+import { readValidatedBody } from 'nuxt/server';
 
-import Database from '#server/utils/Database';
+import * as setupSteps from '#server/features/setup';
 import { defineSetupEventHandler } from '#server/utils/handler';
-import { validateZod } from '#server/utils/types';
-import { UserSetupSchema } from '#db/repositories/user/types';
+import { validateZod } from '#server/http/validation';
+import { UserSetupSchema } from '#shared/contracts/user';
 
 export default defineSetupEventHandler(2, async ({ event }) => {
   const { username, password } = await readValidatedBody(
@@ -11,8 +11,6 @@ export default defineSetupEventHandler(2, async ({ event }) => {
     validateZod(UserSetupSchema, event)
   );
 
-  await Database.users.create(username, password);
-
-  await Database.general.setSetupStep(3);
+  await setupSteps.createAdministrator(username, password);
   return { success: true };
 });

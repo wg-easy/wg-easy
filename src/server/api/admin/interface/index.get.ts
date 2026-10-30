@@ -1,11 +1,6 @@
-import Database from '#server/utils/Database';
-import { definePermissionEventHandler } from '#server/utils/handler';
+import * as vpnSettings from '#server/features/vpn/interface';
+import { defineAuthenticatedEventHandler } from '#server/utils/handler';
 
-export default definePermissionEventHandler('admin', 'any', async () => {
-  const wgInterface = await Database.interfaces.get();
-
-  return {
-    ...wgInterface,
-    privateKey: undefined,
-  };
+export default defineAuthenticatedEventHandler(async ({ user }) => {
+  return vpnSettings.get(user);
 });

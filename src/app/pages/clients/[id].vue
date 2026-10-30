@@ -1,36 +1,64 @@
 <template>
   <main v-if="data">
     <Panel>
+      <NuxtLink
+        to="/"
+        class="mb-6 inline-flex items-center gap-2 text-xs text-muted hover:text-foreground"
+      >
+        <CircleArrowLeftIcon class="size-4" />
+        {{ $t('clients.title') }}
+      </NuxtLink>
       <PanelHead>
         <PanelHeadTitle>
           {{ data.name }}
         </PanelHeadTitle>
       </PanelHead>
       <PanelBody>
-        <FormElement @submit.prevent="submit">
+        <FormElement class="settings-grid space-y-0" @submit.prevent="submit">
           <FormGroup>
             <FormHeading>
-              {{ $t('form.sectionGeneral') }}
+              {{ $t('common.form.sections.general') }}
             </FormHeading>
             <FormTextField
               id="name"
               v-model="data.name"
-              :label="$t('general.name')"
+              :label="$t('common.fields.name')"
             />
             <FormSwitchField
               id="enabled"
               v-model="data.enabled"
-              :label="$t('client.enabled')"
+              :label="$t('clients.status.enabled')"
             />
             <FormDateField
               id="expiresAt"
               v-model="data.expiresAt"
-              :description="$t('client.expireDateDesc')"
-              :label="$t('client.expireDate')"
+              :description="$t('clients.fields.expiresAt.description')"
+              :label="$t('clients.fields.expiresAt.label')"
             />
           </FormGroup>
           <FormGroup>
-            <FormHeading>{{ $t('client.address') }}</FormHeading>
+            <FormHeading>{{ $t('clients.keys.title') }}</FormHeading>
+            <FormLabel for="publicKey">
+              {{ $t('clients.keys.publicKey') }}
+            </FormLabel>
+            <span
+              id="publicKey"
+              class="min-w-0 self-center font-mono text-sm break-all select-all"
+            >
+              {{ data.publicKey }}
+            </span>
+            <FormInfoField
+              id="preSharedKey"
+              :label="$t('clients.keys.preSharedKey')"
+              :data="
+                data.hasPreSharedKey
+                  ? $t('clients.keys.preSharedKeySet')
+                  : $t('clients.keys.preSharedKeyNone')
+              "
+            />
+          </FormGroup>
+          <FormGroup>
+            <FormHeading>{{ $t('clients.fields.address.label') }}</FormHeading>
             <FormTextField
               id="ipv4Address"
               v-model="data.ipv4Address"
@@ -43,20 +71,24 @@
             />
             <FormInfoField
               id="endpoint"
-              :data="data.endpoint ?? $t('client.notConnected')"
-              :label="$t('client.endpoint')"
-              :description="$t('client.endpointDesc')"
+              :data="data.endpoint ?? $t('clients.status.notConnected')"
+              :label="$t('clients.fields.endpoint.label')"
+              :description="$t('clients.fields.endpoint.description')"
             />
           </FormGroup>
           <FormGroup>
-            <FormHeading :description="$t('client.allowedIpsDesc')">
-              {{ $t('general.allowedIps') }}
+            <FormHeading
+              :description="$t('clients.fields.allowedIps.description')"
+            >
+              {{ $t('wireguard.fields.allowedIps') }}
             </FormHeading>
             <FormNullArrayField v-model="data.allowedIps" name="allowedIps" />
           </FormGroup>
           <FormGroup>
-            <FormHeading :description="$t('client.serverAllowedIpsDesc')">
-              {{ $t('client.serverAllowedIps') }}
+            <FormHeading
+              :description="$t('clients.fields.serverAllowedIps.description')"
+            >
+              {{ $t('clients.fields.serverAllowedIps.label') }}
             </FormHeading>
             <FormArrayField
               v-model="data.serverAllowedIps"
@@ -64,210 +96,277 @@
             />
           </FormGroup>
           <FormGroup v-if="globalStore.information?.firewallEnabled">
-            <FormHeading :description="$t('client.firewallIpsDesc')">
-              {{ $t('client.firewallIps') }}
+            <FormHeading
+              :description="$t('clients.fields.firewallIps.description')"
+            >
+              {{ $t('clients.fields.firewallIps.label') }}
             </FormHeading>
             <FormNullArrayField v-model="data.firewallIps" name="firewallIps" />
           </FormGroup>
           <FormGroup>
-            <FormHeading :description="$t('client.dnsDesc')">
-              {{ $t('general.dns') }}
+            <FormHeading :description="$t('clients.fields.dns.description')">
+              {{ $t('wireguard.fields.dns') }}
             </FormHeading>
             <FormNullArrayField v-model="data.dns" name="dns" />
           </FormGroup>
           <FormGroup>
-            <FormHeading>{{ $t('form.sectionAdvanced') }}</FormHeading>
-            <FormNumberField
+            <FormHeading>{{ $t('common.form.sections.advanced') }}</FormHeading>
+            <FormNullNumberField
               id="mtu"
               v-model="data.mtu"
-              :description="$t('client.mtuDesc')"
-              :label="$t('general.mtu')"
+              :description="$t('clients.fields.mtu.description')"
+              :label="$t('wireguard.fields.mtu')"
             />
             <FormNumberField
               id="persistentKeepalive"
               v-model="data.persistentKeepalive"
-              :description="$t('client.persistentKeepaliveDesc')"
-              :label="$t('general.persistentKeepalive')"
+              :description="
+                $t('clients.fields.persistentKeepalive.description')
+              "
+              :label="$t('wireguard.fields.persistentKeepalive')"
             />
           </FormGroup>
           <FormGroup v-if="globalStore.information?.isAwg">
-            <FormHeading>{{ $t('awg.obfuscationParameters') }}</FormHeading>
+            <FormHeading>{{ $t('wireguard.obfuscation.title') }}</FormHeading>
 
             <FormNullNumberField
               id="jC"
               v-model="data.jC"
-              :label="$t('awg.jCLabel')"
-              :description="$t('awg.jCDescription')"
+              :label="$t('wireguard.obfuscation.jC.label')"
+              :description="$t('wireguard.obfuscation.jC.description')"
             />
             <FormNullNumberField
               id="Jmin"
               v-model="data.jMin"
-              :label="$t('awg.jMinLabel')"
-              :description="$t('awg.jMinDescription')"
+              :label="$t('wireguard.obfuscation.jMin.label')"
+              :description="$t('wireguard.obfuscation.jMin.description')"
             />
             <FormNullNumberField
               id="Jmax"
               v-model="data.jMax"
-              :label="$t('awg.jMaxLabel')"
-              :description="$t('awg.jMaxDescription')"
+              :label="$t('wireguard.obfuscation.jMax.label')"
+              :description="$t('wireguard.obfuscation.jMax.description')"
             />
 
-            <div class="col-span-full text-sm">* {{ $t('awg.mtuNote') }}</div>
+            <div class="col-span-full text-sm">
+              * {{ $t('wireguard.obfuscation.mtuNote') }}
+            </div>
 
             <FormNullTextField
               id="i1"
               v-model="data.i1"
-              :label="$t('awg.i1Label')"
-              :description="$t('awg.i1Description')"
+              :label="$t('wireguard.obfuscation.i1.label')"
+              :description="$t('wireguard.obfuscation.i1.description')"
             />
             <FormNullTextField
               id="i2"
               v-model="data.i2"
-              :label="$t('awg.i2Label')"
-              :description="$t('awg.i2Description')"
+              :label="$t('wireguard.obfuscation.i2.label')"
+              :description="$t('wireguard.obfuscation.i2.description')"
             />
             <FormNullTextField
               id="i3"
               v-model="data.i3"
-              :label="$t('awg.i3Label')"
-              :description="$t('awg.i3Description')"
+              :label="$t('wireguard.obfuscation.i3.label')"
+              :description="$t('wireguard.obfuscation.i3.description')"
             />
             <FormNullTextField
               id="i4"
               v-model="data.i4"
-              :label="$t('awg.i4Label')"
-              :description="$t('awg.i4Description')"
+              :label="$t('wireguard.obfuscation.i4.label')"
+              :description="$t('wireguard.obfuscation.i4.description')"
             />
             <FormNullTextField
               id="i5"
               v-model="data.i5"
-              :label="$t('awg.i5Label')"
-              :description="$t('awg.i5Description')"
+              :label="$t('wireguard.obfuscation.i5.label')"
+              :description="$t('wireguard.obfuscation.i5.description')"
             />
 
             <div class="col-span-full text-sm">
-              {{ $t('awg.rangeNote') }}
+              {{ $t('wireguard.obfuscation.rangeNote') }}
             </div>
 
             <FormNullTextField
               id="contentPaddingAddition"
               v-model="data.contentPaddingAddition"
-              :label="$t('awg.contentPaddingAdditionLabel')"
-              :description="$t('awg.contentPaddingAdditionDescription')"
+              :label="$t('wireguard.obfuscation.contentPaddingAddition.label')"
+              :description="
+                $t('wireguard.obfuscation.contentPaddingAddition.description')
+              "
             />
             <FormNullTextField
               id="rekeyAfterTime"
               v-model="data.rekeyAfterTime"
-              :label="$t('awg.rekeyAfterTimeLabel')"
-              :description="$t('awg.rekeyAfterTimeDescription')"
+              :label="$t('wireguard.obfuscation.rekeyAfterTime.label')"
+              :description="
+                $t('wireguard.obfuscation.rekeyAfterTime.description')
+              "
             />
             <FormNullTextField
               id="rekeyTimeout"
               v-model="data.rekeyTimeout"
-              :label="$t('awg.rekeyTimeoutLabel')"
-              :description="$t('awg.rekeyTimeoutDescription')"
+              :label="$t('wireguard.obfuscation.rekeyTimeout.label')"
+              :description="
+                $t('wireguard.obfuscation.rekeyTimeout.description')
+              "
             />
             <FormNullTextField
               id="rejectAfterTime"
               v-model="data.rejectAfterTime"
-              :label="$t('awg.rejectAfterTimeLabel')"
-              :description="$t('awg.rejectAfterTimeDescription')"
+              :label="$t('wireguard.obfuscation.rejectAfterTime.label')"
+              :description="
+                $t('wireguard.obfuscation.rejectAfterTime.description')
+              "
             />
             <FormNullTextField
               id="keepaliveTimeout"
               v-model="data.keepaliveTimeout"
-              :label="$t('awg.keepaliveTimeoutLabel')"
-              :description="$t('awg.keepaliveTimeoutDescription')"
+              :label="$t('wireguard.obfuscation.keepaliveTimeout.label')"
+              :description="
+                $t('wireguard.obfuscation.keepaliveTimeout.description')
+              "
             />
             <FormNullTextField
               id="maxHandshakeAttempts"
               v-model="data.maxHandshakeAttempts"
-              :label="$t('awg.maxHandshakeAttemptsLabel')"
-              :description="$t('awg.maxHandshakeAttemptsDescription')"
+              :label="$t('wireguard.obfuscation.maxHandshakeAttempts.label')"
+              :description="
+                $t('wireguard.obfuscation.maxHandshakeAttempts.description')
+              "
             />
             <FormNullSwitchField
               id="disableCookies"
               v-model="data.disableCookies"
-              :label="$t('awg.disableCookiesLabel')"
-              :description="$t('awg.disableCookiesDescription')"
+              :label="$t('wireguard.obfuscation.disableCookies.label')"
+              :description="
+                $t('wireguard.obfuscation.disableCookies.description')
+              "
             />
           </FormGroup>
           <FormGroup>
-            <FormHeading :description="$t('client.hooksDescription')">
-              {{ $t('client.hooks') }}
+            <FormHeading :description="$t('clients.hooks.description')">
+              {{ $t('clients.hooks.title') }}
             </FormHeading>
             <FormTextArea
               id="PreUp"
               v-model="data.preUp"
-              :description="$t('client.hooksLeaveEmpty')"
-              :label="$t('hooks.preUp')"
+              :description="$t('clients.hooks.fieldDescription')"
+              :label="$t('wireguard.hooks.preUp')"
             />
             <FormTextArea
               id="PostUp"
               v-model="data.postUp"
-              :description="$t('client.hooksLeaveEmpty')"
-              :label="$t('hooks.postUp')"
+              :description="$t('clients.hooks.fieldDescription')"
+              :label="$t('wireguard.hooks.postUp')"
             />
             <FormTextArea
               id="PreDown"
               v-model="data.preDown"
-              :description="$t('client.hooksLeaveEmpty')"
-              :label="$t('hooks.preDown')"
+              :description="$t('clients.hooks.fieldDescription')"
+              :label="$t('wireguard.hooks.preDown')"
             />
             <FormTextArea
               id="PostDown"
               v-model="data.postDown"
-              :description="$t('client.hooksLeaveEmpty')"
-              :label="$t('hooks.postDown')"
+              :description="$t('clients.hooks.fieldDescription')"
+              :label="$t('wireguard.hooks.postDown')"
             />
           </FormGroup>
-          <FormGroup>
-            <FormHeading>{{ $t('form.actions') }}</FormHeading>
-            <FormPrimaryActionField type="submit" :label="$t('form.save')" />
-            <FormSecondaryActionField
-              :label="$t('form.revert')"
-              @click="revert"
+          <FormSaveControls class="col-span-full" @revert="revert" />
+        </FormElement>
+        <FormGroup class="mt-6">
+          <FormHeading>{{ $t('common.form.actions') }}</FormHeading>
+          <div
+            class="col-span-full flex flex-col gap-3 sm:flex-row sm:flex-wrap"
+          >
+            <ClientsConfigDialog :client-id="data.id">
+              <BaseSecondaryButton as="span" class="w-full">
+                {{ $t('clients.configuration.view') }}
+              </BaseSecondaryButton>
+            </ClientsConfigDialog>
+            <ClientsKeyActionDialog
+              :action="
+                data.hasPreSharedKey ? 'rotatePreSharedKey' : 'addPreSharedKey'
+              "
+              :client-name="data.name"
+              :disabled="keyActionPending"
+              @confirm="changeKey('rotatePreSharedKey')"
+            />
+            <ClientsKeyActionDialog
+              action="removePreSharedKey"
+              :client-name="data.name"
+              :disabled="keyActionPending || !data.hasPreSharedKey"
+              @confirm="changeKey('removePreSharedKey')"
+            />
+            <ClientsKeyActionDialog
+              action="rotateKeyPair"
+              :client-name="data.name"
+              :disabled="keyActionPending"
+              @confirm="changeKey('rotateKeyPair')"
             />
             <ClientsDeleteDialog
-              trigger-class="col-span-2"
               :client-name="data.name"
               @delete="deleteClient"
             >
-              <FormSecondaryActionField
-                :label="$t('client.delete')"
-                class="inline-block w-full"
-                as="span"
-              />
+              <BaseSecondaryButton as="span" class="ui-button-danger w-full">
+                {{ $t('common.actions.delete') }}
+              </BaseSecondaryButton>
             </ClientsDeleteDialog>
-            <ClientsConfigDialog
-              trigger-class="col-span-2"
-              :client-id="data.id"
-            >
-              <FormSecondaryActionField
-                :label="$t('client.viewConfig')"
-                class="inline-block w-full"
-                as="span"
-              />
-            </ClientsConfigDialog>
-          </FormGroup>
-        </FormElement>
+          </div>
+        </FormGroup>
       </PanelBody>
     </Panel>
   </main>
 </template>
 
 <script lang="ts" setup>
+import { CircleArrowLeftIcon } from '@lucide/vue';
+
 import { $fetch } from '#imports';
 
 const globalStore = useGlobalStore();
 
 const route = useRoute();
-const id = route.params.id as string;
+const id = Number(route.params.id);
 
 const { data: _data, refresh } = await useFetch(`/api/client/${id}`, {
   method: 'get',
 });
 const data = toRef(_data.value);
+const keyActionPending = ref(false);
+const { t } = useI18n();
+
+const keyActions = {
+  rotatePreSharedKey: () =>
+    $fetch(`/api/client/${id}/preSharedKey`, { method: 'post' }),
+  removePreSharedKey: () =>
+    $fetch(`/api/client/${id}/preSharedKey`, { method: 'delete' }),
+  rotateKeyPair: () =>
+    $fetch(`/api/client/${id}/rotateKeyPair`, { method: 'post' }),
+};
+
+async function refreshKeys() {
+  await refresh();
+  if (data.value && _data.value) {
+    data.value.publicKey = _data.value.publicKey;
+    data.value.hasPreSharedKey = _data.value.hasPreSharedKey;
+    data.value.endpoint = _data.value.endpoint;
+  }
+}
+
+async function changeKey(action: keyof typeof keyActions) {
+  if (keyActionPending.value) return;
+  keyActionPending.value = true;
+  try {
+    await useSubmit(keyActions[action], {
+      revert: refreshKeys,
+      successMsg: t('clients.keys.updated'),
+    })(undefined);
+  } finally {
+    keyActionPending.value = false;
+  }
+}
 
 const _submit = useSubmit(
   (data) =>

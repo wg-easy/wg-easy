@@ -1,35 +1,31 @@
 <template>
-  <main v-if="data">
+  <div v-if="data">
     <FormElement @submit.prevent="submit">
       <FormGroup>
         <FormTextArea
           id="PreUp"
           v-model="data.preUp"
-          :label="$t('hooks.preUp')"
+          :label="$t('wireguard.hooks.preUp')"
         />
         <FormTextArea
           id="PostUp"
           v-model="data.postUp"
-          :label="$t('hooks.postUp')"
+          :label="$t('wireguard.hooks.postUp')"
         />
         <FormTextArea
           id="PreDown"
           v-model="data.preDown"
-          :label="$t('hooks.preDown')"
+          :label="$t('wireguard.hooks.preDown')"
         />
         <FormTextArea
           id="PostDown"
           v-model="data.postDown"
-          :label="$t('hooks.postDown')"
+          :label="$t('wireguard.hooks.postDown')"
         />
       </FormGroup>
-      <FormGroup>
-        <FormHeading>{{ $t('form.actions') }}</FormHeading>
-        <FormPrimaryActionField type="submit" :label="$t('form.save')" />
-        <FormSecondaryActionField :label="$t('form.revert')" @click="revert" />
-      </FormGroup>
+      <FormSaveControls @revert="revert" />
     </FormElement>
-  </main>
+  </div>
 </template>
 
 <script setup lang="ts">

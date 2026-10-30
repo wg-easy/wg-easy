@@ -1,0 +1,49 @@
+services:
+  wg-easy:
+    image: wg-easy-e2e:local
+    environment:
+      INSECURE: "true"
+      DISABLE_IPV6: "true"
+      DISABLE_VERSION_CHECK: "true"
+      DEBUG: ""
+      INIT_ENABLED: ${E2E_INITIALIZED:-true}
+      INIT_USERNAME: e2e-admin
+      INIT_PASSWORD: e2e-only-password-123!
+      INIT_HOST: vpn.example.test
+      INIT_PORT: "51820"
+    cap_add:
+      - NET_ADMIN
+    sysctls:
+      net.ipv4.ip_forward: "1"
+      net.ipv4.conf.all.src_valid_mark: "1"
+    ports:
+      - "127.0.0.1::51821"
+    networks:
+      default:
+        aliases:
+          - vpn.example.test
+    volumes:
+      - wireguard:/etc/wireguard
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          wg show wg0 public-key >/dev/null &&
+          node -e "fetch('http://127.0.0.1:51821/api/information').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"
+      interval: 2s
+      timeout: 5s
+      retries: 30
+      start_period: 5s
+
+  vpn-client:
+    image: wg-easy-e2e:local
+    command: ["dumb-init", "sleep", "infinity"]
+    cap_add:
+      - NET_ADMIN
+    sysctls:
+      net.ipv4.conf.all.src_valid_mark: "1"
+    healthcheck:
+      disable: true
+
+volumes:
+  wireguard:

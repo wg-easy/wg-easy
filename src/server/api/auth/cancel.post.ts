@@ -1,16 +1,5 @@
-import { defineEventHandler } from 'h3';
+import { defineEventHandler } from 'nuxt/server';
 
-import { useWGSession } from '#server/utils/session';
+import { cancelLogin } from '#server/features/identity/session';
 
-export default defineEventHandler(async (event) => {
-  const session = await useWGSession(event);
-
-  await session.update({
-    pendingLogin: undefined,
-    oauth_nonce: undefined,
-    oauth_state: undefined,
-    oauth_verifier: undefined,
-  });
-
-  return { success: true as const };
-});
+export default defineEventHandler(cancelLogin);

@@ -1,6 +1,6 @@
-import { defineEventHandler, getRequestURL, sendRedirect } from 'h3';
+import { defineEventHandler, getRequestURL, sendRedirect } from 'nuxt/server';
 
-import Database from '#server/utils/Database';
+import * as setupSteps from '#server/features/setup';
 
 /* First setup of wg-easy */
 export default defineEventHandler(async (event) => {
@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
     return;
   }
 
-  const { step, done } = await Database.general.getSetupStep();
+  const { step, done } = await setupSteps.status();
   if (!done) {
     const parsedSetup = url.pathname.match(/\/setup\/(\d)/);
     if (!parsedSetup) {

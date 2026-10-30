@@ -1,207 +1,414 @@
 {
-  "pages": {
-    "me": "Conta",
-    "clients": "Clientes",
-    "admin": {
-      "panel": "Panel de administración",
-      "general": "Xeral",
-      "config": "Configuración",
-      "interface": "Interface",
-      "hooks": "Hooks"
-    }
-  },
-  "user": {
-    "email": "Correo electrónico"
-  },
-  "me": {
-    "currentPassword": "Contrasinal actual",
-    "enable2fa": "Activar a autenticación de dobre factor",
-    "enable2faDesc": "Escanea o código QR coa túa aplicación de autenticación ou introduce a chave manualmente.",
-    "2faKey": "Chave TOTP",
-    "2faCodeDesc": "Introduce o código da túa aplicación de autenticación.",
-    "disable2fa": "Desactivar a autenticación de dobre factor",
-    "disable2faDesc": "Introduce o teu contrasinal para desactivar a autenticación de dobre factor.",
-    "linkOauth": "Vincula a túa conta cun provedor externo",
-    "unlinkOauth": "Desvincular",
-    "linkedWith": "Vinculado con {provider}",
-    "providerDisabled": "O provedor vinculado á túa conta non está activado"
-  },
-  "general": {
-    "name": "Nome",
-    "username": "Nome de usuario",
-    "password": "Contrasinal",
-    "newPassword": "Novo contrasinal",
-    "updatePassword": "Actualizar contrasinal",
-    "addPassword": "Engadir contrasinal",
-    "mtu": "MTU",
-    "allowedIps": "IP permitidas",
-    "dns": "DNS",
-    "persistentKeepalive": "Keepalive persistente",
-    "logout": "Pechar sesión",
-    "continue": "Continuar",
-    "host": "Host",
-    "port": "Porto",
+  "common": {
+    "fields": {
+      "email": "Correo electrónico",
+      "name": "Nome",
+      "username": "Nome de usuario",
+      "password": "Contrasinal",
+      "newPassword": "Novo contrasinal",
+      "confirmPassword": "Confirmar o contrasinal"
+    },
+    "actions": {
+      "continue": "Continuar",
+      "delete": "Eliminar",
+      "change": "Cambiar",
+      "cancel": "Cancelar",
+      "create": "Crear",
+      "save": "Gardar",
+      "revert": "Reverter",
+      "add": "Engadir"
+    },
     "yes": "Si",
     "no": "Non",
-    "confirmPassword": "Confirmar o contrasinal",
     "loading": "Cargando...",
-    "2fa": "Autenticación de dobre factor",
-    "2faCode": "Código TOTP",
-    "externalAuth": "Autenticación Externa"
+    "update": {
+      "available": "Hai unha actualización dispoñible!",
+      "action": "Actualizar"
+    },
+    "theme": {
+      "dark": "Tema escuro",
+      "light": "Tema claro",
+      "system": "Tema do sistema"
+    },
+    "donate": "Doar",
+    "notifications": {
+      "success": "Éxito",
+      "saved": "Gardado",
+      "error": "Erro",
+      "unknown": "Erro descoñecido. Revisa a consola para máis detalles"
+    },
+    "form": {
+      "actions": "Accións",
+      "sections": {
+        "general": "Xeral",
+        "advanced": "Avanzado"
+      },
+      "noItems": "Sen elementos",
+      "nullNoItems": "Sen elementos. Usando a configuración global",
+      "nullNotSet": "Non definido",
+      "set": "Definir",
+      "unset": "Quitar"
+    },
+    "clipboard": {
+      "notSupported": "Copiar non é compatible",
+      "copied": "Copiado!",
+      "failed": "Erro ao copiar",
+      "copy": "Copiar"
+    }
+  },
+  "auth": {
+    "logout": "Pechar sesión",
+    "twoFactor": {
+      "title": "Autenticación de dobre factor",
+      "code": "Código TOTP"
+    },
+    "external": {
+      "title": "Autenticación Externa"
+    },
+    "login": {
+      "signIn": "Iniciar sesión",
+      "signInWith": "Iniciar sesión con {provider}",
+      "or": "ou",
+      "rememberMe": "Lembrarme",
+      "rememberMeDescription": "Manter a sesión iniciada ao pechar o navegador",
+      "insecure": "Non podes iniciar sesión cunha conexión insegura. Usa HTTPS.",
+      "twoFactor": {
+        "required": "É necesaria a autenticación de dobre factor",
+        "invalid": "A autenticación de dobre factor é incorrecta"
+      },
+      "expired": "Inicio de sesión caducado. Téntao de novo"
+    }
+  },
+  "account": {
+    "title": "Conta",
+    "password": {
+      "current": "Contrasinal actual",
+      "update": "Actualizar contrasinal",
+      "add": "Engadir contrasinal"
+    },
+    "twoFactor": {
+      "enable": {
+        "label": "Activar a autenticación de dobre factor",
+        "description": "Escanea o código QR coa túa aplicación de autenticación ou introduce a chave manualmente."
+      },
+      "key": "Chave TOTP",
+      "codeDescription": "Introduce o código da túa aplicación de autenticación.",
+      "disable": {
+        "label": "Desactivar a autenticación de dobre factor",
+        "description": "Introduce o teu contrasinal para desactivar a autenticación de dobre factor."
+      }
+    },
+    "external": {
+      "link": "Vincula a túa conta cun provedor externo",
+      "unlink": "Desvincular",
+      "linkedWith": "Vinculado con {provider}",
+      "providerDisabled": "O provedor vinculado á túa conta non está activado"
+    }
   },
   "setup": {
     "welcome": "Benvido á túa primeira configuración de wg-easy",
-    "welcomeDesc": "Atopaches a forma máis doada de instalar e xestionar WireGuard en calquera sistema Linux",
+    "welcomeDescription": "Atopaches a forma máis doada de instalar e xestionar WireGuard en calquera sistema Linux",
     "existingSetup": "Tes unha configuración existente?",
-    "createAdminDesc": "Por favor, introduce primeiro un usuario administrador cun contrasinal seguro. Esta información empregarase para acceder ao panel de administración.",
-    "setupConfigDesc": "Por favor, introduce a información do host e do porto. Isto empregarase para a configuración dos clientes ao configurar WireGuard nos seus dispositivos.",
-    "setupMigrationDesc": "Por favor, fornece o ficheiro da copia de seguridade se queres migrar os datos da túa versión anterior de wg-easy á nova configuración.",
+    "createAdminDescription": "Por favor, introduce primeiro un usuario administrador cun contrasinal seguro. Esta información empregarase para acceder ao panel de administración.",
+    "setupConfigDescription": "Por favor, introduce a información do host e do porto. Isto empregarase para a configuración dos clientes ao configurar WireGuard nos seus dispositivos.",
+    "setupMigrationDescription": "Por favor, fornece o ficheiro da copia de seguridade se queres migrar os datos da túa versión anterior de wg-easy á nova configuración.",
     "upload": "Subir",
     "migration": "Recuperar a copia de seguridade:",
     "createAccount": "Crear conta",
     "successful": "Configuración completada con éxito",
-    "hostDesc": "Nome de host público ao que se conectarán os clientes",
-    "portDesc": "Porto UDP público ao que se conectarán os clientes e no que escoitará WireGuard"
+    "hostDescription": "Nome de host público ao que se conectarán os clientes",
+    "portDescription": "Porto UDP público ao que se conectarán os clientes e no que escoitará WireGuard"
   },
-  "update": {
-    "updateAvailable": "Hai unha actualización dispoñible!",
-    "update": "Actualizar"
-  },
-  "theme": {
-    "dark": "Tema escuro",
-    "light": "Tema claro",
-    "system": "Tema do sistema"
-  },
-  "layout": {
-    "toggleCharts": "Amosar/Ocultar gráficas",
-    "donate": "Doar"
-  },
-  "login": {
-    "signIn": "Iniciar sesión",
-    "signInWith": "Iniciar sesión con {provider}",
-    "or": "ou",
-    "rememberMe": "Lembrarme",
-    "rememberMeDesc": "Manter a sesión iniciada ao pechar o navegador",
-    "insecure": "Non podes iniciar sesión cunha conexión insegura. Usa HTTPS.",
-    "2faRequired": "É necesaria a autenticación de dobre factor",
-    "2faWrong": "A autenticación de dobre factor é incorrecta",
-    "loginExpired": "Inicio de sesión caducado. Téntao de novo"
-  },
-  "client": {
-    "empty": "Aínda non hai clientes.",
-    "newShort": "Novo",
-    "sort": "Ordenar",
-    "create": "Crear cliente",
-    "created": "Cliente creado",
-    "new": "Novo cliente",
-    "name": "Nome",
-    "expireDate": "Data de caducidade",
-    "expireDateDesc": "Data na que o cliente será desactivado. Déixao en branco para permanente",
-    "delete": "Eliminar",
-    "deleteClient": "Eliminar cliente",
-    "deleteDialog": "Seguro que queres eliminar {name}? Esta acción non se pode desfacer.",
-    "enabled": "Activado",
-    "address": "Enderezo",
-    "serverAllowedIps": "IP permitidas polo servidor",
-    "otlDesc": "Xerar ligazón curta dun só uso",
-    "permanent": "Permanente",
-    "createdOn": "Creado o {date}",
-    "lastSeen": "Visto por última vez o {date}",
-    "totalDownload": "Descarga total: {total}",
-    "totalUpload": "Subida total: {total}",
-    "newClient": "Novo cliente",
-    "disableClient": "Desactivar cliente",
-    "enableClient": "Activar cliente",
-    "noPrivKey": "Este cliente non ten unha chave privada coñecida. Non se pode crear a configuración.",
-    "showQR": "Amosar código QR",
-    "downloadConfig": "Descargar configuración",
-    "allowedIpsDesc": "IP que se encamiñarán a través da VPN (sobrescribe a configuración global)",
-    "serverAllowedIpsDesc": "IP que o servidor encamiñará ao cliente",
-    "mtuDesc": "Define a unidade máxima de transmisión (tamaño do paquete) para o túnel VPN",
-    "persistentKeepaliveDesc": "Define o intervalo (en segundos) para os paquetes keep-alive. 0 desactívaos",
-    "hooks": "Hooks",
-    "hooksDescription": "Os hooks só funcionan con wg-quick",
-    "hooksLeaveEmpty": "Só para wg-quick. Noutro caso, déixao baleiro",
-    "dnsDesc": "Servidor DNS que empregarán os clientes (sobrescribe a configuración global)",
-    "notConnected": "Cliente non conectado",
-    "endpoint": "Punto final",
-    "endpointDesc": "IP do cliente desde a que se establece a conexión WireGuard",
-    "search": "Buscar clientes...",
-    "config": "Configuración",
-    "viewConfig": "Ver configuración",
-    "firewallIps": "IPs permitidas da devasa",
-    "firewallIpsDesc": "IPs/CIDRs de destino aos que este cliente pode acceder (aplicado no lado do servidor). Déixao baleiro para usar as IPs permitidas. Admite filtrado opcional por porto e protocolo. Consulta a documentación para a sintaxe.",
-    "downloadPng": "Descargar PNG",
-    "copyPng": "Copiar PNG"
-  },
-  "dialog": {
-    "change": "Cambiar",
-    "cancel": "Cancelar",
-    "create": "Crear"
-  },
-  "toast": {
-    "success": "Éxito",
-    "saved": "Gardado",
-    "error": "Erro",
-    "unknown": "Erro descoñecido. Revisa a consola para máis detalles"
-  },
-  "form": {
-    "actions": "Accións",
-    "save": "Gardar",
-    "revert": "Reverter",
-    "sectionGeneral": "Xeral",
-    "sectionAdvanced": "Avanzado",
-    "noItems": "Sen elementos",
-    "nullNoItems": "Sen elementos. Usando a configuración global",
-    "nullNotSet": "Non definido",
-    "set": "Definir",
-    "unset": "Quitar",
-    "add": "Engadir"
+  "clients": {
+    "title": "Clientes",
+    "list": {
+      "toggleCharts": "Amosar/Ocultar gráficas",
+      "empty": "Aínda non hai clientes.",
+      "new": "Novo",
+      "sort": "Ordenar",
+      "newClient": "Novo cliente",
+      "search": "Buscar clientes..."
+    },
+    "create": {
+      "action": "Crear cliente",
+      "success": "Cliente creado",
+      "title": "Novo cliente"
+    },
+    "fields": {
+      "name": {
+        "label": "Nome"
+      },
+      "expiresAt": {
+        "label": "Data de caducidade",
+        "description": "Data na que o cliente será desactivado. Déixao en branco para permanente"
+      },
+      "address": {
+        "label": "Enderezo"
+      },
+      "serverAllowedIps": {
+        "label": "IP permitidas polo servidor",
+        "description": "IP que o servidor encamiñará ao cliente"
+      },
+      "allowedIps": {
+        "description": "IP que se encamiñarán a través da VPN (sobrescribe a configuración global)"
+      },
+      "mtu": {
+        "description": "Define a unidade máxima de transmisión (tamaño do paquete) para o túnel VPN"
+      },
+      "persistentKeepalive": {
+        "description": "Define o intervalo (en segundos) para os paquetes keep-alive. 0 desactívaos"
+      },
+      "dns": {
+        "description": "Servidor DNS que empregarán os clientes (sobrescribe a configuración global)"
+      },
+      "endpoint": {
+        "label": "Punto final",
+        "description": "IP do cliente desde a que se establece a conexión WireGuard"
+      },
+      "firewallIps": {
+        "label": "IPs permitidas da devasa",
+        "description": "IPs/CIDRs de destino aos que este cliente pode acceder (aplicado no lado do servidor). Déixao baleiro para usar as IPs permitidas. Admite filtrado opcional por porto e protocolo. Consulta a documentación para a sintaxe."
+      }
+    },
+    "delete": {
+      "title": "Eliminar cliente",
+      "description": "Seguro que queres eliminar {name}? Esta acción non se pode desfacer."
+    },
+    "status": {
+      "enabled": "Activado",
+      "permanent": "Permanente",
+      "createdOn": "Creado o {date}",
+      "lastSeen": "Visto por última vez o {date}",
+      "disable": "Desactivar cliente",
+      "enable": "Activar cliente",
+      "notConnected": "Cliente non conectado"
+    },
+    "configuration": {
+      "oneTimeLink": "Xerar ligazón curta dun só uso",
+      "noPrivateKey": "Este cliente non ten unha chave privada coñecida. Non se pode crear a configuración.",
+      "showQrCode": "Amosar código QR",
+      "download": "Descargar configuración",
+      "title": "Configuración",
+      "view": "Ver configuración",
+      "downloadPng": "Descargar PNG",
+      "copyPng": "Copiar PNG"
+    },
+    "traffic": {
+      "totalDownload": "Descarga total: {total}",
+      "totalUpload": "Subida total: {total}"
+    },
+    "hooks": {
+      "title": "Hooks",
+      "description": "Os hooks só funcionan con wg-quick",
+      "fieldDescription": "Só para wg-quick. Noutro caso, déixao baleiro"
+    }
   },
   "admin": {
+    "title": "Panel de administración",
     "general": {
-      "sessionTimeout": "Tempo límite da sesión",
-      "sessionTimeoutDesc": "Duración da sesión para Lembrarme (segundos)",
+      "title": "Xeral",
+      "sessionTimeout": {
+        "label": "Tempo límite da sesión",
+        "description": "Duración da sesión para Lembrarme (segundos)"
+      },
       "metrics": "Métricas",
-      "metricsPassword": "Contrasinal",
-      "metricsPasswordDesc": "Contrasinal Bearer para o endpoint de métricas (contrasinal ou hash argon2)",
-      "json": "JSON",
-      "jsonDesc": "Ruta para as métricas en formato JSON",
-      "prometheus": "Prometheus",
-      "prometheusDesc": "Ruta para as métricas de Prometheus"
+      "metricsPassword": {
+        "label": "Contrasinal",
+        "description": "Contrasinal Bearer para o endpoint de métricas (contrasinal ou hash argon2)"
+      },
+      "json": {
+        "label": "JSON",
+        "description": "Ruta para as métricas en formato JSON"
+      },
+      "prometheus": {
+        "label": "Prometheus",
+        "description": "Ruta para as métricas de Prometheus"
+      }
     },
     "config": {
+      "title": "Configuración",
       "connection": "Conexión",
-      "hostDesc": "Nome de host público ao que se conectarán os clientes (invalida a configuración)",
-      "portDesc": "Porto UDP público ao que se conectarán os clientes (invalida a configuración; probablemente tamén queiras cambiar o Porto da interface)",
-      "allowedIpsDesc": "IPs permitidas que usarán os clientes (configuración global)",
-      "dnsDesc": "Servidor DNS que usarán os clientes (configuración global)",
-      "mtuDesc": "MTU que usarán os clientes (só para clientes novos)",
-      "persistentKeepaliveDesc": "Intervalo en segundos para enviar keepalives ao servidor. 0 = desactivado (só para clientes novos)",
-      "suggest": "Suxerir",
-      "suggestDesc": "Escolle un enderezo IP ou nome de host para o campo Host"
+      "host": {
+        "description": "Nome de host público ao que se conectarán os clientes (invalida a configuración)"
+      },
+      "port": {
+        "description": "Porto UDP público ao que se conectarán os clientes (invalida a configuración; probablemente tamén queiras cambiar o Porto da interface)"
+      },
+      "allowedIps": {
+        "description": "IPs permitidas que usarán os clientes (configuración global)"
+      },
+      "dns": {
+        "description": "Servidor DNS que usarán os clientes (configuración global)"
+      },
+      "mtu": {
+        "description": "MTU que usarán os clientes (só para clientes novos)"
+      },
+      "persistentKeepalive": {
+        "description": "Intervalo en segundos para enviar keepalives ao servidor. 0 = desactivado (só para clientes novos)"
+      },
+      "suggest": {
+        "label": "Suxerir",
+        "description": "Escolle un enderezo IP ou nome de host para o campo Host"
+      }
     },
     "interface": {
+      "title": "Interface",
       "cidrSuccess": "CIDR cambiado",
-      "device": "Dispositivo",
-      "deviceDesc": "Dispositivo Ethernet polo que se redirixirá o tráfico de WireGuard",
-      "routingTable": "Táboa de encamiñamento",
-      "routingTableDesc": "Táboa de encamiñamento para as rutas de WireGuard. Definir como auto, off ou un número de táboa.",
-      "mtuDesc": "MTU que usará WireGuard",
-      "portDesc": "Porto UDP no que WireGuard escoitará (probablemente tamén queiras cambiar o Porto da configuración)",
+      "device": {
+        "label": "Dispositivo",
+        "description": "Dispositivo Ethernet polo que se redirixirá o tráfico de WireGuard"
+      },
+      "routingTable": {
+        "label": "Táboa de encamiñamento",
+        "description": "Táboa de encamiñamento para as rutas de WireGuard. Definir como auto, off ou un número de táboa."
+      },
+      "mtu": {
+        "description": "MTU que usará WireGuard"
+      },
+      "port": {
+        "description": "Porto UDP no que WireGuard escoitará (probablemente tamén queiras cambiar o Porto da configuración)"
+      },
       "changeCidr": "Cambiar CIDR",
-      "restart": "Reiniciar interface",
-      "restartDesc": "Reiniciar a interface de WireGuard",
+      "restart": {
+        "label": "Reiniciar interface",
+        "description": "Reiniciar a interface de WireGuard"
+      },
       "restartWarn": "Seguro que queres reiniciar a interface? Isto desconectará todos os clientes.",
       "restartSuccess": "Interface reiniciada",
       "firewall": "Filtrado de tráfico",
-      "firewallEnabled": "Activar devasa por cliente",
-      "firewallEnabledDesc": "Restrinxir o tráfico dos clientes a IPs de destino específicas usando iptables. Cando está activado, cada cliente pode configurarse con destinos permitidos."
+      "firewallEnabled": {
+        "label": "Activar devasa por cliente",
+        "description": "Restrinxir o tráfico dos clientes a IPs de destino específicas usando iptables. Cando está activado, cada cliente pode configurarse con destinos permitidos."
+      }
     },
-    "introText": "Benvido ao panel de administración.\n\nAquí podes xestionar a configuración xeral, a configuración, os axustes da interface e os hooks.\n\nComeza escollendo unha das seccións na barra lateral."
+    "hooks": {
+      "title": "Hooks"
+    },
+    "introduction": "Benvido ao panel de administración.\n\nAquí podes xestionar a configuración xeral, a configuración, os axustes da interface e os hooks.\n\nComeza escollendo unha das seccións na barra lateral."
   },
-  "zod": {
-    "generic": {
+  "wireguard": {
+    "fields": {
+      "mtu": "MTU",
+      "allowedIps": "IP permitidas",
+      "dns": "DNS",
+      "persistentKeepalive": "Keepalive persistente",
+      "host": "Host",
+      "port": "Porto"
+    },
+    "hooks": {
+      "preUp": "PreUp",
+      "postUp": "PostUp",
+      "preDown": "PreDown",
+      "postDown": "PostDown"
+    },
+    "obfuscation": {
+      "jC": {
+        "label": "Número de paquetes lixo (Jc)",
+        "description": "Número de paquetes lixo para enviar (1-128, recomendado: 4-12)"
+      },
+      "jMin": {
+        "label": "Tamaño mínimo dos paquetes lixo (Jmin)",
+        "description": "Tamaño mínimo dos paquetes lixo (0-1279*, recomendado: 8, debe ser < Jmax)"
+      },
+      "jMax": {
+        "label": "Tamaño máximo dos paquetes lixo (Jmax)",
+        "description": "Tamaño máximo dos paquetes lixo (1-1280*, recomendado: 80, debe ser > Jmin)"
+      },
+      "s1": {
+        "label": "Tamaño lixo do paquete de inicio (S1)",
+        "description": "Tamaño lixo do paquete de inicio (0-1132[1280* - 148 = 1132], recomendado: 15-150, S1+56 ≠ S2)"
+      },
+      "s2": {
+        "label": "Tamaño lixo do paquete de resposta (S2)",
+        "description": "Tamaño lixo do paquete de resposta (0-1188[1280* - 92 = 1188], recomendado: 15-150)"
+      },
+      "s3": {
+        "label": "Tamaño lixo do paquete de resposta cookie (S3)",
+        "description": "Tamaño lixo do paquete de resposta cookie"
+      },
+      "s4": {
+        "label": "Tamaño lixo do paquete de transporte (S4)",
+        "description": "Tamaño lixo do paquete de transporte"
+      },
+      "h1": {
+        "label": "Cabeceira máxica de inicio (H1)",
+        "description": "Valor ou rango da cabeceira do paquete de inicio (X ou X-Y, onde X<Y. Mín 5, máx 2147483647. O valor ou rango non debe solaparse con outras cabeceiras)"
+      },
+      "h2": {
+        "label": "Cabeceira máxica de resposta (H2)",
+        "description": "Valor ou rango da cabeceira do paquete de resposta (X ou X-Y, onde X<Y. Mín 5, máx 2147483647. O valor ou rango non debe solaparse con outras cabeceiras)"
+      },
+      "h3": {
+        "label": "Cabeceira máxica da resposta cookie (H3)",
+        "description": "Valor ou rango da cabeceira do paquete de resposta cookie (X ou X-Y, onde X<Y. Mín 5, máx 2147483647. O valor ou rango non debe solaparse con outras cabeceiras)"
+      },
+      "h4": {
+        "label": "Cabeceira máxica de transporte (H4)",
+        "description": "Valor ou rango da cabeceira do paquete de transporte (X ou X-Y, onde X<Y. Mín 5, máx 2147483647. O valor ou rango non debe solaparse con outras cabeceiras)"
+      },
+      "i1": {
+        "label": "Paquete lixo especial 1 (I1)",
+        "description": "Paquete de simulación de protocolo en formato hexadecimal: <b 0x...>"
+      },
+      "i2": {
+        "label": "Paquete lixo especial 2 (I2)",
+        "description": "Paquete de simulación de protocolo en formato hexadecimal: <b 0x...>"
+      },
+      "i3": {
+        "label": "Paquete lixo especial 3 (I3)",
+        "description": "Paquete de simulación de protocolo en formato hexadecimal: <b 0x...>"
+      },
+      "i4": {
+        "label": "Paquete lixo especial 4 (I4)",
+        "description": "Paquete de simulación de protocolo en formato hexadecimal: <b 0x...>"
+      },
+      "i5": {
+        "label": "Paquete lixo especial 5 (I5)",
+        "description": "Paquete de simulación de protocolo en formato hexadecimal: <b 0x...>"
+      },
+      "rangeNote": "Os seguintes parámetros aceptan un único número ou un rango inclusivo (0-65535), por exemplo 30 ou 30-90",
+      "headerProtectionKey": {
+        "label": "Chave de protección de cabeceira",
+        "description": "Chave base64 de 32 bytes usada para cifrar as cabeceiras dos paquetes. Debe coincidir en ambos os lados, polo que se copia a todos os clientes. Require que S1-S4 sexan polo menos 12"
+      },
+      "contentPaddingAddition": {
+        "label": "Recheo de contido adicional",
+        "description": "Cantidade aleatoria de bytes engadidos aos paquetes de transporte antes do cifrado"
+      },
+      "rekeyAfterTime": {
+        "label": "Tempo para renovar chaves",
+        "description": "Segundos antes de renegociar unha sesión (predeterminado de WireGuard: 120)"
+      },
+      "rekeyTimeout": {
+        "label": "Tempo de espera da renovación de chaves",
+        "description": "Segundos entre reintentos de handshake (predeterminado de WireGuard: 5)"
+      },
+      "rejectAfterTime": {
+        "label": "Tempo para rexeitar",
+        "description": "Duración da sesión en segundos (predeterminado de WireGuard: 180)"
+      },
+      "keepaliveTimeout": {
+        "label": "Tempo de espera de keepalive",
+        "description": "Segundos de inactividade antes de enviar un keepalive (predeterminado de WireGuard: 10)"
+      },
+      "maxHandshakeAttempts": {
+        "label": "Intentos máximos de handshake",
+        "description": "Intentos de handshake antes de desistir (predeterminado de WireGuard: 18)"
+      },
+      "randomTrailers": {
+        "label": "Bytes finais aleatorios",
+        "description": "Engade unha cantidade aleatoria de bytes aos paquetes de handshake. Debe coincidir en ambos os lados, polo que se copia a todos os clientes"
+      },
+      "disableCookies": {
+        "label": "Desactivar cookies",
+        "description": "Non responder aos handshakes con mensaxes cookie cando hai carga. Só afecta a este lado do túnel"
+      },
+      "mtuNote": "Os valores dependen da MTU",
+      "title": "Parámetros de ofuscación de AmneziaWG"
+    }
+  },
+  "validation": {
+    "messages": {
       "required": "{field} é obrigatorio",
       "validNumber": "{field} debe ser un número válido",
       "validNumberRange": "{field} debe ser un número válido ou un rango de números",
@@ -264,72 +471,5 @@
     "allowedIps": "IPs permitidas",
     "allowedIpsInvalid": "Cada entrada de IPs permitidas debe ser un único enderezo IP ou un CIDR",
     "file": "Ficheiro"
-  },
-  "hooks": {
-    "preUp": "PreUp",
-    "postUp": "PostUp",
-    "preDown": "PreDown",
-    "postDown": "PostDown"
-  },
-  "copy": {
-    "notSupported": "Copiar non é compatible",
-    "copied": "Copiado!",
-    "failed": "Erro ao copiar",
-    "copy": "Copiar"
-  },
-  "awg": {
-    "jCLabel": "Número de paquetes lixo (Jc)",
-    "jCDescription": "Número de paquetes lixo para enviar (1-128, recomendado: 4-12)",
-    "jMinLabel": "Tamaño mínimo dos paquetes lixo (Jmin)",
-    "jMinDescription": "Tamaño mínimo dos paquetes lixo (0-1279*, recomendado: 8, debe ser < Jmax)",
-    "jMaxLabel": "Tamaño máximo dos paquetes lixo (Jmax)",
-    "jMaxDescription": "Tamaño máximo dos paquetes lixo (1-1280*, recomendado: 80, debe ser > Jmin)",
-    "s1Label": "Tamaño lixo do paquete de inicio (S1)",
-    "s1Description": "Tamaño lixo do paquete de inicio (0-1132[1280* - 148 = 1132], recomendado: 15-150, S1+56 ≠ S2)",
-    "s2Label": "Tamaño lixo do paquete de resposta (S2)",
-    "s2Description": "Tamaño lixo do paquete de resposta (0-1188[1280* - 92 = 1188], recomendado: 15-150)",
-    "s3Label": "Tamaño lixo do paquete de resposta cookie (S3)",
-    "s3Description": "Tamaño lixo do paquete de resposta cookie",
-    "s4Label": "Tamaño lixo do paquete de transporte (S4)",
-    "s4Description": "Tamaño lixo do paquete de transporte",
-    "h1Label": "Cabeceira máxica de inicio (H1)",
-    "h1Description": "Valor ou rango da cabeceira do paquete de inicio (X ou X-Y, onde X<Y. Mín 5, máx 2147483647. O valor ou rango non debe solaparse con outras cabeceiras)",
-    "h2Label": "Cabeceira máxica de resposta (H2)",
-    "h2Description": "Valor ou rango da cabeceira do paquete de resposta (X ou X-Y, onde X<Y. Mín 5, máx 2147483647. O valor ou rango non debe solaparse con outras cabeceiras)",
-    "h3Label": "Cabeceira máxica da resposta cookie (H3)",
-    "h3Description": "Valor ou rango da cabeceira do paquete de resposta cookie (X ou X-Y, onde X<Y. Mín 5, máx 2147483647. O valor ou rango non debe solaparse con outras cabeceiras)",
-    "h4Label": "Cabeceira máxica de transporte (H4)",
-    "h4Description": "Valor ou rango da cabeceira do paquete de transporte (X ou X-Y, onde X<Y. Mín 5, máx 2147483647. O valor ou rango non debe solaparse con outras cabeceiras)",
-    "i1Label": "Paquete lixo especial 1 (I1)",
-    "i1Description": "Paquete de simulación de protocolo en formato hexadecimal: <b 0x...>",
-    "i2Label": "Paquete lixo especial 2 (I2)",
-    "i2Description": "Paquete de simulación de protocolo en formato hexadecimal: <b 0x...>",
-    "i3Label": "Paquete lixo especial 3 (I3)",
-    "i3Description": "Paquete de simulación de protocolo en formato hexadecimal: <b 0x...>",
-    "i4Label": "Paquete lixo especial 4 (I4)",
-    "i4Description": "Paquete de simulación de protocolo en formato hexadecimal: <b 0x...>",
-    "i5Label": "Paquete lixo especial 5 (I5)",
-    "i5Description": "Paquete de simulación de protocolo en formato hexadecimal: <b 0x...>",
-    "rangeNote": "Os seguintes parámetros aceptan un único número ou un rango inclusivo (0-65535), por exemplo 30 ou 30-90",
-    "headerProtectionKeyLabel": "Chave de protección de cabeceira",
-    "headerProtectionKeyDescription": "Chave base64 de 32 bytes usada para cifrar as cabeceiras dos paquetes. Debe coincidir en ambos os lados, polo que se copia a todos os clientes. Require que S1-S4 sexan polo menos 12",
-    "contentPaddingAdditionLabel": "Recheo de contido adicional",
-    "contentPaddingAdditionDescription": "Cantidade aleatoria de bytes engadidos aos paquetes de transporte antes do cifrado",
-    "rekeyAfterTimeLabel": "Tempo para renovar chaves",
-    "rekeyAfterTimeDescription": "Segundos antes de renegociar unha sesión (predeterminado de WireGuard: 120)",
-    "rekeyTimeoutLabel": "Tempo de espera da renovación de chaves",
-    "rekeyTimeoutDescription": "Segundos entre reintentos de handshake (predeterminado de WireGuard: 5)",
-    "rejectAfterTimeLabel": "Tempo para rexeitar",
-    "rejectAfterTimeDescription": "Duración da sesión en segundos (predeterminado de WireGuard: 180)",
-    "keepaliveTimeoutLabel": "Tempo de espera de keepalive",
-    "keepaliveTimeoutDescription": "Segundos de inactividade antes de enviar un keepalive (predeterminado de WireGuard: 10)",
-    "maxHandshakeAttemptsLabel": "Intentos máximos de handshake",
-    "maxHandshakeAttemptsDescription": "Intentos de handshake antes de desistir (predeterminado de WireGuard: 18)",
-    "randomTrailersLabel": "Bytes finais aleatorios",
-    "randomTrailersDescription": "Engade unha cantidade aleatoria de bytes aos paquetes de handshake. Debe coincidir en ambos os lados, polo que se copia a todos os clientes",
-    "disableCookiesLabel": "Desactivar cookies",
-    "disableCookiesDescription": "Non responder aos handshakes con mensaxes cookie cando hai carga. Só afecta a este lado do túnel",
-    "mtuNote": "Os valores dependen da MTU",
-    "obfuscationParameters": "Parámetros de ofuscación de AmneziaWG"
   }
 }

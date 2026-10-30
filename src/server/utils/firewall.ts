@@ -17,9 +17,48 @@ function chainName(interfaceName: string) {
   return `${CHAIN_NAME}_${interfaceName}`;
 }
 
-// Mutex to prevent concurrent rule rebuilds
-let rebuildInProgress = false;
-let rebuildQueued = false;
+// Each caller waits for its own snapshot, including disabling filtering.
+let pendingRebuild: Promise<void> = Promise.resolve();
+
+function commands(enableIpv6: boolean) {
+  return enableIpv6 ? ['iptables', 'ip6tables'] : ['iptables'];
+}
+
+const trafficChains = ['FORWARD', 'INPUT'] as const;
+
+function rebuildGuard(interfaceName: string) {
+  return `-i ${interfaceName} -m comment --comment "wg-easy rebuild ${interfaceName}" -j DROP`;
+}
+
+async function blockDuringRebuild(interfaceName: string, enableIpv6: boolean) {
+  const guard = rebuildGuard(interfaceName);
+  for (const command of commands(enableIpv6)) {
+    for (const chain of trafficChains) {
+      const rules = (await exec(`${command} -S ${chain}`))
+        .split('\n')
+        .filter((rule) => rule.startsWith(`-A ${chain} `));
+      // A guard below an ACCEPT or a jump to an old chain does not block
+      // traffic. This also repairs guards left by older failed rebuilds.
+      if (rules[0] !== `-A ${chain} ${guard}`)
+        await exec(`${command} -I ${chain} 1 ${guard}`);
+    }
+  }
+}
+
+async function finishRebuild(interfaceName: string, enableIpv6: boolean) {
+  for (const command of commands(enableIpv6)) {
+    for (const chain of trafficChains) {
+      const guard = rebuildGuard(interfaceName);
+      const rules = (await exec(`${command} -S ${chain}`)).split('\n');
+      // Remove all copies, including an older misplaced guard. Failure leaves
+      // the remaining guards in place and the lifecycle retries the update.
+      for (const rule of rules) {
+        if (rule === `-A ${chain} ${guard}`)
+          await exec(`${command} -D ${chain} ${guard}`);
+      }
+    }
+  }
+}
 
 // Cache iptables availability check result
 let iptablesAvailable: boolean | null = null;
@@ -69,6 +108,7 @@ function sanitizeComment(clientId: number, clientName: string): string {
  * @throws {Error} If protocol is specified without a port
  */
 function parseFirewallEntry(entry: string): ParsedEntry {
+  entry = entry.replace(/\/(tcp|udp)$/i, (suffix) => suffix.toLowerCase());
   // Extract protocol suffix first: /tcp or /udp
   let proto: 'tcp' | 'udp' | 'both' | undefined;
   let remaining = entry;
@@ -170,30 +210,34 @@ function generateRuleArgs(
 }
 
 export const firewall = {
+  /** Keep traffic blocked until the entire VPN update has succeeded. */
+  blockTraffic: blockDuringRebuild,
+
   /**
    * Initialize the custom chain if it doesn't exist
    */
-  async initChain(interfaceName: string, enableIpv6: boolean): Promise<void> {
+  async initChain(
+    interfaceName: string,
+    enableIpv6: boolean,
+    attach = true,
+    position = 1
+  ): Promise<void> {
     const chain = chainName(interfaceName);
     FW_DEBUG(
       `Initializing firewall chain ${chain} for interface ${interfaceName}`
     );
 
-    // Create chain if not exists (iptables returns error if exists, so we ignore)
-    await exec(`iptables -N ${chain} 2>/dev/null || true`);
-    if (enableIpv6) {
-      await exec(`ip6tables -N ${chain} 2>/dev/null || true`);
-    }
-
-    // Ensure chain is referenced from FORWARD (if not already)
-    // Insert at position 1 to process before generic ACCEPT rules
-    await exec(
-      `iptables -C FORWARD -i ${interfaceName} -j ${chain} 2>/dev/null || iptables -I FORWARD 1 -i ${interfaceName} -j ${chain}`
-    );
-    if (enableIpv6) {
+    for (const command of commands(enableIpv6)) {
+      // Ignore only an already existing chain, not an unavailable firewall.
       await exec(
-        `ip6tables -C FORWARD -i ${interfaceName} -j ${chain} 2>/dev/null || ip6tables -I FORWARD 1 -i ${interfaceName} -j ${chain}`
+        `${command} -N ${chain} 2>/dev/null || ${command} -S ${chain} >/dev/null`
       );
+      if (!attach) continue;
+      for (const parent of trafficChains) {
+        await exec(
+          `${command} -C ${parent} -i ${interfaceName} -j ${chain} 2>/dev/null || ${command} -I ${parent} ${position} -i ${interfaceName} -j ${chain}`
+        );
+      }
     }
   },
 
@@ -203,9 +247,8 @@ export const firewall = {
   async flushChain(interfaceName: string, enableIpv6: boolean): Promise<void> {
     const chain = chainName(interfaceName);
     FW_DEBUG(`Flushing firewall chain ${chain}`);
-    await exec(`iptables -F ${chain} 2>/dev/null || true`);
-    if (enableIpv6) {
-      await exec(`ip6tables -F ${chain} 2>/dev/null || true`);
+    for (const command of commands(enableIpv6)) {
+      await exec(`${command} -F ${chain}`);
     }
   },
 
@@ -265,32 +308,29 @@ export const firewall = {
   /**
    * Full rebuild of firewall rules from database state
    */
-  async rebuildRules(
+  rebuildRules(
     wgInterface: InterfaceType,
     clients: FirewallClient[],
     userConfig: UserConfigType,
     enableIpv6: boolean
   ): Promise<void> {
-    if (!wgInterface.firewallEnabled) {
-      FW_DEBUG('Firewall filtering disabled, removing any existing rules');
-      await this.removeFiltering(wgInterface.name, enableIpv6);
-      return;
-    }
+    const result = pendingRebuild.then(async () => {
+      if (!wgInterface.firewallEnabled) {
+        FW_DEBUG('Firewall filtering disabled, removing any existing rules');
+        await this.removeFiltering(wgInterface.name, enableIpv6);
+        return;
+      }
 
-    // Handle concurrent rebuilds with queue
-    if (rebuildInProgress) {
-      FW_DEBUG('Rebuild already in progress, queuing');
-      rebuildQueued = true;
-      return;
-    }
-
-    rebuildInProgress = true;
-
-    try {
       FW_DEBUG('Rebuilding firewall rules...');
 
+      // Leave these guards installed on any failure. A retry or explicit
+      // disable removes them only after the rules are safe to use.
+      await blockDuringRebuild(wgInterface.name, enableIpv6);
+
       // Initialize chain structure
-      await this.initChain(wgInterface.name, enableIpv6);
+      // Attach new chains only once their rules are complete. Inserting a
+      // jump above the guard earlier would expose a partially built chain.
+      await this.initChain(wgInterface.name, enableIpv6, false);
 
       // Flush existing rules
       await this.flushChain(wgInterface.name, enableIpv6);
@@ -313,17 +353,13 @@ export const firewall = {
         await exec(`ip6tables -A ${chain} -j DROP`);
       }
 
+      // Keep the DROP guard first, including if removing it later fails.
+      await this.initChain(wgInterface.name, enableIpv6, true, 2);
+      await finishRebuild(wgInterface.name, enableIpv6);
       FW_DEBUG('Firewall rules rebuilt successfully');
-    } finally {
-      rebuildInProgress = false;
-
-      // If another rebuild was queued, run it now
-      if (rebuildQueued) {
-        rebuildQueued = false;
-        FW_DEBUG('Processing queued rebuild');
-        await this.rebuildRules(wgInterface, clients, userConfig, enableIpv6);
-      }
-    }
+    });
+    pendingRebuild = result.catch(() => {});
+    return result;
   },
 
   /**
@@ -336,30 +372,25 @@ export const firewall = {
     const chain = chainName(interfaceName);
     FW_DEBUG(`Removing firewall filtering for interface ${interfaceName}`);
 
-    // Remove jump rules from FORWARD chain
+    // Remove jump rules from both forwarded and server-local traffic.
     // This disconnects the interface from the old shared chain, but it won't delete the chain itself.
     // Other wg-easy instances on the same host may still rely on it.
-    await exec(
-      `iptables -D FORWARD -i ${interfaceName} -j ${chain} 2>/dev/null || true`
-    );
-    await exec(
-      `iptables -D FORWARD -i ${interfaceName} -j ${CHAIN_NAME} 2>/dev/null || true`
-    );
-    if (enableIpv6) {
-      await exec(
-        `ip6tables -D FORWARD -i ${interfaceName} -j ${chain} 2>/dev/null || true`
-      );
-      await exec(
-        `ip6tables -D FORWARD -i ${interfaceName} -j ${CHAIN_NAME} 2>/dev/null || true`
-      );
-    }
-
-    // Flush and delete the chain
-    await exec(`iptables -F ${chain} 2>/dev/null || true`);
-    await exec(`iptables -X ${chain} 2>/dev/null || true`);
-    if (enableIpv6) {
-      await exec(`ip6tables -F ${chain} 2>/dev/null || true`);
-      await exec(`ip6tables -X ${chain} 2>/dev/null || true`);
+    for (const command of commands(enableIpv6)) {
+      for (const parent of trafficChains) {
+        await exec(
+          `${command} -D ${parent} -i ${interfaceName} -j ${chain} 2>/dev/null || true`
+        );
+        await exec(
+          `${command} -D ${parent} -i ${interfaceName} -j ${CHAIN_NAME} 2>/dev/null || true`
+        );
+      }
+      await exec(`${command} -F ${chain} 2>/dev/null || true`);
+      await exec(`${command} -X ${chain} 2>/dev/null || true`);
+      for (const parent of trafficChains) {
+        await exec(
+          `while ${command} -C ${parent} ${rebuildGuard(interfaceName)} 2>/dev/null; do ${command} -D ${parent} ${rebuildGuard(interfaceName)} || exit 1; done`
+        );
+      }
     }
   },
 

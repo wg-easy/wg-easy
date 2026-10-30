@@ -195,9 +195,15 @@ these paths:
 - `/api/auth/verify-2fa`
 - `/cnf/*`
 
+Also protect requests using [Basic Authentication](../../advanced/api.md) on
+all `/api/*` routes. Basic credentials are checked on each authenticated API
+request, so limiting the password sign-in path alone does not cover them. The
+router example below covers only the listed sign-in and download paths.
+
 Choose limits appropriate for your deployment. When using wg-easy security logs
 for detection, configure [`TRUSTED_PROXIES`](../../advanced/config/optional-config.md#trusted-proxies)
 so that logged events contain the original client IP address.
+Configuring this also enables [CSRF origin checks](../../advanced/api.md#csrf-protection).
 
 For example, add these labels to the `wg-easy` service to allow an average of
 five requests per minute per client IP, with a burst of five requests:

@@ -1,5 +1,4 @@
 import { containsCidr, normalizeCidr } from 'cidr-tools';
-import { getRequestHost, getRequestIP, getRequestURL, type H3Event } from 'h3';
 import isCidr from 'is-cidr';
 import { isIP } from 'is-ip';
 
@@ -30,7 +29,7 @@ function normalizeIpAddress(address: string): string | undefined {
   return normalizeCidr(normalizedAddress);
 }
 
-function isTrustedProxy(
+export function isTrustedProxy(
   address: string,
   trustedProxies: readonly string[]
 ): boolean {
@@ -40,42 +39,4 @@ function isTrustedProxy(
   }
 
   return containsCidr(trustedProxies, normalizedAddress);
-}
-
-export function getTrustedRequestHost(
-  event: H3Event,
-  trustedProxies: readonly string[]
-): string {
-  return getRequestHost(event, {
-    xForwardedHost: isRequestFromTrustedProxy(event, trustedProxies),
-  });
-}
-
-export function getTrustedRequestURL(
-  event: H3Event,
-  trustedProxies: readonly string[]
-): URL {
-  return getRequestURL(event, {
-    xForwardedHost: isRequestFromTrustedProxy(event, trustedProxies),
-    xForwardedProto: false,
-  });
-}
-
-export function getTrustedRequestIP(
-  event: H3Event,
-  trustedProxies: readonly string[]
-): string | undefined {
-  return getRequestIP(event, {
-    xForwardedFor: isRequestFromTrustedProxy(event, trustedProxies),
-  });
-}
-
-function isRequestFromTrustedProxy(
-  event: H3Event,
-  trustedProxies: readonly string[]
-): boolean {
-  const remoteAddress = getRequestIP(event);
-  return Boolean(
-    remoteAddress && isTrustedProxy(remoteAddress, trustedProxies)
-  );
 }

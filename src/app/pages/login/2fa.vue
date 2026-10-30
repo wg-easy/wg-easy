@@ -1,11 +1,15 @@
 <template>
   <div>
     <form class="flex flex-col gap-5" @submit.prevent="submit">
+      <label for="login-totp" class="-mb-3 text-xs font-medium text-muted">
+        {{ $t('auth.twoFactor.code') }}
+      </label>
       <BaseInput
+        id="login-totp"
         v-model="totp"
         type="text"
         name="totp"
-        :placeholder="$t('general.2faCode')"
+        :placeholder="$t('auth.twoFactor.code')"
         autocomplete="one-time-code"
         inputmode="numeric"
         maxlength="6"
@@ -14,25 +18,30 @@
       />
 
       <button
-        class="rounded bg-red-800 py-2 text-sm text-white shadow transition hover:bg-red-700 disabled:cursor-not-allowed disabled:bg-gray-200 dark:bg-red-800 dark:text-white dark:hover:bg-red-700 disabled:dark:bg-neutral-800"
+        class="ui-button ui-button-primary w-full"
         :disabled="!totp || authenticating"
       >
-        <IconsLoading v-if="authenticating" class="mx-auto w-5 animate-spin" />
-        <span v-else>{{ $t('general.continue') }}</span>
+        <LoaderCircleIcon
+          v-if="authenticating"
+          class="mx-auto size-5 animate-spin"
+        />
+        <span v-else>{{ $t('common.actions.continue') }}</span>
       </button>
 
       <button
         type="button"
-        class="rounded border-2 border-gray-100 py-2 text-sm text-gray-700 transition hover:border-red-800 hover:bg-red-800 hover:text-white dark:border-neutral-600 dark:text-neutral-200"
+        class="ui-button ui-button-secondary w-full"
         @click="cancel"
       >
-        {{ $t('dialog.cancel') }}
+        {{ $t('common.actions.cancel') }}
       </button>
     </form>
   </div>
 </template>
 
 <script setup lang="ts">
+import { LoaderCircleIcon } from '@lucide/vue';
+
 import { $fetch } from '#imports';
 
 const toast = useToast();
@@ -62,15 +71,15 @@ const _submit = useSubmit(
           authenticating.value = false;
           totp.value = '';
           toast.showToast({
-            title: t('general.2fa'),
-            message: t('login.2faWrong'),
+            title: t('auth.twoFactor.title'),
+            message: t('auth.login.twoFactor.invalid'),
             type: 'error',
           });
           return;
         } else if (data?.status === 'PENDING_LOGIN_EXPIRED') {
           toast.showToast({
-            title: t('general.2fa'),
-            message: t('login.loginExpired'),
+            title: t('auth.twoFactor.title'),
+            message: t('auth.login.expired'),
             type: 'error',
           });
           await navigateTo('/login');

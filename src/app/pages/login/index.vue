@@ -16,11 +16,11 @@
         v-if="authMethods.oauthEnabled && !authMethods.passwordDisabled"
         class="flex items-center gap-2"
       >
-        <div class="h-px flex-1 bg-gray-300 dark:bg-neutral-600"></div>
-        <span class="text-xs text-gray-500 dark:text-neutral-400">
-          {{ $t('login.or') }}
+        <div class="h-px flex-1 bg-line"></div>
+        <span class="text-xs text-subtle">
+          {{ $t('auth.login.or') }}
         </span>
-        <div class="h-px flex-1 bg-gray-300 dark:bg-neutral-600"></div>
+        <div class="h-px flex-1 bg-line"></div>
       </div>
     </div>
 
@@ -30,47 +30,58 @@
       class="flex flex-col gap-5"
       @submit.prevent="submit"
     >
+      <label for="login-username" class="-mb-3 text-xs font-medium text-muted">
+        {{ $t('common.fields.username') }}
+      </label>
       <BaseInput
+        id="login-username"
         v-model="username"
         type="text"
-        :placeholder="$t('general.username')"
+        :placeholder="$t('common.fields.username')"
         autocomplete="username"
         autofocus
         name="username"
       />
 
+      <label for="login-password" class="-mb-3 text-xs font-medium text-muted">
+        {{ $t('common.fields.password') }}
+      </label>
       <BaseInput
+        id="login-password"
         v-model="password"
         type="password"
         name="password"
-        :placeholder="$t('general.password')"
+        :placeholder="$t('common.fields.password')"
         autocomplete="current-password"
       />
 
       <label
         class="flex gap-2 whitespace-nowrap"
-        :title="$t('login.rememberMeDesc')"
+        :title="$t('auth.login.rememberMeDescription')"
       >
         <BaseSwitch v-model="remember" />
-        <span class="text-sm">{{ $t('login.rememberMe') }}</span>
+        <span class="text-sm">{{ $t('auth.login.rememberMe') }}</span>
       </label>
 
       <button
-        class="rounded bg-red-800 py-2 text-sm text-white shadow transition hover:bg-red-700 disabled:cursor-not-allowed disabled:bg-gray-200 dark:bg-red-800 dark:text-white dark:hover:bg-red-700 disabled:dark:bg-neutral-800"
-        :disabled="!password || !username"
+        class="ui-button ui-button-primary w-full"
+        :disabled="!password || !username || authenticating"
       >
-        <IconsLoading v-if="authenticating" class="mx-auto w-5 animate-spin" />
-        <span v-else>{{ $t('login.signIn') }}</span>
+        <LoaderCircleIcon
+          v-if="authenticating"
+          class="mx-auto size-5 animate-spin"
+        />
+        <span v-else>{{ $t('auth.login.signIn') }}</span>
       </button>
     </form>
   </div>
 </template>
 
 <script setup lang="ts">
+import { LoaderCircleIcon } from '@lucide/vue';
+
 import { $fetch } from '#imports';
 
-const toast = useToast();
-const { t } = useI18n();
 const route = useRoute();
 
 const authenticating = ref(false);
@@ -117,14 +128,6 @@ const _submit = useSubmit(
         } else if (data?.status === 'TOTP_REQUIRED') {
           authenticating.value = false;
           await navigateTo('/login/2fa');
-          return;
-        } else if (data?.status === 'INVALID_TOTP_CODE') {
-          authenticating.value = false;
-          toast.showToast({
-            title: t('general.2fa'),
-            message: t('login.2faWrong'),
-            type: 'error',
-          });
           return;
         }
       }

@@ -2,7 +2,14 @@
   <BaseSwitch
     :model-value="enabled"
     :title="
-      client.enabled ? $t('client.disableClient') : $t('client.enableClient')
+      client.enabled
+        ? $t('clients.status.disable')
+        : $t('clients.status.enable')
+    "
+    :aria-label="
+      client.enabled
+        ? $t('clients.status.disable')
+        : $t('clients.status.enable')
     "
     @update:model-value="toggleClient"
   />
@@ -26,30 +33,13 @@ watch(
 
 const clientsStore = useClientsStore();
 
-const _disableClient = useSubmit(
-  (data) =>
-    $fetch(`/api/client/${props.client.id}/disable`, {
+const submit = useSubmit(
+  (enabled: boolean) =>
+    $fetch(`/api/client/${props.client.id}/${enabled ? 'enable' : 'disable'}`, {
       method: 'post',
-      body: data,
     }),
   {
-    revert: async () => {
-      await clientsStore.refresh();
-    },
-    noSuccessToast: true,
-  }
-);
-
-const _enableClient = useSubmit(
-  (data) =>
-    $fetch(`/api/client/${props.client.id}/enable`, {
-      method: 'post',
-      body: data,
-    }),
-  {
-    revert: async () => {
-      await clientsStore.refresh();
-    },
+    revert: () => clientsStore.refresh(),
     noSuccessToast: true,
   }
 );
@@ -60,10 +50,11 @@ async function toggleClient(nextEnabled: boolean | undefined) {
   // Update immediately while the request and store refresh are in progress.
   enabled.value = nextEnabled;
 
-  if (nextEnabled) {
-    await _enableClient(undefined);
-  } else {
-    await _disableClient(undefined);
+  try {
+    await submit(nextEnabled);
+  } finally {
+    // A failed toggle leaves the server value unchanged, so the watcher won't run.
+    enabled.value = props.client.enabled;
   }
 }
 </script>

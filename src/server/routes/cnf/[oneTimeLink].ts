@@ -1,56 +1,26 @@
-import {
-  createError,
-  defineEventHandler,
-  getValidatedRouterParams,
-  setHeader,
-} from 'h3';
+import { defineEventHandler, isNuxtError } from 'nuxt/server';
 
-import Database from '#server/utils/Database';
-import WireGuard from '#server/utils/WireGuard';
+import * as provisioning from '#server/features/vpn/provisioning';
 import { logSecurityEvent } from '#server/utils/securityLogger';
-import { validateZod } from '#server/utils/types';
-import { OneTimeLinkGetSchema } from '#db/repositories/oneTimeLink/types';
+import { validateZod, getValidatedRouterParams } from '#server/http/validation';
+import { OneTimeLinkGetSchema } from '#shared/contracts/oneTimeLink';
 
 export default defineEventHandler(async (event) => {
   const { oneTimeLink } = await getValidatedRouterParams(
     event,
     validateZod(OneTimeLinkGetSchema, event)
   );
-
-  const otl = await Database.oneTimeLinks.getByOtl(oneTimeLink);
-  if (!otl) {
-    logSecurityEvent(event, 'one-time-link');
-    throw createError({
-      statusCode: 404,
-      statusMessage: 'Invalid One Time Link',
-    });
+  try {
+    const download = await provisioning.redeemOneTimeLink(oneTimeLink);
+    event.res.headers.set(
+      'Content-Disposition',
+      `attachment; filename="${download.filename}"`
+    );
+    event.res.headers.set('Content-Type', 'application/octet-stream');
+    return download.contents;
+  } catch (error) {
+    if (isNuxtError(error) && error.status === 404)
+      logSecurityEvent(event, 'one-time-link');
+    throw error;
   }
-
-  if (new Date() > new Date(otl.expiresAt)) {
-    throw createError({
-      statusCode: 410,
-      statusMessage: 'One Time Link has expired',
-    });
-  }
-
-  const client = await Database.clients.get(otl.id);
-  if (!client) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: 'Invalid One Time Link',
-    });
-  }
-
-  const config = await WireGuard.getClientConfiguration({
-    clientId: client.id,
-  });
-  await Database.oneTimeLinks.erase(otl.id);
-
-  setHeader(
-    event,
-    'Content-Disposition',
-    `attachment; filename="${WireGuard.cleanClientFilename(client.name) || client.id}.conf"`
-  );
-  setHeader(event, 'Content-Type', 'application/octet-stream');
-  return config;
 });

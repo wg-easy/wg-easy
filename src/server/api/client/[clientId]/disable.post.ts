@@ -1,25 +1,14 @@
-import { getValidatedRouterParams } from 'h3';
+import * as clients from '#server/features/vpn/clients';
+import { defineAuthenticatedEventHandler } from '#server/utils/handler';
+import { validateZod, getValidatedRouterParams } from '#server/http/validation';
+import { ClientGetSchema } from '#shared/contracts/client';
 
-import Database from '#server/utils/Database';
-import WireGuard from '#server/utils/WireGuard';
-import { definePermissionEventHandler } from '#server/utils/handler';
-import { validateZod } from '#server/utils/types';
-import { ClientGetSchema } from '#db/repositories/client/types';
+export default defineAuthenticatedEventHandler(async ({ event, user }) => {
+  const { clientId } = await getValidatedRouterParams(
+    event,
+    validateZod(ClientGetSchema, event)
+  );
 
-export default definePermissionEventHandler(
-  'clients',
-  'update',
-  async ({ event, checkPermissions }) => {
-    const { clientId } = await getValidatedRouterParams(
-      event,
-      validateZod(ClientGetSchema, event)
-    );
-
-    const client = await Database.clients.get(clientId);
-    checkPermissions(client);
-
-    await Database.clients.toggle(clientId, false);
-    await WireGuard.saveConfig();
-    return { success: true };
-  }
-);
+  await clients.apply(user, clientId, 'disable');
+  return { success: true };
+});

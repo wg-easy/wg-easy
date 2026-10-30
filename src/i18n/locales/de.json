@@ -1,207 +1,484 @@
 {
-  "pages": {
-    "me": "Konto",
-    "clients": "Clients",
-    "admin": {
-      "panel": "Admin-Konsole",
-      "general": "Allgemein",
-      "config": "Konfiguration",
-      "interface": "Interface",
-      "hooks": "Hooks"
-    }
-  },
-  "user": {
-    "email": "E-Mail"
-  },
-  "me": {
-    "currentPassword": "Aktuelles Passwort",
-    "enable2fa": "Zwei-Faktor-Authentifizierung aktivieren",
-    "enable2faDesc": "Scannen Sie den QR-Code mit Ihrer Authentifizierungs-App oder geben Sie den Schlüssel manuell ein.",
-    "2faKey": "TOTP-Schlüssel",
-    "2faCodeDesc": "Geben Sie den Code aus Ihrer Authentifizierungs-App ein.",
-    "disable2fa": "Zwei-Faktor-Authentifizierung deaktivieren",
-    "disable2faDesc": "Geben Sie Ihr Passwort ein, um die Zwei-Faktor-Authentifizierung zu deaktivieren.",
-    "linkOauth": "Konto mit einem externen Anbieter verknüpfen",
-    "unlinkOauth": "Verknüpfung aufheben",
-    "linkedWith": "Mit {provider} verknüpft",
-    "providerDisabled": "Der derzeit verknüpfte Anbieter ist nicht aktiviert"
-  },
-  "general": {
-    "name": "Name",
-    "username": "Benutzername",
-    "password": "Passwort",
-    "newPassword": "Neues Passwort",
-    "updatePassword": "Passwort aktualisieren",
-    "addPassword": "Passwort hinzufügen",
-    "mtu": "MTU",
-    "allowedIps": "Erlaubte IP-Adressen",
-    "dns": "DNS",
-    "persistentKeepalive": "Dauerhaftes Keepalive",
-    "logout": "Abmelden",
-    "continue": "Weiter",
-    "host": "Host",
-    "port": "Port",
+  "common": {
+    "fields": {
+      "email": "E-Mail",
+      "name": "Name",
+      "username": "Benutzername",
+      "password": "Passwort",
+      "newPassword": "Neues Passwort",
+      "confirmPassword": "Passwort bestätigen"
+    },
+    "actions": {
+      "continue": "Weiter",
+      "delete": "Löschen",
+      "change": "Ändern",
+      "cancel": "Abbrechen",
+      "create": "Erstellen",
+      "save": "Speichern",
+      "revert": "Rückgängig machen",
+      "add": "Hinzufügen",
+      "retry": "Erneut versuchen"
+    },
     "yes": "Ja",
     "no": "Nein",
-    "confirmPassword": "Passwort bestätigen",
     "loading": "Laden...",
-    "2fa": "Zwei-Faktor-Authentifizierung",
-    "2faCode": "TOTP-Code",
-    "externalAuth": "Externe Authentifizierung"
+    "update": {
+      "available": "Ein neues Update ist verfügbar!",
+      "action": "Aktualisieren"
+    },
+    "theme": {
+      "dark": "Dunkles Design",
+      "light": "Helles Design",
+      "system": "Systemeinstellung"
+    },
+    "donate": "Spenden",
+    "notifications": {
+      "success": "Erfolg",
+      "saved": "Gespeichert",
+      "error": "Fehler",
+      "unknown": "Unbekannter Fehler. Weitere Informationen finden Sie in der Konsole."
+    },
+    "form": {
+      "actions": "Aktionen",
+      "sections": {
+        "general": "Allgemein",
+        "advanced": "Erweitert"
+      },
+      "noItems": "Keine Einträge",
+      "nullNoItems": "Keine Einträge. Es wird die globale Konfiguration verwendet",
+      "nullNotSet": "Nicht festgelegt",
+      "set": "Festgelegt",
+      "unset": "Nicht festgelegt",
+      "chooseOption": "Option wählen"
+    },
+    "clipboard": {
+      "notSupported": "Kopieren wird nicht unterstützt",
+      "copied": "Kopiert!",
+      "failed": "Kopieren fehlgeschlagen",
+      "copy": "Kopieren"
+    },
+    "documentation": "Dokumentation",
+    "selectLanguage": "Sprache wählen",
+    "skipToContent": "Zum Inhalt springen"
+  },
+  "auth": {
+    "logout": "Abmelden",
+    "twoFactor": {
+      "title": "Zwei-Faktor-Authentifizierung",
+      "code": "TOTP-Code"
+    },
+    "external": {
+      "title": "Externe Authentifizierung"
+    },
+    "login": {
+      "signIn": "Anmelden",
+      "signInWith": "Mit {provider} anmelden",
+      "or": "oder",
+      "rememberMe": "Angemeldet bleiben",
+      "rememberMeDescription": "Bleiben Sie auch nach dem Schließen des Browsers angemeldet",
+      "insecure": "Sie können sich nicht über eine unsichere Verbindung anmelden. Verwenden Sie HTTPS.",
+      "twoFactor": {
+        "required": "Zwei-Faktor-Authentifizierung ist erforderlich",
+        "invalid": "Der Zwei-Faktor-Code ist ungültig"
+      },
+      "expired": "Die Anmeldung ist abgelaufen. Versuchen Sie es erneut",
+      "title": "Willkommen zurück",
+      "description": "Melde dich an, um dein privates Netzwerk zu verwalten."
+    }
+  },
+  "account": {
+    "title": "Konto",
+    "password": {
+      "current": "Aktuelles Passwort",
+      "update": "Passwort aktualisieren",
+      "add": "Passwort hinzufügen"
+    },
+    "twoFactor": {
+      "enable": {
+        "label": "Zwei-Faktor-Authentifizierung aktivieren",
+        "description": "Scannen Sie den QR-Code mit Ihrer Authentifizierungs-App oder geben Sie den Schlüssel manuell ein."
+      },
+      "key": "TOTP-Schlüssel",
+      "codeDescription": "Geben Sie den Code aus Ihrer Authentifizierungs-App ein.",
+      "disable": {
+        "label": "Zwei-Faktor-Authentifizierung deaktivieren",
+        "description": "Geben Sie Ihr Passwort ein, um die Zwei-Faktor-Authentifizierung zu deaktivieren."
+      }
+    },
+    "external": {
+      "link": "Konto mit einem externen Anbieter verknüpfen",
+      "unlink": "Verknüpfung aufheben",
+      "linkedWith": "Mit {provider} verknüpft",
+      "providerDisabled": "Der derzeit verknüpfte Anbieter ist nicht aktiviert"
+    }
   },
   "setup": {
     "welcome": "Willkommen zur Ersteinrichtung von wg-easy",
-    "welcomeDesc": "Sie haben den einfachsten Weg gefunden, WireGuard auf jedem Linux-Server zu installieren und zu verwalten.",
+    "welcomeDescription": "Sie haben den einfachsten Weg gefunden, WireGuard auf jedem Linux-Server zu installieren und zu verwalten.",
     "existingSetup": "Haben Sie eine bestehende Einrichtung?",
-    "createAdminDesc": "Bitte geben Sie zuerst einen Admin-Benutzernamen sowie ein starkes, sicheres Passwort ein. Diese Anmeldedaten benötigen Sie, um sich in der Admin-Konsole anzumelden.",
-    "setupConfigDesc": "Bitte geben Sie die Host- und Portinformationen ein. Diese werden für die Client-Konfiguration verwendet, wenn Sie WireGuard auf Ihren Geräten einrichten.",
-    "setupMigrationDesc": "Bitte geben Sie die Sicherungsdatei an, wenn Sie Ihre Daten von Ihrer vorherigen wg-easy Version in Ihre neue Installation migrieren möchten.",
+    "createAdminDescription": "Bitte geben Sie zuerst einen Admin-Benutzernamen sowie ein starkes, sicheres Passwort ein. Diese Anmeldedaten benötigen Sie, um sich in der Admin-Konsole anzumelden.",
+    "setupConfigDescription": "Bitte geben Sie die Host- und Portinformationen ein. Diese werden für die Client-Konfiguration verwendet, wenn Sie WireGuard auf Ihren Geräten einrichten.",
+    "setupMigrationDescription": "Bitte geben Sie die Sicherungsdatei an, wenn Sie Ihre Daten von Ihrer vorherigen wg-easy Version in Ihre neue Installation migrieren möchten.",
     "upload": "Hochladen",
     "migration": "Backup wiederherstellen:",
     "createAccount": "Konto erstellen",
     "successful": "Einrichtung erfolgreich",
-    "hostDesc": "Öffentlicher Hostname, mit dem sich die Clients verbinden",
-    "portDesc": "Öffentlicher UDP-Port, über den sich die Clients verbinden und auf dem WireGuard lauscht"
+    "hostDescription": "Öffentlicher Hostname, mit dem sich die Clients verbinden",
+    "portDescription": "Öffentlicher UDP-Port, über den sich die Clients verbinden und auf dem WireGuard lauscht",
+    "title": "Erste Schritte"
   },
-  "update": {
-    "updateAvailable": "Ein neues Update ist verfügbar!",
-    "update": "Aktualisieren"
-  },
-  "theme": {
-    "dark": "Dunkles Design",
-    "light": "Helles Design",
-    "system": "Systemeinstellung"
-  },
-  "layout": {
-    "toggleCharts": "Diagramme ein-/ausblenden",
-    "donate": "Spenden"
-  },
-  "login": {
-    "signIn": "Anmelden",
-    "signInWith": "Mit {provider} anmelden",
-    "or": "oder",
-    "rememberMe": "Angemeldet bleiben",
-    "rememberMeDesc": "Bleiben Sie auch nach dem Schließen des Browsers angemeldet",
-    "insecure": "Sie können sich nicht über eine unsichere Verbindung anmelden. Verwenden Sie HTTPS.",
-    "2faRequired": "Zwei-Faktor-Authentifizierung ist erforderlich",
-    "2faWrong": "Der Zwei-Faktor-Code ist ungültig",
-    "loginExpired": "Die Anmeldung ist abgelaufen. Versuchen Sie es erneut"
-  },
-  "client": {
-    "empty": "Es gibt noch keine Clients.",
-    "newShort": "Neu",
-    "sort": "Sortieren",
-    "create": "Client erstellen",
-    "created": "Client wurde erstellt",
-    "new": "Neuer Client",
-    "name": "Name",
-    "expireDate": "Ablaufdatum",
-    "expireDateDesc": "Datum, an dem der Client deaktiviert wird. Leer lassen für dauerhaft aktiv.",
-    "delete": "Löschen",
-    "deleteClient": "Client löschen",
-    "deleteDialog": "Möchten Sie {name} wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
-    "enabled": "Aktiviert",
-    "address": "Adresse",
-    "serverAllowedIps": "Serverseitig erlaubte IP-Adressen",
-    "otlDesc": "Einen kurzen Einmal-Link erzeugen",
-    "permanent": "Dauerhaft",
-    "createdOn": "Erstellt am {date}",
-    "lastSeen": "Zuletzt verbunden am {date}",
-    "totalDownload": "Gesamt-Download: {total}",
-    "totalUpload": "Gesamt-Upload: {total}",
-    "newClient": "Neuer Client",
-    "disableClient": "Client deaktivieren",
-    "enableClient": "Client aktivieren",
-    "noPrivKey": "Für diesen Client ist kein privater Schlüssel bekannt. Die Konfiguration kann daher nicht erstellt werden.",
-    "showQR": "QR-Code anzeigen",
-    "downloadConfig": "Konfiguration herunterladen",
-    "allowedIpsDesc": "Welche IP-Adressen durch das VPN geleitet werden (überschreibt die globale Konfiguration)",
-    "serverAllowedIpsDesc": "Welche IP-Adressen der Server zum Client leiten wird",
-    "mtuDesc": "Legt die maximale Übertragungseinheit (Paketgröße) für den VPN-Tunnel fest",
-    "persistentKeepaliveDesc": "Legt das Intervall (in Sekunden) für Keepalive-Pakete fest. 0 deaktiviert es",
-    "hooks": "Hooks",
-    "hooksDescription": "Hooks funktionieren nur mit wg-quick",
-    "hooksLeaveEmpty": "Nur für wg-quick. Andernfalls leer lassen",
-    "dnsDesc": "DNS-Server, den die Clients verwenden (überschreibt die globale Konfiguration)",
-    "notConnected": "Client nicht verbunden",
-    "endpoint": "Endpunkt",
-    "endpointDesc": "IP-Adresse des Clients, von der aus die WireGuard-Verbindung hergestellt wird",
-    "search": "Suche Clients...",
-    "config": "Konfiguration",
-    "viewConfig": "Konfiguration anzeigen",
-    "firewallIps": "Von der Firewall erlaubte IP-Adressen",
-    "firewallIpsDesc": "Ziel-IP-Adressen und CIDR-Bereiche, auf die dieser Client zugreifen darf (serverseitig durchgesetzt). Lassen Sie das Feld leer, um „Erlaubte IP-Adressen“ zu verwenden. Optionale Filterung nach Port und Protokoll wird unterstützt. Die Syntax finden Sie in der Dokumentation.",
-    "downloadPng": "PNG herunterladen",
-    "copyPng": "PNG kopieren"
-  },
-  "dialog": {
-    "change": "Ändern",
-    "cancel": "Abbrechen",
-    "create": "Erstellen"
-  },
-  "toast": {
-    "success": "Erfolg",
-    "saved": "Gespeichert",
-    "error": "Fehler",
-    "unknown": "Unbekannter Fehler. Weitere Informationen finden Sie in der Konsole."
-  },
-  "form": {
-    "actions": "Aktionen",
-    "save": "Speichern",
-    "revert": "Rückgängig machen",
-    "sectionGeneral": "Allgemein",
-    "sectionAdvanced": "Erweitert",
-    "noItems": "Keine Einträge",
-    "nullNoItems": "Keine Einträge. Es wird die globale Konfiguration verwendet",
-    "nullNotSet": "Nicht festgelegt",
-    "set": "Festgelegt",
-    "unset": "Nicht festgelegt",
-    "add": "Hinzufügen"
+  "clients": {
+    "title": "Clients",
+    "list": {
+      "toggleCharts": "Diagramme ein-/ausblenden",
+      "empty": "Es gibt noch keine Clients.",
+      "new": "Neu",
+      "sort": "Sortieren",
+      "newClient": "Neuer Client",
+      "search": "Suche Clients...",
+      "total": "Clients",
+      "title": "Deine Clients",
+      "autoRefresh": "Wird automatisch aktualisiert",
+      "connectionIssue": "Verbindung unterbrochen",
+      "loadError": "Deine Clients konnten nicht aktualisiert werden. Prüfe die Verbindung und versuche es erneut.",
+      "hint": "Lade eine Konfiguration herunter oder scanne einen QR-Code, um ein Gerät zu verbinden. Einmal-Links ermöglichen das sichere Teilen von Konfigurationen.",
+      "noResults": "Keine Clients entsprechen deiner Suche oder deinen Filtern.",
+      "clearSearch": "Suche löschen"
+    },
+    "create": {
+      "action": "Client erstellen",
+      "success": "Client wurde erstellt",
+      "title": "Neuer Client"
+    },
+    "fields": {
+      "name": {
+        "label": "Name"
+      },
+      "expiresAt": {
+        "label": "Läuft ab am",
+        "description": "Datum und Uhrzeit, zu denen der Client deaktiviert wird, in deiner lokalen Zeitzone. Leer lassen für dauerhaft aktiv."
+      },
+      "address": {
+        "label": "Adresse"
+      },
+      "serverAllowedIps": {
+        "label": "Serverseitig erlaubte IP-Adressen",
+        "description": "Welche IP-Adressen der Server zum Client leiten wird"
+      },
+      "allowedIps": {
+        "description": "Welche IP-Adressen durch das VPN geleitet werden (überschreibt die globale Konfiguration)"
+      },
+      "mtu": {
+        "description": "Legt die maximale Übertragungseinheit (Paketgröße) für den VPN-Tunnel fest"
+      },
+      "persistentKeepalive": {
+        "description": "Legt das Intervall (in Sekunden) für Keepalive-Pakete fest. 0 deaktiviert es"
+      },
+      "dns": {
+        "description": "DNS-Server, den die Clients verwenden (überschreibt die globale Konfiguration)"
+      },
+      "endpoint": {
+        "label": "Endpunkt",
+        "description": "IP-Adresse des Clients, von der aus die WireGuard-Verbindung hergestellt wird"
+      },
+      "firewallIps": {
+        "label": "Von der Firewall erlaubte IP-Adressen",
+        "description": "Ziel-IP-Adressen und CIDR-Bereiche, auf die dieser Client zugreifen darf (serverseitig durchgesetzt). Lassen Sie das Feld leer, um „Erlaubte IP-Adressen“ zu verwenden. Optionale Filterung nach Port und Protokoll wird unterstützt. Die Syntax finden Sie in der Dokumentation."
+      }
+    },
+    "delete": {
+      "title": "Client löschen",
+      "description": "Möchten Sie {name} wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden."
+    },
+    "status": {
+      "enabled": "Aktiviert",
+      "permanent": "Dauerhaft",
+      "createdOn": "Erstellt am {date}",
+      "lastSeen": "Zuletzt verbunden am {date}",
+      "disable": "Client deaktivieren",
+      "enable": "Client aktivieren",
+      "notConnected": "Client nicht verbunden",
+      "disabled": "Deaktiviert",
+      "online": "Online",
+      "offline": "Offline"
+    },
+    "configuration": {
+      "oneTimeLink": "Einen kurzen Einmal-Link erzeugen",
+      "noPrivateKey": "Für diesen Client ist kein privater Schlüssel bekannt. Die Konfiguration kann daher nicht erstellt werden.",
+      "showQrCode": "QR-Code anzeigen",
+      "download": "Konfiguration herunterladen",
+      "title": "Konfiguration",
+      "view": "Konfiguration anzeigen",
+      "downloadPng": "PNG herunterladen",
+      "copyPng": "PNG kopieren"
+    },
+    "traffic": {
+      "totalDownload": "Gesamt-Download: {total}",
+      "totalUpload": "Gesamt-Upload: {total}",
+      "download": "Download",
+      "upload": "Upload"
+    },
+    "hooks": {
+      "title": "Hooks",
+      "description": "Hooks funktionieren nur mit wg-quick",
+      "fieldDescription": "Nur für wg-quick. Andernfalls leer lassen"
+    },
+    "description": "Deine Geräte. Dein Netzwerk. Sicher verbunden.",
+    "pagination": {
+      "label": "Seitennavigation der Clientliste",
+      "range": "{start}–{end} von {total} Clients",
+      "previous": "Zurück",
+      "next": "Weiter",
+      "pageOf": "Seite {page} von {total}",
+      "perPage": "Pro Seite"
+    },
+    "sort": {
+      "ascending": "Sortierung: Name aufsteigend",
+      "descending": "Sortierung: Name absteigend",
+      "label": "Sortieren nach",
+      "options": {
+        "nameAsc": "Name: A–Z",
+        "nameDesc": "Name: Z–A",
+        "newest": "Neueste zuerst",
+        "oldest": "Älteste zuerst",
+        "addressAsc": "IPv4-Adresse: aufsteigend",
+        "addressDesc": "IPv4-Adresse: absteigend",
+        "expiryAsc": "Frühester Ablauf zuerst",
+        "expiryDesc": "Spätester Ablauf zuerst"
+      }
+    },
+    "edit": "{name} bearbeiten",
+    "filters": {
+      "status": {
+        "label": "Status",
+        "options": {
+          "all": "Alle Status",
+          "enabled": "Aktiviert",
+          "disabled": "Deaktiviert",
+          "online": "Online",
+          "offline": "Offline"
+        }
+      },
+      "expiry": {
+        "label": "Ablauf",
+        "options": {
+          "all": "Beliebiger Ablauf",
+          "permanent": "Läuft nie ab",
+          "expiring": "In 7 Tagen ablaufend",
+          "expired": "Abgelaufen"
+        }
+      },
+      "clear": "Filter zurücksetzen"
+    }
   },
   "admin": {
+    "title": "Admin-Konsole",
     "general": {
-      "sessionTimeout": "Sitzungszeitüberschreitung",
-      "sessionTimeoutDesc": "Sitzungsdauer für „Angemeldet bleiben“ (Sekunden)",
+      "title": "Allgemein",
+      "sessionTimeout": {
+        "label": "Sitzungszeitüberschreitung",
+        "description": "Sitzungsdauer für „Angemeldet bleiben“ (Sekunden)"
+      },
       "metrics": "Metriken",
-      "metricsPassword": "Passwort",
-      "metricsPasswordDesc": "Bearer-Passwort für den Metrik-Endpunkt (Passwort oder Argon2-Hash)",
-      "json": "JSON",
-      "jsonDesc": "Pfad zu den Metriken im JSON-Format",
-      "prometheus": "Prometheus",
-      "prometheusDesc": "Pfad zu den Prometheus-Metriken"
+      "metricsPassword": {
+        "label": "Passwort",
+        "description": "Bearer-Passwort für den Metrik-Endpunkt (Passwort oder Argon2-Hash)"
+      },
+      "json": {
+        "label": "JSON",
+        "description": "Pfad zu den Metriken im JSON-Format"
+      },
+      "prometheus": {
+        "label": "Prometheus",
+        "description": "Pfad zu den Prometheus-Metriken"
+      }
     },
     "config": {
+      "title": "Konfiguration",
       "connection": "Verbindung",
-      "hostDesc": "Öffentlicher Hostname, mit dem sich die Clients verbinden (macht bestehende Konfigurationen ungültig)",
-      "portDesc": "Öffentlicher UDP-Port, über den sich die Clients verbinden (macht bestehende Konfigurationen ungültig; Sie sollten wahrscheinlich auch den Interface-Port ändern)",
-      "allowedIpsDesc": "Erlaubte IP-Adressen, die die Clients verwenden (globale Konfiguration)",
-      "dnsDesc": "DNS-Server, den die Clients verwenden (globale Konfiguration)",
-      "mtuDesc": "MTU, die die Clients verwenden (nur für neue Clients)",
-      "persistentKeepaliveDesc": "Intervall in Sekunden, in dem Keepalive-Pakete an den Server gesendet werden. 0 = deaktiviert (nur für neue Clients)",
-      "suggest": "Vorschlagen",
-      "suggestDesc": "Wählen Sie eine IP-Adresse oder einen Hostnamen für das Host-Feld aus"
+      "host": {
+        "description": "Öffentlicher Hostname, mit dem sich die Clients verbinden (macht bestehende Konfigurationen ungültig)"
+      },
+      "port": {
+        "description": "Öffentlicher UDP-Port, über den sich die Clients verbinden (macht bestehende Konfigurationen ungültig; Sie sollten wahrscheinlich auch den Interface-Port ändern)"
+      },
+      "allowedIps": {
+        "description": "Erlaubte IP-Adressen, die die Clients verwenden (globale Konfiguration)"
+      },
+      "dns": {
+        "description": "DNS-Server, den die Clients verwenden (globale Konfiguration)"
+      },
+      "mtu": {
+        "description": "MTU, die die Clients verwenden (nur für neue Clients)"
+      },
+      "persistentKeepalive": {
+        "description": "Intervall in Sekunden, in dem Keepalive-Pakete an den Server gesendet werden. 0 = deaktiviert (nur für neue Clients)"
+      },
+      "suggest": {
+        "label": "Vorschlagen",
+        "description": "Wählen Sie eine IP-Adresse oder einen Hostnamen für das Host-Feld aus"
+      }
     },
     "interface": {
+      "title": "Interface",
       "cidrSuccess": "CIDR wurde geändert",
-      "device": "Gerät",
-      "deviceDesc": "Ethernet-Gerät, durch das der WireGuard-Datenverkehr geleitet werden soll",
-      "routingTable": "Routingtabelle",
-      "routingTableDesc": "Routingtabelle für WireGuard-Routen. Zulässig sind „auto“, „off“ oder eine Tabellennummer.",
-      "mtuDesc": "MTU, die WireGuard verwendet",
-      "portDesc": "UDP-Port, auf dem WireGuard lauscht (Sie sollten wahrscheinlich auch den Port unter „Konfiguration“ ändern)",
+      "device": {
+        "label": "Gerät",
+        "description": "Ethernet-Gerät, durch das der WireGuard-Datenverkehr geleitet werden soll"
+      },
+      "routingTable": {
+        "label": "Routingtabelle",
+        "description": "Routingtabelle für WireGuard-Routen. Zulässig sind „auto“, „off“ oder eine Tabellennummer."
+      },
+      "mtu": {
+        "description": "MTU, die WireGuard verwendet"
+      },
+      "port": {
+        "description": "UDP-Port, auf dem WireGuard lauscht (Sie sollten wahrscheinlich auch den Port unter „Konfiguration“ ändern)"
+      },
       "changeCidr": "CIDR ändern",
-      "restart": "Interface neu starten",
-      "restartDesc": "Das WireGuard-Interface neu starten",
+      "restart": {
+        "label": "Interface neu starten",
+        "description": "Das WireGuard-Interface neu starten"
+      },
       "restartWarn": "Möchten Sie das Interface wirklich neu starten? Dadurch werden alle Clientverbindungen getrennt.",
       "restartSuccess": "Interface neu gestartet",
       "firewall": "Datenverkehrsfilterung",
-      "firewallEnabled": "Firewall pro Client aktivieren",
-      "firewallEnabledDesc": "Beschränken Sie den Client-Datenverkehr mithilfe von iptables auf bestimmte Ziel-IP-Adressen. Bei Aktivierung kann für jeden Client eine Liste der erlaubten Ziele konfiguriert werden."
+      "firewallEnabled": {
+        "label": "Firewall pro Client aktivieren",
+        "description": "Beschränken Sie den Client-Datenverkehr mithilfe von iptables auf bestimmte Ziel-IP-Adressen. Bei Aktivierung kann für jeden Client eine Liste der erlaubten Ziele konfiguriert werden."
+      }
     },
-    "introText": "Willkommen in der Admin-Konsole.\n\nHier können Sie die allgemeinen Einstellungen, die Konfiguration, die Interface-Einstellungen und die Hooks verwalten.\n\nBeginnen Sie, indem Sie einen der Bereiche in der Seitenleiste auswählen."
+    "hooks": {
+      "title": "Hooks"
+    },
+    "introduction": "Willkommen in der Admin-Konsole.\n\nHier können Sie die allgemeinen Einstellungen, die Konfiguration, die Interface-Einstellungen und die Hooks verwalten.\n\nBeginnen Sie, indem Sie einen der Bereiche in der Seitenleiste auswählen.",
+    "description": "Konfiguriere dein Netzwerk und verwalte deinen Server.",
+    "overview": "Übersicht"
   },
-  "zod": {
-    "generic": {
+  "wireguard": {
+    "fields": {
+      "mtu": "MTU",
+      "allowedIps": "Erlaubte IP-Adressen",
+      "dns": "DNS",
+      "persistentKeepalive": "Dauerhaftes Keepalive",
+      "host": "Host",
+      "port": "Port"
+    },
+    "hooks": {
+      "preUp": "PreUp",
+      "postUp": "PostUp",
+      "preDown": "PreDown",
+      "postDown": "PostDown"
+    },
+    "obfuscation": {
+      "jC": {
+        "label": "Anzahl der Junk-Pakete (Jc)",
+        "description": "Anzahl der zu sendenden Junk-Pakete (1-128, empfohlen: 4-12)"
+      },
+      "jMin": {
+        "label": "Minimale Junk-Paketgröße (Jmin)",
+        "description": "Mindestgröße von Junk-Paketen (0-1279*, empfohlen: 8, muss < Jmax sein)"
+      },
+      "jMax": {
+        "label": "Maximale Junk-Paketgröße (Jmax)",
+        "description": "Maximalgröße von Junk-Paketen (1-1280*, empfohlen: 80, muss > Jmin sein)"
+      },
+      "s1": {
+        "label": "Junk-Paketgröße des Init-Pakets (S1)",
+        "description": "Junk-Paketgröße des Init-Pakets (0-1132[1280* - 148 = 1132], empfohlen: 15-150, S1+56 ≠ S2)"
+      },
+      "s2": {
+        "label": "Junk-Paketgröße des Antwort-Pakets (S2)",
+        "description": "Junk-Paketgröße des Antwort-Pakets (0-1188[1280* - 92 = 1188], empfohlen: 15-150)"
+      },
+      "s3": {
+        "label": "Junk-Paketgröße des Cookie-Antwort-Pakets (S3)",
+        "description": "Junk-Paketgröße des Cookie-Antwort-Pakets"
+      },
+      "s4": {
+        "label": "Junk-Paketgröße des Transport-Pakets (S4)",
+        "description": "Junk-Paketgröße des Transport-Pakets"
+      },
+      "h1": {
+        "label": "Init-Magic-Header (H1)",
+        "description": "Wert oder Bereich für den Header des Init-Pakets (X oder X-Y, wobei X < Y gilt. Minimum: 5, Maximum: 2147483647. Der Wert oder Bereich darf sich nicht mit anderen Headern überschneiden)"
+      },
+      "h2": {
+        "label": "Antwort-Magic-Header (H2)",
+        "description": "Wert oder Bereich für den Header des Antwortpakets (X oder X-Y, wobei X < Y gilt. Minimum: 5, Maximum: 2147483647. Der Wert oder Bereich darf sich nicht mit anderen Headern überschneiden)"
+      },
+      "h3": {
+        "label": "Cookie-Antwort-Magic-Header (H3)",
+        "description": "Wert oder Bereich für den Header des Cookie-Antwortpakets (X oder X-Y, wobei X < Y gilt. Minimum: 5, Maximum: 2147483647. Der Wert oder Bereich darf sich nicht mit anderen Headern überschneiden)"
+      },
+      "h4": {
+        "label": "Transport-Magic-Header (H4)",
+        "description": "Wert oder Bereich für den Header des Transportpakets (X oder X-Y, wobei X < Y gilt. Minimum: 5, Maximum: 2147483647. Der Wert oder Bereich darf sich nicht mit anderen Headern überschneiden)"
+      },
+      "i1": {
+        "label": "Spezial-Junk-Paket 1 (I1)",
+        "description": "Protokoll-Nachahmungspaket im Hex-Format: <b 0x...>"
+      },
+      "i2": {
+        "label": "Spezial-Junk-Paket 2 (I2)",
+        "description": "Protokoll-Nachahmungspaket im Hex-Format: <b 0x...>"
+      },
+      "i3": {
+        "label": "Spezial-Junk-Paket 3 (I3)",
+        "description": "Protokoll-Nachahmungspaket im Hex-Format: <b 0x...>"
+      },
+      "i4": {
+        "label": "Spezial-Junk-Paket 4 (I4)",
+        "description": "Protokoll-Nachahmungspaket im Hex-Format: <b 0x...>"
+      },
+      "i5": {
+        "label": "Spezial-Junk-Paket 5 (I5)",
+        "description": "Protokoll-Nachahmungspaket im Hex-Format: <b 0x...>"
+      },
+      "rangeNote": "Die folgenden Parameter akzeptieren eine einzelne Zahl oder einen Bereich (0–65535), zum Beispiel 30 oder 30–90",
+      "headerProtectionKey": {
+        "label": "Schlüssel zum Schutz der Kopfzeile",
+        "description": "32-Byte-Base64-Schlüssel, der zur Verschlüsselung von Paket-Headern verwendet wird. Er muss auf beiden Seiten übereinstimmen, daher wird er an jeden Client kopiert. S1–S4 müssen mindestens 12 betragen"
+      },
+      "contentPaddingAddition": {
+        "label": "Ergänzung zum Inhalt",
+        "description": "Zufällige Anzahl von Bytes, die vor der Verschlüsselung an die Transportpakete angehängt wird"
+      },
+      "rekeyAfterTime": {
+        "label": "Schlüsselwechsel nach einer bestimmten Zeit",
+        "description": "Sekunden vor der Neuverhandlung einer Sitzung (WireGuard-Standard: 120)"
+      },
+      "rekeyTimeout": {
+        "label": "Zeitlimit für den Schlüsselwechsel",
+        "description": "Sekunden zwischen den Wiederholungsversuchen beim Handshake (WireGuard-Standard: 5)"
+      },
+      "rejectAfterTime": {
+        "label": "Nach Ablauf der Frist ablehnen",
+        "description": "Sitzungsdauer in Sekunden (WireGuard-Standard: 180)"
+      },
+      "keepaliveTimeout": {
+        "label": "Keepalive-Timeout",
+        "description": "Inaktivitätszeit in Sekunden vor dem Versand eines Keepalive (WireGuard-Standard: 10)"
+      },
+      "maxHandshakeAttempts": {
+        "label": "Maximale Anzahl von Handshake-Versuchen",
+        "description": "Anzahl der Handshake-Versuche vor dem Abbruch (WireGuard-Standard: 18)"
+      },
+      "randomTrailers": {
+        "label": "Zufällige Trailer",
+        "description": "Füge den Handshake-Paketen eine zufällige Anzahl von Bytes hinzu. Diese muss auf beiden Seiten übereinstimmen, daher wird sie an jeden Client kopiert"
+      },
+      "disableCookies": {
+        "label": "Cookies deaktivieren",
+        "description": "Beantworten Sie Handshakes unter Last nicht mit Cookie-Nachrichten. Dies betrifft nur diese Seite des Tunnels"
+      },
+      "mtuNote": "Werte hängen von der MTU ab",
+      "title": "AmneziaWG-Verschleierungsparameter"
+    }
+  },
+  "validation": {
+    "messages": {
       "required": "{field} ist erforderlich",
       "validNumber": "{field} muss eine Zahl sein",
       "validNumberRange": "{field} muss eine gültige Zahl oder ein gültiger Zahlenbereich sein",
@@ -263,72 +540,5 @@
     "dns": "DNS",
     "allowedIps": "Erlaubte IP-Adressen",
     "file": "Datei"
-  },
-  "hooks": {
-    "preUp": "PreUp",
-    "postUp": "PostUp",
-    "preDown": "PreDown",
-    "postDown": "PostDown"
-  },
-  "copy": {
-    "notSupported": "Kopieren wird nicht unterstützt",
-    "copied": "Kopiert!",
-    "failed": "Kopieren fehlgeschlagen",
-    "copy": "Kopieren"
-  },
-  "awg": {
-    "jCLabel": "Anzahl der Junk-Pakete (Jc)",
-    "jCDescription": "Anzahl der zu sendenden Junk-Pakete (1-128, empfohlen: 4-12)",
-    "jMinLabel": "Minimale Junk-Paketgröße (Jmin)",
-    "jMinDescription": "Mindestgröße von Junk-Paketen (0-1279*, empfohlen: 8, muss < Jmax sein)",
-    "jMaxLabel": "Maximale Junk-Paketgröße (Jmax)",
-    "jMaxDescription": "Maximalgröße von Junk-Paketen (1-1280*, empfohlen: 80, muss > Jmin sein)",
-    "s1Label": "Junk-Paketgröße des Init-Pakets (S1)",
-    "s1Description": "Junk-Paketgröße des Init-Pakets (0-1132[1280* - 148 = 1132], empfohlen: 15-150, S1+56 ≠ S2)",
-    "s2Label": "Junk-Paketgröße des Antwort-Pakets (S2)",
-    "s2Description": "Junk-Paketgröße des Antwort-Pakets (0-1188[1280* - 92 = 1188], empfohlen: 15-150)",
-    "s3Label": "Junk-Paketgröße des Cookie-Antwort-Pakets (S3)",
-    "s3Description": "Junk-Paketgröße des Cookie-Antwort-Pakets",
-    "s4Label": "Junk-Paketgröße des Transport-Pakets (S4)",
-    "s4Description": "Junk-Paketgröße des Transport-Pakets",
-    "h1Label": "Init-Magic-Header (H1)",
-    "h1Description": "Wert oder Bereich für den Header des Init-Pakets (X oder X-Y, wobei X < Y gilt. Minimum: 5, Maximum: 2147483647. Der Wert oder Bereich darf sich nicht mit anderen Headern überschneiden)",
-    "h2Label": "Antwort-Magic-Header (H2)",
-    "h2Description": "Wert oder Bereich für den Header des Antwortpakets (X oder X-Y, wobei X < Y gilt. Minimum: 5, Maximum: 2147483647. Der Wert oder Bereich darf sich nicht mit anderen Headern überschneiden)",
-    "h3Label": "Cookie-Antwort-Magic-Header (H3)",
-    "h3Description": "Wert oder Bereich für den Header des Cookie-Antwortpakets (X oder X-Y, wobei X < Y gilt. Minimum: 5, Maximum: 2147483647. Der Wert oder Bereich darf sich nicht mit anderen Headern überschneiden)",
-    "h4Label": "Transport-Magic-Header (H4)",
-    "h4Description": "Wert oder Bereich für den Header des Transportpakets (X oder X-Y, wobei X < Y gilt. Minimum: 5, Maximum: 2147483647. Der Wert oder Bereich darf sich nicht mit anderen Headern überschneiden)",
-    "i1Label": "Spezial-Junk-Paket 1 (I1)",
-    "i1Description": "Protokoll-Nachahmungspaket im Hex-Format: <b 0x...>",
-    "i2Label": "Spezial-Junk-Paket 2 (I2)",
-    "i2Description": "Protokoll-Nachahmungspaket im Hex-Format: <b 0x...>",
-    "i3Label": "Spezial-Junk-Paket 3 (I3)",
-    "i3Description": "Protokoll-Nachahmungspaket im Hex-Format: <b 0x...>",
-    "i4Label": "Spezial-Junk-Paket 4 (I4)",
-    "i4Description": "Protokoll-Nachahmungspaket im Hex-Format: <b 0x...>",
-    "i5Label": "Spezial-Junk-Paket 5 (I5)",
-    "i5Description": "Protokoll-Nachahmungspaket im Hex-Format: <b 0x...>",
-    "rangeNote": "Die folgenden Parameter akzeptieren eine einzelne Zahl oder einen Bereich (0–65535), zum Beispiel 30 oder 30–90",
-    "headerProtectionKeyLabel": "Schlüssel zum Schutz der Kopfzeile",
-    "headerProtectionKeyDescription": "32-Byte-Base64-Schlüssel, der zur Verschlüsselung von Paket-Headern verwendet wird. Er muss auf beiden Seiten übereinstimmen, daher wird er an jeden Client kopiert. S1–S4 müssen mindestens 12 betragen",
-    "contentPaddingAdditionLabel": "Ergänzung zum Inhalt",
-    "contentPaddingAdditionDescription": "Zufällige Anzahl von Bytes, die vor der Verschlüsselung an die Transportpakete angehängt wird",
-    "rekeyAfterTimeLabel": "Schlüsselwechsel nach einer bestimmten Zeit",
-    "rekeyAfterTimeDescription": "Sekunden vor der Neuverhandlung einer Sitzung (WireGuard-Standard: 120)",
-    "rekeyTimeoutLabel": "Zeitlimit für den Schlüsselwechsel",
-    "rekeyTimeoutDescription": "Sekunden zwischen den Wiederholungsversuchen beim Handshake (WireGuard-Standard: 5)",
-    "rejectAfterTimeLabel": "Nach Ablauf der Frist ablehnen",
-    "rejectAfterTimeDescription": "Sitzungsdauer in Sekunden (WireGuard-Standard: 180)",
-    "keepaliveTimeoutLabel": "Keepalive-Timeout",
-    "keepaliveTimeoutDescription": "Inaktivitätszeit in Sekunden vor dem Versand eines Keepalive (WireGuard-Standard: 10)",
-    "maxHandshakeAttemptsLabel": "Maximale Anzahl von Handshake-Versuchen",
-    "maxHandshakeAttemptsDescription": "Anzahl der Handshake-Versuche vor dem Abbruch (WireGuard-Standard: 18)",
-    "randomTrailersLabel": "Zufällige Trailer",
-    "randomTrailersDescription": "Füge den Handshake-Paketen eine zufällige Anzahl von Bytes hinzu. Diese muss auf beiden Seiten übereinstimmen, daher wird sie an jeden Client kopiert",
-    "disableCookiesLabel": "Cookies deaktivieren",
-    "disableCookiesDescription": "Beantworten Sie Handshakes unter Last nicht mit Cookie-Nachrichten. Dies betrifft nur diese Seite des Tunnels",
-    "mtuNote": "Werte hängen von der MTU ab",
-    "obfuscationParameters": "AmneziaWG-Verschleierungsparameter"
   }
 }

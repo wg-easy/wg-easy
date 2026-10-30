@@ -3,34 +3,46 @@
     <template #trigger>
       <slot />
     </template>
+    <template #title>{{ $t('clients.configuration.showQrCode') }}</template>
     <template #description>
       <div class="bg-white">
-        <img ref="img" :src="qrCode" />
+        <img
+          ref="img"
+          :src="qrCode"
+          :alt="$t('clients.configuration.showQrCode')"
+          class="mx-auto w-full max-w-72"
+        />
       </div>
     </template>
     <template #actions>
       <BaseSecondaryButton
         class="flex items-center gap-2"
-        :title="$t('client.copyPng')"
+        :title="$t('clients.configuration.copyPng')"
         @click="copyPng"
       >
-        <IconsCopy class="size-5" /> PNG
+        <ClipboardCopyIcon class="size-5" />
+        PNG
       </BaseSecondaryButton>
       <BaseSecondaryButton
         class="flex items-center gap-2"
-        :title="$t('client.downloadPng')"
+        :title="$t('clients.configuration.downloadPng')"
         @click="downloadPng"
       >
-        <IconsDownload class="size-5" /> PNG
+        <DownloadIcon class="size-5" />
+        PNG
       </BaseSecondaryButton>
       <DialogClose as-child>
-        <BaseSecondaryButton>{{ $t('dialog.cancel') }}</BaseSecondaryButton>
+        <BaseSecondaryButton>
+          {{ $t('common.actions.cancel') }}
+        </BaseSecondaryButton>
       </DialogClose>
     </template>
   </BaseDialog>
 </template>
 
 <script setup lang="ts">
+import { ClipboardCopyIcon, DownloadIcon } from '@lucide/vue';
+
 defineProps<{ qrCode: string }>();
 
 const toast = useToast();
@@ -79,7 +91,7 @@ async function downloadPng() {
     console.error('failed to download png', e);
     toast.showToast({
       type: 'error',
-      message: $t('toast.unknown'),
+      message: $t('common.notifications.unknown'),
     });
   }
 }
@@ -89,7 +101,7 @@ async function copyPng() {
     console.error('failed to convert svg to png', e);
     toast.showToast({
       type: 'error',
-      message: $t('toast.unknown'),
+      message: $t('common.notifications.unknown'),
     });
   });
   if (!blob) {
@@ -105,13 +117,13 @@ async function copyPng() {
 
     toast.showToast({
       type: 'success',
-      message: $t('copy.copied'),
+      message: $t('common.clipboard.copied'),
     });
   } catch (e) {
     console.error('failed to copy png', e);
     toast.showToast({
       type: 'error',
-      message: $t('copy.failed'),
+      message: $t('common.clipboard.failed'),
     });
   }
 }

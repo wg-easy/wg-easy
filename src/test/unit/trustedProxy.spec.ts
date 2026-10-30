@@ -1,14 +1,12 @@
-import type { IncomingMessage, ServerResponse } from 'node:http';
-
-import { createEvent, type H3Event } from 'h3';
 import { describe, expect, test } from 'vitest';
 
+import { requestEvent } from '../helpers/request';
+
+import { parseTrustedProxies } from '#server/utils/trustedProxy';
 import {
   getTrustedRequestIP,
-  getTrustedRequestHost,
   getTrustedRequestURL,
-  parseTrustedProxies,
-} from '#server/utils/trustedProxy';
+} from '#server/http/request';
 
 describe('parseTrustedProxies', () => {
   test('returns no proxies when the setting is absent', () => {
@@ -41,33 +39,64 @@ describe('trusted request helpers', () => {
     });
 
     expect(getTrustedRequestIP(event, ['10.0.0.0/8'])).toBe('192.0.2.10');
-    expect(getTrustedRequestHost(event, ['10.0.0.0/8'])).toBe('wg-easy:51821');
-    expect(getTrustedRequestURL(event, ['10.0.0.0/8']).origin).toBe(
+    expect(getTrustedRequestURL(event, ['10.0.0.0/8'], 'http').origin).toBe(
       'http://wg-easy:51821'
     );
-    expect(event.node.req.headers['x-forwarded-host']).toBe('vpn.example.com');
-    expect(event.node.req.headers['x-forwarded-proto']).toBe('https');
+    expect(event.req.headers.get('x-forwarded-host')).toBe('vpn.example.com');
+    expect(event.req.headers.get('x-forwarded-proto')).toBe('https');
   });
 
-  test('uses host information from a trusted peer', () => {
+  test('uses the public host and protocol from a trusted peer', () => {
     const event = createTestEvent('10.0.0.2', {
       host: 'wg-easy:51821',
       'x-forwarded-host': 'vpn.example.com:8443, wg-easy:51821',
       'x-forwarded-for': '198.51.100.25',
-      'x-forwarded-proto': 'HTTPS, http',
+      'x-forwarded-proto': 'https, http',
     });
 
     expect(getTrustedRequestIP(event, ['10.0.0.0/8'])).toBe('198.51.100.25');
-    expect(getTrustedRequestHost(event, ['10.0.0.0/8'])).toBe(
-      'vpn.example.com:8443'
+    expect(getTrustedRequestURL(event, ['10.0.0.0/8'], 'http').origin).toBe(
+      'https://vpn.example.com:8443'
     );
-    expect(getTrustedRequestURL(event, ['10.0.0.0/8']).origin).toBe(
-      'http://vpn.example.com:8443'
-    );
-    expect(event.node.req.headers['x-forwarded-host']).toBe(
+    expect(event.req.headers.get('x-forwarded-host')).toBe(
       'vpn.example.com:8443, wg-easy:51821'
     );
-    expect(event.node.req.headers['x-forwarded-proto']).toBe('HTTPS, http');
+    expect(event.req.headers.get('x-forwarded-proto')).toBe('https, http');
+  });
+
+  test.each(['http', 'https'] as const)(
+    'preserves the %s fallback without a valid trusted protocol',
+    (fallback) => {
+      for (const protocol of [undefined, '', 'ftp', 'invalid, https']) {
+        const event = createTestEvent('10.0.0.2', {
+          'x-forwarded-host': 'vpn.example.com',
+          ...(protocol === undefined ? {} : { 'x-forwarded-proto': protocol }),
+        });
+        expect(
+          getTrustedRequestURL(event, ['10.0.0.0/8'], fallback).origin
+        ).toBe(`${fallback}://vpn.example.com`);
+      }
+    }
+  );
+
+  test.each(['192.0.2.10', undefined])(
+    'ignores forwarded protocol with untrusted or unknown source %s',
+    (address) => {
+      const event = createTestEvent(address, {
+        'x-forwarded-proto': 'http',
+        'x-forwarded-for': '10.0.0.2',
+      });
+      expect(getTrustedRequestURL(event, ['10.0.0.0/8'], 'https').origin).toBe(
+        'https://wg-easy:51821'
+      );
+    }
+  );
+
+  test('ignores forwarded protocol when no proxies are configured', () => {
+    const event = createTestEvent('10.0.0.2', { 'x-forwarded-proto': 'http' });
+    expect(getTrustedRequestURL(event, [], 'https').origin).toBe(
+      'https://wg-easy:51821'
+    );
   });
 
   test('returns undefined when no request address is available', () => {
@@ -79,14 +108,11 @@ describe('trusted request helpers', () => {
 
 function createTestEvent(
   remoteAddress: string | undefined,
-  headers: IncomingMessage['headers']
-): H3Event {
-  const request = {
-    connection: {},
-    headers: { ...headers },
-    socket: { remoteAddress },
-    url: '/api/auth/oidc/callback',
-  } as unknown as IncomingMessage;
-
-  return createEvent(request, {} as ServerResponse);
+  headers: Record<string, string>
+) {
+  return requestEvent(
+    'http://wg-easy:51821/api/auth/oidc/callback',
+    { headers },
+    remoteAddress
+  );
 }

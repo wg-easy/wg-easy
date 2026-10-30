@@ -1,7 +1,6 @@
-import Database from '#server/utils/Database';
-import { definePermissionEventHandler } from '#server/utils/handler';
+import * as settings from '#server/features/settings';
+import { defineAuthenticatedEventHandler } from '#server/utils/handler';
 
-export default definePermissionEventHandler('admin', 'any', async () => {
-  const generalConfig = await Database.general.getConfig();
-  return generalConfig;
+export default defineAuthenticatedEventHandler(async ({ user }) => {
+  return settings.get(user);
 });

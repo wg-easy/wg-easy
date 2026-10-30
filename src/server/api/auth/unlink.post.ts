@@ -1,14 +1,8 @@
-import Database from '#server/utils/Database';
-import { definePermissionEventHandler } from '#server/utils/handler';
+import * as identity from '#server/features/identity';
+import { defineAuthenticatedEventHandler } from '#server/utils/handler';
 
-export default definePermissionEventHandler(
-  'me',
-  'update',
-  async ({ user, checkPermissions }) => {
-    checkPermissions(user);
+export default defineAuthenticatedEventHandler(async ({ user }) => {
+  await identity.unlinkOauth(user);
 
-    await Database.users.unlinkOauth(user.id);
-
-    return { success: true };
-  }
-);
+  return { success: true };
+});

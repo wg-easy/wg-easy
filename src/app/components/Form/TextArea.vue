@@ -1,12 +1,10 @@
 <template>
-  <div class="flex items-center">
-    <FormLabel :for="id">
-      {{ label }}
-    </FormLabel>
-    <BaseTooltip v-if="description" :text="description">
-      <IconsInfo class="size-4" />
-    </BaseTooltip>
-  </div>
+  <FormFieldLabel
+    :id="id"
+    :label="label"
+    :description="description"
+    class="self-start"
+  />
   <BaseTextArea
     :id="id"
     v-model.trim="data"

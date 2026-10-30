@@ -1,3 +1,11 @@
 /src/node_modules
 /src/.nuxt
 /src/.output
+node_modules
+.git
+**/.env
+**/.env.*
+**/*.env
+**/test-results
+**/playwright-report
+**/coverage

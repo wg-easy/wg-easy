@@ -4,7 +4,7 @@ import { eq } from 'drizzle-orm';
 
 import { db, schema } from '#cli/db';
 import { WG_ENV } from '#server/utils/config';
-import { wg } from '#server/utils/wgHelper';
+import { generateClientConfig } from '#server/features/vpn/configuration';
 import { encodeQRCodeTerm } from '#server/utils/qr';
 
 export default defineCommand({
@@ -58,14 +58,10 @@ export default defineCommand({
       return;
     }
 
-    const clientConfig = wg.generateClientConfig(
-      wgInterface,
-      userConfig,
-      client,
-      {
-        enableIpv6,
-      }
-    );
+    const clientConfig = generateClientConfig(wgInterface, userConfig, client, {
+      enableIpv6,
+      amnezia: WG_ENV.WG_EXECUTABLE === 'awg',
+    });
 
     consola.log(encodeQRCodeTerm(clientConfig));
   },

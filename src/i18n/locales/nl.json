@@ -1,207 +1,414 @@
 {
-  "pages": {
-    "me": "Account",
-    "clients": "Clients",
-    "admin": {
-      "panel": "Admin-paneel",
-      "general": "Algemeen",
-      "config": "Configuratie",
-      "interface": "Interface",
-      "hooks": "Hooks"
-    }
-  },
-  "user": {
-    "email": "E-mail"
-  },
-  "me": {
-    "currentPassword": "Huidig wachtwoord",
-    "enable2fa": "Twee-factor-authenticatie inschakelen",
-    "enable2faDesc": "Scan de QR-code met uw authenticator-app of voer de sleutel handmatig in.",
-    "2faKey": "TOTP-sleutel",
-    "2faCodeDesc": "Voer de code in van uw authenticator-app.",
-    "disable2fa": "Twee-factor-authenticatie uitschakelen",
-    "disable2faDesc": "Voer uw wachtwoord in om de twee-factor-authenticatie uit te schakelen.",
-    "linkOauth": "Koppel uw account met een externe provider",
-    "unlinkOauth": "Ontkoppelen",
-    "linkedWith": "Gekoppeld met {provider}",
-    "providerDisabled": "Uw huidige gekoppelde provider is niet ingeschakeld"
-  },
-  "general": {
-    "name": "Naam",
-    "username": "Gebruikersnaam",
-    "password": "Wachtwoord",
-    "newPassword": "Nieuw wachtwoord",
-    "updatePassword": "Wachtwoord bijwerken",
-    "addPassword": "Add Password",
-    "mtu": "MTU",
-    "allowedIps": "Toegestane IP's",
-    "dns": "DNS",
-    "persistentKeepalive": "Aanhoudende verbinding",
-    "logout": "Uitloggen",
-    "continue": "Doorgaan",
-    "host": "Host",
-    "port": "Poort",
+  "common": {
+    "fields": {
+      "email": "E-mail",
+      "name": "Naam",
+      "username": "Gebruikersnaam",
+      "password": "Wachtwoord",
+      "newPassword": "Nieuw wachtwoord",
+      "confirmPassword": "Wachtwoord bevestigen"
+    },
+    "actions": {
+      "continue": "Doorgaan",
+      "delete": "Verwijderen",
+      "change": "Wijzigen",
+      "cancel": "Annuleren",
+      "create": "Aanmaken",
+      "save": "Opslaan",
+      "revert": "Terugzetten",
+      "add": "Toevoegen"
+    },
     "yes": "Ja",
     "no": "Nee",
-    "confirmPassword": "Wachtwoord bevestigen",
     "loading": "Laden...",
-    "2fa": "Twee-factor-authenticatie uitschakelen",
-    "2faCode": "TOTP-code",
-    "externalAuth": "Externe authenticatie"
+    "update": {
+      "available": "Er is een update beschikbaar!",
+      "action": "Bijwerken"
+    },
+    "theme": {
+      "dark": "Donker thema",
+      "light": "Licht thema",
+      "system": "Systeem-thema"
+    },
+    "donate": "Doneren",
+    "notifications": {
+      "success": "Succes",
+      "saved": "Opgeslagen",
+      "error": "Fout",
+      "unknown": "Onbekende fout. Zie console voor meer details"
+    },
+    "form": {
+      "actions": "Acties",
+      "sections": {
+        "general": "Algemeen",
+        "advanced": "Geavanceerd"
+      },
+      "noItems": "Geen items",
+      "nullNoItems": "Geen items. Globale configuratie gebruiken",
+      "nullNotSet": "Niet ingeschakeld",
+      "set": "Ingeschakeld",
+      "unset": "Uitschakelen"
+    },
+    "clipboard": {
+      "notSupported": "Kopiëren wordt niet ondersteund",
+      "copied": "Gekopieerd!",
+      "failed": "Kopiëren is mislukt",
+      "copy": "Kopiëren"
+    }
+  },
+  "auth": {
+    "logout": "Uitloggen",
+    "twoFactor": {
+      "title": "Twee-factor-authenticatie uitschakelen",
+      "code": "TOTP-code"
+    },
+    "external": {
+      "title": "Externe authenticatie"
+    },
+    "login": {
+      "signIn": "Aanmelden",
+      "signInWith": "Aanmelden met {provider}",
+      "or": "of",
+      "rememberMe": "Onthoud mij",
+      "rememberMeDescription": "Ingelogd blijven na het sluiten van de browser",
+      "insecure": "U kunt niet inloggen via een onveilige verbinding. Gebruik HTTPS.",
+      "twoFactor": {
+        "required": "Twee-factor-authenticatie is vereist",
+        "invalid": "Twee-factor-authenticatiecode is fout"
+      },
+      "expired": "Login verlopen. Probeer het opnieuw"
+    }
+  },
+  "account": {
+    "title": "Account",
+    "password": {
+      "current": "Huidig wachtwoord",
+      "update": "Wachtwoord bijwerken",
+      "add": "Add Password"
+    },
+    "twoFactor": {
+      "enable": {
+        "label": "Twee-factor-authenticatie inschakelen",
+        "description": "Scan de QR-code met uw authenticator-app of voer de sleutel handmatig in."
+      },
+      "key": "TOTP-sleutel",
+      "codeDescription": "Voer de code in van uw authenticator-app.",
+      "disable": {
+        "label": "Twee-factor-authenticatie uitschakelen",
+        "description": "Voer uw wachtwoord in om de twee-factor-authenticatie uit te schakelen."
+      }
+    },
+    "external": {
+      "link": "Koppel uw account met een externe provider",
+      "unlink": "Ontkoppelen",
+      "linkedWith": "Gekoppeld met {provider}",
+      "providerDisabled": "Uw huidige gekoppelde provider is niet ingeschakeld"
+    }
   },
   "setup": {
     "welcome": "Welkom bij uw eerste installatie van wg-easy",
-    "welcomeDesc": "U hebt de gemakkelijkste manier gevonden om WireGuard op elke Linux-host te installeren en te beheren",
+    "welcomeDescription": "U hebt de gemakkelijkste manier gevonden om WireGuard op elke Linux-host te installeren en te beheren",
     "existingSetup": "Heeft u een bestaande installatie?",
-    "createAdminDesc": "Voer eerst een beheerdersgebruikersnaam en een sterk veilig wachtwoord in. Deze gegevens worden gebruikt om in te loggen op uw Admin-paneel.",
-    "setupConfigDesc": "Voer alstublieft de host- en poortinformatie in. Dit wordt gebruikt voor de clientconfiguratie bij het instellen van WireGuard op hun apparaten.",
-    "setupMigrationDesc": "Geef het back-upbestand op als u de gegevens van uw vorige wg-easy-versie naar uw nieuwe installatie wilt overzetten.",
+    "createAdminDescription": "Voer eerst een beheerdersgebruikersnaam en een sterk veilig wachtwoord in. Deze gegevens worden gebruikt om in te loggen op uw Admin-paneel.",
+    "setupConfigDescription": "Voer alstublieft de host- en poortinformatie in. Dit wordt gebruikt voor de clientconfiguratie bij het instellen van WireGuard op hun apparaten.",
+    "setupMigrationDescription": "Geef het back-upbestand op als u de gegevens van uw vorige wg-easy-versie naar uw nieuwe installatie wilt overzetten.",
     "upload": "Uploaden",
     "migration": "Herstel de back-up:",
     "createAccount": "Account aanmaken",
     "successful": "Installatie succesvol",
-    "hostDesc": "Publieke hostnaam waarmee clients verbinding maken",
-    "portDesc": "Publieke UDP-poort waarop clients verbinding maken en waarop WireGuard luistert"
+    "hostDescription": "Publieke hostnaam waarmee clients verbinding maken",
+    "portDescription": "Publieke UDP-poort waarop clients verbinding maken en waarop WireGuard luistert"
   },
-  "update": {
-    "updateAvailable": "Er is een update beschikbaar!",
-    "update": "Bijwerken"
-  },
-  "theme": {
-    "dark": "Donker thema",
-    "light": "Licht thema",
-    "system": "Systeem-thema"
-  },
-  "layout": {
-    "toggleCharts": "Grafieken tonen/verbergen",
-    "donate": "Doneren"
-  },
-  "login": {
-    "signIn": "Aanmelden",
-    "signInWith": "Aanmelden met {provider}",
-    "or": "of",
-    "rememberMe": "Onthoud mij",
-    "rememberMeDesc": "Ingelogd blijven na het sluiten van de browser",
-    "insecure": "U kunt niet inloggen via een onveilige verbinding. Gebruik HTTPS.",
-    "2faRequired": "Twee-factor-authenticatie is vereist",
-    "2faWrong": "Twee-factor-authenticatiecode is fout",
-    "loginExpired": "Login verlopen. Probeer het opnieuw"
-  },
-  "client": {
-    "empty": "Er zijn nog geen clients.",
-    "newShort": "Nieuw",
-    "sort": "Sortering",
-    "create": "Client aanmaken",
-    "created": "Client aangemaakt",
-    "new": "Nieuwe client",
-    "name": "Naam",
-    "expireDate": "Verloopdatum",
-    "expireDateDesc": "Datum waarop de client wordt uitgeschakeld. Laat leeg voor permanent.",
-    "delete": "Verwijderen",
-    "deleteClient": "Client verwijderen",
-    "deleteDialog": "Weet u zeker dat u {name} wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.",
-    "enabled": "Ingeschakeld",
-    "address": "Adres",
-    "serverAllowedIps": "Toegestane IP's van de server",
-    "otlDesc": "Korte eenmalige link genereren",
-    "permanent": "Permanent",
-    "createdOn": "Aangemaakt op {date}",
-    "lastSeen": "Laatst gezien op {date}",
-    "totalDownload": "Totaal gedownload: {total}",
-    "totalUpload": "Totaal geüpload: {total}",
-    "newClient": "Nieuwe client",
-    "disableClient": "Client uitschakelen",
-    "enableClient": "Client inschakelen",
-    "noPrivKey": "Deze client heeft geen bekende privésleutel. Kan de configuratie niet aanmaken.",
-    "showQR": "QR-code weergeven",
-    "downloadConfig": "Configuratie downloaden",
-    "allowedIpsDesc": "Welke IP's via de VPN worden geleid (overschrijft algemene instellingen)",
-    "serverAllowedIpsDesc": "Naar welke IP's de server het clientverkeer zal routeren",
-    "mtuDesc": "Stelt de maximale transmissie-eenheid (pakketgrootte) voor de VPN-tunnel in",
-    "persistentKeepaliveDesc": "Stelt het interval (seconden) in voor keep-alive-pakketten. 0 schakelt dit uit",
-    "hooks": "Hooks",
-    "hooksDescription": "Hooks functioneren alleen met wg-quick",
-    "hooksLeaveEmpty": "Alleen voor wg-quick. Anders leeg laten",
-    "dnsDesc": "DNS-serverclients zullen gebruiken (overschrijft algemene instellingen)",
-    "notConnected": "Client niet verbonden",
-    "endpoint": "Eindpunt",
-    "endpointDesc": "IP van de client vanaf welke de WireGuard-verbinding tot stand wordt gebracht",
-    "search": "Clients zoeken...",
-    "config": "Configuratie",
-    "viewConfig": "Configuratie weergeven",
-    "firewallIps": "Firewall-toegestane IPs",
-    "firewallIpsDesc": "Bestemmings-IP's/CIDR's waartoe deze client toegang heeft (handhaving aan de serverzijde). Laat leeg om Toegestane IP's te gebruiken. Ondersteunt optionele poort - en protocolfiltering. Zie documentatie voor syntaxis.",
-    "downloadPng": "PNG downloaden",
-    "copyPng": "PNG kopiëren"
-  },
-  "dialog": {
-    "change": "Wijzigen",
-    "cancel": "Annuleren",
-    "create": "Aanmaken"
-  },
-  "toast": {
-    "success": "Succes",
-    "saved": "Opgeslagen",
-    "error": "Fout",
-    "unknown": "Onbekende fout. Zie console voor meer details"
-  },
-  "form": {
-    "actions": "Acties",
-    "save": "Opslaan",
-    "revert": "Terugzetten",
-    "sectionGeneral": "Algemeen",
-    "sectionAdvanced": "Geavanceerd",
-    "noItems": "Geen items",
-    "nullNoItems": "Geen items. Globale configuratie gebruiken",
-    "nullNotSet": "Niet ingeschakeld",
-    "set": "Ingeschakeld",
-    "unset": "Uitschakelen",
-    "add": "Toevoegen"
+  "clients": {
+    "title": "Clients",
+    "list": {
+      "toggleCharts": "Grafieken tonen/verbergen",
+      "empty": "Er zijn nog geen clients.",
+      "new": "Nieuw",
+      "sort": "Sortering",
+      "newClient": "Nieuwe client",
+      "search": "Clients zoeken..."
+    },
+    "create": {
+      "action": "Client aanmaken",
+      "success": "Client aangemaakt",
+      "title": "Nieuwe client"
+    },
+    "fields": {
+      "name": {
+        "label": "Naam"
+      },
+      "expiresAt": {
+        "label": "Verloopdatum",
+        "description": "Datum waarop de client wordt uitgeschakeld. Laat leeg voor permanent."
+      },
+      "address": {
+        "label": "Adres"
+      },
+      "serverAllowedIps": {
+        "label": "Toegestane IP's van de server",
+        "description": "Naar welke IP's de server het clientverkeer zal routeren"
+      },
+      "allowedIps": {
+        "description": "Welke IP's via de VPN worden geleid (overschrijft algemene instellingen)"
+      },
+      "mtu": {
+        "description": "Stelt de maximale transmissie-eenheid (pakketgrootte) voor de VPN-tunnel in"
+      },
+      "persistentKeepalive": {
+        "description": "Stelt het interval (seconden) in voor keep-alive-pakketten. 0 schakelt dit uit"
+      },
+      "dns": {
+        "description": "DNS-serverclients zullen gebruiken (overschrijft algemene instellingen)"
+      },
+      "endpoint": {
+        "label": "Eindpunt",
+        "description": "IP van de client vanaf welke de WireGuard-verbinding tot stand wordt gebracht"
+      },
+      "firewallIps": {
+        "label": "Firewall-toegestane IPs",
+        "description": "Bestemmings-IP's/CIDR's waartoe deze client toegang heeft (handhaving aan de serverzijde). Laat leeg om Toegestane IP's te gebruiken. Ondersteunt optionele poort - en protocolfiltering. Zie documentatie voor syntaxis."
+      }
+    },
+    "delete": {
+      "title": "Client verwijderen",
+      "description": "Weet u zeker dat u {name} wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt."
+    },
+    "status": {
+      "enabled": "Ingeschakeld",
+      "permanent": "Permanent",
+      "createdOn": "Aangemaakt op {date}",
+      "lastSeen": "Laatst gezien op {date}",
+      "disable": "Client uitschakelen",
+      "enable": "Client inschakelen",
+      "notConnected": "Client niet verbonden"
+    },
+    "configuration": {
+      "oneTimeLink": "Korte eenmalige link genereren",
+      "noPrivateKey": "Deze client heeft geen bekende privésleutel. Kan de configuratie niet aanmaken.",
+      "showQrCode": "QR-code weergeven",
+      "download": "Configuratie downloaden",
+      "title": "Configuratie",
+      "view": "Configuratie weergeven",
+      "downloadPng": "PNG downloaden",
+      "copyPng": "PNG kopiëren"
+    },
+    "traffic": {
+      "totalDownload": "Totaal gedownload: {total}",
+      "totalUpload": "Totaal geüpload: {total}"
+    },
+    "hooks": {
+      "title": "Hooks",
+      "description": "Hooks functioneren alleen met wg-quick",
+      "fieldDescription": "Alleen voor wg-quick. Anders leeg laten"
+    }
   },
   "admin": {
+    "title": "Admin-paneel",
     "general": {
-      "sessionTimeout": "Sessie verlopen",
-      "sessionTimeoutDesc": "Sessieduur voor Onthoud mij (sec.)",
+      "title": "Algemeen",
+      "sessionTimeout": {
+        "label": "Sessie verlopen",
+        "description": "Sessieduur voor Onthoud mij (sec.)"
+      },
       "metrics": "Metrics",
-      "metricsPassword": "Wachtwoord",
-      "metricsPasswordDesc": "Bearer-wachtwoord voor het metrics-eindpunt (wachtwoord of argon2-hash)",
-      "json": "JSON",
-      "jsonDesc": "Route voor metrics in JSON-formaat",
-      "prometheus": "Prometheus",
-      "prometheusDesc": "Route voor Prometheus-metrics"
+      "metricsPassword": {
+        "label": "Wachtwoord",
+        "description": "Bearer-wachtwoord voor het metrics-eindpunt (wachtwoord of argon2-hash)"
+      },
+      "json": {
+        "label": "JSON",
+        "description": "Route voor metrics in JSON-formaat"
+      },
+      "prometheus": {
+        "label": "Prometheus",
+        "description": "Route voor Prometheus-metrics"
+      }
     },
     "config": {
+      "title": "Configuratie",
       "connection": "Verbinding",
-      "hostDesc": "Publieke hostnaam waarmee clients verbinding maken (maakt configuratie ongedaan)",
-      "portDesc": "Publieke UDP-poort waarmee clients verbinding maken (maakt configuratie ongedaan; u dient waarschijnlijk ook de interfacepoort te wijzigen)",
-      "allowedIpsDesc": "Toegestane IP's die clients zullen gebruiken (algemene configuratie)",
-      "dnsDesc": "DNS-server die clients zullen gebruiken (algemene configuratie)",
-      "mtuDesc": "MTU die clients zullen gebruiken (alleen voor nieuwe clients)",
-      "persistentKeepaliveDesc": "Interval in seconden om keepalives naar de server te sturen. 0 = uitgeschakeld (alleen voor nieuwe clients)",
-      "suggest": "Voorstellen",
-      "suggestDesc": "Kies een IP-adres of hostnaam voor het veld Host"
+      "host": {
+        "description": "Publieke hostnaam waarmee clients verbinding maken (maakt configuratie ongedaan)"
+      },
+      "port": {
+        "description": "Publieke UDP-poort waarmee clients verbinding maken (maakt configuratie ongedaan; u dient waarschijnlijk ook de interfacepoort te wijzigen)"
+      },
+      "allowedIps": {
+        "description": "Toegestane IP's die clients zullen gebruiken (algemene configuratie)"
+      },
+      "dns": {
+        "description": "DNS-server die clients zullen gebruiken (algemene configuratie)"
+      },
+      "mtu": {
+        "description": "MTU die clients zullen gebruiken (alleen voor nieuwe clients)"
+      },
+      "persistentKeepalive": {
+        "description": "Interval in seconden om keepalives naar de server te sturen. 0 = uitgeschakeld (alleen voor nieuwe clients)"
+      },
+      "suggest": {
+        "label": "Voorstellen",
+        "description": "Kies een IP-adres of hostnaam voor het veld Host"
+      }
     },
     "interface": {
+      "title": "Interface",
       "cidrSuccess": "CIDR gewijzigd",
-      "device": "Apparaat",
-      "deviceDesc": "Ethernet-apparaat waar het WireGuard-verkeer doorheen moet worden doorgestuurd",
-      "routingTable": "Routeringstabel",
-      "routingTableDesc": "Routeringstabel voor WireGuard routes. Stel in op autom., uit of het nummer van een tabel.",
-      "mtuDesc": "MTU die WireGuard zal toepassen",
-      "portDesc": "UDP-poort waarop WireGuard zal luisteren (u dient waarschijnlijk ook de Config-poort te wijzigen)",
+      "device": {
+        "label": "Apparaat",
+        "description": "Ethernet-apparaat waar het WireGuard-verkeer doorheen moet worden doorgestuurd"
+      },
+      "routingTable": {
+        "label": "Routeringstabel",
+        "description": "Routeringstabel voor WireGuard routes. Stel in op autom., uit of het nummer van een tabel."
+      },
+      "mtu": {
+        "description": "MTU die WireGuard zal toepassen"
+      },
+      "port": {
+        "description": "UDP-poort waarop WireGuard zal luisteren (u dient waarschijnlijk ook de Config-poort te wijzigen)"
+      },
       "changeCidr": "CIDR wijzigen",
-      "restart": "Interface opnieuw starten",
-      "restartDesc": "WireGuard-interface opnieuw starten",
+      "restart": {
+        "label": "Interface opnieuw starten",
+        "description": "WireGuard-interface opnieuw starten"
+      },
       "restartWarn": "Weet u zeker dat u de interface wilt herstarten? Dit zal alle clients loskoppelen.",
       "restartSuccess": "Interface opnieuw gestart",
       "firewall": "Traffic-filtering",
-      "firewallEnabled": "Per-Client Firewall inschakelen",
-      "firewallEnabledDesc": "Beperk het clientverkeer tot specifieke bestemmings-IP's met behulp van iptables. Indien ingeschakeld, kan elke client worden geconfigureerd met toegestane bestemmingen."
+      "firewallEnabled": {
+        "label": "Per-Client Firewall inschakelen",
+        "description": "Beperk het clientverkeer tot specifieke bestemmings-IP's met behulp van iptables. Indien ingeschakeld, kan elke client worden geconfigureerd met toegestane bestemmingen."
+      }
     },
-    "introText": "Welkom bij het Admin-paneel.\n\nHier kunt u de algemene instellingen, de configuratie, de interface-instellingen en de hooks beheren.\n\nBegin met het kiezen van een van de secties in de zijbalk."
+    "hooks": {
+      "title": "Hooks"
+    },
+    "introduction": "Welkom bij het Admin-paneel.\n\nHier kunt u de algemene instellingen, de configuratie, de interface-instellingen en de hooks beheren.\n\nBegin met het kiezen van een van de secties in de zijbalk."
   },
-  "zod": {
-    "generic": {
+  "wireguard": {
+    "fields": {
+      "mtu": "MTU",
+      "allowedIps": "Toegestane IP's",
+      "dns": "DNS",
+      "persistentKeepalive": "Aanhoudende verbinding",
+      "host": "Host",
+      "port": "Poort"
+    },
+    "hooks": {
+      "preUp": "Pre-Up",
+      "postUp": "Post-Up",
+      "preDown": "Pre-Down",
+      "postDown": "Post-Down"
+    },
+    "obfuscation": {
+      "jC": {
+        "label": "Junk packet count (Jc)",
+        "description": "Aantal te verzenden junk packets (1-128, aanbevolen: 4-12)"
+      },
+      "jMin": {
+        "label": "Junk packet min size (Jmin)",
+        "description": "Minimale grootte van junk packets (0-1279*, aanbevolen: 8, moet zijn < Jmax)"
+      },
+      "jMax": {
+        "label": "Junk packet max size (Jmax)",
+        "description": "Maximale grootte van junk packets (1-1280*, aanbevolen: 80, moet zijn > Jmin)"
+      },
+      "s1": {
+        "label": "Init packet junk size (S1)",
+        "description": "Grootte Init packet junk (0-1132[1280* - 148 = 1132], aanbevolen: 15-150, S1+56 ≠ S2)"
+      },
+      "s2": {
+        "label": "Response packet junk size (S2)",
+        "description": "Grootte Response packet junk (0-1188[1280* - 92 = 1188], aanbevolen: 15-150)"
+      },
+      "s3": {
+        "label": "Cookie reply packet junk size (S3)",
+        "description": "Grootte Cookie reply packet junk"
+      },
+      "s4": {
+        "label": "Transport packet junk size (S4)",
+        "description": "Grootte Transport packet junk"
+      },
+      "h1": {
+        "label": "Init magic header (H1)",
+        "description": "Waarde of bereik Init packet header (X of X-Y, waarbij X<Y. Min. 5, max. 2147483647. Waarde of bereik mag niet overlappen met andere headers)"
+      },
+      "h2": {
+        "label": "Response magic header (H2)",
+        "description": "Waarde of bereik Response packet header (X of X-Y, waarbij X<Y. Min. 5, max. 2147483647. Waarde of bereik mag niet overlappen met andere headers)"
+      },
+      "h3": {
+        "label": "Cookie reply magic header (H3)",
+        "description": "Waarde of bereik Cookie reply packet header (X of X-Y, waarbij X<Y. Min. 5, max. 2147483647. Waarde of bereik mag niet overlappen met andere headers)"
+      },
+      "h4": {
+        "label": "Transport magic header (H4)",
+        "description": "Waarde of bereik Transport packet header (X of X-Y, waarbij X<Y. Min. 5, max. 2147483647. Waarde of bereik mag niet overlappen met andere headers)"
+      },
+      "i1": {
+        "label": "Special junk packet 1 (I1)",
+        "description": "Protocol mimic packet in hex formaat: <b 0x...>"
+      },
+      "i2": {
+        "label": "Special junk packet 2 (I2)",
+        "description": "Protocol mimic packet in hex formaat: <b 0x...>"
+      },
+      "i3": {
+        "label": "Special junk packet 3 (I3)",
+        "description": "Protocol mimic packet in hex formaat: <b 0x...>"
+      },
+      "i4": {
+        "label": "Special junk packet 4 (I4)",
+        "description": "Protocol mimic packet in hex formaat: <b 0x...>"
+      },
+      "i5": {
+        "label": "Special junk packet 5 (I5)",
+        "description": "Protocol mimic packet in hex formaat: <b 0x...>"
+      },
+      "rangeNote": "De volgende parameters accepteren een enkel getal of een inclusief bereik (0-65535), bijvoorbeeld 30 of 30-90",
+      "headerProtectionKey": {
+        "label": "Header protection key",
+        "description": "32 byte base64-sleutel gebruikt om pakketheaders te coderen. Moet aan beide kanten overeenkomen, dus het wordt naar elke klant gekopieerd. Vereist dat S1-S4 minimaal 12 is"
+      },
+      "contentPaddingAddition": {
+        "label": "Content padding addition",
+        "description": "Willekeurige aantal bytes dat vóór versleuteling wordt toegevoegd aan transportpakketten"
+      },
+      "rekeyAfterTime": {
+        "label": "Rekey after time",
+        "description": "Aantal seconden voordat er opnieuw over een sessie wordt onderhandeld (standaard WireGuard: 120)"
+      },
+      "rekeyTimeout": {
+        "label": "Rekey timeout",
+        "description": "Aantal seconden tussen handshake-retries (WireGuard standaard: 5)"
+      },
+      "rejectAfterTime": {
+        "label": "Reject after time",
+        "description": "Levensduur van sessie in seconden (WireGuard standaard: 180)"
+      },
+      "keepaliveTimeout": {
+        "label": "Keepalive timeout",
+        "description": "Aantal seconden inactief voordat een keepalive wordt verzonden (standaard WireGuard: 10)"
+      },
+      "maxHandshakeAttempts": {
+        "label": "Max handshake attempts",
+        "description": "Aantal handshake-pogingen alvorens op te geven (standaard WireGuard: 18)"
+      },
+      "randomTrailers": {
+        "label": "Random trailers",
+        "description": "Voeg een willekeurige hoeveelheid bytes toe aan handshake-pakketten. Moet aan beide kanten overeenkomen, dus het wordt naar elke client gekopieerd"
+      },
+      "disableCookies": {
+        "label": "Disable cookies",
+        "description": "Beantwoord geen handdrukken met cookieberichten wanneer deze worden geladen. Heeft alleen invloed op deze kant van de tunnel"
+      },
+      "mtuNote": "Waarden zijn afhankelijk van de MTU",
+      "title": "AmneziaWG Obfuscation Parameters"
+    }
+  },
+  "validation": {
+    "messages": {
       "required": "{field} is vereist",
       "validNumber": "{field} moet een geldig getal zijn",
       "validNumberRange": "{field} moet een geldig getal of bereik zijn",
@@ -264,72 +471,5 @@
     "allowedIps": "Toegestane IP's",
     "allowedIpsInvalid": "Elke invoer van toegestane IP's moet één enkel IP-adres of CIDR zijn",
     "file": "Bestand"
-  },
-  "hooks": {
-    "preUp": "Pre-Up",
-    "postUp": "Post-Up",
-    "preDown": "Pre-Down",
-    "postDown": "Post-Down"
-  },
-  "copy": {
-    "notSupported": "Kopiëren wordt niet ondersteund",
-    "copied": "Gekopieerd!",
-    "failed": "Kopiëren is mislukt",
-    "copy": "Kopiëren"
-  },
-  "awg": {
-    "jCLabel": "Junk packet count (Jc)",
-    "jCDescription": "Aantal te verzenden junk packets (1-128, aanbevolen: 4-12)",
-    "jMinLabel": "Junk packet min size (Jmin)",
-    "jMinDescription": "Minimale grootte van junk packets (0-1279*, aanbevolen: 8, moet zijn < Jmax)",
-    "jMaxLabel": "Junk packet max size (Jmax)",
-    "jMaxDescription": "Maximale grootte van junk packets (1-1280*, aanbevolen: 80, moet zijn > Jmin)",
-    "s1Label": "Init packet junk size (S1)",
-    "s1Description": "Grootte Init packet junk (0-1132[1280* - 148 = 1132], aanbevolen: 15-150, S1+56 ≠ S2)",
-    "s2Label": "Response packet junk size (S2)",
-    "s2Description": "Grootte Response packet junk (0-1188[1280* - 92 = 1188], aanbevolen: 15-150)",
-    "s3Label": "Cookie reply packet junk size (S3)",
-    "s3Description": "Grootte Cookie reply packet junk",
-    "s4Label": "Transport packet junk size (S4)",
-    "s4Description": "Grootte Transport packet junk",
-    "h1Label": "Init magic header (H1)",
-    "h1Description": "Waarde of bereik Init packet header (X of X-Y, waarbij X<Y. Min. 5, max. 2147483647. Waarde of bereik mag niet overlappen met andere headers)",
-    "h2Label": "Response magic header (H2)",
-    "h2Description": "Waarde of bereik Response packet header (X of X-Y, waarbij X<Y. Min. 5, max. 2147483647. Waarde of bereik mag niet overlappen met andere headers)",
-    "h3Label": "Cookie reply magic header (H3)",
-    "h3Description": "Waarde of bereik Cookie reply packet header (X of X-Y, waarbij X<Y. Min. 5, max. 2147483647. Waarde of bereik mag niet overlappen met andere headers)",
-    "h4Label": "Transport magic header (H4)",
-    "h4Description": "Waarde of bereik Transport packet header (X of X-Y, waarbij X<Y. Min. 5, max. 2147483647. Waarde of bereik mag niet overlappen met andere headers)",
-    "i1Label": "Special junk packet 1 (I1)",
-    "i1Description": "Protocol mimic packet in hex formaat: <b 0x...>",
-    "i2Label": "Special junk packet 2 (I2)",
-    "i2Description": "Protocol mimic packet in hex formaat: <b 0x...>",
-    "i3Label": "Special junk packet 3 (I3)",
-    "i3Description": "Protocol mimic packet in hex formaat: <b 0x...>",
-    "i4Label": "Special junk packet 4 (I4)",
-    "i4Description": "Protocol mimic packet in hex formaat: <b 0x...>",
-    "i5Label": "Special junk packet 5 (I5)",
-    "i5Description": "Protocol mimic packet in hex formaat: <b 0x...>",
-    "rangeNote": "De volgende parameters accepteren een enkel getal of een inclusief bereik (0-65535), bijvoorbeeld 30 of 30-90",
-    "headerProtectionKeyLabel": "Header protection key",
-    "headerProtectionKeyDescription": "32 byte base64-sleutel gebruikt om pakketheaders te coderen. Moet aan beide kanten overeenkomen, dus het wordt naar elke klant gekopieerd. Vereist dat S1-S4 minimaal 12 is",
-    "contentPaddingAdditionLabel": "Content padding addition",
-    "contentPaddingAdditionDescription": "Willekeurige aantal bytes dat vóór versleuteling wordt toegevoegd aan transportpakketten",
-    "rekeyAfterTimeLabel": "Rekey after time",
-    "rekeyAfterTimeDescription": "Aantal seconden voordat er opnieuw over een sessie wordt onderhandeld (standaard WireGuard: 120)",
-    "rekeyTimeoutLabel": "Rekey timeout",
-    "rekeyTimeoutDescription": "Aantal seconden tussen handshake-retries (WireGuard standaard: 5)",
-    "rejectAfterTimeLabel": "Reject after time",
-    "rejectAfterTimeDescription": "Levensduur van sessie in seconden (WireGuard standaard: 180)",
-    "keepaliveTimeoutLabel": "Keepalive timeout",
-    "keepaliveTimeoutDescription": "Aantal seconden inactief voordat een keepalive wordt verzonden (standaard WireGuard: 10)",
-    "maxHandshakeAttemptsLabel": "Max handshake attempts",
-    "maxHandshakeAttemptsDescription": "Aantal handshake-pogingen alvorens op te geven (standaard WireGuard: 18)",
-    "randomTrailersLabel": "Random trailers",
-    "randomTrailersDescription": "Voeg een willekeurige hoeveelheid bytes toe aan handshake-pakketten. Moet aan beide kanten overeenkomen, dus het wordt naar elke client gekopieerd",
-    "disableCookiesLabel": "Disable cookies",
-    "disableCookiesDescription": "Beantwoord geen handdrukken met cookieberichten wanneer deze worden geladen. Heeft alleen invloed op deze kant van de tunnel",
-    "mtuNote": "Waarden zijn afhankelijk van de MTU",
-    "obfuscationParameters": "AmneziaWG Obfuscation Parameters"
   }
 }
