@@ -603,6 +603,7 @@
     "dns": "DNS",
     "allowedIps": "Allowed IPs",
     "allowedIpsInvalid": "Each Allowed IPs entry must be a single IP address or CIDR",
+    "allowedIpsHostBits": "Each Allowed IPs CIDR must use its network address (e.g. 192.168.1.0/24, not 192.168.1.5/24). WireGuard ignores the host bits, so 192.168.1.0/0 would route all traffic",
     "endpointInvalid": "Use a hostname or IPv4 address followed by :port, or [IPv6]:port (1–65535)",
     "file": "File"
   }
