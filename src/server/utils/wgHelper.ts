@@ -32,10 +32,15 @@ export const wg = {
     );
   },
 
-  sync: (infName: string) => {
-    return exec(
+  sync: async (infName: string) => {
+    // wg-quick sets a fwmark when a peer routes a default route (Table = auto).
+    // The stripped config has no FwMark, so syncconf would reset it to off.
+    const fwmark = await exec(`${wgExecutable} show ${infName} fwmark`);
+    await exec(
       `${wgExecutable} syncconf ${infName} <(${wgExecutable}-quick strip ${infName})`
     );
+    if (/^0x[0-9a-f]+$/i.test(fwmark))
+      await exec(`${wgExecutable} set ${infName} fwmark ${fwmark}`);
   },
 
   removePeer: (infName: string, publicKey: string) => {
