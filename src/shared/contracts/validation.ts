@@ -1,6 +1,8 @@
 import z from 'zod';
 import { isIP, isIPv4, isIPv6 } from 'is-ip';
 import isCidr from 'is-cidr';
+import { parseCidr } from 'cidr-tools';
+import { parseIp } from 'ip-bigint';
 
 export type ID = number;
 
@@ -186,7 +188,16 @@ export const DnsSchema = z.array(AddressSchema, {
 export const AllowedIpEntrySchema = AddressSchema.refine(
   (v) => isIP(v) || isCidr(v) !== 0,
   { message: t('validation.allowedIpsInvalid') }
+).refine(
+  // WireGuard drops host bits, so 192.168.1.0/0 silently becomes 0.0.0.0/0
+  (v) => !isCidr(v) || isNetworkAddress(v),
+  { message: t('validation.allowedIpsHostBits') }
 );
+
+function isNetworkAddress(cidr: string) {
+  const { ip, start } = parseCidr(cidr);
+  return parseIp(ip).number === start;
+}
 
 export const AllowedIpsSchema = z
   .array(AllowedIpEntrySchema, { message: t('validation.allowedIps') })
