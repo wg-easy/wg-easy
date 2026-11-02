@@ -55,6 +55,7 @@ beforeEach(async () => {
     if (command === 'echo new-private-key | wg pubkey') return 'new-public-key';
     if (command === 'wg-quick down wg0; wg-quick up wg0') return '';
     if (command === 'wg show wg0 dump') return '';
+    if (command === 'wg show wg0 fwmark') return 'off';
     if (
       command.includes(' syncconf ') ||
       /^(?:while )?ip6?tables /.test(command)
