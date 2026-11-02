@@ -94,7 +94,9 @@ function update(event: Event, index: number) {
 }
 
 function add() {
-  if (data.value) data.value = [...data.value, ''];
+  if (data.value) {
+    data.value = [...data.value, ''];
+  }
 }
 
 async function move(index: number, target: number) {

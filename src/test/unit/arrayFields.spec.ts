@@ -37,7 +37,9 @@ afterEach(() => {
 async function dispatch(node: RenderedNode, event: string, value?: unknown) {
   const handlers = node.props[event] as
     ((value: unknown) => void) | ((value: unknown) => void)[];
-  for (const handler of [handlers].flat()) handler(value);
+  for (const handler of [handlers].flat()) {
+    handler(value);
+  }
   // VueUse schedules the model update before Vue renders the new order.
   await nextTick();
   await nextTick();
@@ -48,8 +50,9 @@ async function mountField(value: string[] | null, nullable = false) {
     computed,
     useTemplateRef,
     nextTick,
-  }))
+  })) {
     vi.stubGlobal(name, fn);
+  }
   // Parent-owned arrays must never be mutated by field operations.
   const model = shallowRef<readonly string[] | null | undefined>(
     Object.freeze(value)
@@ -106,10 +109,14 @@ async function mountField(value: string[] | null, nullable = false) {
         },
         insertBefore(child: RenderedNode, anchor: RenderedNode | null) {
           const index = list.children.indexOf(child);
-          if (index >= 0) list.children.splice(index, 1);
-          if (anchor)
+          if (index >= 0) {
+            list.children.splice(index, 1);
+          }
+          if (anchor) {
             list.children.splice(list.children.indexOf(anchor), 0, child);
-          else list.children.push(child);
+          } else {
+            list.children.push(child);
+          }
         },
       };
       Object.assign(item, { parentNode: element });
@@ -172,12 +179,13 @@ test('keyboard moves stay in bounds and keep focus on the moved row', async () =
   const handles = [view.button('reorder', 0), view.button('reorder', 1)];
   let focused: RenderedNode | undefined;
   // Supply only the DOM focus primitives missing from the test renderer.
-  for (const handle of handles)
+  for (const handle of handles) {
     Object.assign(handle, {
       focus: () => {
         focused = handle;
       },
     });
+  }
   Object.assign(view.list, { querySelectorAll: () => handles });
 
   await view.key(0, 'ArrowUp');
@@ -209,8 +217,11 @@ test.each([
     const view = await mountField(empty, nullable);
     view.expectItems(empty);
     expect(view.updates).not.toHaveBeenCalled();
-    if (message) expect(textOf(view.root)).toContain(message);
-    else expect(textOf(view.root)).not.toContain('common.form.nullNoItems');
+    if (message) {
+      expect(textOf(view.root)).toContain(message);
+    } else {
+      expect(textOf(view.root)).not.toContain('common.form.nullNoItems');
+    }
 
     await view.click('add');
     view.expectItems(['']);

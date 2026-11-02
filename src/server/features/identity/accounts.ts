@@ -9,8 +9,9 @@ export async function createPasswordUser(
   password: string
 ) {
   const hash = await hashPassword(password);
-  if (await users.getByUsername(username))
+  if (await users.getByUsername(username)) {
     throw new Error('User already exists');
+  }
   const count = await users.count();
   await users.insert({
     username,

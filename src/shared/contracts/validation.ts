@@ -50,12 +50,16 @@ const RANGE_REGEX = /^(\d+)(?:-(\d+))?$/;
 
 function parseRange(value: string) {
   const match = RANGE_REGEX.exec(value);
-  if (!match) return null;
+  if (!match) {
+    return null;
+  }
 
   const lower = Number(match[1]);
   const upper = match[2] === undefined ? lower : Number(match[2]);
 
-  if (!Number.isSafeInteger(lower) || !Number.isSafeInteger(upper)) return null;
+  if (!Number.isSafeInteger(lower) || !Number.isSafeInteger(upper)) {
+    return null;
+  }
 
   return { lower, upper };
 }
@@ -73,7 +77,9 @@ function rangeSchema(min: number, max: number) {
     .refine(
       (v) => {
         const range = parseRange(v);
-        if (!range) return false;
+        if (!range) {
+          return false;
+        }
 
         return (
           range.lower >= min && range.upper <= max && range.lower <= range.upper
@@ -86,7 +92,9 @@ function rangeSchema(min: number, max: number) {
     .transform((v) => {
       const range = parseRange(v);
       // cannot happen, the refine above already rejected unparsable values
-      if (!range) return v;
+      if (!range) {
+        return v;
+      }
 
       return range.lower === range.upper
         ? `${range.lower}`
@@ -159,13 +167,23 @@ export const AddressSchema = z
 export const EndpointSchema = AddressSchema.refine(
   (value) => {
     const match = /^(\[[^\]]+\]|[^:\s]+):(\d{1,5})$/.exec(value);
-    if (!match) return false;
+    if (!match) {
+      return false;
+    }
     const host = match[1]!;
     const port = Number(match[2]);
-    if (port < 1 || port > 65535) return false;
-    if (host.startsWith('[')) return isIPv6(host.slice(1, -1));
-    if (isIPv4(host)) return true;
-    if (/^[\d.]+$/.test(host)) return false;
+    if (port < 1 || port > 65535) {
+      return false;
+    }
+    if (host.startsWith('[')) {
+      return isIPv6(host.slice(1, -1));
+    }
+    if (isIPv4(host)) {
+      return true;
+    }
+    if (/^[\d.]+$/.test(host)) {
+      return false;
+    }
     const hostname = host.endsWith('.') ? host.slice(0, -1) : host;
     return (
       hostname.length <= 253 &&
@@ -212,7 +230,9 @@ const FirewallIpEntrySchema = z
         const [, ipPart, portPart] = portMatch;
         const port = parseInt(portPart!, 10);
         const cleanIp = ipPart!.replace(/^\[|\]$/g, '');
-        if (cleanIp.includes(':') && !/^\[.+\]$/.test(ipPart!)) return false;
+        if (cleanIp.includes(':') && !/^\[.+\]$/.test(ipPart!)) {
+          return false;
+        }
         return (isIP(cleanIp) || isCidr(cleanIp)) && port >= 1 && port <= 65535;
       }
 

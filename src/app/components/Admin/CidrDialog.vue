@@ -35,7 +35,9 @@ const ipv4Cidr = ref(props.ipv4Cidr);
 const ipv6Cidr = ref(props.ipv6Cidr);
 
 function resetOnOpen(open: boolean) {
-  if (!open) return;
+  if (!open) {
+    return;
+  }
 
   ipv4Cidr.value = props.ipv4Cidr;
   ipv6Cidr.value = props.ipv6Cidr;

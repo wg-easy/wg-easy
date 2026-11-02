@@ -7,8 +7,12 @@ const safeMethods = new Set(['GET', 'HEAD', 'OPTIONS']);
 
 export default defineEventHandler((event) => {
   // Opt in through proxy configuration until the next major release.
-  if (WG_ENV.TRUSTED_PROXIES.length === 0) return;
-  if (safeMethods.has(event.req.method)) return;
+  if (WG_ENV.TRUSTED_PROXIES.length === 0) {
+    return;
+  }
+  if (safeMethods.has(event.req.method)) {
+    return;
+  }
 
   const target = getTrustedRequestURL(
     event,
@@ -20,7 +24,9 @@ export default defineEventHandler((event) => {
   // Only an absent Origin may fall back; empty and "null" origins must fail.
   const sourceOrigin =
     origin ?? URL.parse(event.req.headers.get('referer') ?? '')?.origin;
-  if (sourceOrigin === target.origin) return;
+  if (sourceOrigin === target.origin) {
+    return;
+  }
 
   // Protect login and setup too; credentials do not bypass origin validation.
   throw createError({

@@ -269,8 +269,9 @@ describe('identity HTTP contract', () => {
       await passwordLogin(login);
       const cookie = sessionCookie(login);
       const header = login.res.headers.get('set-cookie');
-      if (remember) expect(header).toContain(`Max-Age=${sessionTimeout}`);
-      else {
+      if (remember) {
+        expect(header).toContain(`Max-Age=${sessionTimeout}`);
+      } else {
         expect(header).not.toContain('Max-Age=');
         expect(header).not.toContain('Expires=');
       }
@@ -278,8 +279,11 @@ describe('identity HTTP contract', () => {
       // Advance beyond the sealing library's clock-skew allowance too.
       now += (sessionTimeout + 61) * 1000;
       const read = sessionUser(request('/api/session', undefined, cookie));
-      if (remember) await expect(read).rejects.toMatchObject({ status: 401 });
-      else await expect(read).resolves.toMatchObject({ id: 1 });
+      if (remember) {
+        await expect(read).rejects.toMatchObject({ status: 401 });
+      } else {
+        await expect(read).resolves.toMatchObject({ id: 1 });
+      }
     }
   );
 
@@ -649,18 +653,20 @@ describe('OAuth workflow', () => {
     const before = await fixture.store.users.get(1);
     const start = oauthRequest('');
     await beginOAuth(start);
-    if (failure === 'disallowed domain')
+    if (failure === 'disallowed domain') {
       WG_ENV.OAUTH_ALLOWED_DOMAINS = ['allowed.example.com'];
-    if (failure === 'exchange')
+    }
+    if (failure === 'exchange') {
       vi.mocked(oauthClient.authorizationCodeGrant).mockRejectedValueOnce(
         new Error('Invalid state')
       );
-    else
+    } else {
       vi.mocked(oauthClient.fetchUserInfo).mockResolvedValueOnce({
         sub: failure === 'missing subject' ? '' : 'external-user',
         email: failure === 'missing email' ? undefined : 'admin@example.com',
         email_verified: failure !== 'unverified email',
       });
+    }
     const callback = oauthRequest(
       '/callback?code=code&state=state',
       sessionCookie(start)

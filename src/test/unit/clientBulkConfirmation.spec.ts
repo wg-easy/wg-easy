@@ -30,8 +30,9 @@ async function mountActions() {
   vi.stubGlobal('useClientsStore', () => store);
   vi.stubGlobal('useToast', () => ({ showToast: vi.fn() }));
   vi.stubGlobal('useI18n', () => ({ t: (key: string) => key }));
-  for (const [name, value] of Object.entries({ computed, ref, watch }))
+  for (const [name, value] of Object.entries({ computed, ref, watch })) {
     vi.stubGlobal(name, value);
+  }
   const app = renderer.createApp(BulkActions);
   app.config.globalProperties.$t = (key: string, params?: { count: number }) =>
     `${key}${params ? ` ${params.count}` : ''}`;
@@ -53,8 +54,9 @@ async function mountActions() {
     'AlertDialogContent',
     'AlertDialogTitle',
     'AlertDialogDescription',
-  ])
+  ]) {
     app.component(name, Wrapper);
+  }
   let updateOpen!: (open: boolean) => void;
   app.component(
     'AlertDialogRoot',

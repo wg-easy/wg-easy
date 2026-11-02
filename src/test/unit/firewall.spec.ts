@@ -37,8 +37,9 @@ describe('firewall chains', () => {
       const jump = '-i wg0 -j WG_CLIENTS_wg0';
       const rules = new Map<string, string[]>();
       for (const family of ['iptables', 'ip6tables']) {
-        for (const parent of ['INPUT', 'FORWARD'])
+        for (const parent of ['INPUT', 'FORWARD']) {
           rules.set(`${family}:${parent}`, state === 'existing' ? [jump] : []);
+        }
       }
       const complete = new Set<string>();
       const expectProtected = () => {
@@ -54,17 +55,21 @@ describe('firewall chains', () => {
       execMock.mockImplementation(async (command) => {
         const [family, action, chain] = command.split(' ');
         const entries = rules.get(`${family}:${chain}`);
-        if (action === '-S' && entries)
+        if (action === '-S' && entries) {
           return [
             `-P ${chain} ACCEPT`,
             ...entries.map((rule) => `-A ${chain} ${rule}`),
           ].join('\n');
+        }
         const insertion = command.match(/-I \w+ (\d+) (.+)$/);
         if (entries && insertion) {
           const [, position, rule] = insertion;
-          if (action === '-I' || !entries.includes(rule!))
+          if (action === '-I' || !entries.includes(rule!)) {
             entries.splice(Number(position) - 1, 0, rule!);
-          if (action === '-C') expectProtected();
+          }
+          if (action === '-C') {
+            expectProtected();
+          }
         }
         if (action === '-D' && entries) {
           expect(complete.size).toBe(2);
@@ -78,11 +83,14 @@ describe('firewall chains', () => {
           chain === 'WG_CLIENTS_wg0' &&
           (action === '-F' || action === '-A')
         ) {
-          if (action === '-F') complete.delete(family!);
+          if (action === '-F') {
+            complete.delete(family!);
+          }
           expectProtected();
           if (command.endsWith('-j DROP')) {
-            if (fail && family === 'ip6tables')
+            if (fail && family === 'ip6tables') {
               throw new Error('Firewall unavailable');
+            }
             complete.add(family!);
           }
         }
@@ -91,10 +99,14 @@ describe('firewall chains', () => {
       await expect(
         firewall.rebuildRules(network, [client], defaults, true)
       ).rejects.toThrow('Firewall unavailable');
-      for (const entries of rules.values()) expect(entries[0]).toBe(guard);
+      for (const entries of rules.values()) {
+        expect(entries[0]).toBe(guard);
+      }
       fail = false;
       await firewall.rebuildRules(network, [client], defaults, true);
-      for (const entries of rules.values()) expect(entries).toEqual([jump]);
+      for (const entries of rules.values()) {
+        expect(entries).toEqual([jump]);
+      }
     }
   );
 

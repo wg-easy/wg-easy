@@ -40,7 +40,9 @@ const { data } = useFetch(props.url, {
 const selected = ref<string>();
 
 async function resetOnOpen(open: boolean) {
-  if (!open) return;
+  if (!open) {
+    return;
+  }
 
   selected.value = undefined;
 }

@@ -24,8 +24,9 @@ async function mountSwitch(enabled: boolean) {
   const showToast = vi.fn();
   vi.stubGlobal('useClientsStore', () => ({ refresh }));
   vi.stubGlobal('useToast', () => ({ showToast }));
-  for (const [name, value] of Object.entries({ ref, watch, useSubmit }))
+  for (const [name, value] of Object.entries({ ref, watch, useSubmit })) {
     vi.stubGlobal(name, value);
+  }
 
   let input!: Readonly<{ modelValue: boolean }>;
   let update!: (value: boolean | undefined) => void;

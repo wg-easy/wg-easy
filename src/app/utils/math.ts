@@ -4,8 +4,12 @@ export function bytes(
   kib = false,
   maxunit?: string
 ) {
-  if (bytes === 0) return '0 B';
-  if (Number.isNaN(bytes) && !Number.isFinite(bytes)) return 'NaN';
+  if (bytes === 0) {
+    return '0 B';
+  }
+  if (Number.isNaN(bytes) && !Number.isFinite(bytes)) {
+    return 'NaN';
+  }
   const k = kib ? 1024 : 1000;
   const dm =
     decimals != null && !Number.isNaN(decimals) && decimals >= 0 ? decimals : 2;
@@ -15,7 +19,9 @@ export function bytes(
   let i = Math.floor(Math.log(bytes) / Math.log(k));
   if (maxunit !== undefined) {
     const index = sizes.indexOf(maxunit);
-    if (index !== -1) i = index;
+    if (index !== -1) {
+      i = index;
+    }
   }
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
 }

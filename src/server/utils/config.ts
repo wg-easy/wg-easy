@@ -32,7 +32,9 @@ const detectAwg = async (): Promise<'awg' | 'wg'> => {
         .then(() => 'awg' as const)
         .catch(() => 'wg' as const);
     }
-  } else return 'wg';
+  } else {
+    return 'wg';
+  }
 };
 
 export type OAuthConfig = {

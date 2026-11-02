@@ -73,8 +73,9 @@ export async function login(
 ) {
   const { username, password, remember } = credentials;
   const result = await identity.login(username, password, remember);
-  if (!result.success && result.error === 'INCORRECT_CREDENTIALS')
+  if (!result.success && result.error === 'INCORRECT_CREDENTIALS') {
     logSecurityEvent(event, 'password', username);
+  }
   return authenticate(event, result, remember);
 }
 
@@ -86,8 +87,9 @@ export async function completeSecondFactor(event: RequestEvent, code: string) {
     logSecurityEvent(event, '2fa');
     return { status: result.status };
   }
-  if (result.status === 'USER_DISABLED')
+  if (result.status === 'USER_DISABLED') {
     throw createError({ status: 401, statusText: 'User disabled' });
+  }
   const session = await useWGSession(event, pendingLogin?.remember);
   await session.update({
     ...clearTransientState,
@@ -116,7 +118,9 @@ export async function cancelLogin(event: RequestEvent) {
 }
 
 export async function beginOAuth(event: RequestEvent, link = false) {
-  if (link) await getCurrentUser(event);
+  if (link) {
+    await getCurrentUser(event);
+  }
   const { config, provider, providerConfig } = await buildOauthConfig(event);
   const { origin } = getTrustedRequestURL(
     event,
@@ -151,11 +155,12 @@ export async function completeOAuth(event: RequestEvent, actor?: Actor) {
   const { config, provider, providerConfig } = await buildOauthConfig(event);
   const session = await useWGSession(event);
   const { oauth_nonce, oauth_verifier, oauth_state } = session.data;
-  if (!oauth_nonce || !oauth_verifier || !oauth_state)
+  if (!oauth_nonce || !oauth_verifier || !oauth_state) {
     throw createError({
       status: 400,
       statusText: 'Missing OAuth State',
     });
+  }
   // Consume transient state on both successful and rejected exchanges.
   await session.update(clearTransientState);
   const info = await getUserInfo(
@@ -181,14 +186,16 @@ export async function completeOAuth(event: RequestEvent, actor?: Actor) {
 
 export async function currentSessionUser(event: RequestEvent) {
   const session = await getWGSession(event);
-  if (!session.data.userId || session.data.pendingLogin)
+  if (!session.data.userId || session.data.pendingLogin) {
     throw createError({ status: 401, statusText: 'Not authenticated' });
+  }
   const user = await identity.sessionUser(session.data.userId);
-  if (!user)
+  if (!user) {
     throw createError({
       status: 404,
       statusText: 'Not found in Database',
     });
+  }
   return user;
 }
 
@@ -271,8 +278,9 @@ export async function getCurrentUser(event: RequestEvent) {
     try {
       user = await identity.authenticateBasic(username, password);
     } catch (error) {
-      if (isNuxtError(error) && [401, 403].includes(error.status))
+      if (isNuxtError(error) && [401, 403].includes(error.status)) {
         logSecurityEvent(event, 'basic', username);
+      }
       throw error;
     }
   } else {

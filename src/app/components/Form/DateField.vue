@@ -18,11 +18,15 @@ const mounted = useMounted();
 
 const formattedDate = computed(() => {
   // The browser's timezone is only available after hydration.
-  if (!mounted.value || !data.value) return '';
+  if (!mounted.value || !data.value) {
+    return '';
+  }
 
   // Date-only values retain their original midnight-UTC expiration.
   const date = new Date(data.value);
-  if (Number.isNaN(date.getTime())) return '';
+  if (Number.isNaN(date.getTime())) {
+    return '';
+  }
 
   const pad = (value: number) => String(value).padStart(2, '0');
   const day = `${String(date.getFullYear()).padStart(4, '0')}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;

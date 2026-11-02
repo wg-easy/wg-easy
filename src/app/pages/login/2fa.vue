@@ -93,7 +93,9 @@ const _submit = useSubmit(
 );
 
 async function submit() {
-  if (!totp.value || authenticating.value) return;
+  if (!totp.value || authenticating.value) {
+    return;
+  }
 
   authenticating.value = true;
   return _submit({ totpCode: totp.value });

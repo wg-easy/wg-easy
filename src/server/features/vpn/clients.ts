@@ -112,7 +112,9 @@ export async function apply(
     keys = { privateKey, publicKey: await wg.getPublicKey(privateKey) };
   } else if (action === 'rotatePreSharedKey') {
     const preSharedKey = await wg.generatePreSharedKey();
-    if (!preSharedKey) throw new Error('Failed to generate preshared key');
+    if (!preSharedKey) {
+      throw new Error('Failed to generate preshared key');
+    }
     keys = { preSharedKey };
   } else {
     keys = { preSharedKey: null };
@@ -131,10 +133,13 @@ function changeAccess(actor: Actor, data: ClientBulkType, single: boolean) {
   return commit(async (tx) => {
     const clients = await tx.clients.findByIds(data.clientIds);
     const permission = data.action === 'delete' ? 'delete' : 'update';
-    if (single) authorizeClient(actor, permission, clients[0]);
-    else
-      for (const client of clients)
+    if (single) {
+      authorizeClient(actor, permission, clients[0]);
+    } else {
+      for (const client of clients) {
         authorize(actor, 'clients', permission, client);
+      }
+    }
     if (clients.length !== data.clientIds.length) {
       throw createError({
         status: 404,
@@ -156,8 +161,11 @@ function changeAccess(actor: Actor, data: ClientBulkType, single: boolean) {
         statusText: single ? message : undefined,
       });
     }
-    if (data.action === 'delete') await tx.clients.deleteMany(data.clientIds);
-    else await tx.clients.setEnabled(data.clientIds, data.action === 'enable');
+    if (data.action === 'delete') {
+      await tx.clients.deleteMany(data.clientIds);
+    } else {
+      await tx.clients.setEnabled(data.clientIds, data.action === 'enable');
+    }
     return clients.length;
   });
 }

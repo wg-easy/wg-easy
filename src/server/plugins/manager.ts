@@ -29,7 +29,7 @@ export default defineNitroPlugin(async (nitroApp) => {
   });
   setDatabase(database.store);
   try {
-    if (WG_INITIAL_ENV.ENABLED)
+    if (WG_INITIAL_ENV.ENABLED) {
       await initialize({
         username: WG_INITIAL_ENV.USERNAME,
         password: WG_INITIAL_ENV.PASSWORD,
@@ -40,6 +40,7 @@ export default defineNitroPlugin(async (nitroApp) => {
         dns: WG_INITIAL_ENV.DNS,
         allowedIps: WG_INITIAL_ENV.ALLOWED_IPS,
       });
+    }
     await vpn.start();
   } catch (error) {
     await vpn.stop().catch(() => {});

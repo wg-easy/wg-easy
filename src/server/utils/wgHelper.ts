@@ -40,8 +40,9 @@ export const wg = {
 
   removePeer: (infName: string, publicKey: string) => {
     // Keys come from the kernel dump, but must still be safe shell arguments.
-    if (!/^[A-Za-z0-9+/]{43}=$/.test(publicKey))
+    if (!/^[A-Za-z0-9+/]{43}=$/.test(publicKey)) {
       throw new Error('Invalid WireGuard public key');
+    }
     return exec(`${wgExecutable} set ${infName} peer ${publicKey} remove`);
   },
 

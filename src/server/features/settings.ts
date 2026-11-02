@@ -31,19 +31,23 @@ export async function authorizeMetrics(
 ) {
   const config = await getDatabase().general.getMetricsConfig();
   if (config.password) {
-    if (!credentials)
+    if (!credentials) {
       throw createError({ status: 401, statusText: 'Unauthorized' });
-    if (credentials.method !== 'Bearer' || !credentials.value)
+    }
+    if (credentials.method !== 'Bearer' || !credentials.value) {
       throw createError({
         status: 401,
         statusText: 'Bearer Auth required',
       });
-    if (!(await isPasswordValid(credentials.value, config.password)))
+    }
+    if (!(await isPasswordValid(credentials.value, config.password))) {
       throw createError({ status: 401, statusText: 'Incorrect token' });
+    }
   }
-  if (!config[type])
+  if (!config[type]) {
     throw createError({
       status: 400,
       statusText: 'Metrics not enabled',
     });
+  }
 }

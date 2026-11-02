@@ -28,12 +28,17 @@ export const renderer = createRenderer<TestNode, TestNode>({
     }
     child.parent = parent;
     const index = anchor ? parent.children.indexOf(anchor) : -1;
-    if (index < 0) parent.children.push(child);
-    else parent.children.splice(index, 0, child);
+    if (index < 0) {
+      parent.children.push(child);
+    } else {
+      parent.children.splice(index, 0, child);
+    }
   },
   remove(child) {
     const siblings = child.parent?.children;
-    if (siblings) siblings.splice(siblings.indexOf(child), 1);
+    if (siblings) {
+      siblings.splice(siblings.indexOf(child), 1);
+    }
     child.parent = undefined;
   },
   setText: (node, text) => {

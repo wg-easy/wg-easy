@@ -19,7 +19,9 @@ export async function connect(options: {
   try {
     await migrate(db);
     await renameInterface(db, options.interfaceName);
-    if (options.disableIpv6) await disableIpv6(db, options.interfaceName);
+    if (options.disableIpv6) {
+      await disableIpv6(db, options.interfaceName);
+    }
     return {
       store: createStore(db, options.interfaceName),
       close: () => client.close(),

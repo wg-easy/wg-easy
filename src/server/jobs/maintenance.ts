@@ -5,7 +5,9 @@ export function startMaintenance(
 ) {
   let pending: Promise<void> | undefined;
   const tick = () => {
-    if (pending) return;
+    if (pending) {
+      return;
+    }
     pending = operation()
       .catch((error) => {
         console.error('Running VPN maintenance failed:', error);

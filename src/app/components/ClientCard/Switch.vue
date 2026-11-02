@@ -45,7 +45,9 @@ const submit = useSubmit(
 );
 
 async function toggleClient(nextEnabled: boolean | undefined) {
-  if (nextEnabled === undefined) return;
+  if (nextEnabled === undefined) {
+    return;
+  }
 
   // Update immediately while the request and store refresh are in progress.
   enabled.value = nextEnabled;

@@ -56,7 +56,9 @@ test.each(['throw', 'reject'])(
     const operation = vi
       .fn()
       .mockImplementationOnce(() => {
-        if (failure === 'throw') throw error;
+        if (failure === 'throw') {
+          throw error;
+        }
         return Promise.reject(error);
       })
       .mockResolvedValue('recovered');

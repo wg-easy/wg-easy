@@ -356,7 +356,9 @@ async function refreshKeys() {
 }
 
 async function changeKey(action: keyof typeof keyActions) {
-  if (keyActionPending.value) return;
+  if (keyActionPending.value) {
+    return;
+  }
   keyActionPending.value = true;
   try {
     await useSubmit(keyActions[action], {
