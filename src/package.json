@@ -25,8 +25,8 @@
   },
   "dependencies": {
     "@libsql/client": "^0.18.0",
-    "@lucide/vue": "^1.61.0",
-    "@nuxtjs/color-mode": "^4.0.1",
+    "@lucide/vue": "^1.65.0",
+    "@nuxtjs/color-mode": "^4.1.0",
     "@nuxtjs/i18n": "^10.6.0",
     "@phc/format": "^1.0.0",
     "@pinia/nuxt": "^1.0.3",
@@ -35,7 +35,7 @@
     "@vueuse/core": "^15.0.0",
     "@vueuse/integrations": "^15.0.0",
     "@vueuse/nuxt": "^15.0.0",
-    "apexcharts": "^8.4.1",
+    "apexcharts": "^8.6.0",
     "argon2": "^0.45.1",
     "cidr-tools": "^13.0.4",
     "citty": "^0.2.2",
@@ -46,7 +46,7 @@
     "is-cidr": "^7.0.3",
     "is-ip": "^5.0.1",
     "js-sha256": "^1.0.0",
-    "nuxt": "^4.6.2",
+    "nuxt": "^4.6.3",
     "obug": "^3.0.0",
     "openid-client": "^6.8.8",
     "otpauth": "^9.5.2",
@@ -64,7 +64,7 @@
     "@nuxt/eslint": "^1.17.0",
     "@nuxt/test-utils": "^4.3.4",
     "@playwright/test": "^1.64.1",
-    "@types/node": "^26.6.5",
+    "@types/node": "^26.6.6",
     "@types/phc__format": "^1.0.1",
     "@types/sortablejs": "^1.15.9",
     "@vitest/coverage-v8": "^5.0.5",
@@ -78,7 +78,7 @@
     "tsx": "^4.23.15",
     "typescript": "^6.0.3",
     "vitest": "^5.0.5",
-    "vue-tsc": "^3.3.13"
+    "vue-tsc": "^3.3.14"
   },
-  "packageManager": "pnpm@12.15.0"
+  "packageManager": "pnpm@12.16.1"
 }
