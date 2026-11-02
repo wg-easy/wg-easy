@@ -25,7 +25,9 @@ function sampleTraffic(
 ) {
   const current =
     previousTotal === undefined ? 0 : (total ?? 0) - (previousTotal ?? 0);
-  if (!updateCharts) return { current, series: previousSeries };
+  if (!updateCharts) {
+    return { current, series: previousSeries };
+  }
 
   const history = previousSeries[0]?.data ?? Array<number>(50).fill(0);
   return { current, series: [{ name, data: [...history.slice(1), current] }] };

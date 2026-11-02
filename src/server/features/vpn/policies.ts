@@ -14,8 +14,9 @@ export function authorizeClient<T extends { id: number; userId: number }>(
 ) {
   // Check ownership first so a missing client does not disclose existence.
   authorize(actor, 'clients', action, client);
-  if (!client)
+  if (!client) {
     throw createError({ status: 404, statusText: 'Client not found' });
+  }
   return client;
 }
 

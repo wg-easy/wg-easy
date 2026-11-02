@@ -60,23 +60,26 @@ export function generateOneTimeLink(actor: Actor, clientId: number) {
 export function redeemOneTimeLink(token: string) {
   return getDatabase().transaction(async (tx) => {
     const link = await tx.oneTimeLinks.getByToken(token);
-    if (!link)
+    if (!link) {
       throw createError({
         status: 404,
         statusText: 'Invalid One Time Link',
       });
+    }
     const now = Date.now();
-    if (isExpired(link.expiresAt, now))
+    if (isExpired(link.expiresAt, now)) {
       throw createError({
         status: 410,
         statusText: 'One Time Link has expired',
       });
+    }
     const client = await tx.clients.get(link.id);
-    if (!client)
+    if (!client) {
       throw createError({
         status: 404,
         statusText: 'Invalid One Time Link',
       });
+    }
     const result = await configuration(tx, client);
     // Downloads may shorten the lifetime, but must never extend it.
     const expiresAt = Math.min(Date.parse(link.expiresAt), now + 10_000);

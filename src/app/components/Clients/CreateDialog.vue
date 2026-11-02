@@ -48,7 +48,9 @@ const { t } = useI18n();
 defineProps<{ triggerClass?: string }>();
 
 function resetOnOpen(open: boolean) {
-  if (!open) return;
+  if (!open) {
+    return;
+  }
 
   name.value = '';
   expiresAt.value = null;

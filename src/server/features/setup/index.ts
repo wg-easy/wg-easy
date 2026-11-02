@@ -12,10 +12,12 @@ import { getIpInformation } from '#server/utils/ip';
 export type SetupAction = 2 | 4 | 'migrate';
 
 function checkStep(state: SetupStepType, action: SetupAction) {
-  if (state.done)
+  if (state.done) {
     throw createError({ status: 400, statusText: 'Invalid state' });
-  if (state.step !== 1 && state.step !== 3)
+  }
+  if (state.step !== 1 && state.step !== 3) {
     throw createError({ status: 500, statusText: 'Invalid setup step' });
+  }
   if (state.step === 1 ? action !== 2 : action !== 4 && action !== 'migrate') {
     throw createError({ status: 400, statusText: 'Invalid step' });
   }
@@ -74,16 +76,21 @@ export type InitialSetup = {
 /** Initial data and setup completion commit together, or neither does. */
 export function initialize(config: InitialSetup) {
   return getDatabase().transaction(async (tx) => {
-    if ((await tx.general.getSetupStep()).done) return;
+    if ((await tx.general.getSetupStep()).done) {
+      return;
+    }
     if (config.ipv4Cidr && config.ipv6Cidr) {
       await changeCidr(tx, {
         ipv4Cidr: config.ipv4Cidr,
         ipv6Cidr: config.ipv6Cidr,
       });
     }
-    if (config.dns) await tx.userConfigs.update({ defaultDns: config.dns });
-    if (config.allowedIps)
+    if (config.dns) {
+      await tx.userConfigs.update({ defaultDns: config.dns });
+    }
+    if (config.allowedIps) {
       await tx.userConfigs.update({ defaultAllowedIps: config.allowedIps });
+    }
     if (config.username && config.password && config.host && config.port) {
       await createPasswordUser(tx.users, config.username, config.password);
       await tx.userConfigs.update({ host: config.host, port: config.port });

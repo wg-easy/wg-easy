@@ -31,8 +31,9 @@ export const test = base.extend<{ app: App; initialized: boolean }>({
   app: [
     async ({ initialized }, use, testInfo) => {
       const runDir = process.env.E2E_RUN_DIR;
-      if (!runDir)
+      if (!runDir) {
         throw new Error('Run pnpm test:e2e to manage test containers.');
+      }
 
       const project = `wg-easy-e2e-${randomUUID()}`;
       // Fixture teardown can be skipped when startup is interrupted.
@@ -116,7 +117,9 @@ wg-quick up wg0`,
               ]);
               return true;
             } catch (error) {
-              if ((error as ExecException).code !== 1) throw error;
+              if ((error as ExecException).code !== 1) {
+                throw error;
+              }
               return false;
             }
           },

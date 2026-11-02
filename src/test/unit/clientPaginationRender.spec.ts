@@ -45,7 +45,9 @@ function configureApp(app: App) {
         (value, part) => (value as Record<string, unknown>)[part],
         en
       );
-    if (typeof message !== 'string') throw new Error(`Missing label: ${key}`);
+    if (typeof message !== 'string') {
+      throw new Error(`Missing label: ${key}`);
+    }
     return message.replace(/\{(\w+)\}/g, (_, name) => String(params[name]));
   };
 }

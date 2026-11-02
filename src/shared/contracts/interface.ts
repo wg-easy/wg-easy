@@ -81,7 +81,9 @@ export const InterfaceUpdateSchema = z
     firewallEnabled: EnabledSchema,
   })
   .superRefine((data, ctx) => {
-    if (data.headerProtectionKey === null) return;
+    if (data.headerProtectionKey === null) {
+      return;
+    }
 
     for (const junk of ['s1', 's2', 's3', 's4'] as const) {
       const size = data[junk];

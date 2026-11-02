@@ -198,7 +198,9 @@ const canDisable = computed(() =>
 watch(
   () => clientsStore.selectedIds,
   () => {
-    if (pending.value) return;
+    if (pending.value) {
+      return;
+    }
     confirmation.value = null;
     errorMessage.value = '';
   },
@@ -206,13 +208,17 @@ watch(
 );
 
 function requestConfirmation(action: ClientBulkAction) {
-  if (busy.value || !clientsStore.selectedIds.length) return;
+  if (busy.value || !clientsStore.selectedIds.length) {
+    return;
+  }
   errorMessage.value = '';
   confirmation.value = { action, count: clientsStore.selectedIds.length };
 }
 
 function closeConfirmation() {
-  if (!pending.value) confirmation.value = null;
+  if (!pending.value) {
+    confirmation.value = null;
+  }
 }
 
 function restoreFocus(event: Event) {
@@ -225,8 +231,9 @@ function restoreFocus(event: Event) {
 }
 
 async function runConfirmedAction() {
-  if (busy.value || !confirmation.value || !clientsStore.selectedIds.length)
+  if (busy.value || !confirmation.value || !clientsStore.selectedIds.length) {
     return;
+  }
   const { action, count } = confirmation.value;
   pending.value = true;
   errorMessage.value = '';
@@ -245,7 +252,9 @@ async function runConfirmedAction() {
         : t('clients.bulk.failed');
   } finally {
     pending.value = false;
-    if (clientsStore.selectedIds.length !== count) confirmation.value = null;
+    if (clientsStore.selectedIds.length !== count) {
+      confirmation.value = null;
+    }
   }
 }
 </script>

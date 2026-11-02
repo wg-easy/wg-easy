@@ -24,6 +24,8 @@ vi.mock('#server/utils/totp', () => totp);
 
 export function resetCryptoMocks() {
   const mocks = { ...password, ...totp };
-  for (const mock of Object.values(mocks)) mock.mockReset();
+  for (const mock of Object.values(mocks)) {
+    mock.mockReset();
+  }
   return mocks;
 }

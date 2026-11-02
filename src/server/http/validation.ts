@@ -122,7 +122,9 @@ export async function getValidatedRouterParams<T>(
     // Nuxt preserves encoded path separators; schemas validate the result.
     params = getRouterParams(event, { decode: true });
   } catch (error) {
-    if (!(error instanceof URIError)) throw error;
+    if (!(error instanceof URIError)) {
+      throw error;
+    }
     throw createError({
       status: 400,
       statusText: 'Validation Error',

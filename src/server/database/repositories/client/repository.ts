@@ -178,7 +178,9 @@ export class ClientRepository {
         ),
       },
     });
-    if (!result) return undefined;
+    if (!result) {
+      return undefined;
+    }
 
     return { ...result, hasPreSharedKey: Boolean(result.hasPreSharedKey) };
   }

@@ -67,7 +67,9 @@ export const useClientsStore = defineStore('Clients', () => {
     )
   );
   const pageSelection = computed<boolean | 'indeterminate'>(() => {
-    if (!selectedClients.value.length) return false;
+    if (!selectedClients.value.length) {
+      return false;
+    }
     return selectedClients.value.length === clients.value?.length
       ? true
       : 'indeterminate';
@@ -78,15 +80,21 @@ export const useClientsStore = defineStore('Clients', () => {
   }
 
   function selectClient(id: number, selected: boolean) {
-    if (isUpdatingList.value || isApplyingBulk.value) return;
-    if (!clients.value?.some((client) => client.id === id)) return;
+    if (isUpdatingList.value || isApplyingBulk.value) {
+      return;
+    }
+    if (!clients.value?.some((client) => client.id === id)) {
+      return;
+    }
     selectedIds.value = selected
       ? [...new Set([...selectedIds.value, id])]
       : selectedIds.value.filter((selectedId) => selectedId !== id);
   }
 
   function selectPage(selected: boolean) {
-    if (isUpdatingList.value || isApplyingBulk.value) return;
+    if (isUpdatingList.value || isApplyingBulk.value) {
+      return;
+    }
     selectedIds.value = selected
       ? (clients.value ?? []).map((client) => client.id)
       : [];
@@ -96,7 +104,9 @@ export const useClientsStore = defineStore('Clients', () => {
   let appliedQuery: ClientListQuery | undefined;
 
   async function refresh({ updateCharts = false } = {}) {
-    if (isApplyingBulk.value) return;
+    if (isApplyingBulk.value) {
+      return;
+    }
     const id = ++refreshId;
     const requestedQuery = query.value;
     isUpdatingList.value = requestedQuery !== appliedQuery;
@@ -108,8 +118,9 @@ export const useClientsStore = defineStore('Clients', () => {
         requestedQuery !== query.value ||
         error.value ||
         !data.value
-      )
+      ) {
         return;
+      }
 
       const result = data.value;
       clients.value = toLocalClients(
@@ -133,14 +144,20 @@ export const useClientsStore = defineStore('Clients', () => {
       }
       appliedQuery = query.value;
     } finally {
-      if (id === refreshId) isUpdatingList.value = false;
+      if (id === refreshId) {
+        isUpdatingList.value = false;
+      }
     }
   }
 
   async function setPage(page: number) {
-    if (!Number.isInteger(page) || isUpdatingList.value) return;
+    if (!Number.isInteger(page) || isUpdatingList.value) {
+      return;
+    }
     const nextPage = Math.min(Math.max(1, page), totalPages.value);
-    if (nextPage === pagination.value.page) return;
+    if (nextPage === pagination.value.page) {
+      return;
+    }
     clearSelection();
     query.value = { ...query.value, page: nextPage };
     await refresh();
@@ -152,8 +169,9 @@ export const useClientsStore = defineStore('Clients', () => {
       !Number.isInteger(nextQuery.pageSize) ||
       nextQuery.pageSize < 1 ||
       nextQuery.pageSize > 100
-    )
+    ) {
       return;
+    }
     nextQuery.filter = nextQuery.filter?.trim() || undefined;
     clearSelection();
     query.value = nextQuery;
@@ -169,8 +187,9 @@ export const useClientsStore = defineStore('Clients', () => {
       isApplyingBulk.value ||
       isUpdatingList.value ||
       !selectedIds.value.length
-    )
+    ) {
       return false;
+    }
 
     const clientIds = [...selectedIds.value];
     isApplyingBulk.value = true;

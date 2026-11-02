@@ -13,6 +13,8 @@ export function bindTranslationRequest(event: H3Event) {
 
 export function useRequestTranslation(event: Pick<RequestEvent, 'context'>) {
   const original = requests.get(event.context);
-  if (!original) throw new Error('Translation middleware did not run');
+  if (!original) {
+    throw new Error('Translation middleware did not run');
+  }
   return useTranslation(original);
 }

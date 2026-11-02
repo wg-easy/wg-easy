@@ -58,9 +58,15 @@ beforeEach(async () => {
   vi.resetAllMocks();
   writeFile.mockResolvedValue();
   exec.mockImplementation(async (command: string) => {
-    if (command === 'wg genkey') return 'new-private-key';
-    if (command === 'echo new-private-key | wg pubkey') return 'new-public-key';
-    if (command === 'wg genpsk') return 'new-preshared-key';
+    if (command === 'wg genkey') {
+      return 'new-private-key';
+    }
+    if (command === 'echo new-private-key | wg pubkey') {
+      return 'new-public-key';
+    }
+    if (command === 'wg genpsk') {
+      return 'new-preshared-key';
+    }
     return '';
   });
   getCurrentUser.mockResolvedValue({ id: 1, role: 1 });
@@ -106,8 +112,11 @@ describe.each([
       .where(eq(schema.client.id, 1));
     expect(await mutate(clientEvent())).toEqual({ success: true });
     const changed = await clients.get(1);
-    if (action === 'delete') expect(changed).toBeUndefined();
-    else expect(changed?.enabled).toBe(action === 'enable');
+    if (action === 'delete') {
+      expect(changed).toBeUndefined();
+    } else {
+      expect(changed?.enabled).toBe(action === 'enable');
+    }
     expect((await clients.get(2))?.enabled).toBe(true);
     expect(writeFile).toHaveBeenCalledOnce();
     const config = String(writeFile.mock.calls[0]?.[1]);
@@ -167,7 +176,9 @@ describe('client mutation sequencing', () => {
       finishSync = resolve;
     });
     exec.mockImplementation(async (command: string) => {
-      if (command.includes(' syncconf ')) await syncing;
+      if (command.includes(' syncconf ')) {
+        await syncing;
+      }
       return '';
     });
     let completed = false;
@@ -208,7 +219,9 @@ describe('client mutation sequencing', () => {
 
   test('reports firewall failures after saving and syncing the configuration', async () => {
     exec.mockImplementation(async (command: string) => {
-      if (command.startsWith('iptables ')) throw new Error('Firewall failed');
+      if (command.startsWith('iptables ')) {
+        throw new Error('Firewall failed');
+      }
       return '';
     });
     await expect(disableClient(clientEvent())).rejects.toThrow(
@@ -397,8 +410,12 @@ describe('bulk client API', () => {
         const before = await clients.getAll();
         const selected = new Set(ids);
         const expected = before.flatMap((client) => {
-          if (!selected.has(client.id)) return [client];
-          if (action === 'delete') return [];
+          if (!selected.has(client.id)) {
+            return [client];
+          }
+          if (action === 'delete') {
+            return [];
+          }
           return [
             {
               ...client,
@@ -535,7 +552,9 @@ describe('bulk client API', () => {
 
   test('reports synchronization failures instead of claiming success', async () => {
     exec.mockImplementation(async (command: string) => {
-      if (command.includes(' syncconf ')) throw new Error('Sync failed');
+      if (command.includes(' syncconf ')) {
+        throw new Error('Sync failed');
+      }
       return '';
     });
     await expect(request('disable', [1, 2])).rejects.toThrow('Sync failed');

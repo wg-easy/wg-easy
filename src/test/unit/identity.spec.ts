@@ -50,10 +50,13 @@ describe('identity', () => {
     await fixture();
     const result = await identity.login('admin', 'old-password');
     expect(result.success).toBe(true);
-    if (!result.success) throw new Error('Expected authenticated user');
+    if (!result.success) {
+      throw new Error('Expected authenticated user');
+    }
     expect(result.user).toMatchObject({ id: 1, hasPassword: true });
-    for (const secret of ['password', 'totpKey', 'oauthId'])
+    for (const secret of ['password', 'totpKey', 'oauthId']) {
       expect(result.user).not.toHaveProperty(secret);
+    }
     expect(await identity.sessionUser(1)).toEqual(result.user);
   });
 
@@ -121,8 +124,9 @@ describe('identity', () => {
         expires_at: 1_300_000,
       },
     });
-    if (login.success || login.error !== 'TOTP_REQUIRED')
+    if (login.success || login.error !== 'TOTP_REQUIRED') {
       throw new Error('Expected challenge');
+    }
     expect(
       await identity.completeSecondFactor(login.pendingLogin, '999999')
     ).toEqual({ status: 'INVALID_TOTP_CODE' });

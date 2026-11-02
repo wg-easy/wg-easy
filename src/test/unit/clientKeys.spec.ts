@@ -50,16 +50,27 @@ beforeEach(async () => {
   writeFile.mockResolvedValue();
   getCurrentUser.mockResolvedValue({ id: 1, role: 1 });
   exec.mockImplementation(async (command: string) => {
-    if (command === 'wg genpsk') return 'new-preshared-key';
-    if (command === 'wg genkey') return 'new-private-key';
-    if (command === 'echo new-private-key | wg pubkey') return 'new-public-key';
-    if (command === 'wg-quick down wg0; wg-quick up wg0') return '';
-    if (command === 'wg show wg0 dump') return '';
+    if (command === 'wg genpsk') {
+      return 'new-preshared-key';
+    }
+    if (command === 'wg genkey') {
+      return 'new-private-key';
+    }
+    if (command === 'echo new-private-key | wg pubkey') {
+      return 'new-public-key';
+    }
+    if (command === 'wg-quick down wg0; wg-quick up wg0') {
+      return '';
+    }
+    if (command === 'wg show wg0 dump') {
+      return '';
+    }
     if (
       command.includes(' syncconf ') ||
       /^(?:while )?ip6?tables /.test(command)
-    )
+    ) {
       return '';
+    }
     throw new Error(`Unexpected command: ${command}`);
   });
 
@@ -287,7 +298,9 @@ describe('client key actions', () => {
     async (failedCommand) => {
       const before = await clients.get(1);
       exec.mockImplementation(async (command: string) => {
-        if (command === failedCommand) throw new Error('Key generation failed');
+        if (command === failedCommand) {
+          throw new Error('Key generation failed');
+        }
         return 'new-private-key';
       });
       await expect(rotateKeyPair(event())).rejects.toThrow(

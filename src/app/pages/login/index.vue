@@ -139,7 +139,9 @@ const _submit = useSubmit(
 );
 
 async function submit() {
-  if (!username.value || !password.value || authenticating.value) return;
+  if (!username.value || !password.value || authenticating.value) {
+    return;
+  }
 
   authenticating.value = true;
 

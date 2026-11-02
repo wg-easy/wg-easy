@@ -132,11 +132,15 @@ describe('VPN operations', () => {
         await vpnFixture();
       await store.clients.update(1, { expiresAt: '2000-01-01' });
       const error = new Error('Host unavailable');
-      if (stage === 'configuration')
+      if (stage === 'configuration') {
         writeConfiguration.mockRejectedValueOnce(error);
-      if (stage === 'WireGuard') commands.sync.mockRejectedValueOnce(error);
-      if (stage === 'firewall')
+      }
+      if (stage === 'WireGuard') {
+        commands.sync.mockRejectedValueOnce(error);
+      }
+      if (stage === 'firewall') {
         firewall.rebuildRules.mockRejectedValueOnce(error);
+      }
 
       await expect(vpn.maintain()).rejects.toThrow(error);
       expect((await store.clients.get(1))?.enabled).toBe(false);
@@ -198,8 +202,11 @@ describe('VPN operations', () => {
       await vpn.maintain();
 
       const link = await store.oneTimeLinks.getByToken('download-token');
-      if (offset < 0) expect(link).toBeDefined();
-      else expect(link).toBeUndefined();
+      if (offset < 0) {
+        expect(link).toBeDefined();
+      } else {
+        expect(link).toBeUndefined();
+      }
       expect(await store.clients.get(1)).toEqual(peer);
       expect(writeConfiguration).not.toHaveBeenCalled();
       expect(commands.sync).not.toHaveBeenCalled();
@@ -236,9 +243,11 @@ describe('VPN operations', () => {
           () => clients.apply(admin, 1, 'enable'),
           () => clients.bulk(admin, { action: 'enable', clientIds: [1] }),
         ]) {
-          if (expired)
+          if (expired) {
             await expect(enable()).rejects.toMatchObject({ status: 422 });
-          else await enable();
+          } else {
+            await enable();
+          }
         }
         await vpn.maintain();
         expect((await store.clients.get(1))?.enabled).toBe(!expired);

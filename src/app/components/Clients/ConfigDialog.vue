@@ -49,7 +49,9 @@ const {
 });
 
 async function loadOnOpen(open: boolean) {
-  if (!open) return;
+  if (!open) {
+    return;
+  }
 
   await refresh();
 }

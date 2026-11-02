@@ -39,8 +39,9 @@ async function blockDuringRebuild(interfaceName: string, enableIpv6: boolean) {
         .filter((rule) => rule.startsWith(`-A ${chain} `));
       // A guard below an ACCEPT or a jump to an old chain does not block
       // traffic. This also repairs guards left by older failed rebuilds.
-      if (rules[0] !== `-A ${chain} ${guard}`)
+      if (rules[0] !== `-A ${chain} ${guard}`) {
         await exec(`${command} -I ${chain} 1 ${guard}`);
+      }
     }
   }
 }
@@ -53,8 +54,9 @@ async function finishRebuild(interfaceName: string, enableIpv6: boolean) {
       // Remove all copies, including an older misplaced guard. Failure leaves
       // the remaining guards in place and the lifecycle retries the update.
       for (const rule of rules) {
-        if (rule === `-A ${chain} ${guard}`)
+        if (rule === `-A ${chain} ${guard}`) {
           await exec(`${command} -D ${chain} ${guard}`);
+        }
       }
     }
   }
@@ -232,7 +234,9 @@ export const firewall = {
       await exec(
         `${command} -N ${chain} 2>/dev/null || ${command} -S ${chain} >/dev/null`
       );
-      if (!attach) continue;
+      if (!attach) {
+        continue;
+      }
       for (const parent of trafficChains) {
         await exec(
           `${command} -C ${parent} -i ${interfaceName} -j ${chain} 2>/dev/null || ${command} -I ${parent} ${position} -i ${interfaceName} -j ${chain}`
@@ -337,7 +341,9 @@ export const firewall = {
 
       // Apply rules for each enabled client
       for (const client of clients) {
-        if (!client.enabled) continue;
+        if (!client.enabled) {
+          continue;
+        }
         await this.applyClientRules(
           wgInterface.name,
           client,

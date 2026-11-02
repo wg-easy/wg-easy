@@ -54,10 +54,14 @@ export function nextIPFromUsedAddresses(
   const { version } = cidr;
   const gateway = gatewayNumber(cidr);
   for (let i = cidr.start + 1n; i < cidr.end; i++) {
-    if (i === gateway) continue;
+    if (i === gateway) {
+      continue;
+    }
     const currentIp = stringifyIp({ number: i, version }, { hexify: true });
 
-    if (!usedAddresses.has(currentIp)) return currentIp;
+    if (!usedAddresses.has(currentIp)) {
+      return currentIp;
+    }
   }
 
   throw new Error('Maximum number of clients reached', {
@@ -129,7 +133,9 @@ function getPrivateInformation(interfaceName: string) {
     }
 
     const iface = interfaces[name];
-    if (!iface) continue;
+    if (!iface) {
+      continue;
+    }
 
     for (const { family, internal, address } of iface) {
       if (internal) {

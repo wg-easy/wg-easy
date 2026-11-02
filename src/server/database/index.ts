@@ -8,6 +8,8 @@ export function setDatabase(store: DatabaseStore) {
 }
 
 export function getDatabase(): DatabaseStore {
-  if (!database) throw new Error('Database not yet initialized');
+  if (!database) {
+    throw new Error('Database not yet initialized');
+  }
   return database;
 }

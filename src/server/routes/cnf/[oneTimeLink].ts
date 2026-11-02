@@ -19,8 +19,9 @@ export default defineEventHandler(async (event) => {
     event.res.headers.set('Content-Type', 'application/octet-stream');
     return download.contents;
   } catch (error) {
-    if (isNuxtError(error) && error.status === 404)
+    if (isNuxtError(error) && error.status === 404) {
       logSecurityEvent(event, 'one-time-link');
+    }
     throw error;
   }
 });

@@ -95,10 +95,11 @@ test.each([false, true])(
       expect(download).toContain('RekeyTimeout = 4-8');
       expect(download).toContain('DisableCookies = on');
     } else {
-      for (const output of [server, download])
+      for (const output of [server, download]) {
         expect(output).not.toMatch(
           /^Jc =|^S1 =|^H1 =|^RandomTrailers =|^HeaderProtectionKey =/m
         );
+      }
     }
   }
 );

@@ -63,4 +63,5 @@ export default withNuxt([
     },
   },
   eslintConfigPrettier,
+  { rules: { curly: ['error', 'all'] } },
 ]);

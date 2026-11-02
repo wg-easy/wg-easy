@@ -24,7 +24,9 @@ export function cacheFunction<T>(
   let pending: Promise<T> | undefined;
 
   return () => {
-    if (pending) return pending;
+    if (pending) {
+      return pending;
+    }
     if (entry && performance.now() < entry.expiresAt) {
       return Promise.resolve(entry.value);
     }

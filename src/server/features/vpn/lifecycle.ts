@@ -34,8 +34,9 @@ async function apply(mode?: ApplyMode) {
     })
   );
   const enableIpv6 = !WG_ENV.DISABLE_IPV6;
-  if (network.firewallEnabled)
+  if (network.firewallEnabled) {
     await firewall.blockTraffic(network.name, enableIpv6);
+  }
 
   if (mode === 'sync') {
     // Remove revoked peers before parsing or applying the full configuration.
@@ -46,8 +47,9 @@ async function apply(mode?: ApplyMode) {
         .map((client) => client.publicKey)
     );
     for (const peer of await wg.dump(network.name)) {
-      if (!enabledKeys.has(peer.publicKey))
+      if (!enabledKeys.has(peer.publicKey)) {
         await wg.removePeer(network.name, peer.publicKey);
+      }
     }
   }
   const contents = generateServerConfig(network, hooks, clients, {
@@ -104,21 +106,25 @@ export function maintain() {
       const expired = clients.filter(
         (client) => client.enabled && isExpired(client.expiresAt, timestamp)
       );
-      if (expired.length)
+      if (expired.length) {
         await tx.clients.setEnabled(
           expired.map((client) => client.id),
           false
         );
+      }
       for (const client of clients) {
         if (
           client.oneTimeLink &&
           isExpired(client.oneTimeLink.expiresAt, timestamp)
-        )
+        ) {
           await tx.oneTimeLinks.delete(client.id);
+        }
       }
       return expired.length > 0;
     });
-    if (changed || unapplied.has(database)) await apply();
+    if (changed || unapplied.has(database)) {
+      await apply();
+    }
   });
 }
 export function restart() {
@@ -142,8 +148,9 @@ export function start() {
     }
     if (network.h1 === '0') {
       const headers = new Set<number>();
-      while (headers.size < 4)
+      while (headers.size < 4) {
         headers.add(Math.floor(Math.random() * 2147483642) + 5);
+      }
       const [h1, h2, h3, h4] = [...headers].map(String);
       await interfaces.update({
         h1: h1!,

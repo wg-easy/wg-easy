@@ -10,7 +10,11 @@ export default defineAuthenticatedEventHandler(async ({ event, user }) => {
     event,
     validateZod(UserUpdateTotpSchema, event)
   );
-  if (body.type === 'setup') return identity.setupTotp(user);
-  if (body.type === 'create') return identity.verifyTotp(user, body.code);
+  if (body.type === 'setup') {
+    return identity.setupTotp(user);
+  }
+  if (body.type === 'create') {
+    return identity.verifyTotp(user, body.code);
+  }
   return identity.deleteTotp(user, body.currentPassword);
 });
