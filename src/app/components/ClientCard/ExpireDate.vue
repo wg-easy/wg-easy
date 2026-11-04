@@ -1,21 +1,24 @@
 <template>
-  <div class="block text-xs text-gray-500 dark:text-neutral-400">
-    <span class="inline-block">{{ expiredDateFormat(client.expiresAt) }}</span>
+  <div class="text-[11px] text-subtle">
+    <NuxtTime
+      v-if="client.expiresAt"
+      class="inline-block"
+      :datetime="client.expiresAt"
+      :locale="locale"
+      year="numeric"
+      month="long"
+      day="numeric"
+      hour="2-digit"
+      minute="2-digit"
+    />
+    <span v-else class="inline-block">
+      {{ $t('clients.status.permanent') }}
+    </span>
   </div>
 </template>
 
 <script setup lang="ts">
 defineProps<{ client: LocalClient }>();
 
-const { t, locale } = useI18n();
-
-function expiredDateFormat(value: string | null) {
-  if (value === null) return t('client.permanent');
-  const dateTime = new Date(value);
-  return dateTime.toLocaleDateString(locale.value, {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
-}
+const { locale } = useI18n();
 </script>

@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "985448af-d6d3-4a64-a9de-d5be7dbad711",
+  "id": "4f51ca3b-41f6-470d-a93e-8a1f84e84440",
   "prevId": "209191ca-75c3-4821-93f5-255119b9a351",
   "tables": {
     "clients_table": {
@@ -33,13 +33,6 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
-        },
-        "description": {
-          "name": "description",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
           "autoincrement": false
         },
         "ipv4_address": {
@@ -106,7 +99,7 @@
           "name": "pre_shared_key",
           "type": "text",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false
         },
         "expires_at": {
@@ -148,7 +141,7 @@
           "name": "mtu",
           "type": "integer",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false
         },
         "j_c": {
@@ -557,7 +550,7 @@
           "name": "mtu",
           "type": "integer",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false
         },
         "routing_table": {
@@ -863,120 +856,6 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "client_tags_table": {
-      "name": "client_tags_table",
-      "columns": {
-        "client_id": {
-          "name": "client_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "tag_id": {
-          "name": "tag_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "client_tags_table_client_id_clients_table_id_fk": {
-          "name": "client_tags_table_client_id_clients_table_id_fk",
-          "tableFrom": "client_tags_table",
-          "tableTo": "clients_table",
-          "columnsFrom": [
-            "client_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "cascade"
-        },
-        "client_tags_table_tag_id_tags_table_id_fk": {
-          "name": "client_tags_table_tag_id_tags_table_id_fk",
-          "tableFrom": "client_tags_table",
-          "tableTo": "tags_table",
-          "columnsFrom": [
-            "tag_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "cascade"
-        }
-      },
-      "compositePrimaryKeys": {
-        "client_tags_table_client_id_tag_id_pk": {
-          "columns": [
-            "client_id",
-            "tag_id"
-          ],
-          "name": "client_tags_table_client_id_tag_id_pk"
-        }
-      },
-      "uniqueConstraints": {},
-      "checkConstraints": {}
-    },
-    "tags_table": {
-      "name": "tags_table",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "integer",
-          "primaryKey": true,
-          "notNull": true,
-          "autoincrement": true
-        },
-        "name": {
-          "name": "name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "description": {
-          "name": "description",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "(CURRENT_TIMESTAMP)"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "(CURRENT_TIMESTAMP)"
-        }
-      },
-      "indexes": {
-        "tags_table_name_unique": {
-          "name": "tags_table_name_unique",
-          "columns": [
-            "name"
-          ],
-          "isUnique": true
-        }
-      },
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {}
-    },
     "users_table": {
       "name": "users_table",
       "columns": {
@@ -1117,7 +996,7 @@
           "name": "default_mtu",
           "type": "integer",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false
         },
         "default_persistent_keepalive": {
@@ -1126,6 +1005,14 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
+        },
+        "default_generate_pre_shared_key": {
+          "name": "default_generate_pre_shared_key",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": true
         },
         "default_dns": {
           "name": "default_dns",

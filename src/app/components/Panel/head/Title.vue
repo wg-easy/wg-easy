@@ -1,5 +1,3 @@
 <template>
-  <h2 class="flex-1 break-all text-2xl font-medium">
-    <slot />
-  </h2>
+  <h1 class="page-title min-w-0 break-words"><slot /></h1>
 </template>

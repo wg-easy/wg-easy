@@ -1,23 +1,25 @@
 <template>
   <BaseDialog :trigger-class="triggerClass" @update:open="resetOnOpen">
     <template #trigger><slot /></template>
-    <template #title>{{ $t('admin.config.suggest') }}</template>
+    <template #title>{{ $t('admin.config.suggest.label') }}</template>
     <template #description>
       <div class="flex flex-col items-start gap-2">
-        <p>{{ $t('admin.config.suggestDesc') }}</p>
+        <p>{{ $t('admin.config.suggest.description') }}</p>
         <p v-if="!data">
-          {{ $t('general.loading') }}
+          {{ $t('common.loading') }}
         </p>
         <BaseSelect v-else v-model="selected" :options="data" />
       </div>
     </template>
     <template #actions>
       <DialogClose as-child>
-        <BaseSecondaryButton>{{ $t('dialog.cancel') }}</BaseSecondaryButton>
+        <BaseSecondaryButton>
+          {{ $t('common.actions.cancel') }}
+        </BaseSecondaryButton>
       </DialogClose>
       <DialogClose as-child>
         <BasePrimaryButton @click="$emit('change', selected)">
-          {{ $t('dialog.change') }}
+          {{ $t('common.actions.change') }}
         </BasePrimaryButton>
       </DialogClose>
     </template>
@@ -38,7 +40,9 @@ const { data } = useFetch(props.url, {
 const selected = ref<string>();
 
 async function resetOnOpen(open: boolean) {
-  if (!open) return;
+  if (!open) {
+    return;
+  }
 
   selected.value = undefined;
 }

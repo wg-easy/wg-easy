@@ -1,22 +1,16 @@
-import { readValidatedBody } from 'h3';
+import { readValidatedBody } from 'nuxt/server';
 
-import Database from '#server/utils/Database';
-import { definePermissionEventHandler } from '#server/utils/handler';
-import { validateZod } from '#server/utils/types';
-import { TagCreateSchema } from '#db/repositories/tag/types';
+import * as tags from '#server/features/vpn/tags';
+import { defineAuthenticatedEventHandler } from '#server/utils/handler';
+import { validateZod } from '#server/http/validation';
+import { TagCreateSchema } from '#shared/contracts/tag';
 
-export default definePermissionEventHandler(
-  'tags',
-  'create',
-  async ({ event }) => {
-    const data = await readValidatedBody(
-      event,
-      validateZod(TagCreateSchema, event)
-    );
+export default defineAuthenticatedEventHandler(async ({ event, user }) => {
+  const data = await readValidatedBody(
+    event,
+    validateZod(TagCreateSchema, event)
+  );
 
-    const result = await Database.tags.create(data);
-
-    const tagId = result[0]!.id;
-    return { success: true, tagId };
-  }
-);
+  const tagId = await tags.create(user, data);
+  return { success: true, tagId };
+});

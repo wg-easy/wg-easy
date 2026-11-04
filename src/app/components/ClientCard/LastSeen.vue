@@ -2,13 +2,14 @@
   <span
     v-if="client.latestHandshakeAt"
     :title="
-      $t('client.lastSeen', {
+      $t('clients.status.lastSeen', {
         date: $d(new Date(client.latestHandshakeAt)),
       })
     "
   >
     {{ lastSeen }}
   </span>
+  <span v-else>{{ $t('clients.status.notConnected') }}</span>
 </template>
 
 <script setup lang="ts">
@@ -17,16 +18,17 @@ const props = defineProps<{
 }>();
 
 const { localeProperties } = useI18n();
+const now = useHydrationTime();
 
 const lastSeen = computed(() => {
-  const now = Date.now();
+  const timestamp = now();
 
   return formatTimeAgoIntl(
-    new Date(props.client.latestHandshakeAt ?? now),
+    new Date(props.client.latestHandshakeAt ?? timestamp),
     {
       locale: localeProperties.value.language,
     },
-    now
+    timestamp
   );
 });
 </script>

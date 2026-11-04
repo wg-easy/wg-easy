@@ -1,7 +1,12 @@
-import VueApexCharts from 'vue3-apexcharts';
-
 export default defineNuxtPlugin((nuxtApp) => {
-  // https://github.com/apexcharts/vue3-apexcharts/issues/141
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  nuxtApp.vueApp.use(VueApexCharts as any);
+  const VueApexCharts = defineAsyncComponent(async () => {
+    const [{ default: component }] = await Promise.all([
+      import('vue3-apexcharts/core'),
+      // Register the area renderer before mounting the traffic charts.
+      import('apexcharts/area'),
+    ]);
+    return component;
+  });
+
+  nuxtApp.vueApp.component('apexchart', VueApexCharts);
 });

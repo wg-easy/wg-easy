@@ -28,14 +28,14 @@ export const useToast = defineStore('Toast', () => {
   function showToast({ type, title, message }: ShowToast) {
     if (type === 'success') {
       if (!title) {
-        title = $t('toast.success');
+        title = $t('common.notifications.success');
       }
       if (!message) {
-        message = $t('toast.saved');
+        message = $t('common.notifications.saved');
       }
     } else if (type === 'error') {
       if (!title) {
-        title = $t('toast.error');
+        title = $t('common.notifications.error');
       }
     }
     toast.value?.value?.publish({

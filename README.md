@@ -18,21 +18,25 @@ You have found the easiest way to install & manage WireGuard on any Linux host!
 - All-in-one: WireGuard + Web UI.
 - Easy installation, simple to use.
 - List, create, edit, delete, enable & disable clients.
+- Search, filter, sort, and paginate clients.
+- Enable, disable, or delete multiple selected clients.
 - Show a client's QR code.
-- Download a client's configuration file.
+- Download or copy a client's configuration, and export QR codes as PNG.
+- Rotate client key pairs and add, rotate, or remove preshared keys.
 - Statistics for which clients are connected.
 - Tx/Rx charts for each connected client.
 - Gravatar support.
 - Automatic Light / Dark Mode
 - Multilanguage Support
 - One Time Links
-- Client Expiration
-- Prometheus metrics support
+- Client expiration with date and time
+- Prometheus and JSON metrics support
 - IPv6 support
 - CIDR support
 - 2FA support
 - Per-client firewall filtering (requires iptables)
-- OIDC support (Google, GitHub, Authelia, Authentik, etc.)
+- OAuth support for Google and GitHub, plus generic OIDC providers such as Authelia and Authentik
+- Experimental AmneziaWG support
 
 > [!NOTE]
 > To better manage documentation for this project, it has its own site here: [https://wg-easy.github.io/wg-easy/latest](https://wg-easy.github.io/wg-easy/latest)

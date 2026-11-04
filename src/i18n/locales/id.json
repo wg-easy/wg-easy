@@ -1,181 +1,267 @@
 {
-  "pages": {
-    "me": "Akun",
-    "clients": "Klien",
-    "admin": {
-      "panel": "Panel Admin",
-      "general": "General",
-      "config": "Umum",
-      "interface": "Antarmuka",
-      "hooks": "Hooks"
-    }
-  },
-  "user": {
-    "email": "E-Mail"
-  },
-  "me": {
-    "currentPassword": "Kata Sandi Saat Ini",
-    "enable2fa": "Aktifkan autentikasi dua faktor",
-    "enable2faDesc": "Pindai kode QR dengan aplikasi autentikator anda atau masukkan kuncinya secara manual.",
-    "2faKey": "Kunci TOTP",
-    "2faCodeDesc": "Masukkan kode dari aplikasi autentikator Anda.",
-    "disable2fa": "Nonaktifkan autentikasi dua faktor",
-    "disable2faDesc": "Masukkan kata sandi anda untuk menonaktifkan autentikasi dua faktor."
-  },
-  "general": {
-    "name": "Nama",
-    "username": "Name Pengguna",
-    "password": "Kata Sandi",
-    "newPassword": "Kata Sandi Baru",
-    "updatePassword": "Ubah Kata Sandi",
-    "mtu": "MTU",
-    "allowedIps": "IP yang diizinkan",
-    "dns": "DNS",
-    "persistentKeepalive": "Keepalive Persisten",
-    "logout": "Keluar",
-    "continue": "Lanjutkan",
-    "host": "Host",
-    "port": "Port",
+  "common": {
+    "fields": {
+      "email": "E-Mail",
+      "name": "Nama",
+      "username": "Name Pengguna",
+      "password": "Kata Sandi",
+      "newPassword": "Kata Sandi Baru",
+      "confirmPassword": "Konfirmasi Kata Sandi"
+    },
+    "actions": {
+      "continue": "Lanjutkan",
+      "change": "Ubah",
+      "cancel": "Batal",
+      "create": "Buat",
+      "save": "Simpan",
+      "revert": "Kembalikan",
+      "add": "Tambah"
+    },
     "yes": "Ya",
     "no": "Tidak",
-    "confirmPassword": "Konfirmasi Kata Sandi",
     "loading": "Memuat...",
-    "2fa": "Autentikasi Dua Faktor",
-    "2faCode": "Kode TOTP"
+    "update": {
+      "available": "Ada pembaruan tersedia!",
+      "action": "Pembaruan"
+    },
+    "theme": {
+      "dark": "Tema gelap",
+      "light": "Tema terang",
+      "system": "Tema sistem"
+    },
+    "donate": "Donasi",
+    "notifications": {
+      "success": "Berhasil",
+      "saved": "Tersimpan",
+      "error": "Kesalahan"
+    },
+    "form": {
+      "actions": "Tindakan",
+      "sections": {
+        "general": "Umum",
+        "advanced": "Lanjutan"
+      },
+      "noItems": "Tidak ada item",
+      "nullNoItems": "Tidak ada item. Menggunakan konfigurasi global"
+    }
+  },
+  "auth": {
+    "logout": "Keluar",
+    "twoFactor": {
+      "title": "Autentikasi Dua Faktor",
+      "code": "Kode TOTP"
+    },
+    "login": {
+      "signIn": "Masuk",
+      "rememberMe": "Ingat saya",
+      "rememberMeDescription": "Tetap masuk setelah menutup browser",
+      "insecure": "Anda tidak dapat masuk dengan koneksi yang tidak aman. Gunakan HTTPS.",
+      "twoFactor": {
+        "required": "Autentikasi dua faktor wajib digunakan",
+        "invalid": "Autentikasi dua faktor salah"
+      }
+    }
+  },
+  "account": {
+    "title": "Akun",
+    "password": {
+      "current": "Kata Sandi Saat Ini",
+      "update": "Ubah Kata Sandi"
+    },
+    "twoFactor": {
+      "enable": {
+        "label": "Aktifkan autentikasi dua faktor",
+        "description": "Pindai kode QR dengan aplikasi autentikator anda atau masukkan kuncinya secara manual."
+      },
+      "key": "Kunci TOTP",
+      "codeDescription": "Masukkan kode dari aplikasi autentikator Anda.",
+      "disable": {
+        "label": "Nonaktifkan autentikasi dua faktor",
+        "description": "Masukkan kata sandi anda untuk menonaktifkan autentikasi dua faktor."
+      }
+    }
   },
   "setup": {
     "welcome": "Selamat datang di pengaturan pertama wg-easy anda",
-    "welcomeDesc": "Anda telah menemukan cara termudah untuk menginstal dan mengelola WireGuard di host Linux mana pun",
+    "welcomeDescription": "Anda telah menemukan cara termudah untuk menginstal dan mengelola WireGuard di host Linux mana pun",
     "existingSetup": "Apakah anda sudah memiliki pengaturan sebelumnya?",
-    "createAdminDesc": "Silakan masukkan dulu nama pengguna admin dan kata sandi yang kuat dan aman. Informasi ini akan digunakan untuk masuk ke panel administrasi Anda.",
-    "setupConfigDesc": "Silakan masukkan informasi host dan port. Ini akan digunakan untuk konfigurasi klien saat mengatur WireGuard di perangkat mereka.",
-    "setupMigrationDesc": "Silakan berikan file cadangan jika anda ingin memigrasikan data dari versi wg-easy sebelumnya ke pengaturan baru anda.",
+    "createAdminDescription": "Silakan masukkan dulu nama pengguna admin dan kata sandi yang kuat dan aman. Informasi ini akan digunakan untuk masuk ke panel administrasi Anda.",
+    "setupConfigDescription": "Silakan masukkan informasi host dan port. Ini akan digunakan untuk konfigurasi klien saat mengatur WireGuard di perangkat mereka.",
+    "setupMigrationDescription": "Silakan berikan file cadangan jika anda ingin memigrasikan data dari versi wg-easy sebelumnya ke pengaturan baru anda.",
     "upload": "Unggah",
     "migration": "Pulihkan cadangan:",
     "createAccount": "Buat Akun",
     "successful": "Pengaturan berhasil",
-    "hostDesc": "Hostname publik yang akan digunakan klien untuk terhubung",
-    "portDesc": "Port UDP publik yang akan digunakan klien untuk terhubung dan dibaca oleh WireGuard"
+    "hostDescription": "Hostname publik yang akan digunakan klien untuk terhubung",
+    "portDescription": "Port UDP publik yang akan digunakan klien untuk terhubung dan dibaca oleh WireGuard"
   },
-  "update": {
-    "updateAvailable": "Ada pembaruan tersedia!",
-    "update": "Pembaruan"
-  },
-  "theme": {
-    "dark": "Tema gelap",
-    "light": "Tema terang",
-    "system": "Tema sistem"
-  },
-  "layout": {
-    "toggleCharts": "Tampilkan/sembunyikan Grafik",
-    "donate": "Donasi"
-  },
-  "login": {
-    "signIn": "Masuk",
-    "rememberMe": "Ingat saya",
-    "rememberMeDesc": "Tetap masuk setelah menutup browser",
-    "insecure": "Anda tidak dapat masuk dengan koneksi yang tidak aman. Gunakan HTTPS.",
-    "2faRequired": "Autentikasi dua faktor wajib digunakan",
-    "2faWrong": "Autentikasi dua faktor salah"
-  },
-  "client": {
-    "empty": "Belum ada klien.",
-    "newShort": "Baru",
-    "sort": "Urutkan",
-    "create": "Buat Klien",
-    "created": "Klien terbuat",
-    "new": "Klien Baru",
-    "name": "Nama",
-    "expireDate": "Tanggal Kedaluwarsa",
-    "expireDateDesc": "Tanggal klien akan dinonaktifkan. Kosongkan untuk opsi permanen.",
-    "deleteClient": "Hapus Klien",
-    "deleteDialog": "Apakah Anda yakin ingin menghapus {name}? Tindakan ini tidak dapat dibatalkan.",
-    "enabled": "Aktifkan",
-    "address": "Alamat",
-    "serverAllowedIps": "IP yang Diizinkan pada Server",
-    "otlDesc": "Buat tautan sekali pakai singkat",
-    "permanent": "Permanen",
-    "createdOn": "Dibuat pada {date}",
-    "lastSeen": "Terakhir terlihat pada {date}",
-    "totalDownload": "Total Unduhan: {total}",
-    "totalUpload": "Total Unggahan: {total}",
-    "newClient": "Klien Baru",
-    "disableClient": "Nonaktifkan Klien",
-    "enableClient": "Aktifkan Klien",
-    "noPrivKey": "Klien ini tidak memiliki kunci pribadi (private key) yang diketahui. Tidak dapat membuat konfigurasi.",
-    "showQR": "Tampilkan Kode QR",
-    "downloadConfig": "Unduh Konfigurasi",
-    "allowedIpsDesc": "IP mana yang akan dialihkan melalui VPN (menggantikan konfigurasi global)",
-    "serverAllowedIpsDesc": "IP mana yang akan dialihkan server ke klien",
-    "mtuDesc": "Menetapkan unit transmisi maksimum (ukuran paket) untuk terowongan VPN",
-    "persistentKeepaliveDesc": "Menetapkan interval (dalam detik) untuk paket keep-alive. 0 menonaktifkannya.",
-    "hooks": "Hooks",
-    "hooksDescription": "Hooks hanya berfungsi dengan wg-quick",
-    "hooksLeaveEmpty": "Hanya untuk wg-quick. Jika tidak, biarkan kosong.",
-    "dnsDesc": "Server DNS yang akan digunakan klien (menggantikan konfigurasi global)",
-    "notConnected": "Klien tidak terhubung",
-    "endpoint": "Titik Akhir (Endpoint)",
-    "endpointDesc": "IP klien dari mana koneksi WireGuard dibuat"
-  },
-  "dialog": {
-    "change": "Ubah",
-    "cancel": "Batal",
-    "create": "Buat"
-  },
-  "toast": {
-    "success": "Berhasil",
-    "saved": "Tersimpan",
-    "error": "Kesalahan"
-  },
-  "form": {
-    "actions": "Tindakan",
-    "save": "Simpan",
-    "revert": "Kembalikan",
-    "sectionGeneral": "Umum",
-    "sectionAdvanced": "Lanjutan",
-    "noItems": "Tidak ada item",
-    "nullNoItems": "Tidak ada item. Menggunakan konfigurasi global",
-    "add": "Tambah"
+  "clients": {
+    "title": "Klien",
+    "list": {
+      "toggleCharts": "Tampilkan/sembunyikan Grafik",
+      "empty": "Belum ada klien.",
+      "new": "Baru",
+      "sort": "Urutkan",
+      "newClient": "Klien Baru"
+    },
+    "create": {
+      "action": "Buat Klien",
+      "success": "Klien terbuat",
+      "title": "Klien Baru"
+    },
+    "fields": {
+      "name": {
+        "label": "Nama"
+      },
+      "expiresAt": {
+        "label": "Tanggal Kedaluwarsa",
+        "description": "Tanggal klien akan dinonaktifkan. Kosongkan untuk opsi permanen."
+      },
+      "address": {
+        "label": "Alamat"
+      },
+      "serverAllowedIps": {
+        "label": "IP yang Diizinkan pada Server",
+        "description": "IP mana yang akan dialihkan server ke klien"
+      },
+      "allowedIps": {
+        "description": "IP mana yang akan dialihkan melalui VPN (menggantikan konfigurasi global)"
+      },
+      "mtu": {
+        "description": "Menetapkan unit transmisi maksimum (ukuran paket) untuk terowongan VPN"
+      },
+      "persistentKeepalive": {
+        "description": "Menetapkan interval (dalam detik) untuk paket keep-alive. 0 menonaktifkannya."
+      },
+      "dns": {
+        "description": "Server DNS yang akan digunakan klien (menggantikan konfigurasi global)"
+      },
+      "endpoint": {
+        "label": "Titik Akhir (Endpoint)",
+        "description": "IP klien dari mana koneksi WireGuard dibuat"
+      }
+    },
+    "delete": {
+      "title": "Hapus Klien",
+      "description": "Apakah Anda yakin ingin menghapus {name}? Tindakan ini tidak dapat dibatalkan."
+    },
+    "status": {
+      "enabled": "Aktifkan",
+      "permanent": "Permanen",
+      "createdOn": "Dibuat pada {date}",
+      "lastSeen": "Terakhir terlihat pada {date}",
+      "disable": "Nonaktifkan Klien",
+      "enable": "Aktifkan Klien",
+      "notConnected": "Klien tidak terhubung"
+    },
+    "configuration": {
+      "oneTimeLink": "Buat tautan sekali pakai singkat",
+      "noPrivateKey": "Klien ini tidak memiliki kunci pribadi (private key) yang diketahui. Tidak dapat membuat konfigurasi.",
+      "showQrCode": "Tampilkan Kode QR",
+      "download": "Unduh Konfigurasi"
+    },
+    "traffic": {
+      "totalDownload": "Total Unduhan: {total}",
+      "totalUpload": "Total Unggahan: {total}"
+    },
+    "hooks": {
+      "title": "Hooks",
+      "description": "Hooks hanya berfungsi dengan wg-quick",
+      "fieldDescription": "Hanya untuk wg-quick. Jika tidak, biarkan kosong."
+    }
   },
   "admin": {
+    "title": "Panel Admin",
     "general": {
-      "sessionTimeout": "Waktu Sesi Habis",
-      "sessionTimeoutDesc": "Durasi sesi untuk Ingat Saya (dalam detik)",
+      "title": "General",
+      "sessionTimeout": {
+        "label": "Waktu Sesi Habis",
+        "description": "Durasi sesi untuk Ingat Saya (dalam detik)"
+      },
       "metrics": "Metrik",
-      "metricsPassword": "Kata Sandi",
-      "metricsPasswordDesc": "Kata sandi Bearer untuk endpoint metrik (kata sandi atau hash argon2)",
-      "json": "JSON",
-      "jsonDesc": "Rute untuk metrik dalam format JSON",
-      "prometheus": "Prometheus",
-      "prometheusDesc": "Rute untuk metrik Prometheus"
+      "metricsPassword": {
+        "label": "Kata Sandi",
+        "description": "Kata sandi Bearer untuk endpoint metrik (kata sandi atau hash argon2)"
+      },
+      "json": {
+        "label": "JSON",
+        "description": "Rute untuk metrik dalam format JSON"
+      },
+      "prometheus": {
+        "label": "Prometheus",
+        "description": "Rute untuk metrik Prometheus"
+      }
     },
     "config": {
+      "title": "Umum",
       "connection": "Koneksi",
-      "hostDesc": "Hostname publik yang akan digunakan klien untuk terhubung (membatalkan konfigurasi)",
-      "portDesc": "Port UDP publik yang akan digunakan klien untuk terhubung (membatalkan konfigurasi, anda mungkin ingin mengubah Port Antarmuka juga)",
-      "allowedIpsDesc": "IP yang diizinkan untuk digunakan klien (konfigurasi global)",
-      "dnsDesc": "Server DNS yang akan digunakan klien (konfigurasi global)",
-      "mtuDesc": "MTU yang akan digunakan klien (hanya untuk klien baru)",
-      "persistentKeepaliveDesc": "Interval dalam detik untuk mengirim keepalive ke server. 0 = dinonaktifkan (hanya untuk klien baru)",
-      "suggest": "Menyarankan",
-      "suggestDesc": "Pilih alamat IP atau hostname untuk kolom Host"
+      "host": {
+        "description": "Hostname publik yang akan digunakan klien untuk terhubung (membatalkan konfigurasi)"
+      },
+      "port": {
+        "description": "Port UDP publik yang akan digunakan klien untuk terhubung (membatalkan konfigurasi, anda mungkin ingin mengubah Port Antarmuka juga)"
+      },
+      "allowedIps": {
+        "description": "IP yang diizinkan untuk digunakan klien (konfigurasi global)"
+      },
+      "dns": {
+        "description": "Server DNS yang akan digunakan klien (konfigurasi global)"
+      },
+      "mtu": {
+        "description": "MTU yang akan digunakan klien (hanya untuk klien baru)"
+      },
+      "persistentKeepalive": {
+        "description": "Interval dalam detik untuk mengirim keepalive ke server. 0 = dinonaktifkan (hanya untuk klien baru)"
+      },
+      "suggest": {
+        "label": "Menyarankan",
+        "description": "Pilih alamat IP atau hostname untuk kolom Host"
+      }
     },
     "interface": {
+      "title": "Antarmuka",
       "cidrSuccess": "CIDR diperbarui",
-      "device": "Perangkat",
-      "deviceDesc": "Perangkat Ethernet tempat lalu lintas WireGuard harus diteruskan",
-      "mtuDesc": "MTU yang akan digunakan oleh WireGuard",
-      "portDesc": "Port UDP yang akan didengarkan oleh WireGuard (Anda mungkin ingin mengubah Port Konfigurasi juga)",
+      "device": {
+        "label": "Perangkat",
+        "description": "Perangkat Ethernet tempat lalu lintas WireGuard harus diteruskan"
+      },
+      "mtu": {
+        "description": "MTU yang akan digunakan oleh WireGuard"
+      },
+      "port": {
+        "description": "Port UDP yang akan didengarkan oleh WireGuard (Anda mungkin ingin mengubah Port Konfigurasi juga)"
+      },
       "changeCidr": "Ubah CIDR",
-      "restart": "Mulai Ulang Antarmuka",
-      "restartDesc": "Mulai ulang antarmuka WireGuard",
+      "restart": {
+        "label": "Mulai Ulang Antarmuka",
+        "description": "Mulai ulang antarmuka WireGuard"
+      },
       "restartWarn": "Apakah Anda yakin ingin memulai ulang antarmuka? Ini akan membuat semua klien menjadi terputus.",
       "restartSuccess": "Antarmuka telah dimulai ulang."
     },
-    "introText": "Selamat datang di panel admin.\n\nDi sini Anda dapat mengelola pengaturan umum, konfigurasi, pengaturan antarmuka, dan hooks.\n\nMulailah dengan memilih salah satu bagian di bilah samping."
+    "hooks": {
+      "title": "Hooks"
+    },
+    "introduction": "Selamat datang di panel admin.\n\nDi sini Anda dapat mengelola pengaturan umum, konfigurasi, pengaturan antarmuka, dan hooks.\n\nMulailah dengan memilih salah satu bagian di bilah samping."
   },
-  "zod": {
-    "generic": {
+  "wireguard": {
+    "fields": {
+      "mtu": "MTU",
+      "allowedIps": "IP yang diizinkan",
+      "dns": "DNS",
+      "persistentKeepalive": "Keepalive Persisten",
+      "host": "Host",
+      "port": "Port"
+    },
+    "hooks": {
+      "preUp": "PreUp",
+      "postUp": "PostUp",
+      "preDown": "PreDown",
+      "postDown": "PostDown"
+    }
+  },
+  "validation": {
+    "messages": {
       "required": "{field} diperlukan",
       "validNumber": "{field} harus berupa angka yang valid",
       "validString": "{field} harus berupa string yang valid",
@@ -229,11 +315,5 @@
     "dns": "DNS",
     "allowedIps": "IP yang diizinkan",
     "file": "Berkas"
-  },
-  "hooks": {
-    "preUp": "PreUp",
-    "postUp": "PostUp",
-    "preDown": "PreDown",
-    "postDown": "PostDown"
   }
 }

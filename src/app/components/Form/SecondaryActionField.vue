@@ -1,5 +1,5 @@
 <template>
-  <BaseFormSecondaryButton
+  <BaseSecondaryButton
     :as="as"
     :value="isInput ? label : undefined"
     :type="isInput ? type : undefined"
@@ -8,7 +8,7 @@
     <template v-if="!isInput">
       {{ label }}
     </template>
-  </BaseFormSecondaryButton>
+  </BaseSecondaryButton>
 </template>
 
 <script lang="ts" setup>
@@ -26,7 +26,5 @@ const props = withDefaults(
   }
 );
 
-const isInput = computed(() => {
-  return props.as === 'input';
-});
+const isInput = computed(() => props.as === 'input');
 </script>

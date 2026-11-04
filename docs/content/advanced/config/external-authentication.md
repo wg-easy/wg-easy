@@ -75,6 +75,10 @@ You have to configure the following redirect URIs in your OAuth provider:
 - `https://<your-domain>/api/auth/<provider>/link`
   Used to link an existing account to the provider
 
+Behind a reverse proxy, follow the [public URL configuration](./optional-config.md#public-urls-and-cookies).
+Registered redirect URIs must match the public scheme, host, and port used for
+both OAuth authorization and callbacks.
+
 If your provider does not support multiple redirect URIs (e.g. GitHub) but allows multiple URIs under the same base, then configure:
 
 - `https://<your-domain>/api/auth/<provider>/`

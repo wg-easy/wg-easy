@@ -1,33 +1,21 @@
-import { createError, getValidatedRouterParams, readValidatedBody } from 'h3';
+import { readValidatedBody } from 'nuxt/server';
 
-import Database from '#server/utils/Database';
-import { definePermissionEventHandler } from '#server/utils/handler';
-import { validateZod } from '#server/utils/types';
-import { TagGetSchema, TagUpdateSchema } from '#db/repositories/tag/types';
+import * as tags from '#server/features/vpn/tags';
+import { defineAuthenticatedEventHandler } from '#server/utils/handler';
+import { validateZod, getValidatedRouterParams } from '#server/http/validation';
+import { TagGetSchema, TagUpdateSchema } from '#shared/contracts/tag';
 
-export default definePermissionEventHandler(
-  'tags',
-  'update',
-  async ({ event }) => {
-    const { tagId } = await getValidatedRouterParams(
-      event,
-      validateZod(TagGetSchema, event)
-    );
+export default defineAuthenticatedEventHandler(async ({ event, user }) => {
+  const { tagId } = await getValidatedRouterParams(
+    event,
+    validateZod(TagGetSchema, event)
+  );
 
-    const data = await readValidatedBody(
-      event,
-      validateZod(TagUpdateSchema, event)
-    );
+  const data = await readValidatedBody(
+    event,
+    validateZod(TagUpdateSchema, event)
+  );
 
-    const tag = await Database.tags.get(tagId);
-    if (!tag) {
-      throw createError({
-        statusCode: 404,
-        statusMessage: 'Tag not found',
-      });
-    }
-
-    await Database.tags.update(tagId, data);
-    return { success: true };
-  }
-);
+  await tags.update(user, tagId, data);
+  return { success: true };
+});

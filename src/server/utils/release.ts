@@ -1,4 +1,4 @@
-import { createError } from 'h3';
+import { createError } from 'nuxt/server';
 import { $fetch } from 'ofetch';
 
 import { cacheFunction } from '#server/utils/cache';
@@ -33,8 +33,8 @@ async function fetchLatestRelease() {
   } catch (e) {
     SERVER_DEBUG('Failed to fetch latest releases: ', e);
     throw createError({
-      statusCode: 500,
-      statusMessage: 'Failed to fetch latest release',
+      status: 500,
+      statusText: 'Failed to fetch latest release',
     });
   }
 }

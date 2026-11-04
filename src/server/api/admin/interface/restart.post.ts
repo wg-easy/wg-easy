@@ -1,8 +1,8 @@
-import WireGuard from '#server/utils/WireGuard';
-import { definePermissionEventHandler } from '#server/utils/handler';
+import * as vpnSettings from '#server/features/vpn/interface';
+import { defineAuthenticatedEventHandler } from '#server/utils/handler';
 
-export default definePermissionEventHandler('admin', 'any', async () => {
-  await WireGuard.Restart();
+export default defineAuthenticatedEventHandler(async ({ user }) => {
+  await vpnSettings.restart(user);
 
   return { success: true };
 });

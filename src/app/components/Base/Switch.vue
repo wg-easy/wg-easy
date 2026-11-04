@@ -3,10 +3,10 @@
     :id="id"
     v-model="data"
     :name="id"
-    class="relative flex h-6 w-10 cursor-default rounded-full bg-gray-200 shadow-sm focus-within:outline focus-within:outline-red-700 data-[state=checked]:bg-red-800 dark:bg-neutral-400"
+    class="relative inline-flex h-5 w-9 shrink-0 items-center rounded-full border border-line bg-surface-hover transition-colors disabled:opacity-50 data-[state=checked]:border-accent data-[state=checked]:bg-accent"
   >
     <SwitchThumb
-      class="my-auto block h-4 w-4 translate-x-1 rounded-full bg-white shadow-sm transition-transform duration-100 will-change-transform data-[state=checked]:translate-x-[20px]"
+      class="block size-3.5 translate-x-0.5 rounded-full bg-white shadow-sm transition-transform data-[state=checked]:translate-x-4.5"
     />
   </SwitchRoot>
 </template>

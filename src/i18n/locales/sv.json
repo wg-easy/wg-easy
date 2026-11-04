@@ -1,204 +1,374 @@
 {
-  "pages": {
-    "me": "Konto",
-    "clients": "Klienter",
-    "admin": {
-      "panel": "Adminpanel",
-      "general": "Allmänt",
-      "config": "Konfiguration",
-      "interface": "Gränssnitt",
-      "hooks": "Hooks"
-    }
-  },
-  "user": {
-    "email": "E-post"
-  },
-  "me": {
-    "currentPassword": "Nuvarande lösenord",
-    "enable2fa": "Aktivera tvåfaktorsautentisering",
-    "enable2faDesc": "Skanna QR-koden med din autentiseringsapp eller ange nyckeln manuellt.",
-    "2faKey": "TOTP-nyckel",
-    "2faCodeDesc": "Ange koden från din autentiseringsapp.",
-    "disable2fa": "Inaktivera tvåfaktorsautentisering",
-    "disable2faDesc": "Ange ditt lösenord för att inaktivera tvåfaktorsautentisering.",
-    "linkOauth": "Länka ditt konto till en extern leverantör",
-    "unlinkOauth": "Ta bort länk",
-    "linkedWith": "Länkat till {provider}",
-    "providerDisabled": "Din länkade leverantör är inte aktiverad"
-  },
-  "general": {
-    "name": "Namn",
-    "username": "Användarnamn",
-    "password": "Lösenord",
-    "newPassword": "Nytt lösenord",
-    "updatePassword": "Uppdatera lösenord",
-    "addPassword": "Lägg till lösenord",
-    "mtu": "MTU",
-    "allowedIps": "Tillåtna IP-adresser",
-    "dns": "DNS",
-    "persistentKeepalive": "Persistent Keepalive",
-    "logout": "Logga ut",
-    "continue": "Fortsätt",
-    "host": "Värd",
-    "port": "Port",
+  "common": {
+    "fields": {
+      "email": "E-post",
+      "name": "Namn",
+      "username": "Användarnamn",
+      "password": "Lösenord",
+      "newPassword": "Nytt lösenord",
+      "confirmPassword": "Bekräfta lösenord"
+    },
+    "actions": {
+      "continue": "Fortsätt",
+      "delete": "Ta bort",
+      "change": "Ändra",
+      "cancel": "Avbryt",
+      "create": "Skapa",
+      "save": "Spara",
+      "revert": "Återställ",
+      "add": "Lägg till"
+    },
     "yes": "Ja",
     "no": "Nej",
-    "confirmPassword": "Bekräfta lösenord",
     "loading": "Laddar...",
-    "2fa": "Tvåfaktorsautentisering",
-    "2faCode": "TOTP-kod",
-    "externalAuth": "Extern autentisering"
+    "update": {
+      "available": "Det finns en tillgänglig uppdatering!",
+      "action": "Uppdatera"
+    },
+    "theme": {
+      "dark": "Mörkt tema",
+      "light": "Ljust tema",
+      "system": "Systemtema"
+    },
+    "donate": "Donera",
+    "notifications": {
+      "success": "Klart",
+      "saved": "Sparat",
+      "error": "Fel",
+      "unknown": "Okänt fel. Se konsolen för mer information"
+    },
+    "form": {
+      "actions": "Åtgärder",
+      "sections": {
+        "general": "Allmänt",
+        "advanced": "Avancerat"
+      },
+      "noItems": "Inga objekt",
+      "nullNoItems": "Inga objekt. Den globala konfigurationen används"
+    },
+    "clipboard": {
+      "notSupported": "Kopiering stöds inte",
+      "copied": "Kopierat!",
+      "failed": "Kopieringen misslyckades",
+      "copy": "Kopiera"
+    }
+  },
+  "auth": {
+    "logout": "Logga ut",
+    "twoFactor": {
+      "title": "Tvåfaktorsautentisering",
+      "code": "TOTP-kod"
+    },
+    "external": {
+      "title": "Extern autentisering"
+    },
+    "login": {
+      "signIn": "Logga in",
+      "signInWith": "Logga in med {provider}",
+      "or": "eller",
+      "rememberMe": "Kom ihåg mig",
+      "rememberMeDescription": "Fortsätt vara inloggad efter att webbläsaren stängts",
+      "insecure": "Du kan inte logga in via en osäker anslutning. Använd HTTPS.",
+      "twoFactor": {
+        "required": "Tvåfaktorsautentisering krävs",
+        "invalid": "Koden för tvåfaktorsautentisering är felaktig"
+      },
+      "expired": "Inloggningen har löpt ut. Försök igen"
+    }
+  },
+  "account": {
+    "title": "Konto",
+    "password": {
+      "current": "Nuvarande lösenord",
+      "update": "Uppdatera lösenord",
+      "add": "Lägg till lösenord"
+    },
+    "twoFactor": {
+      "enable": {
+        "label": "Aktivera tvåfaktorsautentisering",
+        "description": "Skanna QR-koden med din autentiseringsapp eller ange nyckeln manuellt."
+      },
+      "key": "TOTP-nyckel",
+      "codeDescription": "Ange koden från din autentiseringsapp.",
+      "disable": {
+        "label": "Inaktivera tvåfaktorsautentisering",
+        "description": "Ange ditt lösenord för att inaktivera tvåfaktorsautentisering."
+      }
+    },
+    "external": {
+      "link": "Länka ditt konto till en extern leverantör",
+      "unlink": "Ta bort länk",
+      "linkedWith": "Länkat till {provider}",
+      "providerDisabled": "Din länkade leverantör är inte aktiverad"
+    }
   },
   "setup": {
     "welcome": "Välkommen till den första konfigurationen av wg-easy",
-    "welcomeDesc": "Du har hittat det enklaste sättet att installera och hantera WireGuard på en Linux-värd",
+    "welcomeDescription": "Du har hittat det enklaste sättet att installera och hantera WireGuard på en Linux-värd",
     "existingSetup": "Har du en befintlig konfiguration?",
-    "createAdminDesc": "Ange först ett administratörsanvändarnamn och ett starkt, säkert lösenord. Dessa uppgifter används för att logga in på adminpanelen.",
-    "setupConfigDesc": "Ange värd- och portinformation. Den används i klientkonfigurationen när WireGuard konfigureras på klienternas enheter.",
-    "setupMigrationDesc": "Ange säkerhetskopian om du vill migrera data från din tidigare version av wg-easy till den nya installationen.",
+    "createAdminDescription": "Ange först ett administratörsanvändarnamn och ett starkt, säkert lösenord. Dessa uppgifter används för att logga in på adminpanelen.",
+    "setupConfigDescription": "Ange värd- och portinformation. Den används i klientkonfigurationen när WireGuard konfigureras på klienternas enheter.",
+    "setupMigrationDescription": "Ange säkerhetskopian om du vill migrera data från din tidigare version av wg-easy till den nya installationen.",
     "upload": "Ladda upp",
     "migration": "Återställ säkerhetskopian:",
     "createAccount": "Skapa konto",
     "successful": "Konfigurationen slutfördes",
-    "hostDesc": "Publikt värdnamn som klienterna ansluter till",
-    "portDesc": "Publik UDP-port som klienterna ansluter till och som WireGuard lyssnar på"
+    "hostDescription": "Publikt värdnamn som klienterna ansluter till",
+    "portDescription": "Publik UDP-port som klienterna ansluter till och som WireGuard lyssnar på"
   },
-  "update": {
-    "updateAvailable": "Det finns en tillgänglig uppdatering!",
-    "update": "Uppdatera"
-  },
-  "theme": {
-    "dark": "Mörkt tema",
-    "light": "Ljust tema",
-    "system": "Systemtema"
-  },
-  "layout": {
-    "toggleCharts": "Visa/dölj diagram",
-    "donate": "Donera"
-  },
-  "login": {
-    "signIn": "Logga in",
-    "signInWith": "Logga in med {provider}",
-    "or": "eller",
-    "rememberMe": "Kom ihåg mig",
-    "rememberMeDesc": "Fortsätt vara inloggad efter att webbläsaren stängts",
-    "insecure": "Du kan inte logga in via en osäker anslutning. Använd HTTPS.",
-    "2faRequired": "Tvåfaktorsautentisering krävs",
-    "2faWrong": "Koden för tvåfaktorsautentisering är felaktig",
-    "loginExpired": "Inloggningen har löpt ut. Försök igen"
-  },
-  "client": {
-    "empty": "Det finns inga klienter ännu.",
-    "newShort": "Ny",
-    "sort": "Sortera",
-    "create": "Skapa klient",
-    "created": "Klienten skapades",
-    "new": "Ny klient",
-    "name": "Namn",
-    "expireDate": "Utgångsdatum",
-    "expireDateDesc": "Datum då klienten inaktiveras. Lämna tomt för permanent åtkomst",
-    "delete": "Ta bort",
-    "deleteClient": "Ta bort klient",
-    "deleteDialog": "Är du säker på att du vill ta bort {name}? Åtgärden kan inte ångras.",
-    "enabled": "Aktiverad",
-    "address": "Adress",
-    "serverAllowedIps": "Serverns tillåtna IP-adresser",
-    "otlDesc": "Generera en kort engångslänk",
-    "permanent": "Permanent",
-    "createdOn": "Skapad {date}",
-    "lastSeen": "Senast sedd {date}",
-    "totalDownload": "Totalt nedladdat: {total}",
-    "totalUpload": "Totalt uppladdat: {total}",
-    "newClient": "Ny klient",
-    "disableClient": "Inaktivera klient",
-    "enableClient": "Aktivera klient",
-    "noPrivKey": "Klienten saknar en känd privat nyckel. Konfigurationen kan inte skapas.",
-    "showQR": "Visa QR-kod",
-    "downloadConfig": "Ladda ner konfiguration",
-    "allowedIpsDesc": "Vilka IP-adresser som ska routas genom VPN-anslutningen (åsidosätter den globala konfigurationen)",
-    "serverAllowedIpsDesc": "Vilka IP-adresser servern ska routa till klienten",
-    "mtuDesc": "Anger maximal överföringsenhet (paketstorlek) för VPN-tunneln",
-    "persistentKeepaliveDesc": "Anger intervallet i sekunder för keepalive-paket. 0 inaktiverar funktionen",
-    "hooks": "Hooks",
-    "hooksDescription": "Hooks fungerar endast med wg-quick",
-    "hooksLeaveEmpty": "Endast för wg-quick. Lämna annars tomt",
-    "dnsDesc": "DNS-server som klienterna ska använda (åsidosätter den globala konfigurationen)",
-    "notConnected": "Klienten är inte ansluten",
-    "endpoint": "Slutpunkt",
-    "endpointDesc": "Klientens IP-adress från vilken WireGuard-anslutningen upprättas",
-    "search": "Sök klienter...",
-    "config": "Konfiguration",
-    "viewConfig": "Visa konfiguration",
-    "firewallIps": "Tillåtna IP-adresser i brandväggen",
-    "firewallIpsDesc": "Mål-IP-adresser/CIDR som klienten får åtkomst till (tillämpas på serversidan). Lämna tomt för att använda Tillåtna IP-adresser. Valfri filtrering efter port och protokoll stöds. Se dokumentationen för syntax.",
-    "downloadPng": "Ladda ner PNG",
-    "copyPng": "Kopiera PNG"
-  },
-  "dialog": {
-    "change": "Ändra",
-    "cancel": "Avbryt",
-    "create": "Skapa"
-  },
-  "toast": {
-    "success": "Klart",
-    "saved": "Sparat",
-    "error": "Fel",
-    "unknown": "Okänt fel. Se konsolen för mer information"
-  },
-  "form": {
-    "actions": "Åtgärder",
-    "save": "Spara",
-    "revert": "Återställ",
-    "sectionGeneral": "Allmänt",
-    "sectionAdvanced": "Avancerat",
-    "noItems": "Inga objekt",
-    "nullNoItems": "Inga objekt. Den globala konfigurationen används",
-    "add": "Lägg till"
+  "clients": {
+    "title": "Klienter",
+    "list": {
+      "toggleCharts": "Visa/dölj diagram",
+      "empty": "Det finns inga klienter ännu.",
+      "new": "Ny",
+      "sort": "Sortera",
+      "newClient": "Ny klient",
+      "search": "Sök klienter..."
+    },
+    "create": {
+      "action": "Skapa klient",
+      "success": "Klienten skapades",
+      "title": "Ny klient"
+    },
+    "fields": {
+      "name": {
+        "label": "Namn"
+      },
+      "expiresAt": {
+        "label": "Utgångsdatum",
+        "description": "Datum då klienten inaktiveras. Lämna tomt för permanent åtkomst"
+      },
+      "address": {
+        "label": "Adress"
+      },
+      "serverAllowedIps": {
+        "label": "Serverns tillåtna IP-adresser",
+        "description": "Vilka IP-adresser servern ska routa till klienten"
+      },
+      "allowedIps": {
+        "description": "Vilka IP-adresser som ska routas genom VPN-anslutningen (åsidosätter den globala konfigurationen)"
+      },
+      "mtu": {
+        "description": "Anger maximal överföringsenhet (paketstorlek) för VPN-tunneln"
+      },
+      "persistentKeepalive": {
+        "description": "Anger intervallet i sekunder för keepalive-paket. 0 inaktiverar funktionen"
+      },
+      "dns": {
+        "description": "DNS-server som klienterna ska använda (åsidosätter den globala konfigurationen)"
+      },
+      "endpoint": {
+        "label": "Slutpunkt",
+        "description": "Klientens IP-adress från vilken WireGuard-anslutningen upprättas"
+      },
+      "firewallIps": {
+        "label": "Tillåtna IP-adresser i brandväggen",
+        "description": "Mål-IP-adresser/CIDR som klienten får åtkomst till (tillämpas på serversidan). Lämna tomt för att använda Tillåtna IP-adresser. Valfri filtrering efter port och protokoll stöds. Se dokumentationen för syntax."
+      }
+    },
+    "delete": {
+      "title": "Ta bort klient",
+      "description": "Är du säker på att du vill ta bort {name}? Åtgärden kan inte ångras."
+    },
+    "status": {
+      "enabled": "Aktiverad",
+      "permanent": "Permanent",
+      "createdOn": "Skapad {date}",
+      "lastSeen": "Senast sedd {date}",
+      "disable": "Inaktivera klient",
+      "enable": "Aktivera klient",
+      "notConnected": "Klienten är inte ansluten"
+    },
+    "configuration": {
+      "oneTimeLink": "Generera en kort engångslänk",
+      "noPrivateKey": "Klienten saknar en känd privat nyckel. Konfigurationen kan inte skapas.",
+      "showQrCode": "Visa QR-kod",
+      "download": "Ladda ner konfiguration",
+      "title": "Konfiguration",
+      "view": "Visa konfiguration",
+      "downloadPng": "Ladda ner PNG",
+      "copyPng": "Kopiera PNG"
+    },
+    "traffic": {
+      "totalDownload": "Totalt nedladdat: {total}",
+      "totalUpload": "Totalt uppladdat: {total}"
+    },
+    "hooks": {
+      "title": "Hooks",
+      "description": "Hooks fungerar endast med wg-quick",
+      "fieldDescription": "Endast för wg-quick. Lämna annars tomt"
+    }
   },
   "admin": {
+    "title": "Adminpanel",
     "general": {
-      "sessionTimeout": "Sessionstimeout",
-      "sessionTimeoutDesc": "Sessionslängd för Kom ihåg mig (sekunder)",
+      "title": "Allmänt",
+      "sessionTimeout": {
+        "label": "Sessionstimeout",
+        "description": "Sessionslängd för Kom ihåg mig (sekunder)"
+      },
       "metrics": "Mätvärden",
-      "metricsPassword": "Lösenord",
-      "metricsPasswordDesc": "Bearer-lösenord för endpointen för mätvärden (lösenord eller Argon2-hash)",
-      "json": "JSON",
-      "jsonDesc": "Sökväg för mätvärden i JSON-format",
-      "prometheus": "Prometheus",
-      "prometheusDesc": "Sökväg för Prometheus-mätvärden"
+      "metricsPassword": {
+        "label": "Lösenord",
+        "description": "Bearer-lösenord för endpointen för mätvärden (lösenord eller Argon2-hash)"
+      },
+      "json": {
+        "label": "JSON",
+        "description": "Sökväg för mätvärden i JSON-format"
+      },
+      "prometheus": {
+        "label": "Prometheus",
+        "description": "Sökväg för Prometheus-mätvärden"
+      }
     },
     "config": {
+      "title": "Konfiguration",
       "connection": "Anslutning",
-      "hostDesc": "Publikt värdnamn som klienterna ansluter till (ogiltigförklarar konfigurationen)",
-      "portDesc": "Publik UDP-port som klienterna ansluter till (ogiltigförklarar konfigurationen, du bör sannolikt även ändra gränssnittets port)",
-      "allowedIpsDesc": "Tillåtna IP-adresser som klienterna använder (global konfiguration)",
-      "dnsDesc": "DNS-server som klienterna använder (global konfiguration)",
-      "mtuDesc": "MTU som klienterna använder (endast för nya klienter)",
-      "persistentKeepaliveDesc": "Intervall i sekunder för att skicka keepalive-paket till servern. 0 = inaktiverat (endast för nya klienter)",
-      "suggest": "Föreslå",
-      "suggestDesc": "Välj en IP-adress eller ett värdnamn för värdfältet"
+      "host": {
+        "description": "Publikt värdnamn som klienterna ansluter till (ogiltigförklarar konfigurationen)"
+      },
+      "port": {
+        "description": "Publik UDP-port som klienterna ansluter till (ogiltigförklarar konfigurationen, du bör sannolikt även ändra gränssnittets port)"
+      },
+      "allowedIps": {
+        "description": "Tillåtna IP-adresser som klienterna använder (global konfiguration)"
+      },
+      "dns": {
+        "description": "DNS-server som klienterna använder (global konfiguration)"
+      },
+      "mtu": {
+        "description": "MTU som klienterna använder (endast för nya klienter)"
+      },
+      "persistentKeepalive": {
+        "description": "Intervall i sekunder för att skicka keepalive-paket till servern. 0 = inaktiverat (endast för nya klienter)"
+      },
+      "suggest": {
+        "label": "Föreslå",
+        "description": "Välj en IP-adress eller ett värdnamn för värdfältet"
+      }
     },
     "interface": {
+      "title": "Gränssnitt",
       "cidrSuccess": "CIDR ändrades",
-      "device": "Enhet",
-      "deviceDesc": "Ethernet-enhet som WireGuard-trafiken ska vidarebefordras genom",
-      "routingTable": "Routingtabell",
-      "routingTableDesc": "Routingtabell för WireGuard-rutter. Ange auto, off eller ett tabellnummer.",
-      "mtuDesc": "MTU som WireGuard använder",
-      "portDesc": "UDP-port som WireGuard lyssnar på (du bör sannolikt även ändra porten under Konfiguration)",
+      "device": {
+        "label": "Enhet",
+        "description": "Ethernet-enhet som WireGuard-trafiken ska vidarebefordras genom"
+      },
+      "routingTable": {
+        "label": "Routingtabell",
+        "description": "Routingtabell för WireGuard-rutter. Ange auto, off eller ett tabellnummer."
+      },
+      "mtu": {
+        "description": "MTU som WireGuard använder"
+      },
+      "port": {
+        "description": "UDP-port som WireGuard lyssnar på (du bör sannolikt även ändra porten under Konfiguration)"
+      },
       "changeCidr": "Ändra CIDR",
-      "restart": "Starta om gränssnitt",
-      "restartDesc": "Starta om WireGuard-gränssnittet",
+      "restart": {
+        "label": "Starta om gränssnitt",
+        "description": "Starta om WireGuard-gränssnittet"
+      },
       "restartWarn": "Är du säker på att du vill starta om gränssnittet? Alla klienter kopplas från.",
       "restartSuccess": "Gränssnittet startades om",
       "firewall": "Trafikfiltrering",
-      "firewallEnabled": "Aktivera brandvägg per klient",
-      "firewallEnabledDesc": "Begränsa klienttrafik till specifika mål-IP-adresser med iptables. När funktionen är aktiverad kan varje klient konfigureras med tillåtna destinationer."
+      "firewallEnabled": {
+        "label": "Aktivera brandvägg per klient",
+        "description": "Begränsa klienttrafik till specifika mål-IP-adresser med iptables. När funktionen är aktiverad kan varje klient konfigureras med tillåtna destinationer."
+      }
     },
-    "introText": "Välkommen till adminpanelen.\n\nHär kan du hantera allmänna inställningar, konfigurationen, gränssnittsinställningar och hooks.\n\nBörja genom att välja ett av avsnitten i sidofältet."
+    "hooks": {
+      "title": "Hooks"
+    },
+    "introduction": "Välkommen till adminpanelen.\n\nHär kan du hantera allmänna inställningar, konfigurationen, gränssnittsinställningar och hooks.\n\nBörja genom att välja ett av avsnitten i sidofältet."
   },
-  "zod": {
-    "generic": {
+  "wireguard": {
+    "fields": {
+      "mtu": "MTU",
+      "allowedIps": "Tillåtna IP-adresser",
+      "dns": "DNS",
+      "persistentKeepalive": "Persistent Keepalive",
+      "host": "Värd",
+      "port": "Port"
+    },
+    "hooks": {
+      "preUp": "PreUp",
+      "postUp": "PostUp",
+      "preDown": "PreDown",
+      "postDown": "PostDown"
+    },
+    "obfuscation": {
+      "jC": {
+        "label": "Antal skräppaket (Jc)",
+        "description": "Antal skräppaket som ska skickas (1–128, rekommenderat: 4–12)"
+      },
+      "jMin": {
+        "label": "Minsta storlek på skräppaket (Jmin)",
+        "description": "Minsta storlek på skräppaket (0–1279*, rekommenderat: 8, måste vara < Jmax)"
+      },
+      "jMax": {
+        "label": "Största storlek på skräppaket (Jmax)",
+        "description": "Största storlek på skräppaket (1–1280*, rekommenderat: 80, måste vara > Jmin)"
+      },
+      "s1": {
+        "label": "Skräpstorlek för initieringspaket (S1)",
+        "description": "Skräpstorlek för initieringspaket (0–1132[1280* - 148 = 1132], rekommenderat: 15–150, S1+56 ≠ S2)"
+      },
+      "s2": {
+        "label": "Skräpstorlek för svarspaket (S2)",
+        "description": "Skräpstorlek för svarspaket (0–1188[1280* - 92 = 1188], rekommenderat: 15–150)"
+      },
+      "s3": {
+        "label": "Skräpstorlek för cookie-svarspaket (S3)",
+        "description": "Skräpstorlek för cookie-svarspaket"
+      },
+      "s4": {
+        "label": "Skräpstorlek för transportpaket (S4)",
+        "description": "Skräpstorlek för transportpaket"
+      },
+      "h1": {
+        "label": "Magisk header för initieringspaket (H1)",
+        "description": "Headervärde eller intervall för initieringspaket (X eller X-Y, där X<Y. Min 5, max 2147483647. Värdet eller intervallet får inte överlappa andra headers)"
+      },
+      "h2": {
+        "label": "Magisk header för svarspaket (H2)",
+        "description": "Headervärde eller intervall för svarspaket (X eller X-Y, där X<Y. Min 5, max 2147483647. Värdet eller intervallet får inte överlappa andra headers)"
+      },
+      "h3": {
+        "label": "Magisk header för cookie-svarspaket (H3)",
+        "description": "Headervärde eller intervall för cookie-svarspaket (X eller X-Y, där X<Y. Min 5, max 2147483647. Värdet eller intervallet får inte överlappa andra headers)"
+      },
+      "h4": {
+        "label": "Magisk header för transportpaket (H4)",
+        "description": "Headervärde eller intervall för transportpaket (X eller X-Y, där X<Y. Min 5, max 2147483647. Värdet eller intervallet får inte överlappa andra headers)"
+      },
+      "i1": {
+        "label": "Särskilt skräppaket 1 (I1)",
+        "description": "Protokollefterliknande paket i hexformat: <b 0x...>"
+      },
+      "i2": {
+        "label": "Särskilt skräppaket 2 (I2)",
+        "description": "Protokollefterliknande paket i hexformat: <b 0x...>"
+      },
+      "i3": {
+        "label": "Särskilt skräppaket 3 (I3)",
+        "description": "Protokollefterliknande paket i hexformat: <b 0x...>"
+      },
+      "i4": {
+        "label": "Särskilt skräppaket 4 (I4)",
+        "description": "Protokollefterliknande paket i hexformat: <b 0x...>"
+      },
+      "i5": {
+        "label": "Särskilt skräppaket 5 (I5)",
+        "description": "Protokollefterliknande paket i hexformat: <b 0x...>"
+      },
+      "mtuNote": "Värdena beror på MTU",
+      "title": "Obfuskeringsparametrar för AmneziaWG"
+    }
+  },
+  "validation": {
+    "messages": {
       "required": "{field} krävs",
       "validNumber": "{field} måste vara ett giltigt tal",
       "validNumberRange": "{field} måste vara ett giltigt tal eller talintervall",
@@ -258,53 +428,5 @@
     "dns": "DNS",
     "allowedIps": "Tillåtna IP-adresser",
     "file": "Fil"
-  },
-  "hooks": {
-    "preUp": "PreUp",
-    "postUp": "PostUp",
-    "preDown": "PreDown",
-    "postDown": "PostDown"
-  },
-  "copy": {
-    "notSupported": "Kopiering stöds inte",
-    "copied": "Kopierat!",
-    "failed": "Kopieringen misslyckades",
-    "copy": "Kopiera"
-  },
-  "awg": {
-    "jCLabel": "Antal skräppaket (Jc)",
-    "jCDescription": "Antal skräppaket som ska skickas (1–128, rekommenderat: 4–12)",
-    "jMinLabel": "Minsta storlek på skräppaket (Jmin)",
-    "jMinDescription": "Minsta storlek på skräppaket (0–1279*, rekommenderat: 8, måste vara < Jmax)",
-    "jMaxLabel": "Största storlek på skräppaket (Jmax)",
-    "jMaxDescription": "Största storlek på skräppaket (1–1280*, rekommenderat: 80, måste vara > Jmin)",
-    "s1Label": "Skräpstorlek för initieringspaket (S1)",
-    "s1Description": "Skräpstorlek för initieringspaket (0–1132[1280* - 148 = 1132], rekommenderat: 15–150, S1+56 ≠ S2)",
-    "s2Label": "Skräpstorlek för svarspaket (S2)",
-    "s2Description": "Skräpstorlek för svarspaket (0–1188[1280* - 92 = 1188], rekommenderat: 15–150)",
-    "s3Label": "Skräpstorlek för cookie-svarspaket (S3)",
-    "s3Description": "Skräpstorlek för cookie-svarspaket",
-    "s4Label": "Skräpstorlek för transportpaket (S4)",
-    "s4Description": "Skräpstorlek för transportpaket",
-    "h1Label": "Magisk header för initieringspaket (H1)",
-    "h1Description": "Headervärde eller intervall för initieringspaket (X eller X-Y, där X<Y. Min 5, max 2147483647. Värdet eller intervallet får inte överlappa andra headers)",
-    "h2Label": "Magisk header för svarspaket (H2)",
-    "h2Description": "Headervärde eller intervall för svarspaket (X eller X-Y, där X<Y. Min 5, max 2147483647. Värdet eller intervallet får inte överlappa andra headers)",
-    "h3Label": "Magisk header för cookie-svarspaket (H3)",
-    "h3Description": "Headervärde eller intervall för cookie-svarspaket (X eller X-Y, där X<Y. Min 5, max 2147483647. Värdet eller intervallet får inte överlappa andra headers)",
-    "h4Label": "Magisk header för transportpaket (H4)",
-    "h4Description": "Headervärde eller intervall för transportpaket (X eller X-Y, där X<Y. Min 5, max 2147483647. Värdet eller intervallet får inte överlappa andra headers)",
-    "i1Label": "Särskilt skräppaket 1 (I1)",
-    "i1Description": "Protokollefterliknande paket i hexformat: <b 0x...>",
-    "i2Label": "Särskilt skräppaket 2 (I2)",
-    "i2Description": "Protokollefterliknande paket i hexformat: <b 0x...>",
-    "i3Label": "Särskilt skräppaket 3 (I3)",
-    "i3Description": "Protokollefterliknande paket i hexformat: <b 0x...>",
-    "i4Label": "Särskilt skräppaket 4 (I4)",
-    "i4Description": "Protokollefterliknande paket i hexformat: <b 0x...>",
-    "i5Label": "Särskilt skräppaket 5 (I5)",
-    "i5Description": "Protokollefterliknande paket i hexformat: <b 0x...>",
-    "mtuNote": "Värdena beror på MTU",
-    "obfuscationParameters": "Obfuskeringsparametrar för AmneziaWG"
   }
 }

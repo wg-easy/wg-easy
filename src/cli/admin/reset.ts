@@ -1,9 +1,10 @@
 import { defineCommand } from 'citty';
 import { consola } from 'consola';
-import { eq } from 'drizzle-orm';
 
-import { db, schema } from '#cli/db';
-import { hashPassword } from '#server/utils/password';
+import { db } from '#cli/db';
+import { createStore } from '#db/store';
+import { resetAdministrator } from '#server/features/identity/recovery';
+import { WG_ENV } from '#server/utils/config';
 
 export default defineCommand({
   meta: {
@@ -33,31 +34,10 @@ export default defineCommand({
       return;
     }
     consola.info('Setting new password for admin user...');
-    const hash = await hashPassword(password);
-
-    const user = await db.transaction(async (tx) => {
-      const user = await tx
-        .select()
-        .from(schema.user)
-        .where(eq(schema.user.id, 1))
-        .get();
-
-      if (!user) {
-        consola.error('Admin user not found');
-        return;
-      }
-
-      await tx
-        .update(schema.user)
-        .set({
-          password: hash,
-          totpVerified: false,
-          totpKey: null,
-        })
-        .where(eq(schema.user.id, 1));
-
-      return user;
-    });
+    const user = await resetAdministrator(
+      createStore(db, WG_ENV.WG_INTERFACE),
+      password
+    );
 
     if (!user) {
       consola.error('Failed to update admin user');

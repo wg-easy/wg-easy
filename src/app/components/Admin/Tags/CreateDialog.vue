@@ -7,22 +7,28 @@
       {{ $t('admin.tags.new') }}
     </template>
     <template #description>
-      <div class="flex flex-col">
-        <FormTextField id="name" v-model="name" :label="$t('general.name')" />
+      <div class="flex flex-col gap-2">
+        <FormTextField
+          id="tagName"
+          v-model="name"
+          :label="$t('common.fields.name')"
+        />
         <FormNullTextField
-          id="description"
+          id="tagDescription"
           v-model="description"
-          :label="$t('general.description')"
+          :label="$t('common.fields.description')"
         />
       </div>
     </template>
     <template #actions>
       <DialogClose as-child>
-        <BaseSecondaryButton>{{ $t('dialog.cancel') }}</BaseSecondaryButton>
+        <BaseSecondaryButton>
+          {{ $t('common.actions.cancel') }}
+        </BaseSecondaryButton>
       </DialogClose>
       <DialogClose as-child>
-        <BasePrimaryButton @click="createTag">
-          {{ $t('dialog.create') }}
+        <BasePrimaryButton :disabled="!name.trim()" @click="createTag">
+          {{ $t('common.actions.create') }}
         </BasePrimaryButton>
       </DialogClose>
     </template>
@@ -30,6 +36,8 @@
 </template>
 
 <script lang="ts" setup>
+import { $fetch } from '#imports';
+
 const name = ref<string>('');
 const description = ref<string | null>(null);
 const tagsStore = useTagsStore();
@@ -39,7 +47,9 @@ const { t } = useI18n();
 defineProps<{ triggerClass?: string }>();
 
 function resetOnOpen(open: boolean) {
-  if (!open) return;
+  if (!open) {
+    return;
+  }
 
   name.value = '';
   description.value = null;

@@ -1,9 +1,6 @@
-import Database from '#server/utils/Database';
-import { definePermissionEventHandler } from '#server/utils/handler';
-import { getIpInformation } from '#server/utils/ip';
+import * as system from '#server/features/system';
+import { defineAuthenticatedEventHandler } from '#server/utils/handler';
 
-export default definePermissionEventHandler('admin', 'any', async () => {
-  const wgInterface = await Database.interfaces.get();
-  const result = await getIpInformation(wgInterface.name);
-  return result;
+export default defineAuthenticatedEventHandler(async ({ user }) => {
+  return system.ipInformation(user);
 });

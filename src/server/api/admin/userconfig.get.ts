@@ -1,7 +1,6 @@
-import Database from '#server/utils/Database';
-import { definePermissionEventHandler } from '#server/utils/handler';
+import * as vpnSettings from '#server/features/vpn/interface';
+import { defineAuthenticatedEventHandler } from '#server/utils/handler';
 
-export default definePermissionEventHandler('admin', 'any', async () => {
-  const userConfig = await Database.userConfigs.get();
-  return userConfig;
+export default defineAuthenticatedEventHandler(async ({ user }) => {
+  return vpnSettings.getDefaults(user);
 });

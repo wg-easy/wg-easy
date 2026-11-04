@@ -1,9 +1,9 @@
 <template>
   <BaseDialog :trigger-class="triggerClass">
     <template #trigger><slot /></template>
-    <template #title>{{ $t('admin.tags.deleteTag') }}</template>
+    <template #title>{{ $t('admin.tags.delete.title') }}</template>
     <template #description>
-      <i18n-t keypath="admin.tags.deleteDialog">
+      <i18n-t keypath="admin.tags.delete.description">
         <template #name>
           <strong>{{ tagName }}</strong>
         </template>
@@ -11,11 +11,13 @@
     </template>
     <template #actions>
       <DialogClose as-child>
-        <BasePrimaryButton>{{ $t('dialog.cancel') }}</BasePrimaryButton>
+        <BaseSecondaryButton>
+          {{ $t('common.actions.cancel') }}
+        </BaseSecondaryButton>
       </DialogClose>
       <DialogClose as-child>
-        <BaseSecondaryButton @click="$emit('delete')">
-          {{ $t('admin.tags.deleteTag') }}
+        <BaseSecondaryButton class="ui-button-danger" @click="$emit('delete')">
+          {{ $t('admin.tags.delete.title') }}
         </BaseSecondaryButton>
       </DialogClose>
     </template>

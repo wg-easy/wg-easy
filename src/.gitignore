@@ -25,4 +25,7 @@ logs
 
 coverage/
 
+test-results/
+playwright-report/
+
 wg-easy.db

@@ -1,11 +1,38 @@
 <template>
-  <p class="m-10 text-center text-sm text-gray-400 dark:text-neutral-400">
-    {{ $t('client.empty') }}<br /><br />
-    <ClientsCreateDialog>
-      <BaseSecondaryButton as="span">
-        <IconsPlus class="mr-2 w-4" />
-        <span class="text-sm">{{ $t('client.new') }}</span>
-      </BaseSecondaryButton>
+  <div
+    class="flex min-h-64 flex-col items-center justify-center gap-4 rounded-xl border border-dashed border-line p-6 text-center"
+  >
+    <div
+      class="grid size-12 place-items-center rounded-xl bg-surface-raised text-subtle"
+    >
+      <ServerIcon class="size-6" />
+    </div>
+    <p class="text-sm text-muted">
+      {{
+        $t(
+          clientsStore.hasActiveFilters
+            ? 'clients.list.noResults'
+            : 'clients.list.empty'
+        )
+      }}
+    </p>
+    <BaseSecondaryButton
+      v-if="clientsStore.hasActiveFilters"
+      @click="clientsStore.clearFilters()"
+    >
+      {{ $t('clients.filters.clear') }}
+    </BaseSecondaryButton>
+    <ClientsCreateDialog v-else>
+      <BasePrimaryButton as="span">
+        <PlusIcon class="size-4" />
+        {{ $t('clients.create.title') }}
+      </BasePrimaryButton>
     </ClientsCreateDialog>
-  </p>
+  </div>
 </template>
+
+<script setup lang="ts">
+import { PlusIcon, ServerIcon } from '@lucide/vue';
+
+const clientsStore = useClientsStore();
+</script>

@@ -1,6 +1,6 @@
-import Database from '#server/utils/Database';
-import { definePermissionEventHandler } from '#server/utils/handler';
+import * as tags from '#server/features/vpn/tags';
+import { defineAuthenticatedEventHandler } from '#server/utils/handler';
 
-export default definePermissionEventHandler('tags', 'view', async () => {
-  return Database.tags.getAll();
+export default defineAuthenticatedEventHandler(async ({ user }) => {
+  return tags.list(user);
 });

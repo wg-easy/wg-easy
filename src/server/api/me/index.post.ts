@@ -1,22 +1,16 @@
-import { readValidatedBody } from 'h3';
+import { readValidatedBody } from 'nuxt/server';
 
-import Database from '#server/utils/Database';
-import { definePermissionEventHandler } from '#server/utils/handler';
-import { validateZod } from '#server/utils/types';
-import { UserUpdateSchema } from '#db/repositories/user/types';
+import * as identity from '#server/features/identity';
+import { defineAuthenticatedEventHandler } from '#server/utils/handler';
+import { validateZod } from '#server/http/validation';
+import { UserUpdateSchema } from '#shared/contracts/user';
 
-export default definePermissionEventHandler(
-  'me',
-  'update',
-  async ({ event, user, checkPermissions }) => {
-    const { name, email } = await readValidatedBody(
-      event,
-      validateZod(UserUpdateSchema, event)
-    );
+export default defineAuthenticatedEventHandler(async ({ event, user }) => {
+  const { name, email } = await readValidatedBody(
+    event,
+    validateZod(UserUpdateSchema, event)
+  );
 
-    checkPermissions(user);
-
-    await Database.users.update(user.id, name, email);
-    return { success: true };
-  }
-);
+  await identity.updateProfile(user, name, email);
+  return { success: true };
+});

@@ -1,55 +1,44 @@
 <template>
   <div
-    :class="`absolute bottom-0 left-0 right-0 z-0 h-6 ${globalStore.uiChartType === 'line' && 'line-chart'}`"
+    class="flex h-14 w-20 shrink-0 flex-col overflow-hidden"
+    aria-hidden="true"
   >
-    <BaseChart :options="chartOptionsTX" :series="client.transferTxSeries" />
-  </div>
-  <div
-    :class="`absolute left-0 right-0 top-0 z-0 h-6 ${globalStore.uiChartType === 'line' && 'line-chart'}`"
-  >
-    <BaseChart
-      :options="chartOptionsRX"
-      :series="client.transferRxSeries"
-      style="transform: scaleY(-1)"
-    />
+    <div class="h-7">
+      <BaseChart :options="chartOptionsTX" :series="client.transferTxSeries" />
+    </div>
+    <div class="h-7">
+      <BaseChart :options="chartOptionsRX" :series="client.transferRxSeries" />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import type { ApexChart, ApexOptions } from 'apexcharts';
+import type { ApexOptions } from 'apexcharts';
 
 defineProps<{
   client: LocalClient;
 }>();
 
-const globalStore = useGlobalStore();
 const theme = useTheme();
 
-const chartOptionsTX = computed(() => {
-  const opts = {
-    ...chartOptions,
-    colors: [CHART_COLORS.tx[theme.value]],
-  };
-  opts.chart.type = globalStore.uiChartType;
-  opts.stroke.width = UI_CHART_PROPS[globalStore.uiChartType].strokeWidth;
-  return opts;
-});
+const chartOptionsTX = computed(() => ({
+  ...chartOptions,
+  colors: [CHART_COLORS.tx[theme.value]],
+}));
 
-const chartOptionsRX = computed(() => {
-  const opts = {
-    ...chartOptions,
-    colors: [CHART_COLORS.rx[theme.value]],
-  };
-  opts.chart.type = globalStore.uiChartType;
-  opts.stroke.width = UI_CHART_PROPS[globalStore.uiChartType].strokeWidth;
-  return opts;
-});
+const chartOptionsRX = computed(() => ({
+  ...chartOptions,
+  colors: [CHART_COLORS.rx[theme.value]],
+}));
 
 const chartOptions = {
   chart: {
-    type: undefined as ApexChart['type'],
+    type: 'area',
     background: 'transparent',
     stacked: false,
+    accessibility: {
+      enabled: false,
+    },
     toolbar: {
       show: false,
     },
@@ -72,7 +61,6 @@ const chartOptions = {
       shade: 'dark',
       type: 'vertical',
       shadeIntensity: 0,
-      gradientToColors: CHART_COLORS.gradient[theme.value],
       inverseColors: false,
       opacityTo: 0,
       stops: [0, 100],
@@ -80,11 +68,6 @@ const chartOptions = {
   },
   dataLabels: {
     enabled: false,
-  },
-  plotOptions: {
-    bar: {
-      horizontal: false,
-    },
   },
   xaxis: {
     labels: {
@@ -128,9 +111,3 @@ const chartOptions = {
   },
 } satisfies ApexOptions;
 </script>
-
-<style scoped lang="css">
-.line-chart .apexcharts-svg {
-  transform: translateY(3px);
-}
-</style>

@@ -4,31 +4,42 @@
       <slot />
     </template>
     <template #title>
-      {{ $t('client.new') }}
+      {{ $t('clients.create.title') }}
     </template>
     <template #description>
-      <div class="flex flex-col">
-        <FormTextField id="name" v-model="name" :label="$t('client.name')" />
+      <div class="flex flex-col gap-2">
+        <FormTextField
+          id="name"
+          v-model="name"
+          :label="$t('clients.fields.name.label')"
+        />
         <FormNullTextField
           id="description"
           v-model="description"
-          :label="$t('general.description')"
+          :label="$t('common.fields.description')"
         />
-        <FormTagsField id="tags" v-model="tagIds" :label="$t('general.tags')" />
+        <FormTagsField
+          id="tags"
+          v-model="tagIds"
+          :label="$t('clients.fields.tags.label')"
+        />
         <FormDateField
           id="expiresAt"
           v-model="expiresAt"
-          :label="$t('client.expireDate')"
+          :label="$t('clients.fields.expiresAt.label')"
+          :description="$t('clients.fields.expiresAt.description')"
         />
       </div>
     </template>
     <template #actions>
       <DialogClose as-child>
-        <BaseSecondaryButton>{{ $t('dialog.cancel') }}</BaseSecondaryButton>
+        <BaseSecondaryButton>
+          {{ $t('common.actions.cancel') }}
+        </BaseSecondaryButton>
       </DialogClose>
       <DialogClose as-child>
-        <BasePrimaryButton @click="createClient">
-          {{ $t('client.create') }}
+        <BasePrimaryButton :disabled="!name.trim()" @click="createClient">
+          {{ $t('clients.create.action') }}
         </BasePrimaryButton>
       </DialogClose>
     </template>
@@ -36,6 +47,8 @@
 </template>
 
 <script lang="ts" setup>
+import { $fetch } from '#imports';
+
 const name = ref<string>('');
 const description = ref<string | null>(null);
 const tagIds = ref<number[]>([]);
@@ -47,7 +60,9 @@ const { t } = useI18n();
 defineProps<{ triggerClass?: string }>();
 
 function resetOnOpen(open: boolean) {
-  if (!open) return;
+  if (!open) {
+    return;
+  }
 
   name.value = '';
   description.value = null;
@@ -72,7 +87,7 @@ const _createClient = useSubmit(
     }),
   {
     revert: () => clientsStore.refresh(),
-    successMsg: t('client.created'),
+    successMsg: t('clients.create.success'),
   }
 );
 </script>

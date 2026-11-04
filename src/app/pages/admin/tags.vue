@@ -1,13 +1,17 @@
 <template>
-  <main>
-    <div class="flex items-center justify-between px-3 py-3">
+  <div class="surface overflow-hidden">
+    <div class="flex items-center justify-end border-b border-line p-4">
       <AdminTagsCreateDialog>
-        <BaseSecondaryButton as="span">
-          <IconsPlus class="mr-2 w-4" />
-          <span class="text-sm">{{ $t('admin.tags.new') }}</span>
-        </BaseSecondaryButton>
+        <BasePrimaryButton as="span">
+          <PlusIcon class="size-4" />
+          {{ $t('admin.tags.new') }}
+        </BasePrimaryButton>
       </AdminTagsCreateDialog>
     </div>
     <AdminTagsList />
-  </main>
+  </div>
 </template>
+
+<script setup lang="ts">
+import { PlusIcon } from '@lucide/vue';
+</script>

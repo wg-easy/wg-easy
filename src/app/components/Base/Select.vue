@@ -1,27 +1,45 @@
 <template>
-  <SelectRoot v-model="selected">
+  <SelectRoot v-model="selected" :disabled="disabled">
     <SelectTrigger
-      class="inline-flex h-8 items-center justify-around gap-2 rounded bg-gray-200 px-3 text-sm leading-none dark:bg-neutral-500 dark:text-neutral-200"
-      aria-label="Choose option"
+      v-bind="$attrs"
+      :aria-label="label ?? $t('common.form.chooseOption')"
+      class="inline-flex min-w-0 items-center justify-between gap-2 text-left"
+      :class="
+        compact
+          ? 'h-9 rounded-lg border border-line bg-surface px-2.5 text-xs text-foreground'
+          : 'ui-input bg-surface'
+      "
     >
-      <SelectValue placeholder="Select..." />
-      <IconsArrowDown class="size-3" />
+      <SelectValue class="truncate">
+        {{
+          selectedOption
+            ? optionText(selectedOption)
+            : $t('common.form.chooseOption')
+        }}
+      </SelectValue>
+      <SelectIcon as-child>
+        <ChevronDownIcon class="size-3.5 shrink-0 text-subtle" />
+      </SelectIcon>
     </SelectTrigger>
-
     <SelectPortal>
       <SelectContent
-        class="z-[100] min-w-28 rounded bg-gray-300 dark:bg-neutral-500"
+        class="ui-menu min-w-(--reka-select-trigger-width)"
+        position="popper"
+        :side-offset="6"
+        :collision-padding="8"
       >
-        <SelectViewport class="p-2">
+        <SelectViewport>
           <SelectItem
-            v-for="(option, index) in options"
-            :key="index"
+            v-for="option in options"
+            :key="option.value"
             :value="option.value"
-            class="relative flex h-6 items-center rounded px-3 text-sm leading-none outline-none hover:bg-red-800 hover:text-white dark:text-white"
+            :text-value="optionText(option)"
+            class="ui-menu-item justify-between data-[state=checked]:text-accent"
           >
-            <SelectItemText>
-              {{ option.value }} - {{ option.label }}
-            </SelectItemText>
+            <SelectItemText>{{ optionText(option) }}</SelectItemText>
+            <SelectItemIndicator>
+              <CheckIcon class="size-4" aria-hidden="true" />
+            </SelectItemIndicator>
           </SelectItem>
         </SelectViewport>
       </SelectContent>
@@ -29,9 +47,26 @@
   </SelectRoot>
 </template>
 
-<script lang="ts" setup>
-defineProps<{
-  options: { label: string; value: string }[];
-}>();
-const selected = defineModel<string>();
+<script lang="ts" setup generic="T extends string | number">
+import { CheckIcon, ChevronDownIcon } from '@lucide/vue';
+
+defineOptions({ inheritAttrs: false });
+const props = withDefaults(
+  defineProps<{
+    options: { label: string; value: T }[];
+    label?: string;
+    compact?: boolean;
+    showValue?: boolean;
+    disabled?: boolean;
+  }>(),
+  { label: undefined, showValue: true }
+);
+const selected = defineModel<T>();
+const selectedOption = computed(() =>
+  props.options.find((option) => option.value === selected.value)
+);
+
+function optionText(option: { label: string; value: T }) {
+  return props.showValue ? `${option.value} - ${option.label}` : option.label;
+}
 </script>

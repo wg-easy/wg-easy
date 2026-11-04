@@ -1,19 +1,15 @@
-import { readValidatedBody } from 'h3';
+import { readValidatedBody } from 'nuxt/server';
 
-import Database from '#server/utils/Database';
-import { definePermissionEventHandler } from '#server/utils/handler';
-import { validateZod } from '#server/utils/types';
-import { GeneralUpdateSchema } from '#db/repositories/general/types';
+import * as settings from '#server/features/settings';
+import { defineAuthenticatedEventHandler } from '#server/utils/handler';
+import { validateZod } from '#server/http/validation';
+import { GeneralUpdateSchema } from '#shared/contracts/general';
 
-export default definePermissionEventHandler(
-  'admin',
-  'any',
-  async ({ event }) => {
-    const data = await readValidatedBody(
-      event,
-      validateZod(GeneralUpdateSchema, event)
-    );
-    await Database.general.update(data);
-    return { success: true };
-  }
-);
+export default defineAuthenticatedEventHandler(async ({ event, user }) => {
+  const data = await readValidatedBody(
+    event,
+    validateZod(GeneralUpdateSchema, event)
+  );
+  await settings.update(user, data);
+  return { success: true };
+});

@@ -7,59 +7,62 @@
       {{ $t('admin.tags.edit') }}
     </template>
     <template #description>
-      <div class="flex flex-col">
-        <FormTextField id="name" v-model="name" :label="$t('general.name')" />
+      <div class="flex flex-col gap-2">
+        <FormTextField
+          :id="`tagName-${tag.id}`"
+          v-model="name"
+          :label="$t('common.fields.name')"
+        />
         <FormNullTextField
-          id="description"
+          :id="`tagDescription-${tag.id}`"
           v-model="description"
-          :label="$t('general.description')"
+          :label="$t('common.fields.description')"
         />
 
-        <div
-          class="mb-1 mt-3 text-sm font-medium text-gray-700 dark:text-neutral-200"
-        >
+        <p class="mt-2 text-sm font-medium text-muted">
           {{ $t('admin.tags.clients') }}
-        </div>
+        </p>
         <div
-          class="max-h-56 overflow-y-auto rounded-lg border-2 border-gray-100 dark:border-neutral-800"
+          class="max-h-56 overflow-y-auto rounded-lg border border-line bg-input p-1.5"
         >
-          <IconsLoading
-            v-if="!clientsStore.clients"
-            class="mx-auto my-3 w-5 animate-spin"
+          <LoaderCircleIcon
+            v-if="!clients"
+            class="mx-auto my-3 size-5 animate-spin text-subtle"
+            aria-hidden="true"
           />
           <p
-            v-else-if="clientsStore.clients.length === 0"
-            class="p-3 text-center text-sm text-gray-400 dark:text-neutral-400"
+            v-else-if="clients.length === 0"
+            class="p-3 text-center text-sm text-subtle"
           >
-            {{ $t('client.empty') }}
+            {{ $t('clients.list.empty') }}
           </p>
-          <button
-            v-for="client in clientsStore.clients"
-            :key="client.id"
-            type="button"
-            class="flex w-full items-center gap-2 px-3 py-1.5 text-left text-sm hover:bg-gray-100 dark:hover:bg-neutral-600"
-            @click="toggleClient(client)"
-          >
-            <CheckboxRoot
-              :model-value="isAssigned(client)"
-              class="pointer-events-none flex h-4 w-4 shrink-0 items-center justify-center rounded border border-gray-300 data-[state=checked]:border-red-800 data-[state=checked]:bg-red-800 dark:border-neutral-500"
+          <template v-else>
+            <label
+              v-for="client in clients"
+              :key="client.id"
+              class="ui-menu-item"
             >
-              <CheckboxIndicator>
-                <IconsCheck class="w-3 text-white" />
-              </CheckboxIndicator>
-            </CheckboxRoot>
-            <span class="truncate">{{ client.name }}</span>
-          </button>
+              <BaseCheckbox
+                :model-value="isAssigned(client)"
+                :label="client.name"
+                :disabled="pending.has(client.id)"
+                @update:model-value="toggleClient(client)"
+              />
+              <span class="truncate">{{ client.name }}</span>
+            </label>
+          </template>
         </div>
       </div>
     </template>
     <template #actions>
       <DialogClose as-child>
-        <BaseSecondaryButton>{{ $t('dialog.cancel') }}</BaseSecondaryButton>
+        <BaseSecondaryButton>
+          {{ $t('common.actions.cancel') }}
+        </BaseSecondaryButton>
       </DialogClose>
       <DialogClose as-child>
-        <BasePrimaryButton @click="editTag">
-          {{ $t('form.save') }}
+        <BasePrimaryButton :disabled="!name.trim()" @click="editTag">
+          {{ $t('common.actions.save') }}
         </BasePrimaryButton>
       </DialogClose>
     </template>
@@ -67,50 +70,84 @@
 </template>
 
 <script lang="ts" setup>
+import { LoaderCircleIcon } from '@lucide/vue';
+
+import { $fetch } from '#imports';
+
 const props = defineProps<{ triggerClass?: string; tag: LocalTag }>();
 
 const name = ref(props.tag.name);
 const description = ref(props.tag.description);
+const clients = ref<ApiClient[] | null>(null);
+const pending = ref(new Set<number>());
 const tagsStore = useTagsStore();
-const clientsStore = useClientsStore();
 
 const { t } = useI18n();
 
-function resetOnOpen(open: boolean) {
-  if (!open) return;
+// The API pages clients (max 100 per page); assignment needs all of them.
+async function fetchAllClients() {
+  const all: ApiClient[] = [];
+  for (let page = 1; ; page++) {
+    const result = await $fetch('/api/client', {
+      query: { page, pageSize: 100 },
+    });
+    all.push(...result.clients);
+    // The server clamps out-of-range pages, so stop on the last one.
+    if (result.page !== page || all.length >= result.total) {
+      return all;
+    }
+  }
+}
+
+async function resetOnOpen(open: boolean) {
+  if (!open) {
+    return;
+  }
 
   name.value = props.tag.name;
   description.value = props.tag.description;
-  clientsStore.refresh();
+  clients.value = null;
+  try {
+    clients.value = await fetchAllClients();
+  } catch (error) {
+    clients.value = [];
+    console.error(error);
+  }
 }
 
-function isAssigned(client: LocalClient) {
+function isAssigned(client: ApiClient) {
   return client.tags.some((clientTag) => clientTag.id === props.tag.id);
 }
 
-function toggleClient(client: LocalClient) {
-  const currentTagIds = client.tags.map((clientTag) => clientTag.id);
-  const tagIds = isAssigned(client)
-    ? currentTagIds.filter((tagId) => tagId !== props.tag.id)
-    : [...currentTagIds, props.tag.id];
+async function toggleClient(client: ApiClient) {
+  if (pending.value.has(client.id)) {
+    return;
+  }
+  const assigned = isAssigned(client);
+  const tags = assigned
+    ? client.tags.filter((clientTag) => clientTag.id !== props.tag.id)
+    : [...client.tags, props.tag];
 
-  const submit = useSubmit(
-    () =>
-      $fetch(`/api/client/${client.id}`, {
-        method: 'post',
-        body: { ...client, tagIds },
-      }),
-    {
-      noSuccessToast: true,
-      revert: async (success) => {
-        if (success) {
-          await clientsStore.refresh();
-        }
-      },
-    }
-  );
-
-  return submit(undefined);
+  pending.value.add(client.id);
+  try {
+    await useSubmit(
+      () =>
+        $fetch(`/api/client/${client.id}`, {
+          method: 'post',
+          body: { ...client, tagIds: tags.map((clientTag) => clientTag.id) },
+        }),
+      {
+        noSuccessToast: true,
+        revert: async (success) => {
+          if (success) {
+            client.tags = tags;
+          }
+        },
+      }
+    )(undefined);
+  } finally {
+    pending.value.delete(client.id);
+  }
 }
 
 function editTag() {

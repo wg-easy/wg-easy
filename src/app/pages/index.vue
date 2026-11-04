@@ -1,40 +1,122 @@
 <template>
-  <main>
-    <Panel>
-      <PanelHead>
-        <PanelHeadTitle>
-          {{ $t('pages.clients') }}
-        </PanelHeadTitle>
-        <PanelHeadBoat>
-          <ClientsSearch />
-          <div class="flex gap-2">
-            <ClientsSort />
-            <ClientsNew />
-          </div>
-        </PanelHeadBoat>
-      </PanelHead>
-
+  <main class="page-container">
+    <div class="mb-7 flex items-end justify-between gap-4">
       <div>
-        <ClientsList
-          v-if="clientsStore.clients && clientsStore.clients.length > 0"
-        />
+        <p class="eyebrow mb-3 flex items-center gap-2">
+          <ServerIcon class="size-3.5 text-accent" />
+          WireGuard
+          <span class="text-line">/</span>
+          {{ $t('clients.title') }}
+        </p>
+        <h1 class="page-title">{{ $t('clients.title') }}</h1>
+        <p class="mt-3 text-sm text-subtle">
+          {{ $t('clients.description') }}
+        </p>
       </div>
-      <ClientsEmpty
-        v-if="clientsStore.clients && clientsStore.clients.length === 0"
-      />
       <div
-        v-if="clientsStore.clients === null"
-        class="p-5 text-gray-200 dark:text-red-300"
+        v-if="clientsStore.clients"
+        class="hidden items-baseline gap-2 text-xs text-subtle sm:flex"
       >
-        <IconsLoading class="mx-auto w-5 animate-spin" />
+        <span class="text-3xl font-semibold tracking-tight text-foreground">
+          {{ clientsStore.pagination.total }}
+        </span>
+        {{ $t('clients.list.total') }}
       </div>
-    </Panel>
+    </div>
+    <div class="surface p-4 sm:p-5">
+      <div class="flex flex-wrap gap-3">
+        <ClientsSearch class="w-full sm:min-w-0 sm:flex-1" />
+        <ClientsNew trigger-class="w-full sm:w-auto" />
+      </div>
+      <ClientsFilters class="mt-4 border-t border-line pt-4" />
+    </div>
+    <div
+      class="mt-6 mb-3 flex items-center justify-between gap-3 text-xs text-subtle"
+    >
+      <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+        <span>{{ $t('clients.list.title') }}</span>
+        <button
+          v-if="clientsStore.clients?.length || bulkMode"
+          type="button"
+          class="inline-flex min-h-8 items-center gap-1.5 text-subtle hover:text-foreground disabled:opacity-45"
+          :aria-pressed="bulkMode"
+          :disabled="clientsStore.isApplyingBulk"
+          @click="toggleBulkMode"
+        >
+          <XIcon v-if="bulkMode" class="size-3.5" aria-hidden="true" />
+          <ListChecksIcon v-else class="size-3.5" aria-hidden="true" />
+          {{ $t(bulkMode ? 'clients.bulk.done' : 'clients.bulk.title') }}
+        </button>
+        <button
+          v-if="clientsStore.hasActiveFilters"
+          type="button"
+          class="inline-flex min-h-8 items-center gap-1 font-medium text-accent hover:text-accent-hover"
+          @click="clientsStore.clearFilters()"
+        >
+          <XIcon class="size-3.5" aria-hidden="true" />
+          {{ $t('clients.filters.clear') }}
+        </button>
+      </div>
+      <span v-if="clientsStore.error" class="text-warning">
+        {{ $t('clients.list.connectionIssue') }}
+      </span>
+      <span
+        v-else-if="clientsStore.isUpdatingList"
+        role="status"
+        class="flex items-center gap-2"
+      >
+        <LoaderCircleIcon class="size-3 animate-spin" aria-hidden="true" />
+        {{ $t('common.loading') }}
+      </span>
+      <span v-else class="flex items-center gap-2">
+        <span class="size-1.5 rounded-full bg-success ring-4 ring-success/10" />
+        {{ $t('clients.list.autoRefresh') }}
+      </span>
+    </div>
+    <div v-if="clientsStore.error" role="alert" class="callout mb-4">
+      <TriangleAlertIcon class="size-5 shrink-0 text-warning" />
+      <span class="flex-1">{{ $t('clients.list.loadError') }}</span>
+      <button class="font-semibold text-accent" @click="clientsStore.refresh()">
+        {{ $t('common.actions.retry') }}
+      </button>
+    </div>
+    <ClientsBulkActions v-if="bulkMode" />
+    <ClientsList v-if="clientsStore.clients?.length" :selectable="bulkMode" />
+    <ClientsEmpty v-else-if="clientsStore.clients" />
+    <div
+      v-else-if="!clientsStore.error"
+      role="status"
+      class="surface flex min-h-56 items-center justify-center gap-3 text-subtle"
+    >
+      <LoaderCircleIcon class="size-5 animate-spin" />
+      {{ $t('common.loading') }}
+    </div>
+    <ClientsPagination v-if="clientsStore.clients" />
+    <p class="mt-5 flex items-start gap-2 text-xs leading-relaxed text-subtle">
+      <InfoIcon class="mt-0.5 size-4 shrink-0 text-accent" />
+      {{ $t('clients.list.hint') }}
+    </p>
   </main>
 </template>
 
 <script setup lang="ts">
+import {
+  InfoIcon,
+  ListChecksIcon,
+  LoaderCircleIcon,
+  ServerIcon,
+  TriangleAlertIcon,
+  XIcon,
+} from '@lucide/vue';
+
 const globalStore = useGlobalStore();
 const clientsStore = useClientsStore();
+const bulkMode = ref(false);
+
+function toggleBulkMode() {
+  bulkMode.value = !bulkMode.value;
+  clientsStore.clearSelection();
+}
 
 // TODO?: use hover card to show more detailed info without leaving the page
 // or do something like a accordion
@@ -69,5 +151,6 @@ onMounted(() => {
 
 onUnmounted(() => {
   pageMounted = false;
+  clientsStore.clearSelection();
 });
 </script>
