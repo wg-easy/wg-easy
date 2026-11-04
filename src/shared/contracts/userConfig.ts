@@ -2,6 +2,7 @@ import z from 'zod';
 
 import {
   AllowedIpsSchema,
+  AwgRangeSchema,
   DnsSchema,
   ISchema,
   JcSchema,
@@ -39,6 +40,13 @@ export const UserConfigUpdateSchema = z.object({
   defaultI3: ISchema,
   defaultI4: ISchema,
   defaultI5: ISchema,
+  defaultContentPaddingAddition: AwgRangeSchema,
+  defaultRekeyAfterTime: AwgRangeSchema,
+  defaultRekeyTimeout: AwgRangeSchema,
+  defaultRejectAfterTime: AwgRangeSchema,
+  defaultKeepaliveTimeout: AwgRangeSchema,
+  defaultMaxHandshakeAttempts: AwgRangeSchema,
+  defaultDisableCookies: z.boolean().nullable(),
   host: host,
 });
 
