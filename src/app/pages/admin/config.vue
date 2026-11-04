@@ -104,6 +104,12 @@
           :description="$t('wireguard.obfuscation.i4.description')"
         />
         <FormNullTextField
+          id="defaultI5"
+          v-model="data.defaultI5"
+          :label="$t('wireguard.obfuscation.i5.label')"
+          :description="$t('wireguard.obfuscation.i5.description')"
+        />
+        <FormNullTextField
           id="defaultContentPaddingAddition"
           v-model="data.defaultContentPaddingAddition"
           :label="$t('wireguard.obfuscation.contentPaddingAddition.label')"
