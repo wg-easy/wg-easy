@@ -3,6 +3,7 @@
     "fields": {
       "email": "E-Mail",
       "name": "Name",
+      "description": "Description",
       "username": "Username",
       "password": "Password",
       "newPassword": "New Password",
@@ -154,6 +155,12 @@
     "fields": {
       "name": {
         "label": "Name"
+      },
+      "tags": {
+        "label": "Tags",
+        "add": "Add Tag",
+        "search": "Search or create tag",
+        "create": "Create new tag \"{name}\""
       },
       "expiresAt": {
         "label": "Expires At",
@@ -413,7 +420,21 @@
     "hooks": {
       "title": "Hooks"
     },
-    "introduction": "Welcome to the admin panel.\n\nHere you can manage the general settings, the configuration, the interface settings and the hooks.\n\nStart by choosing one of the sections in the sidebar.",
+    "tags": {
+      "title": "Tags",
+      "new": "New Tag",
+      "edit": "Edit Tag",
+      "empty": "There are no tags yet.",
+      "created": "Tag created",
+      "updated": "Tag updated",
+      "deleted": "Tag deleted",
+      "delete": {
+        "title": "Delete Tag",
+        "description": "Are you sure you want to delete {name}? This will remove it from all clients. This action cannot be undone."
+      },
+      "clients": "Clients"
+    },
+    "introduction": "Welcome to the admin panel.\n\nHere you can manage the general settings, the configuration, the interface settings, the hooks and the tags.\n\nStart by choosing one of the sections in the sidebar.",
     "description": "Configure your network and manage your server.",
     "overview": "Overview"
   },
@@ -554,6 +575,8 @@
     "client": {
       "id": "Client ID",
       "name": "Name",
+      "description": "Description",
+      "tagIds": "Tags",
       "expiresAt": "Expires At",
       "expiresAtInvalid": "Expiration must be a valid date (YYYY-MM-DD) or an ISO timestamp with a timezone",
       "address4": "IPv4 Address",
@@ -561,6 +584,11 @@
       "serverAllowedIps": "Server Allowed IPs",
       "firewallIps": "Firewall Allowed IPs",
       "firewallIpsInvalid": "Invalid firewall IP entry. See docs for supported syntax."
+    },
+    "tag": {
+      "id": "Tag ID",
+      "name": "Name",
+      "description": "Description"
     },
     "user": {
       "username": "Username",

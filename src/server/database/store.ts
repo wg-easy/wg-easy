@@ -5,11 +5,13 @@ import { UserConfigRepository } from './repositories/userConfig/repository';
 import { OneTimeLinkRepository } from './repositories/oneTimeLink/repository';
 import { UserRepository } from './repositories/user/repository';
 import { GeneralRepository } from './repositories/general/repository';
+import { TagRepository } from './repositories/tag/repository';
 import type { DBExecutor, DBType } from './types';
 
 function repositories(db: DBExecutor, interfaceName: string) {
   return {
     clients: new ClientRepository(db),
+    tags: new TagRepository(db),
     interfaces: new InterfaceRepository(db, interfaceName),
     hooks: new HooksRepository(db, interfaceName),
     userConfigs: new UserConfigRepository(db, interfaceName),

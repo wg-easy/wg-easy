@@ -31,6 +31,7 @@
               }}
             </span>
           </div>
+          <ClientCardDescription :client="client" />
           <ClientCardAddress :client="client" />
           <div
             class="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-subtle"
@@ -39,6 +40,7 @@
             <span aria-hidden="true">·</span>
             <ClientCardExpireDate :client="client" />
           </div>
+          <ClientCardTags :client="client" />
         </div>
       </div>
       <div

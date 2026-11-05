@@ -45,10 +45,11 @@ export function clientDefaults(config: UserConfigType) {
 
 export async function create(actor: Actor, data: ClientCreateType) {
   authorize(actor, 'clients', 'create');
+  const { tagIds, ...fields } = data;
   const privateKey = await wg.generatePrivateKey();
   const publicKey = await wg.getPublicKey(privateKey);
   return commit(async (tx) => {
-    assertClientEnabled(true, data.expiresAt);
+    assertClientEnabled(true, fields.expiresAt);
     const network = await tx.interfaces.get();
     const config = await tx.userConfigs.get();
     const clients = await tx.clients.getAll();
@@ -57,7 +58,7 @@ export async function create(actor: Actor, data: ClientCreateType) {
       : null;
     const [created] = await tx.clients.insert({
       ...clientDefaults(config),
-      ...data,
+      ...fields,
       // Preserve existing ownership until user assignment is introduced.
       userId: 1,
       interfaceId: network.name,
@@ -68,6 +69,9 @@ export async function create(actor: Actor, data: ClientCreateType) {
       ipv6Address: nextIP(parseCidr(network.ipv6Cidr), clients),
       enabled: true,
     });
+    if (tagIds?.length) {
+      await tx.tags.setClientTags(created!.clientId, tagIds);
+    }
     return created!.clientId;
   });
 }
@@ -77,15 +81,19 @@ export async function update(
   clientId: number,
   data: UpdateClientType
 ) {
+  const { tagIds, ...fields } = data;
   await commit(async (tx) => {
     authorizeClient(actor, 'update', await tx.clients.getPublic(clientId));
-    assertClientEnabled(data.enabled, data.expiresAt);
+    assertClientEnabled(fields.enabled, fields.expiresAt);
     const addresses = assertClientAddresses(
-      data,
+      fields,
       await tx.interfaces.get(),
       (await tx.clients.getAll()).filter((client) => client.id !== clientId)
     );
-    await tx.clients.update(clientId, { ...data, ...addresses });
+    await tx.clients.update(clientId, { ...fields, ...addresses });
+    if (tagIds) {
+      await tx.tags.setClientTags(clientId, tagIds);
+    }
   });
 }
 

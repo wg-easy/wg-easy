@@ -25,7 +25,7 @@ Use **Previous** and **Next** below the list to move between pages. **Per page**
 ## Create a Client
 
 1. Select **New Client**.
-2. Enter a **Name** and, optionally, an **Expires At** date and time in your local timezone. Leave the expiration empty for permanent access.
+2. Enter a **Name** and, optionally, a **Description**, **Tags**, and an **Expires At** date and time in your local timezone. Leave the expiration empty for permanent access.
 3. Select **Create Client**.
 4. Download the configuration or scan the QR code to import it on the device.
 
@@ -65,6 +65,8 @@ List fields use one entry per row. Use **Add**, the remove button, and the up/do
 ### General
 
 - **Name**: The name of the client.
+- **Description**: An optional note shown below the client's name in the list.
+- **Tags**: Assign one or more tags to help organize and filter clients. Pick from existing tags, or create a new one on the spot if you have permission to manage tags. Tags themselves are created, edited, and deleted from [Admin Panel → Tags](./admin.md#tags).
 - **Enabled**: Whether the client can connect to the VPN.
 - **Expires At**: The date and time the client will be disabled, shown and entered in your local timezone. Leave empty for permanent access. Existing date-only values remain supported and keep their original midnight-UTC expiration.
 
