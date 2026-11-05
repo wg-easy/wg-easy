@@ -35,6 +35,21 @@ describe('AllowedIpsSchema', () => {
     expect(AllowedIpsSchema.safeParse(['10.0.0.1:443']).success).toBe(false);
   });
 
+  test('rejects CIDRs with host bits set', () => {
+    for (const entry of [
+      '192.168.55.0/0',
+      '192.168.55.0/16',
+      '10.0.0.5/24',
+      'fdcc::5/112',
+    ]) {
+      const result = AllowedIpsSchema.safeParse([entry]);
+      expect(result.success).toBe(false);
+      expect(result.error?.issues[0]?.message).toBe(
+        'validation.allowedIpsHostBits'
+      );
+    }
+  });
+
   test('rejects an empty list', () => {
     expect(AllowedIpsSchema.safeParse([]).success).toBe(false);
   });
