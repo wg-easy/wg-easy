@@ -38,6 +38,13 @@ export function clientDefaults(config: UserConfigType) {
     i3: config.defaultI3,
     i4: config.defaultI4,
     i5: config.defaultI5,
+    contentPaddingAddition: config.defaultContentPaddingAddition,
+    rekeyAfterTime: config.defaultRekeyAfterTime,
+    rekeyTimeout: config.defaultRekeyTimeout,
+    rejectAfterTime: config.defaultRejectAfterTime,
+    keepaliveTimeout: config.defaultKeepaliveTimeout,
+    maxHandshakeAttempts: config.defaultMaxHandshakeAttempts,
+    disableCookies: config.defaultDisableCookies,
     persistentKeepalive: config.defaultPersistentKeepalive,
     serverAllowedIps: [] as string[],
   };
