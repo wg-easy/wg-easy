@@ -1,96 +1,96 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
       <url>
-        <loc>https://wg-easy.github.io/edge/</loc>
+        <loc>https://wg-easy.github.io/wg-easy/edge/</loc>
       </url>
       <url>
-        <loc>https://wg-easy.github.io/edge/advanced/api/</loc>
+        <loc>https://wg-easy.github.io/wg-easy/edge/advanced/api/</loc>
       </url>
       <url>
-        <loc>https://wg-easy.github.io/edge/advanced/config/amnezia/</loc>
+        <loc>https://wg-easy.github.io/wg-easy/edge/advanced/config/amnezia/</loc>
       </url>
       <url>
-        <loc>https://wg-easy.github.io/edge/advanced/config/experimental-config/</loc>
+        <loc>https://wg-easy.github.io/wg-easy/edge/advanced/config/experimental-config/</loc>
       </url>
       <url>
-        <loc>https://wg-easy.github.io/edge/advanced/config/external-authentication/</loc>
+        <loc>https://wg-easy.github.io/wg-easy/edge/advanced/config/external-authentication/</loc>
       </url>
       <url>
-        <loc>https://wg-easy.github.io/edge/advanced/config/optional-config/</loc>
+        <loc>https://wg-easy.github.io/wg-easy/edge/advanced/config/optional-config/</loc>
       </url>
       <url>
-        <loc>https://wg-easy.github.io/edge/advanced/config/unattended-setup/</loc>
+        <loc>https://wg-easy.github.io/wg-easy/edge/advanced/config/unattended-setup/</loc>
       </url>
       <url>
-        <loc>https://wg-easy.github.io/edge/advanced/metrics/prometheus/</loc>
+        <loc>https://wg-easy.github.io/wg-easy/edge/advanced/metrics/prometheus/</loc>
       </url>
       <url>
-        <loc>https://wg-easy.github.io/edge/advanced/migrate/</loc>
+        <loc>https://wg-easy.github.io/wg-easy/edge/advanced/migrate/</loc>
       </url>
       <url>
-        <loc>https://wg-easy.github.io/edge/advanced/migrate/from-14-to-15/</loc>
+        <loc>https://wg-easy.github.io/wg-easy/edge/advanced/migrate/from-14-to-15/</loc>
       </url>
       <url>
-        <loc>https://wg-easy.github.io/edge/contributing/general/</loc>
+        <loc>https://wg-easy.github.io/wg-easy/edge/contributing/general/</loc>
       </url>
       <url>
-        <loc>https://wg-easy.github.io/edge/contributing/issues-and-pull-requests/</loc>
+        <loc>https://wg-easy.github.io/wg-easy/edge/contributing/issues-and-pull-requests/</loc>
       </url>
       <url>
-        <loc>https://wg-easy.github.io/edge/contributing/translation/</loc>
+        <loc>https://wg-easy.github.io/wg-easy/edge/contributing/translation/</loc>
       </url>
       <url>
-        <loc>https://wg-easy.github.io/edge/examples/tutorials/adguard/</loc>
+        <loc>https://wg-easy.github.io/wg-easy/edge/examples/tutorials/adguard/</loc>
       </url>
       <url>
-        <loc>https://wg-easy.github.io/edge/examples/tutorials/auto-updates/</loc>
+        <loc>https://wg-easy.github.io/wg-easy/edge/examples/tutorials/auto-updates/</loc>
       </url>
       <url>
-        <loc>https://wg-easy.github.io/edge/examples/tutorials/basic-installation/</loc>
+        <loc>https://wg-easy.github.io/wg-easy/edge/examples/tutorials/basic-installation/</loc>
       </url>
       <url>
-        <loc>https://wg-easy.github.io/edge/examples/tutorials/caddy/</loc>
+        <loc>https://wg-easy.github.io/wg-easy/edge/examples/tutorials/caddy/</loc>
       </url>
       <url>
-        <loc>https://wg-easy.github.io/edge/examples/tutorials/docker-run/</loc>
+        <loc>https://wg-easy.github.io/wg-easy/edge/examples/tutorials/docker-run/</loc>
       </url>
       <url>
-        <loc>https://wg-easy.github.io/edge/examples/tutorials/dockerless/</loc>
+        <loc>https://wg-easy.github.io/wg-easy/edge/examples/tutorials/dockerless/</loc>
       </url>
       <url>
-        <loc>https://wg-easy.github.io/edge/examples/tutorials/podman-nft/</loc>
+        <loc>https://wg-easy.github.io/wg-easy/edge/examples/tutorials/podman-nft/</loc>
       </url>
       <url>
-        <loc>https://wg-easy.github.io/edge/examples/tutorials/reverse-proxyless/</loc>
+        <loc>https://wg-easy.github.io/wg-easy/edge/examples/tutorials/reverse-proxyless/</loc>
       </url>
       <url>
-        <loc>https://wg-easy.github.io/edge/examples/tutorials/routed/</loc>
+        <loc>https://wg-easy.github.io/wg-easy/edge/examples/tutorials/routed/</loc>
       </url>
       <url>
-        <loc>https://wg-easy.github.io/edge/examples/tutorials/traefik/</loc>
+        <loc>https://wg-easy.github.io/wg-easy/edge/examples/tutorials/traefik/</loc>
       </url>
       <url>
-        <loc>https://wg-easy.github.io/edge/faq/</loc>
+        <loc>https://wg-easy.github.io/wg-easy/edge/faq/</loc>
       </url>
       <url>
-        <loc>https://wg-easy.github.io/edge/getting-started/</loc>
+        <loc>https://wg-easy.github.io/wg-easy/edge/getting-started/</loc>
       </url>
       <url>
-        <loc>https://wg-easy.github.io/edge/guides/2fa/</loc>
+        <loc>https://wg-easy.github.io/wg-easy/edge/guides/2fa/</loc>
       </url>
       <url>
-        <loc>https://wg-easy.github.io/edge/guides/account/</loc>
+        <loc>https://wg-easy.github.io/wg-easy/edge/guides/account/</loc>
       </url>
       <url>
-        <loc>https://wg-easy.github.io/edge/guides/admin/</loc>
+        <loc>https://wg-easy.github.io/wg-easy/edge/guides/admin/</loc>
       </url>
       <url>
-        <loc>https://wg-easy.github.io/edge/guides/cli/</loc>
+        <loc>https://wg-easy.github.io/wg-easy/edge/guides/cli/</loc>
       </url>
       <url>
-        <loc>https://wg-easy.github.io/edge/guides/clients/</loc>
+        <loc>https://wg-easy.github.io/wg-easy/edge/guides/clients/</loc>
       </url>
       <url>
-        <loc>https://wg-easy.github.io/edge/guides/setup/</loc>
+        <loc>https://wg-easy.github.io/wg-easy/edge/guides/setup/</loc>
       </url>
 </urlset>
