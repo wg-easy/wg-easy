@@ -1,4 +1,4 @@
-FROM docker.io/library/node:krypton-alpine@sha256:a34ab6d7f6f4813f4d0c5469d74685604b962fbdbf5793a7bc7b4998ecb867c8 AS build
+FROM docker.io/library/node:lithium-alpine@sha256:8996bb5821d62a8fd9bb27c1cb07462f3fdce6e47d640c6a881ead0b064ce216 AS build
 WORKDIR /app
 
 # update corepack
@@ -29,13 +29,13 @@ RUN apk add linux-headers build-base go git && \
     make && \
     sed -i 's|\[\[ $proto == -4 \]\] && cmd sysctl -q net\.ipv4\.conf\.all\.src_valid_mark=1|[[ $proto == -4 ]] \&\& [[ $(sysctl -n net.ipv4.conf.all.src_valid_mark) != 1 ]] \&\& cmd sysctl -q net.ipv4.conf.all.src_valid_mark=1|' ./wg-quick/linux.bash
 
-FROM docker.io/library/node:krypton-alpine@sha256:a34ab6d7f6f4813f4d0c5469d74685604b962fbdbf5793a7bc7b4998ecb867c8 AS build-libsql
+FROM docker.io/library/node:lithium-alpine@sha256:8996bb5821d62a8fd9bb27c1cb07462f3fdce6e47d640c6a881ead0b064ce216 AS build-libsql
 WORKDIR /app
 RUN npm install --no-save --omit=dev libsql
 
 # Copy build result to a new image.
 # This saves a lot of disk space.
-FROM docker.io/library/node:krypton-alpine@sha256:a34ab6d7f6f4813f4d0c5469d74685604b962fbdbf5793a7bc7b4998ecb867c8
+FROM docker.io/library/node:lithium-alpine@sha256:8996bb5821d62a8fd9bb27c1cb07462f3fdce6e47d640c6a881ead0b064ce216
 WORKDIR /app
 
 HEALTHCHECK --interval=1m --timeout=5s --retries=3 CMD /usr/bin/timeout 5s /bin/sh -c "/usr/bin/wg show | /bin/grep -q interface || exit 1"
