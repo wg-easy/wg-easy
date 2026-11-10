@@ -1,7 +1,7 @@
 import { sha256 } from 'js-sha256';
 import type { TypedInternalResponse } from 'nitropack/types';
 
-type ApiClient = TypedInternalResponse<
+export type ApiClient = TypedInternalResponse<
   '/api/client',
   unknown,
   'get'

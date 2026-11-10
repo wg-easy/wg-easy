@@ -48,6 +48,7 @@ const menuItems = computed(() => [
   { id: 'config', name: t('admin.config.title') },
   { id: 'interface', name: t('admin.interface.title') },
   { id: 'hooks', name: t('admin.hooks.title') },
+  { id: 'tags', name: t('admin.tags.title') },
 ]);
 
 const activeMenuItem = computed(() => {

@@ -58,12 +58,40 @@ const serverAllowedIps = z.array(AllowedIpEntrySchema, {
   message: t('validation.client.serverAllowedIps'),
 });
 
+// Optional so API callers that predate descriptions keep working.
+const description = z
+  .string({ message: t('validation.client.description') })
+  .pipe(safeStringRefine)
+  .pipe(controlStringRefine)
+  .nullable()
+  .optional();
+
+// Omitted on update means "leave the client's tags unchanged".
+const tagIds = z
+  .array(z.number().int().positive(), {
+    message: t('validation.client.tagIds'),
+  })
+  .transform((ids) => [...new Set(ids)])
+  .optional();
+
 export const ClientCreateSchema = z.object({
   name: name,
+  description: description,
   expiresAt: expiresAt,
+  tagIds: tagIds,
 });
 
 export type ClientCreateType = z.infer<typeof ClientCreateSchema>;
+
+const tagIdQuery = z
+  .union([z.coerce.number(), z.array(z.coerce.number())])
+  .transform((v) => (Array.isArray(v) ? v : [v]));
+
+const tagNameValue = z.string().pipe(safeStringRefine);
+
+const tagNameQuery = z
+  .union([tagNameValue, z.array(tagNameValue)])
+  .transform((v) => (Array.isArray(v) ? v : [v]));
 
 export const ClientQuerySchema = z.object({
   filter: z.string().pipe(safeStringRefine).optional(),
@@ -71,6 +99,8 @@ export const ClientQuerySchema = z.object({
   status: z.enum(clientStatusFilters).optional(),
   expiry: z.enum(clientExpiryFilters).optional(),
   sortBy: z.enum(clientSortFields).optional(),
+  tagId: tagIdQuery.optional(),
+  tagName: tagNameQuery.optional(),
   page: z.coerce.number().int().min(1).default(1),
   pageSize: z.coerce.number().int().min(1).max(100).default(25),
 });
@@ -90,6 +120,8 @@ export type ClientBulkType = z.infer<typeof ClientBulkSchema>;
 
 export const ClientUpdateSchema = z.object({
   name: name,
+  description: description,
+  tagIds: tagIds,
   enabled: EnabledSchema,
   expiresAt: expiresAt,
   ipv4Address: address4,
