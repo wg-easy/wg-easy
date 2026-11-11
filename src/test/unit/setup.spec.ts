@@ -11,6 +11,7 @@ import { roles } from '#shared/utils/permissions';
 import { wg } from '#server/utils/wgHelper';
 import { firewall } from '#server/utils/firewall';
 import { maintain } from '#server/features/vpn/lifecycle';
+import { generateClientConfig } from '#server/features/vpn/configuration';
 vi.mock('#server/utils/config', () => ({ WG_ENV: {} }));
 vi.mock('#server/utils/ip', async (original) => ({
   ...(await original<typeof import('#server/utils/ip')>()),
@@ -268,4 +269,44 @@ describe('setup', () => {
       expect(await setup.status()).toEqual({ step: 0, done: true });
     }
   );
+
+  test('leaves imported clients on the global DNS and allowed IPs', async () => {
+    const { store } = await fixture();
+    await setup.createAdministrator('admin', 'a-long-password');
+    await setup.importConfiguration(
+      JSON.stringify({
+        server: {
+          privateKey: 'imported-private',
+          publicKey: 'imported-public',
+          address: '10.9.0.1',
+        },
+        clients: {
+          peer: {
+            name: 'Imported',
+            address: '10.9.0.2',
+            privateKey: 'peer-private',
+            publicKey: 'peer-public',
+            preSharedKey: null,
+            createdAt: '2026-01-01',
+            updatedAt: '2026-01-01',
+            enabled: true,
+          },
+        },
+      })
+    );
+    const [client] = await store.clients.getAll();
+    expect(client).toMatchObject({ dns: null, allowedIps: null });
+
+    await store.userConfigs.update({
+      defaultDns: ['9.9.9.9'],
+      defaultAllowedIps: ['10.0.0.0/8'],
+    });
+    const config = generateClientConfig(
+      await store.interfaces.get(),
+      await store.userConfigs.get(),
+      client!
+    );
+    expect(config).toContain('DNS = 9.9.9.9');
+    expect(config).toContain('AllowedIPs = 10.0.0.0/8');
+  });
 });
