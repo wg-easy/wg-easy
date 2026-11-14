@@ -2,7 +2,7 @@
   <div class="app-shell">
     <a
       href="#main-content"
-      class="ui-button ui-button-primary fixed top-2 left-2 z-[100] -translate-y-24 focus:translate-y-0"
+      class="ui-button ui-button-primary fixed start-2 top-2 z-[100] -translate-y-24 focus:translate-y-0"
     >
       {{ $t('common.skipToContent') }}
     </a>
@@ -10,7 +10,7 @@
       class="mx-auto flex w-full max-w-7xl flex-wrap items-center gap-x-4 gap-y-4 px-4 py-5 sm:px-7 lg:gap-x-8 lg:py-6"
     >
       <HeaderLogo />
-      <div class="ml-auto flex items-center gap-2">
+      <div class="ms-auto flex items-center gap-2">
         <HeaderLangSelector />
         <HeaderThemeSwitch />
         <HeaderChartToggle v-if="loggedIn" />

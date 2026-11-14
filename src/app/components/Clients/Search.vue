@@ -1,7 +1,7 @@
 <template>
   <div class="relative">
     <SearchIcon
-      class="pointer-events-none absolute top-3.5 left-3.5 size-4 text-subtle"
+      class="pointer-events-none absolute start-3.5 top-3.5 size-4 text-subtle"
     />
     <input
       v-model="searchQuery"
@@ -13,7 +13,7 @@
     />
     <button
       v-if="searchQuery"
-      class="absolute top-2 right-2 grid size-7 place-items-center rounded-md text-subtle hover:bg-surface-raised"
+      class="absolute end-2 top-2 grid size-7 place-items-center rounded-md text-subtle hover:bg-surface-raised"
       :aria-label="$t('clients.list.clearSearch')"
       @click="clearSearch"
     >

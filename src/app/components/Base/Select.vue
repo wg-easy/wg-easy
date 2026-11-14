@@ -3,7 +3,7 @@
     <SelectTrigger
       v-bind="$attrs"
       :aria-label="label ?? $t('common.form.chooseOption')"
-      class="inline-flex min-w-0 items-center justify-between gap-2 text-left"
+      class="inline-flex min-w-0 items-center justify-between gap-2 text-start"
       :class="
         compact
           ? 'h-9 rounded-lg border border-line bg-surface px-2.5 text-xs text-foreground'

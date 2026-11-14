@@ -14,7 +14,7 @@
       class="sm:w-48"
       @update:model-value="clientsStore.updateQuery({ expiry: $event })"
     />
-    <ClientsSort class="col-span-2 sm:ml-auto sm:w-56" />
+    <ClientsSort class="col-span-2 sm:ms-auto sm:w-56" />
   </div>
 </template>
 

@@ -3,7 +3,7 @@
     <NuxtLayout>
       <NuxtPage />
       <ToastViewport
-        class="fixed right-0 bottom-0 z-[2147483647] m-0 flex w-[390px] max-w-[100vw] list-none flex-col gap-[10px] p-[var(--viewport-padding)] outline-none [--viewport-padding:_25px]"
+        class="fixed end-0 bottom-0 z-[2147483647] m-0 flex w-[390px] max-w-[100vw] list-none flex-col gap-[10px] p-[var(--viewport-padding)] outline-none [--viewport-padding:_25px]"
       >
         <BaseToast ref="toastRef" />
       </ToastViewport>
@@ -16,10 +16,15 @@ const toast = useToast();
 const toastRef = useTemplateRef('toastRef');
 toast.setToast(toastRef);
 
+const { localeProperties } = useI18n();
+
 // make sure to fetch release early
 useGlobalStore();
 
-useHead({
+useHead(() => ({
+  htmlAttrs: {
+    dir: localeProperties.value.dir || 'ltr',
+  },
   link: [
     {
       rel: 'manifest',
@@ -50,5 +55,5 @@ useHead({
     },
   ],
   title: 'WireGuard Easy',
-});
+}));
 </script>
