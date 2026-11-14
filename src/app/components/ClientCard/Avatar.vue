@@ -7,7 +7,7 @@
       {{ initials }}
     </BaseAvatar>
     <span
-      class="absolute -right-0.5 -bottom-0.5 size-3 rounded-full border-2 border-surface"
+      class="absolute -end-0.5 -bottom-0.5 size-3 rounded-full border-2 border-surface"
       :class="connected ? 'bg-success' : 'bg-subtle'"
     />
   </div>

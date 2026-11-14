@@ -7,7 +7,7 @@
       <Label for="migration">{{ $t('setup.migration') }}</Label>
       <input
         id="migration"
-        class="ui-input file:mr-3 file:rounded file:border-0 file:bg-surface-raised file:px-3 file:py-1 file:text-muted"
+        class="ui-input file:me-3 file:rounded file:border-0 file:bg-surface-raised file:px-3 file:py-1 file:text-muted"
         type="file"
         @change="onChangeFile"
       />

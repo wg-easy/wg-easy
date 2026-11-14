@@ -1,7 +1,7 @@
 <template>
   <DropdownMenuRoot v-model:open="toggleState">
     <DropdownMenuTrigger
-      class="header-control gap-2 rounded-full pr-1 pl-1 sm:pr-3"
+      class="header-control gap-2 rounded-full px-1 sm:pe-3"
       :aria-label="$t('account.title')"
     >
       <BaseAvatar class="size-8 rounded-full bg-surface-hover text-foreground">

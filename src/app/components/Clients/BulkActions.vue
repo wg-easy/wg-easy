@@ -25,7 +25,7 @@
         <button
           ref="actionsTrigger"
           type="button"
-          class="ml-auto inline-flex min-h-8 items-center gap-1.5 hover:text-foreground disabled:opacity-45"
+          class="ms-auto inline-flex min-h-8 items-center gap-1.5 hover:text-foreground disabled:opacity-45"
           :disabled="busy || !clientsStore.selectedIds.length"
         >
           {{ $t('clients.bulk.title') }}
