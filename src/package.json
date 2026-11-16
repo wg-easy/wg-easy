@@ -25,17 +25,17 @@
   },
   "dependencies": {
     "@libsql/client": "^0.18.0",
-    "@lucide/vue": "^1.70.0",
+    "@lucide/vue": "^1.72.0",
     "@nuxtjs/color-mode": "^4.1.0",
     "@nuxtjs/i18n": "^10.6.0",
     "@phc/format": "^1.0.0",
     "@pinia/nuxt": "^1.0.3",
     "@tailwindcss/forms": "^0.5.11",
-    "@tailwindcss/vite": "^4.3.4",
+    "@tailwindcss/vite": "^4.3.5",
     "@vueuse/core": "^15.0.0",
     "@vueuse/integrations": "^15.0.0",
     "@vueuse/nuxt": "^15.0.0",
-    "apexcharts": "^8.7.0",
+    "apexcharts": "^8.8.1",
     "argon2": "^0.45.2",
     "cidr-tools": "^13.0.4",
     "citty": "^0.2.2",
@@ -54,7 +54,7 @@
     "qr": "^0.7.2",
     "reka-ui": "^2.11.0",
     "sortablejs": "^1.15.7",
-    "tailwindcss": "^4.3.4",
+    "tailwindcss": "^4.3.5",
     "verkit": "^0.5.0",
     "vue": "latest",
     "vue3-apexcharts": "^1.11.3",
@@ -62,7 +62,7 @@
   },
   "devDependencies": {
     "@nuxt/eslint": "^1.17.0",
-    "@nuxt/test-utils": "^4.3.4",
+    "@nuxt/test-utils": "^4.4.0",
     "@playwright/test": "^1.65.0",
     "@types/node": "^26.6.6",
     "@types/phc__format": "^1.0.1",
@@ -73,12 +73,12 @@
     "esbuild": "^0.28.2",
     "eslint": "^10.14.0",
     "eslint-config-prettier": "^10.1.8",
-    "prettier": "^3.9.10",
+    "prettier": "^3.10.1",
     "prettier-plugin-tailwindcss": "^0.8.1",
     "tsx": "^4.23.15",
     "typescript": "^6.0.3",
     "vitest": "^5.1.0",
     "vue-tsc": "^3.3.14"
   },
-  "packageManager": "pnpm@12.18.0"
+  "packageManager": "pnpm@12.20.0"
 }
