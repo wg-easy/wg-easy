@@ -1,0 +1,609 @@
+{
+  "common": {
+    "fields": {
+      "email": "E-mail-cím",
+      "name": "Név",
+      "username": "Felhasználónév",
+      "password": "Jelszó",
+      "newPassword": "Új jelszó",
+      "confirmPassword": "Jelszó megerősítése"
+    },
+    "actions": {
+      "continue": "Folytatás",
+      "delete": "Törlés",
+      "change": "Módosítás",
+      "cancel": "Mégse",
+      "create": "Létrehozás",
+      "save": "Mentés",
+      "revert": "Visszaállítás",
+      "add": "Hozzáadás",
+      "reorder": "Húzd az elemeket az átrendezéshez, vagy használd a fel és le nyílbillentyűket",
+      "retry": "Újrapróbálkozás"
+    },
+    "yes": "Igen",
+    "no": "Nem",
+    "loading": "Betöltés...",
+    "update": {
+      "available": "Új frissítés érhető el!",
+      "action": "Frissítés"
+    },
+    "theme": {
+      "dark": "Sötét téma",
+      "light": "Világos téma",
+      "system": "Rendszerbeállítás követése"
+    },
+    "donate": "Adományozás",
+    "notifications": {
+      "success": "Sikeres művelet",
+      "saved": "Mentve",
+      "error": "Hiba",
+      "unknown": "Ismeretlen hiba. További részletekért nézd meg a konzolt."
+    },
+    "form": {
+      "actions": "Műveletek",
+      "sections": {
+        "general": "Általános",
+        "advanced": "Speciális"
+      },
+      "noItems": "Nincsenek elemek",
+      "nullNoItems": "Nincsenek elemek. Globális beállítások használata",
+      "nullNotSet": "Nincs beállítva",
+      "set": "Beállítás",
+      "unset": "Beállítás törlése",
+      "chooseOption": "Válassz egy lehetőséget"
+    },
+    "clipboard": {
+      "notSupported": "A másolás nem támogatott",
+      "copied": "Másolva!",
+      "failed": "A másolás nem sikerült",
+      "copy": "Másolás"
+    },
+    "documentation": "Dokumentáció",
+    "selectLanguage": "Válassz nyelvet",
+    "skipToContent": "Ugrás a tartalomra"
+  },
+  "auth": {
+    "logout": "Kijelentkezés",
+    "twoFactor": {
+      "title": "Kétlépcsős hitelesítés",
+      "code": "TOTP-kód"
+    },
+    "external": {
+      "title": "Külső hitelesítés"
+    },
+    "login": {
+      "signIn": "Bejelentkezés",
+      "signInWith": "Bejelentkezés ezzel: {provider}",
+      "or": "vagy",
+      "rememberMe": "Emlékezz rám",
+      "rememberMeDescription": "Maradj bejelentkezve a böngésző bezárása után is",
+      "insecure": "Nem jelentkezhetsz be nem biztonságos kapcsolaton keresztül. Használj HTTPS-kapcsolatot.",
+      "twoFactor": {
+        "required": "A kétlépcsős hitelesítés kötelező",
+        "invalid": "Érvénytelen kétlépcsős hitelesítési kód"
+      },
+      "expired": "A bejelentkezési munkamenet lejárt. Próbáld újra!",
+      "title": "Üdv újra!",
+      "description": "Jelentkezz be a privát hálózatod kezeléséhez."
+    }
+  },
+  "account": {
+    "title": "Fiók",
+    "password": {
+      "current": "Jelenlegi jelszó",
+      "update": "Jelszó módosítása",
+      "add": "Jelszó hozzáadása"
+    },
+    "twoFactor": {
+      "enable": {
+        "label": "Kétlépcsős hitelesítés bekapcsolása",
+        "description": "Olvasd be a QR-kódot a hitelesítő alkalmazással, vagy írd be a kódot."
+      },
+      "key": "TOTP-kulcs",
+      "codeDescription": "Írd be a hitelesítő alkalmazásban megjelenő kódot.",
+      "disable": {
+        "label": "Kétlépcsős hitelesítés kikapcsolása",
+        "description": "A kétlépcsős hitelesítés kikapcsolásához írd be a jelszavadat."
+      }
+    },
+    "external": {
+      "link": "Fiók összekapcsolása külső szolgáltatóval",
+      "unlink": "Kapcsolat bontása",
+      "linkedWith": "Összekapcsolva ezzel: {provider}",
+      "providerDisabled": "A jelenleg összekapcsolt szolgáltató nincs engedélyezve"
+    }
+  },
+  "setup": {
+    "welcome": "Üdvözlünk a wg-easy beállítási folyamatában!",
+    "welcomeDescription": "Megtaláltad a WireGuard telepítésének és kezelésének legegyszerűbb módját bármely Linux-kiszolgálón.",
+    "existingSetup": "Van már meglévő telepítésed?",
+    "createAdminDescription": "Először adj meg egy rendszergazdai felhasználónevet és egy erős, biztonságos jelszót. Ezekkel az adatokkal tudsz majd bejelentkezni az adminisztrációs felületre.",
+    "setupConfigDescription": "Add meg a hosztnevet és a port adatait. Ezeket az adatokat használja majd a rendszer a kliensek WireGuard-konfigurációjának létrehozásához.",
+    "setupMigrationDescription": "Ha egy korábbi wg-easy-verzióból szeretnéd átköltöztetni az adataidat az új telepítésbe, töltsd fel a biztonsági mentés fájlját.",
+    "upload": "Feltöltés",
+    "migration": "Biztonsági mentés visszaállítása:",
+    "createAccount": "Fiók létrehozása",
+    "successful": "A beállítás sikeresen befejeződött",
+    "hostDescription": "Nyilvános hosztnév, amelyhez a kliensek csatlakoznak",
+    "portDescription": "Nyilvános UDP-port, amelyhez a kliensek csatlakoznak, és amelyen a WireGuard figyel",
+    "title": "Első lépések"
+  },
+  "clients": {
+    "title": "Kliensek",
+    "list": {
+      "toggleCharts": "Grafikonok megjelenítése/elrejtése",
+      "empty": "Még nincsenek kliensek.",
+      "new": "Új",
+      "sort": "Rendezés",
+      "newClient": "Új kliens",
+      "search": "Kliensek keresése...",
+      "total": "kliens",
+      "title": "Klienseid",
+      "autoRefresh": "Automatikus frissítés",
+      "connectionIssue": "Megszakadt a kapcsolat",
+      "loadError": "Nem sikerült frissíteni a kliensek listáját. Ellenőrizd a kapcsolatodat, majd próbáld újra.",
+      "hint": "Egy konfiguráció letöltésével vagy a QR-kód beolvasásával csatlakoztathatsz egy eszközt. Az egyszer használható hivatkozásokkal biztonságosan oszthatsz meg konfigurációkat.",
+      "noResults": "Egyetlen kliens sem felel meg a keresésnek vagy a szűrési feltételeknek.",
+      "clearSearch": "Keresés törlése"
+    },
+    "create": {
+      "action": "Kliens létrehozása",
+      "success": "Kliens létrehozva",
+      "title": "Új kliens"
+    },
+    "fields": {
+      "name": {
+        "label": "Név"
+      },
+      "expiresAt": {
+        "label": "Lejárat ideje",
+        "description": "Az az időpont, amikor a kliens letiltásra kerül, a helyi időzónád szerint. Hagyd üresen, ha nem szeretnéd, hogy lejárjon."
+      },
+      "address": {
+        "label": "IP-cím"
+      },
+      "serverAllowedIps": {
+        "label": "Szerver által engedélyezett IP-címek",
+        "description": "Azok az IP-címek, amelyek felé a szerver a kliensen keresztül irányítja a forgalmat."
+      },
+      "allowedIps": {
+        "description": "Azok az IP-címek, amelyek forgalma a VPN-en keresztül halad (felülírja a globális beállítást)."
+      },
+      "mtu": {
+        "description": "A VPN-alagúton továbbított csomagok maximális méretét (MTU) határozza meg. Az automatikus felismeréshez hagyd üresen."
+      },
+      "persistentKeepalive": {
+        "description": "A kapcsolat fenntartására szolgáló csomagok küldési időköze másodpercben. A 0 érték kikapcsolja ezt a funkciót."
+      },
+      "dns": {
+        "description": "A kliensek által használt DNS-kiszolgáló (felülírja a globális beállítást)."
+      },
+      "endpoint": {
+        "label": "Végpont",
+        "description": "A WireGuard-kapcsolat távoli végpontjának címe és portja."
+      },
+      "firewallIps": {
+        "label": "Tűzfalon engedélyezett IP-címek",
+        "description": "Azok a cél IP-címek és CIDR-tartományok, amelyekhez ez a kliens hozzáférhet (szerveroldali korlátozás). Hagyd üresen, ha az engedélyezett IP-címek beállítást szeretnéd használni. Opcionális port- és protokollszűrés is támogatott. A szintaxisról a dokumentációban olvashatsz."
+      }
+    },
+    "delete": {
+      "title": "Kliens törlése",
+      "description": "Biztosan törölni szeretnéd ezt a klienst: {name}? Ez a művelet nem vonható vissza."
+    },
+    "status": {
+      "enabled": "Engedélyezve",
+      "permanent": "Állandó",
+      "createdOn": "Létrehozva: {date}",
+      "lastSeen": "Utoljára észlelve: {date}",
+      "disable": "Kliens letiltása",
+      "enable": "Kliens engedélyezése",
+      "notConnected": "A kliens nincs csatlakoztatva",
+      "disabled": "Letiltva",
+      "online": "Online",
+      "offline": "Offline"
+    },
+    "keys": {
+      "title": "Kulcsok",
+      "publicKey": "Nyilvános kulcs",
+      "preSharedKey": "Előre megosztott kulcs",
+      "preSharedKeySet": "Beállítva",
+      "preSharedKeyNone": "Nincs beállítva",
+      "actions": {
+        "addPreSharedKey": {
+          "label": "Előre megosztott kulcs hozzáadása",
+          "description": "Generáljunk egy előre megosztott kulcsot ehhez a klienshez: {name}?"
+        },
+        "rotatePreSharedKey": {
+          "label": "Előre megosztott kulcs cseréje",
+          "description": "Generáljunk egy új előre megosztott kulcsot ehhez a klienshez: {name}?"
+        },
+        "removePreSharedKey": {
+          "label": "Előre megosztott kulcs eltávolítása",
+          "description": "Eltávolítod az előre megosztott kulcsot ettől a klienstől: {name}?"
+        },
+        "rotateKeyPair": {
+          "label": "Kulcspár cseréje",
+          "description": "Generáljunk egy új kulcspárt ehhez a klienshez: {name}?"
+        }
+      },
+      "updated": "A kulcsok frissítve"
+    },
+    "configuration": {
+      "oneTimeLink": "Egyszer használható hivatkozás létrehozása",
+      "noPrivateKey": "Ehhez a klienshez nem tartozik ismert privát kulcs. A konfiguráció nem hozható létre.",
+      "showQrCode": "QR-kód megjelenítése",
+      "download": "Konfiguráció letöltése",
+      "title": "Konfiguráció",
+      "view": "Konfiguráció megtekintése",
+      "downloadPng": "PNG letöltése",
+      "copyPng": "PNG másolása"
+    },
+    "traffic": {
+      "totalDownload": "Összes letöltés: {total}",
+      "totalUpload": "Összes feltöltés: {total}",
+      "download": "Letöltés",
+      "upload": "Feltöltés"
+    },
+    "hooks": {
+      "title": "Hookok",
+      "description": "A hookok csak a wg-quick használatával működnek.",
+      "fieldDescription": "Csak wg-quick esetén használható. Egyébként hagyd üresen."
+    },
+    "bulk": {
+      "title": "Csoportos műveletek",
+      "done": "Kijelölés befejezése",
+      "selectPage": "Az összes kliens kijelölése ezen az oldalon",
+      "selectClient": "{name} kijelölése",
+      "selected": "{count} kijelölve",
+      "clearSelection": "Kijelölés törlése",
+      "actions": {
+        "enable": {
+          "label": "Kijelöltek engedélyezése",
+          "title": "Engedélyezed a(z) {count} kijelölt klienst?",
+          "description": "A kijelölt kliensek csatlakozhatnak majd a VPN-hez. A lejárt kliensek lejárati dátumát először módosítani kell.",
+          "success": "{count} kliens engedélyezve."
+        },
+        "disable": {
+          "label": "Kijelöltek letiltása",
+          "title": "Letiltod a(z) {count} kijelölt klienst?",
+          "description": "A kijelölt kliensek elveszítik a VPN-hozzáférésüket. Később újra engedélyezheted őket.",
+          "success": "{count} kliens letiltva."
+        },
+        "delete": {
+          "label": "Kijelöltek törlése",
+          "title": "Törlöd a(z) {count} kijelölt klienst?",
+          "description": "Ezek a kliensek elveszítik a VPN-hozzáférésüket, konfigurációik és egyszer használható hivatkozásaik pedig véglegesen törlődnek. Ez a művelet nem vonható vissza.",
+          "success": "{count} kliens törölve."
+        }
+      },
+      "applying": "A módosítások alkalmazása a kijelölt klienseken…",
+      "failed": "Nem sikerült végrehajtani a csoportos műveletet. Frissítsd a listát, majd próbáld újra."
+    },
+    "description": "Az eszközeid. A hálózatod. Biztonságos kapcsolatban.",
+    "pagination": {
+      "label": "Klienslista lapozása",
+      "range": "{start}–{end} / {total} kliens megjelenítése",
+      "previous": "Előző",
+      "next": "Következő",
+      "pageOf": "{page}. oldal / {total}",
+      "perPage": "Oldalanként"
+    },
+    "sort": {
+      "ascending": "Rendezés név szerint, növekvő sorrendben",
+      "descending": "Rendezés név szerint, csökkenő sorrendben",
+      "label": "Rendezés szempontja",
+      "options": {
+        "nameAsc": "Név: A–Z",
+        "nameDesc": "Név: Z–A",
+        "newest": "Legújabb elöl",
+        "oldest": "Legrégebbi elöl",
+        "addressAsc": "IPv4-cím: növekvő sorrendben",
+        "addressDesc": "IPv4-cím: csökkenő sorrendben",
+        "expiryAsc": "Lejárat: legkorábbi elöl",
+        "expiryDesc": "Lejárat: legkésőbbi elöl"
+      }
+    },
+    "edit": "{name} szerkesztése",
+    "filters": {
+      "status": {
+        "label": "Állapot",
+        "options": {
+          "all": "Minden állapot",
+          "enabled": "Engedélyezve",
+          "disabled": "Letiltva",
+          "online": "Online",
+          "offline": "Offline"
+        }
+      },
+      "expiry": {
+        "label": "Lejárat",
+        "options": {
+          "all": "Bármilyen lejárat",
+          "permanent": "Soha nem jár le",
+          "expiring": "7 napon belül lejár",
+          "expired": "Lejárt"
+        }
+      },
+      "clear": "Szűrők törlése"
+    }
+  },
+  "admin": {
+    "title": "Adminisztrációs felület",
+    "general": {
+      "title": "Általános",
+      "sessionTimeout": {
+        "label": "Munkamenet időkorlátja",
+        "description": "Az Emlékezz rám funkcióval meghosszabbított munkamenet időtartama másodpercben"
+      },
+      "metrics": "Metrikák",
+      "metricsPassword": {
+        "label": "Jelszó",
+        "description": "A metrikavégpont eléréséhez szükséges hitelesítő jelszó (jelszó vagy Argon2-hash)"
+      },
+      "json": {
+        "label": "JSON",
+        "description": "A JSON-formátumú metrikák elérési útvonala"
+      },
+      "prometheus": {
+        "label": "Prometheus",
+        "description": "A Prometheus-metrikák elérési útvonala"
+      }
+    },
+    "config": {
+      "title": "Konfiguráció",
+      "connection": "Kapcsolat",
+      "host": {
+        "description": "Nyilvános hosztnév, amelyhez a kliensek csatlakoznak (a konfigurációk érvénytelenné válnak)"
+      },
+      "port": {
+        "description": "Nyilvános UDP-port, amelyhez a kliensek csatlakoznak (a konfigurációk érvénytelenné válnak; valószínűleg az interfész portját is módosítani szeretnéd)"
+      },
+      "allowedIps": {
+        "description": "A kliensek által használt engedélyezett IP-címek (globális beállítás)"
+      },
+      "dns": {
+        "description": "A kliensek által használt DNS-kiszolgáló (globális beállítás)"
+      },
+      "mtu": {
+        "description": "A kliensek által használt MTU-érték (csak az új klienseknél érvényes). Az automatikus felismeréshez hagyd üresen."
+      },
+      "persistentKeepalive": {
+        "description": "A szervernek küldött életben tartó csomagok küldési időköze másodpercben. A 0 kikapcsolja ezt a funkciót (csak az új klienseknél érvényes)."
+      },
+      "generatePreSharedKey": {
+        "label": "Előre megosztott kulcsok generálása",
+        "description": "Előre megosztott kulcsok automatikus generálása az új kliensekhez"
+      },
+      "suggest": {
+        "label": "Javaslat",
+        "description": "Válassz egy IP-címet vagy hosztnevet a Hoszt mezőhöz"
+      }
+    },
+    "interface": {
+      "title": "Interfész",
+      "cidrSuccess": "A CIDR-tartomány módosítva",
+      "device": {
+        "label": "Eszköz",
+        "description": "Az az Ethernet-eszköz, amelyen keresztül a WireGuard-forgalom továbbításra kerül"
+      },
+      "routingTable": {
+        "label": "Útválasztási tábla",
+        "description": "A WireGuard-útvonalakhoz használt útválasztási tábla. Az értéke auto, off vagy egy táblaszám lehet."
+      },
+      "mtu": {
+        "description": "A WireGuard által használt MTU-érték. Az automatikus felismeréshez hagyd üresen."
+      },
+      "port": {
+        "description": "Az az UDP-port, amelyen a WireGuard figyel (valószínűleg a konfigurációban megadott portot is módosítani szeretnéd)"
+      },
+      "changeCidr": "CIDR-tartomány módosítása",
+      "restart": {
+        "label": "Interfész újraindítása",
+        "description": "A WireGuard-interfész újraindítása"
+      },
+      "restartWarn": "Biztosan újra szeretnéd indítani az interfészt? Ez minden kliens kapcsolatát megszakítja.",
+      "restartSuccess": "Az interfész újraindult",
+      "firewall": "Forgalomszűrés",
+      "firewallEnabled": {
+        "label": "Kliensenkénti tűzfal bekapcsolása",
+        "description": "A kliensek forgalmának korlátozása meghatározott cél IP-címekre az iptables használatával. Bekapcsolás után minden kliensnél külön megadhatók az elérhető célcímek."
+      }
+    },
+    "hooks": {
+      "title": "Hookok"
+    },
+    "introduction": "Üdvözlünk az adminisztrációs felületen!\n\nItt kezelheted az általános beállításokat, a konfigurációt, az interfész beállításait és a hookokat.\n\nKezdésként válassz egy szekciót az oldalsávon.",
+    "description": "Állítsd be a hálózatodat, és kezeld a szerveredet.",
+    "overview": "Áttekintés"
+  },
+  "wireguard": {
+    "fields": {
+      "mtu": "MTU",
+      "allowedIps": "Engedélyezett IP-címek",
+      "dns": "DNS",
+      "persistentKeepalive": "Kapcsolat életben tartása",
+      "host": "Hoszt",
+      "port": "Port"
+    },
+    "hooks": {
+      "preUp": "PreUp",
+      "postUp": "PostUp",
+      "preDown": "PreDown",
+      "postDown": "PostDown"
+    },
+    "obfuscation": {
+      "jC": {
+        "label": "Hamis csomagok száma (Jc)",
+        "description": "A küldendő hamis csomagok száma (1–128, ajánlott: 4–12)"
+      },
+      "jMin": {
+        "label": "Hamis csomagok minimális mérete (Jmin)",
+        "description": "A hamis csomagok minimális mérete (0–1279*, ajánlott: 8, kisebbnek kell lennie a Jmax értékénél)"
+      },
+      "jMax": {
+        "label": "Hamis csomagok maximális mérete (Jmax)",
+        "description": "A hamis csomagok maximális mérete (1–1280*, ajánlott: 80, nagyobbnak kell lennie a Jmin értékénél)"
+      },
+      "s1": {
+        "label": "Kezdőcsomag hamis adatainak mérete (S1)",
+        "description": "A kezdőcsomag hamis adatainak mérete (0–1132 [1280* - 148 = 1132], ajánlott: 15–150, S1+56 ≠ S2)"
+      },
+      "s2": {
+        "label": "Válaszcsomag hamis adatainak mérete (S2)",
+        "description": "A válaszcsomag hamis adatainak mérete (0–1188 [1280* - 92 = 1188], ajánlott: 15–150)"
+      },
+      "s3": {
+        "label": "Cookie-válaszcsomag hamis adatainak mérete (S3)",
+        "description": "A Cookie-válaszcsomag hamis adatainak mérete"
+      },
+      "s4": {
+        "label": "Adatátviteli csomag hamis adatainak mérete (S4)",
+        "description": "Az adatátviteli csomag hamis adatainak mérete"
+      },
+      "h1": {
+        "label": "Kezdőcsomag mágikus fejlécértéke (H1)",
+        "description": "A kezdőcsomag fejlécének értéke vagy tartománya (X vagy X-Y, ahol X<Y. Minimum: 5, maximum: 2147483647. Az érték vagy tartomány nem fedheti át a többi fejléc értékét.)"
+      },
+      "h2": {
+        "label": "Válaszcsomag mágikus fejlécértéke (H2)",
+        "description": "A válaszcsomag fejlécének értéke vagy tartománya (X vagy X-Y, ahol X<Y. Minimum: 5, maximum: 2147483647. Az érték vagy tartomány nem fedheti át a többi fejléc értékét.)"
+      },
+      "h3": {
+        "label": "Cookie-válasz mágikus fejlécértéke (H3)",
+        "description": "A Cookie-válaszcsomag fejlécének értéke vagy tartománya (X vagy X-Y, ahol X<Y. Minimum: 5, maximum: 2147483647. Az érték vagy tartomány nem fedheti át a többi fejléc értékét.)"
+      },
+      "h4": {
+        "label": "Adatátviteli csomag mágikus fejlécértéke (H4)",
+        "description": "Az adatátviteli csomag fejlécének értéke vagy tartománya (X vagy X-Y, ahol X<Y. Minimum: 5, maximum: 2147483647. Az érték vagy tartomány nem fedheti át a többi fejléc értékét.)"
+      },
+      "i1": {
+        "label": "Speciális hamis csomag 1 (I1)",
+        "description": "Protokollt utánzó csomag hexadecimális formátumban: <b 0x...>"
+      },
+      "i2": {
+        "label": "Speciális hamis csomag 2 (I2)",
+        "description": "Protokollt utánzó csomag hexadecimális formátumban: <b 0x...>"
+      },
+      "i3": {
+        "label": "Speciális hamis csomag 3 (I3)",
+        "description": "Protokollt utánzó csomag hexadecimális formátumban: <b 0x...>"
+      },
+      "i4": {
+        "label": "Speciális hamis csomag 4 (I4)",
+        "description": "Protokollt utánzó csomag hexadecimális formátumban: <b 0x...>"
+      },
+      "i5": {
+        "label": "Speciális hamis csomag 5 (I5)",
+        "description": "Protokollt utánzó csomag hexadecimális formátumban: <b 0x...>"
+      },
+      "rangeNote": "A következő paramétereknél egyetlen szám vagy egy zárt intervallum is megadható (0–65535), például 30 vagy 30-90.",
+      "headerProtectionKey": {
+        "label": "Fejlécvédelmi kulcs",
+        "description": "A csomagfejlécek titkosításához használt, 32 bájtos Base64-kulcs. Mindkét oldalon azonosnak kell lennie, ezért minden klienshez átkerül. Az S1–S4 értékeknek legalább 12-nek kell lenniük."
+      },
+      "contentPaddingAddition": {
+        "label": "Adatkitöltés hozzáadása",
+        "description": "A titkosítás előtt az adatátviteli csomagokhoz hozzáfűzött véletlenszerű számú bájt"
+      },
+      "rekeyAfterTime": {
+        "label": "Újrakulcsozás időköze",
+        "description": "A munkamenet újraegyeztetése előtti idő másodpercben (WireGuard-alapértelmezés: 120)"
+      },
+      "rekeyTimeout": {
+        "label": "Újrakulcsozási időkorlát",
+        "description": "A kézfogási kísérletek közötti idő másodpercben (WireGuard-alapértelmezés: 5)"
+      },
+      "rejectAfterTime": {
+        "label": "Kapcsolat elutasítása ennyi idő után",
+        "description": "A munkamenet élettartama másodpercben (WireGuard-alapértelmezés: 180)"
+      },
+      "keepaliveTimeout": {
+        "label": "Kapcsolatfenntartási időkorlát",
+        "description": "Az inaktivitás után eltelt idő másodpercben, amelynek végén kapcsolatfenntartó csomag kerül elküldésre (WireGuard-alapértelmezés: 10)"
+      },
+      "maxHandshakeAttempts": {
+        "label": "Kézfogási kísérletek maximális száma",
+        "description": "A feladás előtti kézfogási kísérletek maximális száma (WireGuard-alapértelmezés: 18)"
+      },
+      "randomTrailers": {
+        "label": "Véletlenszerű záróadatok",
+        "description": "Véletlenszerű számú bájt hozzáfűzése a kézfogási csomagokhoz. Mindkét oldalon azonosnak kell lennie, ezért minden klienshez átkerül."
+      },
+      "disableCookies": {
+        "label": "Cookie-üzenetek kikapcsolása",
+        "description": "Terhelés alatt ne válaszolj Cookie-üzenetekkel a kézfogási kérésekre. Ez csak az alagút ezen oldalára van hatással."
+      },
+      "mtuNote": "Az értékek az MTU-tól függenek",
+      "title": "AmneziaWG-forgalomelrejtési paraméterek"
+    }
+  },
+  "validation": {
+    "messages": {
+      "required": "A(z) {field} megadása kötelező",
+      "validNumber": "A(z) {field} értékének érvényes számnak kell lennie",
+      "validNumberRange": "A(z) {field} értékének érvényes számnak vagy számtartománynak kell lennie",
+      "validString": "A(z) {field} értékének érvényes szövegnek kell lennie",
+      "validBoolean": "A(z) {field} értékének érvényes logikai értéknek kell lennie",
+      "validArray": "A(z) {field} értékének érvényes tömbnek kell lennie",
+      "stringMin": "A(z) {field} legalább {min} karakter hosszú legyen",
+      "stringMax": "A(z) {field} legfeljebb {max} karakter hosszú lehet",
+      "numberMin": "A(z) {field} értéke legalább {min} legyen",
+      "numberMax": "A(z) {field} értéke legfeljebb {max} lehet"
+    },
+    "client": {
+      "id": "Kliensazonosító",
+      "name": "Név",
+      "expiresAt": "Lejárat ideje",
+      "expiresAtInvalid": "A lejáratnak érvényes dátumnak (YYYY-MM-DD) vagy időzónát tartalmazó ISO-időbélyegnek kell lennie.",
+      "address4": "IPv4-cím",
+      "address6": "IPv6-cím",
+      "serverAllowedIps": "Szerver által engedélyezett IP-címek",
+      "firewallIps": "Tűzfalon engedélyezett IP-címek",
+      "firewallIpsInvalid": "Érvénytelen tűzfal-IP-bejegyzés. A támogatott szintaxisról a dokumentációban olvashatsz."
+    },
+    "user": {
+      "username": "Felhasználónév",
+      "password": "Jelszó",
+      "remember": "Emlékezz rám",
+      "name": "Név",
+      "email": "E-mail-cím",
+      "emailInvalid": "Érvényes e-mail-címet adj meg.",
+      "passwordMatch": "A jelszavaknak egyezniük kell",
+      "totpEnable": "TOTP bekapcsolása",
+      "totpEnableTrue": "A TOTP bekapcsolásának értéke csak igaz lehet",
+      "totpCode": "TOTP-kód"
+    },
+    "userConfig": {
+      "host": "Hoszt"
+    },
+    "general": {
+      "sessionTimeout": "Munkamenet időkorlátja",
+      "metricsEnabled": "Metrikák",
+      "metricsPassword": "Metrikák jelszava"
+    },
+    "interface": {
+      "cidr": "CIDR",
+      "device": "Eszköz",
+      "cidrValid": "Érvényes CIDR-tartományt adj meg.",
+      "routingTable": "Az útválasztási tábla értéke auto, off vagy egy táblaszám lehet.",
+      "headerProtectionJunkSize": "Ha fejlécvédelmi kulcs van beállítva, az S1–S4 hamisadat-méreteknek legalább 12-nek kell lenniük."
+    },
+    "otl": "Egyszer használható hivatkozás",
+    "stringMalformed": "A szöveg formátuma érvénytelen",
+    "keyMalformed": "A kulcsnak 32 bájtos, Base64-kódolású kulcsnak kell lennie",
+    "body": "A törzsnek érvényes objektumnak kell lennie",
+    "hook": "Hook",
+    "enabled": "Engedélyezve",
+    "mtu": "MTU",
+    "port": "Port",
+    "portInteger": "A portnak egész számnak kell lennie",
+    "persistentKeepalive": "Kapcsolat életben tartása",
+    "address": "IP-cím",
+    "dns": "DNS",
+    "allowedIps": "Engedélyezett IP-címek",
+    "allowedIpsInvalid": "Minden bejegyzés egyetlen IP-cím vagy CIDR-tartomány legyen.",
+    "endpointInvalid": "Hosztnevet vagy IPv4-címet adj meg :port formában, illetve IPv6-címet [IPv6]:port formában (1–65535).",
+    "file": "Fájl"
+  }
+}
