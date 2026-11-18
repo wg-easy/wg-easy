@@ -206,6 +206,12 @@ export default defineNuxtConfig({
         language: 'az-AZ',
         name: 'Azərbaycan',
       },
+      {
+        code: 'hu',
+        file: 'hu.json',
+        language: 'hu-HU',
+        name: 'Magyar',
+      },
     ],
     defaultLocale: 'en',
     vueI18n: './i18n.config.ts',
