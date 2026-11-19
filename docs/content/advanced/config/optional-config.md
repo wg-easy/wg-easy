@@ -24,6 +24,31 @@ This option can be removed in the future, as more devices support IPv6.
 
 ///
 
+## Docker and Podman secrets
+
+wg-easy can read OAuth client secrets and the unattended setup password from mounted files. For each credential, set either its environment variable or its `_FILE` variant. The `_FILE` value is the path **inside the container**.
+
+For example, save your Google OAuth client secret in `./secrets/google_client_secret` next to your Compose file, then merge this snippet into your configuration.
+
+```yaml
+services:
+    wg-easy:
+        environment:
+            OAUTH_PROVIDERS: google
+            OAUTH_GOOGLE_CLIENT_ID: your-client-id
+            OAUTH_GOOGLE_CLIENT_SECRET_FILE: /run/secrets/google_client_secret
+        secrets:
+            - google_client_secret
+
+secrets:
+    google_client_secret:
+        file: ./secrets/google_client_secret
+```
+
+wg-easy reads each configured file as UTF-8 at startup. It removes one final line ending (LF or CRLF) and preserves all other characters, including spaces. Startup fails if both variables are set, the file cannot be read, or the resulting secret is empty. Restart wg-easy after rotating an OAuth client secret.
+
+See [OAuth provider configuration](./external-authentication.md#provider-configuration) and [unattended setup](./unattended-setup.md) for the supported variable names.
+
 ## Trusted Proxies
 
 Set `TRUSTED_PROXIES` when wg-easy runs behind a reverse proxy and needs to use
