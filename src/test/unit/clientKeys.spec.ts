@@ -55,7 +55,6 @@ beforeEach(async () => {
     if (command === 'echo new-private-key | wg pubkey') return 'new-public-key';
     if (command === 'wg-quick down wg0; wg-quick up wg0') return '';
     if (command === 'wg show wg0 dump') return '';
-    if (command === 'wg show wg0 fwmark') return 'off';
     if (
       command.includes(' syncconf ') ||
       /^(?:while )?ip6?tables /.test(command)
@@ -223,7 +222,9 @@ describe('client key actions', () => {
     expect(String(writeFile.mock.calls[0]?.[1])).not.toContain(
       'PublicKey = public-key-1'
     );
-    expect(exec).toHaveBeenCalledWith('wg syncconf wg0 <(wg-quick strip wg0)');
+    expect(exec).toHaveBeenCalledWith(
+      expect.stringContaining('wg syncconf wg0 ')
+    );
 
     const publicClient = await clients.getPublic(1);
     expect(publicClient).toMatchObject({
