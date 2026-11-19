@@ -85,26 +85,28 @@ If your provider does not support multiple redirect URIs (e.g. GitHub) but allow
 
 ### Provider Configuration
 
+For each provider, supply the client ID and choose one source for the client secret. To use a mounted secret file, set the provider's `_FILE` variable to its path inside the container. See [Docker and Podman secrets](./optional-config.md#docker-and-podman-secrets) for a Compose example.
+
 #### Google
 
-| Env                          | Required           | Description          |
-| ---------------------------- | ------------------ | -------------------- |
-| `OAUTH_GOOGLE_CLIENT_ID`     | :white_check_mark: | Google Client ID     |
-| `OAUTH_GOOGLE_CLIENT_SECRET` | :white_check_mark: | Google Client Secret |
+| Env                                                               | Required           | Description                              |
+| ----------------------------------------------------------------- | ------------------ | ---------------------------------------- |
+| `OAUTH_GOOGLE_CLIENT_ID`                                          | :white_check_mark: | Google Client ID                         |
+| `OAUTH_GOOGLE_CLIENT_SECRET` or `OAUTH_GOOGLE_CLIENT_SECRET_FILE` | :white_check_mark: | Google client secret or path to its file |
 
 <h5>Setup</h5>
 
 1. Go to [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
 2. Create an OAuth 2.0 Client ID (Web application)
 3. Add Authorized redirect URI: See [Redirect URIs](#redirect-uris)
-4. Copy the Client ID and Client Secret to the environment variables
+4. Set `OAUTH_GOOGLE_CLIENT_ID` and supply the client secret using one of the two variables above.
 
 #### GitHub
 
-| Env                          | Required           | Description          |
-| ---------------------------- | ------------------ | -------------------- |
-| `OAUTH_GITHUB_CLIENT_ID`     | :white_check_mark: | GitHub Client ID     |
-| `OAUTH_GITHUB_CLIENT_SECRET` | :white_check_mark: | GitHub Client Secret |
+| Env                                                               | Required           | Description                              |
+| ----------------------------------------------------------------- | ------------------ | ---------------------------------------- |
+| `OAUTH_GITHUB_CLIENT_ID`                                          | :white_check_mark: | GitHub Client ID                         |
+| `OAUTH_GITHUB_CLIENT_SECRET` or `OAUTH_GITHUB_CLIENT_SECRET_FILE` | :white_check_mark: | GitHub client secret or path to its file |
 
 <h5>Setup</h5>
 
@@ -112,7 +114,7 @@ If your provider does not support multiple redirect URIs (e.g. GitHub) but allow
 2. Create a new OAuth App
 3. Add Authorization callback URL: See [Redirect URIs](#redirect-uris)
 4. Create a new client secret
-5. Copy the Client ID and Client Secret to the environment variables
+5. Set `OAUTH_GITHUB_CLIENT_ID` and supply the client secret using one of the two variables above.
 
 #### Generic OIDC
 
@@ -126,12 +128,12 @@ The provider needs to support:
 
 The provider needs to be available with HTTPS and have a valid certificate.
 
-| Env                        | Required           | Default | Example                    | Description        |
-| -------------------------- | ------------------ | ------- | -------------------------- | ------------------ |
-| `OAUTH_OIDC_SERVER`        | :white_check_mark: | -       | `https://auth.example.com` | OIDC Server        |
-| `OAUTH_OIDC_CLIENT_ID`     | :white_check_mark: | -       | -                          | OIDC Client ID     |
-| `OAUTH_OIDC_CLIENT_SECRET` | :white_check_mark: | -       | -                          | OIDC Client Secret |
-| `OAUTH_OIDC_NAME`          | :x:                | OIDC    | `Authelia`                 | Provider Name      |
+| Env                                                           | Required           | Default | Example                    | Description                            |
+| ------------------------------------------------------------- | ------------------ | ------- | -------------------------- | -------------------------------------- |
+| `OAUTH_OIDC_SERVER`                                           | :white_check_mark: | -       | `https://auth.example.com` | OIDC Server                            |
+| `OAUTH_OIDC_CLIENT_ID`                                        | :white_check_mark: | -       | -                          | OIDC Client ID                         |
+| `OAUTH_OIDC_CLIENT_SECRET` or `OAUTH_OIDC_CLIENT_SECRET_FILE` | :white_check_mark: | -       | -                          | OIDC client secret or path to its file |
+| `OAUTH_OIDC_NAME`                                             | :x:                | OIDC    | `Authelia`                 | Provider Name                          |
 
 ##### Authelia Setup
 
