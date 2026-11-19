@@ -24,7 +24,7 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllEnvs());
 afterAll(() => rmSync(directory, { recursive: true, force: true }));
 
-function setSecretFile(name: string, contents: string) {
+function setSecretFile(name: string, contents: string | Uint8Array) {
   const path = join(directory, name);
   writeFileSync(path, contents);
   vi.stubEnv(`${name}_FILE`, path);
@@ -71,7 +71,8 @@ test.each(['direct-secret', ''])(
   }
 );
 
-test('rejects an unreadable secret file at startup', async () => {
+test('rejects an unreadable secret file even when its provider is disabled', async () => {
+  vi.stubEnv('OAUTH_PROVIDERS', 'github');
   vi.stubEnv('OAUTH_OIDC_CLIENT_SECRET_FILE', join(directory, 'missing'));
 
   await expect(import('#server/utils/config')).rejects.toThrow(
@@ -79,6 +80,24 @@ test('rejects an unreadable secret file at startup', async () => {
       'Cannot read the secret file specified by OAUTH_OIDC_CLIENT_SECRET_FILE'
     )
   );
+});
+
+test('rejects malformed UTF-8 in a password file at startup', async () => {
+  setSecretFile('INIT_PASSWORD', Uint8Array.of(0x61, 0xff, 0x62));
+
+  await expect(import('#server/utils/config')).rejects.toThrow(
+    new Error(
+      'The secret file specified by INIT_PASSWORD_FILE contains invalid UTF-8'
+    )
+  );
+});
+
+test('preserves valid Unicode characters in a secret file', async () => {
+  const password = '\uFEFFcafé\uFFFD';
+  setSecretFile('INIT_PASSWORD', password);
+
+  const { WG_INITIAL_ENV } = await import('#server/utils/config');
+  expect(WG_INITIAL_ENV.PASSWORD).toBe(password);
 });
 
 test.each(['', '\n', '\r\n'])(

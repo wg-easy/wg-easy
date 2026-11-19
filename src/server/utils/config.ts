@@ -1,3 +1,4 @@
+import { isUtf8 } from 'node:buffer';
 import { readFileSync } from 'node:fs';
 
 import { createDebug } from 'obug';
@@ -177,13 +178,18 @@ function readSecret(name: string): string | undefined {
     throw new Error(`Set only one of ${name} and ${fileVariable}`);
   }
 
-  let contents: string;
+  let contents: Buffer;
   try {
-    contents = readFileSync(path, 'utf8');
+    contents = readFileSync(path);
   } catch {
     throw new Error(`Cannot read the secret file specified by ${fileVariable}`);
   }
-  const secret = contents.replace(/\r?\n$/, '');
+  if (!isUtf8(contents)) {
+    throw new Error(
+      `The secret file specified by ${fileVariable} contains invalid UTF-8`
+    );
+  }
+  const secret = contents.toString('utf8').replace(/\r?\n$/, '');
   if (secret === '') {
     throw new Error(`The secret file specified by ${fileVariable} is empty`);
   }

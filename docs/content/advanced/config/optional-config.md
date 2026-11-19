@@ -45,7 +45,9 @@ secrets:
         file: ./secrets/google_client_secret
 ```
 
-wg-easy reads each configured file as UTF-8 at startup. It removes one final line ending (LF or CRLF) and preserves all other characters, including spaces. Startup fails if both variables are set, the file cannot be read, or the resulting secret is empty. Restart wg-easy after rotating an OAuth client secret.
+wg-easy reads every configured secret file at startup, including files for disabled OAuth providers. Each file must contain valid UTF-8. wg-easy removes one final line ending (LF or CRLF) and preserves all other characters, including spaces.
+
+Startup fails if both variables are set, the file is unreadable or contains invalid UTF-8, or the resulting secret is empty. The error names the affected variable. Restart wg-easy after rotating an OAuth client secret.
 
 See [OAuth provider configuration](./external-authentication.md#provider-configuration) and [unattended setup](./unattended-setup.md) for the supported variable names.
 
