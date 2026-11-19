@@ -72,8 +72,10 @@ export async function importLegacyConfiguration(
       userId: 1,
       interfaceId: network.name,
       preSharedKey: clientConfig.preSharedKey || null,
-      allowedIps: defaults.defaultAllowedIps,
-      dns: defaults.defaultDns,
+      // Leave these unset so imported clients follow the global settings,
+      // like clients created in the UI. v14 had no per-client values.
+      allowedIps: null,
+      dns: null,
       i5: null,
       ipv4Address: clientConfig.address,
       ipv6Address,
