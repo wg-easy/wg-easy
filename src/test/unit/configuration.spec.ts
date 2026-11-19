@@ -91,7 +91,8 @@ test.each([false, true])(
       expect(server).toContain('MaxHandshakeAttempts = 9');
       expect(server).toContain('DisableCookies = off');
       expect(server).not.toMatch(/^S3 =/m);
-      expect(download).not.toMatch(/^Jc =|^MaxHandshakeAttempts =/m);
+      expect(download).not.toMatch(/^MaxHandshakeAttempts =/m);
+      expect(download).toContain('Jc = 7');
       expect(download).toContain('RekeyTimeout = 4-8');
       expect(download).toContain('DisableCookies = on');
     } else {

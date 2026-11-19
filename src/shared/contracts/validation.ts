@@ -103,8 +103,8 @@ function rangeSchema(min: number, max: number) {
     .nullable();
 }
 
-const H_MIN = 5;
-const H_MAX = 2 ** 31 - 1;
+const H_MIN = 1;
+const H_MAX = 2 ** 32 - 1;
 
 /** H1-H4 packet header types, parsed as a uint32 range */
 export const HSchema = rangeSchema(H_MIN, H_MAX);

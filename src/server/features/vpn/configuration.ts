@@ -114,7 +114,9 @@ export function generateClientConfig(
     dnsServers.length > 0 ? `DNS = ${dnsServers.join(', ')}` : null;
   const mtuLine = client.mtu !== null ? `MTU = ${client.mtu}` : null;
 
-  const awgLines = options.amnezia ? buildAwgLines(wgInterface, client) : [];
+  const awgLines = options.amnezia
+    ? buildAwgLines(wgInterface, client, userConfig)
+    : [];
 
   const extraLines = [mtuLine, dnsLine, ...hookLines, ...awgLines].filter(
     (v) => v !== null
@@ -132,12 +134,16 @@ Endpoint = ${formatEndpoint(userConfig.host, userConfig.port)}`;
 }
 
 /** Shared S/H parameters come from the server; other obfuscation settings belong to each peer. */
-function buildAwgLines(network: InterfaceType, client?: ClientType) {
+function buildAwgLines(
+  network: InterfaceType,
+  client?: ClientType,
+  userConfig?: UserConfigType
+) {
   const own = client ?? network;
   const parameters = {
-    Jc: own.jC,
-    Jmin: own.jMin,
-    Jmax: own.jMax,
+    Jc: own.jC ?? (client ? userConfig?.defaultJC : null),
+    Jmin: own.jMin ?? (client ? userConfig?.defaultJMin : null),
+    Jmax: own.jMax ?? (client ? userConfig?.defaultJMax : null),
     S1: network.s1,
     S2: network.s2,
     S3: network.s3,
@@ -146,20 +152,31 @@ function buildAwgLines(network: InterfaceType, client?: ClientType) {
     H2: network.h2,
     H3: network.h3,
     H4: network.h4,
-    I1: own.i1,
-    I2: own.i2,
-    I3: own.i3,
-    I4: own.i4,
-    I5: own.i5,
+    I1: own.i1 ?? (client ? userConfig?.defaultI1 : null),
+    I2: own.i2 ?? (client ? userConfig?.defaultI2 : null),
+    I3: own.i3 ?? (client ? userConfig?.defaultI3 : null),
+    I4: own.i4 ?? (client ? userConfig?.defaultI4 : null),
+    I5: own.i5 ?? (client ? userConfig?.defaultI5 : null),
     HeaderProtectionKey: network.headerProtectionKey,
-    ContentPaddingAddition: own.contentPaddingAddition,
-    RekeyAfterTime: own.rekeyAfterTime,
-    RekeyTimeout: own.rekeyTimeout,
-    RejectAfterTime: own.rejectAfterTime,
-    KeepaliveTimeout: own.keepaliveTimeout,
-    MaxHandshakeAttempts: own.maxHandshakeAttempts,
+    ContentPaddingAddition:
+      own.contentPaddingAddition ??
+      (client ? userConfig?.defaultContentPaddingAddition : null),
+    RekeyAfterTime:
+      own.rekeyAfterTime ?? (client ? userConfig?.defaultRekeyAfterTime : null),
+    RekeyTimeout:
+      own.rekeyTimeout ?? (client ? userConfig?.defaultRekeyTimeout : null),
+    RejectAfterTime:
+      own.rejectAfterTime ??
+      (client ? userConfig?.defaultRejectAfterTime : null),
+    KeepaliveTimeout:
+      own.keepaliveTimeout ??
+      (client ? userConfig?.defaultKeepaliveTimeout : null),
+    MaxHandshakeAttempts:
+      own.maxHandshakeAttempts ??
+      (client ? userConfig?.defaultMaxHandshakeAttempts : null),
     RandomTrailers: network.randomTrailers,
-    DisableCookies: own.disableCookies,
+    DisableCookies:
+      own.disableCookies ?? (client ? userConfig?.defaultDisableCookies : null),
   };
   return Object.entries(parameters)
     .filter(([, value]) => typeof value === 'boolean' || value)

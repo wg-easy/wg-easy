@@ -60,11 +60,11 @@ describe('AwgRangeSchema', () => {
     expect(() => AwgRangeSchema.parse('')).toThrow();
   });
 
-  test('limits H1-H4 to 5 through 2147483647', () => {
-    expect(HSchema.parse('5')).toBe('5');
-    expect(() => HSchema.parse('4')).toThrow();
-    expect(HSchema.parse('5-2147483647')).toBe('5-2147483647');
-    expect(() => HSchema.parse('5-2147483648')).toThrow();
+  test('limits H1-H4 to 1 through 4294967295', () => {
+    expect(HSchema.parse('1')).toBe('1');
+    expect(() => HSchema.parse('0')).toThrow();
+    expect(HSchema.parse('1-4294967295')).toBe('1-4294967295');
+    expect(() => HSchema.parse('1-4294967296')).toThrow();
   });
 });
 
