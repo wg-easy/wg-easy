@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+
 import { createDebug } from 'obug';
 import packageJson from '@@/package.json';
 
@@ -58,7 +60,7 @@ const GoogleConfig: OAuthConfig = {
   server: 'https://accounts.google.com',
   scope: 'openid email profile',
   clientId: process.env.OAUTH_GOOGLE_CLIENT_ID,
-  clientSecret: process.env.OAUTH_GOOGLE_CLIENT_SECRET,
+  clientSecret: readSecret('OAUTH_GOOGLE_CLIENT_SECRET'),
   params: {
     access_type: 'online',
     prompt: 'select_account',
@@ -69,7 +71,7 @@ const GithubConfig: OAuthConfig = {
   server: 'https://github.com/login/oauth',
   scope: 'read:user user:email',
   clientId: process.env.OAUTH_GITHUB_CLIENT_ID,
-  clientSecret: process.env.OAUTH_GITHUB_CLIENT_SECRET,
+  clientSecret: readSecret('OAUTH_GITHUB_CLIENT_SECRET'),
   params: {
     allow_signup: 'false',
     prompt: 'select_account',
@@ -82,7 +84,7 @@ const OidcConfig: OAuthConfig = {
   server: process.env.OAUTH_OIDC_SERVER ?? '',
   scope: 'openid email profile',
   clientId: process.env.OAUTH_OIDC_CLIENT_ID,
-  clientSecret: process.env.OAUTH_OIDC_CLIENT_SECRET,
+  clientSecret: readSecret('OAUTH_OIDC_CLIENT_SECRET'),
   params: {},
 };
 
@@ -153,7 +155,7 @@ Auto launch OAuth provider: ${WG_ENV.OAUTH_AUTO_LAUNCH ?? 'None'}
 export const WG_INITIAL_ENV = {
   ENABLED: process.env.INIT_ENABLED === 'true',
   USERNAME: process.env.INIT_USERNAME,
-  PASSWORD: process.env.INIT_PASSWORD,
+  PASSWORD: readSecret('INIT_PASSWORD'),
   DNS: process.env.INIT_DNS?.split(',').map((x) => x.trim()),
   IPV4_CIDR: process.env.INIT_IPV4_CIDR,
   IPV6_CIDR: process.env.INIT_IPV6_CIDR,
@@ -163,6 +165,30 @@ export const WG_INITIAL_ENV = {
     ? Number.parseInt(process.env.INIT_PORT, 10)
     : undefined,
 };
+
+function readSecret(name: string): string | undefined {
+  const value = process.env[name];
+  const fileVariable = `${name}_FILE`;
+  const path = process.env[fileVariable];
+  if (path === undefined) {
+    return value;
+  }
+  if (value !== undefined) {
+    throw new Error(`Set only one of ${name} and ${fileVariable}`);
+  }
+
+  let contents: string;
+  try {
+    contents = readFileSync(path, 'utf8');
+  } catch {
+    throw new Error(`Cannot read the secret file specified by ${fileVariable}`);
+  }
+  const secret = contents.replace(/\r?\n$/, '');
+  if (secret === '') {
+    throw new Error(`The secret file specified by ${fileVariable} is empty`);
+  }
+  return secret;
+}
 
 function assertEnv<T extends string>(env: T) {
   const val = process.env[env];
