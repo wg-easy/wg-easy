@@ -2,6 +2,7 @@ import fs from 'node:fs/promises';
 
 import { isExpired } from './policies';
 import { generateServerConfig } from './configuration';
+import { SiteRoutes } from './siteRoutes';
 
 import { getDatabase } from '#db';
 import type { DatabaseStore, Repositories } from '#db/store';
@@ -12,6 +13,7 @@ import { WG_ENV } from '#server/utils/config';
 let pending: Promise<unknown> = Promise.resolve();
 type ApplyMode = 'sync' | 'start' | 'restart';
 const unapplied = new WeakMap<DatabaseStore, ApplyMode>();
+const siteRoutes = new WeakMap<DatabaseStore, SiteRoutes>();
 
 /** Each caller waits for its own update; a failure must not block later updates. */
 function enqueue<T>(operation: () => Promise<T>) {
@@ -61,10 +63,11 @@ async function apply(mode?: ApplyMode) {
   await fs.writeFile(`/etc/wireguard/${network.name}.conf`, contents, {
     mode: 0o600,
   });
+  let startupTrace: string | undefined;
   if (mode === 'start') {
     await wg.down(network.name).catch(() => {});
     try {
-      await wg.up(network.name);
+      startupTrace = await wg.up(network.name);
     } catch (error) {
       if (
         error instanceof Error &&
@@ -78,10 +81,28 @@ async function apply(mode?: ApplyMode) {
       throw error;
     }
   } else if (mode === 'restart') {
-    await wg.restart(network.name);
+    startupTrace = await wg.restart(network.name);
   }
   await wg.sync(network.name);
   await firewall.rebuildRules(network, clients, defaults, enableIpv6);
+  // The interface is running. A route failure only needs a live retry.
+  unapplied.set(database, 'sync');
+  let routes = siteRoutes.get(database);
+  if (!routes) {
+    routes = new SiteRoutes();
+    siteRoutes.set(database, routes);
+  }
+  await routes.sync(
+    network,
+    clients,
+    enableIpv6,
+    startupTrace === undefined
+      ? undefined
+      : {
+          trace: startupTrace,
+          postUp: /^PostUp = (.*)$/m.exec(contents)![1]!,
+        }
+  );
   unapplied.delete(database);
 }
 
@@ -177,6 +198,7 @@ export function stop() {
     const database = getDatabase();
     const network = await database.interfaces.get();
     await wg.down(network.name).catch(() => {});
+    siteRoutes.delete(database);
     unapplied.delete(database);
   });
 }

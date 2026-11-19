@@ -19,7 +19,7 @@ export const wg = {
   },
 
   up: (infName: string) => {
-    return exec(`${wgExecutable}-quick up ${infName}`);
+    return exec(`${wgExecutable}-quick up ${infName}`, { output: 'stderr' });
   },
 
   down: (infName: string) => {
@@ -28,7 +28,8 @@ export const wg = {
 
   restart: (infName: string) => {
     return exec(
-      `${wgExecutable}-quick down ${infName}; ${wgExecutable}-quick up ${infName}`
+      `${wgExecutable}-quick down ${infName}; ${wgExecutable}-quick up ${infName}`,
+      { output: 'stderr' }
     );
   },
 

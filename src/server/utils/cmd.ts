@@ -6,7 +6,13 @@ const CMD_DEBUG = createDebug('CMD');
 
 export function exec(
   cmd: string,
-  { log }: { log: boolean | string } = { log: true }
+  {
+    log = true,
+    output = 'stdout',
+  }: {
+    log?: boolean | string;
+    output?: 'stdout' | 'stderr';
+  } = {}
 ) {
   if (typeof log === 'string') {
     CMD_DEBUG(`$ ${log}`);
@@ -24,11 +30,11 @@ export function exec(
       {
         shell: 'bash',
       },
-      (err, stdout) => {
+      (err, stdout, stderr) => {
         if (err) {
           return reject(err);
         }
-        return resolve(String(stdout).trim());
+        return resolve(String(output === 'stderr' ? stderr : stdout).trim());
       }
     );
   });
