@@ -758,6 +758,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#docker-and-podman-secrets" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Docker and Podman secrets
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#trusted-proxies" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -1848,6 +1859,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#docker-and-podman-secrets" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Docker and Podman secrets
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#trusted-proxies" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -2068,12 +2090,31 @@
 <p>You will however still see a IPv6 address in the Web UI, but it won't be used.</p>
 <p>This option can be removed in the future, as more devices support IPv6.</p>
 </div>
+<h2 id="docker-and-podman-secrets">Docker and Podman secrets<a class="headerlink" href="#docker-and-podman-secrets" title="Permanent link">&para;</a></h2>
+<p>wg-easy can read OAuth client secrets and the unattended setup password from mounted files. For each credential, set either its environment variable or its <code>_FILE</code> variant. The <code>_FILE</code> value is the path <strong>inside the container</strong>.</p>
+<p>For example, save your Google OAuth client secret in <code>./secrets/google_client_secret</code> next to your Compose file, then merge this snippet into your configuration.</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nt">services</span><span class="p">:</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="nt">wg-easy</span><span class="p">:</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">        </span><span class="nt">environment</span><span class="p">:</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">            </span><span class="nt">OAUTH_PROVIDERS</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">google</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">            </span><span class="nt">OAUTH_GOOGLE_CLIENT_ID</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">your-client-id</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">            </span><span class="nt">OAUTH_GOOGLE_CLIENT_SECRET_FILE</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/run/secrets/google_client_secret</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">        </span><span class="nt">secrets</span><span class="p">:</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">google_client_secret</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="nt">secrets</span><span class="p">:</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">    </span><span class="nt">google_client_secret</span><span class="p">:</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">        </span><span class="nt">file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./secrets/google_client_secret</span>
+</span></code></pre></div>
+<p>wg-easy reads every configured secret file at startup, including files for disabled OAuth providers. Each file must contain valid UTF-8. wg-easy removes one final line ending (LF or CRLF) and preserves all other characters, including spaces.</p>
+<p>Startup fails if both variables are set, the file is unreadable or contains invalid UTF-8, or the resulting secret is empty. The error names the affected variable. Restart wg-easy after rotating an OAuth client secret.</p>
+<p>See <a href=".././external-authentication/#provider-configuration">OAuth provider configuration</a> and <a href=".././unattended-setup/">unattended setup</a> for the supported variable names.</p>
 <h2 id="trusted-proxies">Trusted Proxies<a class="headerlink" href="#trusted-proxies" title="Permanent link">&para;</a></h2>
 <p>Set <code>TRUSTED_PROXIES</code> when wg-easy runs behind a reverse proxy and needs to use
 the public host, protocol, or client IP. Supply a comma-separated list of the
 proxy's source IPv4/IPv6 addresses or CIDRs:</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nt">environment</span><span class="p">:</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">TRUSTED_PROXIES=172.18.0.2,fd00:1234::/64</span>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nt">environment</span><span class="p">:</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">TRUSTED_PROXIES=172.18.0.2,fd00:1234::/64</span>
 </span></code></pre></div>
 <p>Only requests from these addresses may supply <code>X-Forwarded-Host</code>,
 <code>X-Forwarded-Proto</code>, and <code>X-Forwarded-For</code>. The forwarded client IP is used in
@@ -2107,8 +2148,8 @@ origin check. See <a href="../../api/#csrf-protection">CSRF protection</a> for t
 implications and the planned default enforcement in the next major release.</p>
 <h2 id="wireguard-interface">WireGuard Interface<a class="headerlink" href="#wireguard-interface" title="Permanent link">&para;</a></h2>
 <p>Set <code>WG_INTERFACE</code> to specify a custom interface name, useful if you are running multiple wg-easy instances on the same host with <code>network_mode: host</code>:</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nt">environment</span><span class="p">:</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">WG_INTERFACE=wg1</span>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nt">environment</span><span class="p">:</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">WG_INTERFACE=wg1</span>
 </span></code></pre></div>
 
 

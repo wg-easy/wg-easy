@@ -2376,6 +2376,7 @@ both OAuth authorization and callbacks.</p>
 <li><code>https://&lt;your-domain&gt;/api/auth/&lt;provider&gt;/</code></li>
 </ul>
 <h3 id="provider-configuration">Provider Configuration<a class="headerlink" href="#provider-configuration" title="Permanent link">&para;</a></h3>
+<p>For each provider, supply the client ID and choose one source for the client secret. To use a mounted secret file, set the provider's <code>_FILE</code> variable to its path inside the container. See <a href=".././optional-config/#docker-and-podman-secrets">Docker and Podman secrets</a> for a Compose example.</p>
 <h4 id="google">Google<a class="headerlink" href="#google" title="Permanent link">&para;</a></h4>
 <table>
 <thead>
@@ -2392,9 +2393,9 @@ both OAuth authorization and callbacks.</p>
 <td>Google Client ID</td>
 </tr>
 <tr>
-<td><code>OAUTH_GOOGLE_CLIENT_SECRET</code></td>
+<td><code>OAUTH_GOOGLE_CLIENT_SECRET</code> or <code>OAUTH_GOOGLE_CLIENT_SECRET_FILE</code></td>
 <td><img alt="✅" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/2705.svg" title=":white_check_mark:" /></td>
-<td>Google Client Secret</td>
+<td>Google client secret or path to its file</td>
 </tr>
 </tbody>
 </table>
@@ -2404,7 +2405,7 @@ both OAuth authorization and callbacks.</p>
 <li>Go to <a href="https://console.cloud.google.com/apis/credentials">Google Cloud Console</a></li>
 <li>Create an OAuth 2.0 Client ID (Web application)</li>
 <li>Add Authorized redirect URI: See <a href="#redirect-uris">Redirect URIs</a></li>
-<li>Copy the Client ID and Client Secret to the environment variables</li>
+<li>Set <code>OAUTH_GOOGLE_CLIENT_ID</code> and supply the client secret using one of the two variables above.</li>
 </ol>
 <h4 id="github">GitHub<a class="headerlink" href="#github" title="Permanent link">&para;</a></h4>
 <table>
@@ -2422,9 +2423,9 @@ both OAuth authorization and callbacks.</p>
 <td>GitHub Client ID</td>
 </tr>
 <tr>
-<td><code>OAUTH_GITHUB_CLIENT_SECRET</code></td>
+<td><code>OAUTH_GITHUB_CLIENT_SECRET</code> or <code>OAUTH_GITHUB_CLIENT_SECRET_FILE</code></td>
 <td><img alt="✅" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/2705.svg" title=":white_check_mark:" /></td>
-<td>GitHub Client Secret</td>
+<td>GitHub client secret or path to its file</td>
 </tr>
 </tbody>
 </table>
@@ -2435,7 +2436,7 @@ both OAuth authorization and callbacks.</p>
 <li>Create a new OAuth App</li>
 <li>Add Authorization callback URL: See <a href="#redirect-uris">Redirect URIs</a></li>
 <li>Create a new client secret</li>
-<li>Copy the Client ID and Client Secret to the environment variables</li>
+<li>Set <code>OAUTH_GITHUB_CLIENT_ID</code> and supply the client secret using one of the two variables above.</li>
 </ol>
 <h4 id="generic-oidc">Generic OIDC<a class="headerlink" href="#generic-oidc" title="Permanent link">&para;</a></h4>
 <p>This supports generic OIDC providers like Authelia, Authentik, etc.</p>
@@ -2472,11 +2473,11 @@ both OAuth authorization and callbacks.</p>
 <td>OIDC Client ID</td>
 </tr>
 <tr>
-<td><code>OAUTH_OIDC_CLIENT_SECRET</code></td>
+<td><code>OAUTH_OIDC_CLIENT_SECRET</code> or <code>OAUTH_OIDC_CLIENT_SECRET_FILE</code></td>
 <td><img alt="✅" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/2705.svg" title=":white_check_mark:" /></td>
 <td>-</td>
 <td>-</td>
-<td>OIDC Client Secret</td>
+<td>OIDC client secret or path to its file</td>
 </tr>
 <tr>
 <td><code>OAUTH_OIDC_NAME</code></td>

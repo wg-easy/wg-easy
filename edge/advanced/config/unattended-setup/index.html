@@ -1860,7 +1860,7 @@
   <h1>Unattended Setup</h1>
 
 <p>If you want to run the setup without any user interaction, e.g. with a tool like Ansible, you can use these environment variables to configure the setup.</p>
-<p>These will only be used during the first start of the container. After that, the setup will be disabled.</p>
+<p>wg-easy uses these values to configure a new installation on its first start.</p>
 <table>
 <thead>
 <tr>
@@ -1884,9 +1884,9 @@
 <td>1</td>
 </tr>
 <tr>
-<td><code>INIT_PASSWORD</code></td>
-<td><code>Se!ureP%ssw</code></td>
-<td>Sets admin password</td>
+<td><code>INIT_PASSWORD</code> or <code>INIT_PASSWORD_FILE</code></td>
+<td><code>Se!ureP%ssw</code> or <code>/run/secrets/admin_password</code></td>
+<td>Sets the admin password directly or reads it from a file</td>
 <td>1</td>
 </tr>
 <tr>
@@ -1929,13 +1929,13 @@
 </table>
 <div class="admonition warning">
 <p class="admonition-title">Variables have to be used together</p>
-<p>If variables are in the same group, you have to set all of them. For example, if you set <code>INIT_IPV4_CIDR</code>, you also have to set <code>INIT_IPV6_CIDR</code>.</p>
+<p>Supply every setting in a group. For the group 1 password, set exactly one of <code>INIT_PASSWORD</code> and <code>INIT_PASSWORD_FILE</code>. If you set <code>INIT_IPV4_CIDR</code>, you also have to set <code>INIT_IPV6_CIDR</code>.</p>
 <p>If you want to skip the setup process, you have to configure group <code>1</code></p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Security</p>
 <p>The initial username and password is not checked for complexity. Make sure to set a long enough username and password. Otherwise, the user won't be able to log in.</p>
-<p>It's recommended to remove the variables after the setup is done to prevent the password from being exposed.</p>
+<p>Remove the setup variables after setup is complete. If you use <code>INIT_PASSWORD_FILE</code>, remove it from the container configuration when you remove the secret mount. wg-easy reads the file on every startup while the variable is set, even after setup is complete. See <a href=".././optional-config/#docker-and-podman-secrets">Docker and Podman secrets</a> for file handling and a Compose example.</p>
 </div>
 
 
