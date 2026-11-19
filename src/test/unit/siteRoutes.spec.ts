@@ -23,7 +23,8 @@ async function fixture() {
           .filter(([dst]) => containsCidr(dst, args.at(-1)!))
           .map(([dst, entry]) => ({
             ...entry,
-            dst,
+            // iproute2 omits the prefix length for host routes.
+            dst: dst.replace(dst.includes(':') ? /\/128$/ : /\/32$/, ''),
             type: '1',
             metric: args.includes('-6') ? 1024 : 0,
           }))
@@ -89,6 +90,27 @@ describe('Server Allowed IP routes', () => {
       ['del', '2001:db8::/64', '100'],
     ]);
   });
+
+  test.each([
+    ['10.8.0.2', 32],
+    ['fdcc:ad94:bacf:61a4::cafe:2', 128],
+  ] as const)(
+    'keeps the route to peer %s until it is disabled',
+    async (address, length) => {
+      const { store, entries, mutate, setRoutes } = await fixture();
+      const host = `${address}/${length}`;
+      await store.interfaces.update({ routingTable: '100' });
+      await setRoutes([host]);
+      await setRoutes([address]);
+      await setRoutes([]);
+      expect([...entries.keys()]).toEqual([host]);
+      await vpn.commit((tx) => tx.clients.update(1, { enabled: false }));
+      expect(mutate.mock.calls).toEqual([
+        ['add', host, '100'],
+        ['del', host, '100'],
+      ]);
+    }
+  );
 
   test.each(['add', 'del'])(
     'retries a failed %s against the committed state',

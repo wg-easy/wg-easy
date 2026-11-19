@@ -12,8 +12,8 @@ import { WG_ENV } from '#server/utils/config';
 
 let pending: Promise<unknown> = Promise.resolve();
 type ApplyMode = 'sync' | 'start' | 'restart';
-const unapplied = new WeakMap<DatabaseStore, ApplyMode>();
-const siteRoutes = new WeakMap<DatabaseStore, SiteRoutes>();
+type HostState = { routes: SiteRoutes; retry?: ApplyMode };
+const hostStates = new WeakMap<DatabaseStore, HostState>();
 
 /** Each caller waits for its own update; a failure must not block later updates. */
 function enqueue<T>(operation: () => Promise<T>) {
@@ -24,9 +24,14 @@ function enqueue<T>(operation: () => Promise<T>) {
 
 async function apply(mode?: ApplyMode) {
   const database = getDatabase();
-  mode ??= unapplied.get(database) ?? 'sync';
+  let state = hostStates.get(database);
+  if (!state) {
+    state = { routes: new SiteRoutes() };
+    hostStates.set(database, state);
+  }
+  mode ??= state.retry ?? 'sync';
   // Clear only after every host effect succeeds. Maintenance retries failures.
-  unapplied.set(database, mode);
+  state.retry = mode;
   const { network, clients, hooks, defaults } = await database.transaction(
     async (tx) => ({
       network: await tx.interfaces.get(),
@@ -86,13 +91,8 @@ async function apply(mode?: ApplyMode) {
   await wg.sync(network.name);
   await firewall.rebuildRules(network, clients, defaults, enableIpv6);
   // The interface is running. A route failure only needs a live retry.
-  unapplied.set(database, 'sync');
-  let routes = siteRoutes.get(database);
-  if (!routes) {
-    routes = new SiteRoutes();
-    siteRoutes.set(database, routes);
-  }
-  await routes.sync(
+  state.retry = 'sync';
+  await state.routes.sync(
     network,
     clients,
     enableIpv6,
@@ -103,7 +103,7 @@ async function apply(mode?: ApplyMode) {
           postUp: /^PostUp = (.*)$/m.exec(contents)![1]!,
         }
   );
-  unapplied.delete(database);
+  delete state.retry;
 }
 
 /** Commit first; a host failure leaves saved state available for a later retry. */
@@ -143,7 +143,7 @@ export function maintain() {
       }
       return expired.length > 0;
     });
-    if (changed || unapplied.has(database)) {
+    if (changed || hostStates.get(database)?.retry) {
       await apply();
     }
   });
@@ -198,7 +198,6 @@ export function stop() {
     const database = getDatabase();
     const network = await database.interfaces.get();
     await wg.down(network.name).catch(() => {});
-    siteRoutes.delete(database);
-    unapplied.delete(database);
+    hostStates.delete(database);
   });
 }
