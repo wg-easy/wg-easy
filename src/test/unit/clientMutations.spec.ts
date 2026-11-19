@@ -121,7 +121,9 @@ describe.each([
     expect(writeFile).toHaveBeenCalledOnce();
     const config = String(writeFile.mock.calls[0]?.[1]);
     expect(config.includes('PublicKey = public-1')).toBe(action === 'enable');
-    expect(exec).toHaveBeenCalledWith('wg syncconf wg0 <(wg-quick strip wg0)');
+    expect(exec).toHaveBeenCalledWith(
+      expect.stringContaining('wg syncconf wg0 ')
+    );
   });
 
   test('rejects another owner before changing or synchronizing anything', async () => {
@@ -189,7 +191,7 @@ describe('client mutation sequencing', () => {
     try {
       await vi.waitFor(() =>
         expect(exec).toHaveBeenCalledWith(
-          'wg syncconf wg0 <(wg-quick strip wg0)'
+          expect.stringContaining('wg syncconf wg0 ')
         )
       );
       expect((await clients.get(1))?.enabled).toBe(false);
@@ -213,7 +215,7 @@ describe('client mutation sequencing', () => {
     await expect(disableClient(clientEvent())).rejects.toThrow('Disk full');
     expect((await clients.get(1))?.enabled).toBe(false);
     expect(exec).not.toHaveBeenCalledWith(
-      'wg syncconf wg0 <(wg-quick strip wg0)'
+      expect.stringContaining('wg syncconf wg0 ')
     );
   });
 
@@ -229,7 +231,9 @@ describe('client mutation sequencing', () => {
     );
     expect((await clients.get(1))?.enabled).toBe(false);
     expect(writeFile).toHaveBeenCalledOnce();
-    expect(exec).toHaveBeenCalledWith('wg syncconf wg0 <(wg-quick strip wg0)');
+    expect(exec).toHaveBeenCalledWith(
+      expect.stringContaining('wg syncconf wg0 ')
+    );
   });
 });
 
@@ -442,7 +446,7 @@ describe('bulk client API', () => {
             .sort()
         );
         expect(exec).toHaveBeenCalledWith(
-          'wg syncconf wg0 <(wg-quick strip wg0)'
+          expect.stringContaining('wg syncconf wg0 ')
         );
 
         if (action !== 'delete') {

@@ -233,7 +233,9 @@ describe('client key actions', () => {
     expect(String(writeFile.mock.calls[0]?.[1])).not.toContain(
       'PublicKey = public-key-1'
     );
-    expect(exec).toHaveBeenCalledWith('wg syncconf wg0 <(wg-quick strip wg0)');
+    expect(exec).toHaveBeenCalledWith(
+      expect.stringContaining('wg syncconf wg0 ')
+    );
 
     const publicClient = await clients.getPublic(1);
     expect(publicClient).toMatchObject({

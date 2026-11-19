@@ -33,8 +33,13 @@ export const wg = {
   },
 
   sync: (infName: string) => {
+    // wg-quick's automatic routing mark exists only on the live interface.
+    // Supply it as an interface setting in the same update as the peers.
     return exec(
-      `${wgExecutable} syncconf ${infName} <(${wgExecutable}-quick strip ${infName})`
+      `fwmark=$(${wgExecutable} show ${infName} fwmark) && ` +
+        `config=$(${wgExecutable}-quick strip ${infName}) && ` +
+        `printf '%s\\n' '[Interface]' "FwMark = $fwmark" "$config" | ` +
+        `${wgExecutable} syncconf ${infName} /dev/stdin`
     );
   },
 
