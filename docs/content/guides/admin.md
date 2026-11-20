@@ -2,7 +2,7 @@
 title: Admin Panel
 ---
 
-Open the user menu in the top-right corner and select **Admin Panel**. Choose **General**, **Config**, **Interface**, or **Hooks** in the sidebar. Use **Save** to apply form changes and **Revert** to discard unsaved changes.
+Open the user menu in the top-right corner and select **Admin Panel**. Choose **General**, **Config**, **Interface**, **Hooks**, or **Tags** in the sidebar. Use **Save** to apply form changes and **Revert** to discard unsaved changes.
 
 ## General Settings
 
@@ -97,3 +97,11 @@ Filtering covers forwarded traffic and traffic addressed to the VPN server itsel
 - **PostDown**: After the interface stops.
 
 The default hooks set up forwarding and NAT. Templates can use `{{ipv4Cidr}}`, `{{ipv6Cidr}}`, `{{device}}`, `{{interface}}`, `{{port}}`, and `{{uiPort}}`, which are replaced with the current server settings. CIDR placeholders use the network address, so `10.8.0.15/24` becomes `10.8.0.0/24` in hooks. Saved hooks run at the corresponding interface lifecycle event. Hooks on an individual client's page instead run on that client device.
+
+## Tags
+
+**Tags** lists the tags available for organizing clients. Use **New Tag** to add one with a name and an optional description; names must be unique.
+
+Edit a tag to rename it, change its description, or assign it to clients. Checking or unchecking a client in the **Clients** list applies immediately; **Save** only applies the name and description. Deleting a tag removes it from every client.
+
+Tags can also be assigned from each client's page; see [Clients → General](./clients.md#general). The client API accepts `tagId` and `tagName` query parameters to list only clients carrying any of the given tags.

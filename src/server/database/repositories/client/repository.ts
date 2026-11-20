@@ -9,7 +9,10 @@ import {
   isNull,
   gt,
   lte,
+  type SQL,
 } from 'drizzle-orm';
+
+import { clientTag, tag } from '../tag/schema';
 
 import { client } from './schema';
 
@@ -17,6 +20,42 @@ import type { ClientQueryType } from '#shared/contracts/client';
 import type { DBExecutor } from '#db/types';
 
 const publicColumns = { privateKey: false, preSharedKey: false } as const;
+const withTags = { clientTags: { with: { tag: true } } } as const;
+
+function flattenTags<
+  T extends { clientTags: { tag: typeof tag.$inferSelect }[] },
+>({ clientTags, ...row }: T) {
+  return { ...row, tags: clientTags.map(({ tag }) => tag) };
+}
+
+/**
+ * Matches clients carrying any of the given tags (by id or by name).
+ *
+ * The explicit return type keeps the inferred `/api/client` response type
+ * shallow; inferring it pushes Nitro's typed `$fetch` past TS2321.
+ */
+function tagFilter(
+  db: DBExecutor,
+  { tagId, tagName }: Pick<ClientQueryType, 'tagId' | 'tagName'>
+): SQL | undefined {
+  const matches = [
+    tagId?.length ? inArray(clientTag.tagId, tagId) : undefined,
+    tagName?.length ? inArray(tag.name, tagName) : undefined,
+  ].filter((match) => match !== undefined);
+
+  if (matches.length === 0) {
+    return undefined;
+  }
+
+  return inArray(
+    client.id,
+    db
+      .select({ id: clientTag.clientId })
+      .from(clientTag)
+      .innerJoin(tag, eq(clientTag.tagId, tag.id))
+      .where(or(...matches))
+  );
+}
 
 function withTimestamps<T extends { createdAt: string; updatedAt: string }>(
   row: T
@@ -30,6 +69,7 @@ function withTimestamps<T extends { createdAt: string; updatedAt: string }>(
 }
 
 function clientFilter(
+  db: DBExecutor,
   query: ClientQueryType,
   onlinePublicKeys: string[],
   now: number
@@ -68,7 +108,8 @@ function clientFilter(
           like(client.ipv6Address, pattern)
         ),
     statusFilters[query.status ?? 'all'],
-    expiryFilters[query.expiry ?? 'all']
+    expiryFilters[query.expiry ?? 'all'],
+    tagFilter(db, query)
   );
 }
 
@@ -109,7 +150,7 @@ export class ClientRepository {
   ) {
     const where = and(
       userId === undefined ? undefined : eq(client.userId, userId),
-      clientFilter(query, onlinePublicKeys, now)
+      clientFilter(this.db, query, onlinePublicKeys, now)
     );
     return this.db.transaction(async (tx) => {
       const total = await tx.$count(client, where);
@@ -119,7 +160,7 @@ export class ClientRepository {
       );
       const result = await tx.query.client.findMany({
         where,
-        with: { oneTimeLink: true },
+        with: { oneTimeLink: true, ...withTags },
         columns: publicColumns,
         orderBy: (t, { asc, desc }) => {
           const order = query.sort === 'desc' ? desc : asc;
@@ -150,7 +191,7 @@ export class ClientRepository {
       });
 
       return {
-        clients: result.map(withTimestamps),
+        clients: result.map((row) => withTimestamps(flattenTags(row))),
         total,
         page,
         pageSize: query.pageSize,
@@ -172,6 +213,7 @@ export class ClientRepository {
     const result = await this.db.query.client.findFirst({
       where: eq(client.id, id),
       columns: publicColumns,
+      with: withTags,
       extras: {
         hasPreSharedKey: sql<number>`${client.preSharedKey} IS NOT NULL`.as(
           'has_pre_shared_key'
@@ -182,7 +224,10 @@ export class ClientRepository {
       return undefined;
     }
 
-    return { ...result, hasPreSharedKey: Boolean(result.hasPreSharedKey) };
+    return {
+      ...flattenTags(result),
+      hasPreSharedKey: Boolean(result.hasPreSharedKey),
+    };
   }
 
   async insert(data: typeof client.$inferInsert) {

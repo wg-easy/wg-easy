@@ -24,6 +24,16 @@
               v-model="data.name"
               :label="$t('common.fields.name')"
             />
+            <FormNullTextField
+              id="description"
+              v-model="data.description"
+              :label="$t('common.fields.description')"
+            />
+            <FormTagsField
+              id="tags"
+              v-model="tagIds"
+              :label="$t('clients.fields.tags.label')"
+            />
             <FormSwitchField
               id="enabled"
               v-model="data.enabled"
@@ -334,6 +344,7 @@ const { data: _data, refresh } = await useFetch(`/api/client/${id}`, {
   method: 'get',
 });
 const data = toRef(_data.value);
+const tagIds = ref<number[]>(data.value?.tags.map((tag) => tag.id) ?? []);
 const keyActionPending = ref(false);
 const { t } = useI18n();
 
@@ -388,12 +399,13 @@ const _submit = useSubmit(
 );
 
 function submit() {
-  return _submit(data.value);
+  return _submit({ ...data.value, tagIds: tagIds.value });
 }
 
 async function revert() {
   await refresh();
   data.value = toRef(_data.value).value;
+  tagIds.value = data.value?.tags.map((tag) => tag.id) ?? [];
 }
 
 const _deleteClient = useSubmit(
