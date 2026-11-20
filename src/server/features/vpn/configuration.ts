@@ -1,7 +1,7 @@
 import { normalizeCidr, parseCidr } from 'cidr-tools';
 
 import { formatEndpoint } from '#server/utils/endpoint';
-import { getGatewayAddress } from '#server/utils/ip';
+import { getGatewayAddress, normalizePrefix } from '#server/utils/ip';
 import type { ClientType } from '#db/repositories/client/types';
 import type { InterfaceType } from '#db/repositories/interface/types';
 import type { UserConfigType } from '#db/repositories/userConfig/types';
@@ -12,13 +12,15 @@ type Options = {
   amnezia?: boolean;
   uiPort?: string;
 };
+type ServerOptions = Options & { managedSites?: ReadonlySet<string> };
+type ServerPeer = Omit<ClientType, 'createdAt' | 'updatedAt'>;
 
 /** The complete server file, including enabled peers and its final newline. */
 export function generateServerConfig(
   network: InterfaceType,
   hooks: HooksType,
-  clients: Omit<ClientType, 'createdAt' | 'updatedAt'>[],
-  options: Options = {}
+  clients: ServerPeer[],
+  options: ServerOptions = {}
 ) {
   return [
     generateServerInterface(network, hooks, options),
@@ -29,31 +31,77 @@ export function generateServerConfig(
   ].join('\n\n');
 }
 
+/** wg-quick owns tunnel addresses and default routes. Ordinary site routes are
+ * installed after the complete peer configuration is synced, before PostUp. */
+export function generateStartupConfig(
+  network: InterfaceType,
+  hooks: HooksType,
+  clients: ServerPeer[],
+  options: Options
+) {
+  if (network.routingTable === 'off') {
+    return;
+  }
+  const managedSites = managedSitePrefixes(clients, options.enableIpv6 ?? true);
+  if (!managedSites.size) {
+    return;
+  }
+  return {
+    contents: generateServerConfig(network, { ...hooks, postUp: '' }, clients, {
+      ...options,
+      managedSites,
+    }),
+    postUp: iptablesTemplate(hooks.postUp, network, options.uiPort ?? '51821'),
+  };
+}
+
+export function managedSitePrefixes(
+  clients: Pick<ClientType, 'enabled' | 'serverAllowedIps'>[],
+  enableIpv6: boolean
+) {
+  return new Set(
+    clients
+      .filter((client) => client.enabled)
+      .flatMap((client) => serverAllowedIps(client, enableIpv6))
+      .map(normalizePrefix)
+      .filter((prefix) => !prefix.endsWith('/0'))
+  );
+}
+
+function serverAllowedIps(
+  client: Pick<ClientType, 'serverAllowedIps'>,
+  enableIpv6: boolean
+) {
+  return (client.serverAllowedIps ?? []).filter(
+    (prefix) => enableIpv6 || !prefix.includes(':')
+  );
+}
+
 // WireGuard uses an all-zero key to explicitly clear the active peer's preshared key.
 const unsetPreSharedKey = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=';
 
-function generateServerPeer(
-  client: Omit<ClientType, 'createdAt' | 'updatedAt'>,
-  options: Options = {}
-) {
+function generateServerPeer(client: ServerPeer, options: ServerOptions = {}) {
   const { enableIpv6 = true } = options;
 
   const allowedIps = [
     `${client.ipv4Address}/32`,
     ...(enableIpv6 ? [`${client.ipv6Address}/128`] : []),
-    ...(client.serverAllowedIps ?? []),
+    ...serverAllowedIps(client, enableIpv6),
+  ].filter((prefix) => !options.managedSites?.has(normalizePrefix(prefix)));
+
+  const lines = [
+    `# Client: ${client.name} (${client.id})`,
+    '[Peer]',
+    `PublicKey = ${client.publicKey}`,
+    `PresharedKey = ${client.preSharedKey ?? unsetPreSharedKey}`,
   ];
-
-  const extraLines = [];
-  if (client.serverEndpoint) {
-    extraLines.push(`Endpoint = ${client.serverEndpoint}`);
+  if (allowedIps.length) {
+    lines.push(`AllowedIPs = ${allowedIps.join(', ')}`);
   }
-
-  return `# Client: ${client.name} (${client.id})
-[Peer]
-PublicKey = ${client.publicKey}
-PresharedKey = ${client.preSharedKey ?? unsetPreSharedKey}
-AllowedIPs = ${allowedIps.join(', ')}${extraLines.length ? `\n${extraLines.join('\n')}` : ''}`;
+  if (client.serverEndpoint) {
+    lines.push(`Endpoint = ${client.serverEndpoint}`);
+  }
+  return lines.join('\n');
 }
 
 function generateServerInterface(

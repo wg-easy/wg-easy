@@ -11,10 +11,10 @@ function serverAllowedIps(page: Page) {
   });
 }
 
-async function addSiteSubnet(page: Page) {
+async function addSiteSubnet(page: Page, prefix = siteSubnet) {
   const routes = serverAllowedIps(page);
   await routes.getByRole('button', { name: 'Add' }).click();
-  await routes.getByRole('textbox').fill(siteSubnet);
+  await routes.getByRole('textbox').last().fill(prefix);
 }
 
 test('a downloaded configuration carries traffic only while the client is enabled', async ({
@@ -105,7 +105,10 @@ test('reports a route conflict and withdraws the site route after a restart', as
   const save = page.getByRole('button', { name: 'Save', exact: true });
   await save.click();
   await expect(
-    page.getByText(`Settings saved. Could not install ${siteSubnet}`)
+    page
+      .getByRole('region', { name: /Notifications/ })
+      .getByRole('listitem')
+      .getByText(`Settings saved. Could not install ${siteSubnet}`)
   ).toBeVisible();
   expect(await readRoute()).toContain('dev eth0');
   await app.execServer(['ip', 'route', 'del', siteSubnet, 'dev', 'eth0']);
@@ -119,4 +122,68 @@ test('reports a route conflict and withdraws the site route after a restart', as
   expect(await readRoute()).toContain('dev wg0');
   await card.getByRole('switch', { name: 'Disable Client' }).click();
   await expect.poll(readRoute).toBe('');
+});
+
+test('starts with a site conflict, preserves hook and backup routes, and retries live', async ({
+  page,
+  app,
+}) => {
+  test.slow(); // Exercise the real one-minute maintenance timer.
+  await login(page);
+  const healthy = await createClient(page, 'Healthy peer');
+  const peerConfig = (await downloadConfiguration(page, healthy)).contents;
+  const site = await createClient(page, 'Office LAN');
+  await site.getByRole('link', { name: 'Office LAN', exact: true }).click();
+  const backup = '192.0.2.0/24';
+  const manual = '10.8.0.77/32';
+  const ipv6 = '2001:db8:42::/64';
+  for (const prefix of [siteSubnet, backup, manual, ipv6]) {
+    await addSiteSubnet(page, prefix);
+  }
+  await page.getByRole('button', { name: 'Save', exact: true }).click();
+  await expect(page).toHaveURL(app.url + '/');
+
+  const saved = await page.request.post(app.url + '/api/admin/hooks', {
+    headers: { Origin: app.url },
+    data: {
+      preUp: `ip route replace ${siteSubnet} dev eth0; ip route replace ${backup} dev eth0 metric 500`,
+      postUp: `ip route get 192.0.2.1 | grep -q "dev %i"; ip -4 route add ${manual} dev %i # office`,
+      preDown: '',
+      postDown: '',
+    },
+  });
+  expect(saved.ok()).toBe(true);
+
+  await page.goto('about:blank');
+  const url = await app.restart();
+  await page.context().clearCookies();
+  await login(page, url + '/login');
+  await app.connectClient(peerConfig);
+  await expect.poll(() => app.pingFromClient('10.8.0.1')).toBe(true);
+
+  const read = (prefix: string) =>
+    app.execServer(['ip', '-4', 'route', 'show', 'exact', prefix]);
+  expect(await read(siteSubnet)).toContain('dev eth0');
+  expect(await read(backup)).toContain('dev wg0');
+  expect(await read(backup)).toContain('metric 500');
+  expect(await read(manual)).toContain('dev wg0');
+  expect(
+    await app.execServer(['wg', 'show', 'wg0', 'allowed-ips'])
+  ).not.toContain(ipv6);
+  expect(
+    await app.execServer(['ip', '-6', 'route', 'show', 'exact', ipv6])
+  ).toBe('');
+
+  const ifindex = () => app.execServer(['cat', '/sys/class/net/wg0/ifindex']);
+  const before = await ifindex();
+  await app.execServer(['ip', 'route', 'del', siteSubnet, 'dev', 'eth0']);
+  await expect
+    .poll(() => read(siteSubnet), { timeout: 75_000, intervals: [1000] })
+    .toContain('dev wg0');
+  expect(await ifindex()).toBe(before);
+  await site.getByRole('switch', { name: 'Disable Client' }).click();
+  await expect.poll(() => read(siteSubnet)).toBe('');
+  expect(await read(backup)).not.toContain('dev wg0');
+  expect(await read(backup)).toContain('metric 500');
+  expect(await read(manual)).toContain('dev wg0');
 });

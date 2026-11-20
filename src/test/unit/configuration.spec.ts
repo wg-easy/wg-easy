@@ -4,6 +4,7 @@ import { databaseFixture } from '../helpers/database';
 
 import {
   generateServerConfig,
+  generateStartupConfig,
   generateClientConfig,
 } from '#server/features/vpn/configuration';
 import { roles } from '#shared/utils/permissions';
@@ -138,4 +139,39 @@ test('assembles only enabled peers and formats IPv4-only hooks and defaults', as
   expect(
     generateClientConfig(network, defaults, { ...client, dns: [] })
   ).not.toMatch(/^DNS =/m);
+});
+
+test('stages only enabled route families and leaves default routes to wg-quick', async () => {
+  const { network, hooks, client } = await fixture();
+  const peers = [
+    {
+      ...client,
+      serverAllowedIps: [
+        '0.0.0.0/0',
+        '::/0',
+        '192.0.2.7/24',
+        '2001:db8::/64',
+        client.ipv4Address,
+      ],
+    },
+  ];
+  const startup = generateStartupConfig(network, hooks, peers, {
+    enableIpv6: false,
+  });
+  expect(startup?.contents).toContain('AllowedIPs = 0.0.0.0/0\n');
+  expect(startup?.contents).not.toContain('2001:db8');
+  const full = generateServerConfig(network, hooks, peers, {
+    enableIpv6: false,
+  });
+  expect(full).toContain('192.0.2.7/24');
+  expect(full).not.toContain('2001:db8');
+  expect(full).not.toContain('::/0');
+  const ipv6 = generateStartupConfig(network, hooks, peers, {
+    enableIpv6: true,
+  });
+  expect(ipv6?.contents).toContain('0.0.0.0/0, ::/0');
+  expect(ipv6?.contents).not.toContain('2001:db8::/64');
+  expect(
+    generateStartupConfig({ ...network, routingTable: 'off' }, hooks, peers, {})
+  ).toBeUndefined();
 });

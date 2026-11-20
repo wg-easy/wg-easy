@@ -1,7 +1,27 @@
+import fs from 'node:fs/promises';
+
 import { exec } from '#server/utils/cmd';
 import { WG_ENV } from '#server/utils/config';
+import { parseInterfaceName } from '#server/utils/interfaceName';
 
 const wgExecutable = WG_ENV.WG_EXECUTABLE;
+
+async function up(infName: string, startupConfig?: string) {
+  const name = parseInterfaceName(infName);
+  if (startupConfig === undefined) {
+    return exec(`${wgExecutable}-quick up ${name}`);
+  }
+  // wg-quick derives the interface name from the filename. Keep the complete
+  // configuration in /etc/wireguard for syncconf, shutdown and external tools.
+  const dir = await fs.mkdtemp('/tmp/wg-easy-up-');
+  try {
+    const path = `${dir}/${name}.conf`;
+    await fs.writeFile(path, startupConfig, { mode: 0o600 });
+    return await exec(`${wgExecutable}-quick up ${path}`);
+  } finally {
+    await fs.rm(dir, { recursive: true, force: true });
+  }
+}
 
 export const wg = {
   generatePrivateKey: () => {
@@ -18,18 +38,33 @@ export const wg = {
     return exec(`${wgExecutable} genpsk`);
   },
 
-  up: (infName: string) => {
-    return exec(`${wgExecutable}-quick up ${infName}`, { output: 'stderr' });
-  },
+  up,
 
   down: (infName: string) => {
     return exec(`${wgExecutable}-quick down ${infName}`);
   },
 
-  restart: (infName: string) => {
+  restart: async (infName: string, startupConfig?: string) => {
+    await wg.down(infName).catch(() => {});
+    return up(infName, startupConfig);
+  },
+
+  postUp: (infName: string, table: string, hook: string) => {
+    const name = parseInterfaceName(infName);
+    // awg-quick strips config comments before handing the hook to Bash.
+    const script = wgExecutable === 'awg' ? hook.split('#', 1)[0]! : hook;
     return exec(
-      `${wgExecutable}-quick down ${infName}; ${wgExecutable}-quick up ${infName}`,
-      { output: 'stderr' }
+      `set -eo pipefail\nshopt -s extglob\n${script.replaceAll('%i', name)}`,
+      {
+        log: false,
+        env: {
+          ...process.env,
+          LC_ALL: 'C',
+          INTERFACE: name,
+          CONFIG_FILE: `/etc/wireguard/${name}.conf`,
+          TABLE: table,
+        },
+      }
     );
   },
 

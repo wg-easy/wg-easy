@@ -376,7 +376,7 @@ describe('VPN operations', () => {
     expect(writeConfiguration.mock.calls[0]?.[1]).toContain(
       'PrivateKey = new-private'
     );
-    expect(commands.up).toHaveBeenCalledWith('wg0');
+    expect(commands.up).toHaveBeenCalledWith('wg0', undefined);
     expect(firewall.rebuildRules).toHaveBeenCalledOnce();
     await vpn.stop();
     expect(commands.down).toHaveBeenCalledTimes(2);

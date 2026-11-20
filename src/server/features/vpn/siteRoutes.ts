@@ -1,19 +1,19 @@
 import { createError } from 'nuxt/server';
 import { parseCidr } from 'cidr-tools';
-import { stringifyIp } from 'ip-bigint';
+
+import { managedSitePrefixes } from './configuration';
 
 import { exec } from '#server/utils/cmd';
+import { normalizePrefix } from '#server/utils/ip';
 import { parseInterfaceName } from '#server/utils/interfaceName';
 import type { ClientType } from '#db/repositories/client/types';
 import type { InterfaceType } from '#db/repositories/interface/types';
 
 type SiteRoute = { prefix: string; table: number };
-type InstalledRoute = SiteRoute & { protocol: number };
 type RouteClient = Pick<
   ClientType,
   'enabled' | 'serverAllowedIps' | 'ipv4Address' | 'ipv6Address'
 >;
-type Startup = { trace: string; postUp: string };
 type KernelRoute = {
   dst: string;
   dev?: string;
@@ -24,22 +24,11 @@ type KernelRoute = {
   metric?: number;
 };
 
-// An application-specific Linux route protocol distinguishes live additions from
-// admin routes. wg-quick creates its ordinary routes with RTPROT_BOOT (3).
+// Tag every site route installed by wg-easy, including during startup.
 const siteProtocol = 242;
-const bootProtocol = 3;
 
 function routeKey({ prefix, table }: SiteRoute) {
   return `${table}/${prefix}`;
-}
-
-function canonicalPrefix(value: string) {
-  if (value.includes('%')) {
-    throw new Error('Site routes cannot include an IPv6 zone ID');
-  }
-  // Always use the network address and an explicit mask, even for host routes.
-  const { start, version, prefix } = parseCidr(value);
-  return `${stringifyIp({ number: start, version }, { hexify: true })}/${prefix}`;
 }
 
 function routingTable(setting: string) {
@@ -58,26 +47,19 @@ class RouteConflict extends Error {}
 
 export class SiteRoutes {
   // A matching route on wg0 alone is insufficient proof of ownership.
-  private owned = new Map<string, InstalledRoute>();
+  private owned = new Map<string, SiteRoute>();
 
   async sync(
     network: InterfaceType,
     clients: RouteClient[],
-    enableIpv6: boolean,
-    startup?: Startup
+    enableIpv6: boolean
   ) {
     const device = parseInterfaceName(network.name);
-    if (startup) {
-      this.owned.clear();
-    }
     const desired = this.desiredRoutes(
       network.routingTable,
       clients,
       enableIpv6
     );
-    if (startup && desired.size) {
-      this.recordStartupRoutes(device, desired, startup);
-    }
 
     let failure;
     // Process each prefix even if another client has a conflicting route.
@@ -102,9 +84,7 @@ export class SiteRoutes {
         });
       }
     }
-    if (failure) {
-      throw failure;
-    }
+    return failure;
   }
 
   private desiredRoutes(
@@ -113,69 +93,33 @@ export class SiteRoutes {
     enableIpv6: boolean
   ) {
     const desired = new Map<string, SiteRoute>();
-    const enabled = clients.filter((client) => client.enabled);
-    const sites = new Set(
-      enabled.flatMap((client) => client.serverAllowedIps ?? [])
-    );
-    if (setting === 'off' || (!sites.size && !this.owned.size)) {
+    if (setting === 'off') {
+      return desired;
+    }
+    const sites = managedSitePrefixes(clients, enableIpv6);
+    if (!sites.size && !this.owned.size) {
       return desired;
     }
     const table = routingTable(setting);
     // An enabled peer's tunnel address can keep an existing site route alive.
     const addresses = this.owned.size
-      ? enabled.flatMap((client) => [client.ipv4Address, client.ipv6Address])
+      ? clients
+          .filter((client) => client.enabled)
+          .flatMap((client) =>
+            enableIpv6
+              ? [client.ipv4Address, client.ipv6Address]
+              : [client.ipv4Address]
+          )
+          .map(normalizePrefix)
       : [];
-    for (const value of [...sites, ...addresses]) {
-      if (!enableIpv6 && value.includes(':')) {
-        continue;
-      }
-      const prefix = canonicalPrefix(value);
+    for (const prefix of [...sites, ...addresses]) {
       const route = { prefix, table };
       const key = routeKey(route);
-      if (!prefix.endsWith('/0') && (sites.has(value) || this.owned.has(key))) {
+      if (sites.has(prefix) || this.owned.has(key)) {
         desired.set(key, route);
       }
     }
     return desired;
-  }
-
-  private recordStartupRoutes(
-    device: string,
-    desired: Map<string, SiteRoute>,
-    startup: Startup
-  ) {
-    // wg-quick reports each route it actually added. Exclude user hooks and
-    // skipped/connected routes, even when they exactly match a desired prefix.
-    const lines = startup.trace.split('\n');
-    const up = lines.findIndex(
-      (line) =>
-        /^\[#\] ip link set mtu \d+ up dev /.test(line) &&
-        line.endsWith(` dev ${device}`)
-    );
-    if (up < 0) {
-      return;
-    }
-    const postUp = `[#] ${startup.postUp.trim().replaceAll('%i', device)}`;
-    for (const line of lines.slice(up + 1)) {
-      if (line === postUp) {
-        break;
-      }
-      const [, destination, dev, table = 'auto'] =
-        /^\[#\] ip -[46] route add ([\da-f.:/]+) dev ([\w=+.-]+)(?: table (\d+))?$/.exec(
-          line
-        ) ?? [];
-      if (!destination || dev !== device) {
-        continue;
-      }
-      const key = routeKey({
-        prefix: canonicalPrefix(destination),
-        table: routingTable(table),
-      });
-      const route = desired.get(key);
-      if (route) {
-        this.owned.set(key, { ...route, protocol: bootProtocol });
-      }
-    }
   }
 
   private async applyRoute(
@@ -202,14 +146,14 @@ export class SiteRoutes {
     const exact = byLength.get(Number(parseCidr(prefix).prefix)) ?? [];
     const direct = (entry: KernelRoute) =>
       entry.dev === device && entry.type === '1' && !entry.gateway;
-    const owned = this.owned.get(key);
+
     const metric = ipv6 ? 1024 : 0;
     const installed =
-      owned &&
+      this.owned.has(key) &&
       exact.some(
         (entry) =>
           direct(entry) &&
-          Number(entry.protocol) === owned.protocol &&
+          Number(entry.protocol) === siteProtocol &&
           (entry.metric ?? 0) === metric
       );
     if (!installed) {
@@ -219,23 +163,29 @@ export class SiteRoutes {
     if (action === 'remove') {
       if (installed) {
         await exec(
-          `${ip} route del ${target} proto ${owned.protocol} metric ${metric}`
+          `${ip} route del ${target} proto ${siteProtocol} metric ${metric}`
         );
         this.owned.delete(key);
       }
       return;
     }
-    if (exact.length) {
-      if (!exact.every(direct)) {
-        throw new RouteConflict();
-      }
+    // Linux selects the longest prefix first, then the lowest metric.
+    const best = byLength.get(Math.max(...byLength.keys())) ?? [];
+    const bestMetric = Math.min(...best.map((entry) => entry.metric ?? 0));
+    const preferred = best.filter(
+      (entry) => (entry.metric ?? 0) === bestMetric
+    );
+    if (
+      preferred.length &&
+      (exact.length || automatic) &&
+      preferred.every(direct)
+    ) {
       return;
     }
-    const best = byLength.get(Math.max(...byLength.keys()));
-    if (automatic && best?.every(direct)) {
-      return;
+    if (exact.length && bestMetric <= metric) {
+      throw new RouteConflict();
     }
     await exec(`${ip} route add ${target} proto ${siteProtocol}`);
-    this.owned.set(key, { ...route, protocol: siteProtocol });
+    this.owned.set(key, route);
   }
 }

@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises';
 
 import { isExpired } from './policies';
-import { generateServerConfig } from './configuration';
+import { generateServerConfig, generateStartupConfig } from './configuration';
 import { SiteRoutes } from './siteRoutes';
 
 import { getDatabase } from '#db';
@@ -59,20 +59,24 @@ async function apply(mode?: ApplyMode) {
       }
     }
   }
-  const contents = generateServerConfig(network, hooks, clients, {
+  const options = {
     enableIpv6,
     amnezia: WG_ENV.WG_EXECUTABLE === 'awg',
     uiPort: WG_ENV.PORT,
-  });
+  };
+  const contents = generateServerConfig(network, hooks, clients, options);
+  const startup =
+    mode === 'sync'
+      ? undefined
+      : generateStartupConfig(network, hooks, clients, options);
 
   await fs.writeFile(`/etc/wireguard/${network.name}.conf`, contents, {
     mode: 0o600,
   });
-  let startupTrace: string | undefined;
   if (mode === 'start') {
     await wg.down(network.name).catch(() => {});
     try {
-      startupTrace = await wg.up(network.name);
+      await wg.up(network.name, startup?.contents);
     } catch (error) {
       if (
         error instanceof Error &&
@@ -86,23 +90,35 @@ async function apply(mode?: ApplyMode) {
       throw error;
     }
   } else if (mode === 'restart') {
-    startupTrace = await wg.restart(network.name);
+    await wg.restart(network.name, startup?.contents);
+  }
+  if (mode !== 'sync') {
+    state.routes = new SiteRoutes();
   }
   await wg.sync(network.name);
+  if (startup?.postUp) {
+    // PostUp may use a site route, or supply one itself. Apply available
+    // routes first, then check the final kernel state after the hook.
+    await state.routes.sync(network, clients, enableIpv6);
+    try {
+      await wg.postUp(network.name, network.routingTable, startup.postUp);
+    } catch (error) {
+      await wg.down(network.name).catch(() => {});
+      throw error;
+    }
+  }
   await firewall.rebuildRules(network, clients, defaults, enableIpv6);
   // The interface is running. A route failure only needs a live retry.
   state.retry = 'sync';
-  await state.routes.sync(
-    network,
-    clients,
-    enableIpv6,
-    startupTrace === undefined
-      ? undefined
-      : {
-          trace: startupTrace,
-          postUp: /^PostUp = (.*)$/m.exec(contents)![1]!,
-        }
-  );
+  const error = await state.routes.sync(network, clients, enableIpv6);
+  if (error) {
+    if (mode !== 'start') {
+      throw error;
+    }
+    // The maintenance timer starts after this returns. Keep healthy peers up.
+    console.error('Could not apply all VPN site routes at startup:', error);
+    return;
+  }
   delete state.retry;
 }
 

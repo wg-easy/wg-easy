@@ -153,27 +153,51 @@ describe('Server Allowed IP routes', () => {
   });
 
   test.each(['start', 'restart'] as const)(
-    'withdraws only routes installed by wg-quick on %s',
+    'installs site routes before PostUp and preserves routes created by the hook on %s',
     async (mode) => {
       const { store, entries, mutate, wg, setRoutes } = await fixture();
-      const manual = '192.0.2.0/24';
+      const manual = '10.8.0.7/32';
+      entries.set('10.8.0.0/24', { dev: 'wg0', table: '254', protocol: '2' });
       await store.clients.update(1, { serverAllowedIps: [prefix, manual] });
-      const hook = `ip -4 route add ${manual} dev %i`;
+      const hook = `ip -4 route add ${manual} dev %i # office`;
       await store.hooks.update({ postUp: hook });
-      for (const dst of [manual, prefix]) {
-        entries.set(dst, { dev: 'wg0', table: '254', protocol: '3' });
-      }
-      wg[mode === 'start' ? 'up' : 'restart'].mockResolvedValue(
-        [
-          '[#] ip link set mtu 1420 up dev wg0',
-          `[#] ip -4 route add ${prefix} dev wg0`,
-          '[#] ' + hook.replace('%i', 'wg0'),
-        ].join('\n')
-      );
+      wg.postUp.mockImplementation(async () => {
+        expect(entries.get(prefix)?.protocol).toBe('242');
+        entries.set(manual, { dev: 'wg0', table: '254', protocol: '3' });
+        return '';
+      });
       await vpn[mode]();
+      const bootConfig =
+        wg[mode === 'start' ? 'up' : 'restart'].mock.lastCall?.[1];
+      expect(bootConfig).toContain('AllowedIPs = 10.8.0.2/32');
+      expect(bootConfig).not.toContain(prefix);
+      expect(wg.postUp).toHaveBeenCalledExactlyOnceWith('wg0', 'auto', hook);
       await setRoutes([]);
-      expect(mutate.mock.calls).toEqual([['del', prefix, '254']]);
+      expect(mutate.mock.calls).toEqual([
+        ['add', prefix, '254'],
+        ['del', prefix, '254'],
+      ]);
       expect(entries.has(manual)).toBe(true);
     }
   );
+
+  test('keeps other site routes up and retries a startup conflict without restarting', async () => {
+    const { store, entries, wg } = await fixture();
+    const other = '198.51.100.0/24';
+    entries.set(prefix, { dev: 'eth0', table: '254', protocol: '4' });
+    await store.clients.update(1, { serverAllowedIps: [prefix, other] });
+    const log = vi.spyOn(console, 'error').mockImplementation(() => {});
+    await vpn.start();
+    expect(log).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.objectContaining({ status: 409 })
+    );
+    expect(entries.get(other)?.dev).toBe('wg0');
+    expect(entries.get(prefix)?.dev).toBe('eth0');
+    entries.delete(prefix);
+    await vpn.maintain();
+    expect(entries.get(prefix)?.protocol).toBe('242');
+    expect(wg.up).toHaveBeenCalledOnce();
+    expect(wg.restart).not.toHaveBeenCalled();
+  });
 });

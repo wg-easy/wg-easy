@@ -2,12 +2,21 @@ import { Resolver } from 'node:dns/promises';
 import { networkInterfaces } from 'node:os';
 
 import { normalizeIp, parseIp, stringifyIp } from 'ip-bigint';
-import type { parseCidr } from 'cidr-tools';
+import { parseCidr } from 'cidr-tools';
 
 import { cacheFunction } from '#server/utils/cache';
 import type { ClientNextIpType } from '#db/repositories/client/types';
 
 type ParsedCidr = ReturnType<typeof parseCidr>;
+
+export function normalizePrefix(value: string) {
+  if (value.includes('%')) {
+    throw new Error('Site routes cannot include an IPv6 zone ID');
+  }
+  // Always use the network address and an explicit mask, even for host routes.
+  const { start, version, prefix } = parseCidr(value);
+  return `${stringifyIp({ number: start, version }, { hexify: true })}/${prefix}`;
+}
 
 export function normalizeAddress(address: string) {
   return normalizeIp(address, { hexify: true });

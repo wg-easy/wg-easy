@@ -6,11 +6,11 @@ import { createDebug } from 'obug';
 const CMD_DEBUG = createDebug('CMD');
 const run = promisify(execShell);
 
-type CommandOptions = { log?: boolean | string; output?: 'stdout' | 'stderr' };
+type CommandOptions = { log?: boolean | string; env?: NodeJS.ProcessEnv };
 
 export async function exec(
   cmd: string,
-  { log = true, output = 'stdout' }: CommandOptions = {}
+  { log = true, env }: CommandOptions = {}
 ) {
   if (typeof log === 'string') {
     CMD_DEBUG(`$ ${log}`);
@@ -22,6 +22,6 @@ export async function exec(
     return '';
   }
 
-  const result = await run(cmd, { shell: 'bash' });
-  return result[output].trim();
+  const { stdout } = await run(cmd, { shell: 'bash', env });
+  return stdout.trim();
 }
