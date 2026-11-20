@@ -12,9 +12,7 @@ import { ClientUpdateSchema } from '#shared/contracts/client';
 const key = KeySchema.unwrap();
 const address = ClientUpdateSchema.shape.ipv4Address;
 const client = z.object({
-  name: ClientUpdateSchema.shape.name.refine(
-    (value) => !/[\u0085\u2028\u2029]/u.test(value)
-  ),
+  name: ClientUpdateSchema.shape.name,
   address,
   privateKey: key,
   publicKey: key,
