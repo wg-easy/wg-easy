@@ -40,8 +40,7 @@ export async function vpnFixture() {
   vi.spyOn(wg, 'generatePreSharedKey').mockResolvedValue('new-preshared');
   vi.spyOn(wg, 'dump').mockResolvedValue([]);
   vi.spyOn(wg, 'up').mockResolvedValue('');
-  vi.spyOn(wg, 'down').mockResolvedValue('');
-  vi.spyOn(wg, 'restart').mockResolvedValue('');
+  vi.spyOn(wg, 'down').mockResolvedValue();
   vi.spyOn(wg, 'postUp').mockResolvedValue('');
   vi.spyOn(wg, 'sync').mockResolvedValue('');
   vi.spyOn(wg, 'removePeer').mockResolvedValue('');

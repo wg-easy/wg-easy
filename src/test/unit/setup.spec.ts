@@ -24,7 +24,9 @@ async function fixture() {
   const writeConfiguration = vi.spyOn(fs, 'writeFile').mockResolvedValue();
   vi.spyOn(wg, 'dump').mockResolvedValue([]);
   const sync = vi.spyOn(wg, 'sync').mockResolvedValue('');
-  const restart = vi.spyOn(wg, 'restart').mockResolvedValue('');
+  vi.spyOn(wg, 'down').mockResolvedValue();
+  vi.spyOn(wg, 'postUp').mockResolvedValue('');
+  const up = vi.spyOn(wg, 'up').mockResolvedValue('');
   vi.spyOn(firewall, 'rebuildRules').mockResolvedValue();
   onTestFinished(() => vi.restoreAllMocks());
   const ipInformation = vi
@@ -36,7 +38,7 @@ async function fixture() {
     ipInformation,
     writeConfiguration,
     sync,
-    restart,
+    up,
   };
 }
 
@@ -220,7 +222,7 @@ describe('setup', () => {
   test.each([false, true])(
     'preserves imported keys, client addresses, and the gateway (retry=%s)',
     async (failRestart) => {
-      const { store, writeConfiguration, restart, sync } = await fixture();
+      const { store, writeConfiguration, up, sync } = await fixture();
       await setup.createAdministrator('admin', 'a-long-password');
       const file = JSON.stringify({
         server: {
@@ -242,7 +244,7 @@ describe('setup', () => {
         },
       });
       if (failRestart) {
-        restart.mockRejectedValueOnce(new Error('Restart failed'));
+        up.mockRejectedValueOnce(new Error('Restart failed'));
         await expect(setup.importConfiguration(file)).rejects.toThrow(
           'Restart failed'
         );
@@ -251,7 +253,7 @@ describe('setup', () => {
       } else {
         await setup.importConfiguration(file);
       }
-      expect(restart).toHaveBeenCalledTimes(failRestart ? 2 : 1);
+      expect(up).toHaveBeenCalledTimes(failRestart ? 2 : 1);
       expect(sync).toHaveBeenCalledExactlyOnceWith('wg0');
       expect(writeConfiguration.mock.lastCall?.[1]).toContain(
         'PrivateKey = imported-private'

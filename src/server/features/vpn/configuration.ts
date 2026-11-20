@@ -14,6 +14,7 @@ type Options = {
 };
 type ServerOptions = Options & { managedSites?: ReadonlySet<string> };
 type ServerPeer = Omit<ClientType, 'createdAt' | 'updatedAt'>;
+type RouteClient = Pick<ClientType, 'enabled' | 'serverAllowedIps'>;
 
 /** The complete server file, including enabled peers and its final newline. */
 export function generateServerConfig(
@@ -55,17 +56,38 @@ export function generateStartupConfig(
   };
 }
 
+/** wg-quick installs one default per active address family in the configured table. */
+export function defaultRoutePolicy(
+  table: string,
+  clients: RouteClient[],
+  enableIpv6: boolean
+) {
+  const routes: { ipv4?: string; ipv6?: string } = {};
+  if (table !== 'off') {
+    for (const prefix of enabledServerAllowedIps(clients, enableIpv6)) {
+      if (prefix.endsWith('/0')) {
+        routes[prefix.includes(':') ? 'ipv6' : 'ipv4'] = table;
+      }
+    }
+  }
+  return routes;
+}
+
 export function managedSitePrefixes(
-  clients: Pick<ClientType, 'enabled' | 'serverAllowedIps'>[],
+  clients: RouteClient[],
   enableIpv6: boolean
 ) {
   return new Set(
-    clients
-      .filter((client) => client.enabled)
-      .flatMap((client) => serverAllowedIps(client, enableIpv6))
+    enabledServerAllowedIps(clients, enableIpv6)
       .map(normalizePrefix)
       .filter((prefix) => !prefix.endsWith('/0'))
   );
+}
+
+function enabledServerAllowedIps(clients: RouteClient[], enableIpv6: boolean) {
+  return clients
+    .filter((client) => client.enabled)
+    .flatMap((client) => serverAllowedIps(client, enableIpv6));
 }
 
 function serverAllowedIps(

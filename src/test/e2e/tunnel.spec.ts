@@ -91,6 +91,95 @@ test('saving a site subnet routes live traffic without interrupting another peer
   expect(await traffic).toContain(', 0% packet loss');
 });
 
+test.describe('dual-stack default routes', () => {
+  test.use({ ipv6: true });
+  test('saving default prefixes installs and withdraws wg-quick policy routing', async ({
+    page,
+    app,
+  }) => {
+    await login(page);
+    const card = await createClient(page, 'Default gateway');
+    const edit = () =>
+      card.getByRole('link', { name: 'Default gateway', exact: true }).click();
+    const save = async () => {
+      await page.getByRole('button', { name: 'Save', exact: true }).click();
+      await expect(page).toHaveURL(app.url + '/');
+    };
+    const rules = () =>
+      Promise.all(
+        ['-4', '-6'].map((family) =>
+          app.execServer(['ip', family, 'rule', 'show'])
+        )
+      );
+    const lookup = () =>
+      app.execServer(['ip', '-4', 'route', 'get', '203.0.113.1']);
+    const before = await rules();
+    await edit();
+    await addSiteSubnet(page, '0.0.0.0/0');
+    await addSiteSubnet(page, '::/0');
+    await save();
+    expect(await lookup()).toContain('dev wg0');
+    expect(
+      await app.execServer(['ip', '-6', 'route', 'get', '2001:db8::1'])
+    ).toContain('dev wg0');
+
+    const url = app.url + '/api/admin/interface';
+    const settings = await (await page.request.get(url)).json();
+    const changeTable = async (routingTable: string) => {
+      const response = await page.request.post(url, {
+        headers: { Origin: app.url },
+        data: { ...settings, routingTable },
+      });
+      expect(response.ok()).toBe(true);
+    };
+    await changeTable('100');
+    expect(
+      await app.execServer([
+        'ip',
+        '-4',
+        'route',
+        'show',
+        'table',
+        '100',
+        'exact',
+        '0.0.0.0/0',
+      ])
+    ).toContain('default dev wg0');
+    expect(
+      await app.execServer([
+        'ip',
+        '-6',
+        'route',
+        'show',
+        'table',
+        '100',
+        'exact',
+        '::/0',
+      ])
+    ).toContain('default dev wg0');
+    expect(await rules()).toEqual(before);
+    expect(await lookup()).toContain('dev eth0');
+    await changeTable('auto');
+    expect(await lookup()).toContain('dev wg0');
+
+    await edit();
+    // Withdraw IPv6 on its own while IPv4 still needs the policy table.
+    const remove = serverAllowedIps(page).getByRole('button', {
+      name: 'Delete',
+    });
+    await remove.last().click();
+    await save();
+    expect((await rules())[1]).toEqual(before[1]);
+    expect(await lookup()).toContain('dev wg0');
+    await edit();
+    await remove.click();
+    await save();
+    expect(await rules()).toEqual(before);
+    expect(await lookup()).toContain('dev eth0');
+    expect(await app.execServer(['wg', 'show', 'wg0', 'fwmark'])).toBe('off');
+  });
+});
+
 test('reports a route conflict and withdraws the site route after a restart', async ({
   page,
   app,
@@ -122,6 +211,44 @@ test('reports a route conflict and withdraws the site route after a restart', as
   expect(await readRoute()).toContain('dev wg0');
   await card.getByRole('switch', { name: 'Disable Client' }).click();
   await expect.poll(readRoute).toBe('');
+});
+
+test('a partially failed PostUp stays down until an administrator restarts it', async ({
+  page,
+  app,
+}) => {
+  await login(page);
+  const hooksUrl = app.url + '/api/admin/hooks';
+  const restartUrl = app.url + '/api/admin/interface/restart';
+  const headers = { Origin: app.url };
+  const hooks = {
+    preUp: '',
+    postUp: 'echo run >> /tmp/post-up-attempts; false',
+    preDown: '',
+    postDown: '',
+  };
+  expect(
+    (await page.request.post(hooksUrl, { headers, data: hooks })).ok()
+  ).toBe(true);
+  const failed = await page.request.post(restartUrl, { headers });
+  expect(failed.status()).toBe(503);
+  expect((await failed.json()).message).toContain('PostUp failed');
+  expect(await app.execServer(['wg', 'show', 'interfaces'])).toBe('');
+
+  const fixed = {
+    ...hooks,
+    postUp:
+      'test "$CONFIG_FILE" = /etc/wireguard/wg0.conf; cmd echo fixed >> /tmp/post-up-attempts',
+  };
+  // The corrected hook is saved. Applying it requires an explicit restart.
+  expect(
+    (await page.request.post(hooksUrl, { headers, data: fixed })).status()
+  ).toBe(503);
+  const attempts = () => app.execServer(['cat', '/tmp/post-up-attempts']);
+  expect(await attempts()).toBe('run');
+  expect((await page.request.post(restartUrl, { headers })).ok()).toBe(true);
+  expect(await attempts()).toBe('run\nfixed');
+  expect(await app.execServer(['wg', 'show', 'interfaces'])).toBe('wg0');
 });
 
 test('starts with a site conflict, preserves hook and backup routes, and retries live', async ({
@@ -165,7 +292,7 @@ test('starts with a site conflict, preserves hook and backup routes, and retries
     app.execServer(['ip', '-4', 'route', 'show', 'exact', prefix]);
   expect(await read(siteSubnet)).toContain('dev eth0');
   expect(await read(backup)).toContain('dev wg0');
-  expect(await read(backup)).toContain('metric 500');
+  expect(await read(backup)).toMatch(/\bdev eth0\b[^\n]*\bmetric 500\b/);
   expect(await read(manual)).toContain('dev wg0');
   expect(
     await app.execServer(['wg', 'show', 'wg0', 'allowed-ips'])
@@ -184,6 +311,6 @@ test('starts with a site conflict, preserves hook and backup routes, and retries
   await site.getByRole('switch', { name: 'Disable Client' }).click();
   await expect.poll(() => read(siteSubnet)).toBe('');
   expect(await read(backup)).not.toContain('dev wg0');
-  expect(await read(backup)).toContain('metric 500');
+  expect(await read(backup)).toMatch(/\bdev eth0\b[^\n]*\bmetric 500\b/);
   expect(await read(manual)).toContain('dev wg0');
 });

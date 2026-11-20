@@ -1,4 +1,5 @@
 import fs from 'node:fs/promises';
+import { existsSync } from 'node:fs';
 
 import { exec } from '#server/utils/cmd';
 import { WG_ENV } from '#server/utils/config';
@@ -6,18 +7,38 @@ import { parseInterfaceName } from '#server/utils/interfaceName';
 
 const wgExecutable = WG_ENV.WG_EXECUTABLE;
 
-async function up(infName: string, startupConfig?: string) {
+export class NativePostUpError extends Error {}
+
+async function up(
+  infName: string,
+  config?: { contents: string; nativePostUp?: boolean }
+) {
   const name = parseInterfaceName(infName);
-  if (startupConfig === undefined) {
+  if (!config) {
     return exec(`${wgExecutable}-quick up ${name}`);
   }
   // wg-quick derives the interface name from the filename. Keep the complete
   // configuration in /etc/wireguard for syncconf, shutdown and external tools.
   const dir = await fs.mkdtemp('/tmp/wg-easy-up-');
+  const marker = `${dir}/post-up-started`;
   try {
     const path = `${dir}/${name}.conf`;
-    await fs.writeFile(path, startupConfig, { mode: 0o600 });
+    // Native hooks still see the persistent file and wg-quick's shell functions.
+    // Mark entry into PostUp so failures during earlier setup can be retried.
+    const contents = config.nativePostUp
+      ? config.contents.replace(
+          /^(PreUp|PostUp) = (?=.)/gm,
+          (field, phase) =>
+            `${field}CONFIG_FILE=/etc/wireguard/${name}.conf; ${phase === 'PostUp' ? `: > ${marker}; ` : ''}`
+        )
+      : config.contents;
+    await fs.writeFile(path, contents, { mode: 0o600 });
     return await exec(`${wgExecutable}-quick up ${path}`);
+  } catch (cause) {
+    if (config.nativePostUp && existsSync(marker)) {
+      throw new NativePostUpError('PostUp failed', { cause });
+    }
+    throw cause;
   } finally {
     await fs.rm(dir, { recursive: true, force: true });
   }
@@ -40,13 +61,12 @@ export const wg = {
 
   up,
 
-  down: (infName: string) => {
-    return exec(`${wgExecutable}-quick down ${infName}`);
-  },
-
-  restart: async (infName: string, startupConfig?: string) => {
-    await wg.down(infName).catch(() => {});
-    return up(infName, startupConfig);
+  down: async (infName: string) => {
+    const name = parseInterfaceName(infName);
+    const interfaces = await exec(`${wgExecutable} show interfaces`);
+    if (interfaces.split(/\s+/).includes(name)) {
+      await exec(`${wgExecutable}-quick down ${name}`);
+    }
   },
 
   postUp: (infName: string, table: string, hook: string) => {

@@ -28,10 +28,15 @@ export const credentials = {
   password: 'e2e-only-password-123!',
 };
 
-export const test = base.extend<{ app: App; initialized: boolean }>({
+export const test = base.extend<{
+  app: App;
+  initialized: boolean;
+  ipv6: boolean;
+}>({
   initialized: [true, { option: true }],
+  ipv6: [false, { option: true }],
   app: [
-    async ({ initialized }, use, testInfo) => {
+    async ({ initialized, ipv6 }, use, testInfo) => {
       const runDir = process.env.E2E_RUN_DIR;
       if (!runDir) {
         throw new Error('Run pnpm test:e2e to manage test containers.');
@@ -57,6 +62,7 @@ export const test = base.extend<{ app: App; initialized: boolean }>({
             env: {
               ...process.env,
               E2E_INITIALIZED: String(initialized),
+              E2E_DISABLE_IPV6: String(!ipv6),
             },
             timeout: 120_000,
             maxBuffer: 4 * 1024 * 1024,

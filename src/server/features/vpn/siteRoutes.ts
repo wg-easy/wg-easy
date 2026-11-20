@@ -18,14 +18,28 @@ type KernelRoute = {
   dst: string;
   dev?: string;
   gateway?: string;
-  table: string;
-  type: string;
-  protocol: string;
+  table?: string | number;
+  type?: string | number;
+  protocol: string | number;
   metric?: number;
 };
 
 // Tag every site route installed by wg-easy, including during startup.
 const siteProtocol = 242;
+
+function kernelTable(table: KernelRoute['table']) {
+  switch (table) {
+    case undefined:
+    case 'main':
+      return 254;
+    case 'default':
+      return 253;
+    case 'local':
+      return 255;
+    default:
+      return Number(table);
+  }
+}
 
 function routeKey({ prefix, table }: SiteRoute) {
   return `${table}/${prefix}`;
@@ -137,7 +151,7 @@ export class SiteRoutes {
       `${ip} -N -j -details route show table all match ${prefix}`
     );
     const matching = (JSON.parse(output || '[]') as KernelRoute[]).filter(
-      (entry) => Number(entry.table) === table && entry.dst !== 'default'
+      (entry) => kernelTable(entry.table) === table && entry.dst !== 'default'
     );
     // "match" returns only covering prefixes. Equal lengths are exact matches.
     const byLength = Map.groupBy(matching, (entry) =>
@@ -145,7 +159,11 @@ export class SiteRoutes {
     );
     const exact = byLength.get(Number(parseCidr(prefix).prefix)) ?? [];
     const direct = (entry: KernelRoute) =>
-      entry.dev === device && entry.type === '1' && !entry.gateway;
+      entry.dev === device &&
+      !entry.gateway &&
+      (entry.type === undefined ||
+        entry.type === 'unicast' ||
+        Number(entry.type) === 1);
 
     const metric = ipv6 ? 1024 : 0;
     const installed =

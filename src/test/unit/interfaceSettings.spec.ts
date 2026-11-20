@@ -77,7 +77,7 @@ describe('interface settings', () => {
     expect(firewall.rebuildRules).not.toHaveBeenCalled();
     expect(writeConfiguration).not.toHaveBeenCalled();
     expect(commands.sync).not.toHaveBeenCalled();
-    expect(commands.restart).not.toHaveBeenCalled();
+    expect(commands.up).not.toHaveBeenCalled();
   });
 
   test.each([false, true])(

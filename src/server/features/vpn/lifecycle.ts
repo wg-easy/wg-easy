@@ -1,18 +1,30 @@
 import fs from 'node:fs/promises';
+import { isDeepStrictEqual } from 'node:util';
+
+import { createError } from 'nuxt/server';
 
 import { isExpired } from './policies';
-import { generateServerConfig, generateStartupConfig } from './configuration';
+import {
+  defaultRoutePolicy,
+  generateServerConfig,
+  generateStartupConfig,
+} from './configuration';
 import { SiteRoutes } from './siteRoutes';
 
 import { getDatabase } from '#db';
 import type { DatabaseStore, Repositories } from '#db/store';
-import { wg } from '#server/utils/wgHelper';
+import { NativePostUpError, wg } from '#server/utils/wgHelper';
 import { firewall } from '#server/utils/firewall';
 import { WG_ENV } from '#server/utils/config';
 
 let pending: Promise<unknown> = Promise.resolve();
 type ApplyMode = 'sync' | 'start' | 'restart';
-type HostState = { routes: SiteRoutes; retry?: ApplyMode };
+type HostState = {
+  routes: SiteRoutes;
+  defaultRoutes: ReturnType<typeof defaultRoutePolicy>;
+  retry?: ApplyMode;
+  postUpError?: Error;
+};
 const hostStates = new WeakMap<DatabaseStore, HostState>();
 
 /** Each caller waits for its own update; a failure must not block later updates. */
@@ -22,13 +34,36 @@ function enqueue<T>(operation: () => Promise<T>) {
   return result;
 }
 
+async function failedPostUp(
+  state: HostState,
+  name: string,
+  cause: unknown
+): Promise<never> {
+  // An arbitrary hook may have applied external effects before failing.
+  state.postUpError = createError({
+    status: 503,
+    statusText: 'VPN interface needs attention',
+    message:
+      'PostUp failed. Check the hook and its effects, then restart the VPN interface from the admin panel.',
+    cause,
+  });
+  try {
+    await wg.down(name);
+    delete state.retry;
+  } catch (error) {
+    console.error('Could not shut down the VPN after PostUp failed:', error);
+  }
+  throw state.postUpError;
+}
+
 async function apply(mode?: ApplyMode) {
   const database = getDatabase();
   let state = hostStates.get(database);
   if (!state) {
-    state = { routes: new SiteRoutes() };
+    state = { routes: new SiteRoutes(), defaultRoutes: {} };
     hostStates.set(database, state);
   }
+  const manualRestart = mode === 'restart' || mode === 'start';
   mode ??= state.retry ?? 'sync';
   // Clear only after every host effect succeeds. Maintenance retries failures.
   state.retry = mode;
@@ -41,6 +76,25 @@ async function apply(mode?: ApplyMode) {
     })
   );
   const enableIpv6 = !WG_ENV.DISABLE_IPV6;
+  if (state.postUpError && !manualRestart) {
+    // If the hook's cleanup also failed, retry only the shutdown.
+    await wg.down(network.name);
+    delete state.retry;
+    throw state.postUpError;
+  }
+  delete state.postUpError;
+  const defaultRoutes = defaultRoutePolicy(
+    network.routingTable,
+    clients,
+    enableIpv6
+  );
+  if (
+    mode === 'sync' &&
+    !isDeepStrictEqual(defaultRoutes, state.defaultRoutes)
+  ) {
+    mode = 'restart';
+    state.retry = mode;
+  }
   if (network.firewallEnabled) {
     await firewall.blockTraffic(network.name, enableIpv6);
   }
@@ -58,6 +112,10 @@ async function apply(mode?: ApplyMode) {
         await wg.removePeer(network.name, peer.publicKey);
       }
     }
+  } else {
+    // wg-quick down needs the old Table setting and the live peer AllowedIPs
+    // to remove its default-route policy before the new configuration is written.
+    await wg.down(network.name);
   }
   const options = {
     enableIpv6,
@@ -73,11 +131,16 @@ async function apply(mode?: ApplyMode) {
   await fs.writeFile(`/etc/wireguard/${network.name}.conf`, contents, {
     mode: 0o600,
   });
-  if (mode === 'start') {
-    await wg.down(network.name).catch(() => {});
+  if (mode !== 'sync') {
     try {
-      await wg.up(network.name, startup?.contents);
+      const config =
+        startup ??
+        (hooks.postUp ? { contents, nativePostUp: true } : undefined);
+      await wg.up(network.name, config);
     } catch (error) {
+      if (error instanceof NativePostUpError) {
+        return failedPostUp(state, network.name, error);
+      }
       if (
         error instanceof Error &&
         error.message.includes(`Cannot find device "${network.name}"`)
@@ -89,11 +152,12 @@ async function apply(mode?: ApplyMode) {
       }
       throw error;
     }
-  } else if (mode === 'restart') {
-    await wg.restart(network.name, startup?.contents);
-  }
-  if (mode !== 'sync') {
     state.routes = new SiteRoutes();
+    state.defaultRoutes = defaultRoutes;
+    // Any native PostUp has completed. A sync failure must not replay it.
+    if (!startup?.postUp) {
+      state.retry = 'sync';
+    }
   }
   await wg.sync(network.name);
   if (startup?.postUp) {
@@ -102,14 +166,13 @@ async function apply(mode?: ApplyMode) {
     await state.routes.sync(network, clients, enableIpv6);
     try {
       await wg.postUp(network.name, network.routingTable, startup.postUp);
-    } catch (error) {
-      await wg.down(network.name).catch(() => {});
-      throw error;
+    } catch (cause) {
+      return failedPostUp(state, network.name, cause);
     }
   }
-  await firewall.rebuildRules(network, clients, defaults, enableIpv6);
-  // The interface is running. A route failure only needs a live retry.
+  // The interface and its hooks are up. Retry subsequent failures live.
   state.retry = 'sync';
+  await firewall.rebuildRules(network, clients, defaults, enableIpv6);
   const error = await state.routes.sync(network, clients, enableIpv6);
   if (error) {
     if (mode !== 'start') {
