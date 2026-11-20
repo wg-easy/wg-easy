@@ -14,7 +14,15 @@ There is no documentation for the API yet, but this will be added as the underly
 
 ## Authentication
 
-Authenticated endpoints accept the Web UI's session cookie or HTTP Basic Authentication with your login username and password.
+Most authenticated endpoints accept the Web UI's session cookie or HTTP Basic Authentication with your login username and password.
+
+After creating the first administrator with `POST /api/setup/2`, sign in to obtain the administrator's session cookie. The following endpoints accept only an administrator session cookie and are available only while setup is unfinished.
+
+| Request                   | Purpose                              |
+| ------------------------- | ------------------------------------ |
+| `GET /api/setup/4`        | Get suggested endpoint addresses     |
+| `POST /api/setup/4`       | Save the endpoint and finish setup   |
+| `POST /api/setup/migrate` | Import a v14 backup and finish setup |
 
 Basic Authentication is unavailable for accounts with 2FA enabled and when `DISABLE_PASSWORD_AUTH=true`. A session established through the normal sign-in flow, including 2FA when required, can still access the API. API requests follow the signed-in user's permissions.
 
