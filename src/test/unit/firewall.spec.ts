@@ -14,6 +14,7 @@ const client = {
   name: 'Laptop',
   ipv4Address: '10.8.0.2',
   ipv6Address: 'fd00::2',
+  serverAllowedIps: [],
   allowedIps: null,
   firewallIps: null,
   enabled: true,
@@ -24,6 +25,53 @@ beforeEach(() => {
 });
 
 describe('firewall chains', () => {
+  test.each([false, true])(
+    'limits forwarded site replies to enabled routes and address families (IPv6 %s)',
+    async (enableIpv6) => {
+      const { store } = await databaseFixture();
+      const network = {
+        ...(await store.interfaces.get()),
+        name: 'wg1',
+        ipv4Cidr: '10.8.0.1/24',
+        ipv6Cidr: 'fd00::1/64',
+        firewallEnabled: true,
+      };
+      const gateway = {
+        ...client,
+        serverAllowedIps: ['192.0.2.9/24', '2001:db8:1::/64', '10.8.0.2/32'],
+      };
+      await firewall.rebuildRules(
+        network,
+        [
+          gateway,
+          { ...client, enabled: false, serverAllowedIps: ['198.51.100.0/24'] },
+        ],
+        await store.userConfigs.get(),
+        enableIpv6
+      );
+
+      const rules = execMock.mock.calls.map(([command]) => command);
+      for (const [tool, site, pool] of [
+        ['iptables', '192.0.2.0/24', '10.8.0.0/24'],
+        ['ip6tables', '2001:db8:1::/64', 'fd00::/64'],
+      ] as const) {
+        const replies = rules.filter(
+          (rule) => rule.startsWith(tool + ' ') && rule.includes('--ctdir')
+        );
+        if (tool === 'ip6tables' && !enableIpv6) {
+          expect(replies).toEqual([]);
+          continue;
+        }
+        expect(replies).toEqual([
+          `${tool} -A WG_CLIENTS_wg1 -o wg1 -s ${site} -d ${pool} -m conntrack --ctstate ESTABLISHED --ctdir REPLY -j ACCEPT`,
+        ]);
+        expect(rules.indexOf(replies[0]!)).toBeLessThan(
+          rules.indexOf(`${tool} -A WG_CLIENTS_wg1 -j DROP`)
+        );
+      }
+    }
+  );
+
   test.each(['new', 'existing'])(
     '%s filtering stays protected throughout a failed rebuild and its retry',
     async (state) => {

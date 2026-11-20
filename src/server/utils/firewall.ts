@@ -2,6 +2,7 @@ import { createDebug } from 'obug';
 import { isIPv6 } from 'is-ip';
 
 import { exec } from '#server/utils/cmd';
+import { normalizePrefix } from '#server/utils/ip';
 import type { ClientType } from '#db/repositories/client/types';
 import type { InterfaceType } from '#db/repositories/interface/types';
 import type { UserConfigType } from '#db/repositories/userConfig/types';
@@ -78,9 +79,36 @@ type FirewallClient = Pick<
   | 'ipv4Address'
   | 'ipv6Address'
   | 'allowedIps'
+  | 'serverAllowedIps'
   | 'firewallIps'
   | 'enabled'
 >;
+
+async function allowRoutedReplies(
+  network: InterfaceType,
+  client: FirewallClient,
+  enableIpv6: boolean
+) {
+  for (const site of client.serverAllowedIps ?? []) {
+    const ipv6 = site.includes(':');
+    if (ipv6 && !enableIpv6) {
+      continue;
+    }
+    const source = normalizePrefix(site);
+    if (
+      source === normalizePrefix(ipv6 ? client.ipv6Address : client.ipv4Address)
+    ) {
+      continue;
+    }
+    const pool = normalizePrefix(ipv6 ? network.ipv6Cidr : network.ipv4Cidr);
+    const command = ipv6 ? 'ip6tables' : 'iptables';
+    // Both peers use this interface. Only the reply leg of an established
+    // connection can pass here, even when the site advertises a default route.
+    await exec(
+      `${command} -A ${chainName(network.name)} -o ${network.name} -s ${source} -d ${pool} -m conntrack --ctstate ESTABLISHED --ctdir REPLY -j ACCEPT`
+    );
+  }
+}
 
 /**
  * Sanitize a client identifier for use in an iptables comment.
@@ -350,6 +378,7 @@ export const firewall = {
           userConfig.defaultAllowedIps,
           enableIpv6
         );
+        await allowRoutedReplies(wgInterface, client, enableIpv6);
       }
 
       // Add final DROP for any traffic not explicitly allowed
