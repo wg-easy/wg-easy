@@ -1,7 +1,11 @@
+import { randomBytes } from 'node:crypto';
+
 import { createDebug } from 'obug';
 import { isIPv6 } from 'is-ip';
+import { createError } from 'nuxt/server';
 
 import { exec } from '#server/utils/cmd';
+import { normalizePrefix } from '#server/utils/ip';
 import type { ClientType } from '#db/repositories/client/types';
 import type { InterfaceType } from '#db/repositories/interface/types';
 import type { UserConfigType } from '#db/repositories/userConfig/types';
@@ -78,9 +82,70 @@ type FirewallClient = Pick<
   | 'ipv4Address'
   | 'ipv6Address'
   | 'allowedIps'
+  | 'serverAllowedIps'
   | 'firewallIps'
   | 'enabled'
 >;
+
+const replyMatch = '-m conntrack --ctstate ESTABLISHED --ctdir REPLY';
+type AddressFamily = 'IPv4' | 'IPv6';
+type SiteGateway = Pick<
+  FirewallClient,
+  'ipv4Address' | 'ipv6Address' | 'serverAllowedIps'
+>;
+
+function* routedSites(client: SiteGateway, enableIpv6: boolean) {
+  for (const site of client.serverAllowedIps ?? []) {
+    const ipv6 = site.includes(':');
+    if (ipv6 && !enableIpv6) {
+      continue;
+    }
+    const source = normalizePrefix(site);
+    if (
+      source === normalizePrefix(ipv6 ? client.ipv6Address : client.ipv4Address)
+    ) {
+      continue;
+    }
+    yield { source, ipv6 };
+  }
+}
+
+export function routedReplyFamilies(
+  gateways: SiteGateway[],
+  enableIpv6: boolean
+) {
+  const families = new Set<AddressFamily>();
+  for (const client of gateways) {
+    for (const { ipv6 } of routedSites(client, enableIpv6)) {
+      families.add(ipv6 ? 'IPv6' : 'IPv4');
+    }
+  }
+  return families;
+}
+
+export async function checkRoutedReplySupport(families: Set<AddressFamily>) {
+  for (const family of families) {
+    const command = family === 'IPv6' ? 'ip6tables' : 'iptables';
+    // Exercise the kernel match in a chain that no traffic traverses.
+    const chain = `WG_CT_${randomBytes(8).toString('hex')}`;
+    try {
+      await exec(`${command} -w 2 -N ${chain}`);
+      try {
+        await exec(`${command} -w 2 -A ${chain} ${replyMatch} -j ACCEPT`);
+      } finally {
+        await exec(
+          `${command} -w 2 -F ${chain} && ${command} -w 2 -X ${chain}`
+        );
+      }
+    } catch (cause) {
+      throw createError({
+        status: 422,
+        message: `Could not verify ${family} conntrack support with ${command}. Check the host's netfilter conntrack support and firewall permissions before enabling routed replies.`,
+        cause,
+      });
+    }
+  }
+}
 
 /**
  * Sanitize a client identifier for use in an iptables comment.
@@ -350,6 +415,15 @@ export const firewall = {
           userConfig.defaultAllowedIps,
           enableIpv6
         );
+        for (const { source, ipv6 } of routedSites(client, enableIpv6)) {
+          const command = ipv6 ? 'ip6tables' : 'iptables';
+          const pool = normalizePrefix(
+            ipv6 ? wgInterface.ipv6Cidr : wgInterface.ipv4Cidr
+          );
+          await exec(
+            `${command} -A ${chainName(wgInterface.name)} -o ${wgInterface.name} -s ${source} -d ${pool} ${replyMatch} -j ACCEPT`
+          );
+        }
       }
 
       // Add final DROP for any traffic not explicitly allowed

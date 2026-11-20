@@ -14,7 +14,11 @@ import { SiteRoutes } from './siteRoutes';
 import { getDatabase } from '#db';
 import type { DatabaseStore, Repositories } from '#db/store';
 import { NativePostUpError, wg } from '#server/utils/wgHelper';
-import { firewall } from '#server/utils/firewall';
+import {
+  checkRoutedReplySupport,
+  firewall,
+  routedReplyFamilies,
+} from '#server/utils/firewall';
 import { WG_ENV } from '#server/utils/config';
 
 let pending: Promise<unknown> = Promise.resolve();
@@ -64,6 +68,12 @@ async function apply(mode?: ApplyMode) {
     hostStates.set(database, state);
   }
   const manualRestart = mode === 'restart' || mode === 'start';
+  if (manualRestart) {
+    const gateways = await filteredSiteGateways(database);
+    await checkRoutedReplySupport(
+      routedReplyFamilies(gateways, !WG_ENV.DISABLE_IPV6)
+    );
+  }
   mode ??= state.retry ?? 'sync';
   // Clear only after every host effect succeeds. Maintenance retries failures.
   state.retry = mode;
@@ -185,13 +195,33 @@ async function apply(mode?: ApplyMode) {
   delete state.retry;
 }
 
-/** Commit first; a host failure leaves saved state available for a later retry. */
+async function filteredSiteGateways(tx: Repositories) {
+  const network = await tx.interfaces.get();
+  return network.firewallEnabled ? tx.clients.getEnabledSiteGateways() : [];
+}
+
+/** Validate new host requirements before committing, then apply the saved state. */
 export function commit<T>(
   change: (tx: Repositories) => Promise<T>,
   mode?: ApplyMode
 ) {
   return enqueue(async () => {
-    const result = await getDatabase().transaction(change);
+    const result = await getDatabase().transaction(async (tx) => {
+      const before = await filteredSiteGateways(tx);
+      const value = await change(tx);
+      const enableIpv6 = !WG_ENV.DISABLE_IPV6;
+      const after = routedReplyFamilies(
+        await filteredSiteGateways(tx),
+        enableIpv6
+      );
+      // Revoking a peer or disabling filtering must still work if the host changes.
+      if (after.size) {
+        await checkRoutedReplySupport(
+          after.difference(routedReplyFamilies(before, enableIpv6))
+        );
+      }
+      return value;
+    });
     await apply(mode);
     return result;
   });
