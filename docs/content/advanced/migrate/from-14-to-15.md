@@ -44,7 +44,11 @@ docker compose down
 
 Follow the instructions in the [Getting Started][docs-getting-started] or [Basic Installation][docs-examples] guide to start the new container.
 
-In the setup wizard, select that you already have a configuration file and upload the `wg0.json` file you downloaded in the backup step.
+Create the first administrator in the setup wizard, then sign in with that account. When asked if you have an existing setup, select **Yes**, choose your v14 `wg0.json` backup, and select **Upload**.
+
+wg-easy validates the whole backup, including disabled clients, before applying it. Each public key must match its private key and be unique across the server and its clients. Each client needs a unique host address in the server's `/24`, excluding the network, gateway, and broadcast addresses.
+
+If a field is invalid, the error identifies the field and setup stays open. Correct the backup and upload it again. A successful import opens the dashboard.
 
 [docs-getting-started]: ../../getting-started.md
 [docs-examples]: ../../examples/tutorials/basic-installation.md

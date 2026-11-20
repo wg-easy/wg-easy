@@ -4,6 +4,7 @@ import { describe, expect, test, vi, onTestFinished } from 'vitest';
 
 import { databaseFixture } from '../helpers/database';
 import { resetCryptoMocks } from '../helpers/crypto';
+import { legacyBackup } from '../helpers/legacyBackup';
 
 import * as setup from '#server/features/setup';
 import { getIpInformation } from '#server/utils/ip';
@@ -175,27 +176,7 @@ describe('setup', () => {
       "CREATE TRIGGER fail_completion BEFORE UPDATE OF setup_step ON general_table BEGIN SELECT RAISE(ABORT, 'completion failure'); END"
     );
     await expect(
-      setup.importConfiguration(
-        JSON.stringify({
-          server: {
-            privateKey: 'imported-private',
-            publicKey: 'imported-public',
-            address: '10.9.0.1',
-          },
-          clients: {
-            peer: {
-              name: 'Imported',
-              address: '10.9.0.2',
-              privateKey: 'peer-private',
-              publicKey: 'peer-public',
-              preSharedKey: '',
-              createdAt: '2026-01-01',
-              updatedAt: '2026-01-01',
-              enabled: true,
-            },
-          },
-        })
-      )
+      setup.importConfiguration(JSON.stringify(legacyBackup()))
     ).rejects.toMatchObject({
       cause: expect.objectContaining({
         message: expect.stringContaining('completion failure'),
@@ -219,30 +200,139 @@ describe('setup', () => {
     expect(ipInformation).toHaveBeenCalledWith('wg0');
   });
 
+  test.each([
+    ['server', 'privateKey', null],
+    ['server', 'publicKey', 'invalid key'],
+    ['server', 'address', '192.0.2.100/24'],
+    ['peer', 'privateKey', 'invalid key'],
+    ['peer', 'publicKey', Buffer.alloc(31).toString('base64')],
+    ['peer', 'preSharedKey', 'A'.repeat(42) + 'B='],
+    ['peer', 'address', '2001:db8::1'],
+    ['peer', 'name', 'two\nlines'],
+    ['peer', 'name', 'two\rlines'],
+  ] as const)(
+    'rejects an invalid %s %s before applying any changes',
+    async (section, field, value) => {
+      const { store, writeConfiguration, up } = await fixture();
+      await setup.createAdministrator('admin', 'a-long-password');
+      const before = await store.interfaces.get();
+      const backup = legacyBackup();
+      const peer = { ...backup.clients.peer, enabled: false };
+      const file = {
+        server: backup.server,
+        clients: { ...backup.clients, 'private-record-id': peer },
+      };
+      Object.assign(section === 'server' ? file.server : peer, {
+        [field]: value,
+      });
+      const location = section === 'server' ? 'server' : 'clients.1';
+      await expect(
+        setup.importConfiguration(JSON.stringify(file))
+      ).rejects.toMatchObject({
+        status: 400,
+        message: `Invalid backup field: ${location}.${field}`,
+      });
+      expect(await setup.status()).toEqual({ step: 3, done: false });
+      expect(await store.interfaces.get()).toEqual(before);
+      expect(await store.clients.getAll()).toEqual([]);
+      expect(writeConfiguration).not.toHaveBeenCalled();
+      expect(up).not.toHaveBeenCalled();
+    }
+  );
+
+  test.each(['10.9.0.15', '10.9.0.0', '10.9.0.255', '10.9.1.1'])(
+    'rejects a peer address outside the allocation pool (%s)',
+    async (address) => {
+      const { store, writeConfiguration } = await fixture();
+      await setup.createAdministrator('admin', 'a-long-password');
+      const network = await store.interfaces.get();
+      const backup = legacyBackup();
+      backup.clients.peer.address = address;
+      backup.clients.peer.enabled = false;
+      await expect(
+        setup.importConfiguration(JSON.stringify(backup))
+      ).rejects.toMatchObject({
+        status: 400,
+        message: expect.stringContaining('clients.0.address'),
+      });
+      expect(await store.interfaces.get()).toEqual(network);
+      expect(await store.clients.getAll()).toEqual([]);
+      expect(await setup.status()).toEqual({ step: 3, done: false });
+      expect(writeConfiguration).not.toHaveBeenCalled();
+    }
+  );
+
+  test('rejects mismatched key pairs and a peer using the server key pair', async () => {
+    const { store, writeConfiguration } = await fixture();
+    await setup.createAdministrator('admin', 'a-long-password');
+    const network = await store.interfaces.get();
+    const backup = legacyBackup();
+    const peer = backup.clients.peer;
+    const serverPublicKey = backup.server.publicKey;
+    backup.server.publicKey = peer.publicKey;
+    await expect(
+      setup.importConfiguration(JSON.stringify(backup))
+    ).rejects.toMatchObject({
+      status: 400,
+      message: 'Key pair mismatch at server.publicKey',
+    });
+    backup.server.publicKey = serverPublicKey;
+    peer.privateKey = backup.server.privateKey;
+    await expect(
+      setup.importConfiguration(JSON.stringify(backup))
+    ).rejects.toMatchObject({
+      status: 400,
+      message: 'Key pair mismatch at clients.0.publicKey',
+    });
+    peer.publicKey = serverPublicKey;
+    await expect(
+      setup.importConfiguration(JSON.stringify(backup))
+    ).rejects.toMatchObject({
+      status: 400,
+      message: 'Duplicate public key at clients.0.publicKey',
+    });
+    expect(await store.interfaces.get()).toEqual(network);
+    expect(await store.clients.getAll()).toEqual([]);
+    expect(await setup.status()).toEqual({ step: 3, done: false });
+    expect(writeConfiguration).not.toHaveBeenCalled();
+  });
+
+  test('accepts a corrected backup after a JSON or duplicate field error', async () => {
+    const { store, writeConfiguration, sync } = await fixture();
+    await setup.createAdministrator('admin', 'a-long-password');
+    await expect(
+      setup.importConfiguration('invalid JSON')
+    ).rejects.toMatchObject({
+      status: 400,
+      message: 'The backup must be a JSON document.',
+    });
+    const backup = legacyBackup();
+    const clients = { ...backup.clients, copy: { ...backup.clients.peer } };
+    for (const field of ['address', 'publicKey'] as const) {
+      await expect(
+        setup.importConfiguration(JSON.stringify({ ...backup, clients }))
+      ).rejects.toMatchObject({
+        status: 400,
+        message: expect.stringContaining(`clients.1.${field}`),
+      });
+      clients.copy.address = '10.9.0.2';
+    }
+    expect(await store.clients.getAll()).toEqual([]);
+    expect(writeConfiguration).not.toHaveBeenCalled();
+    await setup.importConfiguration(JSON.stringify(backup));
+    expect(sync).toHaveBeenCalledOnce();
+    expect(await store.clients.getAll()).toMatchObject([
+      { preSharedKey: backup.clients.peer.preSharedKey },
+    ]);
+  });
+
   test.each([false, true])(
     'preserves imported keys, client addresses, and the gateway (retry=%s)',
     async (failRestart) => {
       const { store, writeConfiguration, up, sync } = await fixture();
       await setup.createAdministrator('admin', 'a-long-password');
-      const file = JSON.stringify({
-        server: {
-          privateKey: 'imported-private',
-          publicKey: 'imported-public',
-          address: '10.9.0.15',
-        },
-        clients: {
-          peer: {
-            name: 'Imported',
-            address: '10.9.0.1',
-            privateKey: 'peer-private',
-            publicKey: 'peer-public',
-            preSharedKey: null,
-            createdAt: '2026-01-01',
-            updatedAt: '2026-01-01',
-            enabled: true,
-          },
-        },
-      });
+      const backup = legacyBackup();
+      const file = JSON.stringify(backup);
       if (failRestart) {
         up.mockRejectedValueOnce(new Error('Restart failed'));
         await expect(setup.importConfiguration(file)).rejects.toThrow(
@@ -256,13 +346,13 @@ describe('setup', () => {
       expect(up).toHaveBeenCalledTimes(failRestart ? 2 : 1);
       expect(sync).toHaveBeenCalledExactlyOnceWith('wg0');
       expect(writeConfiguration.mock.lastCall?.[1]).toContain(
-        'PrivateKey = imported-private'
+        `PrivateKey = ${backup.server.privateKey}`
       );
       expect(writeConfiguration.mock.lastCall?.[1]).toContain(
         'Address = 10.9.0.15/24'
       );
       expect(writeConfiguration.mock.lastCall?.[1]).toContain(
-        'PublicKey = peer-public'
+        `PublicKey = ${backup.clients.peer.publicKey}`
       );
       expect((await store.interfaces.get()).ipv4Cidr).toBe('10.9.0.15/24');
       expect(await store.clients.getAll()).toMatchObject([
@@ -275,27 +365,7 @@ describe('setup', () => {
   test('leaves imported clients on the global DNS and allowed IPs', async () => {
     const { store } = await fixture();
     await setup.createAdministrator('admin', 'a-long-password');
-    await setup.importConfiguration(
-      JSON.stringify({
-        server: {
-          privateKey: 'imported-private',
-          publicKey: 'imported-public',
-          address: '10.9.0.1',
-        },
-        clients: {
-          peer: {
-            name: 'Imported',
-            address: '10.9.0.2',
-            privateKey: 'peer-private',
-            publicKey: 'peer-public',
-            preSharedKey: null,
-            createdAt: '2026-01-01',
-            updatedAt: '2026-01-01',
-            enabled: true,
-          },
-        },
-      })
-    );
+    await setup.importConfiguration(JSON.stringify(legacyBackup()));
     const [client] = await store.clients.getAll();
     expect(client).toMatchObject({ dns: null, allowedIps: null });
 

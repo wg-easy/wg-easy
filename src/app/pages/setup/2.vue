@@ -1,39 +1,48 @@
 <template>
   <div>
-    <p class="text-sm leading-relaxed text-muted">
-      {{ $t('setup.createAdminDescription') }}
+    <p
+      v-if="authMethods?.passwordDisabled"
+      role="alert"
+      class="text-sm leading-relaxed text-muted"
+    >
+      {{ $t('setup.enablePasswordSignIn') }}
     </p>
-    <div class="mt-8 flex flex-col gap-3">
-      <div class="flex flex-col">
-        <FormNullTextField
-          id="username"
-          v-model="username"
-          autocomplete="username"
-          :label="$t('common.fields.username')"
-        />
+    <template v-else>
+      <p class="text-sm leading-relaxed text-muted">
+        {{ $t('setup.createAdminDescription') }}
+      </p>
+      <div class="mt-8 flex flex-col gap-3">
+        <div class="flex flex-col">
+          <FormNullTextField
+            id="username"
+            v-model="username"
+            autocomplete="username"
+            :label="$t('common.fields.username')"
+          />
+        </div>
+        <div class="flex flex-col">
+          <FormPasswordField
+            id="password"
+            v-model="password"
+            autocomplete="new-password"
+            :label="$t('common.fields.password')"
+          />
+        </div>
+        <div class="flex flex-col">
+          <FormPasswordField
+            id="confirmPassword"
+            v-model="confirmPassword"
+            autocomplete="new-password"
+            :label="$t('common.fields.confirmPassword')"
+          />
+        </div>
+        <div class="mt-4 flex justify-center">
+          <BasePrimaryButton @click="submit">
+            {{ $t('setup.createAccount') }}
+          </BasePrimaryButton>
+        </div>
       </div>
-      <div class="flex flex-col">
-        <FormPasswordField
-          id="password"
-          v-model="password"
-          autocomplete="new-password"
-          :label="$t('common.fields.password')"
-        />
-      </div>
-      <div class="flex flex-col">
-        <FormPasswordField
-          id="confirmPassword"
-          v-model="confirmPassword"
-          autocomplete="new-password"
-          :label="$t('common.fields.confirmPassword')"
-        />
-      </div>
-      <div class="mt-4 flex justify-center">
-        <BasePrimaryButton @click="submit">
-          {{ $t('setup.createAccount') }}
-        </BasePrimaryButton>
-      </div>
-    </div>
+    </template>
   </div>
 </template>
 
@@ -46,6 +55,7 @@ definePageMeta({
 
 const setupStore = useSetupStore();
 setupStore.setStep(2);
+const { data: authMethods } = await useFetch('/api/auth/methods');
 
 const username = ref<null | string>(null);
 const password = ref<string>('');
@@ -60,7 +70,7 @@ const _submit = useSubmit(
   {
     revert: async (success) => {
       if (success) {
-        await navigateTo('/setup/3');
+        await navigateTo('/login');
       }
     },
     noSuccessToast: true,
