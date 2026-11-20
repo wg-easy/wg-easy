@@ -234,6 +234,7 @@
       "noPrivateKey": "This client has no known private key. Cannot create Configuration.",
       "showQrCode": "Show QR Code",
       "download": "Download Configuration",
+      "copy": "Copy Configuration",
       "title": "Configuration",
       "view": "View Configuration",
       "downloadPng": "Download PNG",

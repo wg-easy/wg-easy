@@ -172,6 +172,7 @@
       "noPrivateKey": "Người dùng này không có khóa riêng tư. Không thể tạo cấu hình.",
       "showQrCode": "Hiển thị mã QR",
       "download": "Tải cấu hình",
+      "copy": "Sao chép cấu hình",
       "title": "Cấu hình",
       "view": "Xem cấu hình",
       "downloadPng": "Tải PNG",
