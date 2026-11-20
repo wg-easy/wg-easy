@@ -118,6 +118,7 @@
     "welcomeDescription": "You have found the easiest way to install and manage WireGuard on any Linux host",
     "existingSetup": "Do you have an existing setup?",
     "createAdminDescription": "Please first enter an admin username and a strong secure password. This information will be used to log in to your administration panel.",
+    "enablePasswordSignIn": "To create the first administrator and sign in, set DISABLE_PASSWORD_AUTH=false and restart wg-easy. After setup, you can disable password sign-in again once you have linked and tested your administrator’s OAuth login.",
     "setupConfigDescription": "Please enter the host and port information. This will be used for the client configuration when setting up WireGuard on their devices.",
     "setupMigrationDescription": "Please provide the backup file if you want to migrate your data from your previous wg-easy version to your new setup.",
     "upload": "Upload",
