@@ -1,5 +1,8 @@
+import { randomBytes } from 'node:crypto';
+
 import { createDebug } from 'obug';
 import { isIPv6 } from 'is-ip';
+import { createError } from 'nuxt/server';
 
 import { exec } from '#server/utils/cmd';
 import { normalizePrefix } from '#server/utils/ip';
@@ -84,11 +87,14 @@ type FirewallClient = Pick<
   | 'enabled'
 >;
 
-async function allowRoutedReplies(
-  network: InterfaceType,
-  client: FirewallClient,
-  enableIpv6: boolean
-) {
+const replyMatch = '-m conntrack --ctstate ESTABLISHED --ctdir REPLY';
+type AddressFamily = 'IPv4' | 'IPv6';
+type SiteGateway = Pick<
+  FirewallClient,
+  'ipv4Address' | 'ipv6Address' | 'serverAllowedIps'
+>;
+
+function* routedSites(client: SiteGateway, enableIpv6: boolean) {
   for (const site of client.serverAllowedIps ?? []) {
     const ipv6 = site.includes(':');
     if (ipv6 && !enableIpv6) {
@@ -100,13 +106,44 @@ async function allowRoutedReplies(
     ) {
       continue;
     }
-    const pool = normalizePrefix(ipv6 ? network.ipv6Cidr : network.ipv4Cidr);
-    const command = ipv6 ? 'ip6tables' : 'iptables';
-    // Both peers use this interface. Only the reply leg of an established
-    // connection can pass here, even when the site advertises a default route.
-    await exec(
-      `${command} -A ${chainName(network.name)} -o ${network.name} -s ${source} -d ${pool} -m conntrack --ctstate ESTABLISHED --ctdir REPLY -j ACCEPT`
-    );
+    yield { source, ipv6 };
+  }
+}
+
+export function routedReplyFamilies(
+  gateways: SiteGateway[],
+  enableIpv6: boolean
+) {
+  const families = new Set<AddressFamily>();
+  for (const client of gateways) {
+    for (const { ipv6 } of routedSites(client, enableIpv6)) {
+      families.add(ipv6 ? 'IPv6' : 'IPv4');
+    }
+  }
+  return families;
+}
+
+export async function checkRoutedReplySupport(families: Set<AddressFamily>) {
+  for (const family of families) {
+    const command = family === 'IPv6' ? 'ip6tables' : 'iptables';
+    // Exercise the kernel match in a chain that no traffic traverses.
+    const chain = `WG_CT_${randomBytes(8).toString('hex')}`;
+    try {
+      await exec(`${command} -w 2 -N ${chain}`);
+      try {
+        await exec(`${command} -w 2 -A ${chain} ${replyMatch} -j ACCEPT`);
+      } finally {
+        await exec(
+          `${command} -w 2 -F ${chain} && ${command} -w 2 -X ${chain}`
+        );
+      }
+    } catch (cause) {
+      throw createError({
+        status: 422,
+        message: `Could not verify ${family} conntrack support with ${command}. Check the host's netfilter conntrack support and firewall permissions before enabling routed replies.`,
+        cause,
+      });
+    }
   }
 }
 
@@ -378,7 +415,15 @@ export const firewall = {
           userConfig.defaultAllowedIps,
           enableIpv6
         );
-        await allowRoutedReplies(wgInterface, client, enableIpv6);
+        for (const { source, ipv6 } of routedSites(client, enableIpv6)) {
+          const command = ipv6 ? 'ip6tables' : 'iptables';
+          const pool = normalizePrefix(
+            ipv6 ? wgInterface.ipv6Cidr : wgInterface.ipv4Cidr
+          );
+          await exec(
+            `${command} -A ${chainName(wgInterface.name)} -o ${wgInterface.name} -s ${source} -d ${pool} ${replyMatch} -j ACCEPT`
+          );
+        }
       }
 
       // Add final DROP for any traffic not explicitly allowed

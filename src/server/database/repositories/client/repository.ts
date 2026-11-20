@@ -85,6 +85,16 @@ export class ClientRepository {
     return result.map(withTimestamps);
   }
 
+  getEnabledSiteGateways() {
+    return this.db.query.client.findMany({
+      columns: { ipv4Address: true, ipv6Address: true, serverAllowedIps: true },
+      where: and(
+        eq(client.enabled, true),
+        sql`json_array_length(${client.serverAllowedIps}) > 0`
+      ),
+    });
+  }
+
   /**
    * Returns all clients without sensitive data
    */

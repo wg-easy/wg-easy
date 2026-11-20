@@ -10,10 +10,93 @@ import * as provisioning from '#server/features/vpn/provisioning';
 import * as queries from '#server/features/vpn/queries';
 import { ClientQuerySchema } from '#shared/contracts/client';
 import { NativePostUpError } from '#server/utils/wgHelper';
+import * as cmd from '#server/utils/cmd';
 
 const admin = { id: 1, role: roles.ADMIN };
 
 describe('VPN operations', () => {
+  test.each(['firewall', 'site', 'peer', 'start', 'restart'] as const)(
+    'rejects an unsupported IPv6 conntrack match before applying %s',
+    async (operation) => {
+      const { store, commands, firewall } = await vpnFixture();
+      const site = '2001:db8:1::/64';
+      await store.interfaces.update({
+        firewallEnabled: operation !== 'firewall',
+      });
+      await store.clients.update(1, {
+        enabled: operation !== 'peer',
+        serverAllowedIps: operation === 'site' ? [] : [site],
+      });
+      const exec = vi.spyOn(cmd, 'exec').mockImplementation(async (command) => {
+        if (command.includes('-m conntrack')) {
+          throw new Error('match unavailable');
+        }
+        return '';
+      });
+      const changes = {
+        firewall: () =>
+          vpn.commit((tx) => tx.interfaces.update({ firewallEnabled: true })),
+        site: () =>
+          vpn.commit((tx) =>
+            tx.clients.update(1, { serverAllowedIps: [site] })
+          ),
+        peer: () => clients.bulk(admin, { action: 'enable', clientIds: [1] }),
+        start: () => vpn.start(),
+        restart: () => vpn.restart(),
+      };
+
+      await expect(changes[operation]()).rejects.toMatchObject({
+        status: 422,
+        message: expect.stringMatching(/IPv6.*conntrack.*ip6tables/),
+      });
+      expect((await store.interfaces.get()).firewallEnabled).toBe(
+        operation !== 'firewall'
+      );
+      expect(await store.clients.get(1)).toMatchObject({
+        enabled: operation !== 'peer',
+        serverAllowedIps: operation === 'site' ? [] : [site],
+      });
+      expect(firewall.blockTraffic).not.toHaveBeenCalled();
+      expect(commands.down).not.toHaveBeenCalled();
+      expect(commands.sync).not.toHaveBeenCalled();
+      const calls = exec.mock.calls.map(([command]) => command);
+      expect(calls.every((command) => command.startsWith('ip6tables '))).toBe(
+        true
+      );
+      const chain = calls[0]?.split(' ').at(-1);
+      expect(chain).toMatch(/^WG_CT_/);
+      expect(calls).toEqual([
+        `ip6tables -w 2 -N ${chain}`,
+        `ip6tables -w 2 -A ${chain} -m conntrack --ctstate ESTABLISHED --ctdir REPLY -j ACCEPT`,
+        `ip6tables -w 2 -F ${chain} && ip6tables -w 2 -X ${chain}`,
+      ]);
+    }
+  );
+
+  test('checks only newly required families and allows revocation after a failed check', async () => {
+    const { store } = await vpnFixture();
+    await store.interfaces.update({ firewallEnabled: true });
+    const ipv4 = '192.0.2.0/24';
+    const ipv6 = '2001:db8:1::/64';
+    await store.clients.update(1, { serverAllowedIps: [ipv4] });
+    const checked: string[] = [];
+    vi.spyOn(cmd, 'exec').mockImplementation(async (command) => {
+      if (command.includes('-m conntrack')) {
+        checked.push(command.split(' ')[0]!);
+        throw new Error('match unavailable');
+      }
+      return '';
+    });
+    await expect(
+      vpn.commit((tx) =>
+        tx.clients.update(1, { serverAllowedIps: [ipv4, ipv6] })
+      )
+    ).rejects.toThrow('IPv6');
+    await clients.apply(admin, 1, 'disable');
+    expect((await store.clients.get(1))?.enabled).toBe(false);
+    expect(checked).toEqual(['ip6tables']);
+  });
+
   test('refuses to start without required firewall tools and preserves the setting', async () => {
     const { store, commands, firewall } = await vpnFixture();
     await store.interfaces.update({ firewallEnabled: true });
