@@ -230,7 +230,7 @@ describe('setup', () => {
     ['peer', 'preSharedKey', 'A'.repeat(42) + 'B='],
     ['peer', 'address', '2001:db8::1'],
     ['peer', 'name', 'two\nlines'],
-    ['peer', 'name', 'two\u2028lines'],
+    ['peer', 'name', 'two\rlines'],
   ] as const)(
     'rejects an invalid %s %s before applying any changes',
     async (section, field, value) => {
