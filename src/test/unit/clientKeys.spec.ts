@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { requestEvent } from '../helpers/request';
 import { databaseFixture } from '../helpers/database';
+import { legacyBackup } from '../helpers/legacyBackup';
 
 import * as clientOperations from '#server/features/vpn/clients';
 import { UserConfigRepository } from '#db/repositories/userConfig/repository';
@@ -160,33 +161,31 @@ describe('client key actions', () => {
     'normalizes an imported absent key (%s) to null',
     async (preSharedKey) => {
       await store.general.update({ setupStep: 3 });
-      await importConfiguration(
-        JSON.stringify({
-          server: {
-            privateKey: Buffer.alloc(32, 1).toString('base64'),
-            publicKey: Buffer.alloc(32, 2).toString('base64'),
-            address: '10.8.0.1',
-          },
-          clients: {
-            imported: {
-              name: 'Imported client',
-              enabled: true,
-              address: '10.8.0.4',
-              privateKey: Buffer.alloc(32, 3).toString('base64'),
-              publicKey: Buffer.alloc(32, 4).toString('base64'),
-              preSharedKey,
-              createdAt: '2026-01-01',
-              updatedAt: '2026-01-01',
-            },
-          },
-        })
-      );
+      const backup = legacyBackup(preSharedKey);
+      backup.server.address = '10.8.0.1';
+      backup.clients.peer.address = '10.8.0.4';
+      await importConfiguration(JSON.stringify(backup));
       expect(await clients.get(3)).toMatchObject({ preSharedKey: null });
       expect(await clients.getPublic(3)).toMatchObject({
         hasPreSharedKey: false,
       });
     }
   );
+
+  test('rejects an imported server key already used by an existing peer', async () => {
+    await store.general.update({ setupStep: 3 });
+    const backup = legacyBackup();
+    await clients.update(1, { publicKey: backup.server.publicKey });
+    const network = await store.interfaces.get();
+    await expect(
+      importConfiguration(JSON.stringify(backup))
+    ).rejects.toMatchObject({
+      status: 400,
+      message: 'Duplicate public key at server.publicKey',
+    });
+    expect(await store.interfaces.get()).toEqual(network);
+    expect(writeFile).not.toHaveBeenCalled();
+  });
 
   test('removes only the selected preshared key and updates both configurations', async () => {
     const before = await clients.get(1);

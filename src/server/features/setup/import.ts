@@ -1,3 +1,5 @@
+import { createPrivateKey, createPublicKey } from 'node:crypto';
+
 import { parseCidr } from 'cidr-tools';
 import { createError } from 'nuxt/server';
 import { z } from 'zod';
@@ -5,7 +7,11 @@ import { z } from 'zod';
 import type { Repositories } from '#db/store';
 import { changeCidr } from '#server/features/vpn/interface';
 import { clientDefaults } from '#server/features/vpn/clients';
-import { nextIPFromUsedAddresses, normalizeAddress } from '#server/utils/ip';
+import {
+  isClientAddress,
+  nextIPFromUsedAddresses,
+  normalizeAddress,
+} from '#server/utils/ip';
 import { KeySchema } from '#shared/contracts/validation';
 import { ClientUpdateSchema } from '#shared/contracts/client';
 
@@ -59,16 +65,33 @@ function parseBackup(file: string) {
   return result.data;
 }
 
+function checkKeyPair(
+  keys: { privateKey: string; publicKey: string },
+  field: string,
+  usedPublicKeys: Set<string>
+) {
+  const privateKey = createPrivateKey({
+    key: Buffer.from(keys.privateKey, 'base64'),
+    format: 'raw-private',
+    asymmetricKeyType: 'x25519',
+  });
+  const publicKey = createPublicKey(privateKey).export({
+    format: 'raw-public',
+  });
+  if (publicKey.toString('base64') !== keys.publicKey) {
+    throw invalidBackup(`Key pair mismatch at ${field}`);
+  }
+  if (usedPublicKeys.has(keys.publicKey)) {
+    throw invalidBackup(`Duplicate public key at ${field}`);
+  }
+  usedPublicKeys.add(keys.publicKey);
+}
+
 export async function importLegacyConfiguration(
   tx: Repositories,
   file: string
 ) {
   const oldConfig = parseBackup(file);
-
-  await tx.interfaces.update({
-    privateKey: oldConfig.server.privateKey,
-    publicKey: oldConfig.server.publicKey,
-  });
 
   const ipv4Cidr = parseCidr(oldConfig.server.address + '/24');
   const ipv6Cidr = parseCidr('fdcc:ad94:bacf:61a4::cafe:0/112');
@@ -83,16 +106,22 @@ export async function importLegacyConfiguration(
   );
   const ipv4Addresses = new Set(existing.map((client) => client.ipv4Address));
   const publicKeys = new Set(existing.map((client) => client.publicKey));
+  checkKeyPair(oldConfig.server, 'server.publicKey', publicKeys);
+  await tx.interfaces.update({
+    privateKey: oldConfig.server.privateKey,
+    publicKey: oldConfig.server.publicKey,
+  });
 
   const defaults = await tx.userConfigs.get();
   const network = await tx.interfaces.get();
   for (const [index, clientConfig] of oldConfig.clients.entries()) {
+    if (!isClientAddress(clientConfig.address, ipv4Cidr)) {
+      throw invalidBackup(`Unusable peer address at clients.${index}.address`);
+    }
     if (ipv4Addresses.has(clientConfig.address)) {
       throw invalidBackup(`Duplicate address at clients.${index}.address`);
     }
-    if (publicKeys.has(clientConfig.publicKey)) {
-      throw invalidBackup(`Duplicate public key at clients.${index}.publicKey`);
-    }
+    checkKeyPair(clientConfig, `clients.${index}.publicKey`, publicKeys);
     const ipv6Address = nextIPFromUsedAddresses(ipv6Cidr, ipv6Addresses);
 
     await tx.clients.insert({
@@ -114,6 +143,5 @@ export async function importLegacyConfiguration(
     });
     ipv6Addresses.add(ipv6Address);
     ipv4Addresses.add(clientConfig.address);
-    publicKeys.add(clientConfig.publicKey);
   }
 }
