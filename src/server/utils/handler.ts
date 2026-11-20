@@ -2,7 +2,11 @@ import { defineEventHandler, type RequestEvent } from 'nuxt/server';
 
 import * as setup from '#server/features/setup';
 import { authorizeMetrics } from '#server/features/settings';
-import { getCurrentUser } from '#server/features/identity/session';
+import { authorize } from '#server/features/authorization';
+import {
+  currentSessionUser,
+  getCurrentUser,
+} from '#server/features/identity/session';
 import type { PublicUser } from '#shared/contracts/identity';
 
 /**
@@ -22,6 +26,9 @@ export function defineSetupEventHandler<T>(
   handler: (params: { event: RequestEvent }) => T
 ) {
   return defineEventHandler(async (event) => {
+    if (step !== 2) {
+      authorize(await currentSessionUser(event), 'admin', 'any');
+    }
     await setup.assertStep(step);
     return handler({ event });
   });

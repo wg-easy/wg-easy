@@ -7,6 +7,7 @@ import { commit } from '#server/features/vpn/lifecycle';
 import { getDatabase } from '#db';
 import type { SetupStepType } from '#shared/contracts/general';
 import { createPasswordUser } from '#server/features/identity/accounts';
+import { assertPasswordEnabled } from '#server/features/identity';
 import { getIpInformation } from '#server/utils/ip';
 
 export type SetupAction = 2 | 4 | 'migrate';
@@ -35,6 +36,7 @@ export async function assertStep(action: SetupAction) {
 export function createAdministrator(username: string, password: string) {
   return getDatabase().transaction(async (tx) => {
     checkStep(await tx.general.getSetupStep(), 2);
+    assertPasswordEnabled();
     await createPasswordUser(tx.users, username, password);
     await tx.general.update({ setupStep: 3 });
   });

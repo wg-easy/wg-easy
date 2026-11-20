@@ -83,6 +83,7 @@ import { LoaderCircleIcon } from '@lucide/vue';
 import { $fetch } from '#imports';
 
 const route = useRoute();
+const setupStore = useSetupStore();
 
 const authenticating = ref(false);
 const remember = ref(false);
@@ -97,7 +98,11 @@ watchEffect(() => {
       ? route.query.auto_launch
       : undefined;
 
-  if (authMethods.value?.autoLaunchProvider && !autoLauchQuery) {
+  if (
+    setupStore.done &&
+    authMethods.value?.autoLaunchProvider &&
+    !autoLauchQuery
+  ) {
     navigateTo(`/api/auth/${authMethods.value.autoLaunchProvider}`, {
       external: true,
     });

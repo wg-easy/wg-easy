@@ -163,8 +163,8 @@ describe('client key actions', () => {
       await importConfiguration(
         JSON.stringify({
           server: {
-            privateKey: 'server-private',
-            publicKey: 'server-public',
+            privateKey: Buffer.alloc(32, 1).toString('base64'),
+            publicKey: Buffer.alloc(32, 2).toString('base64'),
             address: '10.8.0.1',
           },
           clients: {
@@ -172,8 +172,8 @@ describe('client key actions', () => {
               name: 'Imported client',
               enabled: true,
               address: '10.8.0.4',
-              privateKey: 'imported-private-key',
-              publicKey: 'imported-public-key',
+              privateKey: Buffer.alloc(32, 3).toString('base64'),
+              publicKey: Buffer.alloc(32, 4).toString('base64'),
               preSharedKey,
               createdAt: '2026-01-01',
               updatedAt: '2026-01-01',

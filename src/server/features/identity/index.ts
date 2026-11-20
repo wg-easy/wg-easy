@@ -141,7 +141,7 @@ export function loginWithOAuth(
   email: string,
   name: string
 ): Promise<OAuthLoginResult> {
-  return getDatabase().transaction(async ({ users }) => {
+  return getDatabase().transaction(async ({ users, general }) => {
     const linked = await users.getByOAuth(provider, oauthId);
     if (linked) {
       if (!linked.enabled) {
@@ -164,7 +164,8 @@ export function loginWithOAuth(
         false
       );
     }
-    if (!WG_ENV.OAUTH_AUTO_REGISTER) {
+    // Claim the instance through setup before OAuth can create other admins.
+    if (!WG_ENV.OAUTH_AUTO_REGISTER || !(await general.getSetupStep()).done) {
       return { success: false, error: 'AUTO_REGISTER_DISABLED' };
     }
     let availableUsername = username;

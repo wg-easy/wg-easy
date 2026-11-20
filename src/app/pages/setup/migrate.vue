@@ -28,7 +28,7 @@ definePageMeta({
 });
 
 const setupStore = useSetupStore();
-setupStore.setStep(5);
+setupStore.setStep(4);
 
 const backupFile = ref<null | File>(null);
 
@@ -36,10 +36,7 @@ function onChangeFile(evt: Event) {
   const target = evt.target as HTMLInputElement;
   const file = target.files?.[0];
 
-  if (file) {
-    backupFile.value = file;
-    console.log('selected file', backupFile.value);
-  }
+  backupFile.value = file ?? null;
 }
 
 const _submit = useSubmit(
@@ -51,7 +48,7 @@ const _submit = useSubmit(
   {
     revert: async (success) => {
       if (success) {
-        await navigateTo('/setup/success');
+        await navigateTo('/');
       }
     },
     noSuccessToast: true,
