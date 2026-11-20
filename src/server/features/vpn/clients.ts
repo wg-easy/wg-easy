@@ -79,6 +79,7 @@ export async function update(
 ) {
   await commit(async (tx) => {
     authorizeClient(actor, 'update', await tx.clients.getPublic(clientId));
+    // TODO: Require admin approval for changes to serverAllowedIps because they affect host routing.
     assertClientEnabled(data.enabled, data.expiresAt);
     const addresses = assertClientAddresses(
       data,

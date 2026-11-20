@@ -17,7 +17,9 @@ type App = {
   publicKey: (privateKey: string) => Promise<string>;
   serverPublicKey: () => Promise<string>;
   restart: () => Promise<string>;
-  connectClient: (configuration: string) => Promise<void>;
+  connectClient: (configuration: string, index?: number) => Promise<void>;
+  execClient: (args: string[], index?: number) => Promise<string>;
+  execServer: (args: string[]) => Promise<string>;
   pingFromClient: (address: string) => Promise<boolean>;
 };
 
@@ -26,10 +28,15 @@ export const credentials = {
   password: 'e2e-only-password-123!',
 };
 
-export const test = base.extend<{ app: App; initialized: boolean }>({
+export const test = base.extend<{
+  app: App;
+  initialized: boolean;
+  ipv6: boolean;
+}>({
   initialized: [true, { option: true }],
+  ipv6: [false, { option: true }],
   app: [
-    async ({ initialized }, use, testInfo) => {
+    async ({ initialized, ipv6 }, use, testInfo) => {
       const runDir = process.env.E2E_RUN_DIR;
       if (!runDir) {
         throw new Error('Run pnpm test:e2e to manage test containers.');
@@ -55,6 +62,7 @@ export const test = base.extend<{ app: App; initialized: boolean }>({
             env: {
               ...process.env,
               E2E_INITIALIZED: String(initialized),
+              E2E_DISABLE_IPV6: String(!ipv6),
             },
             timeout: 120_000,
             maxBuffer: 4 * 1024 * 1024,
@@ -65,8 +73,11 @@ export const test = base.extend<{ app: App; initialized: boolean }>({
       }
       const wg = (args: string[], input?: string) =>
         compose(['exec', '-T', 'wg-easy', 'wg', ...args], input);
-      const execClient = (args: string[], input?: string) =>
-        compose(['exec', '-T', 'vpn-client', ...args], input);
+      const execClient = (args: string[], index = 1, input?: string) =>
+        compose(
+          ['exec', '-T', '--index', String(index), 'vpn-client', ...args],
+          input
+        );
       const getUrl = async () =>
         `http://${await compose(['port', 'wg-easy', '51821'])}`;
 
@@ -85,8 +96,16 @@ export const test = base.extend<{ app: App; initialized: boolean }>({
             (await wg(['show', 'wg0', 'peers'])).split(/\s+/).filter(Boolean),
           publicKey: (privateKey) => wg(['pubkey'], `${privateKey}\n`),
           serverPublicKey: () => wg(['show', 'wg0', 'public-key']),
-          connectClient: async (configuration) => {
-            await compose(['up', '-d', 'vpn-client']);
+          execClient,
+          execServer: (args) => compose(['exec', '-T', 'wg-easy', ...args]),
+          connectClient: async (configuration, index = 1) => {
+            await compose([
+              'up',
+              '-d',
+              '--scale',
+              `vpn-client=${index}`,
+              'vpn-client',
+            ]);
             await execClient(
               [
                 'sh',
@@ -99,6 +118,7 @@ resolvconf -u
 resolvconf -a eth0 < /tmp/docker-resolv.conf
 wg-quick up wg0`,
               ],
+              index,
               configuration
             );
           },

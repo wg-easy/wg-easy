@@ -9,6 +9,7 @@ import * as settings from '#server/features/vpn/interface';
 import * as provisioning from '#server/features/vpn/provisioning';
 import * as queries from '#server/features/vpn/queries';
 import { ClientQuerySchema } from '#shared/contracts/client';
+import { NativePostUpError } from '#server/utils/wgHelper';
 
 const admin = { id: 1, role: roles.ADMIN };
 
@@ -35,7 +36,7 @@ describe('VPN operations', () => {
     async (mode) => {
       const { store, commands, firewall } = await vpnFixture();
       await store.interfaces.update({ firewallEnabled: true });
-      commands[mode === 'start' ? 'up' : mode].mockImplementation(async () => {
+      commands[mode === 'sync' ? 'sync' : 'up'].mockImplementation(async () => {
         expect(firewall.blockTraffic).toHaveBeenCalledWith('wg0', true);
         throw new Error('WireGuard unavailable');
       });
@@ -157,11 +158,38 @@ describe('VPN operations', () => {
 
   test('retries a failed restart as a restart', async () => {
     const { commands } = await vpnFixture();
-    commands.restart.mockRejectedValueOnce(new Error('Restart failed'));
+    commands.up.mockRejectedValueOnce(new Error('Restart failed'));
     await expect(vpn.restart()).rejects.toThrow('Restart failed');
     await vpn.maintain();
-    expect(commands.restart).toHaveBeenCalledTimes(2);
+    expect(commands.up).toHaveBeenCalledTimes(2);
     expect(commands.sync).toHaveBeenCalledOnce();
+  });
+
+  test('retries firewall setup after a restart without running PostUp again', async () => {
+    const { commands, firewall } = await vpnFixture();
+    firewall.rebuildRules.mockRejectedValueOnce(
+      new Error('Firewall unavailable')
+    );
+    await expect(vpn.restart()).rejects.toThrow('Firewall unavailable');
+    await vpn.maintain();
+    expect(firewall.rebuildRules).toHaveBeenCalledTimes(2);
+    expect(commands.up).toHaveBeenCalledOnce();
+    expect(commands.up.mock.lastCall?.[1]?.nativePostUp).toBe(true);
+  });
+
+  test('retries only shutdown when cleanup after a failed PostUp also fails', async () => {
+    const { commands } = await vpnFixture();
+    commands.down
+      .mockResolvedValueOnce()
+      .mockRejectedValueOnce(new Error('Shutdown failed'));
+    commands.up.mockRejectedValueOnce(new NativePostUpError('Hook failed'));
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    await expect(vpn.restart()).rejects.toMatchObject({ status: 503 });
+    await expect(vpn.maintain()).rejects.toMatchObject({ status: 503 });
+    await vpn.maintain();
+    expect(commands.down).toHaveBeenCalledTimes(3);
+    expect(commands.up).toHaveBeenCalledOnce();
+    expect(commands.postUp).not.toHaveBeenCalled();
   });
 
   test('retries a failed start without replacing the initialized server identity', async () => {
@@ -376,7 +404,10 @@ describe('VPN operations', () => {
     expect(writeConfiguration.mock.calls[0]?.[1]).toContain(
       'PrivateKey = new-private'
     );
-    expect(commands.up).toHaveBeenCalledWith('wg0');
+    expect(commands.up).toHaveBeenCalledWith(
+      'wg0',
+      expect.objectContaining({ nativePostUp: true })
+    );
     expect(firewall.rebuildRules).toHaveBeenCalledOnce();
     await vpn.stop();
     expect(commands.down).toHaveBeenCalledTimes(2);

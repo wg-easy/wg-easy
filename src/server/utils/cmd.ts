@@ -1,12 +1,16 @@
-import childProcess from 'child_process';
+import { exec as execShell } from 'node:child_process';
+import { promisify } from 'node:util';
 
 import { createDebug } from 'obug';
 
 const CMD_DEBUG = createDebug('CMD');
+const run = promisify(execShell);
 
-export function exec(
+type CommandOptions = { log?: boolean | string; env?: NodeJS.ProcessEnv };
+
+export async function exec(
   cmd: string,
-  { log }: { log: boolean | string } = { log: true }
+  { log = true, env }: CommandOptions = {}
 ) {
   if (typeof log === 'string') {
     CMD_DEBUG(`$ ${log}`);
@@ -15,21 +19,9 @@ export function exec(
   }
 
   if (process.platform !== 'linux') {
-    return Promise.resolve('');
+    return '';
   }
 
-  return new Promise<string>((resolve, reject) => {
-    childProcess.exec(
-      cmd,
-      {
-        shell: 'bash',
-      },
-      (err, stdout) => {
-        if (err) {
-          return reject(err);
-        }
-        return resolve(String(stdout).trim());
-      }
-    );
-  });
+  const { stdout } = await run(cmd, { shell: 'bash', env });
+  return stdout.trim();
 }

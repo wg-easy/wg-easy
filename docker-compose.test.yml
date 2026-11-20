@@ -3,7 +3,7 @@ services:
     image: wg-easy-e2e:local
     environment:
       INSECURE: "true"
-      DISABLE_IPV6: "true"
+      DISABLE_IPV6: ${E2E_DISABLE_IPV6:-true}
       DISABLE_VERSION_CHECK: "true"
       DEBUG: ""
       INIT_ENABLED: ${E2E_INITIALIZED:-true}
