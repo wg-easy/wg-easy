@@ -104,10 +104,58 @@
           :description="$t('wireguard.obfuscation.i4.description')"
         />
         <FormNullTextField
-          id="i5"
+          id="defaultI5"
           v-model="data.defaultI5"
           :label="$t('wireguard.obfuscation.i5.label')"
           :description="$t('wireguard.obfuscation.i5.description')"
+        />
+        <FormNullTextField
+          id="defaultContentPaddingAddition"
+          v-model="data.defaultContentPaddingAddition"
+          :label="$t('wireguard.obfuscation.contentPaddingAddition.label')"
+          :description="
+            $t('wireguard.obfuscation.contentPaddingAddition.description')
+          "
+        />
+        <FormNullTextField
+          id="defaultRekeyAfterTime"
+          v-model="data.defaultRekeyAfterTime"
+          :label="$t('wireguard.obfuscation.rekeyAfterTime.label')"
+          :description="$t('wireguard.obfuscation.rekeyAfterTime.description')"
+        />
+        <FormNullTextField
+          id="defaultRekeyTimeout"
+          v-model="data.defaultRekeyTimeout"
+          :label="$t('wireguard.obfuscation.rekeyTimeout.label')"
+          :description="$t('wireguard.obfuscation.rekeyTimeout.description')"
+        />
+        <FormNullTextField
+          id="defaultRejectAfterTime"
+          v-model="data.defaultRejectAfterTime"
+          :label="$t('wireguard.obfuscation.rejectAfterTime.label')"
+          :description="$t('wireguard.obfuscation.rejectAfterTime.description')"
+        />
+        <FormNullTextField
+          id="defaultKeepaliveTimeout"
+          v-model="data.defaultKeepaliveTimeout"
+          :label="$t('wireguard.obfuscation.keepaliveTimeout.label')"
+          :description="
+            $t('wireguard.obfuscation.keepaliveTimeout.description')
+          "
+        />
+        <FormNullTextField
+          id="defaultMaxHandshakeAttempts"
+          v-model="data.defaultMaxHandshakeAttempts"
+          :label="$t('wireguard.obfuscation.maxHandshakeAttempts.label')"
+          :description="
+            $t('wireguard.obfuscation.maxHandshakeAttempts.description')
+          "
+        />
+        <FormNullSwitchField
+          id="defaultDisableCookies"
+          v-model="data.defaultDisableCookies"
+          :label="$t('wireguard.obfuscation.disableCookies.label')"
+          :description="$t('wireguard.obfuscation.disableCookies.description')"
         />
       </FormGroup>
       <FormSaveControls @revert="revert" />
