@@ -17,6 +17,10 @@ import { UserConfigUpdateSchema } from '#shared/contracts/userConfig';
 import removePreSharedKey from '#server/api/client/[clientId]/preSharedKey.delete';
 import rotatePreSharedKey from '#server/api/client/[clientId]/preSharedKey.post';
 import rotateKeyPair from '#server/api/client/[clientId]/rotateKeyPair.post';
+import createClient from '#server/api/client/index.post';
+import replacePublicKey from '#server/api/client/[clientId]/publicKey.put';
+import qrCode from '#server/api/client/[clientId]/qrcode.svg.get';
+import * as provisioning from '#server/features/vpn/provisioning';
 import {
   generateClientConfig,
   generateServerConfig,
@@ -29,6 +33,9 @@ const { getCurrentUser, exec } = vi.hoisted(() => ({
 
 vi.mock('#server/features/identity/session', () => ({ getCurrentUser }));
 vi.mock('#server/utils/cmd', () => ({ exec }));
+vi.mock('#server/http/translation', () => ({
+  useRequestTranslation: () => (key: string) => key,
+}));
 vi.mock('#server/utils/config', () => ({
   OLD_ENV: {},
   WG_ENV: { WG_EXECUTABLE: 'wg', WG_INTERFACE: 'wg0', PORT: '51821' },
@@ -39,8 +46,17 @@ let clients: ClientRepository;
 let store: Awaited<ReturnType<typeof databaseFixture>>['store'];
 let db: Awaited<ReturnType<typeof databaseFixture>>['db'];
 
-function event(clientId = '1') {
-  const event = requestEvent(`http://localhost/api/client/${clientId}`);
+function event(clientId = '1', publicKey?: string) {
+  const event = requestEvent(
+    `http://localhost/api/client/${clientId}`,
+    publicKey === undefined
+      ? undefined
+      : {
+          method: 'PUT',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ publicKey }),
+        }
+  );
   event.context.params = { clientId };
   return event;
 }
@@ -118,6 +134,120 @@ async function configurations(clientId = 1) {
     client: generateClientConfig(wgInterface, userConfig, client),
   };
 }
+
+describe('device-held private keys', () => {
+  const admin = { id: 1, role: roles.ADMIN };
+  const firstKey = Buffer.alloc(32, 1).toString('base64');
+  const nextKey = Buffer.alloc(32, 2).toString('base64');
+
+  function register(publicKey: string) {
+    return createClient(
+      requestEvent('http://localhost/api/client', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ name: 'Router', expiresAt: null, publicKey }),
+      })
+    );
+  }
+
+  test.each([true, false])(
+    'registers a public key with preshared-key generation %s',
+    async (generate) => {
+      await store.userConfigs.update({ defaultGeneratePreSharedKey: generate });
+      const { clientId } = await register(`  ${firstKey}\n`);
+      expect(exec).not.toHaveBeenCalledWith('wg genkey');
+      expect(await clients.get(clientId)).toMatchObject({
+        privateKey: null,
+        publicKey: firstKey,
+        preSharedKey: generate ? 'new-preshared-key' : null,
+      });
+      const page = await clients.getPage({ page: 1, pageSize: 25 });
+      expect(
+        page.clients.find((client) => client.id === clientId)
+      ).toMatchObject({ hasPrivateKey: false });
+      expect(await clients.getPublic(1)).toMatchObject({ hasPrivateKey: true });
+      const download = await provisioning.download(admin, clientId);
+      expect(download.filename).toBe('Router.template.conf');
+      expect(download.contents).toContain('# PrivateKey =');
+      expect(download.contents).not.toMatch(/^PrivateKey =/m);
+      expect(
+        download.contents.includes('PresharedKey = new-preshared-key')
+      ).toBe(generate);
+      expect(String(writeFile.mock.calls[0]?.[1])).toContain(
+        `PublicKey = ${firstKey}`
+      );
+      await provisioning.generateOneTimeLink(admin, clientId);
+      const link = (await clients.getAll()).find(
+        (client) => client.id === clientId
+      )!.oneTimeLink!;
+      expect(await provisioning.redeemOneTimeLink(link.oneTimeLink)).toEqual(
+        download
+      );
+      await expect(qrCode(event(String(clientId)))).rejects.toMatchObject({
+        status: 409,
+        message: expect.stringContaining('configuration template'),
+      });
+    }
+  );
+
+  test('an owner can replace a public key and retry without changing other settings or synchronizing twice', async () => {
+    const { clientId } = await register(firstKey);
+    const before = await clients.get(clientId);
+    getCurrentUser.mockResolvedValue({ id: 1, role: 2 });
+    const replace = () =>
+      replacePublicKey(event(String(clientId), ` ${nextKey} `));
+    writeFile.mockClear();
+    await replace();
+    expect(await clients.get(clientId)).toEqual({
+      ...before,
+      publicKey: nextKey,
+      updatedAt: expect.any(String),
+    });
+    const config = String(writeFile.mock.calls[0]?.[1]);
+    expect(config).toContain(nextKey);
+    expect(config).not.toContain(firstKey);
+    await replace();
+    expect(writeFile).toHaveBeenCalledOnce();
+    await expect(rotateKeyPair(event(String(clientId)))).rejects.toMatchObject({
+      status: 409,
+    });
+    await expect(replacePublicKey(event('1', firstKey))).rejects.toMatchObject({
+      status: 409,
+    });
+    getCurrentUser.mockResolvedValue({ id: 2, role: 2 });
+    await expect(
+      replacePublicKey(event(String(clientId), firstKey))
+    ).rejects.toMatchObject({ status: 403 });
+    expect((await clients.get(clientId))?.publicKey).toBe(nextKey);
+    expect(writeFile).toHaveBeenCalledOnce();
+  });
+
+  test('creation and replacement reject invalid or conflicting keys before applying changes', async () => {
+    const { clientId } = await register(firstKey);
+    const serverKey = Buffer.alloc(32, 3).toString('base64');
+    await store.interfaces.update({ publicKey: serverKey });
+    await clients.update(2, { publicKey: nextKey, enabled: false });
+    writeFile.mockClear();
+    for (const [key, status] of [
+      ['bad', 400],
+      [Buffer.alloc(32).toString('base64'), 400],
+      [firstKey.slice(0, -2) + 'B=', 400],
+      [serverKey, 422],
+      [nextKey, 409],
+    ] as const) {
+      await expect(register(key)).rejects.toMatchObject({ status });
+      await expect(
+        replacePublicKey(event(String(clientId), key))
+      ).rejects.toMatchObject({ status });
+    }
+    await expect(
+      replacePublicKey(event(String(clientId), ' '))
+    ).rejects.toMatchObject({ status: 400 });
+    expect(await clients.getAll()).toHaveLength(3);
+    expect((await clients.get(clientId))?.publicKey).toBe(firstKey);
+    expect(writeFile).not.toHaveBeenCalled();
+  });
+});
 
 describe('client key actions', () => {
   test.each([true, false])(

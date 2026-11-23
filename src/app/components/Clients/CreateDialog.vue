@@ -13,6 +13,13 @@
           v-model="name"
           :label="$t('clients.fields.name.label')"
         />
+        <FormTextField
+          id="devicePublicKey"
+          v-model="publicKey"
+          :label="$t('clients.keys.publicKey')"
+          :description="$t('clients.create.publicKeyHint')"
+          autocomplete="off"
+        />
         <FormDateField
           id="expiresAt"
           v-model="expiresAt"
@@ -40,6 +47,7 @@
 import { $fetch } from '#imports';
 
 const name = ref<string>('');
+const publicKey = ref('');
 const expiresAt = ref<string | null>(null);
 const clientsStore = useClientsStore();
 
@@ -53,11 +61,16 @@ function resetOnOpen(open: boolean) {
   }
 
   name.value = '';
+  publicKey.value = '';
   expiresAt.value = null;
 }
 
 function createClient() {
-  return _createClient({ name: name.value, expiresAt: expiresAt.value });
+  return _createClient({
+    name: name.value,
+    publicKey: publicKey.value || undefined,
+    expiresAt: expiresAt.value,
+  });
 }
 
 const _createClient = useSubmit(

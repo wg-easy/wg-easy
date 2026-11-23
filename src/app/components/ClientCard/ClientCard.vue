@@ -57,7 +57,7 @@
         </label>
         <div class="flex gap-1.5">
           <ClientCardEdit :client="client" />
-          <ClientCardQRCode :client="client" />
+          <ClientCardQRCode v-if="client.hasPrivateKey" :client="client" />
           <ClientCardConfig :client="client" />
           <ClientCardOneTimeLinkBtn :client="client" />
         </div>

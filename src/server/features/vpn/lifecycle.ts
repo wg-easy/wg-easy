@@ -200,6 +200,8 @@ async function filteredSiteGateways(tx: Repositories) {
   return network.firewallEnabled ? tx.clients.getEnabledSiteGateways() : [];
 }
 
+export const unchanged = Symbol('unchanged');
+
 /** Validate new host requirements before committing, then apply the saved state. */
 export function commit<T>(
   change: (tx: Repositories) => Promise<T>,
@@ -222,7 +224,9 @@ export function commit<T>(
       }
       return value;
     });
-    await apply(mode);
+    if (result !== unchanged || hostStates.get(getDatabase())?.retry) {
+      await apply(mode);
+    }
     return result;
   });
 }

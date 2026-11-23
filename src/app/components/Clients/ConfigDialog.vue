@@ -4,7 +4,11 @@
       <slot />
     </template>
     <template #title>
-      {{ $t('clients.configuration.title') }}
+      {{
+        isTemplate
+          ? $t('clients.configuration.template')
+          : $t('clients.configuration.title')
+      }}
     </template>
     <template #description>
       <div v-if="status === 'success'">
@@ -30,7 +34,11 @@
 </template>
 
 <script setup lang="ts">
-const props = defineProps<{ triggerClass?: string; clientId: number }>();
+const props = defineProps<{
+  triggerClass?: string;
+  clientId: number;
+  isTemplate: boolean;
+}>();
 
 const toast = useToast();
 const { copied, copy, isSupported } = useClipboard({

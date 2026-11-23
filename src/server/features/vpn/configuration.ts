@@ -190,8 +190,12 @@ export function generateClientConfig(
     (v) => v !== null
   );
 
+  const privateKeyLine = client.privateKey
+    ? `PrivateKey = ${client.privateKey}`
+    : '# Configuration template: on the device, uncomment the next line and enter its private key.\n# PrivateKey = <device private key>';
+
   return `[Interface]
-PrivateKey = ${client.privateKey}
+${privateKeyLine}
 Address = ${address}
 ${extraLines.length ? `${extraLines.join('\n')}\n` : ''}
 [Peer]

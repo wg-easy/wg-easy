@@ -58,9 +58,27 @@ const serverAllowedIps = z.array(AllowedIpEntrySchema, {
   message: t('validation.client.serverAllowedIps'),
 });
 
+const publicKeyError = t('validation.client.publicKey');
+// A 32-byte key ends with two zero padding bits and one '=' in canonical base64.
+const publicKey = z
+  .string()
+  .trim()
+  .regex(/^[A-Za-z0-9+/]{42}[AEIMQUYcgkosw048]=$/, publicKeyError)
+  .refine(
+    (key) => key !== 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=',
+    publicKeyError
+  );
+
+export const ClientPublicKeySchema = z.object({ publicKey });
+
 export const ClientCreateSchema = z.object({
   name: name,
   expiresAt: expiresAt,
+  publicKey: z
+    .string()
+    .trim()
+    .pipe(z.union([z.literal(''), publicKey], { error: publicKeyError }))
+    .optional(),
 });
 
 export type ClientCreateType = z.infer<typeof ClientCreateSchema>;

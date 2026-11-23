@@ -2,6 +2,7 @@
   <BaseDialog
     :trigger-disabled="disabled"
     trigger-class="disabled:cursor-not-allowed disabled:opacity-50"
+    @update:open="publicKey = ''"
   >
     <template #trigger>
       <BaseSecondaryButton as="span" class="w-full">
@@ -15,6 +16,14 @@
           <strong>{{ clientName }}</strong>
         </template>
       </i18n-t>
+      <div v-if="action === 'replacePublicKey'" class="mt-4 grid gap-2">
+        <FormTextField
+          id="replacementPublicKey"
+          v-model="publicKey"
+          :label="$t('clients.keys.publicKey')"
+          autocomplete="off"
+        />
+      </div>
     </template>
     <template #actions>
       <DialogClose as-child>
@@ -25,8 +34,10 @@
       <DialogClose as-child>
         <BaseSecondaryButton
           class="ui-button-danger"
-          :disabled="disabled"
-          @click="$emit('confirm')"
+          :disabled="
+            disabled || (action === 'replacePublicKey' && !publicKey.trim())
+          "
+          @click="$emit('confirm', publicKey)"
         >
           {{ $t(`clients.keys.actions.${action}.label`) }}
         </BaseSecondaryButton>
@@ -41,10 +52,12 @@ defineProps<{
     | 'addPreSharedKey'
     | 'rotatePreSharedKey'
     | 'removePreSharedKey'
+    | 'replacePublicKey'
     | 'rotateKeyPair';
   clientName: string;
   disabled?: boolean;
 }>();
 
-defineEmits<{ confirm: [] }>();
+const publicKey = ref('');
+defineEmits<{ confirm: [publicKey: string] }>();
 </script>

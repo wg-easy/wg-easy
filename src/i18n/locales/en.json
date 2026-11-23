@@ -147,6 +147,7 @@
       "clearSearch": "Clear search"
     },
     "create": {
+      "publicKeyHint": "Paste the public key generated on the device, or leave this blank to let wg-easy generate a key pair.",
       "action": "Create Client",
       "success": "Client created",
       "title": "New Client"
@@ -225,11 +226,18 @@
         "rotateKeyPair": {
           "label": "Rotate Key Pair",
           "description": "Generate a new key pair for {name}?"
+        },
+        "replacePublicKey": {
+          "label": "Replace Public Key",
+          "description": "Enter the new public key from {name}. Applying this change immediately disconnects the old key."
         }
       },
       "updated": "Keys updated"
     },
     "configuration": {
+      "template": "Configuration template",
+      "viewTemplate": "View configuration template",
+      "downloadTemplate": "Download configuration template",
       "oneTimeLink": "Generate short one time link",
       "noPrivateKey": "This client has no known private key. Cannot create Configuration.",
       "showQrCode": "Show QR Code",
@@ -553,6 +561,7 @@
     },
     "client": {
       "id": "Client ID",
+      "publicKey": "Enter a valid, nonzero 32-byte WireGuard public key in base64.",
       "name": "Name",
       "expiresAt": "Expires At",
       "expiresAtInvalid": "Expiration must be a valid date (YYYY-MM-DD) or an ISO timestamp with a timezone",

@@ -30,7 +30,7 @@ export const client = sqliteTable(
     postUp: text('post_up').default('').notNull(),
     preDown: text('pre_down').default('').notNull(),
     postDown: text('post_down').default('').notNull(),
-    privateKey: text('private_key').notNull(),
+    privateKey: text('private_key'),
     publicKey: text('public_key').notNull(),
     preSharedKey: text('pre_shared_key'),
     expiresAt: text('expires_at'),

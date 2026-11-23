@@ -280,9 +280,16 @@
           <div
             class="col-span-full flex flex-col gap-3 sm:flex-row sm:flex-wrap"
           >
-            <ClientsConfigDialog :client-id="data.id">
+            <ClientsConfigDialog
+              :client-id="data.id"
+              :is-template="!data.hasPrivateKey"
+            >
               <BaseSecondaryButton as="span" class="w-full">
-                {{ $t('clients.configuration.view') }}
+                {{
+                  data.hasPrivateKey
+                    ? $t('clients.configuration.view')
+                    : $t('clients.configuration.viewTemplate')
+                }}
               </BaseSecondaryButton>
             </ClientsConfigDialog>
             <ClientsKeyActionDialog
@@ -300,10 +307,10 @@
               @confirm="changeKey('removePreSharedKey')"
             />
             <ClientsKeyActionDialog
-              action="rotateKeyPair"
+              :action="pairAction"
               :client-name="data.name"
               :disabled="keyActionPending"
-              @confirm="changeKey('rotateKeyPair')"
+              @confirm="changeKey(pairAction, $event)"
             />
             <ClientsDeleteDialog
               :client-name="data.name"
@@ -334,6 +341,9 @@ const { data: _data, refresh } = await useFetch(`/api/client/${id}`, {
   method: 'get',
 });
 const data = toRef(_data.value);
+const pairAction = computed(() =>
+  data.value?.hasPrivateKey ? 'rotateKeyPair' : 'replacePublicKey'
+);
 const keyActionPending = ref(false);
 const { t } = useI18n();
 
@@ -344,6 +354,11 @@ const keyActions = {
     $fetch(`/api/client/${id}/preSharedKey`, { method: 'delete' }),
   rotateKeyPair: () =>
     $fetch(`/api/client/${id}/rotateKeyPair`, { method: 'post' }),
+  replacePublicKey: (publicKey: string) =>
+    $fetch(`/api/client/${id}/publicKey`, {
+      method: 'put',
+      body: { publicKey },
+    }),
 };
 
 async function refreshKeys() {
@@ -355,13 +370,13 @@ async function refreshKeys() {
   }
 }
 
-async function changeKey(action: keyof typeof keyActions) {
+async function changeKey(action: keyof typeof keyActions, publicKey = '') {
   if (keyActionPending.value) {
     return;
   }
   keyActionPending.value = true;
   try {
-    await useSubmit(keyActions[action], {
+    await useSubmit(() => keyActions[action](publicKey), {
       revert: refreshKeys,
       successMsg: t('clients.keys.updated'),
     })(undefined);

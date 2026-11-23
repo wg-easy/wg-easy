@@ -8,13 +8,13 @@ import { WG_ENV } from '#server/utils/config';
 import { getDatabase } from '#db';
 import type { Repositories } from '#db/store';
 
-function filename(name: string, id: number) {
+function filename(name: string, id: number, template: boolean) {
   const clean = name
     .replace(/[^a-zA-Z0-9_=+.-]/g, '-')
     .replace(/(-{2,}|-$)/g, '-')
     .replace(/-$/, '')
     .substring(0, 32);
-  return `${clean || id}.conf`;
+  return `${clean || id}${template ? '.template' : ''}.conf`;
 }
 
 async function configuration(
@@ -24,7 +24,8 @@ async function configuration(
   const network = await tx.interfaces.get();
   const defaults = await tx.userConfigs.get();
   return {
-    filename: filename(client.name, client.id),
+    filename: filename(client.name, client.id, !client.privateKey),
+    isTemplate: !client.privateKey,
     contents: generateClientConfig(network, defaults, client, {
       enableIpv6: !WG_ENV.DISABLE_IPV6,
       amnezia: WG_ENV.WG_EXECUTABLE === 'awg',
