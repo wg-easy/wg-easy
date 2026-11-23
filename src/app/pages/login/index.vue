@@ -93,15 +93,15 @@ const password = ref<string>('');
 const { data: authMethods } = await useFetch('/api/auth/methods');
 
 watchEffect(() => {
-  const autoLauchQuery =
-    typeof route.query.auto_launch === 'string' && !!route.query.auto_launch
+  const autoLaunchQuery =
+    typeof route.query.auto_launch === 'string'
       ? route.query.auto_launch
       : undefined;
 
   if (
     setupStore.done &&
     authMethods.value?.autoLaunchProvider &&
-    !autoLauchQuery
+    !autoLaunchQuery
   ) {
     navigateTo(`/api/auth/${authMethods.value.autoLaunchProvider}`, {
       external: true,
@@ -109,11 +109,11 @@ watchEffect(() => {
   }
 
   if (
-    autoLauchQuery &&
-    autoLauchQuery !== 'false' &&
-    authMethods.value?.providers?.[autoLauchQuery as OAUTH_PROVIDER]
+    autoLaunchQuery &&
+    autoLaunchQuery !== 'false' &&
+    authMethods.value?.providers?.[autoLaunchQuery as OAUTH_PROVIDER]
   ) {
-    navigateTo(`/api/auth/${autoLauchQuery}`, {
+    navigateTo(`/api/auth/${autoLaunchQuery}`, {
       external: true,
     });
   }

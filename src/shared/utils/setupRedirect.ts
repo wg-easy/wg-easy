@@ -1,27 +1,19 @@
-/** The persisted step identifies which pages can be revisited on a fresh request. */
-export function setupRedirect(path: string, step: number) {
-  path = path.replace(/\/$/, '');
+const accountPages = ['/setup/1', '/setup/2'];
+const configurationPages = [
+  '/setup/3',
+  '/setup/4',
+  '/setup/migrate',
+  '/login',
+  '/login/2fa',
+];
+
+export function setupRedirect(pathname: string, step: number) {
+  const path = pathname.replace(/\/$/, '');
   if (step === 0) {
-    if (path === '/setup' || path.startsWith('/setup/')) {
-      return '/';
-    }
-    return;
+    return path === '/setup' || path.startsWith('/setup/') ? '/' : undefined;
   }
-  if (step === 1) {
-    if (path !== '/setup/1' && path !== '/setup/2') {
-      return '/setup/1';
-    }
-    return;
-  }
-  if (
-    ![
-      '/login',
-      '/login/2fa',
-      '/setup/3',
-      '/setup/4',
-      '/setup/migrate',
-    ].includes(path)
-  ) {
-    return '/setup/3';
+  const pages = step === 1 ? accountPages : configurationPages;
+  if (!pages.includes(path)) {
+    return pages[0];
   }
 }

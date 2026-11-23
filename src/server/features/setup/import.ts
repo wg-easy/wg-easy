@@ -16,19 +16,19 @@ import { KeySchema } from '#shared/contracts/validation';
 import { ClientUpdateSchema } from '#shared/contracts/client';
 import { zeroWireGuardKey } from '#shared/utils/wireguard';
 
-const key = KeySchema.unwrap().refine((value) => value !== zeroWireGuardKey);
-const optionalClientKey = key
-  .or(z.literal(['', null]).transform(() => null))
-  .default(null);
+const nonzero = (key: string | null) => key !== zeroWireGuardKey;
+const key = KeySchema.unwrap().refine(nonzero);
+const optionalKey = KeySchema.or(z.literal(''))
+  .optional()
+  .transform((value) => value || null);
 const address = ClientUpdateSchema.shape.ipv4Address;
 const client = z.object({
   name: ClientUpdateSchema.shape.name,
   address,
-  privateKey: optionalClientKey,
+  privateKey: optionalKey.refine(nonzero),
   publicKey: key,
-  preSharedKey: z.preprocess(
-    (value) => (value === zeroWireGuardKey ? null : value),
-    optionalClientKey
+  preSharedKey: optionalKey.transform((value) =>
+    value === zeroWireGuardKey ? null : value
   ),
   enabled: z.boolean(),
 });
@@ -107,9 +107,8 @@ export async function importLegacyConfiguration(
   tx: Repositories,
   file: string
 ) {
-  const oldConfig = parseBackup(file);
-
-  const ipv4Cidr = parseCidr(oldConfig.server.address + '/24');
+  const { server, clients } = parseBackup(file);
+  const ipv4Cidr = parseCidr(server.address + '/24');
   const ipv6Cidr = parseCidr('fdcc:ad94:bacf:61a4::cafe:0/112');
 
   await changeCidr(tx, {
@@ -122,42 +121,34 @@ export async function importLegacyConfiguration(
   );
   const ipv4Addresses = new Set(existing.map((client) => client.ipv4Address));
   const publicKeys = new Set(existing.map((client) => client.publicKey));
-  checkKeys(oldConfig.server, 'server.publicKey', publicKeys);
+  checkKeys(server, 'server.publicKey', publicKeys);
   await tx.interfaces.update({
-    privateKey: oldConfig.server.privateKey,
-    publicKey: oldConfig.server.publicKey,
+    privateKey: server.privateKey,
+    publicKey: server.publicKey,
   });
 
   const defaults = await tx.userConfigs.get();
   const network = await tx.interfaces.get();
-  for (const [index, clientConfig] of oldConfig.clients.entries()) {
-    if (!isClientAddress(clientConfig.address, ipv4Cidr)) {
+  for (const [index, { address, ...peer }] of clients.entries()) {
+    if (!isClientAddress(address, ipv4Cidr)) {
       throw invalidBackup(`Unusable peer address at clients.${index}.address`);
     }
-    if (ipv4Addresses.has(clientConfig.address)) {
+    if (ipv4Addresses.has(address)) {
       throw invalidBackup(`Duplicate address at clients.${index}.address`);
     }
-    checkKeys(clientConfig, `clients.${index}.publicKey`, publicKeys);
+    checkKeys(peer, `clients.${index}.publicKey`, publicKeys);
     const ipv6Address = nextIPFromUsedAddresses(ipv6Cidr, ipv6Addresses);
 
     await tx.clients.insert({
       ...clientDefaults(defaults),
-      name: clientConfig.name,
-      enabled: clientConfig.enabled,
-      privateKey: clientConfig.privateKey,
-      publicKey: clientConfig.publicKey,
+      ...peer,
       userId: 1,
       interfaceId: network.name,
-      preSharedKey: clientConfig.preSharedKey,
-      // Leave these unset so imported clients follow the global settings,
-      // like clients created in the UI. v14 had no per-client values.
-      allowedIps: null,
-      dns: null,
       i5: null,
-      ipv4Address: clientConfig.address,
+      ipv4Address: address,
       ipv6Address,
     });
     ipv6Addresses.add(ipv6Address);
-    ipv4Addresses.add(clientConfig.address);
+    ipv4Addresses.add(address);
   }
 }

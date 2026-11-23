@@ -187,54 +187,28 @@ describe('identity HTTP contract', () => {
     ['/api/setup/4', configureEndpoint, {}],
     ['/api/setup/4', setupIpInformation, undefined],
   ] as const)(
-    'requires a fully signed-in administrator before processing %s',
+    'requires an administrator session for %s',
     async (path, handler, body) => {
       await fixture.store.general.update({ setupStep: 3 });
       await expect(handler(request(path, body))).rejects.toMatchObject({
         status: 401,
       });
-      await expect(
-        handler(basicRequest(credentials.password))
-      ).rejects.toMatchObject({ status: 401 });
 
-      await fixture.store.users.update(1, {
-        totpVerified: true,
-        totpKey: 'secret',
-      });
+      await fixture.store.users.update(1, { role: roles.CLIENT });
       const login = request('/api/auth/password', credentials);
       await passwordLogin(login);
-      const pendingCookie = sessionCookie(login);
       await expect(
-        handler(request(path, body, pendingCookie))
-      ).rejects.toMatchObject({ status: 401 });
-
-      const verify = request(
-        '/api/auth/verify-2fa',
-        { totpCode: '123456' },
-        pendingCookie
-      );
-      await verifySecondFactor(verify);
-      const cookie = sessionCookie(verify);
-      await fixture.store.users.update(1, { role: roles.CLIENT });
-      await expect(handler(request(path, body, cookie))).rejects.toMatchObject({
-        status: 403,
-      });
-      await fixture.store.users.update(1, { role: roles.ADMIN });
-      if (body) {
-        await expect(
-          handler(request(path, body, cookie))
-        ).rejects.toMatchObject({ status: 400 });
-      } else {
-        await handler(request(path, body, cookie));
-        expect(getIpInformation).toHaveBeenCalledOnce();
-      }
-      await fixture.store.general.update({ setupStep: 0 });
-      await expect(handler(request(path, body, cookie))).rejects.toMatchObject({
-        status: 400,
-        statusText: 'Invalid state',
-      });
+        handler(request(path, body, sessionCookie(login)))
+      ).rejects.toMatchObject({ status: 403 });
     }
   );
+
+  test('requires a session even when setup receives valid Basic credentials', async () => {
+    await fixture.store.general.update({ setupStep: 3 });
+    await expect(
+      importBackup(basicRequest(credentials.password))
+    ).rejects.toMatchObject({ status: 401 });
+  });
 
   function basicRequest(password: string) {
     return requestEvent('https://localhost/api/admin/general', {

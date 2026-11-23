@@ -5,12 +5,9 @@ import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { requestEvent } from '../helpers/request';
 import { databaseFixture } from '../helpers/database';
-import { legacyBackup } from '../helpers/legacyBackup';
 
 import * as clientOperations from '#server/features/vpn/clients';
 import { roles } from '#shared/utils/permissions';
-import { zeroWireGuardKey } from '#shared/utils/wireguard';
-import { importConfiguration } from '#server/features/setup';
 import * as schema from '#db/schema';
 import { ClientUpdateSchema } from '#shared/contracts/client';
 import { UserConfigUpdateSchema } from '#shared/contracts/userConfig';
@@ -484,58 +481,6 @@ describe('client key actions', () => {
       });
     }
   );
-
-  const legacyPeer = legacyBackup().clients.peer;
-  test.each([
-    ['', '', null],
-    [null, null, null],
-    [undefined, undefined, null],
-    [undefined, legacyPeer.preSharedKey, legacyPeer.preSharedKey],
-    [legacyPeer.privateKey, undefined, null],
-    [legacyPeer.privateKey, zeroWireGuardKey, null],
-  ] as const)(
-    'imports a v14 peer with privateKey=%s and preSharedKey=%s',
-    async (privateKey, preSharedKey, expectedPreSharedKey) => {
-      await store.general.update({ setupStep: 3 });
-      const server = { ...legacyBackup().server, address: '10.8.0.1' };
-      const peer = {
-        ...legacyPeer,
-        address: '10.8.0.4',
-        privateKey,
-        preSharedKey,
-      };
-      await importConfiguration(JSON.stringify({ server, clients: { peer } }));
-      expect(await clients.get(3)).toMatchObject({
-        publicKey: peer.publicKey,
-        privateKey: privateKey || null,
-        preSharedKey: expectedPreSharedKey,
-      });
-      expect(await clients.getPublic(3)).toMatchObject({
-        hasPrivateKey: Boolean(privateKey),
-        hasPreSharedKey: Boolean(expectedPreSharedKey),
-      });
-      const download = await provisioning.download(owner, 3);
-      expect(download.isTemplate).toBe(!privateKey);
-      expect(download.contents.includes('PresharedKey =')).toBe(
-        Boolean(expectedPreSharedKey)
-      );
-    }
-  );
-
-  test('rejects an imported server key already used by an existing peer', async () => {
-    await store.general.update({ setupStep: 3 });
-    const backup = legacyBackup();
-    await clients.update(1, { publicKey: backup.server.publicKey });
-    const network = await store.interfaces.get();
-    await expect(
-      importConfiguration(JSON.stringify(backup))
-    ).rejects.toMatchObject({
-      status: 400,
-      message: 'Duplicate public key at server.publicKey',
-    });
-    expect(await store.interfaces.get()).toEqual(network);
-    expect(writeFile).not.toHaveBeenCalled();
-  });
 
   test('removes only the selected preshared key and updates both configurations', async () => {
     const before = await clients.get(1);

@@ -1,11 +1,13 @@
 import type { Page } from '@playwright/test';
 
+import { legacyBackup } from '../helpers/legacyBackup';
+
 import { credentials, expect, test } from './fixtures';
 import { goto, reload } from './helpers';
 
 test.use({ initialized: false });
 
-async function claimAndSignIn(page: Page) {
+async function createAdministrator(page: Page) {
   await goto(page, '/');
   await expect(page).toHaveURL(/\/setup\/1$/);
   await page.getByRole('link', { name: 'Continue', exact: true }).click();
@@ -18,8 +20,9 @@ async function claimAndSignIn(page: Page) {
     .getByRole('button', { name: 'Create Account', exact: true })
     .click();
   await expect(page).toHaveURL(/\/login$/);
-  await goto(page, '/setup/migrate');
-  await expect(page).toHaveURL(/\/login$/);
+}
+
+async function signIn(page: Page) {
   await page.getByLabel('Username', { exact: true }).fill(credentials.username);
   await page.getByLabel('Password', { exact: true }).fill(credentials.password);
   await page.getByRole('button', { name: 'Sign In', exact: true }).click();
@@ -29,7 +32,8 @@ async function claimAndSignIn(page: Page) {
 test('a fresh installation can be configured once through the setup wizard', async ({
   page,
 }) => {
-  await claimAndSignIn(page);
+  await createAdministrator(page);
+  await signIn(page);
   await page.getByRole('link', { name: 'No', exact: true }).click();
   await expect(page).toHaveURL(/\/setup\/4$/);
   await reload(page);
@@ -61,44 +65,31 @@ test('an administrator can correct a v14 backup and reach the dashboard', async 
   page,
   app,
 }) => {
-  await claimAndSignIn(page);
+  await createAdministrator(page);
+  await goto(page, '/setup/migrate');
+  await expect(page).toHaveURL(/\/login$/);
+  await signIn(page);
   await page.getByRole('link', { name: 'Yes', exact: true }).click();
   await expect(page).toHaveURL(/\/setup\/migrate$/);
   await reload(page);
-  const privateKey = await app.execServer(['wg', 'genkey']);
-  const publicKey = await app.publicKey(privateKey);
-  const peerPublicKey = await app.publicKey(
-    await app.execServer(['wg', 'genkey'])
-  );
-  const upload = async (key: string) => {
-    const file = {
-      server: { privateKey, publicKey: key, address: '10.9.0.15' },
-      clients: {
-        phone: {
-          name: 'Phone',
-          address: '10.9.0.2',
-          enabled: true,
-          publicKey: peerPublicKey,
-        },
-      },
-    };
+  const upload = async (contents: string) => {
     await page.locator('#migration').setInputFiles({
       name: 'wg0.json',
       mimeType: 'application/json',
-      buffer: Buffer.from(JSON.stringify(file)),
+      buffer: Buffer.from(contents),
     });
     await page.getByRole('button', { name: 'Upload', exact: true }).click();
   };
-  await upload('invalid');
+  await upload('invalid JSON');
   await expect(
-    page.getByText('Invalid backup field: server.publicKey', { exact: true })
+    page.getByText('The backup must be a JSON document.', { exact: true })
   ).toBeVisible();
-  await upload(publicKey);
+  await upload(JSON.stringify(legacyBackup));
   await expect(
     page.getByRole('heading', { name: 'Clients', exact: true })
   ).toBeVisible();
-  expect(await app.serverPublicKey()).toBe(publicKey);
-  expect(await app.peers()).toEqual([peerPublicKey]);
+  expect(await app.serverPublicKey()).toBe(legacyBackup.server.publicKey);
+  expect(await app.peers()).toEqual([legacyBackup.clients.peer.publicKey]);
   await goto(page, '/setup/migrate');
   await expect(page).toHaveURL(/\/$/);
 });

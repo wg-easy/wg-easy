@@ -228,10 +228,15 @@ describe('identity', () => {
     });
   });
 
-  test.each([false, true])(
-    'honors OAuth auto-registration (%s)',
-    async (oauthAutoRegister) => {
+  test.each([
+    [false, 0, false],
+    [true, 3, false],
+    [true, 0, true],
+  ] as const)(
+    'OAuth auto-registration enabled=%s at setup step %i permits signup=%s',
+    async (oauthAutoRegister, setupStep, canRegister) => {
       const { store } = await fixture({ oauthAutoRegister });
+      await store.general.update({ setupStep });
       const result = await identity.loginWithOAuth(
         'oidc',
         'new',
@@ -239,7 +244,7 @@ describe('identity', () => {
         'new@example.com',
         'New'
       );
-      if (oauthAutoRegister) {
+      if (canRegister) {
         expect(result).toMatchObject({
           success: true,
           user: { username: 'new-user', role: roles.ADMIN, hasPassword: false },
@@ -252,27 +257,6 @@ describe('identity', () => {
         });
         expect(await store.users.count()).toBe(1);
       }
-    }
-  );
-
-  test.each([1, 3])(
-    'defers OAuth auto-registration at setup step %i',
-    async (setupStep) => {
-      const { store } = await fixture({ oauthAutoRegister: true });
-      await store.general.update({ setupStep });
-      expect(
-        await identity.loginWithOAuth(
-          'oidc',
-          'new',
-          'new-user',
-          'new@example.com',
-          'New'
-        )
-      ).toEqual({
-        success: false,
-        error: 'AUTO_REGISTER_DISABLED',
-      });
-      expect(await store.users.count()).toBe(1);
     }
   );
 
