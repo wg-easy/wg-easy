@@ -140,7 +140,9 @@ async function issueLink(clientId = 1) {
   const link = await db.query.oneTimeLink.findFirst({
     where: eq(schema.oneTimeLink.id, clientId),
   });
-  return link!.oneTimeLink;
+  const token = link!.oneTimeLink;
+  expect(token).toMatch(/^[A-Za-z0-9]{8}$/);
+  return token;
 }
 
 describe('device-held private keys', () => {
@@ -292,7 +294,6 @@ describe('converting client keys', () => {
         provisioning.redeemOneTimeLink(managedLink)
       ).rejects.toMatchObject({ status: 404 });
       const templateLink = await issueLink();
-      expect(templateLink).toHaveLength(8);
       await expect(
         provisioning.redeemOneTimeLink(managedLink)
       ).rejects.toMatchObject({ status: 404 });
@@ -316,7 +317,6 @@ describe('converting client keys', () => {
         provisioning.redeemOneTimeLink(templateLink)
       ).rejects.toMatchObject({ status: 404 });
       const freshLink = await issueLink();
-      expect(freshLink).toHaveLength(8);
       await expect(
         provisioning.redeemOneTimeLink(templateLink)
       ).rejects.toMatchObject({ status: 404 });

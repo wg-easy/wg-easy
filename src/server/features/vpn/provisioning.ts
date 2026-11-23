@@ -1,4 +1,4 @@
-import { randomBytes } from 'node:crypto';
+import { randomInt } from 'node:crypto';
 
 import { createError } from 'nuxt/server';
 
@@ -9,6 +9,9 @@ import { WG_ENV } from '#server/utils/config';
 import { getDatabase } from '#db';
 import type { ClientType } from '#db/repositories/client/types';
 import type { Repositories } from '#db/store';
+
+const tokenAlphabet =
+  'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
 function filename(name: string, id: number, template: boolean) {
   const clean = name
@@ -47,7 +50,10 @@ export function download(actor: Actor, clientId: number) {
 export function generateOneTimeLink(actor: Actor, clientId: number) {
   return getDatabase().transaction(async (tx) => {
     authorizeClient(actor, 'update', await tx.clients.getPublic(clientId));
-    const token = randomBytes(6).toString('base64url');
+    const token = Array.from(
+      { length: 8 },
+      () => tokenAlphabet[randomInt(tokenAlphabet.length)]
+    ).join('');
     await tx.oneTimeLinks.save(
       clientId,
       token,
