@@ -1769,6 +1769,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Share a Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#one-time-links" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        One-time links
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1912,6 +1929,34 @@
       </span>
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Actions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#change-the-clients-key-pair" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Change the client's key pair
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#switch-where-the-private-key-is-stored" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Switch where the private key is stored
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -2048,6 +2093,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Share a Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#one-time-links" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        One-time links
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -2192,6 +2254,34 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Actions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#change-the-clients-key-pair" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Change the client's key pair
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#switch-where-the-private-key-is-stored" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Switch where the private key is stored
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
       </ul>
@@ -2308,19 +2398,20 @@
 <ol>
 <li>Select <strong>New Client</strong>.</li>
 <li>Enter a <strong>Name</strong> and, optionally, an <strong>Expires At</strong> date and time in your local timezone. Leave the expiration empty for permanent access.</li>
+<li>By default, wg-easy generates a WireGuard key pair. To use a key pair generated on the device, expand <strong>Advanced</strong> and paste the device's <strong>Public Key</strong>. Keep the private key on the device.</li>
 <li>Select <strong>Create Client</strong>.</li>
-<li>Download the configuration or scan the QR code to import it on the device.</li>
 </ol>
-<p>New clients receive an available VPN address and generated keys. The <a href=".././admin/#client-configuration">Admin Panel's Config settings</a> control their defaults.</p>
+<p>wg-easy assigns the client an available VPN address. The <a href=".././admin/#client-configuration">Admin Panel's Config settings</a> control its defaults.</p>
 <h2 id="share-a-configuration">Share a Configuration<a class="headerlink" href="#share-a-configuration" title="Permanent link">&para;</a></h2>
-<p>The buttons on each client card let you:</p>
+<p>Use the buttons on the client card to set up the device. The available options depend on where the private key is stored.</p>
 <ul>
-<li><strong>Show QR Code</strong>: Scan the code with a compatible VPN app. The dialog also supports downloading or copying the QR code as a PNG.</li>
-<li><strong>Download Configuration</strong>: Download the client's configuration file.</li>
-<li><strong>Generate short one time link</strong>: Display a temporary download link below the card, with a countdown. The link is valid for five minutes. After the first download, it remains available for up to ten seconds to accommodate duplicate browser requests, without exceeding the original expiry. Further downloads do not extend this grace period.</li>
+<li>If <strong>wg-easy manages the key</strong>, select <strong>Download Configuration</strong> to import the <code>.conf</code> file, or <strong>Show QR Code</strong> to scan it with a compatible VPN app. You can also download or copy the QR code as a PNG.</li>
+<li>If <strong>the device holds the key</strong>, select <strong>Download configuration template</strong>. On the device, open the <code>.template.conf</code> file, uncomment the <code>PrivateKey</code> line under <code>[Interface]</code>, and replace <code>&lt;device private key&gt;</code> with the matching private key. Save and import the completed file. If the key is already in the VPN app, you can copy the settings from the template into that tunnel.</li>
 </ul>
-<p>One-time links are intentionally short for manual entry. The current token scheme has only 1,000 possible values per client ID, so links can be guessed. Anyone with an active link can download the complete configuration, including its private key, without signing in. Generate a link when the recipient is ready to use it and share it privately. Authenticated downloads and QR codes are also available.</p>
-<p>On the client's edit page, <strong>View Configuration</strong> displays the saved configuration and lets you copy it. Save form changes before viewing or sharing the configuration. Configuration changes are not pushed to devices; import the updated file or QR code on the device when its settings change.</p>
+<p>On the client's edit page, <strong>View Configuration</strong> or <strong>View configuration template</strong> lets you copy the saved settings. After changing settings in wg-easy, save them and apply them on the device.</p>
+<h3 id="one-time-links">One-time links<a class="headerlink" href="#one-time-links" title="Permanent link">&para;</a></h3>
+<p>Select <strong>Generate short one time link</strong> to share the configuration or template. The link appears below the card with a countdown. New links use eight random letters and digits and are case-sensitive.</p>
+<p>Anyone with the link can download the file without signing in. A full configuration includes the client's private key, and both files include the preshared key if one is configured. Share the link privately. It expires after five minutes or ten seconds after the first download, whichever comes first. Repeat downloads do not extend it.</p>
 <h2 id="bulk-actions">Bulk Actions<a class="headerlink" href="#bulk-actions" title="Permanent link">&para;</a></h2>
 <ol>
 <li>Select <strong>Bulk actions</strong> above the client list.</li>
@@ -2428,10 +2519,20 @@
 <li><strong>Add Preshared Key</strong>: Generate a preshared key when none is configured, immediately after confirmation.</li>
 <li><strong>Rotate Preshared Key</strong>: Replace the existing preshared key with a newly generated key immediately after confirmation.</li>
 <li><strong>Remove Preshared Key</strong>: Remove the client's preshared key immediately after confirmation.</li>
-<li><strong>Rotate Key Pair</strong>: Generate a new private and public key pair immediately after confirmation. The old keys will stop working.</li>
-<li><strong>View Configuration</strong>: View and copy the current client configuration. After adding, rotating, or removing the preshared key, or rotating the key pair, update the configuration on the client device to reconnect.</li>
 <li><strong>Delete</strong>: Delete the client.</li>
 </ul>
+<p>After changing the preshared key, update the configuration on the device to reconnect.</p>
+<h4 id="change-the-clients-key-pair">Change the client's key pair<a class="headerlink" href="#change-the-clients-key-pair" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Rotate Key Pair</strong> generates a new key pair in wg-easy. Import the new configuration on the device to reconnect.</li>
+<li><strong>Replace Public Key</strong> is available when the device holds the private key. Generate a new key pair on the device and enter its public key in wg-easy. Once confirmed, only the new key pair can connect as this client.</li>
+</ul>
+<h4 id="switch-where-the-private-key-is-stored">Switch where the private key is stored<a class="headerlink" href="#switch-where-the-private-key-is-stored" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Use Device Key</strong> removes the client's private key from wg-easy. To keep the current tunnel connected, make sure the device already has the private key and leave the prefilled public key as it is. To switch to a new key pair generated on the device, enter its public key instead.</li>
+<li><strong>Manage Key in wg-easy</strong> generates a fresh key pair. Import the new configuration or scan its QR code to reconnect.</li>
+</ul>
+<p>Both switches take effect on confirmation and revoke the client's active one-time link. The client keeps its VPN addresses, preshared key, and other settings.</p>
 
 
 
