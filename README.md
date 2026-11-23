@@ -20,8 +20,9 @@ You have found the easiest way to install & manage WireGuard on any Linux host!
 - List, create, edit, delete, enable & disable clients.
 - Search, filter, sort, and paginate clients.
 - Enable, disable, or delete multiple selected clients.
-- Show a client's QR code.
-- Download or copy a client's configuration, and export QR codes as PNG.
+- Generate client keys in wg-easy or register a device's WireGuard public key.
+- Download or copy a full configuration or a template for a device-held key.
+- Scan a QR code or export it as a PNG when wg-easy manages the client's private key.
 - Rotate client key pairs and add, rotate, or remove preshared keys.
 - Statistics for which clients are connected.
 - Tx/Rx charts for each connected client.
