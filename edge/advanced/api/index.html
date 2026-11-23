@@ -2030,7 +2030,30 @@
 <p>You can use the API to interact with the application programmatically. The API is available at <code>/api</code> and supports GET, POST, and DELETE requests. The API is designed to be simple and easy to use, with a focus on providing a consistent interface for all endpoints.</p>
 <p>There is no documentation for the API yet, but this will be added as the underlying library supports it.</p>
 <h2 id="authentication">Authentication<a class="headerlink" href="#authentication" title="Permanent link">&para;</a></h2>
-<p>Authenticated endpoints accept the Web UI's session cookie or HTTP Basic Authentication with your login username and password.</p>
+<p>Most authenticated endpoints accept the Web UI's session cookie or HTTP Basic Authentication with your login username and password.</p>
+<p>After creating the first administrator with <code>POST /api/setup/2</code>, sign in to obtain the administrator's session cookie. The following endpoints accept only an administrator session cookie and are available only while setup is unfinished.</p>
+<table>
+<thead>
+<tr>
+<th>Request</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET /api/setup/4</code></td>
+<td>Get suggested endpoint addresses</td>
+</tr>
+<tr>
+<td><code>POST /api/setup/4</code></td>
+<td>Save the endpoint and finish setup</td>
+</tr>
+<tr>
+<td><code>POST /api/setup/migrate</code></td>
+<td>Import a v14 backup and finish setup</td>
+</tr>
+</tbody>
+</table>
 <p>Basic Authentication is unavailable for accounts with 2FA enabled and when <code>DISABLE_PASSWORD_AUTH=true</code>. A session established through the normal sign-in flow, including 2FA when required, can still access the API. API requests follow the signed-in user's permissions.</p>
 <p>Basic Authentication failures are logged as <code>Security failure: type=basic</code>. wg-easy does not implement rate limiting. Configure your reverse proxy or an external security tool to protect requests using Basic Authentication on <strong>all API routes</strong>, as limiting only <code>/api/auth/password</code> does not cover them. Configure <a href=".././config/optional-config/#trusted-proxies"><code>TRUSTED_PROXIES</code></a> so that security logs contain the original client IP address.</p>
 <h3 id="authentication-example">Authentication Example<a class="headerlink" href="#authentication-example" title="Permanent link">&para;</a></h3>

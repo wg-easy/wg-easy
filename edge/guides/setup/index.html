@@ -2012,14 +2012,14 @@
 <p>On the first visit to the Web UI, the setup wizard guides you through creating an administrator and configuring the VPN. Select <strong>Continue</strong> on the welcome screen to begin. For automated deployments, see <a href="../../advanced/config/unattended-setup/">Unattended Setup</a>.</p>
 <h2 id="user-setup">User Setup<a class="headerlink" href="#user-setup" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Username</strong>: Your administrator login name, at least two characters long.</li>
+<li><strong>Username</strong>: Your administrator login name.</li>
 <li><strong>Password</strong>: Your administrator password, at least 12 characters long.</li>
 <li><strong>Confirm Password</strong>: Enter the same password again.</li>
 </ul>
-<p>Select <strong>Create Account</strong> to continue.</p>
+<p>Select <strong>Create Account</strong>, then sign in with the username and password you just chose. If you close the browser before finishing setup, sign in again to resume.</p>
+<p>If you set <code>DISABLE_PASSWORD_AUTH=true</code>, change it to <code>false</code> and recreate the container with the updated setting before creating the administrator. After setup, you can switch to <a href="../../advanced/config/external-authentication/#disable-password-authentication">OAuth-only sign-in</a>.</p>
 <h2 id="existing-setup">Existing Setup<a class="headerlink" href="#existing-setup" title="Permanent link">&para;</a></h2>
-<p>If you have the config from the previous version, you can import it by clicking "Yes". This currently expects a config from v14.</p>
-<p>If this is the first time you are using this, you can click "No" to create a new config.</p>
+<p>After signing in, select <strong>Yes</strong> to import a v14 backup or <strong>No</strong> to configure a fresh installation.</p>
 <h3 id="no-host-setup">No - Host Setup<a class="headerlink" href="#no-host-setup" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>Host</strong>: The public hostname or IP address clients will connect to, such as <code>vpn.example.com</code>. IPv6 addresses may be entered with or without brackets, for example <code>2001:db8::1</code> or <code>[2001:db8::1]</code>. Use <strong>Suggest</strong> to choose a detected address or hostname.</li>
@@ -2027,9 +2027,9 @@
 </ul>
 <p>Select <strong>Continue</strong> to finish setup.</p>
 <h3 id="yes-migration">Yes - Migration<a class="headerlink" href="#yes-migration" title="Permanent link">&para;</a></h3>
-<p>Select the <code>wg0.json</code> file from the previous version. Read <a href="../../advanced/migrate/from-14-to-15/">Migrate from v14 to v15</a> for more information.</p>
+<p>Select your v14 <code>wg0.json</code> backup and choose <strong>Upload</strong>. See <a href="../../advanced/migrate/from-14-to-15/">Migrate from v14 to v15</a> for backup and import instructions.</p>
 <h2 id="after-setup">After Setup<a class="headerlink" href="#after-setup" title="Permanent link">&para;</a></h2>
-<p>Sign in and <a href=".././clients/#create-a-client">create your first client</a>. Use the user menu to open the <a href=".././admin/">Admin Panel</a> or manage your <a href=".././account/">Account</a>, including <a href=".././2fa/">two-factor authentication</a>.</p>
+<p>Setup opens the dashboard with your administrator account signed in. From there you can manage imported clients or <a href=".././clients/#create-a-client">create a client</a>. Use the user menu to open the <a href=".././admin/">Admin Panel</a> or manage your <a href=".././account/">Account</a>, including <a href=".././2fa/">two-factor authentication</a>.</p>
 
 
 

@@ -2103,7 +2103,10 @@
 </span></code></pre></div>
 <h3 id="start-new-container">Start new container<a class="headerlink" href="#start-new-container" title="Permanent link">&para;</a></h3>
 <p>Follow the instructions in the <a href="../../../getting-started/">Getting Started</a> or <a href="../../../examples/tutorials/basic-installation/">Basic Installation</a> guide to start the new container.</p>
-<p>In the setup wizard, select that you already have a configuration file and upload the <code>wg0.json</code> file you downloaded in the backup step.</p>
+<p>Create the first administrator in the setup wizard, then sign in with that account. When asked if you have an existing setup, select <strong>Yes</strong>, choose your v14 <code>wg0.json</code> backup, and select <strong>Upload</strong>.</p>
+<p>wg-easy validates the whole backup, including disabled clients, before applying it. The server needs its key pair, and every client needs a public key. All public keys must be unique. If the backup includes a client private key, it must match that client's public key. Each client needs a unique host address in the server's <code>/24</code>, excluding the network, gateway, and broadcast addresses.</p>
+<p>Client <code>privateKey</code> and <code>preSharedKey</code> fields can be omitted, set to <code>null</code>, or left as an empty string. If the private key is absent, wg-easy preserves the client's public key and treats the private key as device-held. An absent or all-zero preshared key disables presharing. An all-zero private key is invalid for both the server and its clients.</p>
+<p>If a field is invalid, the error identifies the field and setup stays open. Correct the backup and upload it again. A successful import opens the dashboard.</p>
 <h3 id="environment-variables">Environment Variables<a class="headerlink" href="#environment-variables" title="Permanent link">&para;</a></h3>
 <p>v15 does not use the same environment variables as v14, most of them have been moved to the Admin Panel in the Web UI.</p>
 <h3 id="done">Done<a class="headerlink" href="#done" title="Permanent link">&para;</a></h3>

@@ -2302,18 +2302,11 @@
 </tr>
 </tbody>
 </table>
-<p>When enabled:</p>
-<ul>
-<li>
-<p>If a user logs in with an email address that is not yet registered, a new account will be created for them.</p>
-</li>
-<li>
-<p>If a user logs in with an email address that is already registered, their account will be linked to the OAuth provider (if not already linked), regardless of the value of <code>OAUTH_AUTO_REGISTER</code>.</p>
-</li>
-</ul>
+<p>Auto-registration starts after setup is complete. With <code>OAUTH_AUTO_REGISTER=true</code>, signing in with a new email address creates an account.</p>
+<p>Users with a linked OAuth account can sign in during setup. If a verified email address matches an existing account without a linked provider, wg-easy links that account regardless of the value of <code>OAUTH_AUTO_REGISTER</code>.</p>
 <div class="admonition warning">
 <p class="admonition-title"> Security</p>
-<p>Users will be created with Admin Permissions, as the permissions system is not yet implemented. Only enable this if you trust all users that can log in with the OAuth provider.</p>
+<p>Every account created through OAuth auto-registration has the administrator role. Only enable this if you trust all users who can sign in through the provider to administer wg-easy.</p>
 <p>Use <a href="#allowed-domains">Allowed Domains</a> to restrict which users can log in.</p>
 </div>
 <h3 id="allowed-domains">Allowed Domains<a class="headerlink" href="#allowed-domains" title="Permanent link">&para;</a></h3>
@@ -2543,13 +2536,10 @@ both OAuth authorization and callbacks.</p>
 </tr>
 </tbody>
 </table>
-<p>When enabled:</p>
-<ul>
-<li>Users will not be able to log in with a password</li>
-</ul>
+<p>For interactive setup, leave <code>DISABLE_PASSWORD_AUTH</code> unset or set it to <code>false</code> so you can create the first administrator and sign in. If it is already <code>true</code>, change it to <code>false</code> and recreate the container with the updated setting before beginning setup.</p>
 <div class="admonition warning">
 <p class="admonition-title">Access Recovery</p>
-<p>Before disabling password authentication, ensure that at least one OAuth provider is configured and that you have successfully linked an administrator account.</p>
+<p>After setup, link your administrator account to an OAuth provider and verify that you can sign in with it in a separate browser session. Then set <code>DISABLE_PASSWORD_AUTH=true</code> and recreate the container with the updated setting.</p>
 <p>If no login method is available, you will not be able to log in to the application and will need to reset the configuration to regain access.</p>
 </div>
 
