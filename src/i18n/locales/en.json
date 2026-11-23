@@ -147,6 +147,7 @@
       "clearSearch": "Clear search"
     },
     "create": {
+      "publicKeyHint": "Enter the device's public key or leave empty to generate a key pair.",
       "action": "Create Client",
       "success": "Client created",
       "title": "New Client"
@@ -225,11 +226,26 @@
         "rotateKeyPair": {
           "label": "Rotate Key Pair",
           "description": "Generate a new key pair for {name}?"
+        },
+        "replacePublicKey": {
+          "label": "Replace Public Key",
+          "description": "Replace the public key for {name}? The old key will lose access."
+        },
+        "useDeviceKey": {
+          "label": "Use Device Key",
+          "description": "Remove the private key for {name} from wg-easy? Keep the current public key to stay connected. Downloads will be templates and existing one-time links will expire."
+        },
+        "useManagedKey": {
+          "label": "Manage Key in wg-easy",
+          "description": "Generate a new key pair for {name}? Install the new configuration to reconnect. Existing one-time links will expire."
         }
       },
       "updated": "Keys updated"
     },
     "configuration": {
+      "template": "Configuration template",
+      "viewTemplate": "View configuration template",
+      "downloadTemplate": "Download configuration template",
       "oneTimeLink": "Generate short one time link",
       "noPrivateKey": "This client has no known private key. Cannot create Configuration.",
       "showQrCode": "Show QR Code",
@@ -553,6 +569,7 @@
     },
     "client": {
       "id": "Client ID",
+      "publicKey": "Enter a valid, nonzero 32-byte WireGuard public key in base64.",
       "name": "Name",
       "expiresAt": "Expires At",
       "expiresAtInvalid": "Expiration must be a valid date (YYYY-MM-DD) or an ISO timestamp with a timezone",

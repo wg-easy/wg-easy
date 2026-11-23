@@ -40,7 +40,6 @@
     "cidr-tools": "^13.0.4",
     "citty": "^0.2.2",
     "consola": "^3.4.2",
-    "crc-32": "^1.2.2",
     "drizzle-orm": "^0.45.4",
     "ip-bigint": "^10.0.4",
     "is-cidr": "^7.0.3",

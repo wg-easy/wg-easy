@@ -31,7 +31,11 @@ export function clientCard(page: Page, name: string) {
   });
 }
 
-export async function createClient(page: Page, name: string) {
+export async function createClient(
+  page: Page,
+  name: string,
+  publicKey?: string
+) {
   // Repeated create controls and their nested button roles perform the same action.
   await page
     .getByRole('button', { name: 'New Client', exact: true })
@@ -39,6 +43,12 @@ export async function createClient(page: Page, name: string) {
     .click();
   const dialog = page.getByRole('dialog');
   await dialog.getByLabel('Name', { exact: true }).fill(name);
+  if (publicKey) {
+    const keyField = dialog.getByLabel('Public Key', { exact: true });
+    await expect(keyField).toBeHidden();
+    await dialog.getByRole('button', { name: 'Advanced', exact: true }).click();
+    await keyField.fill(publicKey);
+  }
   await dialog
     .getByRole('button', { name: 'Create Client', exact: true })
     .click();

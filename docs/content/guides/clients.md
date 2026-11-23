@@ -26,22 +26,25 @@ Use **Previous** and **Next** below the list to move between pages. **Per page**
 
 1. Select **New Client**.
 2. Enter a **Name** and, optionally, an **Expires At** date and time in your local timezone. Leave the expiration empty for permanent access.
-3. Select **Create Client**.
-4. Download the configuration or scan the QR code to import it on the device.
+3. By default, wg-easy generates a WireGuard key pair. To use a key pair generated on the device, expand **Advanced** and paste the device's **Public Key**. Keep the private key on the device.
+4. Select **Create Client**.
 
-New clients receive an available VPN address and generated keys. The [Admin Panel's Config settings](./admin.md#client-configuration) control their defaults.
+wg-easy assigns the client an available VPN address. The [Admin Panel's Config settings](./admin.md#client-configuration) control its defaults.
 
 ## Share a Configuration
 
-The buttons on each client card let you:
+Use the buttons on the client card to set up the device. The available options depend on where the private key is stored.
 
-- **Show QR Code**: Scan the code with a compatible VPN app. The dialog also supports downloading or copying the QR code as a PNG.
-- **Download Configuration**: Download the client's configuration file.
-- **Generate short one time link**: Display a temporary download link below the card, with a countdown. The link is valid for five minutes. After the first download, it remains available for up to ten seconds to accommodate duplicate browser requests, without exceeding the original expiry. Further downloads do not extend this grace period.
+- If **wg-easy manages the key**, select **Download Configuration** to import the `.conf` file, or **Show QR Code** to scan it with a compatible VPN app. You can also download or copy the QR code as a PNG.
+- If **the device holds the key**, select **Download configuration template**. On the device, open the `.template.conf` file, uncomment the `PrivateKey` line under `[Interface]`, and replace `<device private key>` with the matching private key. Save and import the completed file. If the key is already in the VPN app, you can copy the settings from the template into that tunnel.
 
-One-time links are intentionally short for manual entry. The current token scheme has only 1,000 possible values per client ID, so links can be guessed. Anyone with an active link can download the complete configuration, including its private key, without signing in. Generate a link when the recipient is ready to use it and share it privately. Authenticated downloads and QR codes are also available.
+On the client's edit page, **View Configuration** or **View configuration template** lets you copy the saved settings. After changing settings in wg-easy, save them and apply them on the device.
 
-On the client's edit page, **View Configuration** displays the saved configuration and lets you copy it. Save form changes before viewing or sharing the configuration. Configuration changes are not pushed to devices; import the updated file or QR code on the device when its settings change.
+### One-time links
+
+Select **Generate short one time link** to share the configuration or template. The link appears below the card with a countdown. New links use eight random letters and digits and are case-sensitive.
+
+Anyone with the link can download the file without signing in. A full configuration includes the client's private key, and both files include the preshared key if one is configured. Share the link privately. It expires after five minutes or ten seconds after the first download, whichever comes first. Repeat downloads do not extend it.
 
 ## Bulk Actions
 
@@ -177,6 +180,18 @@ These commands are included in the client configuration and run on the client de
 - **Add Preshared Key**: Generate a preshared key when none is configured, immediately after confirmation.
 - **Rotate Preshared Key**: Replace the existing preshared key with a newly generated key immediately after confirmation.
 - **Remove Preshared Key**: Remove the client's preshared key immediately after confirmation.
-- **Rotate Key Pair**: Generate a new private and public key pair immediately after confirmation. The old keys will stop working.
-- **View Configuration**: View and copy the current client configuration. After adding, rotating, or removing the preshared key, or rotating the key pair, update the configuration on the client device to reconnect.
 - **Delete**: Delete the client.
+
+After changing the preshared key, update the configuration on the device to reconnect.
+
+#### Change the client's key pair
+
+- **Rotate Key Pair** generates a new key pair in wg-easy. Import the new configuration on the device to reconnect.
+- **Replace Public Key** is available when the device holds the private key. Generate a new key pair on the device and enter its public key in wg-easy. Once confirmed, only the new key pair can connect as this client.
+
+#### Switch where the private key is stored
+
+- **Use Device Key** removes the client's private key from wg-easy. To keep the current tunnel connected, make sure the device already has the private key and leave the prefilled public key as it is. To switch to a new key pair generated on the device, enter its public key instead.
+- **Manage Key in wg-easy** generates a fresh key pair. Import the new configuration or scan its QR code to reconnect.
+
+Both switches take effect on confirmation and revoke the client's active one-time link. The client keeps its VPN addresses, preshared key, and other settings.

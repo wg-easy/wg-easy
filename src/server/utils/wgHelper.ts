@@ -45,14 +45,15 @@ async function up(
 }
 
 export const wg = {
-  generatePrivateKey: () => {
-    return exec(`${wgExecutable} genkey`);
-  },
-
-  getPublicKey: (privateKey: string) => {
-    return exec(`echo ${privateKey} | ${wgExecutable} pubkey`, {
-      log: `echo ***hidden*** | ${wgExecutable} pubkey`,
-    });
+  async generateKeyPair() {
+    const privateKey = await exec(`${wgExecutable} genkey`);
+    const publicKey = await exec(
+      `echo ${privateKey} | ${wgExecutable} pubkey`,
+      {
+        log: `echo ***hidden*** | ${wgExecutable} pubkey`,
+      }
+    );
+    return { privateKey, publicKey };
   },
 
   generatePreSharedKey: () => {

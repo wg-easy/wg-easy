@@ -223,9 +223,6 @@ importers:
       consola:
         specifier: ^3.4.2
         version: 3.4.2
-      crc-32:
-        specifier: ^1.2.2
-        version: 1.2.2
       drizzle-orm:
         specifier: ^0.45.4
         version: 0.45.4(@libsql/client@0.18.0)

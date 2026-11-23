@@ -2,6 +2,8 @@ import z from 'zod';
 import { isIP, isIPv4, isIPv6 } from 'is-ip';
 import isCidr from 'is-cidr';
 
+import { wireGuardKeyPattern } from '#shared/utils/wireguard';
+
 export type ID = number;
 
 /**
@@ -125,11 +127,8 @@ export const KeySchema = z
   .pipe(safeStringRefine)
   .pipe(controlStringRefine)
   .refine(
-    (v) => {
-      // 32 bytes occupy 43 base64 symbols; the last symbol has two zero padding bits.
-      return /^[A-Za-z0-9+/]{42}[AEIMQUYcgkosw048]=$/.test(v);
-    },
-    { message: t('validation.keyMalformed') }
+    (value) => wireGuardKeyPattern.test(value),
+    t('validation.keyMalformed')
   )
   .nullable();
 

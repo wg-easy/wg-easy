@@ -1,5 +1,6 @@
 import { normalizeCidr, parseCidr } from 'cidr-tools';
 
+import { zeroWireGuardKey } from '#shared/utils/wireguard';
 import { formatEndpoint } from '#server/utils/endpoint';
 import { getGatewayAddress, normalizePrefix } from '#server/utils/ip';
 import type { ClientType } from '#db/repositories/client/types';
@@ -99,9 +100,6 @@ function serverAllowedIps(
   );
 }
 
-// WireGuard uses an all-zero key to explicitly clear the active peer's preshared key.
-const unsetPreSharedKey = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=';
-
 function generateServerPeer(client: ServerPeer, options: ServerOptions = {}) {
   const { enableIpv6 = true } = options;
 
@@ -115,7 +113,8 @@ function generateServerPeer(client: ServerPeer, options: ServerOptions = {}) {
     `# Client: ${client.name} (${client.id})`,
     '[Peer]',
     `PublicKey = ${client.publicKey}`,
-    `PresharedKey = ${client.preSharedKey ?? unsetPreSharedKey}`,
+    // An all-zero key clears any preshared key on the active peer.
+    `PresharedKey = ${client.preSharedKey ?? zeroWireGuardKey}`,
   ];
   if (allowedIps.length) {
     lines.push(`AllowedIPs = ${allowedIps.join(', ')}`);
@@ -190,8 +189,12 @@ export function generateClientConfig(
     (v) => v !== null
   );
 
+  const privateKeyLine = client.privateKey
+    ? `PrivateKey = ${client.privateKey}`
+    : '# Configuration template: on the device, uncomment the next line and enter its private key.\n# PrivateKey = <device private key>';
+
   return `[Interface]
-PrivateKey = ${client.privateKey}
+${privateKeyLine}
 Address = ${address}
 ${extraLines.length ? `${extraLines.join('\n')}\n` : ''}
 [Peer]

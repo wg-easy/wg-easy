@@ -52,7 +52,7 @@ cli clients:list
 
 ### Show Client QR Code
 
-Display the QR code for a specific client, which can be scanned by a compatible app to import the client's configuration.
+Use this command when wg-easy manages the client's private key. Scan the QR code with a compatible VPN app to import the configuration. For a device that holds its own private key, use the [configuration template](./clients.md#share-a-configuration).
 
 ```shell
 cli clients:qr <client_id>

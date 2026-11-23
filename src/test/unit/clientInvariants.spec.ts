@@ -261,7 +261,10 @@ describe('CIDR changes', () => {
     const { store, commands } = await vpnFixture();
     await store.clients.update(1, { ipv4Address: '10.8.0.200' });
     const id = await clients.create(admin, { name: 'Second', expiresAt: null });
-    commands.getPublicKey.mockResolvedValueOnce('third-public');
+    commands.generateKeyPair.mockResolvedValueOnce({
+      privateKey: 'third-private',
+      publicKey: 'third-public',
+    });
     const third = await clients.create(admin, {
       name: 'Third',
       expiresAt: null,

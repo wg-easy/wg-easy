@@ -1,7 +1,7 @@
 import { createError } from 'nuxt/server';
 import { parseCidr } from 'cidr-tools';
 
-import { commit } from './lifecycle';
+import { commit, unchanged } from './lifecycle';
 import {
   authorize,
   authorizeClient,
@@ -13,9 +13,12 @@ import {
 
 import { wg } from '#server/utils/wgHelper';
 import { getDatabase } from '#db';
+import type { Repositories } from '#db/store';
 import type {
   ClientBulkType,
   ClientCreateType,
+  ClientKeyModeChange,
+  ClientPublicKeyChange,
   UpdateClientType,
 } from '#shared/contracts/client';
 import type { UserConfigType } from '#db/repositories/userConfig/types';
@@ -26,6 +29,14 @@ type ClientAction =
   | 'rotateKeyPair'
   | 'rotatePreSharedKey'
   | 'removePreSharedKey';
+
+async function clientForUpdate(
+  tx: Repositories,
+  actor: Actor,
+  clientId: number
+) {
+  return authorizeClient(actor, 'update', await tx.clients.getPublic(clientId));
+}
 
 export function clientDefaults(config: UserConfigType) {
   return {
@@ -43,26 +54,57 @@ export function clientDefaults(config: UserConfigType) {
   };
 }
 
+function staleClientKeys() {
+  return createError({
+    status: 409,
+    message: 'The client keys have changed. Refresh and try again.',
+  });
+}
+
+async function assertDevicePublicKey(
+  tx: Repositories,
+  network: { name: string; publicKey: string },
+  publicKey: string,
+  clientId?: number
+) {
+  if (network.publicKey === publicKey) {
+    throw createError({
+      status: 422,
+      message: 'The interface already uses this public key.',
+    });
+  }
+  if (await tx.clients.hasPublicKey(network.name, publicKey, clientId)) {
+    throw createError({
+      status: 409,
+      message: 'Another client already uses this public key.',
+    });
+  }
+}
+
 export async function create(actor: Actor, data: ClientCreateType) {
   authorize(actor, 'clients', 'create');
-  const privateKey = await wg.generatePrivateKey();
-  const publicKey = await wg.getPublicKey(privateKey);
+  assertClientEnabled(true, data.expiresAt);
+  const keys = data.publicKey
+    ? { publicKey: data.publicKey, privateKey: null }
+    : await wg.generateKeyPair();
+  const config = await getDatabase().userConfigs.get();
+  const preSharedKey = config.defaultGeneratePreSharedKey
+    ? await wg.generatePreSharedKey()
+    : null;
   return commit(async (tx) => {
     assertClientEnabled(true, data.expiresAt);
     const network = await tx.interfaces.get();
-    const config = await tx.userConfigs.get();
+    if (data.publicKey) {
+      await assertDevicePublicKey(tx, network, data.publicKey);
+    }
     const clients = await tx.clients.getAll();
-    const preSharedKey = config.defaultGeneratePreSharedKey
-      ? await wg.generatePreSharedKey()
-      : null;
     const [created] = await tx.clients.insert({
       ...clientDefaults(config),
       ...data,
       // Preserve existing ownership until user assignment is introduced.
       userId: 1,
       interfaceId: network.name,
-      privateKey,
-      publicKey,
+      ...keys,
       preSharedKey: preSharedKey || null,
       ipv4Address: nextIP(parseCidr(network.ipv4Cidr), clients),
       ipv6Address: nextIP(parseCidr(network.ipv6Cidr), clients),
@@ -72,13 +114,107 @@ export async function create(actor: Actor, data: ClientCreateType) {
   });
 }
 
+export async function replacePublicKey(
+  actor: Actor,
+  clientId: number,
+  { currentPublicKey, publicKey }: ClientPublicKeyChange
+) {
+  await commit(async (tx) => {
+    const client = await clientForUpdate(tx, actor, clientId);
+    if (client.hasPrivateKey) {
+      throw createError({
+        status: 409,
+        message: 'Use Rotate Key Pair for this client.',
+      });
+    }
+    if (client.publicKey === publicKey) {
+      return unchanged;
+    }
+    if (client.publicKey !== currentPublicKey) {
+      throw staleClientKeys();
+    }
+    await assertDevicePublicKey(tx, await tx.interfaces.get(), publicKey);
+    await tx.clients.update(clientId, { publicKey });
+  });
+}
+
+async function setManagedKeys(
+  actor: Actor,
+  clientId: number,
+  expectedDeviceKey?: string
+) {
+  const before = await clientForUpdate(getDatabase(), actor, clientId);
+  const converting = expectedDeviceKey !== undefined;
+  if (!before.hasPrivateKey) {
+    if (!converting) {
+      throw createError({
+        status: 409,
+        message:
+          'Generate a key pair on the device and replace its public key.',
+      });
+    }
+    if (before.publicKey !== expectedDeviceKey) {
+      throw staleClientKeys();
+    }
+  }
+  const keys =
+    converting && before.hasPrivateKey ? null : await wg.generateKeyPair();
+  return commit(async (tx) => {
+    const client = await clientForUpdate(tx, actor, clientId);
+    if (converting && client.hasPrivateKey) {
+      return unchanged;
+    }
+    if (
+      !keys ||
+      client.hasPrivateKey !== before.hasPrivateKey ||
+      client.publicKey !== before.publicKey
+    ) {
+      throw staleClientKeys();
+    }
+    await tx.clients.update(clientId, keys);
+    if (converting) {
+      await tx.oneTimeLinks.delete(clientId);
+    }
+  });
+}
+
+export function setKeyMode(
+  actor: Actor,
+  clientId: number,
+  change: ClientKeyModeChange
+) {
+  if (change.mode === 'managed') {
+    return setManagedKeys(actor, clientId, change.currentPublicKey);
+  }
+  return commit(async (tx) => {
+    const client = await clientForUpdate(tx, actor, clientId);
+    if (!client.hasPrivateKey && client.publicKey === change.publicKey) {
+      return unchanged;
+    }
+    if (!client.hasPrivateKey || change.currentPublicKey !== client.publicKey) {
+      throw staleClientKeys();
+    }
+    await assertDevicePublicKey(
+      tx,
+      await tx.interfaces.get(),
+      change.publicKey,
+      clientId
+    );
+    await tx.clients.update(clientId, {
+      publicKey: change.publicKey,
+      privateKey: null,
+    });
+    await tx.oneTimeLinks.delete(clientId);
+  });
+}
+
 export async function update(
   actor: Actor,
   clientId: number,
   data: UpdateClientType
 ) {
   await commit(async (tx) => {
-    authorizeClient(actor, 'update', await tx.clients.getPublic(clientId));
+    await clientForUpdate(tx, actor, clientId);
     // TODO: Require admin approval for changes to serverAllowedIps because they affect host routing.
     assertClientEnabled(data.enabled, data.expiresAt);
     const addresses = assertClientAddresses(
@@ -100,29 +236,21 @@ export async function apply(
     return;
   }
 
-  // Authorize before generating secrets, then recheck in the write transaction.
-  authorizeClient(
-    actor,
-    'update',
-    await getDatabase().clients.getPublic(clientId)
-  );
-  let keys:
-    { privateKey: string; publicKey: string } | { preSharedKey: string | null };
   if (action === 'rotateKeyPair') {
-    const privateKey = await wg.generatePrivateKey();
-    keys = { privateKey, publicKey: await wg.getPublicKey(privateKey) };
-  } else if (action === 'rotatePreSharedKey') {
-    const preSharedKey = await wg.generatePreSharedKey();
+    await setManagedKeys(actor, clientId);
+    return;
+  }
+  let preSharedKey = null;
+  if (action === 'rotatePreSharedKey') {
+    await clientForUpdate(getDatabase(), actor, clientId);
+    preSharedKey = await wg.generatePreSharedKey();
     if (!preSharedKey) {
       throw new Error('Failed to generate preshared key');
     }
-    keys = { preSharedKey };
-  } else {
-    keys = { preSharedKey: null };
   }
   await commit(async (tx) => {
-    authorizeClient(actor, 'update', await tx.clients.getPublic(clientId));
-    await tx.clients.update(clientId, keys);
+    await clientForUpdate(tx, actor, clientId);
+    await tx.clients.update(clientId, { preSharedKey });
   });
 }
 

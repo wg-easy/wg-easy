@@ -2,6 +2,7 @@ import z from 'zod';
 import { isIPv4, isIPv6 } from 'is-ip';
 
 import { clientBulkActions } from '#shared/utils/clientBulk';
+import { wireGuardKeyPattern, zeroWireGuardKey } from '#shared/utils/wireguard';
 import {
   clientExpiryFilters,
   clientSortFields,
@@ -58,9 +59,37 @@ const serverAllowedIps = z.array(AllowedIpEntrySchema, {
   message: t('validation.client.serverAllowedIps'),
 });
 
+const publicKeyError = t('validation.client.publicKey');
+// A blank field requests automatic key generation when creating a client.
+const publicKeyField = z
+  .string()
+  .trim()
+  .refine(
+    (key) =>
+      key === '' || (wireGuardKeyPattern.test(key) && key !== zeroWireGuardKey),
+    publicKeyError
+  );
+
+export const ClientPublicKeySchema = z.object({
+  currentPublicKey: z.string().min(1),
+  publicKey: publicKeyField.refine((key) => key !== '', publicKeyError),
+});
+
+export type ClientPublicKeyChange = z.infer<typeof ClientPublicKeySchema>;
+
+export const ClientKeyModeSchema = z.discriminatedUnion('mode', [
+  ClientPublicKeySchema.pick({ currentPublicKey: true }).extend({
+    mode: z.literal('managed'),
+  }),
+  ClientPublicKeySchema.extend({ mode: z.literal('device') }),
+]);
+
+export type ClientKeyModeChange = z.infer<typeof ClientKeyModeSchema>;
+
 export const ClientCreateSchema = z.object({
   name: name,
   expiresAt: expiresAt,
+  publicKey: publicKeyField.optional(),
 });
 
 export type ClientCreateType = z.infer<typeof ClientCreateSchema>;

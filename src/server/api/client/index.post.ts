@@ -6,14 +6,11 @@ import { validateZod } from '#server/http/validation';
 import { ClientCreateSchema } from '#shared/contracts/client';
 
 export default defineAuthenticatedEventHandler(async ({ event, user }) => {
-  const { name, expiresAt } = await readValidatedBody(
+  const data = await readValidatedBody(
     event,
     validateZod(ClientCreateSchema, event)
   );
 
-  const clientId = await clients.create(user, {
-    name,
-    expiresAt,
-  });
+  const clientId = await clients.create(user, data);
   return { success: true, clientId };
 });

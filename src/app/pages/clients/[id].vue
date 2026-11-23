@@ -280,31 +280,8 @@
           <div
             class="col-span-full flex flex-col gap-3 sm:flex-row sm:flex-wrap"
           >
-            <ClientsConfigDialog :client-id="data.id">
-              <BaseSecondaryButton as="span" class="w-full">
-                {{ $t('clients.configuration.view') }}
-              </BaseSecondaryButton>
-            </ClientsConfigDialog>
-            <ClientsKeyActionDialog
-              :action="
-                data.hasPreSharedKey ? 'rotatePreSharedKey' : 'addPreSharedKey'
-              "
-              :client-name="data.name"
-              :disabled="keyActionPending"
-              @confirm="changeKey('rotatePreSharedKey')"
-            />
-            <ClientsKeyActionDialog
-              action="removePreSharedKey"
-              :client-name="data.name"
-              :disabled="keyActionPending || !data.hasPreSharedKey"
-              @confirm="changeKey('removePreSharedKey')"
-            />
-            <ClientsKeyActionDialog
-              action="rotateKeyPair"
-              :client-name="data.name"
-              :disabled="keyActionPending"
-              @confirm="changeKey('rotateKeyPair')"
-            />
+            <ClientsConfigDialog :client="data" />
+            <ClientsKeyActions :client="data" :refresh="refreshKeys" />
             <ClientsDeleteDialog
               :client-name="data.name"
               @delete="deleteClient"
@@ -334,39 +311,14 @@ const { data: _data, refresh } = await useFetch(`/api/client/${id}`, {
   method: 'get',
 });
 const data = toRef(_data.value);
-const keyActionPending = ref(false);
-const { t } = useI18n();
-
-const keyActions = {
-  rotatePreSharedKey: () =>
-    $fetch(`/api/client/${id}/preSharedKey`, { method: 'post' }),
-  removePreSharedKey: () =>
-    $fetch(`/api/client/${id}/preSharedKey`, { method: 'delete' }),
-  rotateKeyPair: () =>
-    $fetch(`/api/client/${id}/rotateKeyPair`, { method: 'post' }),
-};
 
 async function refreshKeys() {
   await refresh();
   if (data.value && _data.value) {
     data.value.publicKey = _data.value.publicKey;
+    data.value.hasPrivateKey = _data.value.hasPrivateKey;
     data.value.hasPreSharedKey = _data.value.hasPreSharedKey;
     data.value.endpoint = _data.value.endpoint;
-  }
-}
-
-async function changeKey(action: keyof typeof keyActions) {
-  if (keyActionPending.value) {
-    return;
-  }
-  keyActionPending.value = true;
-  try {
-    await useSubmit(keyActions[action], {
-      revert: refreshKeys,
-      successMsg: t('clients.keys.updated'),
-    })(undefined);
-  } finally {
-    keyActionPending.value = false;
   }
 }
 

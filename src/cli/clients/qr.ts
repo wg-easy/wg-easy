@@ -5,7 +5,7 @@ import { eq } from 'drizzle-orm';
 import { db, schema } from '#cli/db';
 import { WG_ENV } from '#server/utils/config';
 import { generateClientConfig } from '#server/features/vpn/configuration';
-import { encodeQRCodeTerm } from '#server/utils/qr';
+import { encodeQRCodeTerm, templateQrMessage } from '#server/utils/qr';
 
 export default defineCommand({
   meta: {
@@ -55,6 +55,12 @@ export default defineCommand({
     });
     if (!client) {
       consola.error(`Client with ID ${clientId} not found`);
+      return;
+    }
+
+    if (!client.privateKey) {
+      consola.error(templateQrMessage);
+      process.exitCode = 1;
       return;
     }
 

@@ -1,5 +1,6 @@
 import {
   eq,
+  ne,
   sql,
   or,
   like,
@@ -17,6 +18,9 @@ import type { ClientQueryType } from '#shared/contracts/client';
 import type { DBExecutor } from '#db/types';
 
 const publicColumns = { privateKey: false, preSharedKey: false } as const;
+const hasPrivateKey = sql<number>`${client.privateKey} IS NOT NULL`.as(
+  'has_private_key'
+);
 
 function withTimestamps<T extends { createdAt: string; updatedAt: string }>(
   row: T
@@ -27,6 +31,12 @@ function withTimestamps<T extends { createdAt: string; updatedAt: string }>(
     createdAt: new Date(createdAt),
     updatedAt: new Date(updatedAt),
   };
+}
+
+function publicListRow<
+  T extends { createdAt: string; updatedAt: string; hasPrivateKey: number },
+>({ hasPrivateKey, ...row }: T) {
+  return { ...withTimestamps(row), hasPrivateKey: Boolean(hasPrivateKey) };
 }
 
 function clientFilter(
@@ -102,10 +112,11 @@ export class ClientRepository {
     const result = await this.db.query.client.findMany({
       with: { oneTimeLink: true },
       columns: publicColumns,
+      extras: { hasPrivateKey },
       orderBy: (t, { asc }) => asc(t.name),
     });
 
-    return result.map(withTimestamps);
+    return result.map(publicListRow);
   }
 
   /**
@@ -131,6 +142,7 @@ export class ClientRepository {
         where,
         with: { oneTimeLink: true },
         columns: publicColumns,
+        extras: { hasPrivateKey },
         orderBy: (t, { asc, desc }) => {
           const order = query.sort === 'desc' ? desc : asc;
           if (query.sortBy === 'createdAt') {
@@ -160,7 +172,7 @@ export class ClientRepository {
       });
 
       return {
-        clients: result.map(withTimestamps),
+        clients: result.map(publicListRow),
         total,
         page,
         pageSize: query.pageSize,
@@ -183,6 +195,7 @@ export class ClientRepository {
       where: eq(client.id, id),
       columns: publicColumns,
       extras: {
+        hasPrivateKey,
         hasPreSharedKey: sql<number>`${client.preSharedKey} IS NOT NULL`.as(
           'has_pre_shared_key'
         ),
@@ -192,14 +205,34 @@ export class ClientRepository {
       return undefined;
     }
 
-    return { ...result, hasPreSharedKey: Boolean(result.hasPreSharedKey) };
+    return {
+      ...result,
+      hasPrivateKey: Boolean(result.hasPrivateKey),
+      hasPreSharedKey: Boolean(result.hasPreSharedKey),
+    };
   }
 
   async insert(data: typeof client.$inferInsert) {
     return this.db
       .insert(client)
-      .values(data)
+      .values({ ...data, privateKey: data.privateKey || null })
       .returning({ clientId: client.id });
+  }
+
+  async hasPublicKey(
+    interfaceId: string,
+    publicKey: string,
+    exceptId?: number
+  ) {
+    const count = await this.db.$count(
+      client,
+      and(
+        eq(client.interfaceId, interfaceId),
+        eq(client.publicKey, publicKey),
+        exceptId === undefined ? undefined : ne(client.id, exceptId)
+      )
+    );
+    return count > 0;
   }
 
   async findByIds(ids: number[]) {

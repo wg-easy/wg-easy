@@ -1,6 +1,9 @@
 import type { ErrorCorrection } from 'qr';
 import { encodeQR } from 'qr';
 
+export const templateQrMessage =
+  'This client keeps its private key on the device. Download the configuration template from wg-easy.';
+
 export function encodeQRCode(config: string): string {
   return tryECCModes((ecc) => {
     return encodeQR(config, 'svg', {

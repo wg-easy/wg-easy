@@ -200,6 +200,8 @@ async function filteredSiteGateways(tx: Repositories) {
   return network.firewallEnabled ? tx.clients.getEnabledSiteGateways() : [];
 }
 
+export const unchanged = Symbol('unchanged');
+
 /** Validate new host requirements before committing, then apply the saved state. */
 export function commit<T>(
   change: (tx: Repositories) => Promise<T>,
@@ -222,7 +224,9 @@ export function commit<T>(
       }
       return value;
     });
-    await apply(mode);
+    if (result !== unchanged || hostStates.get(getDatabase())?.retry) {
+      await apply(mode);
+    }
     return result;
   });
 }
@@ -269,11 +273,7 @@ export function start() {
       network.privateKey === '---default---' &&
       network.publicKey === '---default---'
     ) {
-      const privateKey = await wg.generatePrivateKey();
-      await interfaces.update({
-        privateKey,
-        publicKey: await wg.getPublicKey(privateKey),
-      });
+      await interfaces.update(await wg.generateKeyPair());
       network = await interfaces.get();
     }
     if (network.h1 === '0') {

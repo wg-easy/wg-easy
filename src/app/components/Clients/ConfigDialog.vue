@@ -1,10 +1,21 @@
 <template>
-  <BaseDialog :trigger-class="triggerClass" @update:open="loadOnOpen">
+  <BaseDialog
+    trigger-class="ui-button ui-button-secondary"
+    @update:open="loadOnOpen"
+  >
     <template #trigger>
-      <slot />
+      {{
+        client.hasPrivateKey
+          ? $t('clients.configuration.view')
+          : $t('clients.configuration.viewTemplate')
+      }}
     </template>
     <template #title>
-      {{ $t('clients.configuration.title') }}
+      {{
+        client.hasPrivateKey
+          ? $t('clients.configuration.title')
+          : $t('clients.configuration.template')
+      }}
     </template>
     <template #description>
       <div v-if="status === 'success'">
@@ -30,7 +41,9 @@
 </template>
 
 <script setup lang="ts">
-const props = defineProps<{ triggerClass?: string; clientId: number }>();
+const props = defineProps<{
+  client: Pick<LocalClient, 'id' | 'hasPrivateKey'>;
+}>();
 
 const toast = useToast();
 const { copied, copy, isSupported } = useClipboard({
@@ -42,7 +55,7 @@ const {
   data: config,
   status,
   refresh,
-} = useFetch(`/api/client/${props.clientId}/configuration`, {
+} = useFetch(`/api/client/${props.client.id}/configuration`, {
   responseType: 'text',
   server: false,
   immediate: false,

@@ -19,6 +19,30 @@
           :label="$t('clients.fields.expiresAt.label')"
           :description="$t('clients.fields.expiresAt.description')"
         />
+        <CollapsibleRoot class="mt-2 rounded-lg border border-line">
+          <CollapsibleTrigger
+            class="group flex min-h-11 w-full items-center gap-2.5 rounded-lg px-3 text-sm font-medium text-foreground transition-colors hover:bg-surface-hover data-[state=open]:rounded-b-none data-[state=open]:bg-surface-raised"
+          >
+            <SlidersHorizontalIcon
+              class="size-4 text-muted"
+              aria-hidden="true"
+            />
+            {{ $t('common.form.sections.advanced') }}
+            <ChevronDownIcon
+              class="ms-auto size-4 text-subtle transition-transform group-data-[state=open]:rotate-180"
+              aria-hidden="true"
+            />
+          </CollapsibleTrigger>
+          <CollapsibleContent class="grid gap-2 px-3 pt-2 pb-3">
+            <FormTextField
+              id="devicePublicKey"
+              v-model="publicKey"
+              :label="$t('clients.keys.publicKey')"
+              :description="$t('clients.create.publicKeyHint')"
+              autocomplete="off"
+            />
+          </CollapsibleContent>
+        </CollapsibleRoot>
       </div>
     </template>
     <template #actions>
@@ -37,9 +61,11 @@
 </template>
 
 <script lang="ts" setup>
+import { ChevronDownIcon, SlidersHorizontalIcon } from '@lucide/vue';
 import { $fetch } from '#imports';
 
 const name = ref<string>('');
+const publicKey = ref('');
 const expiresAt = ref<string | null>(null);
 const clientsStore = useClientsStore();
 
@@ -53,11 +79,16 @@ function resetOnOpen(open: boolean) {
   }
 
   name.value = '';
+  publicKey.value = '';
   expiresAt.value = null;
 }
 
 function createClient() {
-  return _createClient({ name: name.value, expiresAt: expiresAt.value });
+  return _createClient({
+    name: name.value,
+    publicKey: publicKey.value || undefined,
+    expiresAt: expiresAt.value,
+  });
 }
 
 const _createClient = useSubmit(
