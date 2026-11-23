@@ -281,35 +281,7 @@
             class="col-span-full flex flex-col gap-3 sm:flex-row sm:flex-wrap"
           >
             <ClientsConfigDialog :client="data" />
-            <ClientsKeyActionDialog
-              :action="
-                data.hasPreSharedKey ? 'rotatePreSharedKey' : 'addPreSharedKey'
-              "
-              :client-name="data.name"
-              :disabled="keyActionPending"
-              @confirm="changeKey"
-            />
-            <ClientsKeyActionDialog
-              action="removePreSharedKey"
-              :client-name="data.name"
-              :disabled="keyActionPending || !data.hasPreSharedKey"
-              @confirm="changeKey"
-            />
-            <ClientsKeyActionDialog
-              :action="
-                data.hasPrivateKey ? 'rotateKeyPair' : 'replacePublicKey'
-              "
-              :client-name="data.name"
-              :disabled="keyActionPending"
-              @confirm="changeKey"
-            />
-            <ClientsKeyActionDialog
-              :action="data.hasPrivateKey ? 'useDeviceKey' : 'useManagedKey'"
-              :client-name="data.name"
-              :initial-public-key="data.publicKey"
-              :disabled="keyActionPending"
-              @confirm="changeKey"
-            />
+            <ClientsKeyActions :client="data" :refresh="refreshKeys" />
             <ClientsDeleteDialog
               :client-name="data.name"
               @delete="deleteClient"
@@ -339,31 +311,6 @@ const { data: _data, refresh } = await useFetch(`/api/client/${id}`, {
   method: 'get',
 });
 const data = toRef(_data.value);
-const keyActionPending = ref(false);
-const { t } = useI18n();
-
-const keyActions = {
-  rotatePreSharedKey: () =>
-    $fetch(`/api/client/${id}/preSharedKey`, { method: 'post' }),
-  removePreSharedKey: () =>
-    $fetch(`/api/client/${id}/preSharedKey`, { method: 'delete' }),
-  rotateKeyPair: () =>
-    $fetch(`/api/client/${id}/rotateKeyPair`, { method: 'post' }),
-  replacePublicKey: (publicKey: string) =>
-    $fetch(`/api/client/${id}/publicKey`, {
-      method: 'put',
-      body: { publicKey },
-    }),
-  useDeviceKey: (publicKey: string) => setKeyMode('device', publicKey),
-  useManagedKey: () => setKeyMode('managed'),
-};
-
-function setKeyMode(mode: 'managed' | 'device', publicKey?: string) {
-  return $fetch(`/api/client/${id}/keyMode`, {
-    method: 'put',
-    body: { mode, currentPublicKey: data.value!.publicKey, publicKey },
-  });
-}
 
 async function refreshKeys() {
   await refresh();
@@ -372,26 +319,6 @@ async function refreshKeys() {
     data.value.hasPrivateKey = _data.value.hasPrivateKey;
     data.value.hasPreSharedKey = _data.value.hasPreSharedKey;
     data.value.endpoint = _data.value.endpoint;
-  }
-}
-
-async function changeKey(
-  action: keyof typeof keyActions | 'addPreSharedKey',
-  publicKey: string
-) {
-  if (keyActionPending.value) {
-    return;
-  }
-  keyActionPending.value = true;
-  try {
-    const request =
-      keyActions[action === 'addPreSharedKey' ? 'rotatePreSharedKey' : action];
-    await useSubmit(request, {
-      revert: refreshKeys,
-      successMsg: t('clients.keys.updated'),
-    })(publicKey);
-  } finally {
-    keyActionPending.value = false;
   }
 }
 

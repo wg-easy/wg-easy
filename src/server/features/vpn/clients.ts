@@ -28,6 +28,14 @@ type ClientAction =
   | 'rotatePreSharedKey'
   | 'removePreSharedKey';
 
+async function clientForUpdate(
+  tx: Repositories,
+  actor: Actor,
+  clientId: number
+) {
+  return authorizeClient(actor, 'update', await tx.clients.getPublic(clientId));
+}
+
 export function clientDefaults(config: UserConfigType) {
   return {
     mtu: config.defaultMtu,
@@ -100,11 +108,7 @@ export async function replacePublicKey(
   publicKey: string
 ) {
   await commit(async (tx) => {
-    const client = authorizeClient(
-      actor,
-      'update',
-      await tx.clients.getPublic(clientId)
-    );
+    const client = await clientForUpdate(tx, actor, clientId);
     if (client.hasPrivateKey) {
       throw createError({
         status: 409,
@@ -125,11 +129,7 @@ export function setKeyMode(
   change: ClientKeyModeChange
 ) {
   return commit(async (tx) => {
-    const client = authorizeClient(
-      actor,
-      'update',
-      await tx.clients.getPublic(clientId)
-    );
+    const client = await clientForUpdate(tx, actor, clientId);
     const alreadyInMode = client.hasPrivateKey === (change.mode === 'managed');
     if (
       alreadyInMode &&
@@ -163,7 +163,7 @@ export async function update(
   data: UpdateClientType
 ) {
   await commit(async (tx) => {
-    authorizeClient(actor, 'update', await tx.clients.getPublic(clientId));
+    await clientForUpdate(tx, actor, clientId);
     // TODO: Require admin approval for changes to serverAllowedIps because they affect host routing.
     assertClientEnabled(data.enabled, data.expiresAt);
     const addresses = assertClientAddresses(
@@ -186,11 +186,7 @@ export async function apply(
   }
 
   await commit(async (tx) => {
-    const client = authorizeClient(
-      actor,
-      'update',
-      await tx.clients.getPublic(clientId)
-    );
+    const client = await clientForUpdate(tx, actor, clientId);
     if (action === 'rotateKeyPair') {
       if (!client.hasPrivateKey) {
         throw createError({

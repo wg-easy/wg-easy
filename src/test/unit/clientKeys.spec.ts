@@ -7,11 +7,9 @@ import { requestEvent } from '../helpers/request';
 import { databaseFixture } from '../helpers/database';
 
 import * as clientOperations from '#server/features/vpn/clients';
-import { UserConfigRepository } from '#db/repositories/userConfig/repository';
 import { roles } from '#shared/utils/permissions';
 import { importConfiguration } from '#server/features/setup';
 import * as schema from '#db/schema';
-import { ClientRepository } from '#db/repositories/client/repository';
 import { ClientUpdateSchema } from '#shared/contracts/client';
 import { UserConfigUpdateSchema } from '#shared/contracts/userConfig';
 import removePreSharedKey from '#server/api/client/[clientId]/preSharedKey.delete';
@@ -43,9 +41,10 @@ vi.mock('#server/utils/config', () => ({
 }));
 const writeFile = vi.spyOn(fs, 'writeFile');
 
-let clients: ClientRepository;
 let store: Awaited<ReturnType<typeof databaseFixture>>['store'];
+let clients: typeof store.clients;
 let db: Awaited<ReturnType<typeof databaseFixture>>['db'];
+const owner = { id: 1, role: roles.CLIENT };
 
 function event(clientId = '1', body?: Record<string, unknown>) {
   const event = requestEvent(
@@ -121,19 +120,27 @@ beforeEach(async () => {
       enabled: true,
     }))
   );
-  clients = new ClientRepository(db);
+  clients = store.clients;
 });
 
 async function configurations(clientId = 1) {
   const client = (await clients.get(clientId))!;
-  const wgInterface = (await db.select().from(schema.wgInterface))[0]!;
-  const userConfig = (await db.select().from(schema.userConfig))[0]!;
+  const wgInterface = await store.interfaces.get();
+  const userConfig = await store.userConfigs.get();
   return {
     server: generateServerConfig(wgInterface, await store.hooks.get(), [
       client,
     ]),
     client: generateClientConfig(wgInterface, userConfig, client),
   };
+}
+
+async function issueLink(clientId = 1) {
+  await provisioning.generateOneTimeLink(owner, clientId);
+  const link = await db.query.oneTimeLink.findFirst({
+    where: eq(schema.oneTimeLink.id, clientId),
+  });
+  return link!.oneTimeLink;
 }
 
 describe('device-held private keys', () => {
@@ -177,13 +184,8 @@ describe('device-held private keys', () => {
       expect(String(writeFile.mock.calls[0]?.[1])).toContain(
         `PublicKey = ${firstKey}`
       );
-      await provisioning.generateOneTimeLink(admin, clientId);
-      const link = (await clients.getAll()).find(
-        (client) => client.id === clientId
-      )!.oneTimeLink!;
-      expect(await provisioning.redeemOneTimeLink(link.oneTimeLink)).toEqual(
-        download
-      );
+      const token = await issueLink(clientId);
+      expect(await provisioning.redeemOneTimeLink(token)).toEqual(download);
       await expect(qrCode(event(String(clientId)))).rejects.toMatchObject({
         status: 409,
         message: expect.stringContaining('configuration template'),
@@ -263,13 +265,6 @@ describe('device-held private keys', () => {
 describe('converting client keys', () => {
   const original = Buffer.alloc(32, 1).toString('base64');
   const replacement = Buffer.alloc(32, 2).toString('base64');
-  const owner = { id: 1, role: roles.CLIENT };
-
-  async function issueLink() {
-    await provisioning.generateOneTimeLink(owner, 1);
-    return (await clients.getAll()).find((client) => client.id === 1)!
-      .oneTimeLink!.oneTimeLink;
-  }
 
   test.each([original, replacement])(
     'converts a disabled client in place using device public key %s',
@@ -382,7 +377,7 @@ describe('client key actions', () => {
   test.each([true, false])(
     'creates clients with preshared-key generation set to %s',
     async (defaultGeneratePreSharedKey) => {
-      const userConfigs = new UserConfigRepository(db, 'wg0');
+      const { userConfigs } = store;
       const defaults = await userConfigs.get();
       expect(defaults.defaultGeneratePreSharedKey).toBe(true);
       const existing = await clients.getAll();
