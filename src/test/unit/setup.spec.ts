@@ -205,9 +205,11 @@ describe('setup', () => {
     ['server', 'privateKey', null],
     ['server', 'privateKey', ''],
     ['server', 'privateKey', undefined],
+    ['server', 'privateKey', zeroWireGuardKey],
     ['server', 'publicKey', 'invalid key'],
     ['server', 'address', '192.0.2.100/24'],
     ['peer', 'privateKey', 'invalid key'],
+    ['peer', 'privateKey', zeroWireGuardKey],
     ['peer', 'publicKey', Buffer.alloc(31).toString('base64')],
     ['peer', 'publicKey', undefined],
     ['peer', 'publicKey', zeroWireGuardKey],
@@ -244,6 +246,22 @@ describe('setup', () => {
       expect(up).not.toHaveBeenCalled();
     }
   );
+
+  test('rejects a backup with a reserved client record ID before importing any peers', async () => {
+    const { store, writeConfiguration } = await fixture();
+    await setup.createAdministrator('admin', 'a-long-password');
+    const backup = legacyBackup();
+    const clients = { ...backup.clients, ['__proto__']: backup.clients.peer };
+    await expect(
+      setup.importConfiguration(JSON.stringify({ ...backup, clients }))
+    ).rejects.toMatchObject({
+      status: 400,
+      message: 'Invalid backup field: clients',
+    });
+    expect(await setup.status()).toEqual({ step: 3, done: false });
+    expect(await store.clients.getAll()).toEqual([]);
+    expect(writeConfiguration).not.toHaveBeenCalled();
+  });
 
   test.each(['10.9.0.15', '10.9.0.0', '10.9.0.255', '10.9.1.1'])(
     'rejects a peer address outside the allocation pool (%s)',

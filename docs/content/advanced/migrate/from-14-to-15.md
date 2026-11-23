@@ -48,7 +48,7 @@ Create the first administrator in the setup wizard, then sign in with that accou
 
 wg-easy validates the whole backup, including disabled clients, before applying it. The server needs its key pair, and every client needs a public key. All public keys must be unique. If the backup includes a client private key, it must match that client's public key. Each client needs a unique host address in the server's `/24`, excluding the network, gateway, and broadcast addresses.
 
-Client `privateKey` and `preSharedKey` fields can be omitted, set to `null`, or left as an empty string. If the private key is absent, wg-easy preserves the client's public key and treats the private key as device-held. If the preshared key is absent, the peer continues without one.
+Client `privateKey` and `preSharedKey` fields can be omitted, set to `null`, or left as an empty string. If the private key is absent, wg-easy preserves the client's public key and treats the private key as device-held. An absent or all-zero preshared key disables presharing. An all-zero private key is invalid for both the server and its clients.
 
 If a field is invalid, the error identifies the field and setup stays open. Correct the backup and upload it again. A successful import opens the dashboard.
 

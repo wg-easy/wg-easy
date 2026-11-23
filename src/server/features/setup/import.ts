@@ -16,17 +16,20 @@ import { KeySchema } from '#shared/contracts/validation';
 import { ClientUpdateSchema } from '#shared/contracts/client';
 import { zeroWireGuardKey } from '#shared/utils/wireguard';
 
-const key = KeySchema.unwrap();
-const optionalClientKey = KeySchema.or(z.literal(''))
-  .default(null)
-  .transform((value) => value || null);
+const key = KeySchema.unwrap().refine((value) => value !== zeroWireGuardKey);
+const optionalClientKey = key
+  .or(z.literal(['', null]).transform(() => null))
+  .default(null);
 const address = ClientUpdateSchema.shape.ipv4Address;
 const client = z.object({
   name: ClientUpdateSchema.shape.name,
   address,
   privateKey: optionalClientKey,
-  publicKey: key.refine((value) => value !== zeroWireGuardKey),
-  preSharedKey: optionalClientKey,
+  publicKey: key,
+  preSharedKey: z.preprocess(
+    (value) => (value === zeroWireGuardKey ? null : value),
+    optionalClientKey
+  ),
   enabled: z.boolean(),
 });
 
@@ -37,9 +40,16 @@ const legacyConfigSchema = z.object({
     // Used for the gateway and its /24 CIDR.
     address,
   }),
-  // v14 uses arbitrary record keys. Only use ordinals in validation errors.
+  // A Zod record silently drops __proto__. Check the original IDs first,
+  // then validate by ordinal so peer errors never include the original IDs.
   clients: z
-    .record(z.string(), z.unknown())
+    .custom<Record<string, unknown>>(
+      (value) =>
+        value !== null &&
+        typeof value === 'object' &&
+        !Array.isArray(value) &&
+        !Object.hasOwn(value, '__proto__')
+    )
     .transform(Object.values)
     .pipe(z.array(client)),
 });

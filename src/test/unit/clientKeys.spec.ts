@@ -9,6 +9,7 @@ import { legacyBackup } from '../helpers/legacyBackup';
 
 import * as clientOperations from '#server/features/vpn/clients';
 import { roles } from '#shared/utils/permissions';
+import { zeroWireGuardKey } from '#shared/utils/wireguard';
 import { importConfiguration } from '#server/features/setup';
 import * as schema from '#db/schema';
 import { ClientUpdateSchema } from '#shared/contracts/client';
@@ -486,14 +487,15 @@ describe('client key actions', () => {
 
   const legacyPeer = legacyBackup().clients.peer;
   test.each([
-    { privateKey: '', preSharedKey: '' },
-    { privateKey: null, preSharedKey: null },
-    { privateKey: undefined, preSharedKey: undefined },
-    { privateKey: undefined, preSharedKey: legacyPeer.preSharedKey },
-    { privateKey: legacyPeer.privateKey, preSharedKey: undefined },
-  ])(
-    'imports a v14 peer with privateKey=$privateKey and preSharedKey=$preSharedKey',
-    async ({ privateKey, preSharedKey }) => {
+    ['', '', null],
+    [null, null, null],
+    [undefined, undefined, null],
+    [undefined, legacyPeer.preSharedKey, legacyPeer.preSharedKey],
+    [legacyPeer.privateKey, undefined, null],
+    [legacyPeer.privateKey, zeroWireGuardKey, null],
+  ] as const)(
+    'imports a v14 peer with privateKey=%s and preSharedKey=%s',
+    async (privateKey, preSharedKey, expectedPreSharedKey) => {
       await store.general.update({ setupStep: 3 });
       const server = { ...legacyBackup().server, address: '10.8.0.1' };
       const peer = {
@@ -506,16 +508,16 @@ describe('client key actions', () => {
       expect(await clients.get(3)).toMatchObject({
         publicKey: peer.publicKey,
         privateKey: privateKey || null,
-        preSharedKey: preSharedKey || null,
+        preSharedKey: expectedPreSharedKey,
       });
       expect(await clients.getPublic(3)).toMatchObject({
         hasPrivateKey: Boolean(privateKey),
-        hasPreSharedKey: Boolean(preSharedKey),
+        hasPreSharedKey: Boolean(expectedPreSharedKey),
       });
       const download = await provisioning.download(owner, 3);
       expect(download.isTemplate).toBe(!privateKey);
       expect(download.contents.includes('PresharedKey =')).toBe(
-        Boolean(preSharedKey)
+        Boolean(expectedPreSharedKey)
       );
     }
   );
