@@ -42,14 +42,10 @@ test('a device-held key connects using the template and can be replaced', async 
   });
   await page
     .getByRole('button', { name: 'View configuration template' })
-    .first()
     .click();
   await expect(page.getByRole('dialog')).toContainText('# PrivateKey =');
   await page.keyboard.press('Escape');
-  await page
-    .getByRole('button', { name: 'Replace Public Key' })
-    .first()
-    .click();
+  await page.getByRole('button', { name: 'Replace Public Key' }).click();
   const dialog = page.getByRole('dialog');
   const replacement = generateKeyPairSync('x25519').publicKey.export({
     format: 'jwk',

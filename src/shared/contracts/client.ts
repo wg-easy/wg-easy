@@ -2,6 +2,7 @@ import z from 'zod';
 import { isIPv4, isIPv6 } from 'is-ip';
 
 import { clientBulkActions } from '#shared/utils/clientBulk';
+import { wireGuardKeyPattern, zeroWireGuardKey } from '#shared/utils/wireguard';
 import {
   clientExpiryFilters,
   clientSortFields,
@@ -59,26 +60,24 @@ const serverAllowedIps = z.array(AllowedIpEntrySchema, {
 });
 
 const publicKeyError = t('validation.client.publicKey');
-// A 32-byte key ends with two zero padding bits and one '=' in canonical base64.
-const publicKey = z
+// A blank field requests automatic key generation when creating a client.
+const publicKeyField = z
   .string()
   .trim()
-  .regex(/^[A-Za-z0-9+/]{42}[AEIMQUYcgkosw048]=$/, publicKeyError)
   .refine(
-    (key) => key !== 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=',
+    (key) =>
+      key === '' || (wireGuardKeyPattern.test(key) && key !== zeroWireGuardKey),
     publicKeyError
   );
 
-export const ClientPublicKeySchema = z.object({ publicKey });
+export const ClientPublicKeySchema = z.object({
+  publicKey: publicKeyField.refine((key) => key !== '', publicKeyError),
+});
 
 export const ClientCreateSchema = z.object({
   name: name,
   expiresAt: expiresAt,
-  publicKey: z
-    .string()
-    .trim()
-    .pipe(z.union([z.literal(''), publicKey], { error: publicKeyError }))
-    .optional(),
+  publicKey: publicKeyField.optional(),
 });
 
 export type ClientCreateType = z.infer<typeof ClientCreateSchema>;

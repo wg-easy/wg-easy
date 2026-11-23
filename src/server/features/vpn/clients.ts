@@ -43,12 +43,7 @@ export function clientDefaults(config: UserConfigType) {
   };
 }
 
-async function generateKeyPair() {
-  const privateKey = await wg.generatePrivateKey();
-  return { privateKey, publicKey: await wg.getPublicKey(privateKey) };
-}
-
-async function assertPublicKeyAvailable(
+async function deviceKeys(
   tx: Repositories,
   network: { name: string; publicKey: string },
   publicKey: string
@@ -65,6 +60,7 @@ async function assertPublicKeyAvailable(
       message: 'Another client already uses this public key.',
     });
   }
+  return { publicKey, privateKey: null };
 }
 
 export async function create(actor: Actor, data: ClientCreateType) {
@@ -72,12 +68,9 @@ export async function create(actor: Actor, data: ClientCreateType) {
   return commit(async (tx) => {
     assertClientEnabled(true, data.expiresAt);
     const network = await tx.interfaces.get();
-    if (data.publicKey) {
-      await assertPublicKeyAvailable(tx, network, data.publicKey);
-    }
     const keys = data.publicKey
-      ? { publicKey: data.publicKey, privateKey: null }
-      : await generateKeyPair();
+      ? await deviceKeys(tx, network, data.publicKey)
+      : await wg.generateKeyPair();
     const config = await tx.userConfigs.get();
     const clients = await tx.clients.getAll();
     const preSharedKey = config.defaultGeneratePreSharedKey
@@ -119,8 +112,8 @@ export async function replacePublicKey(
     if (client.publicKey === publicKey) {
       return unchanged;
     }
-    await assertPublicKeyAvailable(tx, await tx.interfaces.get(), publicKey);
-    await tx.clients.update(clientId, { publicKey });
+    const keys = await deviceKeys(tx, await tx.interfaces.get(), publicKey);
+    await tx.clients.update(clientId, keys);
   });
 }
 
@@ -166,7 +159,7 @@ export async function apply(
             'Generate a key pair on the device and replace its public key.',
         });
       }
-      await tx.clients.update(clientId, await generateKeyPair());
+      await tx.clients.update(clientId, await wg.generateKeyPair());
       return;
     }
     const preSharedKey =

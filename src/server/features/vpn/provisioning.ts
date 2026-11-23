@@ -6,6 +6,7 @@ import { generateClientConfig } from './configuration';
 
 import { WG_ENV } from '#server/utils/config';
 import { getDatabase } from '#db';
+import type { ClientType } from '#db/repositories/client/types';
 import type { Repositories } from '#db/store';
 
 function filename(name: string, id: number, template: boolean) {
@@ -17,15 +18,13 @@ function filename(name: string, id: number, template: boolean) {
   return `${clean || id}${template ? '.template' : ''}.conf`;
 }
 
-async function configuration(
-  tx: Repositories,
-  client: NonNullable<Awaited<ReturnType<Repositories['clients']['get']>>>
-) {
+async function configuration(tx: Repositories, client: ClientType) {
   const network = await tx.interfaces.get();
   const defaults = await tx.userConfigs.get();
+  const isTemplate = !client.privateKey;
   return {
-    filename: filename(client.name, client.id, !client.privateKey),
-    isTemplate: !client.privateKey,
+    filename: filename(client.name, client.id, isTemplate),
+    isTemplate,
     contents: generateClientConfig(network, defaults, client, {
       enableIpv6: !WG_ENV.DISABLE_IPV6,
       amnezia: WG_ENV.WG_EXECUTABLE === 'awg',

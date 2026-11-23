@@ -35,8 +35,10 @@ export async function vpnFixture() {
     persistentKeepalive: 0,
     enabled: true,
   });
-  vi.spyOn(wg, 'generatePrivateKey').mockResolvedValue('new-private');
-  vi.spyOn(wg, 'getPublicKey').mockResolvedValue('new-public');
+  vi.spyOn(wg, 'generateKeyPair').mockResolvedValue({
+    privateKey: 'new-private',
+    publicKey: 'new-public',
+  });
   vi.spyOn(wg, 'generatePreSharedKey').mockResolvedValue('new-preshared');
   vi.spyOn(wg, 'dump').mockResolvedValue([]);
   vi.spyOn(wg, 'up').mockResolvedValue('');

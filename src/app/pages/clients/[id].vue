@@ -280,37 +280,28 @@
           <div
             class="col-span-full flex flex-col gap-3 sm:flex-row sm:flex-wrap"
           >
-            <ClientsConfigDialog
-              :client-id="data.id"
-              :is-template="!data.hasPrivateKey"
-            >
-              <BaseSecondaryButton as="span" class="w-full">
-                {{
-                  data.hasPrivateKey
-                    ? $t('clients.configuration.view')
-                    : $t('clients.configuration.viewTemplate')
-                }}
-              </BaseSecondaryButton>
-            </ClientsConfigDialog>
+            <ClientsConfigDialog :client="data" />
             <ClientsKeyActionDialog
               :action="
                 data.hasPreSharedKey ? 'rotatePreSharedKey' : 'addPreSharedKey'
               "
               :client-name="data.name"
               :disabled="keyActionPending"
-              @confirm="changeKey('rotatePreSharedKey')"
+              @confirm="changeKey"
             />
             <ClientsKeyActionDialog
               action="removePreSharedKey"
               :client-name="data.name"
               :disabled="keyActionPending || !data.hasPreSharedKey"
-              @confirm="changeKey('removePreSharedKey')"
+              @confirm="changeKey"
             />
             <ClientsKeyActionDialog
-              :action="pairAction"
+              :action="
+                data.hasPrivateKey ? 'rotateKeyPair' : 'replacePublicKey'
+              "
               :client-name="data.name"
               :disabled="keyActionPending"
-              @confirm="changeKey(pairAction, $event)"
+              @confirm="changeKey"
             />
             <ClientsDeleteDialog
               :client-name="data.name"
@@ -341,9 +332,6 @@ const { data: _data, refresh } = await useFetch(`/api/client/${id}`, {
   method: 'get',
 });
 const data = toRef(_data.value);
-const pairAction = computed(() =>
-  data.value?.hasPrivateKey ? 'rotateKeyPair' : 'replacePublicKey'
-);
 const keyActionPending = ref(false);
 const { t } = useI18n();
 
@@ -370,16 +358,21 @@ async function refreshKeys() {
   }
 }
 
-async function changeKey(action: keyof typeof keyActions, publicKey = '') {
+async function changeKey(
+  action: keyof typeof keyActions | 'addPreSharedKey',
+  publicKey: string
+) {
   if (keyActionPending.value) {
     return;
   }
   keyActionPending.value = true;
   try {
-    await useSubmit(() => keyActions[action](publicKey), {
+    const request =
+      keyActions[action === 'addPreSharedKey' ? 'rotatePreSharedKey' : action];
+    await useSubmit(request, {
       revert: refreshKeys,
       successMsg: t('clients.keys.updated'),
-    })(undefined);
+    })(publicKey);
   } finally {
     keyActionPending.value = false;
   }

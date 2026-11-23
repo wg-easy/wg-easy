@@ -1,15 +1,13 @@
 <template>
   <BaseDialog
     :trigger-disabled="disabled"
-    trigger-class="disabled:cursor-not-allowed disabled:opacity-50"
+    trigger-class="ui-button ui-button-secondary"
     @update:open="publicKey = ''"
   >
     <template #trigger>
-      <BaseSecondaryButton as="span" class="w-full">
-        {{ $t(`clients.keys.actions.${action}.label`) }}
-      </BaseSecondaryButton>
+      {{ label }}
     </template>
-    <template #title>{{ $t(`clients.keys.actions.${action}.label`) }}</template>
+    <template #title>{{ label }}</template>
     <template #description>
       <i18n-t :keypath="`clients.keys.actions.${action}.description`">
         <template #name>
@@ -37,9 +35,9 @@
           :disabled="
             disabled || (action === 'replacePublicKey' && !publicKey.trim())
           "
-          @click="$emit('confirm', publicKey)"
+          @click="$emit('confirm', action, publicKey)"
         >
-          {{ $t(`clients.keys.actions.${action}.label`) }}
+          {{ label }}
         </BaseSecondaryButton>
       </DialogClose>
     </template>
@@ -47,17 +45,20 @@
 </template>
 
 <script lang="ts" setup>
-defineProps<{
-  action:
-    | 'addPreSharedKey'
-    | 'rotatePreSharedKey'
-    | 'removePreSharedKey'
-    | 'replacePublicKey'
-    | 'rotateKeyPair';
+type KeyAction =
+  | 'addPreSharedKey'
+  | 'rotatePreSharedKey'
+  | 'removePreSharedKey'
+  | 'replacePublicKey'
+  | 'rotateKeyPair';
+const props = defineProps<{
+  action: KeyAction;
   clientName: string;
   disabled?: boolean;
 }>();
 
 const publicKey = ref('');
-defineEmits<{ confirm: [publicKey: string] }>();
+const { t } = useI18n();
+const label = computed(() => t(`clients.keys.actions.${props.action}.label`));
+defineEmits<{ confirm: [action: KeyAction, publicKey: string] }>();
 </script>

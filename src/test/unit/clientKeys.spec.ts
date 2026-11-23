@@ -190,6 +190,14 @@ describe('device-held private keys', () => {
     }
   );
 
+  test('a blank public key selects automatic key generation', async () => {
+    const { clientId } = await register('  ');
+    expect(await clients.get(clientId)).toMatchObject({
+      privateKey: 'new-private-key',
+      publicKey: 'new-public-key',
+    });
+  });
+
   test('an owner can replace a public key and retry without changing other settings or synchronizing twice', async () => {
     const { clientId } = await register(firstKey);
     const before = await clients.get(clientId);

@@ -273,11 +273,7 @@ export function start() {
       network.privateKey === '---default---' &&
       network.publicKey === '---default---'
     ) {
-      const privateKey = await wg.generatePrivateKey();
-      await interfaces.update({
-        privateKey,
-        publicKey: await wg.getPublicKey(privateKey),
-      });
+      await interfaces.update(await wg.generateKeyPair());
       network = await interfaces.get();
     }
     if (network.h1 === '0') {

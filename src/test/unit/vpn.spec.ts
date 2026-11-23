@@ -289,7 +289,7 @@ describe('VPN operations', () => {
 
     expect(commands.up).toHaveBeenCalledTimes(2);
     expect(commands.sync).toHaveBeenCalledOnce();
-    expect(commands.generatePrivateKey).toHaveBeenCalledOnce();
+    expect(commands.generateKeyPair).toHaveBeenCalledOnce();
     expect(await store.interfaces.get()).toEqual(initialized);
     await vpn.maintain();
     expect(commands.up).toHaveBeenCalledTimes(2);
