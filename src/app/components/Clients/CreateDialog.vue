@@ -13,19 +13,26 @@
           v-model="name"
           :label="$t('clients.fields.name.label')"
         />
-        <FormTextField
-          id="devicePublicKey"
-          v-model="publicKey"
-          :label="$t('clients.keys.publicKey')"
-          :description="$t('clients.create.publicKeyHint')"
-          autocomplete="off"
-        />
         <FormDateField
           id="expiresAt"
           v-model="expiresAt"
           :label="$t('clients.fields.expiresAt.label')"
           :description="$t('clients.fields.expiresAt.description')"
         />
+        <details class="mt-2">
+          <summary class="cursor-pointer font-medium text-foreground">
+            {{ $t('common.form.sections.advanced') }}
+          </summary>
+          <div class="mt-2 grid gap-2">
+            <FormTextField
+              id="devicePublicKey"
+              v-model="publicKey"
+              :label="$t('clients.keys.publicKey')"
+              :description="$t('clients.create.publicKeyHint')"
+              autocomplete="off"
+            />
+          </div>
+        </details>
       </div>
     </template>
     <template #actions>

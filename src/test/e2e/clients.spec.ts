@@ -70,8 +70,8 @@ test('converting key modes keeps the tunnel with the same key and reconnects wit
   const [publicKey] = await app.peers();
   await card.getByRole('link', { name: 'Laptop', exact: true }).click();
   const dialog = page.getByRole('dialog');
-  const device = 'Use device-held key';
-  const managed = 'Manage key in wg-easy';
+  const device = 'Use Device Key';
+  const managed = 'Manage Key in wg-easy';
   await page.getByRole('button', { name: device }).click();
   await expect(dialog.getByLabel('Public Key')).toHaveValue(publicKey!);
   await dialog.getByRole('button', { name: device }).click();

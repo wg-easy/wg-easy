@@ -44,7 +44,10 @@ export async function createClient(
   const dialog = page.getByRole('dialog');
   await dialog.getByLabel('Name', { exact: true }).fill(name);
   if (publicKey) {
-    await dialog.getByLabel('Public Key', { exact: true }).fill(publicKey);
+    const keyField = dialog.getByLabel('Public Key', { exact: true });
+    await expect(keyField).toBeHidden();
+    await dialog.getByText('Advanced', { exact: true }).click();
+    await keyField.fill(publicKey);
   }
   await dialog
     .getByRole('button', { name: 'Create Client', exact: true })

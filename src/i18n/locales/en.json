@@ -147,7 +147,7 @@
       "clearSearch": "Clear search"
     },
     "create": {
-      "publicKeyHint": "Paste the public key generated on the device, or leave this blank to let wg-easy generate a key pair.",
+      "publicKeyHint": "Enter the device's public key or leave empty to generate a key pair.",
       "action": "Create Client",
       "success": "Client created",
       "title": "New Client"
@@ -229,15 +229,15 @@
         },
         "replacePublicKey": {
           "label": "Replace Public Key",
-          "description": "Enter the new public key from {name}. Applying this change immediately disconnects the old key."
+          "description": "Replace the public key for {name}? The old key will lose access."
         },
         "useDeviceKey": {
-          "label": "Use device-held key",
-          "description": "Remove the private key stored by wg-easy for {name}? Keep the current public key to keep the device connected, or enter a new public key to revoke the old one. Make sure the device has the matching private key. Future downloads will be templates. Existing one-time links will expire."
+          "label": "Use Device Key",
+          "description": "Remove the private key for {name} from wg-easy? Keep the current public key to stay connected. Downloads will be templates and existing one-time links will expire."
         },
         "useManagedKey": {
-          "label": "Manage key in wg-easy",
-          "description": "Generate and store a new key pair in wg-easy for {name}? The current key will lose access. Install the new configuration on the device to reconnect. Existing one-time links will expire."
+          "label": "Manage Key in wg-easy",
+          "description": "Generate a new key pair for {name}? Install the new configuration to reconnect. Existing one-time links will expire."
         }
       },
       "updated": "Keys updated"
