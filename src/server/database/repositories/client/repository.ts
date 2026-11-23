@@ -1,5 +1,6 @@
 import {
   eq,
+  ne,
   sql,
   or,
   like,
@@ -218,10 +219,18 @@ export class ClientRepository {
       .returning({ clientId: client.id });
   }
 
-  async hasPublicKey(interfaceId: string, publicKey: string) {
+  async hasPublicKey(
+    interfaceId: string,
+    publicKey: string,
+    exceptId?: number
+  ) {
     const count = await this.db.$count(
       client,
-      and(eq(client.interfaceId, interfaceId), eq(client.publicKey, publicKey))
+      and(
+        eq(client.interfaceId, interfaceId),
+        eq(client.publicKey, publicKey),
+        exceptId === undefined ? undefined : ne(client.id, exceptId)
+      )
     );
     return count > 0;
   }

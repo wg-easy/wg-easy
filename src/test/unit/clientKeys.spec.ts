@@ -19,6 +19,7 @@ import rotatePreSharedKey from '#server/api/client/[clientId]/preSharedKey.post'
 import rotateKeyPair from '#server/api/client/[clientId]/rotateKeyPair.post';
 import createClient from '#server/api/client/index.post';
 import replacePublicKey from '#server/api/client/[clientId]/publicKey.put';
+import setKeyMode from '#server/api/client/[clientId]/keyMode.put';
 import qrCode from '#server/api/client/[clientId]/qrcode.svg.get';
 import * as provisioning from '#server/features/vpn/provisioning';
 import {
@@ -46,15 +47,15 @@ let clients: ClientRepository;
 let store: Awaited<ReturnType<typeof databaseFixture>>['store'];
 let db: Awaited<ReturnType<typeof databaseFixture>>['db'];
 
-function event(clientId = '1', publicKey?: string) {
+function event(clientId = '1', body?: Record<string, unknown>) {
   const event = requestEvent(
     `http://localhost/api/client/${clientId}`,
-    publicKey === undefined
+    body === undefined
       ? undefined
       : {
           method: 'PUT',
           headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ publicKey }),
+          body: JSON.stringify(body),
         }
   );
   event.context.params = { clientId };
@@ -203,7 +204,7 @@ describe('device-held private keys', () => {
     const before = await clients.get(clientId);
     getCurrentUser.mockResolvedValue({ id: 1, role: 2 });
     const replace = () =>
-      replacePublicKey(event(String(clientId), ` ${nextKey} `));
+      replacePublicKey(event(String(clientId), { publicKey: ` ${nextKey} ` }));
     writeFile.mockClear();
     await replace();
     expect(await clients.get(clientId)).toEqual({
@@ -219,12 +220,14 @@ describe('device-held private keys', () => {
     await expect(rotateKeyPair(event(String(clientId)))).rejects.toMatchObject({
       status: 409,
     });
-    await expect(replacePublicKey(event('1', firstKey))).rejects.toMatchObject({
+    await expect(
+      replacePublicKey(event('1', { publicKey: firstKey }))
+    ).rejects.toMatchObject({
       status: 409,
     });
     getCurrentUser.mockResolvedValue({ id: 2, role: 2 });
     await expect(
-      replacePublicKey(event(String(clientId), firstKey))
+      replacePublicKey(event(String(clientId), { publicKey: firstKey }))
     ).rejects.toMatchObject({ status: 403 });
     expect((await clients.get(clientId))?.publicKey).toBe(nextKey);
     expect(writeFile).toHaveBeenCalledOnce();
@@ -245,15 +248,133 @@ describe('device-held private keys', () => {
     ] as const) {
       await expect(register(key)).rejects.toMatchObject({ status });
       await expect(
-        replacePublicKey(event(String(clientId), key))
+        replacePublicKey(event(String(clientId), { publicKey: key }))
       ).rejects.toMatchObject({ status });
     }
     await expect(
-      replacePublicKey(event(String(clientId), ' '))
+      replacePublicKey(event(String(clientId), { publicKey: ' ' }))
     ).rejects.toMatchObject({ status: 400 });
     expect(await clients.getAll()).toHaveLength(3);
     expect((await clients.get(clientId))?.publicKey).toBe(firstKey);
     expect(writeFile).not.toHaveBeenCalled();
+  });
+});
+
+describe('converting client keys', () => {
+  const original = Buffer.alloc(32, 1).toString('base64');
+  const replacement = Buffer.alloc(32, 2).toString('base64');
+  const owner = { id: 1, role: roles.CLIENT };
+
+  async function issueLink() {
+    await provisioning.generateOneTimeLink(owner, 1);
+    return (await clients.getAll()).find((client) => client.id === 1)!
+      .oneTimeLink!.oneTimeLink;
+  }
+
+  test.each([original, replacement])(
+    'converts a disabled client in place using device public key %s',
+    async (publicKey) => {
+      getCurrentUser.mockResolvedValue(owner);
+      await clients.update(1, { publicKey: original, enabled: false });
+      const before = await clients.get(1);
+      const managedLink = await issueLink();
+      const useDevice = () =>
+        setKeyMode(
+          event('1', {
+            mode: 'device',
+            currentPublicKey: original,
+            publicKey: ` ${publicKey} `,
+          })
+        );
+      await useDevice();
+      expect(await clients.get(1)).toEqual({
+        ...before,
+        privateKey: null,
+        publicKey,
+        updatedAt: expect.any(String),
+      });
+      await expect(
+        provisioning.redeemOneTimeLink(managedLink)
+      ).rejects.toMatchObject({ status: 404 });
+      const templateLink = await issueLink();
+      expect(templateLink).toMatch(/^t/);
+      await expect(
+        provisioning.redeemOneTimeLink(managedLink)
+      ).rejects.toMatchObject({ status: 404 });
+      await useDevice();
+      expect(await provisioning.redeemOneTimeLink(templateLink)).toMatchObject({
+        isTemplate: true,
+      });
+
+      const useManaged = () =>
+        setKeyMode(
+          event('1', { mode: 'managed', currentPublicKey: publicKey })
+        );
+      await Promise.all([useManaged(), useManaged()]);
+      expect(await clients.get(1)).toEqual({
+        ...before,
+        privateKey: 'new-private-key',
+        publicKey: 'new-public-key',
+        updatedAt: expect.any(String),
+      });
+      await expect(
+        provisioning.redeemOneTimeLink(templateLink)
+      ).rejects.toMatchObject({ status: 404 });
+      const freshLink = await issueLink();
+      expect(freshLink).toMatch(/^m/);
+      await expect(
+        provisioning.redeemOneTimeLink(templateLink)
+      ).rejects.toMatchObject({ status: 404 });
+      expect(await provisioning.redeemOneTimeLink(freshLink)).toMatchObject({
+        isTemplate: false,
+      });
+      expect(
+        exec.mock.calls.filter(([command]) => command === 'wg genkey')
+      ).toHaveLength(1);
+      expect(writeFile).toHaveBeenCalledTimes(2);
+    }
+  );
+
+  test('rejects unauthorized, stale and invalid conversions without changing keys or links', async () => {
+    await clients.update(1, { publicKey: original });
+    await clients.update(2, { publicKey: replacement, enabled: false });
+    const before = await clients.get(1);
+    const token = await issueLink();
+    const useDevice = (currentPublicKey: string, publicKey: string) =>
+      setKeyMode(event('1', { mode: 'device', currentPublicKey, publicKey }));
+    getCurrentUser.mockResolvedValue({ id: 2, role: roles.CLIENT });
+    await expect(useDevice(original, original)).rejects.toMatchObject({
+      status: 403,
+    });
+    getCurrentUser.mockResolvedValue(owner);
+    await expect(useDevice(replacement, original)).rejects.toMatchObject({
+      status: 409,
+    });
+    await expect(useDevice(original, replacement)).rejects.toMatchObject({
+      status: 409,
+    });
+    await expect(useDevice(original, ' ')).rejects.toMatchObject({
+      status: 400,
+    });
+    expect(await clients.get(1)).toEqual(before);
+    expect(await provisioning.redeemOneTimeLink(token)).toMatchObject({
+      isTemplate: false,
+    });
+    expect(writeFile).not.toHaveBeenCalled();
+  });
+
+  test('a failed key generation preserves the device key and its template link', async () => {
+    await clients.update(1, { publicKey: original, privateKey: null });
+    const before = await clients.get(1);
+    const token = await issueLink();
+    exec.mockRejectedValueOnce(new Error('Failed to generate key'));
+    await expect(
+      setKeyMode(event('1', { mode: 'managed', currentPublicKey: original }))
+    ).rejects.toThrow('Failed to generate key');
+    expect(await clients.get(1)).toEqual(before);
+    expect(await provisioning.redeemOneTimeLink(token)).toMatchObject({
+      isTemplate: true,
+    });
   });
 });
 

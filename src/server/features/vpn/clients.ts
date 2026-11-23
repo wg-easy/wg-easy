@@ -16,6 +16,7 @@ import type { Repositories } from '#db/store';
 import type {
   ClientBulkType,
   ClientCreateType,
+  ClientKeyModeChange,
   UpdateClientType,
 } from '#shared/contracts/client';
 import type { UserConfigType } from '#db/repositories/userConfig/types';
@@ -46,7 +47,8 @@ export function clientDefaults(config: UserConfigType) {
 async function deviceKeys(
   tx: Repositories,
   network: { name: string; publicKey: string },
-  publicKey: string
+  publicKey: string,
+  clientId?: number
 ) {
   if (network.publicKey === publicKey) {
     throw createError({
@@ -54,7 +56,7 @@ async function deviceKeys(
       message: 'The interface already uses this public key.',
     });
   }
-  if (await tx.clients.hasPublicKey(network.name, publicKey)) {
+  if (await tx.clients.hasPublicKey(network.name, publicKey, clientId)) {
     throw createError({
       status: 409,
       message: 'Another client already uses this public key.',
@@ -114,6 +116,44 @@ export async function replacePublicKey(
     }
     const keys = await deviceKeys(tx, await tx.interfaces.get(), publicKey);
     await tx.clients.update(clientId, keys);
+  });
+}
+
+export function setKeyMode(
+  actor: Actor,
+  clientId: number,
+  change: ClientKeyModeChange
+) {
+  return commit(async (tx) => {
+    const client = authorizeClient(
+      actor,
+      'update',
+      await tx.clients.getPublic(clientId)
+    );
+    const alreadyInMode = client.hasPrivateKey === (change.mode === 'managed');
+    if (
+      alreadyInMode &&
+      (change.mode === 'managed' || change.publicKey === client.publicKey)
+    ) {
+      return unchanged;
+    }
+    if (alreadyInMode || change.currentPublicKey !== client.publicKey) {
+      throw createError({
+        status: 409,
+        message: 'The client keys have changed. Refresh and try again.',
+      });
+    }
+    const keys =
+      change.mode === 'managed'
+        ? await wg.generateKeyPair()
+        : await deviceKeys(
+            tx,
+            await tx.interfaces.get(),
+            change.publicKey,
+            clientId
+          );
+    await tx.clients.update(clientId, keys);
+    await tx.oneTimeLinks.delete(clientId);
   });
 }
 

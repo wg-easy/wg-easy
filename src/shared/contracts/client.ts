@@ -74,6 +74,16 @@ export const ClientPublicKeySchema = z.object({
   publicKey: publicKeyField.refine((key) => key !== '', publicKeyError),
 });
 
+export const ClientKeyModeSchema = z.discriminatedUnion('mode', [
+  z.object({ mode: z.literal('managed'), currentPublicKey: z.string().min(1) }),
+  ClientPublicKeySchema.extend({
+    mode: z.literal('device'),
+    currentPublicKey: z.string().min(1),
+  }),
+]);
+
+export type ClientKeyModeChange = z.infer<typeof ClientKeyModeSchema>;
+
 export const ClientCreateSchema = z.object({
   name: name,
   expiresAt: expiresAt,

@@ -57,6 +57,48 @@ test('a device-held key connects using the template and can be replaced', async 
   await expect.poll(() => app.pingFromClient('10.8.0.1')).toBe(false);
 });
 
+test('converting key modes keeps the tunnel with the same key and reconnects with a fresh managed pair', async ({
+  page,
+  app,
+}) => {
+  await login(page);
+  const card = await createClient(page, 'Laptop');
+  const { contents } = await downloadConfiguration(page, card);
+  await app.connectClient(contents);
+  const canReachServer = () => app.pingFromClient('10.8.0.1');
+  await expect.poll(canReachServer).toBe(true);
+  const [publicKey] = await app.peers();
+  await card.getByRole('link', { name: 'Laptop', exact: true }).click();
+  const dialog = page.getByRole('dialog');
+  const device = 'Use device-held key';
+  const managed = 'Manage key in wg-easy';
+  await page.getByRole('button', { name: device }).click();
+  await expect(dialog.getByLabel('Public Key')).toHaveValue(publicKey!);
+  await dialog.getByRole('button', { name: device }).click();
+  await page
+    .getByRole('button', { name: 'View configuration template' })
+    .click();
+  await expect(dialog.locator('code')).toContainText('# PrivateKey =');
+  await page.keyboard.press('Escape');
+  await expect.poll(canReachServer).toBe(true);
+
+  await page.getByRole('button', { name: managed }).click();
+  await dialog.getByRole('button', { name: managed }).click();
+  await expect(
+    page.getByRole('button', { name: 'View Configuration', exact: true })
+  ).toBeVisible();
+  await expect.poll(canReachServer).toBe(false);
+  await page.getByRole('link', { name: 'Clients', exact: true }).click();
+  await expect(
+    card.getByRole('button', { name: 'Show QR Code' })
+  ).toBeVisible();
+  const fresh = await downloadConfiguration(page, card);
+  expect(fresh.filename).toBe('Laptop.conf');
+  await app.execClient(['wg-quick', 'down', 'wg0']);
+  await app.connectClient(fresh.contents);
+  await expect.poll(canReachServer).toBe(true);
+});
+
 test('a downloaded client is applied to WireGuard and disabling or deleting it revokes access', async ({
   page,
   app,

@@ -230,6 +230,14 @@
         "replacePublicKey": {
           "label": "Replace Public Key",
           "description": "Enter the new public key from {name}. Applying this change immediately disconnects the old key."
+        },
+        "useDeviceKey": {
+          "label": "Use device-held key",
+          "description": "Remove the private key stored by wg-easy for {name}? Keep the current public key to keep the device connected, or enter a new public key to revoke the old one. Make sure the device has the matching private key. Future downloads will be templates. Existing one-time links will expire."
+        },
+        "useManagedKey": {
+          "label": "Manage key in wg-easy",
+          "description": "Generate and store a new key pair in wg-easy for {name}? The current key will lose access. Install the new configuration on the device to reconnect. Existing one-time links will expire."
         }
       },
       "updated": "Keys updated"

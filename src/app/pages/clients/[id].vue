@@ -303,6 +303,13 @@
               :disabled="keyActionPending"
               @confirm="changeKey"
             />
+            <ClientsKeyActionDialog
+              :action="data.hasPrivateKey ? 'useDeviceKey' : 'useManagedKey'"
+              :client-name="data.name"
+              :initial-public-key="data.publicKey"
+              :disabled="keyActionPending"
+              @confirm="changeKey"
+            />
             <ClientsDeleteDialog
               :client-name="data.name"
               @delete="deleteClient"
@@ -347,12 +354,22 @@ const keyActions = {
       method: 'put',
       body: { publicKey },
     }),
+  useDeviceKey: (publicKey: string) => setKeyMode('device', publicKey),
+  useManagedKey: () => setKeyMode('managed'),
 };
+
+function setKeyMode(mode: 'managed' | 'device', publicKey?: string) {
+  return $fetch(`/api/client/${id}/keyMode`, {
+    method: 'put',
+    body: { mode, currentPublicKey: data.value!.publicKey, publicKey },
+  });
+}
 
 async function refreshKeys() {
   await refresh();
   if (data.value && _data.value) {
     data.value.publicKey = _data.value.publicKey;
+    data.value.hasPrivateKey = _data.value.hasPrivateKey;
     data.value.hasPreSharedKey = _data.value.hasPreSharedKey;
     data.value.endpoint = _data.value.endpoint;
   }
