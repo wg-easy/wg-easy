@@ -12,7 +12,7 @@ Before you can get started with deploying your own VPN, there are some requireme
 
 1. You need to have a host that you can manage
 2. You need to have a domain name or a public IP address
-3. You need a supported architecture (x86_64, arm64)
+3. You need an arm64 host or an x86_64 (amd64) host with SSE3 and SSE4.1
 
 ### Host Setup
 
