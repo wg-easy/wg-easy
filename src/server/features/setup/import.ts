@@ -14,15 +14,19 @@ import {
 } from '#server/utils/ip';
 import { KeySchema } from '#shared/contracts/validation';
 import { ClientUpdateSchema } from '#shared/contracts/client';
+import { zeroWireGuardKey } from '#shared/utils/wireguard';
 
 const key = KeySchema.unwrap();
+const optionalClientKey = KeySchema.or(z.literal(''))
+  .default(null)
+  .transform((value) => value || null);
 const address = ClientUpdateSchema.shape.ipv4Address;
 const client = z.object({
   name: ClientUpdateSchema.shape.name,
   address,
-  privateKey: key,
-  publicKey: key,
-  preSharedKey: z.union([KeySchema, z.literal('')]),
+  privateKey: optionalClientKey,
+  publicKey: key.refine((value) => value !== zeroWireGuardKey),
+  preSharedKey: optionalClientKey,
   enabled: z.boolean(),
 });
 
@@ -65,21 +69,23 @@ function parseBackup(file: string) {
   return result.data;
 }
 
-function checkKeyPair(
-  keys: { privateKey: string; publicKey: string },
+function checkKeys(
+  keys: { privateKey: string | null; publicKey: string },
   field: string,
   usedPublicKeys: Set<string>
 ) {
-  const privateKey = createPrivateKey({
-    key: Buffer.from(keys.privateKey, 'base64'),
-    format: 'raw-private',
-    asymmetricKeyType: 'x25519',
-  });
-  const publicKey = createPublicKey(privateKey).export({
-    format: 'raw-public',
-  });
-  if (publicKey.toString('base64') !== keys.publicKey) {
-    throw invalidBackup(`Key pair mismatch at ${field}`);
+  if (keys.privateKey !== null) {
+    const privateKey = createPrivateKey({
+      key: Buffer.from(keys.privateKey, 'base64'),
+      format: 'raw-private',
+      asymmetricKeyType: 'x25519',
+    });
+    const publicKey = createPublicKey(privateKey).export({
+      format: 'raw-public',
+    });
+    if (publicKey.toString('base64') !== keys.publicKey) {
+      throw invalidBackup(`Key pair mismatch at ${field}`);
+    }
   }
   if (usedPublicKeys.has(keys.publicKey)) {
     throw invalidBackup(`Duplicate public key at ${field}`);
@@ -106,7 +112,7 @@ export async function importLegacyConfiguration(
   );
   const ipv4Addresses = new Set(existing.map((client) => client.ipv4Address));
   const publicKeys = new Set(existing.map((client) => client.publicKey));
-  checkKeyPair(oldConfig.server, 'server.publicKey', publicKeys);
+  checkKeys(oldConfig.server, 'server.publicKey', publicKeys);
   await tx.interfaces.update({
     privateKey: oldConfig.server.privateKey,
     publicKey: oldConfig.server.publicKey,
@@ -121,7 +127,7 @@ export async function importLegacyConfiguration(
     if (ipv4Addresses.has(clientConfig.address)) {
       throw invalidBackup(`Duplicate address at clients.${index}.address`);
     }
-    checkKeyPair(clientConfig, `clients.${index}.publicKey`, publicKeys);
+    checkKeys(clientConfig, `clients.${index}.publicKey`, publicKeys);
     const ipv6Address = nextIPFromUsedAddresses(ipv6Cidr, ipv6Addresses);
 
     await tx.clients.insert({
@@ -132,7 +138,7 @@ export async function importLegacyConfiguration(
       publicKey: clientConfig.publicKey,
       userId: 1,
       interfaceId: network.name,
-      preSharedKey: clientConfig.preSharedKey || null,
+      preSharedKey: clientConfig.preSharedKey,
       // Leave these unset so imported clients follow the global settings,
       // like clients created in the UI. v14 had no per-client values.
       allowedIps: null,

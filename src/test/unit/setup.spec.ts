@@ -9,6 +9,7 @@ import { legacyBackup } from '../helpers/legacyBackup';
 import * as setup from '#server/features/setup';
 import { getIpInformation } from '#server/utils/ip';
 import { roles } from '#shared/utils/permissions';
+import { zeroWireGuardKey } from '#shared/utils/wireguard';
 import { wg } from '#server/utils/wgHelper';
 import { firewall } from '#server/utils/firewall';
 import { maintain } from '#server/features/vpn/lifecycle';
@@ -202,10 +203,14 @@ describe('setup', () => {
 
   test.each([
     ['server', 'privateKey', null],
+    ['server', 'privateKey', ''],
+    ['server', 'privateKey', undefined],
     ['server', 'publicKey', 'invalid key'],
     ['server', 'address', '192.0.2.100/24'],
     ['peer', 'privateKey', 'invalid key'],
     ['peer', 'publicKey', Buffer.alloc(31).toString('base64')],
+    ['peer', 'publicKey', undefined],
+    ['peer', 'publicKey', zeroWireGuardKey],
     ['peer', 'preSharedKey', 'A'.repeat(42) + 'B='],
     ['peer', 'address', '2001:db8::1'],
     ['peer', 'name', 'two\nlines'],
@@ -307,7 +312,10 @@ describe('setup', () => {
       message: 'The backup must be a JSON document.',
     });
     const backup = legacyBackup();
-    const clients = { ...backup.clients, copy: { ...backup.clients.peer } };
+    const clients = {
+      ...backup.clients,
+      copy: { ...backup.clients.peer, privateKey: '' },
+    };
     for (const field of ['address', 'publicKey'] as const) {
       await expect(
         setup.importConfiguration(JSON.stringify({ ...backup, clients }))

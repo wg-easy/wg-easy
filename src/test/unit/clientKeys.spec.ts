@@ -484,18 +484,39 @@ describe('client key actions', () => {
     }
   );
 
-  test.each(['', null])(
-    'normalizes an imported absent key (%s) to null',
-    async (preSharedKey) => {
+  const legacyPeer = legacyBackup().clients.peer;
+  test.each([
+    { privateKey: '', preSharedKey: '' },
+    { privateKey: null, preSharedKey: null },
+    { privateKey: undefined, preSharedKey: undefined },
+    { privateKey: undefined, preSharedKey: legacyPeer.preSharedKey },
+    { privateKey: legacyPeer.privateKey, preSharedKey: undefined },
+  ])(
+    'imports a v14 peer with privateKey=$privateKey and preSharedKey=$preSharedKey',
+    async ({ privateKey, preSharedKey }) => {
       await store.general.update({ setupStep: 3 });
-      const backup = legacyBackup(preSharedKey);
-      backup.server.address = '10.8.0.1';
-      backup.clients.peer.address = '10.8.0.4';
-      await importConfiguration(JSON.stringify(backup));
-      expect(await clients.get(3)).toMatchObject({ preSharedKey: null });
-      expect(await clients.getPublic(3)).toMatchObject({
-        hasPreSharedKey: false,
+      const server = { ...legacyBackup().server, address: '10.8.0.1' };
+      const peer = {
+        ...legacyPeer,
+        address: '10.8.0.4',
+        privateKey,
+        preSharedKey,
+      };
+      await importConfiguration(JSON.stringify({ server, clients: { peer } }));
+      expect(await clients.get(3)).toMatchObject({
+        publicKey: peer.publicKey,
+        privateKey: privateKey || null,
+        preSharedKey: preSharedKey || null,
       });
+      expect(await clients.getPublic(3)).toMatchObject({
+        hasPrivateKey: Boolean(privateKey),
+        hasPreSharedKey: Boolean(preSharedKey),
+      });
+      const download = await provisioning.download(owner, 3);
+      expect(download.isTemplate).toBe(!privateKey);
+      expect(download.contents.includes('PresharedKey =')).toBe(
+        Boolean(preSharedKey)
+      );
     }
   );
 

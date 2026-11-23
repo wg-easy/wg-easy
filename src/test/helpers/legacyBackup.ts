@@ -1,6 +1,4 @@
-export function legacyBackup(
-  preSharedKey: string | null = Buffer.alloc(32, 5).toString('base64')
-) {
+export function legacyBackup() {
   // The public keys were derived from these test inputs with wg pubkey.
   return {
     server: {
@@ -14,7 +12,7 @@ export function legacyBackup(
         address: '10.9.0.1',
         privateKey: Buffer.alloc(32, 3).toString('base64'),
         publicKey: 'Xf7dO2vUf2+ijuFdlp1bsOpTd01Ii9r53xxuASSz7yI=',
-        preSharedKey,
+        preSharedKey: Buffer.alloc(32, 5).toString('base64'),
         enabled: true,
         createdAt: '2026-01-01',
         updatedAt: '2026-01-01',

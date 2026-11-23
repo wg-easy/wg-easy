@@ -67,10 +67,20 @@ test('an administrator can correct a v14 backup and reach the dashboard', async 
   await reload(page);
   const privateKey = await app.execServer(['wg', 'genkey']);
   const publicKey = await app.publicKey(privateKey);
+  const peerPublicKey = await app.publicKey(
+    await app.execServer(['wg', 'genkey'])
+  );
   const upload = async (key: string) => {
     const file = {
       server: { privateKey, publicKey: key, address: '10.9.0.15' },
-      clients: {},
+      clients: {
+        phone: {
+          name: 'Phone',
+          address: '10.9.0.2',
+          enabled: true,
+          publicKey: peerPublicKey,
+        },
+      },
     };
     await page.locator('#migration').setInputFiles({
       name: 'wg0.json',
@@ -88,6 +98,7 @@ test('an administrator can correct a v14 backup and reach the dashboard', async 
     page.getByRole('heading', { name: 'Clients', exact: true })
   ).toBeVisible();
   expect(await app.serverPublicKey()).toBe(publicKey);
+  expect(await app.peers()).toEqual([peerPublicKey]);
   await goto(page, '/setup/migrate');
   await expect(page).toHaveURL(/\/$/);
 });
