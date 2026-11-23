@@ -19,11 +19,21 @@
           :label="$t('clients.fields.expiresAt.label')"
           :description="$t('clients.fields.expiresAt.description')"
         />
-        <details class="mt-2">
-          <summary class="cursor-pointer font-medium text-foreground">
+        <CollapsibleRoot class="mt-2 rounded-lg border border-line">
+          <CollapsibleTrigger
+            class="group flex min-h-11 w-full items-center gap-2.5 rounded-lg px-3 text-sm font-medium text-foreground transition-colors hover:bg-surface-hover data-[state=open]:rounded-b-none data-[state=open]:bg-surface-raised"
+          >
+            <SlidersHorizontalIcon
+              class="size-4 text-muted"
+              aria-hidden="true"
+            />
             {{ $t('common.form.sections.advanced') }}
-          </summary>
-          <div class="mt-2 grid gap-2">
+            <ChevronDownIcon
+              class="ms-auto size-4 text-subtle transition-transform group-data-[state=open]:rotate-180"
+              aria-hidden="true"
+            />
+          </CollapsibleTrigger>
+          <CollapsibleContent class="grid gap-2 px-3 pt-2 pb-3">
             <FormTextField
               id="devicePublicKey"
               v-model="publicKey"
@@ -31,8 +41,8 @@
               :description="$t('clients.create.publicKeyHint')"
               autocomplete="off"
             />
-          </div>
-        </details>
+          </CollapsibleContent>
+        </CollapsibleRoot>
       </div>
     </template>
     <template #actions>
@@ -51,6 +61,7 @@
 </template>
 
 <script lang="ts" setup>
+import { ChevronDownIcon, SlidersHorizontalIcon } from '@lucide/vue';
 import { $fetch } from '#imports';
 
 const name = ref<string>('');
