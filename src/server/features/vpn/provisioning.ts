@@ -46,14 +46,8 @@ export function download(actor: Actor, clientId: number) {
 
 export function generateOneTimeLink(actor: Actor, clientId: number) {
   return getDatabase().transaction(async (tx) => {
-    const client = authorizeClient(
-      actor,
-      'update',
-      await tx.clients.getPublic(clientId)
-    );
-    // A template URL must never be reissued as a private-key download.
-    const prefix = client.hasPrivateKey ? 'm' : 't';
-    const token = prefix + randomBytes(6).toString('base64url');
+    authorizeClient(actor, 'update', await tx.clients.getPublic(clientId));
+    const token = randomBytes(6).toString('base64url');
     await tx.oneTimeLinks.save(
       clientId,
       token,

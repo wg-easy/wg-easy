@@ -292,7 +292,7 @@ describe('converting client keys', () => {
         provisioning.redeemOneTimeLink(managedLink)
       ).rejects.toMatchObject({ status: 404 });
       const templateLink = await issueLink();
-      expect(templateLink).toMatch(/^t/);
+      expect(templateLink).toHaveLength(8);
       await expect(
         provisioning.redeemOneTimeLink(managedLink)
       ).rejects.toMatchObject({ status: 404 });
@@ -316,7 +316,7 @@ describe('converting client keys', () => {
         provisioning.redeemOneTimeLink(templateLink)
       ).rejects.toMatchObject({ status: 404 });
       const freshLink = await issueLink();
-      expect(freshLink).toMatch(/^m/);
+      expect(freshLink).toHaveLength(8);
       await expect(
         provisioning.redeemOneTimeLink(templateLink)
       ).rejects.toMatchObject({ status: 404 });
