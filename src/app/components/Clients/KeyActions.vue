@@ -1,10 +1,10 @@
 <template>
   <BaseDialog
-    v-for="(action, index) in actions"
-    :key="index"
+    v-for="action in actions"
+    :key="action.name"
     :trigger-disabled="pending || action.disabled"
     trigger-class="ui-button ui-button-secondary"
-    @update:open="(open) => open && (publicKey = action.initialPublicKey ?? '')"
+    @update:open="(open) => open && openAction(action)"
   >
     <template #trigger>
       {{ label(action) }}
@@ -38,7 +38,7 @@
             pending ||
             (action.initialPublicKey !== undefined && !publicKey.trim())
           "
-          @click="confirm(action)"
+          @click="confirm()"
         >
           {{ label(action) }}
         </BaseSecondaryButton>
@@ -67,11 +67,17 @@ const props = defineProps<{
 }>();
 
 const publicKey = ref('');
+let openedAction: KeyAction;
 const pending = ref(false);
 const { t } = useI18n();
 
 function label(action: KeyAction) {
   return t(`clients.keys.actions.${action.name}.label`);
+}
+
+function openAction(action: KeyAction) {
+  openedAction = action;
+  publicKey.value = action.initialPublicKey ?? '';
 }
 
 const actions = computed<KeyAction[]>(() => {
@@ -105,7 +111,7 @@ const actions = computed<KeyAction[]>(() => {
           request: (publicKey) =>
             $fetch(`${clientUrl}/publicKey`, {
               method: 'put',
-              body: { publicKey },
+              body: { currentPublicKey, publicKey },
             }),
         },
     hasPrivateKey
@@ -130,13 +136,13 @@ const submit = useSubmit(
   }
 );
 
-async function confirm(action: KeyAction) {
+async function confirm() {
   if (pending.value) {
     return;
   }
   pending.value = true;
   try {
-    await submit(action);
+    await submit(openedAction);
   } finally {
     pending.value = false;
   }

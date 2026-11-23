@@ -13,10 +13,10 @@ export default defineAuthenticatedEventHandler(async ({ event, user }) => {
     event,
     validateZod(ClientGetSchema, event)
   );
-  const { publicKey } = await readValidatedBody(
+  const change = await readValidatedBody(
     event,
     validateZod(ClientPublicKeySchema, event)
   );
-  await clients.replacePublicKey(user, clientId, publicKey);
+  await clients.replacePublicKey(user, clientId, change);
   return { success: true };
 });

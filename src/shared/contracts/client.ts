@@ -71,15 +71,17 @@ const publicKeyField = z
   );
 
 export const ClientPublicKeySchema = z.object({
+  currentPublicKey: z.string().min(1),
   publicKey: publicKeyField.refine((key) => key !== '', publicKeyError),
 });
 
+export type ClientPublicKeyChange = z.infer<typeof ClientPublicKeySchema>;
+
 export const ClientKeyModeSchema = z.discriminatedUnion('mode', [
-  z.object({ mode: z.literal('managed'), currentPublicKey: z.string().min(1) }),
-  ClientPublicKeySchema.extend({
-    mode: z.literal('device'),
-    currentPublicKey: z.string().min(1),
+  ClientPublicKeySchema.pick({ currentPublicKey: true }).extend({
+    mode: z.literal('managed'),
   }),
+  ClientPublicKeySchema.extend({ mode: z.literal('device') }),
 ]);
 
 export type ClientKeyModeChange = z.infer<typeof ClientKeyModeSchema>;

@@ -160,6 +160,16 @@ describe('device-held private keys', () => {
     );
   }
 
+  function replace(
+    clientId: number,
+    currentPublicKey: string,
+    publicKey: string
+  ) {
+    return replacePublicKey(
+      event(String(clientId), { currentPublicKey, publicKey })
+    );
+  }
+
   test.each([true, false])(
     'registers a public key with preshared-key generation %s',
     async (generate) => {
@@ -207,10 +217,8 @@ describe('device-held private keys', () => {
     const { clientId } = await register(firstKey);
     const before = await clients.get(clientId);
     getCurrentUser.mockResolvedValue({ id: 1, role: 2 });
-    const replace = () =>
-      replacePublicKey(event(String(clientId), { publicKey: ` ${nextKey} ` }));
     writeFile.mockClear();
-    await replace();
+    await replace(clientId, firstKey, ` ${nextKey} `);
     expect(await clients.get(clientId)).toEqual({
       ...before,
       publicKey: nextKey,
@@ -219,20 +227,21 @@ describe('device-held private keys', () => {
     const config = String(writeFile.mock.calls[0]?.[1]);
     expect(config).toContain(nextKey);
     expect(config).not.toContain(firstKey);
-    await replace();
+    await replace(clientId, firstKey, nextKey);
+    await expect(replace(clientId, firstKey, firstKey)).rejects.toMatchObject({
+      status: 409,
+    });
     expect(writeFile).toHaveBeenCalledOnce();
     await expect(rotateKeyPair(event(String(clientId)))).rejects.toMatchObject({
       status: 409,
     });
-    await expect(
-      replacePublicKey(event('1', { publicKey: firstKey }))
-    ).rejects.toMatchObject({
+    await expect(replace(1, 'public-key-1', firstKey)).rejects.toMatchObject({
       status: 409,
     });
     getCurrentUser.mockResolvedValue({ id: 2, role: 2 });
-    await expect(
-      replacePublicKey(event(String(clientId), { publicKey: firstKey }))
-    ).rejects.toMatchObject({ status: 403 });
+    await expect(replace(clientId, nextKey, firstKey)).rejects.toMatchObject({
+      status: 403,
+    });
     expect((await clients.get(clientId))?.publicKey).toBe(nextKey);
     expect(writeFile).toHaveBeenCalledOnce();
   });
@@ -251,13 +260,13 @@ describe('device-held private keys', () => {
       [nextKey, 409],
     ] as const) {
       await expect(register(key)).rejects.toMatchObject({ status });
-      await expect(
-        replacePublicKey(event(String(clientId), { publicKey: key }))
-      ).rejects.toMatchObject({ status });
+      await expect(replace(clientId, firstKey, key)).rejects.toMatchObject({
+        status,
+      });
     }
-    await expect(
-      replacePublicKey(event(String(clientId), { publicKey: ' ' }))
-    ).rejects.toMatchObject({ status: 400 });
+    await expect(replace(clientId, firstKey, ' ')).rejects.toMatchObject({
+      status: 400,
+    });
     expect(await clients.getAll()).toHaveLength(3);
     expect((await clients.get(clientId))?.publicKey).toBe(firstKey);
     expect(writeFile).not.toHaveBeenCalled();
@@ -323,9 +332,9 @@ describe('converting client keys', () => {
       expect(await provisioning.redeemOneTimeLink(freshLink)).toMatchObject({
         isTemplate: false,
       });
-      expect(
-        exec.mock.calls.filter(([command]) => command === 'wg genkey')
-      ).toHaveLength(1);
+      exec.mockClear();
+      await useManaged();
+      expect(exec).not.toHaveBeenCalled();
       expect(writeFile).toHaveBeenCalledTimes(2);
     }
   );
@@ -374,6 +383,70 @@ describe('converting client keys', () => {
 });
 
 describe('client key actions', () => {
+  test.each(['create', 'rotate', 'convert'] as const)(
+    'allows other client updates while %s is generating a key pair',
+    async (operation) => {
+      const original = Buffer.alloc(32, 1).toString('base64');
+      await clients.update(1, {
+        publicKey: original,
+        privateKey: operation === 'convert' ? null : 'private-key-1',
+      });
+      const entered = Promise.withResolvers<undefined>();
+      const generation = Promise.withResolvers<string>();
+      exec.mockImplementationOnce(() => {
+        entered.resolve(undefined);
+        return generation.promise;
+      });
+      const pending = {
+        create: () =>
+          clientOperations.create(
+            { id: 1, role: roles.ADMIN },
+            { name: 'Laptop', expiresAt: null }
+          ),
+        rotate: () => rotateKeyPair(event()),
+        convert: () =>
+          setKeyMode(
+            event('1', { mode: 'managed', currentPublicKey: original })
+          ),
+      }[operation]();
+      await entered.promise;
+      const disable = clientOperations.apply(owner, 2, 'disable');
+      try {
+        await vi.waitFor(() => expect(writeFile).toHaveBeenCalledOnce());
+        await disable;
+        expect((await clients.get(2))?.enabled).toBe(false);
+      } finally {
+        generation.resolve('new-private-key');
+        await Promise.all([pending, disable]);
+      }
+    }
+  );
+
+  test('discards a generated key pair if the device key changed during conversion', async () => {
+    const original = Buffer.alloc(32, 1).toString('base64');
+    const replacement = Buffer.alloc(32, 2).toString('base64');
+    await clients.update(1, { publicKey: original, privateKey: null });
+    const link = await issueLink();
+    exec.mockImplementationOnce(async () => {
+      await clientOperations.replacePublicKey(owner, 1, {
+        currentPublicKey: original,
+        publicKey: replacement,
+      });
+      return 'new-private-key';
+    });
+    await expect(
+      setKeyMode(event('1', { mode: 'managed', currentPublicKey: original }))
+    ).rejects.toMatchObject({ status: 409 });
+    expect(await clients.get(1)).toMatchObject({
+      publicKey: replacement,
+      privateKey: null,
+    });
+    expect(await provisioning.redeemOneTimeLink(link)).toMatchObject({
+      isTemplate: true,
+    });
+    expect(writeFile).toHaveBeenCalledOnce();
+  });
+
   test.each([true, false])(
     'creates clients with preshared-key generation set to %s',
     async (defaultGeneratePreSharedKey) => {

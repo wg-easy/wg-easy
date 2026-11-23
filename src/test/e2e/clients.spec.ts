@@ -5,6 +5,7 @@ import {
   clientCard,
   createClient,
   downloadConfiguration,
+  goto,
   login,
   reload,
 } from './helpers';
@@ -45,6 +46,11 @@ test('a device-held key connects using the template and can be replaced', async 
     .click();
   await expect(page.getByRole('dialog')).toContainText('# PrivateKey =');
   await page.keyboard.press('Escape');
+  const otherTab = await page.context().newPage();
+  await goto(otherTab, page.url());
+  await otherTab.getByRole('button', { name: 'Replace Public Key' }).click();
+  const staleDialog = otherTab.getByRole('dialog');
+  await staleDialog.getByLabel('Public Key', { exact: true }).fill(publicKey);
   await page.getByRole('button', { name: 'Replace Public Key' }).click();
   const dialog = page.getByRole('dialog');
   const replacement = generateKeyPairSync('x25519').publicKey.export({
@@ -54,6 +60,11 @@ test('a device-held key connects using the template and can be replaced', async 
   await dialog.getByLabel('Public Key', { exact: true }).fill(newKey);
   await dialog.getByRole('button', { name: 'Replace Public Key' }).click();
   await expect.poll(app.peers).toEqual([newKey]);
+  await staleDialog.getByRole('button', { name: 'Replace Public Key' }).click();
+  await expect(
+    otherTab.getByText('The client keys have changed. Refresh and try again.')
+  ).toBeVisible();
+  expect(await app.peers()).toEqual([newKey]);
   await expect.poll(() => app.pingFromClient('10.8.0.1')).toBe(false);
 });
 
