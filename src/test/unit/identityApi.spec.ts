@@ -25,6 +25,9 @@ import beginOAuth from '#server/api/auth/[provider]/index.get';
 import oauthCallback from '#server/api/auth/[provider]/callback.get';
 import oauthLink from '#server/api/auth/[provider]/link.get';
 import createAdministrator from '#server/api/setup/2.post';
+import importBackup from '#server/api/setup/migrate.post';
+import configureEndpoint from '#server/api/setup/4.post';
+import setupIpInformation from '#server/api/setup/4.get';
 import { logSecurityEvent } from '#server/utils/securityLogger';
 
 vi.mock('#server/utils/ip', async (original) => ({
@@ -100,6 +103,7 @@ const credentials = {
 beforeEach(async () => {
   vi.resetAllMocks();
   WG_ENV.INSECURE = false;
+  WG_ENV.DISABLE_PASSWORD_AUTH = false;
   WG_ENV.TRUSTED_PROXIES = [];
   WG_ENV.OAUTH_ALLOWED_DOMAINS = undefined;
   fixture = await databaseFixture();
@@ -122,6 +126,20 @@ async function existingAdministrator() {
 }
 
 describe('username contract', () => {
+  test('leaves interactive setup unclaimed when password sign-in is disabled', async () => {
+    WG_ENV.DISABLE_PASSWORD_AUTH = true;
+    await expect(
+      createAdministrator(
+        request('/api/setup/2', {
+          ...credentials,
+          confirmPassword: credentials.password,
+        })
+      )
+    ).rejects.toMatchObject({ status: 403 });
+    expect(await fixture.store.users.count()).toBe(0);
+    expect((await fixture.store.general.getSetupStep()).step).toBe(1);
+  });
+
   test.each(['a', '__proto__'])(
     'can log in with username %s accepted during setup',
     async (username) => {
@@ -163,6 +181,34 @@ describe('username contract', () => {
 
 describe('identity HTTP contract', () => {
   beforeEach(existingAdministrator);
+
+  test.each([
+    ['/api/setup/migrate', importBackup, { file: 'invalid JSON' }],
+    ['/api/setup/4', configureEndpoint, {}],
+    ['/api/setup/4', setupIpInformation, undefined],
+  ] as const)(
+    'requires an administrator session for %s',
+    async (path, handler, body) => {
+      await fixture.store.general.update({ setupStep: 3 });
+      await expect(handler(request(path, body))).rejects.toMatchObject({
+        status: 401,
+      });
+
+      await fixture.store.users.update(1, { role: roles.CLIENT });
+      const login = request('/api/auth/password', credentials);
+      await passwordLogin(login);
+      await expect(
+        handler(request(path, body, sessionCookie(login)))
+      ).rejects.toMatchObject({ status: 403 });
+    }
+  );
+
+  test('requires a session even when setup receives valid Basic credentials', async () => {
+    await fixture.store.general.update({ setupStep: 3 });
+    await expect(
+      importBackup(basicRequest(credentials.password))
+    ).rejects.toMatchObject({ status: 401 });
+  });
 
   function basicRequest(password: string) {
     return requestEvent('https://localhost/api/admin/general', {

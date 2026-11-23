@@ -6,17 +6,17 @@ On the first visit to the Web UI, the setup wizard guides you through creating a
 
 ## User Setup
 
-- **Username**: Your administrator login name, at least two characters long.
+- **Username**: Your administrator login name.
 - **Password**: Your administrator password, at least 12 characters long.
 - **Confirm Password**: Enter the same password again.
 
-Select **Create Account** to continue.
+Select **Create Account**, then sign in with the username and password you just chose. If you close the browser before finishing setup, sign in again to resume.
+
+If you set `DISABLE_PASSWORD_AUTH=true`, change it to `false` and recreate the container with the updated setting before creating the administrator. After setup, you can switch to [OAuth-only sign-in](../advanced/config/external-authentication.md#disable-password-authentication).
 
 ## Existing Setup
 
-If you have the config from the previous version, you can import it by clicking "Yes". This currently expects a config from v14.
-
-If this is the first time you are using this, you can click "No" to create a new config.
+After signing in, select **Yes** to import a v14 backup or **No** to configure a fresh installation.
 
 ### No - Host Setup
 
@@ -27,8 +27,8 @@ Select **Continue** to finish setup.
 
 ### Yes - Migration
 
-Select the `wg0.json` file from the previous version. Read [Migrate from v14 to v15](../advanced/migrate/from-14-to-15.md) for more information.
+Select your v14 `wg0.json` backup and choose **Upload**. See [Migrate from v14 to v15](../advanced/migrate/from-14-to-15.md) for backup and import instructions.
 
 ## After Setup
 
-Sign in and [create your first client](./clients.md#create-a-client). Use the user menu to open the [Admin Panel](./admin.md) or manage your [Account](./account.md), including [two-factor authentication](./2fa.md).
+Setup opens the dashboard with your administrator account signed in. From there you can manage imported clients or [create a client](./clients.md#create-a-client). Use the user menu to open the [Admin Panel](./admin.md) or manage your [Account](./account.md), including [two-factor authentication](./2fa.md).

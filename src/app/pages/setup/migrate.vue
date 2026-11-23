@@ -7,9 +7,9 @@
       <Label for="migration">{{ $t('setup.migration') }}</Label>
       <input
         id="migration"
+        ref="migration"
         class="ui-input file:mr-3 file:rounded file:border-0 file:bg-surface-raised file:px-3 file:py-1 file:text-muted"
         type="file"
-        @change="onChangeFile"
       />
     </div>
     <div class="mt-4">
@@ -27,31 +27,20 @@ definePageMeta({
   layout: 'setup',
 });
 
-const setupStore = useSetupStore();
-setupStore.setStep(5);
+useSetupStore().step = 4;
 
-const backupFile = ref<null | File>(null);
+const migration = useTemplateRef<HTMLInputElement>('migration');
 
-function onChangeFile(evt: Event) {
-  const target = evt.target as HTMLInputElement;
-  const file = target.files?.[0];
-
-  if (file) {
-    backupFile.value = file;
-    console.log('selected file', backupFile.value);
-  }
-}
-
-const _submit = useSubmit(
-  (data) =>
+const upload = useSubmit(
+  async (file: File) =>
     $fetch('/api/setup/migrate', {
       method: 'post',
-      body: data,
+      body: { file: await file.text() },
     }),
   {
     revert: async (success) => {
       if (success) {
-        await navigateTo('/setup/success');
+        await navigateTo('/');
       }
     },
     noSuccessToast: true,
@@ -59,24 +48,9 @@ const _submit = useSubmit(
 );
 
 async function submit() {
-  if (!backupFile.value) {
-    return;
+  const file = migration.value?.files?.[0];
+  if (file) {
+    await upload(file);
   }
-  const content = await readFileContent(backupFile.value);
-  return _submit({ file: content });
-}
-
-async function readFileContent(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-
-    reader.onload = (event) => {
-      resolve(event.target?.result as string);
-    };
-    reader.onerror = (error) => {
-      reject(error);
-    };
-    reader.readAsText(file);
-  });
 }
 </script>

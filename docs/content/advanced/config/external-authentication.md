@@ -26,15 +26,13 @@ To automatically register users that log in with an OAuth provider, set the foll
 | --------------------- | -------- | ------- | ------------------------ |
 | `OAUTH_AUTO_REGISTER` | :x:      | `false` | Enable auto-registration |
 
-When enabled:
+Auto-registration starts after setup is complete. With `OAUTH_AUTO_REGISTER=true`, signing in with a new email address creates an account.
 
-- If a user logs in with an email address that is not yet registered, a new account will be created for them.
-
-- If a user logs in with an email address that is already registered, their account will be linked to the OAuth provider (if not already linked), regardless of the value of `OAUTH_AUTO_REGISTER`.
+Users with a linked OAuth account can sign in during setup. If a verified email address matches an existing account without a linked provider, wg-easy links that account regardless of the value of `OAUTH_AUTO_REGISTER`.
 
 /// warning | Security
 
-Users will be created with Admin Permissions, as the permissions system is not yet implemented. Only enable this if you trust all users that can log in with the OAuth provider.
+Every account created through OAuth auto-registration has the administrator role. Only enable this if you trust all users who can sign in through the provider to administer wg-easy.
 
 Use [Allowed Domains](#allowed-domains) to restrict which users can log in.
 
@@ -182,13 +180,11 @@ To disable password-based authentication and only allow login via OAuth provider
 | ----------------------- | -------- | ------- | ------------------------------- |
 | `DISABLE_PASSWORD_AUTH` | :x:      | `false` | Disable password authentication |
 
-When enabled:
-
-- Users will not be able to log in with a password
+For interactive setup, leave `DISABLE_PASSWORD_AUTH` unset or set it to `false` so you can create the first administrator and sign in. If it is already `true`, change it to `false` and recreate the container with the updated setting before beginning setup.
 
 /// warning | Access Recovery
 
-Before disabling password authentication, ensure that at least one OAuth provider is configured and that you have successfully linked an administrator account.
+After setup, link your administrator account to an OAuth provider and verify that you can sign in with it in a separate browser session. Then set `DISABLE_PASSWORD_AUTH=true` and recreate the container with the updated setting.
 
 If no login method is available, you will not be able to log in to the application and will need to reset the configuration to regain access.
 

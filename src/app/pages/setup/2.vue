@@ -1,5 +1,12 @@
 <template>
-  <div>
+  <p
+    v-if="authMethods?.passwordDisabled"
+    role="alert"
+    class="text-sm leading-relaxed text-muted"
+  >
+    {{ $t('setup.enablePasswordSignIn') }}
+  </p>
+  <form v-else @submit.prevent="submit">
     <p class="text-sm leading-relaxed text-muted">
       {{ $t('setup.createAdminDescription') }}
     </p>
@@ -29,12 +36,12 @@
         />
       </div>
       <div class="mt-4 flex justify-center">
-        <BasePrimaryButton @click="submit">
+        <BasePrimaryButton type="submit">
           {{ $t('setup.createAccount') }}
         </BasePrimaryButton>
       </div>
     </div>
-  </div>
+  </form>
 </template>
 
 <script lang="ts" setup>
@@ -44,8 +51,8 @@ definePageMeta({
   layout: 'setup',
 });
 
-const setupStore = useSetupStore();
-setupStore.setStep(2);
+useSetupStore().step = 2;
+const { data: authMethods } = await useFetch('/api/auth/methods');
 
 const username = ref<null | string>(null);
 const password = ref<string>('');
@@ -60,7 +67,7 @@ const _submit = useSubmit(
   {
     revert: async (success) => {
       if (success) {
-        await navigateTo('/setup/3');
+        await navigateTo('/login');
       }
     },
     noSuccessToast: true,

@@ -8,7 +8,6 @@ import { databaseFixture } from '../helpers/database';
 
 import * as clientOperations from '#server/features/vpn/clients';
 import { roles } from '#shared/utils/permissions';
-import { importConfiguration } from '#server/features/setup';
 import * as schema from '#db/schema';
 import { ClientUpdateSchema } from '#shared/contracts/client';
 import { UserConfigUpdateSchema } from '#shared/contracts/userConfig';
@@ -479,38 +478,6 @@ describe('client key actions', () => {
       });
       expect(await clients.getPublic(clientId)).toMatchObject({
         hasPreSharedKey: defaultGeneratePreSharedKey,
-      });
-    }
-  );
-
-  test.each(['', null])(
-    'normalizes an imported absent key (%s) to null',
-    async (preSharedKey) => {
-      await store.general.update({ setupStep: 3 });
-      await importConfiguration(
-        JSON.stringify({
-          server: {
-            privateKey: 'server-private',
-            publicKey: 'server-public',
-            address: '10.8.0.1',
-          },
-          clients: {
-            imported: {
-              name: 'Imported client',
-              enabled: true,
-              address: '10.8.0.4',
-              privateKey: 'imported-private-key',
-              publicKey: 'imported-public-key',
-              preSharedKey,
-              createdAt: '2026-01-01',
-              updatedAt: '2026-01-01',
-            },
-          },
-        })
-      );
-      expect(await clients.get(3)).toMatchObject({ preSharedKey: null });
-      expect(await clients.getPublic(3)).toMatchObject({
-        hasPreSharedKey: false,
       });
     }
   );

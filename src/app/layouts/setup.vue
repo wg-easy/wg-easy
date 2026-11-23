@@ -17,10 +17,7 @@
         </h1>
         <slot />
         <div class="mt-9 flex gap-2">
-          <UiStepProgress
-            :step="setupStore.step"
-            :total-steps="setupStore.totalSteps"
-          />
+          <UiStepProgress :step="setupStore.step" :total-steps="4" />
         </div>
       </div>
     </main>

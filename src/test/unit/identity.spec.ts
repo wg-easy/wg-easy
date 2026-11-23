@@ -14,6 +14,7 @@ async function fixture(
   options: { passwordEnabled?: boolean; oauthAutoRegister?: boolean } = {}
 ) {
   const { store } = await databaseFixture();
+  await store.general.update({ setupStep: 0 });
   const crypto = resetCryptoMocks();
   await store.users.insert({
     id: 1,
@@ -227,10 +228,15 @@ describe('identity', () => {
     });
   });
 
-  test.each([false, true])(
-    'honors OAuth auto-registration (%s)',
-    async (oauthAutoRegister) => {
+  test.each([
+    [false, 0, false],
+    [true, 3, false],
+    [true, 0, true],
+  ] as const)(
+    'OAuth auto-registration enabled=%s at setup step %i permits signup=%s',
+    async (oauthAutoRegister, setupStep, canRegister) => {
       const { store } = await fixture({ oauthAutoRegister });
+      await store.general.update({ setupStep });
       const result = await identity.loginWithOAuth(
         'oidc',
         'new',
@@ -238,7 +244,7 @@ describe('identity', () => {
         'new@example.com',
         'New'
       );
-      if (oauthAutoRegister) {
+      if (canRegister) {
         expect(result).toMatchObject({
           success: true,
           user: { username: 'new-user', role: roles.ADMIN, hasPassword: false },

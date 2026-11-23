@@ -16,6 +16,5 @@ definePageMeta({
   layout: 'setup',
 });
 
-const setupStore = useSetupStore();
-setupStore.setStep(1);
+useSetupStore().step = 1;
 </script>

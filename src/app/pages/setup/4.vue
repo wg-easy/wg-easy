@@ -38,8 +38,7 @@ definePageMeta({
   layout: 'setup',
 });
 
-const setupStore = useSetupStore();
-setupStore.setStep(4);
+useSetupStore().step = 4;
 
 const host = ref<null | string>(null);
 const port = ref<number>(51820);
@@ -53,7 +52,7 @@ const _submit = useSubmit(
   {
     revert: async (success) => {
       if (success) {
-        await navigateTo('/setup/success');
+        await navigateTo('/');
       }
     },
     noSuccessToast: true,

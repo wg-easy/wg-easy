@@ -1,33 +1,18 @@
 import { defineEventHandler, getRequestURL, sendRedirect } from 'nuxt/server';
 
-import * as setupSteps from '#server/features/setup';
+import { status } from '#server/features/setup';
+import { setupRedirect } from '#shared/utils/setupRedirect';
 
-/* First setup of wg-easy */
 export default defineEventHandler(async (event) => {
-  const url = getRequestURL(event);
-
-  // User can't be logged in, and public routes can be accessed whenever
-  if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/_i18n/')) {
+  const { pathname } = getRequestURL(event);
+  if (pathname.startsWith('/api/') || pathname.startsWith('/_i18n/')) {
     return;
   }
 
-  const { step, done } = await setupSteps.status();
-  if (!done) {
-    const parsedSetup = url.pathname.match(/\/setup\/(\d)/);
-    if (!parsedSetup) {
-      return sendRedirect(event, `/setup/1`, 302);
-    }
-    const [_, currentSetup] = parsedSetup;
-
-    if (step.toString() === currentSetup) {
-      return;
-    }
-    return sendRedirect(event, `/setup/${step}`, 302);
-  } else {
-    // If already set up
-    if (!url.pathname.startsWith('/setup/')) {
-      return;
-    }
-    return sendRedirect(event, '/login', 302);
+  const { step } = await status();
+  event.context.setupStep = step;
+  const redirect = setupRedirect(pathname, step);
+  if (redirect) {
+    return sendRedirect(event, redirect, 302);
   }
 });

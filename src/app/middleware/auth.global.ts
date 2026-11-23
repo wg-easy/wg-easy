@@ -1,33 +1,50 @@
+import { setupRedirect } from '#shared/utils/setupRedirect';
+
 export default defineNuxtRouteMiddleware(async (to) => {
-  // api & setup handled server side
-  if (to.path.startsWith('/api/') || to.path.startsWith('/setup')) {
+  if (to.path.startsWith('/api/')) {
     return;
   }
 
   const event = useRequestEvent();
+  const setupStore = useSetupStore();
+  const step = setupStore.done
+    ? 0
+    : (event?.context.setupStep ?? (await $fetch('/api/setup/status')).step);
+  setupStore.done = step === 0;
+  if (import.meta.client) {
+    const redirect = setupRedirect(to.path, step);
+    if (redirect) {
+      return navigateTo(redirect);
+    }
+  }
+  if (step === 1) {
+    return;
+  }
 
   const authStore = useAuthStore();
   authStore.userData = await authStore.getSession(event);
 
-  const isLoginRoute = to.path === '/login' || to.path === '/login/2fa';
-
-  // skip login pages if already logged in
-  if (isLoginRoute) {
-    if (authStore.userData?.username) {
-      return navigateTo('/', { redirectCode: 302 });
+  const path = to.path.replace(/\/$/, '');
+  if (path === '/login' || path === '/login/2fa') {
+    if (authStore.userData) {
+      return navigateTo(setupStore.done ? '/' : '/setup/3');
     }
     return;
   }
 
-  // Require auth for every page other than Login
-  if (!authStore.userData?.username) {
-    return navigateTo('/login', { redirectCode: 302 });
+  if (!authStore.userData) {
+    return navigateTo('/login');
   }
 
-  // Check for admin access
-  if (to.path.startsWith('/admin')) {
-    if (!hasPermissions(authStore.userData, 'admin', 'any')) {
-      return abortNavigation('Not allowed to access Admin Panel');
-    }
+  if (
+    (path.startsWith('/admin') || path.startsWith('/setup/')) &&
+    !hasPermissions(authStore.userData, 'admin', 'any')
+  ) {
+    return abortNavigation(
+      createError({
+        statusCode: 403,
+        statusMessage: 'Administrator access required',
+      })
+    );
   }
 });
