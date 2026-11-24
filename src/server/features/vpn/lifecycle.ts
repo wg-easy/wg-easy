@@ -20,12 +20,14 @@ import {
   routedReplyFamilies,
 } from '#server/utils/firewall';
 import { WG_ENV } from '#server/utils/config';
+import { setTunnelMtu } from '#server/utils/tunnelMtu';
 
 let pending: Promise<unknown> = Promise.resolve();
 type ApplyMode = 'sync' | 'start' | 'restart';
 type HostState = {
   routes: SiteRoutes;
   defaultRoutes: ReturnType<typeof defaultRoutePolicy>;
+  mtu?: number | null;
   retry?: ApplyMode;
   postUpError?: Error;
 };
@@ -164,12 +166,17 @@ async function apply(mode?: ApplyMode) {
     }
     state.routes = new SiteRoutes();
     state.defaultRoutes = defaultRoutes;
+    state.mtu = network.mtu;
     // Any native PostUp has completed. A sync failure must not replay it.
     if (!startup?.postUp) {
       state.retry = 'sync';
     }
   }
   await wg.sync(network.name);
+  if (state.mtu !== undefined && state.mtu !== network.mtu) {
+    await setTunnelMtu(network.name, network.mtu);
+  }
+  state.mtu = network.mtu;
   if (startup?.postUp) {
     // PostUp may use a site route, or supply one itself. Apply available
     // routes first, then check the final kernel state after the hook.
