@@ -62,20 +62,40 @@ export const wg = {
 
   up,
 
-  down: async (infName: string) => {
+  down: async (infName: string, failedStart?: { routingTable: string }) => {
     const name = parseInterfaceName(infName);
     const interfaces = await exec(`${wgExecutable} show interfaces`);
-    if (interfaces.split(/\s+/).includes(name)) {
+    if (!interfaces.split(/\s+/).includes(name)) {
+      return;
+    }
+    if (!failedStart) {
       await exec(`${wgExecutable}-quick down ${name}`);
+      return;
+    }
+    // Keep quick's default-policy teardown while skipping both down hooks.
+    const dir = await fs.mkdtemp('/tmp/wg-easy-cleanup-');
+    try {
+      const path = `${dir}/${name}.conf`;
+      await fs.writeFile(
+        path,
+        `[Interface]\nTable = ${failedStart.routingTable}\n`,
+        {
+          mode: 0o600,
+        }
+      );
+      await exec(`${wgExecutable}-quick down ${path}`);
+    } finally {
+      await fs.rm(dir, { recursive: true, force: true });
     }
   },
 
   postUp: (infName: string, table: string, hook: string) => {
     const name = parseInterfaceName(infName);
-    // awg-quick strips config comments before handing the hook to Bash.
-    const script = wgExecutable === 'awg' ? hook.split('#', 1)[0]! : hook;
     return exec(
-      `set -eo pipefail\nshopt -s extglob\n${script.replaceAll('%i', name)}`,
+      `set -eo pipefail
+shopt -s extglob
+cmd() { echo "[#] $*" >&2; "$@"; }
+${hook.replaceAll('%i', name)}`,
       {
         log: false,
         env: {

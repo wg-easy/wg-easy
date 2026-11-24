@@ -27,7 +27,12 @@ type HostState = {
   routes: SiteRoutes;
   defaultRoutes: ReturnType<typeof defaultRoutePolicy>;
   retry?: ApplyMode;
-  postUpError?: Error;
+  failedStart?: {
+    error: Error;
+    name: string;
+    routingTable: string;
+    cleanupPending: boolean;
+  };
 };
 const hostStates = new WeakMap<DatabaseStore, HostState>();
 
@@ -38,26 +43,37 @@ function enqueue<T>(operation: () => Promise<T>) {
   return result;
 }
 
+async function cleanFailedStart(
+  failure: NonNullable<HostState['failedStart']>
+) {
+  if (failure.cleanupPending) {
+    await wg.down(failure.name, { routingTable: failure.routingTable });
+    failure.cleanupPending = false;
+  }
+}
+
 async function failedPostUp(
   state: HostState,
   name: string,
+  routingTable: string,
   cause: unknown
 ): Promise<never> {
   // An arbitrary hook may have applied external effects before failing.
-  state.postUpError = createError({
+  const error = createError({
     status: 503,
     statusText: 'VPN interface needs attention',
     message:
       'PostUp failed. Check the hook and its effects, then restart the VPN interface from the admin panel.',
     cause,
   });
+  state.failedStart = { name, routingTable, error, cleanupPending: true };
   try {
-    await wg.down(name);
+    await cleanFailedStart(state.failedStart);
     delete state.retry;
   } catch (error) {
     console.error('Could not shut down the VPN after PostUp failed:', error);
   }
-  throw state.postUpError;
+  throw error;
 }
 
 async function apply(mode?: ApplyMode) {
@@ -86,13 +102,14 @@ async function apply(mode?: ApplyMode) {
     })
   );
   const enableIpv6 = !WG_ENV.DISABLE_IPV6;
-  if (state.postUpError && !manualRestart) {
-    // If the hook's cleanup also failed, retry only the shutdown.
-    await wg.down(network.name);
-    delete state.retry;
-    throw state.postUpError;
+  if (state.failedStart) {
+    await cleanFailedStart(state.failedStart);
+    if (!manualRestart) {
+      delete state.retry;
+      throw state.failedStart.error;
+    }
+    delete state.failedStart;
   }
-  delete state.postUpError;
   const defaultRoutes = defaultRoutePolicy(
     network.routingTable,
     clients,
@@ -149,7 +166,7 @@ async function apply(mode?: ApplyMode) {
       await wg.up(network.name, config);
     } catch (error) {
       if (error instanceof NativePostUpError) {
-        return failedPostUp(state, network.name, error);
+        return failedPostUp(state, network.name, network.routingTable, error);
       }
       if (
         error instanceof Error &&
@@ -177,7 +194,7 @@ async function apply(mode?: ApplyMode) {
     try {
       await wg.postUp(network.name, network.routingTable, startup.postUp);
     } catch (cause) {
-      return failedPostUp(state, network.name, cause);
+      return failedPostUp(state, network.name, network.routingTable, cause);
     }
   }
   // The interface and its hooks are up. Retry subsequent failures live.
@@ -306,7 +323,12 @@ export function stop() {
   return enqueue(async () => {
     const database = getDatabase();
     const network = await database.interfaces.get();
-    await wg.down(network.name).catch(() => {});
+    const failure = hostStates.get(database)?.failedStart;
+    if (failure) {
+      await cleanFailedStart(failure);
+    } else {
+      await wg.down(network.name).catch(() => {});
+    }
     hostStates.delete(database);
   });
 }

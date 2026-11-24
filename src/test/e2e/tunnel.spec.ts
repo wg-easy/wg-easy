@@ -1,6 +1,6 @@
 import type { Page } from '@playwright/test';
 
-import { expect, test } from './fixtures';
+import { credentials, expect, test } from './fixtures';
 import { createClient, downloadConfiguration, login } from './helpers';
 
 const siteSubnet = '192.168.120.0/22';
@@ -213,43 +213,110 @@ test('reports a route conflict and withdraws the site route after a restart', as
   await expect.poll(readRoute).toBe('');
 });
 
-test('a partially failed PostUp stays down until an administrator restarts it', async ({
-  page,
-  app,
-}) => {
-  await login(page);
-  const hooksUrl = app.url + '/api/admin/hooks';
-  const restartUrl = app.url + '/api/admin/interface/restart';
-  const headers = { Origin: app.url };
-  const hooks = {
-    preUp: '',
-    postUp: 'echo run >> /tmp/post-up-attempts; false',
-    preDown: '',
-    postDown: '',
-  };
-  expect(
-    (await page.request.post(hooksUrl, { headers, data: hooks })).ok()
-  ).toBe(true);
-  const failed = await page.request.post(restartUrl, { headers });
-  expect(failed.status()).toBe(503);
-  expect((await failed.json()).message).toContain('PostUp failed');
-  expect(await app.execServer(['wg', 'show', 'interfaces'])).toBe('');
+for (const backend of ['wg', 'awg'] as const) {
+  test.describe(`${backend} site-routed hooks`, () => {
+    test.use({ backend });
+    test('a partially failed PostUp stays down until an administrator restarts it', async ({
+      request,
+      app,
+    }) => {
+      const headers = { Origin: app.url };
+      const login = await request.post('/api/auth/password', {
+        headers,
+        data: { ...credentials, remember: false },
+      });
+      expect(login.ok()).toBe(true);
+      const client = await request.post('/api/client', {
+        headers,
+        data: { name: 'Office router', expiresAt: null },
+      });
+      expect(client.ok()).toBe(true);
+      const clientUrl = `/api/client/${(await client.json()).clientId}`;
+      const peer = await (await request.get(clientUrl)).json();
+      const hookRoute = '10.8.0.77/32';
+      const siteHost = '192.168.120.1';
+      await app.connectClient(
+        await (await request.get(clientUrl + '/configuration')).text()
+      );
+      await app.execClient([
+        'ip',
+        'addr',
+        'add',
+        siteHost + '/32',
+        'dev',
+        'lo',
+      ]);
+      const port = await app.execClient([
+        backend,
+        'show',
+        'wg0',
+        'listen-port',
+      ]);
+      const withSite = await request.post(clientUrl, {
+        headers,
+        data: {
+          ...peer,
+          serverEndpoint: `vpn-client:${port}`,
+          serverAllowedIps: [siteSubnet, hookRoute],
+        },
+      });
+      expect(withSite.ok()).toBe(true);
 
-  const fixed = {
-    ...hooks,
-    postUp:
-      'test "$CONFIG_FILE" = /etc/wireguard/wg0.conf; cmd echo fixed >> /tmp/post-up-attempts',
-  };
-  // The corrected hook is saved. Applying it requires an explicit restart.
-  expect(
-    (await page.request.post(hooksUrl, { headers, data: fixed })).status()
-  ).toBe(503);
-  const attempts = () => app.execServer(['cat', '/tmp/post-up-attempts']);
-  expect(await attempts()).toBe('run');
-  expect((await page.request.post(restartUrl, { headers })).ok()).toBe(true);
-  expect(await attempts()).toBe('run\nfixed');
-  expect(await app.execServer(['wg', 'show', 'interfaces'])).toBe('wg0');
-});
+      const hooksUrl = '/api/admin/hooks';
+      const restartUrl = '/api/admin/interface/restart';
+      const attempts = '/tmp/post-up-attempts';
+      const hooks = {
+        preUp: '',
+        postUp: `echo run >> ${attempts}; false`,
+        preDown: `if [[ -f ${attempts} ]]; then echo PreDown >> ${attempts}; fi`,
+        postDown: `if [[ -f ${attempts} ]]; then echo PostDown >> ${attempts}; fi`,
+      };
+      expect(
+        (await request.post(hooksUrl, { headers, data: hooks })).ok()
+      ).toBe(true);
+      const failed = await request.post(restartUrl, { headers });
+      expect(failed.status()).toBe(503);
+      expect((await failed.json()).message).toContain('PostUp failed');
+      expect(await app.execServer([backend, 'show', 'interfaces'])).toBe('');
+      expect(
+        await app.execServer(['ip', 'route', 'show', 'exact', siteSubnet])
+      ).toBe('');
+      const readAttempts = () => app.execServer(['cat', attempts]);
+      expect(await readAttempts()).toBe('run');
+
+      const fixed = {
+        ...hooks,
+        postUp: [
+          'test "$CONFIG_FILE" = /etc/wireguard/wg0.conf',
+          `grep '^AllowedIPs = .*${siteSubnet}' "$CONFIG_FILE"`,
+          'test "$INTERFACE" = {{interface}}',
+          'test "$TABLE" = auto',
+          `ping -c 1 -W 4 ${siteHost}`,
+          `ip route add ${hookRoute} dev %i`,
+          `cmd echo office#lan "hq #1" >> ${attempts} # trailing comment`,
+          `echo ready >> ${attempts}`,
+        ].join(';\n'),
+      };
+      // The corrected hook is saved. Applying it requires an explicit restart.
+      expect(
+        (await request.post(hooksUrl, { headers, data: fixed })).status()
+      ).toBe(503);
+      expect(await readAttempts()).toBe('run');
+      expect((await request.post(restartUrl, { headers })).ok()).toBe(true);
+      expect(await readAttempts()).toBe('run\noffice#lan hq #1\nready');
+      expect(await app.execServer([backend, 'show', 'interfaces'])).toBe('wg0');
+
+      const disabled = await request.post(clientUrl + '/disable', { headers });
+      expect(disabled.ok()).toBe(true);
+      expect(
+        await app.execServer(['ip', 'route', 'show', 'exact', siteSubnet])
+      ).toBe('');
+      expect(
+        await app.execServer(['ip', 'route', 'show', 'exact', hookRoute])
+      ).toContain('dev wg0');
+    });
+  });
+}
 
 test('starts with a site conflict, preserves hook and backup routes, and retries live', async ({
   page,

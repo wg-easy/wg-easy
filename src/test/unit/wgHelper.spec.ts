@@ -18,12 +18,9 @@ vi.mock('#server/utils/config', () => ({
 const runBash = promisify(execFile);
 const stripped = '[Interface]\nListenPort = 51820\n[Peer]\nAllowedIPs = ::/0';
 
-test.each([
-  ['wg', 'office#lan'],
-  ['awg', 'office'],
-])(
-  'runs deferred %s hooks with the interface, table, and native comment semantics',
-  async (backend, label) => {
+test.each(['wg', 'awg'])(
+  'runs site-routed %s hooks in the WireGuard Bash environment',
+  async (backend) => {
     vi.resetModules();
     config.WG_EXECUTABLE = backend;
     try {
@@ -35,9 +32,9 @@ test.each([
         await backendWg.postUp(
           'wg0',
           '100',
-          'echo %i "$INTERFACE" "$TABLE" office#lan'
+          'cmd echo %i "$INTERFACE" "$TABLE" "$CONFIG_FILE" office#lan "hq #1" # comment'
         )
-      ).toBe(`wg0 wg0 100 ${label}`);
+      ).toBe('wg0 wg0 100 /etc/wireguard/wg0.conf office#lan hq #1');
       await expect(
         backendWg.postUp('wg0', '100', 'false | true')
       ).rejects.toThrow();
