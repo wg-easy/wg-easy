@@ -31,14 +31,20 @@ export const credentials = {
 export const test = base.extend<{
   app: App;
   initialized: boolean;
+  strictReversePath: boolean;
   ipv6: boolean;
   backend: 'wg' | 'awg';
 }>({
   initialized: [true, { option: true }],
+  strictReversePath: [false, { option: true }],
   ipv6: [false, { option: true }],
   backend: ['wg', { option: true }],
   app: [
-    async ({ initialized, ipv6, backend }, use, testInfo) => {
+    async (
+      { initialized, ipv6, backend, strictReversePath },
+      use,
+      testInfo
+    ) => {
       const runDir = process.env.E2E_RUN_DIR;
       if (!runDir) {
         throw new Error('Run pnpm test:e2e to manage test containers.');
@@ -64,6 +70,7 @@ export const test = base.extend<{
             env: {
               ...process.env,
               E2E_BACKEND: backend,
+              E2E_RP_FILTER: strictReversePath ? '1' : '0',
               E2E_INITIALIZED: String(initialized),
               E2E_DISABLE_IPV6: String(!ipv6),
             },

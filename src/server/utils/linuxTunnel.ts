@@ -2,6 +2,7 @@ import { readFile } from 'node:fs/promises';
 
 import { createError } from 'nuxt/server';
 
+import { DefaultPolicy } from '#server/features/vpn/defaultPolicy';
 import type { HooksType } from '#db/repositories/hooks/types';
 import type { InterfaceType } from '#db/repositories/interface/types';
 import {
@@ -38,6 +39,7 @@ async function interfaceIndex(name: string) {
 
 export class LinuxTunnel {
   private running?: RunningLink;
+  defaultPolicy = new DefaultPolicy();
 
   async checkOwnership(name: string) {
     const index = await interfaceIndex(parseInterfaceName(name));
@@ -75,6 +77,7 @@ export class LinuxTunnel {
       throw new Error(`Tunnel interface ${name} disappeared during creation`);
     }
     const expand = (text: string) => expandHook(text, network, WG_ENV.PORT);
+    this.defaultPolicy = new DefaultPolicy();
     this.running = {
       index: index ?? 0,
       quick: Boolean(quick),
@@ -104,6 +107,7 @@ export class LinuxTunnel {
       return;
     }
     if (running.quick) {
+      await this.defaultPolicy.stop(name);
       await wg.down(
         name,
         skipHooks ? { routingTable: running.table } : undefined
@@ -112,6 +116,7 @@ export class LinuxTunnel {
       if (!skipHooks && running.preDown) {
         await wg.runHook(name, running.table, running.preDown);
       }
+      await this.defaultPolicy.stop(name);
       await exec(`ip link delete dev ${name}`);
     }
     this.running = undefined;

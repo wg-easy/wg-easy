@@ -1,5 +1,4 @@
 import fs from 'node:fs/promises';
-import { isDeepStrictEqual } from 'node:util';
 
 import { createError } from 'nuxt/server';
 
@@ -29,7 +28,6 @@ type ApplyMode = 'sync' | 'start' | 'restart';
 type HostState = {
   tunnel: LinuxTunnel;
   routes: SiteRoutes;
-  defaultRoutes: ReturnType<typeof defaultRoutePolicy>;
   mtu?: number | null;
   retry?: ApplyMode;
   failedStart?: {
@@ -87,7 +85,6 @@ async function apply(mode?: ApplyMode) {
     state = {
       tunnel: new LinuxTunnel(),
       routes: new SiteRoutes(),
-      defaultRoutes: {},
     };
     hostStates.set(database, state);
   }
@@ -123,13 +120,6 @@ async function apply(mode?: ApplyMode) {
     clients,
     enableIpv6
   );
-  if (
-    mode === 'sync' &&
-    !isDeepStrictEqual(defaultRoutes, state.defaultRoutes)
-  ) {
-    mode = 'restart';
-    state.retry = mode;
-  }
   await state.tunnel.checkOwnership(network.name);
   if (network.firewallEnabled) {
     await firewall.blockTraffic(network.name, enableIpv6);
@@ -149,8 +139,6 @@ async function apply(mode?: ApplyMode) {
       }
     }
   } else {
-    // wg-quick down needs the old Table setting and the live peer AllowedIPs
-    // to remove its default-route policy before the new configuration is written.
     await state.tunnel.stop(network.name);
   }
   const options = {
@@ -168,10 +156,7 @@ async function apply(mode?: ApplyMode) {
       await setTunnelMtu(network.name, network.mtu);
     }
   } else {
-    // Until live default policies are available, quick handles those
-    // deployments. AmneziaWG also uses its existing startup path for now.
-    const quick =
-      options.amnezia || Boolean(defaultRoutes.ipv4 || defaultRoutes.ipv6);
+    const quick = options.amnezia;
     const startup = quick
       ? generateStartupConfig(network, hooks, clients, options)
       : undefined;
@@ -198,10 +183,12 @@ async function apply(mode?: ApplyMode) {
       await state.tunnel.stop(network.name, true);
       throw error;
     }
-    state.defaultRoutes = defaultRoutes;
     if (postUp) {
       // A hook may use a site route, or supply a missing one itself.
       await state.routes.sync(network, clients, enableIpv6);
+      if (!quick) {
+        await state.tunnel.defaultPolicy.sync(network, defaultRoutes);
+      }
       try {
         await wg.runHook(network.name, network.routingTable, postUp);
       } catch (cause) {
@@ -213,7 +200,12 @@ async function apply(mode?: ApplyMode) {
   // The interface and its hooks are up. Retry subsequent failures live.
   state.retry = 'sync';
   await firewall.rebuildRules(network, clients, defaults, enableIpv6);
-  const error = await state.routes.sync(network, clients, enableIpv6);
+  const siteError = await state.routes.sync(network, clients, enableIpv6);
+  const policyError = await state.tunnel.defaultPolicy.sync(
+    network,
+    defaultRoutes
+  );
+  const error = siteError ?? policyError;
   if (error) {
     if (mode !== 'start') {
       throw error;

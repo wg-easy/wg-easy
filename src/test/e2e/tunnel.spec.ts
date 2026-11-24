@@ -93,7 +93,7 @@ test('saving a site subnet routes live traffic without interrupting another peer
 
 test.describe('dual-stack default routes', () => {
   test.use({ ipv6: true });
-  test('saving default prefixes installs and withdraws wg-quick policy routing', async ({
+  test('saving default prefixes installs and withdraws live policy routing', async ({
     page,
     app,
   }) => {
