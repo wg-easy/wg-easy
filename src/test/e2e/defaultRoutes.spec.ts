@@ -76,6 +76,31 @@ for (const backend of ['wg', 'awg'] as const) {
               .filter((r) => r.includes(' table ' + table))
               .join('\n')
           );
+      // Docker provides an IPv4 underlay. Add an IPv6 default to exercise the
+      // socket-mark exemption in that family's real routing policy database.
+      await app.execServer(['ip', 'link', 'add', 'underlay6', 'type', 'dummy']);
+      await app.execServer(['ip', 'link', 'set', 'underlay6', 'up']);
+      await app.execServer([
+        'ip',
+        '-6',
+        'addr',
+        'add',
+        'fd12:3456::1/64',
+        'dev',
+        'underlay6',
+        'nodad',
+      ]);
+      await app.execServer([
+        'ip',
+        '-6',
+        'route',
+        'add',
+        'default',
+        'dev',
+        'underlay6',
+        'metric',
+        '1',
+      ]);
       const [originalIndex, originalRules] = await Promise.all([
         index(),
         rules(),
@@ -98,6 +123,9 @@ for (const backend of ['wg', 'awg'] as const) {
       expect(socketMark).not.toBe('off');
       expect(await lookup('203.0.113.1', 'mark', socketMark)).toContain(
         'dev eth0'
+      );
+      expect(await lookup('2001:db8::1', 'mark', socketMark)).toContain(
+        'dev underlay6'
       );
       await gateway.routes(['0.0.0.0/0']);
       expect((await rules())[1]).toBe(originalRules[1]);
@@ -184,18 +212,28 @@ exec /sbin/ip "$@"
 SH
 chmod +x /usr/local/bin/ip`,
   ]);
+  const ongoing = app.execClient([
+    'ping',
+    '-c',
+    '30',
+    '-i',
+    '0.1',
+    '-I',
+    'wg0',
+    '10.8.0.1',
+  ]);
   const failed = await request.post(revoked.url + '/disable', {
     headers: { Origin: app.url },
   });
   expect(failed.status()).toBe(500);
-  expect((await failed.json()).message).toContain('::/0');
+  expect((await failed.json()).message).toContain('::/0 on wg0 in table 51820');
   expect(await app.peers()).not.toContain(revoked.settings.publicKey);
   expect(await read('-6')).toBe(v6);
   expect(await read('-4')).toBe(v4);
   expect(
     await app.execServer(['ip', '-6', 'route', 'get', '2001:db8::1'])
   ).toContain('dev wg0');
-  expect(await app.pingFromClient('10.8.0.1')).toBe(true);
+  expect(await ongoing).toContain(', 0% packet loss');
   await app.execServer(['mv', '/usr/local/bin/ip', '/tmp/failed-ip']);
   await expect
     .poll(() => read('-6'), { timeout: 75_000, intervals: [1000] })
@@ -375,6 +413,12 @@ test.describe('strict reverse-path filtering', () => {
     );
     await ip('route', 'del', connected.dst, 'dev', 'eth0');
     await app.execClient(['wg-quick', 'down', 'wg0']);
+    const iface = '/api/admin/interface';
+    await api.post(iface, {
+      ...(await (await request.get(iface)).json()),
+      port: 51830,
+    });
+
     await gateway.routes(['0.0.0.0/0']);
     expect(await app.execServer(['ip', 'route', 'get', endpoint])).toContain(
       'dev wg0'
