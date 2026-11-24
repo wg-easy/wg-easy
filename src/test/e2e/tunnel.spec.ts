@@ -283,6 +283,17 @@ for (const backend of ['wg', 'awg'] as const) {
       ).toBe('');
       const readAttempts = () => app.execServer(['cat', attempts]);
       expect(await readAttempts()).toBe('run');
+      // The preferred tunnel route may coexist with an operator's backup route.
+      await app.execServer([
+        'ip',
+        'route',
+        'add',
+        siteSubnet,
+        'dev',
+        'eth0',
+        'metric',
+        '500',
+      ]);
 
       const fixed = {
         ...hooks,
@@ -308,9 +319,15 @@ for (const backend of ['wg', 'awg'] as const) {
 
       const disabled = await request.post(clientUrl + '/disable', { headers });
       expect(disabled.ok()).toBe(true);
-      expect(
-        await app.execServer(['ip', 'route', 'show', 'exact', siteSubnet])
-      ).toBe('');
+      const remaining = await app.execServer([
+        'ip',
+        'route',
+        'show',
+        'exact',
+        siteSubnet,
+      ]);
+      expect(remaining).toMatch(/dev eth0.*metric 500/);
+      expect(remaining).not.toContain('dev wg0');
       expect(
         await app.execServer(['ip', 'route', 'show', 'exact', hookRoute])
       ).toContain('dev wg0');
