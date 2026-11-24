@@ -282,6 +282,18 @@ chmod +x /usr/local/bin/ip`,
 
   // With no previous gateway, a failed addition leaves only the independent site.
   await api.table('100');
+  await app.execServer(['ip', 'link', 'add', 'fallback6', 'type', 'dummy']);
+  await app.execServer(['ip', 'link', 'set', 'fallback6', 'up']);
+  await app.execServer([
+    'ip',
+    '-6',
+    'address',
+    'add',
+    'fd12:3456::1/64',
+    'dev',
+    'fallback6',
+    'nodad',
+  ]);
   await app.execServer([
     'ip',
     '-6',
@@ -289,7 +301,7 @@ chmod +x /usr/local/bin/ip`,
     'add',
     'default',
     'dev',
-    'eth0',
+    'fallback6',
     'table',
     '100',
     'metric',
