@@ -179,7 +179,7 @@ describe('firewall chains', () => {
       expect.stringContaining('ip6tables')
     );
     expect(execMock).toHaveBeenCalledWith(
-      expect.stringContaining('iptables -C INPUT -i wg1 -j WG_CLIENTS_wg1')
+      expect.stringContaining('iptables -I INPUT 1 -i wg1 -j WG_CLIENTS_wg1')
     );
     expect(execMock).toHaveBeenCalledWith(
       expect.stringContaining('iptables -D INPUT -i wg1 -j WG_CLIENTS_wg1')

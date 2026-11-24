@@ -330,15 +330,47 @@ for (const backend of ['wg', 'awg'] as const) {
         data: { ...network, firewallEnabled: true },
         failOnStatusCode: true,
       });
+      const localTarget = '192.0.2.99';
+      await app.execServer([
+        'ip',
+        'addr',
+        'add',
+        localTarget + '/32',
+        'dev',
+        'lo',
+      ]);
+      await request.post(clientUrl, {
+        headers,
+        data: {
+          ...(await (await request.get(clientUrl)).json()),
+          firewallIps: ['10.8.0.1/32'],
+        },
+        failOnStatusCode: true,
+      });
       await request.post(hooksUrl, {
         headers,
         data: {
           ...fixed,
-          postUp: `ping -c 1 -W 4 ${peer.ipv4Address}; ip route add ${hookRoute} dev %i`,
+          postUp: [
+            `ping -c 1 -W 4 ${peer.ipv4Address}`,
+            `ip route add ${hookRoute} dev %i`,
+            'iptables -I INPUT 1 -i %i -m comment --comment site-hook -j ACCEPT',
+            'iptables -D FORWARD -i %i -j WG_CLIENTS_%i',
+            'iptables -F WG_CLIENTS_%i',
+          ].join('; '),
         },
         failOnStatusCode: true,
       });
       await request.post(restartUrl, { headers, failOnStatusCode: true });
+
+      expect(await app.pingFromClient('10.8.0.1')).toBe(true);
+      expect(await app.pingFromClient(localTarget)).toBe(false);
+      expect(await app.execServer(['iptables', '-S', 'INPUT'])).toContain(
+        'site-hook'
+      );
+      expect(await app.execServer(['iptables', '-S', 'FORWARD'])).toContain(
+        '-i wg0 -j WG_CLIENTS_wg0'
+      );
 
       const disabled = await request.post(clientUrl + '/disable', { headers });
       expect(disabled.ok()).toBe(true);

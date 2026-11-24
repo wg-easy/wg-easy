@@ -6,6 +6,7 @@ import type {
   ClientNextIpType,
   ClientType,
 } from '#db/repositories/client/types';
+import { zeroWireGuardKey } from '#shared/utils/wireguard';
 import type { InterfaceCidrUpdateType } from '#shared/contracts/interface';
 import {
   isClientAddress,
@@ -92,21 +93,17 @@ export function peersForRunningNetwork<T extends SavedPeer>(
   });
 }
 
+function effectivePsk(key: string | null) {
+  return key && key !== '(none)' && key !== zeroWireGuardKey ? key : null;
+}
+
 /** Reopen filtering after a failed peer update only for verified sources. */
 export function peersWithVerifiedSources(
   clients: ServerPeer[],
-  running: { publicKey: string; allowedIps: string }[],
+  running: { publicKey: string; preSharedKey: string; allowedIps: string }[],
   enableIpv6: boolean,
   restoredDefaults: ReadonlyMap<string, string | undefined>
 ) {
-  const active = new Map<string, string>();
-  for (const peer of running) {
-    for (const ip of peer.allowedIps.split(',')) {
-      if (ip && ip !== '(none)') {
-        active.set(normalizePrefix(ip), peer.publicKey);
-      }
-    }
-  }
   const enabled = clients
     .filter((client) => client.enabled)
     .map((client) => {
@@ -123,6 +120,24 @@ export function peersWithVerifiedSources(
       }
       return { ...client, serverAllowedIps };
     });
+  const credentials = new Map(
+    enabled.map((client) => [
+      client.publicKey,
+      effectivePsk(client.preSharedKey),
+    ])
+  );
+  const active = new Map<string, string | null>();
+  for (const peer of running) {
+    const owner =
+      credentials.get(peer.publicKey) === effectivePsk(peer.preSharedKey)
+        ? peer.publicKey
+        : null;
+    for (const ip of peer.allowedIps.split(',')) {
+      if (ip && ip !== '(none)') {
+        active.set(normalizePrefix(ip), owner);
+      }
+    }
+  }
   const expected = new Map<string, string | null>();
   for (const peer of enabled) {
     for (const ip of peerAllowedIps(peer, enableIpv6)) {
@@ -135,7 +150,8 @@ export function peersWithVerifiedSources(
     }
   }
   const changed = [...new Set([...active.keys(), ...expected.keys()])].filter(
-    (prefix) => active.get(prefix) !== expected.get(prefix)
+    (prefix) =>
+      !active.get(prefix) || active.get(prefix) !== expected.get(prefix)
   );
   return enabled
     .map((client) => {

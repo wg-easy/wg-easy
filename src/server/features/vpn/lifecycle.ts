@@ -271,6 +271,10 @@ async function apply(mode?: ApplyMode) {
   state.mtu = network.mtu;
   // The interface and its hooks are up. Retry subsequent failures live.
   state.retry = 'sync';
+  if (mode !== 'sync' && network.firewallEnabled && hooks.postUp) {
+    // The hook may have reloaded or reordered the filter table.
+    await state.tunnel.guardTraffic(network, enableIpv6);
+  }
   const restoredDefaults = state.restoredDefaults;
   restoredDefaults.clear();
   const siteError = await state.routes.sync(network, clients, enableIpv6);
@@ -291,7 +295,7 @@ async function apply(mode?: ApplyMode) {
       restoredDefaults
     );
     await firewall.rebuildRules(network, verified, defaults, enableIpv6);
-  } else if (mode === 'sync' || !network.firewallEnabled || !hooks.postUp) {
+  } else {
     await firewall.rebuildRules(network, clients, defaults, enableIpv6);
   }
   if (!network.firewallEnabled) {

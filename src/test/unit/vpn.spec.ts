@@ -2,6 +2,7 @@ import { describe, expect, test, vi } from 'vitest';
 
 import { vpnFixture } from '../helpers/vpn';
 
+import { zeroWireGuardKey } from '#shared/utils/wireguard';
 import { roles } from '#shared/utils/permissions';
 import * as vpn from '#server/features/vpn/lifecycle';
 import * as clients from '#server/features/vpn/clients';
@@ -171,6 +172,57 @@ describe('VPN operations', () => {
       expect(active).toEqual(new Set(['public']));
     }
   );
+
+  test('a rotated PSK excludes its old traffic and overlapping site ranges after a failed sync', async () => {
+    const { store, commands, firewall } = await vpnFixture();
+    await store.interfaces.update({ firewallEnabled: true });
+    const gateway = (await store.clients.get(1))!;
+    await store.clients.update(1, {
+      serverAllowedIps: ['192.0.2.0/24'],
+      preSharedKey: null,
+    });
+    await store.clients.insert({
+      ...gateway,
+      id: 2,
+      publicKey: 'rotated',
+      ipv4Address: '10.8.0.3',
+      ipv6Address: 'fd00::3',
+      preSharedKey: 'old-key',
+      serverAllowedIps: ['192.0.2.128/25'],
+    });
+    await store.clients.insert({
+      ...gateway,
+      id: 3,
+      publicKey: 'unaffected',
+      ipv4Address: '10.8.0.4',
+      ipv6Address: 'fd00::4',
+      preSharedKey: zeroWireGuardKey,
+    });
+    commands.dump.mockResolvedValue(
+      [
+        ['public', zeroWireGuardKey, '10.8.0.2/32,192.0.2.0/24'],
+        ['rotated', 'old-key', '10.8.0.3/32,192.0.2.128/25'],
+        ['unaffected', '(none)', '10.8.0.4/32'],
+      ].map(([publicKey, preSharedKey, allowedIps]) => ({
+        publicKey: publicKey!,
+        preSharedKey: preSharedKey!,
+        allowedIps: allowedIps!,
+        endpoint: null,
+        latestHandshakeAt: null,
+        transferRx: 0,
+        transferTx: 0,
+        persistentKeepalive: '0',
+      }))
+    );
+    commands.sync.mockRejectedValueOnce(new Error('Endpoint unavailable'));
+    await expect(
+      vpn.commit((tx) => tx.clients.update(2, { preSharedKey: 'new-key' }))
+    ).rejects.toThrow('Endpoint unavailable');
+    expect(firewall.rebuildRules.mock.lastCall?.[1]).toMatchObject([
+      { id: 1, ipv4Address: '10.8.0.2', serverAllowedIps: [] },
+      { id: 3, ipv4Address: '10.8.0.4' },
+    ]);
+  });
 
   test('serializes updates and uses one snapshot for configuration and firewall', async () => {
     const { commands, writeConfiguration, firewall, store } =

@@ -34,13 +34,17 @@ function rebuildGuard(interfaceName: string) {
   return `-i ${interfaceName} -m comment --comment "wg-easy rebuild ${interfaceName}" -j DROP`;
 }
 
+async function chainRules(command: string, chain: string) {
+  return (await exec(`${command} -S ${chain}`))
+    .split('\n')
+    .filter((rule) => rule.startsWith(`-A ${chain} `));
+}
+
 async function blockDuringRebuild(interfaceName: string, enableIpv6: boolean) {
   const guard = rebuildGuard(interfaceName);
   for (const command of commands(enableIpv6)) {
     for (const chain of trafficChains) {
-      const rules = (await exec(`${command} -S ${chain}`))
-        .split('\n')
-        .filter((rule) => rule.startsWith(`-A ${chain} `));
+      const rules = await chainRules(command, chain);
       // A guard below an ACCEPT or a jump to an old chain does not block
       // traffic. This also repairs guards left by older failed rebuilds.
       if (rules[0] !== `-A ${chain} ${guard}`) {
@@ -302,9 +306,18 @@ export const firewall = {
         continue;
       }
       for (const parent of trafficChains) {
-        await exec(
-          `${command} -C ${parent} -i ${interfaceName} -j ${chain} 2>/dev/null || ${command} -I ${parent} ${position} -i ${interfaceName} -j ${chain}`
-        );
+        const jump = `-i ${interfaceName} -j ${chain}`;
+        const rules = await chainRules(command, parent);
+        const matches = rules.filter((rule) => rule === `-A ${parent} ${jump}`);
+        if (matches.length === 1 && rules[position - 1] === matches[0]) {
+          continue;
+        }
+        // The rebuild guard stays first until both families are ready. A hook
+        // may have removed our jump or placed a foreign ACCEPT ahead of it.
+        for (let i = 0; i < matches.length; i++) {
+          await exec(`${command} -D ${parent} ${jump}`);
+        }
+        await exec(`${command} -I ${parent} ${position} ${jump}`);
       }
     }
   },
