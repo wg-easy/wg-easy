@@ -1,7 +1,7 @@
 import type { Page } from '@playwright/test';
 
-import { credentials, expect, test } from './fixtures';
-import { createClient, downloadConfiguration, login } from './helpers';
+import { expect, test } from './fixtures';
+import { admin, createClient, downloadConfiguration, login } from './helpers';
 
 const siteSubnet = '192.168.120.0/22';
 
@@ -220,24 +220,15 @@ for (const backend of ['wg', 'awg'] as const) {
       request,
       app,
     }) => {
-      const headers = { Origin: app.url };
-      const login = await request.post('/api/auth/password', {
-        headers,
-        data: { ...credentials, remember: false },
-      });
-      expect(login.ok()).toBe(true);
-      const client = await request.post('/api/client', {
-        headers,
-        data: { name: 'Office router', expiresAt: null },
-      });
-      expect(client.ok()).toBe(true);
-      const clientUrl = `/api/client/${(await client.json()).clientId}`;
-      const peer = await (await request.get(clientUrl)).json();
+      const { post, headers, create, download, json } = await admin(
+        request,
+        app.url
+      );
+      const clientUrl = await create('Office router');
+      const peer = await json(clientUrl);
       const hookRoute = '10.8.0.77/32';
       const siteHost = '192.168.120.1';
-      await app.connectClient(
-        await (await request.get(clientUrl + '/configuration')).text()
-      );
+      await app.connectClient(await download(clientUrl));
       await app.execClient([
         'ip',
         'addr',
@@ -252,15 +243,11 @@ for (const backend of ['wg', 'awg'] as const) {
         'wg0',
         'listen-port',
       ]);
-      const withSite = await request.post(clientUrl, {
-        headers,
-        data: {
-          ...peer,
-          serverEndpoint: `vpn-client:${port}`,
-          serverAllowedIps: [siteSubnet, hookRoute],
-        },
+      await post(clientUrl, {
+        ...peer,
+        serverEndpoint: `vpn-client:${port}`,
+        serverAllowedIps: [siteSubnet, hookRoute],
       });
-      expect(withSite.ok()).toBe(true);
 
       const hooksUrl = '/api/admin/hooks';
       const restartUrl = '/api/admin/interface/restart';
@@ -271,9 +258,7 @@ for (const backend of ['wg', 'awg'] as const) {
         preDown: `if [[ -f ${attempts} ]]; then echo PreDown >> ${attempts}; fi`,
         postDown: `if [[ -f ${attempts} ]]; then echo PostDown >> ${attempts}; fi`,
       };
-      expect(
-        (await request.post(hooksUrl, { headers, data: hooks })).ok()
-      ).toBe(true);
+      await post(hooksUrl, hooks);
       const failed = await request.post(restartUrl, { headers });
       expect(failed.status()).toBe(503);
       expect((await failed.json()).message).toContain('PostUp failed');
@@ -319,17 +304,12 @@ for (const backend of ['wg', 'awg'] as const) {
       ]);
       expect(savedHook).toContain('echo ready');
       expect(await readAttempts()).toBe('run');
-      expect((await request.post(restartUrl, { headers })).ok()).toBe(true);
+      await post(restartUrl);
       expect(await readAttempts()).toBe('run\noffice#lan hq #1\nready');
       expect(await app.execServer([backend, 'show', 'interfaces'])).toBe('wg0');
 
       const iface = '/api/admin/interface';
-      const network = await (await request.get(iface)).json();
-      await request.post(iface, {
-        headers,
-        data: { ...network, firewallEnabled: true },
-        failOnStatusCode: true,
-      });
+      await post(iface, { ...(await json(iface)), firewallEnabled: true });
       const localTarget = '192.0.2.99';
       await app.execServer([
         'ip',
@@ -339,29 +319,21 @@ for (const backend of ['wg', 'awg'] as const) {
         'dev',
         'lo',
       ]);
-      await request.post(clientUrl, {
-        headers,
-        data: {
-          ...(await (await request.get(clientUrl)).json()),
-          firewallIps: ['10.8.0.1/32'],
-        },
-        failOnStatusCode: true,
+      await post(clientUrl, {
+        ...(await json(clientUrl)),
+        firewallIps: ['10.8.0.1/32'],
       });
-      await request.post(hooksUrl, {
-        headers,
-        data: {
-          ...fixed,
-          postUp: [
-            `ping -c 1 -W 4 ${peer.ipv4Address}`,
-            `ip route add ${hookRoute} dev %i`,
-            'iptables -I INPUT 1 -i %i -m comment --comment site-hook -j ACCEPT',
-            'iptables -D FORWARD -i %i -j WG_CLIENTS_%i',
-            'iptables -F WG_CLIENTS_%i',
-          ].join('; '),
-        },
-        failOnStatusCode: true,
+      await post(hooksUrl, {
+        ...fixed,
+        postUp: [
+          `ping -c 1 -W 4 ${peer.ipv4Address}`,
+          `ip route add ${hookRoute} dev %i`,
+          'iptables -I INPUT 1 -i %i -m comment --comment site-hook -j ACCEPT',
+          'iptables -D FORWARD -i %i -j WG_CLIENTS_%i',
+          'iptables -F WG_CLIENTS_%i',
+        ].join('; '),
       });
-      await request.post(restartUrl, { headers, failOnStatusCode: true });
+      await post(restartUrl);
 
       expect(await app.pingFromClient('10.8.0.1')).toBe(true);
       expect(await app.pingFromClient(localTarget)).toBe(false);
@@ -372,8 +344,7 @@ for (const backend of ['wg', 'awg'] as const) {
         '-i wg0 -j WG_CLIENTS_wg0'
       );
 
-      const disabled = await request.post(clientUrl + '/disable', { headers });
-      expect(disabled.ok()).toBe(true);
+      await post(clientUrl + '/disable');
       const remaining = await app.execServer([
         'ip',
         'route',

@@ -19,7 +19,7 @@ export type RouteFamily = 'ipv4' | 'ipv6';
 export const routeMetric = (family: RouteFamily) =>
   family === 'ipv4' ? 0 : 1024;
 
-export function directRoute(route: KernelRoute, device: string) {
+function directRoute(route: KernelRoute, device: string) {
   return (
     route.dev === device &&
     !route.gateway &&
@@ -27,6 +27,19 @@ export function directRoute(route: KernelRoute, device: string) {
       Number(route.type) === 1 ||
       route.type === 'unicast')
   );
+}
+
+// For equally specific routes Linux prefers the lowest metric. All routes
+// tied at that metric must lead directly to the tunnel.
+export function preferredRoute(routes: KernelRoute[], device: string) {
+  const metric = Math.min(...routes.map((route) => route.metric ?? 0));
+  const preferred = routes.filter((route) => (route.metric ?? 0) === metric);
+  return {
+    metric,
+    viaTunnel:
+      preferred.length > 0 &&
+      preferred.every((route) => directRoute(route, device)),
+  };
 }
 
 // Numeric, detailed iproute2 output identifies attributes that distinguish

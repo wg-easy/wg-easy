@@ -1,7 +1,5 @@
 import { normalizeCidr, parseCidr } from 'cidr-tools';
 
-import type { PeerAddresses } from './activePeers';
-
 import { zeroWireGuardKey } from '#shared/utils/wireguard';
 import { formatEndpoint } from '#server/utils/endpoint';
 import { getGatewayAddress } from '#server/utils/ip';
@@ -15,12 +13,15 @@ type Options = {
   amnezia?: boolean;
   uiPort?: string;
 };
+export type PeerAddresses = {
+  ipv4Address: string | null;
+  ipv6Address: string | null;
+};
 export type ServerPeer = Omit<
   ClientType,
   'createdAt' | 'updatedAt' | keyof PeerAddresses
 > &
   PeerAddresses;
-type RouteClient = Pick<ClientType, 'enabled' | 'serverAllowedIps'>;
 
 /** The complete server file, including enabled peers and its final newline. */
 export function generateServerConfig(
@@ -61,38 +62,6 @@ function generateServerPeers(clients: ServerPeer[], options: Options) {
     .map((client) => generateServerPeer(client, options));
 }
 
-/** Both startup and live edits derive default policy from enabled peers. */
-export function defaultRoutePolicy(
-  table: string,
-  clients: RouteClient[],
-  enableIpv6: boolean
-) {
-  const routes: { ipv4?: string; ipv6?: string } = {};
-  if (table !== 'off') {
-    for (const prefix of enabledServerAllowedIps(clients, enableIpv6)) {
-      if (prefix.endsWith('/0')) {
-        routes[prefix.includes(':') ? 'ipv6' : 'ipv4'] = table;
-      }
-    }
-  }
-  return routes;
-}
-
-function enabledServerAllowedIps(clients: RouteClient[], enableIpv6: boolean) {
-  return clients
-    .filter((client) => client.enabled)
-    .flatMap((client) => serverAllowedIps(client, enableIpv6));
-}
-
-function serverAllowedIps(
-  client: Pick<ClientType, 'serverAllowedIps'>,
-  enableIpv6: boolean
-) {
-  return (client.serverAllowedIps ?? []).filter(
-    (prefix) => enableIpv6 || !prefix.includes(':')
-  );
-}
-
 export function peerAllowedIps(
   client: Pick<ServerPeer, 'ipv4Address' | 'ipv6Address' | 'serverAllowedIps'>,
   enableIpv6: boolean
@@ -100,7 +69,9 @@ export function peerAllowedIps(
   return [
     ...(client.ipv4Address ? [`${client.ipv4Address}/32`] : []),
     ...(enableIpv6 && client.ipv6Address ? [`${client.ipv6Address}/128`] : []),
-    ...serverAllowedIps(client, enableIpv6),
+    ...(client.serverAllowedIps ?? []).filter(
+      (prefix) => enableIpv6 || !prefix.includes(':')
+    ),
   ];
 }
 

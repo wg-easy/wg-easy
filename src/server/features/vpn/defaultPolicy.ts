@@ -2,29 +2,33 @@ import { execFile } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 import { isDeepStrictEqual, promisify } from 'node:util';
 
+import { parseCidr } from 'cidr-tools';
 import { createError } from 'nuxt/server';
 import { z } from 'zod';
 
 import {
-  directRoute,
+  preferredRoute,
   matchesOwnedRoute,
   routeMetric,
   kernelTable,
   routeProtocol,
   routingTable,
   type KernelRoute,
+  type RouteFamily,
 } from './linuxRouting';
-import { tunnelAddresses } from './configuration';
 
 import type { InterfaceType } from '#db/repositories/interface/types';
 import { WG_ENV } from '#server/utils/config';
+import { getGatewayAddress } from '#server/utils/ip';
 
 const run = promisify(execFile);
 const families = ['ipv4', 'ipv6'] as const;
 class DefaultRouteConflict extends Error {}
 
-type Family = (typeof families)[number];
-type Defaults = Partial<Record<Family, string>>;
+export type RestoreDefaultPeer = (
+  family: RouteFamily,
+  prefix: string
+) => Promise<void>;
 const id = z.int().positive().max(0xffffffff);
 const item = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('route'), table: id }),
@@ -48,9 +52,12 @@ type Rule = Record<string, unknown> & {
   priority: number;
   table?: string | number;
 };
-const flag = (family: Family) => (family === 'ipv4' ? '-4' : '-6');
+const flag = (family: RouteFamily) => (family === 'ipv4' ? '-4' : '-6');
 
-async function inspect<T>(family: Family, ...args: string[]): Promise<T[]> {
+async function inspect<T>(
+  family: RouteFamily,
+  ...args: string[]
+): Promise<T[]> {
   const { stdout } = await run('ip', [flag(family), '-N', '-j', '-d', ...args]);
   return JSON.parse(stdout);
 }
@@ -184,6 +191,106 @@ function firewallArgs(
   ];
 }
 
+async function preparePolicyChange(
+  name: string,
+  family: RouteFamily,
+  item: Item,
+  tag: string,
+  add: boolean
+) {
+  if (item.kind === 'route') {
+    const entries = (
+      await inspect<KernelRoute>(
+        family,
+        'route',
+        'show',
+        'table',
+        'all',
+        'exact',
+        'default'
+      )
+    ).filter(
+      (entry) =>
+        kernelTable(entry.table) === item.table && entry.dst === 'default'
+    );
+    const preferred = preferredRoute(entries, name);
+    const installed = entries.some((route) =>
+      matchesOwnedRoute(route, name, family)
+    );
+    if (
+      add &&
+      !preferred.viaTunnel &&
+      preferred.metric <= routeMetric(family)
+    ) {
+      throw new DefaultRouteConflict('An existing default route conflicts');
+    }
+    return {
+      installed,
+      satisfied: preferred.viaTunnel,
+      apply: () =>
+        run('ip', [
+          flag(family),
+          'route',
+          add ? 'add' : 'del',
+          'default',
+          'dev',
+          name,
+          'table',
+          String(item.table),
+          'proto',
+          String(routeProtocol),
+          'metric',
+          String(routeMetric(family)),
+        ]),
+    };
+  }
+  if (item.kind === 'suppress' || item.kind === 'lookup') {
+    const slot = (await inspect<Rule>(family, 'rule', 'show')).filter(
+      (r) =>
+        r.priority === item.priority && Number(r.protocol) === routeProtocol
+    );
+    const installed = slot.some((r) => matchesRule(r, item));
+    if (slot.length > 1 && installed) {
+      throw new Error('Ambiguous routing rule priority ' + item.priority);
+    }
+    const selector =
+      item.kind === 'lookup'
+        ? ['not', 'fwmark', String(item.mark), 'table', String(item.table)]
+        : ['table', 'main', 'suppress_prefixlength', '0'];
+    return {
+      installed,
+      satisfied: installed,
+      apply: () =>
+        run('ip', [
+          flag(family),
+          'rule',
+          add ? 'add' : 'del',
+          'pref',
+          String(item.priority),
+          ...selector,
+          'protocol',
+          String(routeProtocol),
+        ]),
+    };
+  }
+  const command = family === 'ipv4' ? 'iptables' : 'ip6tables';
+  let installed;
+  try {
+    await run(command, firewallArgs(item, name, tag, '-C'));
+    installed = true;
+  } catch (error) {
+    if ((error as { code?: number }).code !== 1) {
+      throw error;
+    }
+    installed = false;
+  }
+  return {
+    installed,
+    satisfied: installed,
+    apply: () => run(command, firewallArgs(item, name, tag, add ? '-I' : '-D')),
+  };
+}
+
 /** A serializable journal of this interface's policy, including partial updates.
  * The lifecycle owns the instance identity and supplies durable persistence. */
 export class DefaultPolicy {
@@ -260,31 +367,18 @@ export class DefaultPolicy {
     await this.persist(this.state);
   }
 
-  private async desired(
+  private async automaticItems(
     network: InterfaceType,
-    family: Family,
-    setting: string | undefined,
-    auto?: { table: number; mark: number }
+    family: RouteFamily,
+    { table, mark }: { table: number; mark: number }
   ): Promise<Item[]> {
-    if (!setting) {
-      return [];
-    }
-    if (setting !== 'auto') {
-      return [{ kind: 'route', table: routingTable(setting) }];
-    }
-    if (!auto) {
-      throw new Error('No automatic routing table available');
-    }
-    const { table, mark } = auto;
     const priority = priorities(
       await inspect<Rule>(family, 'rule', 'show'),
       this.state.owned[family],
       table,
       mark
     );
-    const address = tunnelAddresses(network, family === 'ipv6')[
-      family === 'ipv4' ? 0 : 1
-    ]!.split('/')[0]!;
+    const address = getGatewayAddress(parseCidr(network[`${family}Cidr`]));
     const items: Item[] = [
       { kind: 'route', table },
       { kind: 'protect', address },
@@ -308,7 +402,7 @@ export class DefaultPolicy {
 
   private async reconcile(
     name: string,
-    family: Family,
+    family: RouteFamily,
     item: Item,
     add: boolean
   ) {
@@ -317,89 +411,13 @@ export class DefaultPolicy {
       isDeepStrictEqual(candidate, item)
     );
     const recorded = index >= 0;
-    const ip = [flag(family)];
-    let command = 'ip';
-    let args: string[];
-    let installed: boolean;
-    let satisfied: boolean;
-    if (item.kind === 'route') {
-      const entries = (
-        await inspect<KernelRoute>(
-          family,
-          'route',
-          'show',
-          'table',
-          'all',
-          'exact',
-          'default'
-        )
-      ).filter(
-        (entry) =>
-          kernelTable(entry.table) === item.table && entry.dst === 'default'
-      );
-      const rank = Math.min(...entries.map((r) => r.metric ?? 0));
-      const preferred = entries.filter((r) => (r.metric ?? 0) === rank);
-      installed = entries.some((route) =>
-        matchesOwnedRoute(route, name, family)
-      );
-      satisfied =
-        preferred.length > 0 &&
-        preferred.every((route) => directRoute(route, name));
-      if (add && !satisfied && rank <= routeMetric(family)) {
-        throw new DefaultRouteConflict('An existing default route conflicts');
-      }
-      args = [
-        ...ip,
-        'route',
-        add ? 'add' : 'del',
-        'default',
-        'dev',
-        name,
-        'table',
-        String(item.table),
-        'proto',
-        String(routeProtocol),
-        'metric',
-        String(routeMetric(family)),
-      ];
-    } else if (item.kind === 'suppress' || item.kind === 'lookup') {
-      const slot = (await inspect<Rule>(family, 'rule', 'show')).filter(
-        (r) =>
-          r.priority === item.priority && Number(r.protocol) === routeProtocol
-      );
-      installed = slot.some((r) => matchesRule(r, item));
-      if (slot.length > 1 && installed) {
-        throw new Error('Ambiguous routing rule priority ' + item.priority);
-      }
-      satisfied = installed;
-      const selector =
-        item.kind === 'lookup'
-          ? ['not', 'fwmark', String(item.mark), 'table', String(item.table)]
-          : ['table', 'main', 'suppress_prefixlength', '0'];
-      args = [
-        ...ip,
-        'rule',
-        add ? 'add' : 'del',
-        'pref',
-        String(item.priority),
-        ...selector,
-        'protocol',
-        String(routeProtocol),
-      ];
-    } else {
-      command = family === 'ipv4' ? 'iptables' : 'ip6tables';
-      try {
-        await run(command, firewallArgs(item, name, this.state.tag, '-C'));
-        installed = true;
-      } catch (error) {
-        if ((error as { code?: number }).code !== 1) {
-          throw error;
-        }
-        installed = false;
-      }
-      satisfied = installed;
-      args = firewallArgs(item, name, this.state.tag, add ? '-I' : '-D');
-    }
+    const { installed, satisfied, apply } = await preparePolicyChange(
+      name,
+      family,
+      item,
+      this.state.tag,
+      add
+    );
     if (recorded && !installed) {
       owned.splice(index, 1);
       await this.persist(this.state);
@@ -414,7 +432,7 @@ export class DefaultPolicy {
       await this.persist(this.state);
     }
     try {
-      await run(command, args);
+      await apply();
     } catch (error) {
       if (add) {
         owned.splice(owned.indexOf(item), 1);
@@ -429,7 +447,7 @@ export class DefaultPolicy {
     return true;
   }
 
-  private async family(name: string, family: Family, desired: Item[]) {
+  private async family(name: string, family: RouteFamily, desired: Item[]) {
     const obsolete = this.state.owned[family].filter(
       (item) => !desired.some((wanted) => isDeepStrictEqual(wanted, item))
     );
@@ -466,29 +484,28 @@ export class DefaultPolicy {
 
   async sync(
     network: InterfaceType,
-    defaults: Defaults,
-    restorePeer?: (family: Family, prefix: string) => Promise<void>
+    defaults: Set<RouteFamily>,
+    restorePeer?: RestoreDefaultPeer
   ) {
     const name = network.name;
     let failure;
     for (const family of families) {
-      const setting = defaults[family];
+      const setting = defaults.has(family) ? network.routingTable : undefined;
       if (!setting && !this.state.owned[family].length) {
         continue;
       }
       const previous = this.state.owned[family].find((item) => 'table' in item);
       let table = setting ?? String(previous?.table ?? 254);
       try {
-        const auto =
-          setting === 'auto' ? await this.automatic(name) : undefined;
-        if (auto) {
+        let desired: Item[] = [];
+        if (setting === 'auto') {
+          const auto = await this.automatic(name);
           table = String(auto.table);
+          desired = await this.automaticItems(network, family, auto);
+        } else if (setting) {
+          desired = [{ kind: 'route', table: routingTable(setting) }];
         }
-        await this.family(
-          name,
-          family,
-          await this.desired(network, family, setting, auto)
-        );
+        await this.family(name, family, desired);
       } catch (cause) {
         let error = cause;
         const prefix = family === 'ipv4' ? '0.0.0.0/0' : '::/0';

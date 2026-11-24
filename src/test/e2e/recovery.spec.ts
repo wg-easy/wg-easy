@@ -1,4 +1,5 @@
-import { credentials, expect, test } from './fixtures';
+import { expect, test } from './fixtures';
+import { admin } from './helpers';
 
 test.use({ keepNamespace: true, ipv6: true });
 
@@ -9,12 +10,9 @@ for (const backend of ['wg', 'awg'] as const) {
       app,
       request,
     }) => {
-      const headers = { Origin: app.url };
-      const post = (url: string, data?: object) =>
-        request.post(url, { headers, data, failOnStatusCode: true });
-      await post('/api/auth/password', { ...credentials, remember: false });
+      const { post, json, create, download } = await admin(request, app.url);
       const iface = '/api/admin/interface';
-      const settings = await (await request.get(iface)).json();
+      const settings = await json(iface);
       const hooks = (tag: string) => {
         const rule = `INPUT -i {{device}} -p udp --dport {{port}} -m comment --comment ${tag} -j ACCEPT`;
         return post('/api/admin/hooks', {
@@ -39,12 +37,8 @@ for (const backend of ['wg', 'awg'] as const) {
         'ACCEPT',
       ];
       await app.execServer(['iptables', '-A', ...sentinel]);
-      const peer = await post('/api/client', {
-        name: 'Recovery peer',
-        expiresAt: null,
-      });
-      const url = '/api/client/' + (await peer.json()).clientId;
-      const client = await (await request.get(url)).json();
+      const url = await create('Recovery peer');
+      const client = await json(url);
       await post(url, { ...client, serverAllowedIps: ['0.0.0.0/0', '::/0'] });
       expect(await app.execServer(['stat', '-c', '%u %a', record])).toBe(
         '0 600'
@@ -109,8 +103,8 @@ for (const backend of ['wg', 'awg'] as const) {
         'WG_CLIENTS_wg0'
       );
       // The advertised endpoint has no port forwarder in this fixture.
-      await post('/api/auth/password', { ...credentials, remember: false });
-      const config = await (await request.get(url + '/configuration')).text();
+      await admin(request, app.url);
+      const config = await download(url);
       await app.connectClient(
         config.replace('vpn.example.test:51820', 'vpn.example.test:51830')
       );
@@ -142,13 +136,7 @@ for (const evidence of [
     app,
     request,
   }) => {
-    const post = (url: string, data?: object) =>
-      request.post(url, {
-        headers: { Origin: app.url },
-        data,
-        failOnStatusCode: true,
-      });
-    await post('/api/auth/password', { ...credentials, remember: false });
+    const { post } = await admin(request, app.url);
     await post('/api/admin/hooks', {
       preUp: '',
       postUp: '',
@@ -232,13 +220,7 @@ for (const phase of ['PostUp', 'PreDown'] as const) {
     app,
     request,
   }) => {
-    const post = (url: string, data?: object) =>
-      request.post(url, {
-        headers: { Origin: app.url },
-        data,
-        failOnStatusCode: true,
-      });
-    await post('/api/auth/password', { ...credentials, remember: false });
+    const { post } = await admin(request, app.url);
     const pause =
       'if test -e /tmp/pause; then rm /tmp/pause; echo $$ >/tmp/paused-hook; exec sleep 60; fi';
     await post('/api/admin/hooks', {
@@ -289,15 +271,9 @@ test('withdraws filtering after deleting a link whose PostUp failed', async ({
   app,
   request,
 }) => {
-  const post = (url: string, data?: object) =>
-    request.post(url, {
-      headers: { Origin: app.url },
-      data,
-      failOnStatusCode: true,
-    });
-  await post('/api/auth/password', { ...credentials, remember: false });
+  const { headers, json, post } = await admin(request, app.url);
   const iface = '/api/admin/interface';
-  const settings = await (await request.get(iface)).json();
+  const settings = await json(iface);
   await post(iface, { ...settings, firewallEnabled: true });
   await post('/api/admin/hooks', {
     preUp:
@@ -306,9 +282,7 @@ test('withdraws filtering after deleting a link whose PostUp failed', async ({
     preDown: 'touch /tmp/ran-down',
     postDown: 'touch /tmp/ran-down',
   });
-  const restart = await request.post(iface + '/restart', {
-    headers: { Origin: app.url },
-  });
+  const restart = await request.post(iface + '/restart', { headers });
   expect(restart.status()).toBe(503);
   await app.execServer(['test', '-e', '/tmp/guarded']);
   await app.execServer(['test', '!', '-e', '/sys/class/net/wg0']);

@@ -3,13 +3,14 @@ import { parseCidr } from 'cidr-tools';
 
 import { peerAllowedIps, type ServerPeer } from './configuration';
 import {
-  directRoute,
+  preferredRoute,
   matchesOwnedRoute,
   routeMetric,
   kernelTable,
   routeProtocol,
   routingTable,
   type KernelRoute,
+  type RouteFamily,
 } from './linuxRouting';
 
 import { exec } from '#server/utils/cmd';
@@ -18,31 +19,46 @@ import { parseInterfaceName } from '#server/utils/interfaceName';
 import type { InterfaceType } from '#db/repositories/interface/types';
 
 type SiteRoute = { prefix: string; table: number };
-type RouteClient = Pick<
-  ServerPeer,
-  'enabled' | 'serverAllowedIps' | 'ipv4Address' | 'ipv6Address'
->;
 function routeKey({ prefix, table }: SiteRoute) {
   return `${table}/${prefix}`;
 }
 
 class RouteConflict extends Error {}
 
+export function routesForPeers(
+  setting: string,
+  clients: ServerPeer[],
+  enableIpv6: boolean
+) {
+  const sites = new Map<string, SiteRoute>();
+  const defaults = new Set<RouteFamily>();
+  if (setting === 'off') {
+    return { sites, defaults };
+  }
+  const table = routingTable(setting);
+  for (const client of clients) {
+    if (!client.enabled) {
+      continue;
+    }
+    for (const value of peerAllowedIps(client, enableIpv6)) {
+      const prefix = normalizePrefix(value);
+      if (prefix.endsWith('/0')) {
+        defaults.add(prefix.includes(':') ? 'ipv6' : 'ipv4');
+      } else {
+        const route = { prefix, table };
+        sites.set(routeKey(route), route);
+      }
+    }
+  }
+  return { sites, defaults };
+}
+
 export class SiteRoutes {
   // A matching route on wg0 alone is insufficient proof of ownership.
   private owned = new Map<string, SiteRoute>();
 
-  async sync(
-    network: InterfaceType,
-    clients: RouteClient[],
-    enableIpv6: boolean
-  ) {
+  async sync(network: InterfaceType, desired: Map<string, SiteRoute>) {
     const device = parseInterfaceName(network.name);
-    const desired = this.desiredRoutes(
-      network.routingTable,
-      clients,
-      enableIpv6
-    );
 
     let failure;
     // Process each prefix even if another client has a conflicting route.
@@ -68,31 +84,6 @@ export class SiteRoutes {
       }
     }
     return failure;
-  }
-
-  private desiredRoutes(
-    setting: string,
-    clients: RouteClient[],
-    enableIpv6: boolean
-  ) {
-    const desired = new Map<string, SiteRoute>();
-    if (setting === 'off') {
-      return desired;
-    }
-    const table = routingTable(setting);
-    for (const client of clients) {
-      if (!client.enabled) {
-        continue;
-      }
-      for (const value of peerAllowedIps(client, enableIpv6)) {
-        const prefix = normalizePrefix(value);
-        if (!prefix.endsWith('/0')) {
-          const route = { prefix, table };
-          desired.set(routeKey(route), route);
-        }
-      }
-    }
-    return desired;
   }
 
   private async applyRoute(
@@ -137,18 +128,11 @@ export class SiteRoutes {
     }
     // Linux selects the longest prefix first, then the lowest metric.
     const best = byLength.get(Math.max(...byLength.keys())) ?? [];
-    const bestMetric = Math.min(...best.map((entry) => entry.metric ?? 0));
-    const preferred = best.filter(
-      (entry) => (entry.metric ?? 0) === bestMetric
-    );
-    if (
-      preferred.length &&
-      (exact.length || automatic) &&
-      preferred.every((entry) => directRoute(entry, device))
-    ) {
+    const preferred = preferredRoute(best, device);
+    if ((exact.length || automatic) && preferred.viaTunnel) {
       return;
     }
-    if (exact.length && bestMetric <= metric) {
+    if (exact.length && preferred.metric <= metric) {
       throw new RouteConflict();
     }
     await exec(`${ip} route add ${target} proto ${routeProtocol}`);

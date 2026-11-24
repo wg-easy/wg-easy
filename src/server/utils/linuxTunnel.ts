@@ -3,7 +3,11 @@ import { readFile } from 'node:fs/promises';
 
 import { createError } from 'nuxt/server';
 
-import { DefaultPolicy } from '#server/features/vpn/defaultPolicy';
+import {
+  DefaultPolicy,
+  type RestoreDefaultPeer,
+} from '#server/features/vpn/defaultPolicy';
+import { SiteRoutes, routesForPeers } from '#server/features/vpn/siteRoutes';
 import {
   readTunnelRecord,
   removeTunnelRecord,
@@ -15,6 +19,7 @@ import type { InterfaceType } from '#db/repositories/interface/types';
 import {
   expandHook,
   tunnelAddresses,
+  type ServerPeer,
 } from '#server/features/vpn/configuration';
 import { exec } from '#server/utils/cmd';
 import { WG_ENV } from '#server/utils/config';
@@ -45,7 +50,8 @@ export class LinuxTunnel {
   private running?: TunnelRecord;
   // Only this process can finish removal after it observed link deletion.
   private deleted?: TunnelRecord;
-  defaultPolicy = new DefaultPolicy();
+  private defaultPolicy = new DefaultPolicy();
+  private readonly sites = new SiteRoutes();
 
   private attach(record: TunnelRecord) {
     this.running = record;
@@ -69,7 +75,7 @@ export class LinuxTunnel {
         if (!this.running) {
           this.attach(record);
         }
-        return link.index;
+        return record;
       }
     } catch (cause) {
       // Missing, unreadable and malformed records all leave ownership unproven.
@@ -147,12 +153,12 @@ export class LinuxTunnel {
     if (process.platform !== 'linux') {
       return;
     }
-    if (!(await this.checkOwnership(network.name)) || !this.running) {
+    const record = await this.checkOwnership(network.name);
+    if (!record) {
       throw new Error(
         `Tunnel interface ${network.name} disappeared during startup`
       );
     }
-    const record = this.running;
     const applied = {
       ...record,
       preDown: expandHook(hooks.preDown, network, WG_ENV.PORT),
@@ -160,6 +166,26 @@ export class LinuxTunnel {
     };
     await saveTunnelRecord(applied);
     this.running = applied;
+  }
+
+  async syncRoutes(
+    network: InterfaceType,
+    clients: ServerPeer[],
+    enableIpv6: boolean,
+    restorePeer?: RestoreDefaultPeer
+  ) {
+    const { sites, defaults } = routesForPeers(
+      network.routingTable,
+      clients,
+      enableIpv6
+    );
+    const siteError = await this.sites.sync(network, sites);
+    const policyError = await this.defaultPolicy.sync(
+      network,
+      defaults,
+      restorePeer
+    );
+    return { siteError, policyError };
   }
 
   async configureLink(network: InterfaceType, enableIpv6: boolean) {
@@ -172,9 +198,8 @@ export class LinuxTunnel {
   }
 
   async stop(name: string, skipHooks = false) {
-    const index = await this.checkOwnership(name);
-    const running = this.running;
-    if (!running || index === undefined) {
+    const running = await this.checkOwnership(name);
+    if (!running) {
       this.running = undefined;
       return this.finishDeletion(skipHooks);
     }

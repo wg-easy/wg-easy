@@ -1,4 +1,5 @@
-import { credentials, expect, test } from './fixtures';
+import { expect, test } from './fixtures';
+import { admin } from './helpers';
 
 for (const backend of ['wg', 'awg'] as const) {
   test.describe(backend, () => {
@@ -7,10 +8,7 @@ for (const backend of ['wg', 'awg'] as const) {
       app,
       request,
     }) => {
-      const headers = { Origin: app.url };
-      const post = (path: string, data?: object) =>
-        request.post(path, { headers, data, failOnStatusCode: true });
-      await post('/api/auth/password', { ...credentials, remember: false });
+      const { post, json, create, download } = await admin(request, app.url);
       await post('/api/admin/hooks', {
         preUp: 'echo preUp >> /tmp/mtu-hooks',
         postUp: 'echo postUp >> /tmp/mtu-hooks',
@@ -24,34 +22,20 @@ for (const backend of ['wg', 'awg'] as const) {
       // Docker networks can use jumbo frames. Pin the underlay for automatic MTU.
       await app.execServer(['ip', 'link', 'set', 'dev', 'eth0', 'mtu', '1480']);
       const url = '/api/admin/interface';
-      const settings = await (await request.get(url)).json();
+      const settings = await json(url);
       const saveMtu = (mtu: number | null) => post(url, { ...settings, mtu });
       const link = (field: string) =>
         app.execServer(['cat', '/sys/class/net/wg0/' + field]);
       await saveMtu(null);
       expect(await link('mtu')).toBe('1400');
 
-      const peer = await post('/api/client', {
-        name: 'MTU witness',
-        expiresAt: null,
-      });
-      const { clientId } = await peer.json();
-      const download = await request.get(
-        `/api/client/${clientId}/configuration`,
-        {
-          failOnStatusCode: true,
-        }
-      );
-      await app.connectClient(await download.text());
+      const witness = await create('MTU witness');
+      await app.connectClient(await download(witness));
       await expect.poll(() => app.pingFromClient('10.8.0.1')).toBe(true);
 
-      const other = await post('/api/client', {
-        name: 'Other endpoint',
-        expiresAt: null,
-      });
-      const otherUrl = '/api/client/' + (await other.json()).clientId;
+      const otherUrl = await create('Other endpoint');
       const otherPeer = {
-        ...(await (await request.get(otherUrl)).json()),
+        ...(await json(otherUrl)),
         serverEndpoint: '192.0.2.1:51820',
       };
       await post(otherUrl, otherPeer);

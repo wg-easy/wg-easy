@@ -1,17 +1,13 @@
-import { credentials, expect, test } from './fixtures';
-import { goto, reload } from './helpers';
+import { expect, test } from './fixtures';
+import { admin, goto, reload } from './helpers';
 
 test('stages the listener and uplink until restart and replaces their hook-installed rules together', async ({
   app,
   request,
 }) => {
-  const headers = { Origin: app.url };
-  const post = (url: string, data?: object) =>
-    request.post(url, { headers, data, failOnStatusCode: true });
-  await post('/api/auth/password', { ...credentials, remember: false });
+  const { post, json, create, download } = await admin(request, app.url);
   const iface = '/api/admin/interface';
-  const getSettings = async () => (await request.get(iface)).json();
-  const settings = await getSettings();
+  const settings = await json(iface);
   const installHooks = (tag: string) => {
     const rule = `INPUT -i {{device}} -p udp --dport {{port}} -m comment --comment ${tag} -j ACCEPT`;
     return post('/api/admin/hooks', {
@@ -29,30 +25,30 @@ test('stages the listener and uplink until restart and replaces their hook-insta
   const newRule = /-i lo .*--dport 51830 .*cutover-new/;
   expect(await rules()).toMatch(oldRule);
 
-  const peer = await post('/api/client', { name: 'Witness', expiresAt: null });
-  const url = `/api/client/${(await peer.json()).clientId}/configuration`;
-  const download = async () => (await request.get(url)).text();
-  await app.connectClient(await download());
+  const witness = await create('Witness');
+  await app.connectClient(await download(witness));
   await expect.poll(() => app.pingFromClient('10.8.0.1')).toBe(true);
 
   await post(iface, { ...settings, port: 51830 });
   expect(await port()).toBe('51820');
-  expect(await getSettings()).toMatchObject({
+  expect(await json(iface)).toMatchObject({
     port: 51830,
     restartRequired: true,
   });
   await post(iface, settings);
-  expect((await getSettings()).restartRequired).toBe(false);
+  expect((await json(iface)).restartRequired).toBe(false);
   await post(iface, { ...settings, device: 'lo' });
-  expect((await getSettings()).restartRequired).toBe(true);
+  expect((await json(iface)).restartRequired).toBe(true);
   await post(iface, { ...settings, device: 'lo', port: 51830 });
   await installHooks('cutover-new');
-  await post('/api/client', { name: 'Intervening edit', expiresAt: null });
+  await create('Intervening edit');
   expect(await port()).toBe('51820');
   expect(await rules()).toMatch(oldRule);
   expect(await rules()).not.toMatch(newRule);
   expect(await app.pingFromClient('10.8.0.1')).toBe(true);
-  expect(await download()).toContain('Endpoint = vpn.example.test:51820');
+  expect(await download(witness)).toContain(
+    'Endpoint = vpn.example.test:51820'
+  );
   expect(await app.execServer(['cat', '/etc/wireguard/wg0.conf'])).toContain(
     'ListenPort = 51830'
   );
@@ -61,8 +57,8 @@ test('stages the listener and uplink until restart and replaces their hook-insta
   expect(await port()).toBe('51830');
   expect(await rules()).not.toContain('cutover-old');
   expect(await rules()).toMatch(newRule);
-  expect((await getSettings()).restartRequired).toBe(false);
-  const config = await download();
+  expect((await json(iface)).restartRequired).toBe(false);
+  const config = await download(witness);
   expect(config).toContain('Endpoint = vpn.example.test:51820');
   // Connect directly to the new listener. This fixture has no public port forwarder.
   await app.execClient(['wg-quick', 'down', 'wg0']);
@@ -76,11 +72,7 @@ test('reloads saved settings and shows Restart required until they match the run
   app,
   page,
 }) => {
-  await page.request.post('/api/auth/password', {
-    headers: { Origin: app.url },
-    data: { ...credentials, remember: false },
-    failOnStatusCode: true,
-  });
+  await admin(page.request, app.url);
   await goto(page, '/admin/interface');
   const port = page.getByLabel('Port', { exact: true });
   const device = page.getByLabel('Device', { exact: true });

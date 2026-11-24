@@ -1,11 +1,12 @@
 import { containsCidr, parseCidr } from 'cidr-tools';
 
-import { peerAllowedIps, type ServerPeer } from './configuration';
+import {
+  peerAllowedIps,
+  type PeerAddresses,
+  type ServerPeer,
+} from './configuration';
 
-import type {
-  ClientNextIpType,
-  ClientType,
-} from '#db/repositories/client/types';
+import type { ClientType } from '#db/repositories/client/types';
 import { zeroWireGuardKey } from '#shared/utils/wireguard';
 import type { InterfaceCidrUpdateType } from '#shared/contracts/interface';
 import {
@@ -14,11 +15,7 @@ import {
   normalizePrefix,
 } from '#server/utils/ip';
 
-export type PeerAddresses = {
-  ipv4Address: string | null;
-  ipv6Address: string | null;
-};
-type SavedPeer = ClientNextIpType & Pick<ClientType, 'id' | 'serverAllowedIps'>;
+type SavedPeer = Omit<ClientType, 'createdAt' | 'updatedAt'>;
 
 function addressFor(
   field: keyof PeerAddresses,
@@ -53,13 +50,13 @@ function addressFor(
   };
 }
 
-export function peersForRunningNetwork<T extends SavedPeer>(
-  peers: T[],
+export function peersForRunningNetwork(
+  peers: SavedPeer[],
   saved: InterfaceCidrUpdateType,
   active: InterfaceCidrUpdateType | undefined,
   previous: ReadonlyMap<number, PeerAddresses>,
   enableIpv6: boolean
-): (Omit<T, keyof PeerAddresses> & PeerAddresses)[] {
+): ServerPeer[] {
   if (
     !active ||
     (active.ipv4Cidr === saved.ipv4Cidr && active.ipv6Cidr === saved.ipv6Cidr)

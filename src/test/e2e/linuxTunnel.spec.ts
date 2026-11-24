@@ -1,4 +1,5 @@
-import { credentials, expect, test } from './fixtures';
+import { expect, test } from './fixtures';
+import { admin } from './helpers';
 
 for (const backend of ['wg', 'awg'] as const) {
   test.describe(backend, () => {
@@ -36,20 +37,11 @@ for (const backend of ['wg', 'awg'] as const) {
           }
           await app.execServer(['ip', 'link', 'del', 'backend-probe']);
         }
-        const headers = { Origin: app.url };
-        const post = (url: string, data?: object) =>
-          request.post(url, { headers, data, failOnStatusCode: true });
-        await post('/api/auth/password', { ...credentials, remember: false });
-        const settings = await (
-          await request.get('/api/admin/interface')
-        ).json();
+        const { post, json, create, download } = await admin(request, app.url);
+        const settings = await json('/api/admin/interface');
         await post('/api/admin/interface', { ...settings, s1: 122, jC: 8 });
-        const peer = await post('/api/client', {
-          name: 'Site router',
-          expiresAt: null,
-        });
-        const url = '/api/client/' + (await peer.json()).clientId;
-        const client = await (await request.get(url)).json();
+        const url = await create('Site router');
+        const client = await json(url);
         const site = '192.0.2.0/24';
         await post(url, { ...client, jC: 3, serverAllowedIps: [site] });
         if (userspace) {
@@ -85,7 +77,7 @@ chmod +x /usr/local/bin/ip`,
             await app.execServer(['ip', '-details', 'link', 'show', 'wg0'])
           ).toContain(kind);
         }
-        const config = await (await request.get(url + '/configuration')).text();
+        const config = await download(url);
         // S1 is shared. Each end has its own junk packet count.
         const parameters = (contents: string) =>
           contents
@@ -143,16 +135,12 @@ test.describe('numbered routing table', () => {
     app,
     request,
   }) => {
-    const headers = { Origin: app.url };
-    const post = (url: string, data?: object) =>
-      request.post(url, { headers, data, failOnStatusCode: true });
-    await post('/api/auth/password', { ...credentials, remember: false });
+    const { post, json, create } = await admin(request, app.url);
     const iface = '/api/admin/interface';
-    const settings = await (await request.get(iface)).json();
+    const settings = await json(iface);
     await post(iface, { ...settings, routingTable: '100' });
-    const peer = await post('/api/client', { name: 'Branch', expiresAt: null });
-    const clientUrl = '/api/client/' + (await peer.json()).clientId;
-    const client = await (await request.get(clientUrl)).json();
+    const clientUrl = await create('Branch');
+    const client = await json(clientUrl);
     const routes = () =>
       Promise.all(
         ['-4', '-6'].map((family) =>
@@ -183,12 +171,7 @@ test('reports a replacement interface and leaves its configuration in place', as
   app,
   request,
 }) => {
-  const headers = { Origin: app.url };
-  await request.post('/api/auth/password', {
-    headers,
-    data: { ...credentials, remember: false },
-    failOnStatusCode: true,
-  });
+  const { headers } = await admin(request, app.url);
   const index = await app.execServer(['cat', '/sys/class/net/wg0/ifindex']);
   await app.execServer(['ip', 'link', 'del', 'dev', 'wg0']);
   await app.execServer([
