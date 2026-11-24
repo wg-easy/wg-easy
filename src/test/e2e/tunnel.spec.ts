@@ -312,6 +312,12 @@ for (const backend of ['wg', 'awg'] as const) {
       expect(
         (await request.post(hooksUrl, { headers, data: fixed })).status()
       ).toBe(503);
+      const savedHook = await app.execServer([
+        'grep',
+        '^PostUp =',
+        '/etc/wireguard/wg0.conf',
+      ]);
+      expect(savedHook).toContain('echo ready');
       expect(await readAttempts()).toBe('run');
       expect((await request.post(restartUrl, { headers })).ok()).toBe(true);
       expect(await readAttempts()).toBe('run\noffice#lan hq #1\nready');

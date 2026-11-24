@@ -123,9 +123,26 @@ async function apply(mode?: ApplyMode) {
       routedReplyFamilies(gateways, !WG_ENV.DISABLE_IPV6)
     );
   }
+  const options = {
+    enableIpv6,
+    amnezia: WG_ENV.WG_EXECUTABLE === 'awg',
+    uiPort: WG_ENV.PORT,
+  };
+  async function writeSavedConfig() {
+    const contents = generateServerConfig(
+      savedNetwork,
+      hooks,
+      savedClients,
+      options
+    );
+    await fs.writeFile(`/etc/wireguard/${savedNetwork.name}.conf`, contents, {
+      mode: 0o600,
+    });
+  }
   if (state.failedStart) {
     await cleanFailedStart(state.tunnel, state.failedStart);
     if (!manualRestart) {
+      await writeSavedConfig();
       delete state.retry;
       throw state.failedStart.error;
     }
@@ -164,20 +181,7 @@ async function apply(mode?: ApplyMode) {
   } else {
     await state.tunnel.stop(network.name);
   }
-  const options = {
-    enableIpv6,
-    amnezia: WG_ENV.WG_EXECUTABLE === 'awg',
-    uiPort: WG_ENV.PORT,
-  };
-  const contents = generateServerConfig(
-    savedNetwork,
-    hooks,
-    savedClients,
-    options
-  );
-  await fs.writeFile(`/etc/wireguard/${network.name}.conf`, contents, {
-    mode: 0o600,
-  });
+  await writeSavedConfig();
   if (mode === 'sync') {
     await wg.sync(network, clients, enableIpv6);
   } else {
