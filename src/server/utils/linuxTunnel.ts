@@ -15,13 +15,11 @@ import { parseInterfaceName } from '#server/utils/interfaceName';
 import { setTunnelMtu } from '#server/utils/tunnelMtu';
 import { wg } from '#server/utils/wgHelper';
 
-type QuickStartup = { contents: string; nativePostUp?: boolean };
 type RunningLink = {
   index: number;
   table: string;
   preDown: string;
   postDown: string;
-  quick: boolean;
 };
 
 async function interfaceIndex(name: string) {
@@ -53,24 +51,23 @@ export class LinuxTunnel {
     return index;
   }
 
-  async create(network: InterfaceType, hooks: HooksType, quick?: QuickStartup) {
+  async create(network: InterfaceType, hooks: HooksType) {
     const name = parseInterfaceName(network.name);
-    if (quick) {
-      await wg.up(name, quick);
-    } else {
-      try {
-        await exec(`ip link add dev ${name} type wireguard`);
-      } catch (error) {
-        // A missing link kind is recoverable. Permission and name collisions
-        // must be reported, since attaching a userspace process is unsafe.
-        if (
-          !(error instanceof Error) ||
-          !/unknown device type|operation not supported/i.test(error.message)
-        ) {
-          throw error;
-        }
-        await exec(`wireguard-go ${name}`);
+    const kind = WG_ENV.WG_EXECUTABLE === 'awg' ? 'amneziawg' : 'wireguard';
+    try {
+      await exec(`ip link add dev ${name} type ${kind}`);
+    } catch (error) {
+      // A missing link kind is recoverable. Permission and name collisions
+      // must be reported, since attaching a userspace process is unsafe.
+      if (
+        !(error instanceof Error) ||
+        !/unknown device type|operation not supported/i.test(error.message)
+      ) {
+        throw error;
       }
+      // Keep the userspace link alive while the container init forwards TERM
+      // to the app. stop() runs PreDown, then deletes the link and its daemon.
+      await exec(`setsid ${kind}-go ${name}`);
     }
     const index = await interfaceIndex(name);
     if (index === undefined && process.platform === 'linux') {
@@ -80,12 +77,11 @@ export class LinuxTunnel {
     this.defaultPolicy = new DefaultPolicy();
     this.running = {
       index: index ?? 0,
-      quick: Boolean(quick),
       table: network.routingTable,
       preDown: expand(hooks.preDown),
       postDown: expand(hooks.postDown),
     };
-    if (!quick && hooks.preUp) {
+    if (hooks.preUp) {
       await wg.runHook(name, network.routingTable, expand(hooks.preUp));
     }
   }
@@ -106,21 +102,13 @@ export class LinuxTunnel {
       this.running = undefined;
       return;
     }
-    if (running.quick) {
-      await this.defaultPolicy.stop(name);
-      await wg.down(
-        name,
-        skipHooks ? { routingTable: running.table } : undefined
-      );
-    } else {
-      if (!skipHooks && running.preDown) {
-        await wg.runHook(name, running.table, running.preDown);
-      }
-      await this.defaultPolicy.stop(name);
-      await exec(`ip link delete dev ${name}`);
+    if (!skipHooks && running.preDown) {
+      await wg.runHook(name, running.table, running.preDown);
     }
+    await this.defaultPolicy.stop(name);
+    await exec(`ip link delete dev ${name}`);
     this.running = undefined;
-    if (!running.quick && !skipHooks && running.postDown) {
+    if (!skipHooks && running.postDown) {
       await wg.runHook(name, running.table, running.postDown);
     }
   }

@@ -31,92 +31,116 @@ async function admin(request: APIRequestContext, origin: string) {
   };
 }
 
-test('changes default routes live while another peer carries traffic', async ({
-  request,
-  app,
-}) => {
-  const api = await admin(request, app.url);
-  const gateway = await api.peer('Default gateway');
-  const witness = await api.peer('Connected peer');
-  await api.post('/api/admin/hooks', {
-    preUp: 'echo pre >> /tmp/hooks',
-    postUp: 'echo up >> /tmp/hooks',
-    preDown: 'echo down >> /tmp/hooks',
-    postDown: 'echo post >> /tmp/hooks',
-  });
-  await api.post('/api/admin/interface/restart');
-  await app.connectClient(await witness.config());
-  await expect.poll(() => app.pingFromClient('10.8.0.1')).toBe(true);
-  const index = () => app.execServer(['cat', '/sys/class/net/wg0/ifindex']);
-  const mark = () => app.execServer(['wg', 'show', 'wg0', 'fwmark']);
-  const rules = () =>
-    Promise.all(
-      ['-4', '-6'].map((f) => app.execServer(['ip', f, 'rule', 'show']))
-    );
-  const lookup = (target: string, ...args: string[]) =>
-    app.execServer(['ip', 'route', 'get', target, ...args]);
-  const tableRoutes = (family: string, table: string) =>
-    app
-      .execServer(['ip', family, 'route', 'show', 'table', 'all', 'dev', 'wg0'])
-      .then((s) =>
-        s
-          .split('\n')
-          .filter((r) => r.includes(' table ' + table))
-          .join('\n')
+for (const backend of ['wg', 'awg'] as const) {
+  test.describe(backend, () => {
+    test.use({ backend });
+    test('changes default routes live while another peer carries traffic', async ({
+      request,
+      app,
+    }) => {
+      const api = await admin(request, app.url);
+      const gateway = await api.peer('Default gateway');
+      const witness = await api.peer('Connected peer');
+      await api.post('/api/admin/hooks', {
+        preUp: 'echo pre >> /tmp/hooks',
+        postUp: 'echo up >> /tmp/hooks',
+        preDown: 'echo down >> /tmp/hooks',
+        postDown: 'echo post >> /tmp/hooks',
+      });
+      await api.post('/api/admin/interface/restart');
+      await app.connectClient(await witness.config());
+      await expect.poll(() => app.pingFromClient('10.8.0.1')).toBe(true);
+      const index = () => app.execServer(['cat', '/sys/class/net/wg0/ifindex']);
+      const mark = () => app.execServer([backend, 'show', 'wg0', 'fwmark']);
+      const rules = () =>
+        Promise.all(
+          ['-4', '-6'].map((f) => app.execServer(['ip', f, 'rule', 'show']))
+        );
+      const lookup = (target: string, ...args: string[]) =>
+        app.execServer(['ip', 'route', 'get', target, ...args]);
+      const tableRoutes = (family: string, table: string) =>
+        app
+          .execServer([
+            'ip',
+            family,
+            'route',
+            'show',
+            'table',
+            'all',
+            'dev',
+            'wg0',
+          ])
+          .then((s) =>
+            s
+              .split('\n')
+              .filter((r) => r.includes(' table ' + table))
+              .join('\n')
+          );
+      const [originalIndex, originalRules] = await Promise.all([
+        index(),
+        rules(),
+      ]);
+      const traffic = app.execClient([
+        'ping',
+        '-c',
+        '80',
+        '-i',
+        '0.1',
+        '-I',
+        'wg0',
+        '10.8.0.1',
+      ]);
+      await gateway.routes(['0.0.0.0/0', '::/0']);
+      expect(await index()).toBe(originalIndex);
+      expect(await lookup('203.0.113.1')).toContain('dev wg0');
+      expect(await lookup('2001:db8::1')).toContain('dev wg0');
+      const socketMark = await mark();
+      expect(socketMark).not.toBe('off');
+      expect(await lookup('203.0.113.1', 'mark', socketMark)).toContain(
+        'dev eth0'
       );
-  const [originalIndex, originalRules] = await Promise.all([index(), rules()]);
-  const traffic = app.execClient([
-    'ping',
-    '-c',
-    '80',
-    '-i',
-    '0.1',
-    '-I',
-    'wg0',
-    '10.8.0.1',
-  ]);
-  await gateway.routes(['0.0.0.0/0', '::/0']);
-  expect(await index()).toBe(originalIndex);
-  expect(await lookup('203.0.113.1')).toContain('dev wg0');
-  expect(await lookup('2001:db8::1')).toContain('dev wg0');
-  const socketMark = await mark();
-  expect(socketMark).not.toBe('off');
-  expect(await lookup('203.0.113.1', 'mark', socketMark)).toContain('dev eth0');
-  await gateway.routes(['0.0.0.0/0']);
-  expect((await rules())[1]).toBe(originalRules[1]);
-  expect(await mark()).toBe(socketMark);
-  expect(await lookup('203.0.113.1')).toContain('dev wg0');
-  await gateway.routes(['0.0.0.0/0', '::/0']);
-  await api.table('100');
-  for (const family of ['-4', '-6']) {
-    expect(await tableRoutes(family, '100')).toContain('default table 100');
-  }
-  expect(await rules()).toEqual(originalRules);
-  expect(await mark()).toBe('off');
-  expect(await lookup('203.0.113.1')).toContain('dev eth0');
-  const selector = ['pref', '100', 'to', '203.0.113.1/32', 'table', '100'];
-  await app.execServer(['ip', '-4', 'rule', 'add', ...selector]);
-  expect(await lookup('203.0.113.1')).toContain('dev wg0');
-  await app.execServer(['ip', '-4', 'rule', 'del', ...selector]);
-  await api.table('off');
-  for (const family of ['-4', '-6']) {
-    expect(await tableRoutes(family, '100')).toBe('');
-  }
-  const allowed = await app.execServer(['wg', 'show', 'wg0', 'allowed-ips']);
-  expect(allowed).toContain('0.0.0.0/0');
-  expect(allowed).toContain('::/0');
-  expect(await index()).toBe(originalIndex);
-  expect(await app.execServer(['cat', '/tmp/hooks'])).toBe('pre\nup');
-  expect(await traffic).toContain(', 0% packet loss');
+      await gateway.routes(['0.0.0.0/0']);
+      expect((await rules())[1]).toBe(originalRules[1]);
+      expect(await mark()).toBe(socketMark);
+      expect(await lookup('203.0.113.1')).toContain('dev wg0');
+      await gateway.routes(['0.0.0.0/0', '::/0']);
+      await api.table('100');
+      for (const family of ['-4', '-6']) {
+        expect(await tableRoutes(family, '100')).toContain('default table 100');
+      }
+      expect(await rules()).toEqual(originalRules);
+      expect(await mark()).toBe('off');
+      expect(await lookup('203.0.113.1')).toContain('dev eth0');
+      const selector = ['pref', '100', 'to', '203.0.113.1/32', 'table', '100'];
+      await app.execServer(['ip', '-4', 'rule', 'add', ...selector]);
+      expect(await lookup('203.0.113.1')).toContain('dev wg0');
+      await app.execServer(['ip', '-4', 'rule', 'del', ...selector]);
+      await api.table('off');
+      for (const family of ['-4', '-6']) {
+        expect(await tableRoutes(family, '100')).toBe('');
+      }
+      const allowed = await app.execServer([
+        backend,
+        'show',
+        'wg0',
+        'allowed-ips',
+      ]);
+      expect(allowed).toContain('0.0.0.0/0');
+      expect(allowed).toContain('::/0');
+      expect(await index()).toBe(originalIndex);
+      expect(await app.execServer(['cat', '/tmp/hooks'])).toBe('pre\nup');
+      expect(await traffic).toContain(', 0% packet loss');
 
-  await api.table('auto');
-  await api.post('/api/admin/interface/restart');
-  expect(await lookup('203.0.113.1')).toContain('dev wg0');
-  expect(await lookup('2001:db8::1')).toContain('dev wg0');
-  await gateway.routes([]);
-  expect(await mark()).toBe('off');
-  expect(await rules()).toEqual(originalRules);
-});
+      await api.table('auto');
+      await api.post('/api/admin/interface/restart');
+      expect(await lookup('203.0.113.1')).toContain('dev wg0');
+      expect(await lookup('2001:db8::1')).toContain('dev wg0');
+      await gateway.routes([]);
+      expect(await mark()).toBe('off');
+      expect(await rules()).toEqual(originalRules);
+    });
+  });
+}
 
 test('rolls back a partially withdrawn IPv6 policy, keeps the revocation, and retries live', async ({
   request,

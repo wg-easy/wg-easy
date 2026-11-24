@@ -38,7 +38,7 @@ RUN npm install --no-save --omit=dev libsql
 FROM docker.io/library/node:lithium-alpine@sha256:6bd9ab43c0ec0190ca7b2d193906cb8b7edf6e7f4afa43ddeccd6452710bffb5
 WORKDIR /app
 
-HEALTHCHECK --interval=1m --timeout=5s --retries=3 CMD /usr/bin/timeout 5s /bin/sh -c "/usr/bin/wg show | /bin/grep -q interface || exit 1"
+HEALTHCHECK --interval=1m --timeout=5s --retries=3 CMD /usr/bin/wg show "${WG_INTERFACE:-wg0}" public-key >/dev/null 2>&1 || /usr/bin/awg show "${WG_INTERFACE:-wg0}" public-key >/dev/null
 
 # Copy build
 COPY --from=build /app/.output /app
