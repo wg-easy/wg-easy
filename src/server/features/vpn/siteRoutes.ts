@@ -10,7 +10,6 @@ import {
   routeProtocol,
   routingTable,
   type KernelRoute,
-  type RouteFamily,
 } from './linuxRouting';
 
 import { exec } from '#server/utils/cmd';
@@ -94,15 +93,14 @@ async function readTable(ipv6: boolean, table: number, match?: string) {
   return routes;
 }
 
-export function routesForPeers(
+function siteRoutesForPeers(
   setting: string,
   clients: ServerPeer[],
   enableIpv6: boolean
 ) {
   const sites = new Map<string, SiteRoute>();
-  const defaults = new Set<RouteFamily>();
   if (setting === 'off') {
-    return { sites, defaults };
+    return sites;
   }
   const table = routingTable(setting);
   for (const client of clients) {
@@ -111,22 +109,29 @@ export function routesForPeers(
     }
     for (const value of peerAllowedIps(client, enableIpv6)) {
       const prefix = normalizePrefix(value);
-      if (prefix.endsWith('/0')) {
-        defaults.add(prefix.includes(':') ? 'ipv6' : 'ipv4');
-      } else {
+      if (!prefix.endsWith('/0')) {
         const route = { prefix, table };
         sites.set(routeKey(route), route);
       }
     }
   }
-  return { sites, defaults };
+  return sites;
 }
 
 export class SiteRoutes {
   // A matching route on wg0 alone is insufficient proof of ownership.
   private owned = new Map<string, SiteRoute>();
 
-  async sync(network: InterfaceType, desired: Map<string, SiteRoute>) {
+  async sync(
+    network: InterfaceType,
+    clients: ServerPeer[],
+    enableIpv6: boolean
+  ) {
+    const desired = siteRoutesForPeers(
+      network.routingTable,
+      clients,
+      enableIpv6
+    );
     const device = parseInterfaceName(network.name);
     const tables = new Map<string, Promise<RouteTable | undefined>>();
 

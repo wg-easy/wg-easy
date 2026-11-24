@@ -8,7 +8,7 @@ test.use({ keepNamespace: true, ipv6: true });
 for (const backend of ['wg', 'awg'] as const) {
   test.describe(backend, () => {
     test.use({ backend });
-    test('recovers the surviving tunnel, its applied hooks and live policy', async ({
+    test('recovers the surviving tunnel, its applied hooks and recorded default rules', async ({
       app,
       request,
     }) => {
@@ -25,9 +25,7 @@ for (const backend of ['wg', 'awg'] as const) {
         });
       };
       await hooks('old-hook');
-      await post(iface + '/restart');
       const read = (path: string) => app.execServer(['cat', path]);
-      const index = await read('/sys/class/net/wg0/ifindex');
       const rules = () => app.execServer(['iptables', '-w', '-S', 'INPUT']);
       const sentinel = [
         'INPUT',
@@ -42,6 +40,7 @@ for (const backend of ['wg', 'awg'] as const) {
       const url = await create('Recovery peer');
       const client = await json(url);
       await post(url, { ...client, serverAllowedIps: ['0.0.0.0/0', '::/0'] });
+      const index = await read('/sys/class/net/wg0/ifindex');
       expect(await app.execServer(['stat', '-c', '%u %a', record])).toBe(
         '0 600'
       );
@@ -84,6 +83,19 @@ while [ ! -f /tmp/locked ]; do sleep 0.05; done`,
         firewallEnabled: true,
       });
       await app.stopProcess('KILL');
+      // Older versions also journaled routes that disappear with the link.
+      await app.execServer([
+        'node',
+        '-e',
+        `
+        const fs = require('node:fs');
+        const file = process.argv[1];
+        const record = JSON.parse(fs.readFileSync(file, 'utf8'));
+        record.policy.owned.ipv4.push({ kind: 'route', table: 51820 });
+        fs.writeFileSync(file, JSON.stringify(record));
+      `,
+        record,
+      ]);
       expect(await read('/sys/class/net/wg0/ifindex')).toBe(index);
       expect(await rules()).toContain('old-hook');
       const namespace = await app.execServer(['readlink', '/proc/self/ns/net']);

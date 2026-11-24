@@ -13,7 +13,7 @@ function serverAllowedIps(page: Page) {
 
 async function addSiteSubnet(page: Page, prefix = siteSubnet) {
   const routes = serverAllowedIps(page);
-  await routes.getByRole('button', { name: 'Add' }).click();
+  await routes.getByRole('button', { name: 'Add', exact: true }).click();
   await routes.getByRole('textbox').last().fill(prefix);
 }
 
@@ -69,95 +69,6 @@ test('saving a site subnet routes live traffic without interrupting another peer
   expect(await lookup()).not.toContain('dev wg0');
   expect(await ifindex()).toBe(before);
   expect(await traffic).toContain(', 0% packet loss');
-});
-
-test.describe('dual-stack default routes', () => {
-  test.use({ ipv6: true });
-  test('saving default prefixes installs and withdraws live policy routing', async ({
-    page,
-    app,
-  }) => {
-    await login(page);
-    const card = await createClient(page, 'Default gateway');
-    const edit = () =>
-      card.getByRole('link', { name: 'Default gateway', exact: true }).click();
-    const save = async () => {
-      await page.getByRole('button', { name: 'Save', exact: true }).click();
-      await expect(page).toHaveURL(app.url + '/');
-    };
-    const rules = () =>
-      Promise.all(
-        ['-4', '-6'].map((family) =>
-          app.execServer(['ip', family, 'rule', 'show'])
-        )
-      );
-    const lookup = () =>
-      app.execServer(['ip', '-4', 'route', 'get', '203.0.113.1']);
-    const before = await rules();
-    await edit();
-    await addSiteSubnet(page, '0.0.0.0/0');
-    await addSiteSubnet(page, '::/0');
-    await save();
-    expect(await lookup()).toContain('dev wg0');
-    expect(
-      await app.execServer(['ip', '-6', 'route', 'get', '2001:db8::1'])
-    ).toContain('dev wg0');
-
-    const url = app.url + '/api/admin/interface';
-    const settings = await (await page.request.get(url)).json();
-    const changeTable = async (routingTable: string) => {
-      const response = await page.request.post(url, {
-        headers: { Origin: app.url },
-        data: { ...settings, routingTable },
-      });
-      expect(response.ok()).toBe(true);
-    };
-    await changeTable('100');
-    expect(
-      await app.execServer([
-        'ip',
-        '-4',
-        'route',
-        'show',
-        'table',
-        '100',
-        'exact',
-        '0.0.0.0/0',
-      ])
-    ).toContain('default dev wg0');
-    expect(
-      await app.execServer([
-        'ip',
-        '-6',
-        'route',
-        'show',
-        'table',
-        '100',
-        'exact',
-        '::/0',
-      ])
-    ).toContain('default dev wg0');
-    expect(await rules()).toEqual(before);
-    expect(await lookup()).toContain('dev eth0');
-    await changeTable('auto');
-    expect(await lookup()).toContain('dev wg0');
-
-    await edit();
-    // Withdraw IPv6 on its own while IPv4 still needs the policy table.
-    const remove = serverAllowedIps(page).getByRole('button', {
-      name: 'Delete',
-    });
-    await remove.last().click();
-    await save();
-    expect((await rules())[1]).toEqual(before[1]);
-    expect(await lookup()).toContain('dev wg0');
-    await edit();
-    await remove.click();
-    await save();
-    expect(await rules()).toEqual(before);
-    expect(await lookup()).toContain('dev eth0');
-    expect(await app.execServer(['wg', 'show', 'wg0', 'fwmark'])).toBe('off');
-  });
 });
 
 test('reports a route conflict and withdraws the site route after a restart', async ({

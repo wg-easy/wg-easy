@@ -48,9 +48,11 @@ When AmneziaWG is active, **Config** also provides default obfuscation parameter
 - **Routing Table** accepts `auto`, `off`, or a numeric ID from 0 to 4294967295. Linux interprets IDs with a leading zero as octal.
 - **AmneziaWG Obfuscation Parameters**: Server-side AmneziaWG settings, shown when AmneziaWG is active.
 
-**Change CIDR** saves the IPv4 and IPv6 ranges for the next interface start. Until then, clients and configuration downloads use the current ranges. Adding a client requires space in both the current and saved ranges. **Restart Interface** disconnects clients and applies the saved ranges, listen port, device and hooks. Clients keep any address still usable in the new range. After restart, download and distribute a new configuration for each client whose address changed. MTU and routing table changes apply when you save.
+**Change CIDR** saves the IPv4 and IPv6 ranges for the next interface start. Until then, clients and configuration downloads use the current ranges. Adding a client requires space in both the current and saved ranges. **Restart Interface** disconnects clients and applies the saved ranges, listen port, device and hooks. Clients keep any address still usable in the new range. After restart, download and distribute a new configuration for each client whose address changed. MTU changes apply when you save.
 
-With **Routing Table** set to `auto`, a peer advertising a default route needs the two rule priorities immediately before the main table lookup. If host rules occupy either priority, wg-easy reports a conflict and preserves their precedence. An existing socket mark is preserved. When wg-easy assigns a new mark, it checks the host's IPv4 and IPv6 routing rules, including masked marks. Maintenance retries when the required priorities and mark are available.
+wg-easy automatically restarts the interface when it adds or removes a managed default route for IPv4 or IPv6, or moves a default route to another routing table. All peers briefly disconnect, and the new interface starts with the saved settings and hooks. Ordinary site routes update live. With **Routing Table** set to `off`, wg-easy leaves route installation to the host.
+
+With **Routing Table** set to `auto`, a peer advertising a default route needs the two rule priorities immediately before the main table lookup. If host rules occupy either priority, wg-easy reports a conflict and preserves their precedence. If `PreUp` sets a socket mark, wg-easy uses it. When wg-easy assigns a new mark, it checks the host's IPv4 and IPv6 routing rules, including masked marks. If default-route setup fails, wg-easy takes the interface down and maintenance retries startup.
 
 The address in the CIDR selects the server's gateway address. A network address keeps the first host as the gateway, preserving existing setups: `10.8.0.0/24` uses `10.8.0.1`. To choose another gateway, enter it directly, for example `10.8.0.15/24`. Clients then use available addresses from `10.8.0.1` through `10.8.0.254`, excluding `10.8.0.15`. The same rule applies to IPv6 and unattended setup CIDRs. The network and last address remain reserved for both address families.
 
@@ -94,7 +96,7 @@ Filtering covers forwarded traffic and traffic addressed to the VPN server itsel
 **Hooks** configures commands run on the server when the VPN interface starts or stops:
 
 - **PreUp**: Before the interface starts.
-- **PostUp** runs after wg-easy attempts to install the routes. When the hook succeeds, wg-easy checks the routes again and restores any required routes the hook removed. Maintenance retries any remaining conflicts.
+- **PostUp** runs after wg-easy installs the default routes and attempts the site routes. After the hook, wg-easy checks site routes again. Maintenance retries any remaining site-route conflicts.
 - **PreDown**: Before the interface stops.
 - **PostDown**: After the interface stops.
 

@@ -37,6 +37,10 @@ test('applies the new subnet to peers, downloads and firewall rules at restart',
   await expect.poll(() => app.pingFromClient('10.8.0.1', 2)).toBe(true);
   expect(await app.pingFromClient('10.8.0.1')).toBe(true);
 
+  const nat = () =>
+    app.execServer(['iptables', '-t', 'nat', '-S', 'POSTROUTING']);
+  expect(await nat()).toContain('-s 10.8.0.0/24 -o eth0 -j MASQUERADE');
+  expect(await nat()).not.toContain('10.90.0.0/24');
   const saved = await json(witness);
   await post(witness, { ...saved, serverAllowedIps: ['0.0.0.0/0'] });
   const route = await app.execServer([
@@ -49,15 +53,6 @@ test('applies the new subnet to peers, downloads and firewall rules at restart',
     'default',
   ]);
   expect(route).toContain('default dev wg0');
-  expect((await json(iface)).restartRequired).toBe(true);
-  expect(await app.pingFromClient('10.8.0.1')).toBe(true);
-  await post(witness, saved);
-
-  const nat = () =>
-    app.execServer(['iptables', '-t', 'nat', '-S', 'POSTROUTING']);
-  expect(await nat()).toContain('-s 10.8.0.0/24 -o eth0 -j MASQUERADE');
-  expect(await nat()).not.toContain('10.90.0.0/24');
-  await post(iface + '/restart');
   expect((await json(iface)).restartRequired).toBe(false);
   expect(await nat()).not.toContain('10.8.0.0/24');
   expect(await nat()).toContain('-s 10.90.0.0/24 -o eth0 -j MASQUERADE');

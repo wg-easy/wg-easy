@@ -1,22 +1,25 @@
 import { execFile } from 'node:child_process';
-import { randomUUID } from 'node:crypto';
-import { isDeepStrictEqual, promisify } from 'node:util';
+import { promisify } from 'node:util';
 
 import { parseCidr } from 'cidr-tools';
 import { createError } from 'nuxt/server';
-import { z } from 'zod';
 
 import {
   preferredRoute,
-  matchesOwnedRoute,
   routeMetric,
   kernelTable,
   routeProtocol,
-  routingTable,
   type KernelRoute,
   type RouteFamily,
 } from './linuxRouting';
+import type { ServerPeer } from './configuration';
+import {
+  saveTunnelRecord,
+  type PolicyRule,
+  type TunnelRecord,
+} from './tunnelRecord';
 
+import { parseRoutingTableId } from '#shared/utils/routingTable';
 import type { InterfaceType } from '#db/repositories/interface/types';
 import { WG_ENV } from '#server/utils/config';
 import { getGatewayAddress } from '#server/utils/ip';
@@ -25,28 +28,33 @@ const run = promisify(execFile);
 const families = ['ipv4', 'ipv6'] as const;
 class DefaultRouteConflict extends Error {}
 
-export type RestoreDefaultPeer = (
-  family: RouteFamily,
-  prefix: string
-) => Promise<void>;
-const id = z.int().positive().max(0xffffffff);
-const item = z.discriminatedUnion('kind', [
-  z.object({ kind: z.literal('route'), table: id }),
-  z.object({ kind: z.literal('suppress'), priority: id }),
-  z.object({ kind: z.literal('lookup'), priority: id, table: id, mark: id }),
-  z.object({ kind: z.literal('listener'), port: id.max(65535), mark: id }),
-  z.object({
-    kind: z.literal('protect'),
-    address: z.union([z.ipv4(), z.ipv6()]),
-  }),
-]);
-type Item = z.infer<typeof item>;
-export const defaultPolicyState = z.object({
-  tag: z.string().regex(/^wg-easy-[\da-f-]{36}$/),
-  assignedMark: id.optional(),
-  owned: z.object({ ipv4: z.array(item), ipv6: z.array(item) }),
-});
-export type DefaultPolicyState = z.infer<typeof defaultPolicyState>;
+export type DefaultRouteTables = Partial<Record<RouteFamily, number | 'auto'>>;
+
+export function defaultRouteTables(
+  setting: string,
+  clients: ServerPeer[],
+  enableIpv6: boolean
+): DefaultRouteTables {
+  const tables: DefaultRouteTables = {};
+  const table = setting === 'auto' ? 'auto' : parseRoutingTableId(setting);
+  if (table === undefined) {
+    return tables;
+  }
+  for (const peer of clients) {
+    if (!peer.enabled) {
+      continue;
+    }
+    for (const prefix of peer.serverAllowedIps ?? []) {
+      if (/\/0+$/.test(prefix)) {
+        const family = prefix.includes(':') ? 'ipv6' : 'ipv4';
+        if (enableIpv6 || family === 'ipv4') {
+          tables[family] = table || 254;
+        }
+      }
+    }
+  }
+  return tables;
+}
 
 type Rule = Record<string, unknown> & {
   priority: number;
@@ -62,7 +70,10 @@ async function inspect<T>(
   return JSON.parse(stdout);
 }
 
-function matchesRule(rule: Rule, item: Extract<Item, { priority: number }>) {
+function matchesRule(
+  rule: Rule,
+  item: Extract<PolicyRule, { priority: number }>
+) {
   if (
     rule.priority !== item.priority ||
     Number(rule.protocol) !== routeProtocol ||
@@ -123,17 +134,13 @@ function availableMark(preferred: number, rules: Rule[]) {
     if (!match) {
       return candidate >>> 0;
     }
-    // Any free mark must differ in at least one of the matching mask's bits.
-    // Branch on its first differing bit to skip whole ranges in one step.
-    let adjustable = match.mask & ~fixedBits;
-    while (adjustable) {
+    // A free mark must differ on a masked bit. Try both values of one
+    // adjustable bit, fixing it so each recursive step makes progress.
+    const adjustable = match.mask & ~fixedBits;
+    if (adjustable) {
       const bit = adjustable & -adjustable;
-      fixedBits |= bit;
-      const mark = choose(candidate ^ bit, fixedBits);
-      if (mark !== undefined) {
-        return mark;
-      }
-      adjustable ^= bit;
+      const fixed = fixedBits | bit;
+      return choose(candidate ^ bit, fixed) ?? choose(candidate, fixed);
     }
   }
   const mark = choose(initial, fixed);
@@ -143,7 +150,7 @@ function availableMark(preferred: number, rules: Rule[]) {
   return mark;
 }
 
-function suppressPriority(rules: Rule[], owned: Item[]) {
+function suppressPriority(rules: Rule[]) {
   const main = rules.find(
     (rule) =>
       kernelTable(rule.table) === 254 &&
@@ -152,475 +159,292 @@ function suppressPriority(rules: Rule[], owned: Item[]) {
         ['priority', 'table', 'src', 'protocol'].includes(key)
       )
   );
-  if (!main) {
-    return;
-  }
-  // An earlier pair would place the tunnel ahead of the host rule blocking
-  // these slots. Leave that policy in control and retry when there is room.
-  const first = main.priority - 2;
-  const usable = [first, first + 1].every((priority) => {
-    const occupants = rules.filter((rule) => rule.priority === priority);
-    return (
-      !occupants.length ||
-      (occupants.length === 1 &&
-        owned.some(
-          (item) => 'priority' in item && matchesRule(occupants[0]!, item)
-        ))
+  // An earlier pair would put the tunnel ahead of the intervening host policy.
+  const first = (main?.priority ?? 0) - 2;
+  if (
+    first <= 0 ||
+    rules.some((rule) => rule.priority === first || rule.priority === first + 1)
+  ) {
+    throw new DefaultRouteConflict(
+      'No available routing rule priorities between host policy and the main table.'
     );
-  });
-  if (first > 0 && usable) {
-    return first;
   }
+  return first;
 }
 
-function firewallArgs(
-  item: Extract<Item, { kind: 'listener' | 'protect' }>,
-  name: string,
-  tag: string,
-  action: string
+function runFirewallRule(
+  { name, policy }: TunnelRecord,
+  family: RouteFamily,
+  rule: Extract<PolicyRule, { kind: 'listener' | 'protect' }>,
+  action: '-I' | '-C' | '-D'
 ) {
-  const common = ['-m', 'comment', '--comment', tag];
-  if (item.kind === 'protect') {
-    return [
-      '-w',
-      '-t',
-      'raw',
-      action,
-      'PREROUTING',
-      '!',
-      '-i',
-      name,
+  const command = family === 'ipv4' ? 'iptables' : 'ip6tables';
+  const ingress = [action, 'PREROUTING', '!', '-i', name];
+  const comment = ['-m', 'comment', '--comment', policy.tag];
+  if (rule.kind === 'protect') {
+    const external = [
       '-d',
-      item.address,
+      rule.address,
       '-m',
       'addrtype',
       '!',
       '--src-type',
       'LOCAL',
-      ...common,
+    ];
+    return run(command, [
+      '-w',
+      '-t',
+      'raw',
+      ...ingress,
+      ...external,
+      ...comment,
       '-j',
       'DROP',
-    ];
+    ]);
   }
-  // With strict rp_filter a new handshake must reach the listener even before
-  // there is a marked conntrack reply. Preserve marks set by host policy.
-  return [
+  // Mark fresh handshakes for strict rp_filter without overwriting a host mark.
+  const listener = ['-p', 'udp', '--dport', String(rule.port)];
+  const local = ['-m', 'addrtype', '--dst-type', 'LOCAL'];
+  const unmarked = ['-m', 'mark', '--mark', '0'];
+  const setMark = ['-j', 'MARK', '--set-mark', String(rule.mark)];
+  return run(command, [
     '-w',
     '-t',
     'mangle',
-    action,
-    'PREROUTING',
-    '!',
-    '-i',
+    ...ingress,
+    ...listener,
+    ...local,
+    ...unmarked,
+    ...comment,
+    ...setMark,
+  ]);
+}
+
+async function installRoute(name: string, family: RouteFamily, table: number) {
+  const routes = await inspect<KernelRoute>(
+    family,
+    'route',
+    'show',
+    'table',
+    'all',
+    'exact',
+    'default'
+  );
+  const preferred = preferredRoute(
+    routes.filter(
+      (route) => kernelTable(route.table) === table && route.dst === 'default'
+    ),
+    name
+  );
+  if (preferred.viaTunnel) {
+    return;
+  }
+  if (preferred.metric <= routeMetric(family)) {
+    throw new DefaultRouteConflict(
+      'An existing route conflicts with this default.'
+    );
+  }
+  // Linux removes routes bound to this link when the interface is deleted.
+  await run('ip', [
+    flag(family),
+    'route',
+    'add',
+    'default',
+    'dev',
     name,
-    '-p',
-    'udp',
-    '--dport',
-    String(item.port),
-    '-m',
-    'addrtype',
-    '--dst-type',
-    'LOCAL',
-    '-m',
-    'mark',
-    '--mark',
-    '0',
-    ...common,
-    '-j',
-    'MARK',
-    '--set-mark',
-    String(item.mark),
-  ];
+    'table',
+    String(table),
+    'proto',
+    String(routeProtocol),
+    'metric',
+    String(routeMetric(family)),
+  ]);
 }
 
-async function preparePolicyChange(
-  name: string,
+function changeRule(
+  record: TunnelRecord,
   family: RouteFamily,
-  item: Item,
-  tag: string,
-  add: boolean
+  rule: PolicyRule,
+  action: 'add' | 'del'
 ) {
-  if (item.kind === 'route') {
-    const entries = (
-      await inspect<KernelRoute>(
-        family,
-        'route',
-        'show',
-        'table',
-        'all',
-        'exact',
-        'default'
-      )
-    ).filter(
-      (entry) =>
-        kernelTable(entry.table) === item.table && entry.dst === 'default'
+  if (!('priority' in rule)) {
+    return runFirewallRule(
+      record,
+      family,
+      rule,
+      action === 'add' ? '-I' : '-D'
     );
-    const preferred = preferredRoute(entries, name);
-    const installed = entries.some((route) =>
-      matchesOwnedRoute(route, name, family)
-    );
-    if (
-      add &&
-      !preferred.viaTunnel &&
-      preferred.metric <= routeMetric(family)
-    ) {
-      throw new DefaultRouteConflict(
-        'An existing route conflicts with this default.'
-      );
-    }
-    return {
-      installed,
-      satisfied: preferred.viaTunnel,
-      apply: () =>
-        run('ip', [
-          flag(family),
-          'route',
-          add ? 'add' : 'del',
-          'default',
-          'dev',
-          name,
-          'table',
-          String(item.table),
-          'proto',
-          String(routeProtocol),
-          'metric',
-          String(routeMetric(family)),
-        ]),
-    };
   }
-  if (item.kind === 'suppress' || item.kind === 'lookup') {
-    const occupants = (await inspect<Rule>(family, 'rule', 'show')).filter(
-      (r) => r.priority === item.priority
-    );
-    const slot = occupants.filter((r) => Number(r.protocol) === routeProtocol);
-    const installed = slot.some((r) => matchesRule(r, item));
-    if (add && occupants.length && !(occupants.length === 1 && installed)) {
-      throw new DefaultRouteConflict(
-        `Routing rule priority ${item.priority} is occupied.`
-      );
-    }
-    if (slot.length > 1 && installed) {
-      throw new Error('Ambiguous routing rule priority ' + item.priority);
-    }
-    const selector =
-      item.kind === 'lookup'
-        ? ['not', 'fwmark', String(item.mark), 'table', String(item.table)]
-        : ['table', 'main', 'suppress_prefixlength', '0'];
-    return {
-      installed,
-      satisfied: installed,
-      apply: () =>
-        run('ip', [
-          flag(family),
-          'rule',
-          add ? 'add' : 'del',
-          'pref',
-          String(item.priority),
-          ...selector,
-          'protocol',
-          String(routeProtocol),
-        ]),
-    };
-  }
-  const command = family === 'ipv4' ? 'iptables' : 'ip6tables';
-  let installed;
-  try {
-    await run(command, firewallArgs(item, name, tag, '-C'));
-    installed = true;
-  } catch (error) {
-    if ((error as { code?: number }).code !== 1) {
-      throw error;
-    }
-    installed = false;
-  }
-  return {
-    installed,
-    satisfied: installed,
-    apply: () => run(command, firewallArgs(item, name, tag, add ? '-I' : '-D')),
-  };
+  const selector =
+    rule.kind === 'lookup'
+      ? ['not', 'fwmark', String(rule.mark), 'table', String(rule.table)]
+      : ['table', 'main', 'suppress_prefixlength', '0'];
+  return run('ip', [
+    flag(family),
+    'rule',
+    action,
+    'pref',
+    String(rule.priority),
+    ...selector,
+    'protocol',
+    String(routeProtocol),
+  ]);
 }
 
-/** A serializable journal of this interface's policy, including partial updates.
- * The lifecycle owns the instance identity and supplies durable persistence. */
-export class DefaultPolicy {
-  constructor(
-    readonly state: DefaultPolicyState = {
-      tag: 'wg-easy-' + randomUUID(),
-      owned: { ipv4: [], ipv6: [] },
-    },
-    private readonly persist: (
-      state: DefaultPolicyState
-    ) => Promise<void> = async () => {}
-  ) {}
+async function rulesAt(family: RouteFamily, priority: number) {
+  const rules = await inspect<Rule>(family, 'rule', 'show');
+  return rules.filter((rule) => rule.priority === priority);
+}
 
-  private async automaticIds(currentMark: number, previousTable?: number) {
-    if (currentMark && previousTable) {
-      return { mark: currentMark, table: previousTable };
-    }
-    const used = new Set([0, 253, 254, 255]);
-    const foreignRules: Rule[] = [];
-    for (const family of families) {
-      const rules = await inspect<Rule>(family, 'rule', 'show');
-      if (!previousTable) {
-        const routes = await inspect<KernelRoute>(
-          family,
-          'route',
-          'show',
-          'table',
-          'all'
-        );
-        for (const entry of [...routes, ...rules]) {
-          used.add(kernelTable(entry.table));
-        }
-      }
-      if (!currentMark) {
-        const owned = this.state.owned[family].filter(
-          (item) => item.kind === 'lookup'
-        );
-        for (const rule of rules) {
-          const index = owned.findIndex((item) => matchesRule(rule, item));
-          if (index < 0) {
-            foreignRules.push(rule);
-          } else {
-            owned.splice(index, 1);
-          }
-        }
-      }
-    }
-    let table = previousTable ?? (currentMark || 51820);
-    while (used.has(table)) {
-      table = table === 0xffffffff ? 1 : table + 1;
-    }
-    return { table, mark: currentMark || availableMark(table, foreignRules) };
-  }
-
-  private async automatic(name: string, family: RouteFamily) {
-    const owned = this.state.owned[family];
-    const priority = suppressPriority(
-      await inspect<Rule>(family, 'rule', 'show'),
-      owned
+async function ruleStillOwned(
+  record: TunnelRecord,
+  family: RouteFamily,
+  item: PolicyRule
+) {
+  if ('priority' in item) {
+    const candidates = (await rulesAt(family, item.priority)).filter(
+      (rule) => Number(rule.protocol) === routeProtocol
     );
-    if (priority === undefined) {
-      // A host rule may now sit behind our old automatic lookup. Withdraw
-      // this family's own policy before reporting the conflict.
-      if (owned.some((item) => 'priority' in item)) {
-        await this.family(name, family, []);
-      }
-      throw new DefaultRouteConflict(
-        'No available routing rule priorities between host policy and the main table.'
-      );
-    }
-    const backend = WG_ENV.WG_EXECUTABLE;
-    const { stdout } = await run(backend, ['show', name, 'fwmark']);
-    const current = stdout.trim() === 'off' ? 0 : Number(stdout.trim());
-    if (this.state.assignedMark && this.state.assignedMark !== current) {
-      delete this.state.assignedMark;
-      await this.persist(this.state);
-    }
-    const previous = families
-      .flatMap((f) => this.state.owned[f])
-      .find((item) => item.kind === 'lookup');
-    const { table, mark } = await this.automaticIds(current, previous?.table);
-    if (!current) {
-      this.state.assignedMark = mark;
-      await this.persist(this.state);
-      await run(backend, ['set', name, 'fwmark', String(mark)]);
-    }
-    return { table, mark, priority };
-  }
-
-  private async clearMark(name: string, backend = WG_ENV.WG_EXECUTABLE) {
-    const mark = this.state.assignedMark;
-    if (
-      !mark ||
-      families.some((f) =>
-        this.state.owned[f].some(
-          (item) => item.kind === 'lookup' || item.kind === 'listener'
-        )
-      )
-    ) {
-      return;
-    }
-    const { stdout } = await run(backend, ['show', name, 'fwmark']);
-    if (Number(stdout.trim()) === mark) {
-      await run(backend, ['set', name, 'fwmark', '0']);
-    }
-    delete this.state.assignedMark;
-    await this.persist(this.state);
-  }
-
-  private async automaticItems(
-    network: InterfaceType,
-    family: RouteFamily,
-    { table, mark, priority }: { table: number; mark: number; priority: number }
-  ): Promise<Item[]> {
-    const address = getGatewayAddress(parseCidr(network[`${family}Cidr`]));
-    const items: Item[] = [
-      { kind: 'route', table },
-      { kind: 'protect', address },
-    ];
-    if (family === 'ipv4') {
-      const { stdout } = await run('sysctl', [
-        '-n',
-        'net.ipv4.conf.all.src_valid_mark',
-      ]);
-      if (stdout.trim() !== '1') {
-        await run('sysctl', ['-q', 'net.ipv4.conf.all.src_valid_mark=1']);
-      }
-      items.push({ kind: 'listener', port: network.port, mark });
-    }
-    items.push(
-      { kind: 'suppress', priority },
-      { kind: 'lookup', priority: priority + 1, table, mark }
-    );
-    return items;
-  }
-
-  private async reconcile(
-    name: string,
-    family: RouteFamily,
-    item: Item,
-    add: boolean
-  ) {
-    const owned = this.state.owned[family];
-    const index = owned.findIndex((candidate) =>
-      isDeepStrictEqual(candidate, item)
-    );
-    const recorded = index >= 0;
-    const { installed, satisfied, apply } = await preparePolicyChange(
-      name,
-      family,
-      item,
-      this.state.tag,
-      add
-    );
-    if (recorded && !installed) {
-      owned.splice(index, 1);
-      await this.persist(this.state);
-    }
-    if (add ? satisfied : !(recorded && installed)) {
+    if (!candidates.some((rule) => matchesRule(rule, item))) {
       return false;
     }
-    // Record a claim before installation. Recovery checks the exact kernel
-    // selector before deleting it. A failed add never confers ownership.
-    if (add) {
-      owned.push(item);
-      await this.persist(this.state);
-    }
-    try {
-      await apply();
-    } catch (error) {
-      if (add) {
-        owned.splice(owned.indexOf(item), 1);
-        await this.persist(this.state);
-      }
-      throw error;
-    }
-    if (!add) {
-      owned.splice(index, 1);
-      await this.persist(this.state);
+    // The deletion selector can also match a more specific rule at this priority.
+    if (candidates.length > 1) {
+      throw new Error('Ambiguous routing rule priority ' + item.priority);
     }
     return true;
   }
-
-  private async family(name: string, family: RouteFamily, desired: Item[]) {
-    const obsolete = this.state.owned[family].filter(
-      (item) => !desired.some((wanted) => isDeepStrictEqual(wanted, item))
-    );
-    // A new socket mark changes the lookup selector at the same priority.
-    // Retire the old selector first so a failed add can restore it unambiguously.
-    const changes = desired.map((item) => ({ item, add: true }));
-    for (const item of obsolete.reverse()) {
-      const removal = { item, add: false };
-      if (
-        'priority' in item &&
-        desired.some(
-          (wanted) => 'priority' in wanted && wanted.priority === item.priority
-        )
-      ) {
-        changes.unshift(removal);
-      } else {
-        changes.push(removal);
-      }
+  try {
+    await runFirewallRule(record, family, item, '-C');
+    return true;
+  } catch (error) {
+    if ((error as { code?: number }).code === 1) {
+      return false;
     }
-    const applied: typeof changes = [];
-    try {
-      for (const change of changes) {
-        if (await this.reconcile(name, family, change.item, change.add)) {
-          applied.push(change);
-        }
-      }
-    } catch (cause) {
-      const failures = [cause];
-      for (const { item, add } of applied.reverse()) {
-        try {
-          await this.reconcile(name, family, item, !add);
-        } catch (rollbackError) {
-          failures.push(rollbackError);
-        }
-      }
-      if (failures.length > 1) {
-        throw new AggregateError(
-          failures,
-          'Could not restore previous default route policy',
-          { cause }
-        );
-      }
-      throw cause;
+    throw error;
+  }
+}
+
+async function automaticIds(name: string) {
+  const used = new Set([0, 253, 254, 255]);
+  const rules: Rule[] = [];
+  for (const family of families) {
+    const familyRules = await inspect<Rule>(family, 'rule', 'show');
+    rules.push(...familyRules);
+    const routes = await inspect<KernelRoute>(
+      family,
+      'route',
+      'show',
+      'table',
+      'all'
+    );
+    for (const entry of [...routes, ...familyRules]) {
+      used.add(kernelTable(entry.table));
     }
   }
+  const backend = WG_ENV.WG_EXECUTABLE;
+  const { stdout } = await run(backend, ['show', name, 'fwmark']);
+  const current = stdout.trim() === 'off' ? 0 : Number(stdout.trim());
+  let table = current || 51820;
+  while (used.has(table)) {
+    table = table === 0xffffffff ? 1 : table + 1;
+  }
+  const mark = current || availableMark(table, rules);
+  if (!current) {
+    await run(backend, ['set', name, 'fwmark', String(mark)]);
+  }
+  return { table, mark };
+}
 
-  async sync(
-    network: InterfaceType,
-    defaults: Set<RouteFamily>,
-    restorePeer: RestoreDefaultPeer
-  ) {
-    const name = network.name;
-    let failure;
-    for (const family of families) {
-      const setting = defaults.has(family) ? network.routingTable : undefined;
-      if (!setting && !this.state.owned[family].length) {
+/** Claim a rule before installing it so an interrupted start can be cleaned up. */
+async function installRule(
+  record: TunnelRecord,
+  family: RouteFamily,
+  rule: PolicyRule
+) {
+  if ('priority' in rule && (await rulesAt(family, rule.priority)).length) {
+    throw new DefaultRouteConflict(
+      `Routing rule priority ${rule.priority} is occupied.`
+    );
+  }
+  const owned = record.policy.owned[family];
+  owned.push(rule);
+  try {
+    await saveTunnelRecord(record);
+    await changeRule(record, family, rule, 'add');
+  } catch (error) {
+    owned.pop();
+    await saveTunnelRecord(record);
+    throw error;
+  }
+}
+
+export async function installDefaultRoutes(
+  record: TunnelRecord,
+  network: InterfaceType,
+  tables: DefaultRouteTables
+) {
+  const { name } = network;
+  let auto;
+  for (const family of families) {
+    let table = tables[family];
+    if (table === undefined) {
+      continue;
+    }
+    try {
+      if (table !== 'auto') {
+        await installRoute(name, family, table);
         continue;
       }
-      const previous = this.state.owned[family].find((item) => 'table' in item);
-      let table = setting ?? String(previous?.table ?? 254);
-      try {
-        let desired: Item[] = [];
-        if (setting === 'auto') {
-          const auto = await this.automatic(name, family);
-          table = String(auto.table);
-          desired = await this.automaticItems(network, family, auto);
-        } else if (setting) {
-          desired = [{ kind: 'route', table: routingTable(setting) }];
+      const priority = suppressPriority(
+        await inspect<Rule>(family, 'rule', 'show')
+      );
+      auto ??= await automaticIds(name);
+      table = auto.table;
+      await installRoute(name, family, auto.table);
+      const address = getGatewayAddress(parseCidr(network[`${family}Cidr`]));
+      await installRule(record, family, { kind: 'protect', address });
+      if (family === 'ipv4') {
+        const { stdout } = await run('sysctl', [
+          '-n',
+          'net.ipv4.conf.all.src_valid_mark',
+        ]);
+        if (stdout.trim() !== '1') {
+          await run('sysctl', ['-q', 'net.ipv4.conf.all.src_valid_mark=1']);
         }
-        await this.family(name, family, desired);
-      } catch (cause) {
-        let error = cause;
-        const prefix = family === 'ipv4' ? '0.0.0.0/0' : '::/0';
-        try {
-          await restorePeer(family, prefix);
-        } catch (rollbackError) {
-          error = new AggregateError(
-            [cause, rollbackError],
-            'Could not restore default gateway'
-          );
-        }
-        failure ??= createError({
-          status: cause instanceof DefaultRouteConflict ? 409 : 500,
-          statusText: 'Default route update failed',
-          message: `Settings saved. Could not update ${prefix} on ${name} in table ${table}. ${cause instanceof DefaultRouteConflict ? cause.message + ' ' : ''}Maintenance will retry.`,
-          cause: error,
+        await installRule(record, family, {
+          kind: 'listener',
+          port: network.port,
+          mark: auto.mark,
         });
       }
+      await installRule(record, family, { kind: 'suppress', priority });
+      await installRule(record, family, {
+        kind: 'lookup',
+        priority: priority + 1,
+        ...auto,
+      });
+    } catch (cause) {
+      const prefix = family === 'ipv4' ? '0.0.0.0/0' : '::/0';
+      return createError({
+        status: cause instanceof DefaultRouteConflict ? 409 : 500,
+        statusText: 'Default route setup failed',
+        message: `Could not start ${name} with ${prefix} in table ${table}. ${cause instanceof DefaultRouteConflict ? cause.message + ' ' : ''}Maintenance will retry.`,
+        cause,
+      });
     }
-    await this.clearMark(name);
-    return failure;
   }
+}
 
-  async stop(name: string, backend = WG_ENV.WG_EXECUTABLE) {
-    for (const family of families) {
-      await this.family(name, family, []);
+export async function removeDefaultRules(record: TunnelRecord) {
+  for (const family of families) {
+    const owned = record.policy.owned[family];
+    for (const rule of [...owned].reverse()) {
+      if (await ruleStillOwned(record, family, rule)) {
+        await changeRule(record, family, rule, 'del');
+      }
+      owned.pop();
+      await saveTunnelRecord(record);
     }
-    await this.clearMark(name, backend);
   }
 }

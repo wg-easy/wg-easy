@@ -8,8 +8,7 @@ import { roles } from '#shared/utils/permissions';
 import * as vpn from '#server/features/vpn/lifecycle';
 import * as recovery from '#server/features/vpn/tunnelRecord';
 import { LinuxTunnel } from '#server/utils/linuxTunnel';
-import { DefaultPolicy } from '#server/features/vpn/defaultPolicy';
-import { wg } from '#server/utils/wgHelper';
+import { SiteRoutes } from '#server/features/vpn/siteRoutes';
 import * as clients from '#server/features/vpn/clients';
 import * as settings from '#server/features/vpn/interface';
 import * as provisioning from '#server/features/vpn/provisioning';
@@ -392,25 +391,66 @@ describe('VPN operations', () => {
     }
   );
 
-  test('restores the peer default when PostUp clears a route conflict', async () => {
-    const { commands, store } = await vpnFixture();
-    const policy = vi.mocked(DefaultPolicy.prototype.sync);
-    await store.clients.update(1, { serverAllowedIps: ['0.0.0.0/0'] });
-    policy.mockImplementationOnce(async (_network, _defaults, restorePeer) => {
-      await restorePeer('ipv4', '0.0.0.0/0');
-      return createError({ status: 409, message: 'conflicting route' });
-    });
-    vi.spyOn(wg, 'restoreDefault').mockResolvedValue();
-    await vpn.restart();
-    expect(commands.sync).toHaveBeenCalledTimes(2);
-    expect(commands.sync.mock.invocationCallOrder[1]).toBeGreaterThan(
-      commands.runHook.mock.invocationCallOrder[0]!
-    );
-    expect(policy).toHaveBeenCalledTimes(2);
-    expect(policy.mock.invocationCallOrder[1]).toBeGreaterThan(
-      commands.sync.mock.invocationCallOrder[1]!
-    );
+  test('restarts for changes to the managed default families or table and syncs ordinary edits live', async () => {
+    const { commands } = await vpnFixture();
+    const configure = vi.mocked(LinuxTunnel.prototype.configureLink);
+    const routes = (serverAllowedIps: string[]) =>
+      vpn.commit((tx) => tx.clients.update(1, { serverAllowedIps }));
+    const table = (routingTable: string) =>
+      vpn.commit((tx) => tx.interfaces.update({ routingTable }));
+
+    await vpn.start();
+    await routes(['10.1.2.3/0']);
+    await routes(['0.0.0.0/0', '192.0.2.0/24']);
+    await routes(['0.0.0.0/0', '::/0']);
+    await table('010');
+    await table('8');
+    await clients.apply(admin, 1, 'disable');
+    await table('off');
+    await clients.apply(admin, 1, 'enable');
+    expect(configure.mock.calls.map(([, , tables]) => tables)).toEqual([
+      {},
+      { ipv4: 'auto' },
+      { ipv4: 'auto', ipv6: 'auto' },
+      { ipv4: 8, ipv6: 8 },
+      {},
+    ]);
+    expect(commands.up).toHaveBeenCalledTimes(5);
+    expect(commands.sync).toHaveBeenCalledTimes(9);
   });
+
+  test.each(['start', 'edit'])(
+    'cleans up failed default policy at %s and retries on a fresh link before PostUp',
+    async (operation) => {
+      const { store, commands } = await vpnFixture();
+      await store.hooks.update({ preUp: '', postUp: 'up' });
+      const configure = vi.mocked(LinuxTunnel.prototype.configureLink);
+      configure.mockResolvedValueOnce(
+        createError({ status: 409, message: 'Default route conflict' })
+      );
+      const changes = { serverAllowedIps: ['::/0'] };
+      if (operation === 'start') {
+        vi.spyOn(console, 'error').mockImplementation(() => {});
+        await store.clients.update(1, changes);
+        await vpn.start();
+      } else {
+        await expect(
+          vpn.commit((tx) => tx.clients.update(1, changes))
+        ).rejects.toMatchObject({ status: 409 });
+      }
+      expect(commands.down).toHaveBeenLastCalledWith('wg0', true);
+      expect(commands.runHook).not.toHaveBeenCalled();
+      await vpn.maintain();
+      await vpn.maintain();
+      expect(commands.up).toHaveBeenCalledTimes(2);
+      expect(configure).toHaveBeenCalledTimes(2);
+      expect(commands.runHook).toHaveBeenCalledExactlyOnceWith(
+        'wg0',
+        'auto',
+        'up'
+      );
+    }
+  );
 
   test('retries firewall setup after a restart without running PostUp again', async () => {
     const { commands, firewall } = await vpnFixture();
@@ -427,14 +467,14 @@ describe('VPN operations', () => {
   test('finishes a failed post-hook route check live after a cold start', async () => {
     const { commands } = await vpnFixture();
     vi.spyOn(console, 'error').mockImplementation(() => {});
-    const policy = vi.mocked(DefaultPolicy.prototype.sync);
-    policy
+    const sites = vi.spyOn(SiteRoutes.prototype, 'sync');
+    sites
       .mockResolvedValueOnce(undefined)
-      .mockRejectedValueOnce(new Error('Policy read failed'));
+      .mockRejectedValueOnce(new Error('Route read failed'));
     await vpn.start();
     expect(commands.runHook).toHaveBeenCalledOnce();
     await vpn.maintain();
-    expect(policy).toHaveBeenCalledTimes(3);
+    expect(sites).toHaveBeenCalledTimes(3);
     expect(commands.up).toHaveBeenCalledOnce();
     expect(commands.runHook).toHaveBeenCalledOnce();
   });

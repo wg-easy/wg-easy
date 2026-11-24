@@ -13,25 +13,9 @@ function effectivePsk(key: string | null) {
 export function peersWithVerifiedSources(
   clients: ServerPeer[],
   running: { publicKey: string; preSharedKey: string; allowedIps: string }[],
-  enableIpv6: boolean,
-  restoredDefaults: ReadonlyMap<string, string | undefined>
+  enableIpv6: boolean
 ) {
-  const enabled = clients
-    .filter((client) => client.enabled)
-    .map((client) => {
-      if (!restoredDefaults.size) {
-        return client;
-      }
-      const serverAllowedIps = client.serverAllowedIps.filter(
-        (ip) => !restoredDefaults.has(normalizePrefix(ip))
-      );
-      for (const [prefix, previousKey] of restoredDefaults) {
-        if (client.publicKey === previousKey) {
-          serverAllowedIps.push(prefix);
-        }
-      }
-      return { ...client, serverAllowedIps };
-    });
+  const enabled = clients.filter((client) => client.enabled);
   const credentials = new Map(
     enabled.map((client) => [
       client.publicKey,

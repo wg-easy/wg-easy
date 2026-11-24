@@ -4,13 +4,27 @@ import { mkdir, open, rename, rm } from 'node:fs/promises';
 
 import { z } from 'zod';
 
-import { defaultPolicyState } from './defaultPolicy';
-
 import { parseInterfaceName } from '#server/utils/interfaceName';
 
 const directory = '/etc/wireguard/.wg-easy';
 // The volume holds one VPN configuration, even when WG_INTERFACE is renamed.
 const failureFile = 'failed-post-up';
+const id = z.int().positive().max(0xffffffff);
+const rule = z.discriminatedUnion('kind', [
+  z.object({ kind: z.literal('suppress'), priority: id }),
+  z.object({ kind: z.literal('lookup'), priority: id, table: id, mark: id }),
+  z.object({ kind: z.literal('listener'), port: id.max(65535), mark: id }),
+  z.object({
+    kind: z.literal('protect'),
+    address: z.union([z.ipv4(), z.ipv6()]),
+  }),
+]);
+// Earlier records included routes. Linux removes those with the link.
+const ownedRules = z
+  .array(z.union([rule, z.object({ kind: z.literal('route'), table: id })]))
+  .transform((items) => items.filter((item) => item.kind !== 'route'));
+export type PolicyRule = z.infer<typeof rule>;
+
 const tunnelRecord = z.object({
   version: z.literal(1),
   name: z.string(),
@@ -23,7 +37,10 @@ const tunnelRecord = z.object({
   preDown: z.string(),
   postDown: z.string(),
   // The policy tag also identifies this generation in the kernel link alias.
-  policy: defaultPolicyState,
+  policy: z.object({
+    tag: z.string().regex(/^wg-easy-[\da-f-]{36}$/),
+    owned: z.object({ ipv4: ownedRules, ipv6: ownedRules }),
+  }),
 });
 export type TunnelRecord = z.infer<typeof tunnelRecord>;
 

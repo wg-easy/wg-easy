@@ -166,7 +166,7 @@
       },
       "serverAllowedIps": {
         "label": "Server Allowed IPs",
-        "description": "Which IPs the server will route to the client"
+        "description": "Which IPs the server routes to this client. Adding or removing a managed default route restarts the interface for all clients."
       },
       "allowedIps": {
         "description": "Which IPs will be routed through the VPN (overrides global config)"
@@ -406,7 +406,7 @@
       },
       "routingTable": {
         "label": "Routing Table",
-        "description": "Routing table for WireGuard routes. Set to auto, off, or a table number."
+        "description": "Routing table for WireGuard routes. Set to auto, off, or a table number. Changing the table for a managed default route restarts the interface for all clients."
       },
       "mtu": {
         "description": "MTU WireGuard will use. Leave empty for automatic detection"

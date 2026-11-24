@@ -30,7 +30,7 @@ async function routingAdmin(request: APIRequestContext, origin: string) {
 for (const backend of ['wg', 'awg'] as const) {
   test.describe(backend, () => {
     test.use({ backend });
-    test('changes default routes live while another peer carries traffic', async ({
+    test('restarts to install and withdraw dual-stack default routes and reconnects peers', async ({
       request,
       app,
     }) => {
@@ -54,24 +54,19 @@ for (const backend of ['wg', 'awg'] as const) {
         );
       const lookup = (target: string, ...args: string[]) =>
         app.execServer(['ip', 'route', 'get', target, ...args]);
-      const tableRoutes = (family: string, table: string) =>
-        app
-          .execServer([
-            'ip',
-            family,
-            'route',
-            'show',
-            'table',
-            'all',
-            'dev',
-            'wg0',
-          ])
-          .then((s) =>
-            s
-              .split('\n')
-              .filter((r) => r.includes(' table ' + table))
-              .join('\n')
-          );
+      const defaults = (family: string) =>
+        app.execServer([
+          'ip',
+          family,
+          'route',
+          'show',
+          'table',
+          'all',
+          'dev',
+          'wg0',
+          'exact',
+          'default',
+        ]);
       // Docker provides an IPv4 underlay. Add an IPv6 default to exercise the
       // socket-mark exemption in that family's real routing policy database.
       await app.execServer(['ip', 'link', 'add', 'underlay6', 'type', 'dummy']);
@@ -101,18 +96,18 @@ for (const backend of ['wg', 'awg'] as const) {
         index(),
         rules(),
       ]);
-      const traffic = app.execClient([
-        'ping',
-        '-c',
-        '80',
-        '-i',
-        '0.1',
-        '-I',
-        'wg0',
-        '10.8.0.1',
-      ]);
       await gateway.routes(['0.0.0.0/0', '::/0']);
-      expect(await index()).toBe(originalIndex);
+      const dualStackIndex = await index();
+      expect(dualStackIndex).not.toBe(originalIndex);
+      expect(await app.execServer(['cat', '/tmp/hooks'])).toBe(
+        'pre\nup\ndown\npost\npre\nup'
+      );
+      // The connected peer must initiate a new handshake after its server restarts.
+      await expect
+        .poll(() => app.pingFromClient('10.8.0.1'), { timeout: 35_000 })
+        .toBe(true);
+      await gateway.routes(['0.0.0.0/0', '::/0', '192.0.2.0/24']);
+      expect(await index()).toBe(dualStackIndex);
       expect(await lookup('203.0.113.1')).toContain('dev wg0');
       expect(await lookup('2001:db8::1')).toContain('dev wg0');
       const socketMark = await mark();
@@ -130,7 +125,7 @@ for (const backend of ['wg', 'awg'] as const) {
       await gateway.routes(['0.0.0.0/0', '::/0']);
       await api.table('100');
       for (const family of ['-4', '-6']) {
-        expect(await tableRoutes(family, '100')).toContain('default table 100');
+        expect(await defaults(family)).toContain('default table 100');
       }
       expect(await rules()).toEqual(originalRules);
       expect(await mark()).toBe('off');
@@ -141,7 +136,7 @@ for (const backend of ['wg', 'awg'] as const) {
       await app.execServer(['ip', '-4', 'rule', 'del', ...selector]);
       await api.table('off');
       for (const family of ['-4', '-6']) {
-        expect(await tableRoutes(family, '100')).toBe('');
+        expect(await defaults(family)).toBe('');
       }
       const allowed = await app.execServer([
         backend,
@@ -151,12 +146,8 @@ for (const backend of ['wg', 'awg'] as const) {
       ]);
       expect(allowed).toContain('0.0.0.0/0');
       expect(allowed).toContain('::/0');
-      expect(await index()).toBe(originalIndex);
-      expect(await app.execServer(['cat', '/tmp/hooks'])).toBe('pre\nup');
-      expect(await traffic).toContain(', 0% packet loss');
 
       await api.table('auto');
-      await api.post('/api/admin/interface/restart');
       expect(await lookup('203.0.113.1')).toContain('dev wg0');
       expect(await lookup('2001:db8::1')).toContain('dev wg0');
       await gateway.routes([]);
@@ -166,201 +157,44 @@ for (const backend of ['wg', 'awg'] as const) {
   });
 }
 
-test('rolls back a partially withdrawn IPv6 policy, keeps the revocation, and retries live', async ({
-  request,
-  app,
-}) => {
-  test.slow(); // The lifecycle maintenance timer runs once per minute.
-  const api = await routingAdmin(request, app.url);
-  const witness = await api.peer('IPv4 gateway');
-  const revoked = await api.peer('IPv6 gateway');
-  const candidate = await api.peer('New IPv6 gateway');
-  await api.post('/api/admin/hooks', {
-    preUp: 'echo up >> /tmp/phases',
-    postUp: '',
-    preDown: 'echo down >> /tmp/phases',
-    postDown: '',
-  });
-  await api.post('/api/admin/interface/restart');
-  const read = (family: string) =>
-    app.execServer(['/sbin/ip', family, 'rule', 'show']);
-  const beforeV6 = await read('-6');
-  const mark = () => app.execServer(['wg', 'show', 'wg0', 'fwmark']);
-  await witness.routes(['0.0.0.0/0']);
-  await revoked.routes(['::/0']);
-  const appliedMark = await mark();
-  await app.connectClient(await witness.config());
-  await expect.poll(() => app.pingFromClient('10.8.0.1')).toBe(true);
-  const index = () => app.execServer(['cat', '/sys/class/net/wg0/ifindex']);
-  const [originalIndex, v4, v6] = await Promise.all([
-    index(),
-    read('-4'),
-    read('-6'),
-  ]);
-  // Fail after the IPv6 tunnel lookup was removed, before its suppress-main
-  // rule can be retired. The real kernel carries all other policy updates.
-  await app.execServer([
-    'sh',
-    '-ec',
-    `cat > /usr/local/bin/ip <<'SH'
-#!/bin/sh
-case " $* " in
-  *" -6 rule del "*" suppress_prefixlength "*) exit 2 ;;
-  *" -6 -N -j -d rule show "*) test ! -f /tmp/fail-rule-read || exit 2 ;;
-esac
-exec /sbin/ip "$@"
-SH
-chmod +x /usr/local/bin/ip`,
-  ]);
-  const ongoing = app.execClient([
-    'ping',
-    '-c',
-    '30',
-    '-i',
-    '0.1',
-    '-I',
-    'wg0',
-    '10.8.0.1',
-  ]);
-  // A host reachable only through the gateway's default needs both the Linux
-  // policy and WireGuard AllowedIPs to keep working after rollback.
-  const remote = '2001:db8:1234::1';
-  await app.connectClient(await revoked.config(), 2);
-  await app.execClient(
-    ['ip', '-6', 'address', 'add', remote + '/128', 'dev', 'lo'],
-    2
-  );
-  await app.execClient(
-    ['ping', '-6', '-c', '1', '-W', '3', 'fdcc:ad94:bacf:61a4::cafe:1'],
-    2
-  );
-  const pingRemote = () =>
-    app.execServer(['ping', '-6', '-c', '1', '-W', '3', remote]);
-  expect(await pingRemote()).toContain('0% packet loss');
-  const failedWithdrawal = await request.post(revoked.url, {
-    headers: { Origin: app.url },
-    data: { ...revoked.settings, serverAllowedIps: ['2001:db8:2222::/64'] },
-  });
-  expect(failedWithdrawal.status()).toBe(500);
-  expect(await pingRemote()).toContain('0% packet loss');
-  expect(await app.execServer(['wg', 'show', 'wg0', 'allowed-ips'])).toContain(
-    '2001:db8:2222::/64'
-  );
-  // The old gateway is already removed from saved settings. A failed
-  // transfer to the next gateway must keep the old one carrying traffic.
-  const candidateRoutes = (routes: string[]) =>
-    request.post(candidate.url, {
-      headers: { Origin: app.url },
-      data: { ...candidate.settings, serverAllowedIps: routes },
-    });
-  await app.execServer(['touch', '/tmp/fail-rule-read']);
-  expect((await candidateRoutes(['::/0'])).status()).toBe(500);
-  expect(await pingRemote()).toContain('0% packet loss');
-  expect(await mark()).toBe(appliedMark);
-  expect((await candidateRoutes([])).status()).toBe(500);
-  const failed = await request.post(revoked.url + '/disable', {
-    headers: { Origin: app.url },
-  });
-  expect(failed.status()).toBe(500);
-  expect((await failed.json()).message).toContain('::/0 on wg0 in table 51820');
-  expect(await app.peers()).not.toContain(revoked.settings.publicKey);
-  expect(await read('-6')).toBe(v6);
-  expect(await read('-4')).toBe(v4);
-  expect(
-    await app.execServer(['ip', '-6', 'route', 'get', '2001:db8::1'])
-  ).toContain('dev wg0');
-  expect(await ongoing).toContain(', 0% packet loss');
-  await app.execServer(['mv', '/usr/local/bin/ip', '/tmp/failed-ip']);
-  await expect
-    .poll(() => read('-6'), { timeout: 75_000, intervals: [1000] })
-    .toBe(beforeV6);
-  expect(await read('-4')).toBe(v4);
-  expect(await index()).toBe(originalIndex);
-  expect(await app.execServer(['cat', '/tmp/phases'])).toBe('up');
-  expect(await app.peers()).not.toContain(revoked.settings.publicKey);
-  expect(await app.pingFromClient('10.8.0.1')).toBe(true);
-
-  // With no previous gateway, a failed addition leaves only the independent site.
-  await api.table('100');
-  await app.execServer(['ip', 'link', 'add', 'fallback6', 'type', 'dummy']);
-  await app.execServer(['ip', 'link', 'set', 'fallback6', 'up']);
-  await app.execServer([
-    'ip',
-    '-6',
-    'address',
-    'add',
-    'fd12:3456::1/64',
-    'dev',
-    'fallback6',
-    'nodad',
-  ]);
-  await app.execServer([
-    'ip',
-    '-6',
-    'route',
-    'add',
-    'default',
-    'dev',
-    'fallback6',
-    'table',
-    '100',
-    'metric',
-    '1',
-  ]);
-  expect((await candidateRoutes(['::/0', '2001:db8:abcd::/64'])).status()).toBe(
-    409
-  );
-  const allowed = await app.execServer(['wg', 'show', 'wg0', 'allowed-ips']);
-  expect(allowed).not.toContain('::/0');
-  expect(allowed).toContain('2001:db8:abcd::/64');
-});
-
 test('keeps host routing precedence when automatic policy has no free priorities before main', async ({
   request,
   app,
 }) => {
   const api = await routingAdmin(request, app.url);
   const peer = await api.peer('Default gateway');
-  const ip = (...args: string[]) => app.execServer(['ip', '-4', ...args]);
-  const destination = '203.0.113.17';
+  const ip = (...args: string[]) => app.execServer(['ip', '-6', ...args]);
+  const v4Rules = () => app.execServer(['ip', '-4', 'rule', 'show']);
+  const beforeV4 = await v4Rules();
+  const destination = '2001:db8::17';
   const selector = ['to', destination, 'table', '600'];
-  await ip('route', 'add', 'default', 'dev', 'eth0', 'table', '600');
+  await ip('route', 'add', 'default', 'dev', 'lo', 'table', '600');
   await ip('rule', 'add', 'pref', '32765', ...selector);
   const before = await ip('rule', 'show');
 
   const requestDefault = () =>
     request.post(peer.url, {
       headers: { Origin: app.url },
-      data: { ...peer.settings, serverAllowedIps: ['0.0.0.0/0'] },
+      data: { ...peer.settings, serverAllowedIps: ['0.0.0.0/0', '::/0'] },
     });
   const failed = await requestDefault();
   expect(failed.status()).toBe(409);
   expect((await failed.json()).message).toContain('routing rule priorities');
   expect(await ip('rule', 'show')).toBe(before);
-  expect(await ip('route', 'get', destination)).toContain('table 600');
-  expect(await app.execServer(['wg', 'show', 'wg0', 'fwmark'])).toBe('off');
-  expect(
-    await app.execServer(['wg', 'show', 'wg0', 'allowed-ips'])
-  ).not.toContain('0.0.0.0/0');
+  expect(await v4Rules()).toBe(beforeV4);
+  for (const table of ['mangle', 'raw']) {
+    expect(await app.execServer(['iptables', '-t', table, '-S'])).not.toMatch(
+      /wg-easy-[\da-f-]+/
+    );
+  }
+  expect(await app.execServer(['wg', 'show', 'interfaces'])).toBe('');
 
-  // Leave precisely two priorities free. A subsequent sync must reuse its pair.
+  // Leave precisely two priorities free, then retry the failed start.
   await ip('rule', 'add', 'pref', '32763', ...selector);
   await ip('rule', 'del', 'pref', '32765', ...selector);
-  await peer.routes(['0.0.0.0/0']);
-  await peer.routes(['0.0.0.0/0', '192.0.2.0/24']);
-  expect(await ip('route', 'get', destination)).toContain('table 600');
-  expect(await ip('route', 'get', '203.0.113.18')).toContain('dev wg0');
-
-  // Move the host rule behind an active suppress-main rule. A specific main
-  // route now masks the host's table until the old automatic policy yields.
-  await ip('route', 'add', destination, 'dev', 'eth0');
-  await ip('rule', 'del', 'pref', '32763', ...selector);
-  await ip('rule', 'add', 'pref', '32765', ...selector);
-  expect(await ip('route', 'get', destination)).not.toContain('table 600');
-  expect((await requestDefault()).status()).toBe(409);
-  expect(await ip('rule', 'show')).toBe(before);
-  expect(await ip('route', 'get', destination)).toContain('table 600');
-  expect(await app.execServer(['wg', 'show', 'wg0', 'fwmark'])).toBe('off');
+  await peer.routes(['0.0.0.0/0', '::/0']);
+  await peer.routes(['0.0.0.0/0', '::/0', '192.0.2.0/24']);
+  expect(await ip('route', 'get', '2001:db8::18')).toContain('dev wg0');
 });
 
 test('allocates a socket mark outside host rule masks in both families', async ({
@@ -429,19 +263,23 @@ test('allocates a socket mark outside host rule masks in both families', async (
   });
   expect(blocked.status()).toBe(409);
   expect((await blocked.json()).message).toContain('No firewall mark');
-  expect(await mark()).toBe('off');
+  expect(await app.execServer(['wg', 'show', 'interfaces'])).toBe('');
   expect(await route('51820')).toContain('table 600');
 });
 
-test('borrows host marks, avoids occupied tables and preserves replaced rules and foreign routes', async ({
+test('uses a PreUp socket mark and leaves a host replacement rule alone during teardown', async ({
   request,
   app,
 }) => {
   const api = await routingAdmin(request, app.url);
   const peer = await api.peer('Default gateway');
+  await api.post('/api/admin/hooks', {
+    preUp: 'wg set %i fwmark 600',
+    postUp: '',
+    preDown: '',
+    postDown: '',
+  });
   const ip = (...args: string[]) => app.execServer(['ip', ...args]);
-  const mark = () => app.execServer(['wg', 'show', 'wg0', 'fwmark']);
-  await app.execServer(['wg', 'set', 'wg0', 'fwmark', '600']);
   await ip(
     '-6',
     'rule',
@@ -454,107 +292,42 @@ test('borrows host marks, avoids occupied tables and preserves replaced rules an
     '600'
   );
   await ip('-4', 'route', 'add', '192.0.2.0/24', 'dev', 'eth0', 'table', '601');
-  await ip(
-    '-4',
-    'route',
-    'add',
-    'default',
-    'dev',
-    'wg0',
-    'table',
-    '100',
-    'proto',
-    '99'
-  );
+  await peer.routes(['0.0.0.0/0']);
+  expect(await app.execServer(['wg', 'show', 'wg0', 'fwmark'])).toBe('0x258');
   const rules = async () =>
     JSON.parse(await ip('-4', '-N', '-j', '-d', 'rule', 'show')) as {
       priority: number;
-      protocol: string;
-      table: string;
       fwmark?: string;
+      table: string;
+      protocol: string;
       not?: null;
     }[];
-  const lookup = async () =>
-    (await rules()).find(
-      (r) => r.protocol === '242' && Object.hasOwn(r, 'not')
-    )!;
-  await peer.routes(['0.0.0.0/0']);
-  expect(await mark()).toBe('0x258');
-  expect(await lookup()).toMatchObject({ fwmark: '0x258', table: '602' });
-  // A host can change its socket mark while an automatic policy is active.
-  await app.execServer(['wg', 'set', 'wg0', 'fwmark', '610']);
-  await peer.routes(['0.0.0.0/0', '192.0.2.128/25']);
-  const current = await lookup();
-  expect(current.fwmark).toBe('0x262');
-  expect(
-    await ip('-4', 'route', 'get', '203.0.113.1', 'mark', '610')
-  ).toContain('dev eth0');
+  const lookup = (await rules()).find((rule) => Object.hasOwn(rule, 'not'))!;
+  expect(lookup).toMatchObject({ fwmark: '0x258', table: '602' });
   const selector = [
     'fwmark',
-    '610',
+    '600',
     'table',
-    current.table,
+    lookup.table,
     'pref',
-    String(current.priority),
+    String(lookup.priority),
     'protocol',
     '242',
   ];
   await ip('-4', 'rule', 'del', 'not', ...selector);
   await ip('-4', 'rule', 'add', ...selector);
-  await api.table('100');
+  await api.table('off');
   expect(await rules()).toContainEqual(
     expect.objectContaining({
-      priority: current.priority,
-      fwmark: '0x262',
+      priority: lookup.priority,
+      fwmark: '0x258',
       protocol: '242',
     })
-  );
-  await api.table('off');
-  expect(await ip('-4', '-N', 'route', 'show', 'table', '100')).toContain(
-    'default dev wg0 proto 99'
   );
   expect(await ip('-4', 'route', 'show', 'table', '601')).toContain(
     '192.0.2.0/24 dev eth0'
   );
   expect(await ip('-6', 'rule', 'show')).toContain('lookup 600');
-  await api.table('101');
-  const site = '192.0.2.128/25';
-  await ip(
-    '-4',
-    'route',
-    'replace',
-    site,
-    'dev',
-    'wg0',
-    'table',
-    '101',
-    'proto',
-    '242',
-    'mtu',
-    '1300'
-  );
-  await ip(
-    '-4',
-    'route',
-    'replace',
-    'default',
-    'dev',
-    'wg0',
-    'table',
-    '101',
-    'proto',
-    '242',
-    'src',
-    '10.8.0.1'
-  );
-  await api.table('off');
-  expect(await ip('-4', '-N', 'route', 'show', 'table', '101')).toContain(
-    'src 10.8.0.1'
-  );
-  expect(
-    await ip('-4', 'route', 'show', 'table', '101', 'exact', site)
-  ).toContain('mtu 1300');
-  expect(await mark()).toBe('0x262');
 });
 
 test.describe('strict reverse-path filtering', () => {
@@ -619,12 +392,6 @@ test.describe('strict reverse-path filtering', () => {
     );
     await ip('route', 'del', connected.dst, 'dev', 'eth0');
     await app.execClient(['wg-quick', 'down', 'wg0']);
-    const iface = '/api/admin/interface';
-    await api.post(iface, {
-      ...(await (await request.get(iface)).json()),
-      port: 51830,
-    });
-
     await gateway.routes(['0.0.0.0/0']);
     expect(await app.execServer(['ip', 'route', 'get', endpoint])).toContain(
       'dev wg0'

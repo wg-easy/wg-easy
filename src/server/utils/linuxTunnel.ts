@@ -4,10 +4,11 @@ import { readFile } from 'node:fs/promises';
 import { createError } from 'nuxt/server';
 
 import {
-  DefaultPolicy,
-  type RestoreDefaultPeer,
+  installDefaultRoutes,
+  removeDefaultRules,
+  type DefaultRouteTables,
 } from '#server/features/vpn/defaultPolicy';
-import { SiteRoutes, routesForPeers } from '#server/features/vpn/siteRoutes';
+import { SiteRoutes } from '#server/features/vpn/siteRoutes';
 import {
   readTunnelRecord,
   removeTunnelRecord,
@@ -19,7 +20,6 @@ import type { InterfaceType } from '#db/repositories/interface/types';
 import {
   expandHook,
   tunnelAddresses,
-  type ServerPeer,
 } from '#server/features/vpn/configuration';
 import { exec } from '#server/utils/cmd';
 import { WG_ENV } from '#server/utils/config';
@@ -51,15 +51,7 @@ export class LinuxTunnel {
   private pendingDownHooks = false;
   // Only this process can finish removal after it observed link deletion.
   private deleted?: TunnelRecord;
-  private defaultPolicy = new DefaultPolicy();
-  private readonly sites = new SiteRoutes();
-
-  private attach(record: TunnelRecord) {
-    this.running = record;
-    this.defaultPolicy = new DefaultPolicy(record.policy, async (policy) => {
-      await saveTunnelRecord({ ...this.running!, policy });
-    });
-  }
+  readonly sites = new SiteRoutes();
 
   async checkOwnership(name: string) {
     const link = await linkIdentity(parseInterfaceName(name));
@@ -73,9 +65,7 @@ export class LinuxTunnel {
         record.policy.tag === link.alias &&
         record.index === link.index
       ) {
-        if (!this.running) {
-          this.attach(record);
-        }
+        this.running = record;
         return record;
       }
     } catch (cause) {
@@ -131,7 +121,7 @@ export class LinuxTunnel {
       postDown: '',
       policy: { tag: alias, owned: { ipv4: [], ipv6: [] } },
     };
-    this.attach(record);
+    this.running = record;
     await saveTunnelRecord(record);
   }
 
@@ -188,37 +178,28 @@ export class LinuxTunnel {
     }
   }
 
-  async syncRoutes(
+  async configureLink(
     network: InterfaceType,
-    clients: ServerPeer[],
     enableIpv6: boolean,
-    restorePeer: RestoreDefaultPeer
+    defaultTables: DefaultRouteTables
   ) {
-    const { sites, defaults } = routesForPeers(
-      network.routingTable,
-      clients,
-      enableIpv6
-    );
-    const siteError = await this.sites.sync(network, sites);
-    const policyError = await this.defaultPolicy.sync(
-      network,
-      defaults,
-      restorePeer
-    );
-    return { siteError, policyError };
-  }
-
-  async configureLink(network: InterfaceType, enableIpv6: boolean) {
-    const name = parseInterfaceName(network.name);
+    if (process.platform !== 'linux') {
+      return;
+    }
+    if (this.running?.name !== network.name) {
+      throw new Error(`No tunnel recovery record for ${network.name}`);
+    }
+    const { name } = this.running;
     for (const address of tunnelAddresses(network, enableIpv6)) {
       await exec(`ip address add ${address} dev ${name}`);
     }
     await setTunnelMtu(name, network.mtu);
     await exec(`ip link set dev ${name} up`);
+    return installDefaultRoutes(this.running, network, defaultTables);
   }
 
   async stop(name: string, skipHooks = false) {
-    const running = await this.checkOwnership(name);
+    let running = await this.checkOwnership(name);
     if (!running) {
       this.running = undefined;
       return this.finishDeletion(skipHooks);
@@ -226,20 +207,16 @@ export class LinuxTunnel {
     // Consume PreDown before invoking Bash. A crash or partial hook failure
     // cannot safely establish which commands from that hook already ran.
     if (running.preDown || (skipHooks && running.postDown)) {
-      const consumed = {
+      const { preDown, postDown } = running;
+      running = {
         ...running,
         preDown: '',
-        postDown: skipHooks ? '' : running.postDown,
+        postDown: skipHooks ? '' : postDown,
       };
-      await saveTunnelRecord(consumed);
-      this.running = consumed;
-      if (!skipHooks && running.preDown) {
-        await wg.runHook(
-          name,
-          running.table,
-          running.preDown,
-          running.disableIpv6
-        );
+      await saveTunnelRecord(running);
+      this.running = running;
+      if (!skipHooks && preDown) {
+        await wg.runHook(name, running.table, preDown, running.disableIpv6);
         if (!(await this.checkOwnership(name))) {
           throw new Error(
             `Tunnel interface ${name} disappeared during PreDown`
@@ -247,7 +224,7 @@ export class LinuxTunnel {
         }
       }
     }
-    await this.defaultPolicy.stop(name, running.backend);
+    await removeDefaultRules(running);
     await exec(`ip link delete dev ${name}`);
     this.deleted = this.running;
     this.running = undefined;
