@@ -172,7 +172,7 @@ export class LinuxTunnel {
     network: InterfaceType,
     clients: ServerPeer[],
     enableIpv6: boolean,
-    restorePeer?: RestoreDefaultPeer
+    restorePeer: RestoreDefaultPeer
   ) {
     const { sites, defaults } = routesForPeers(
       network.routingTable,

@@ -272,11 +272,16 @@ describe('Server Allowed IP routes', () => {
     }
   );
 
-  test('keeps other site routes up and retries a startup conflict without restarting', async () => {
+  test('keeps other routes up and retries a conflict cleared by PostUp on the next maintenance pass', async () => {
     const { store, entries, wg } = await fixture();
     const other = '198.51.100.0/24';
     entries.set(prefix, { dev: 'eth0', table: '254', protocol: '4' });
     await store.clients.update(1, { serverAllowedIps: [prefix, other] });
+    wg.runHook.mockImplementation(async () => {
+      expect(entries.get(other)?.dev).toBe('wg0');
+      entries.delete(prefix);
+      return '';
+    });
     const log = vi.spyOn(console, 'error').mockImplementation(() => {});
     await vpn.start();
     expect(log).toHaveBeenCalledWith(
@@ -284,10 +289,10 @@ describe('Server Allowed IP routes', () => {
       expect.objectContaining({ status: 409 })
     );
     expect(entries.get(other)?.dev).toBe('wg0');
-    expect(entries.get(prefix)?.dev).toBe('eth0');
-    entries.delete(prefix);
+    expect(entries.has(prefix)).toBe(false);
     await vpn.maintain();
     expect(entries.get(prefix)?.protocol).toBe('242');
+    expect(wg.runHook).toHaveBeenCalledOnce();
     expect(wg.up).toHaveBeenCalledOnce();
     expect(wg.down).toHaveBeenCalledOnce();
   });

@@ -6,7 +6,7 @@ import { createError } from 'nuxt/server';
 
 import { exec } from '#server/utils/cmd';
 import { normalizePrefix } from '#server/utils/ip';
-import type { ServerPeer } from '#server/features/vpn/configuration';
+import type { ClientType } from '#db/repositories/client/types';
 import type { InterfaceType } from '#db/repositories/interface/types';
 import type { UserConfigType } from '#db/repositories/userConfig/types';
 
@@ -84,16 +84,9 @@ type ParsedEntry = {
 };
 
 type FirewallClient = Pick<
-  ServerPeer,
-  | 'id'
-  | 'name'
-  | 'ipv4Address'
-  | 'ipv6Address'
-  | 'allowedIps'
-  | 'serverAllowedIps'
-  | 'firewallIps'
-  | 'enabled'
->;
+  ClientType,
+  'id' | 'name' | 'allowedIps' | 'serverAllowedIps' | 'firewallIps' | 'enabled'
+> & { ipv4Address: string | null; ipv6Address: string | null };
 
 const replyMatch = '-m conntrack --ctstate ESTABLISHED --ctdir REPLY';
 type AddressFamily = 'IPv4' | 'IPv6';

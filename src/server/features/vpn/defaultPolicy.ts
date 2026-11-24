@@ -485,7 +485,7 @@ export class DefaultPolicy {
   async sync(
     network: InterfaceType,
     defaults: Set<RouteFamily>,
-    restorePeer?: RestoreDefaultPeer
+    restorePeer: RestoreDefaultPeer
   ) {
     const name = network.name;
     let failure;
@@ -510,7 +510,7 @@ export class DefaultPolicy {
         let error = cause;
         const prefix = family === 'ipv4' ? '0.0.0.0/0' : '::/0';
         try {
-          await restorePeer?.(family, prefix);
+          await restorePeer(family, prefix);
         } catch (rollbackError) {
           error = new AggregateError(
             [cause, rollbackError],

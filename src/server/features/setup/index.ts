@@ -2,7 +2,7 @@ import { createError } from 'nuxt/server';
 
 import { importLegacyConfiguration } from './import';
 
-import { changeCidr } from '#server/features/vpn/interface';
+import { renumberClients } from '#server/features/vpn/subnets';
 import { commit } from '#server/features/vpn/lifecycle';
 import { getDatabase } from '#db';
 import type { SetupStepType } from '#shared/contracts/general';
@@ -82,10 +82,12 @@ export function initialize(config: InitialSetup) {
       return;
     }
     if (config.ipv4Cidr && config.ipv6Cidr) {
-      await changeCidr(tx, {
+      const cidrs = {
         ipv4Cidr: config.ipv4Cidr,
         ipv6Cidr: config.ipv6Cidr,
-      });
+      };
+      await tx.interfaces.update(cidrs);
+      await renumberClients(tx, await tx.clients.getAll(), cidrs);
     }
     if (config.dns) {
       await tx.userConfigs.update({ defaultDns: config.dns });

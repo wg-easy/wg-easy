@@ -1,7 +1,7 @@
 import { createError } from 'nuxt/server';
 import { parseCidr } from 'cidr-tools';
 
-import { commit, unchanged } from './lifecycle';
+import { commit, runningSettings, unchanged } from './lifecycle';
 import {
   authorize,
   authorizeClient,
@@ -22,7 +22,7 @@ import type {
   UpdateClientType,
 } from '#shared/contracts/client';
 import type { UserConfigType } from '#db/repositories/userConfig/types';
-import { nextIP } from '#server/utils/ip';
+import { assertSubnetCapacity, nextIP } from '#server/utils/ip';
 
 type ClientAction =
   | ClientBulkType['action']
@@ -93,11 +93,14 @@ export async function create(actor: Actor, data: ClientCreateType) {
     : null;
   return commit(async (tx) => {
     assertClientEnabled(true, data.expiresAt);
-    const network = await tx.interfaces.get();
+    const saved = await tx.interfaces.get();
+    const network = runningSettings(saved);
     if (data.publicKey) {
       await assertDevicePublicKey(tx, network, data.publicKey);
     }
     const clients = await tx.clients.getAll();
+    // A peer created while a subnet change is pending must fit after restart.
+    assertSubnetCapacity(saved, clients.length + 1);
     const [created] = await tx.clients.insert({
       ...clientDefaults(config),
       ...data,
@@ -219,7 +222,7 @@ export async function update(
     assertClientEnabled(data.enabled, data.expiresAt);
     const addresses = assertClientAddresses(
       data,
-      await tx.interfaces.get(),
+      runningSettings(await tx.interfaces.get()),
       (await tx.clients.getAll()).filter((client) => client.id !== clientId)
     );
     await tx.clients.update(clientId, { ...data, ...addresses });

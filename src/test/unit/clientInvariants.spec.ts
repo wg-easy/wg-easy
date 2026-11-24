@@ -2,6 +2,7 @@ import { describe, expect, test } from 'vitest';
 
 import { vpnFixture } from '../helpers/vpn';
 
+import * as vpn from '#server/features/vpn/lifecycle';
 import * as clients from '#server/features/vpn/clients';
 import * as settings from '#server/features/vpn/interface';
 import { roles } from '#shared/utils/permissions';
@@ -147,7 +148,7 @@ describe('client access and addresses', () => {
 });
 
 describe('CIDR changes', () => {
-  test('rolls back both networks and earlier peer reassignments if the IPv6 pool runs out', async () => {
+  test('rejects a pending IPv6 subnet too small for the existing peers', async () => {
     const { store, commands, writeConfiguration, firewall } =
       await vpnFixture();
     await clients.create(admin, { name: 'Second', expiresAt: null });
@@ -157,8 +158,6 @@ describe('CIDR changes', () => {
     commands.sync.mockClear();
     firewall.rebuildRules.mockClear();
 
-    // IPv4 fits both clients; IPv6 fits only the first. The second allocation
-    // must undo the first client's already-completed address changes too.
     await expect(
       settings.updateCidr(admin, {
         ipv4Cidr: '192.0.2.0/29',
@@ -173,6 +172,35 @@ describe('CIDR changes', () => {
     expect(firewall.rebuildRules).not.toHaveBeenCalled();
   });
 
+  test('uses the running pool for edits and keeps enough space for every peer after a cold start', async () => {
+    const { store, commands } = await vpnFixture();
+    await vpn.start();
+    const ipv6Cidr = (await store.interfaces.get()).ipv6Cidr;
+    commands.sync.mockClear();
+    await settings.updateCidr(admin, { ipv4Cidr: '192.0.2.0/30', ipv6Cidr });
+    expect(commands.sync).not.toHaveBeenCalled();
+    await clients.update(
+      admin,
+      1,
+      ClientUpdateSchema.parse({
+        ...(await store.clients.get(1)),
+        ipv4Address: '10.8.0.10',
+      })
+    );
+    await expect(
+      clients.create(admin, { name: 'Second', expiresAt: null })
+    ).rejects.toMatchObject({
+      status: 422,
+      message: expect.stringContaining('192.0.2.0/30'),
+    });
+    expect((await store.clients.get(1))?.ipv4Address).toBe('10.8.0.10');
+
+    await vpn.stop();
+    await vpn.start();
+    expect((await store.clients.get(1))?.ipv4Address).toBe('192.0.2.2');
+    expect((await settings.get(admin)).restartRequired).toBe(false);
+  });
+
   test('allows the former gateway as a client address but rejects the current gateway', async () => {
     const { store, writeConfiguration } = await vpnFixture();
     const before = await store.clients.get(1);
@@ -183,6 +211,7 @@ describe('CIDR changes', () => {
         ipv6Cidr: 'fdcc:ad94:bacf:61a4::cafe:f/112',
       })
     );
+    await vpn.restart();
     expect(await store.clients.get(1)).toMatchObject({
       ipv4Address: before!.ipv4Address,
       ipv6Address: before!.ipv6Address,
@@ -231,6 +260,7 @@ describe('CIDR changes', () => {
       ipv4Cidr: '10.8.0.2/30',
       ipv6Cidr: 'fdcc:ad94:bacf:61a4::cafe:2/126',
     });
+    await vpn.restart();
     expect(await store.clients.get(1)).toMatchObject({
       ipv4Address: '10.8.0.1',
       ipv6Address: 'fdcc:ad94:bacf:61a4::cafe:1',
@@ -240,6 +270,7 @@ describe('CIDR changes', () => {
       ipv4Cidr: '10.8.0.0/30',
       ipv6Cidr: 'fdcc:ad94:bacf:61a4::cafe:0/126',
     });
+    await vpn.restart();
     expect(await store.clients.get(1)).toMatchObject({
       ipv4Address: '10.8.0.2',
       ipv6Address: 'fdcc:ad94:bacf:61a4::cafe:2',
@@ -253,6 +284,7 @@ describe('CIDR changes', () => {
       ipv4Cidr: '10.8.0.0/30',
       ipv6Cidr: network.ipv6Cidr,
     });
+    await vpn.restart();
     expect((await store.clients.get(1))?.ipv4Address).toBe('10.8.0.2');
     expect((await store.interfaces.get()).ipv4Cidr).toBe('10.8.0.0/30');
   });
@@ -271,6 +303,7 @@ describe('CIDR changes', () => {
     });
     const ipv6Cidr = (await store.interfaces.get()).ipv6Cidr;
     await settings.updateCidr(admin, { ipv4Cidr: '10.8.0.0/29', ipv6Cidr });
+    await vpn.restart();
     expect((await store.clients.get(id))?.ipv4Address).toBe('10.8.0.2');
     expect((await store.clients.get(third))?.ipv4Address).toBe('10.8.0.3');
     expect((await store.clients.get(1))?.ipv4Address).toBe('10.8.0.4');
@@ -285,6 +318,7 @@ describe('CIDR changes', () => {
       ipv4Cidr: '10.8.0.0/24',
       ipv6Cidr: 'fdcc:ad94:bacf:61a4::cafe:4/126',
     });
+    await vpn.restart();
     expect((await store.clients.get(1))?.ipv6Address).toBe(
       'fdcc:ad94:bacf:61a4::cafe:6'
     );

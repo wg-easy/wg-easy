@@ -95,6 +95,10 @@ export class ClientRepository {
     return result.map(withTimestamps);
   }
 
+  count() {
+    return this.db.$count(client);
+  }
+
   getEnabledSiteGateways() {
     return this.db.query.client.findMany({
       columns: { ipv4Address: true, ipv6Address: true, serverAllowedIps: true },

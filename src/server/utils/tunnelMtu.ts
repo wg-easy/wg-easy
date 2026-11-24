@@ -30,23 +30,25 @@ async function underlayMtu(device: string) {
   const show = (field: string) =>
     run(WG_ENV.WG_EXECUTABLE, ['show', device, field]);
   const { stdout } = await show('endpoints');
-  const endpoints = new Set<string>();
-  for (const match of stdout.matchAll(/\t(?:\[([^\]]+)\]|([\d.]+)):\d+$/gm)) {
-    endpoints.add(match[1] ?? match[2]!);
-  }
+  const endpoints = new Set(
+    stdout
+      .matchAll(/\t(?:\[([^\]]+)\]|([\d.]+)):\d+$/gm)
+      .map((match) => match[1] ?? match[2]!)
+  );
   if (endpoints.size) {
     // Match the marked UDP socket even when the tunnel carries a default route.
     const fwmark = (await show('fwmark')).stdout.trim();
+    const mark = fwmark === 'off' ? [] : ['mark', fwmark];
     let smallest = Infinity;
     for (const endpoint of endpoints) {
       const [host, scope] = endpoint.split('%');
-      const lookup = ['route', 'get', host!];
-      if (scope) {
-        lookup.push('oif', scope);
-      }
-      if (fwmark !== 'off') {
-        lookup.push('mark', fwmark);
-      }
+      const lookup = [
+        'route',
+        'get',
+        host!,
+        ...(scope ? ['oif', scope] : []),
+        ...mark,
+      ];
       // An unreachable peer must not hide another peer's usable route.
       const routes = await ipJson<Route>(lookup).catch(() => []);
       const mtu = routeMtu(routes[0]);
@@ -61,11 +63,9 @@ async function underlayMtu(device: string) {
 
   for (const family of ['-4', '-6']) {
     const routes = await ipJson<Route>([family, 'route', 'show', 'default']);
-    for (const route of routes) {
-      const mtu = routeMtu(route);
-      if (mtu) {
-        return mtu;
-      }
+    const mtu = routes.map(routeMtu).find((value) => value !== undefined);
+    if (mtu !== undefined) {
+      return mtu;
     }
   }
   return 1500;

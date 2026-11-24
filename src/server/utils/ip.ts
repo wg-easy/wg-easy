@@ -2,9 +2,11 @@ import { Resolver } from 'node:dns/promises';
 import { networkInterfaces } from 'node:os';
 
 import { normalizeIp, parseIp, stringifyIp } from 'ip-bigint';
+import { createError } from 'nuxt/server';
 import { parseCidr } from 'cidr-tools';
 
 import { cacheFunction } from '#server/utils/cache';
+import type { InterfaceCidrUpdateType } from '#shared/contracts/interface';
 import type { ClientNextIpType } from '#db/repositories/client/types';
 
 type ParsedCidr = ReturnType<typeof parseCidr>;
@@ -33,6 +35,26 @@ export function getGatewayAddress(cidr: ParsedCidr) {
     { number: gatewayNumber(cidr), version: cidr.version },
     { hexify: true }
   );
+}
+
+export function assertSubnetCapacity(
+  cidrs: InterfaceCidrUpdateType,
+  count: number
+) {
+  for (const value of [cidrs.ipv4Cidr, cidrs.ipv6Cidr]) {
+    const pool = parseCidr(value);
+    const reserved = new Set([pool.start, pool.end]);
+    const gateway = gatewayNumber(pool);
+    if (gateway <= pool.end) {
+      reserved.add(gateway);
+    }
+    if (BigInt(count) > pool.end - pool.start + 1n - BigInt(reserved.size)) {
+      throw createError({
+        status: 422,
+        message: `Maximum number of clients reached for ${value}. Choose a larger IPv${pool.version} subnet.`,
+      });
+    }
+  }
 }
 
 /** Match the allocation pool: reserve the network, server, and last address. */

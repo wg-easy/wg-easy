@@ -48,7 +48,7 @@ When AmneziaWG is active, **Config** also provides default obfuscation parameter
 - **Routing Table**: `auto`, `off`, or a routing table number.
 - **AmneziaWG Obfuscation Parameters**: Server-side AmneziaWG settings, shown when AmneziaWG is active.
 
-**Change CIDR** updates the VPN address ranges, preserves client addresses that remain usable, and reassigns addresses that fall outside the new pool or become reserved. Distribute updated configurations to clients whose addresses changed. **Restart Interface** brings the interface down and back up, disconnecting all clients. Restart to apply a saved listen port, device, or CIDR and load the next set of hooks. MTU and routing table changes apply when you save.
+**Change CIDR** saves the IPv4 and IPv6 ranges for the next interface start. Until then, clients and configuration downloads use the current ranges. Adding a client requires space in both the current and saved ranges. **Restart Interface** disconnects clients and applies the saved ranges, listen port, device and hooks. Clients keep any address still usable in the new range. After restart, download and distribute a new configuration for each client whose address changed. MTU and routing table changes apply when you save.
 
 The address in the CIDR selects the server's gateway address. A network address keeps the first host as the gateway, preserving existing setups: `10.8.0.0/24` uses `10.8.0.1`. To choose another gateway, enter it directly, for example `10.8.0.15/24`. Clients then use available addresses from `10.8.0.1` through `10.8.0.254`, excluding `10.8.0.15`. The same rule applies to IPv6 and unattended setup CIDRs. The network and last address remain reserved for both address families.
 
@@ -92,7 +92,7 @@ Filtering covers forwarded traffic and traffic addressed to the VPN server itsel
 **Hooks** configures commands run on the server when the VPN interface starts or stops:
 
 - **PreUp**: Before the interface starts.
-- **PostUp**: After the interface starts.
+- **PostUp** runs after wg-easy attempts to install the routes. If a route conflicts, other routes can still come up. Maintenance retries the failed route.
 - **PreDown**: Before the interface stops.
 - **PostDown**: After the interface stops.
 

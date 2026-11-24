@@ -13,15 +13,7 @@ type Options = {
   amnezia?: boolean;
   uiPort?: string;
 };
-export type PeerAddresses = {
-  ipv4Address: string | null;
-  ipv6Address: string | null;
-};
-export type ServerPeer = Omit<
-  ClientType,
-  'createdAt' | 'updatedAt' | keyof PeerAddresses
-> &
-  PeerAddresses;
+export type ServerPeer = Omit<ClientType, 'createdAt' | 'updatedAt'>;
 
 /** The complete server file, including enabled peers and its final newline. */
 export function generateServerConfig(
@@ -67,8 +59,8 @@ export function peerAllowedIps(
   enableIpv6: boolean
 ) {
   return [
-    ...(client.ipv4Address ? [`${client.ipv4Address}/32`] : []),
-    ...(enableIpv6 && client.ipv6Address ? [`${client.ipv6Address}/128`] : []),
+    `${client.ipv4Address}/32`,
+    ...(enableIpv6 ? [`${client.ipv6Address}/128`] : []),
     ...(client.serverAllowedIps ?? []).filter(
       (prefix) => enableIpv6 || !prefix.includes(':')
     ),
@@ -84,10 +76,8 @@ function generateServerPeer(client: ServerPeer, options: Options = {}) {
     `PublicKey = ${client.publicKey}`,
     // An all-zero key clears any preshared key on the active peer.
     `PresharedKey = ${client.preSharedKey ?? zeroWireGuardKey}`,
+    `AllowedIPs = ${allowedIps.join(', ')}`,
   ];
-  if (allowedIps.length) {
-    lines.push(`AllowedIPs = ${allowedIps.join(', ')}`);
-  }
   if (client.serverEndpoint) {
     lines.push(`Endpoint = ${client.serverEndpoint}`);
   }
