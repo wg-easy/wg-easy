@@ -29,7 +29,7 @@ test('distributes renumbered configurations while established clients use the ru
 }) => {
   const { post, json, create, download } = await admin(page.request, app.url);
   const network = await json(iface);
-  await post(iface, { ...network, firewallEnabled: true });
+  await post(iface, { ...network, firewallEnabled: true, routingTable: '123' });
   const witness = await create('Established client');
   await app.connectClient(await download(witness));
   await expect.poll(() => app.pingFromClient('10.8.0.1')).toBe(true);
@@ -54,6 +54,14 @@ test('distributes renumbered configurations while established clients use the ru
   await app.connectClient(await download(pending), 2);
   expect(await app.pingFromClient('10.8.0.1', 2)).toBe(false);
   expect(await app.pingFromClient('10.8.0.1')).toBe(true);
+
+  const saved = await json(witness);
+  await post(witness, { ...saved, serverAllowedIps: ['0.0.0.0/0'] });
+  const route = await app.execServer(['ip', '-4', 'route', 'show', 'table', '123', 'default']);
+  expect(route).toContain('default dev wg0');
+  expect((await json(iface)).restartRequired).toBe(true);
+  expect(await app.pingFromClient('10.8.0.1')).toBe(true);
+  await post(witness, saved);
 
   const nat = () =>
     app.execServer(['iptables', '-t', 'nat', '-S', 'POSTROUTING']);
@@ -132,4 +140,42 @@ test.describe('dual-stack peers', () => {
     expect(await routes('-4')).toContain('192.0.2.0/24');
     expect(await rules()).toContain(saved.ipv4Address);
   });
+});
+
+test('protects an old address across staged gateway edits and key rotation until its owner is deleted', async ({
+  app,
+  request,
+}) => {
+  const { post, json, create, download } = await admin(request, app.url);
+  const { ipv6Cidr } = await json(iface);
+  const original = await create('Moved gateway client');
+  const unchanged = await create('Unaffected client');
+  await app.connectClient(await download(unchanged));
+
+  // The future gateway takes the first client's address. A subsequent edit
+  // frees it in the saved pool while the original client still uses it live.
+  const stage = (ipv4Cidr: string) =>
+    post(iface + '/cidr', { ipv4Cidr, ipv6Cidr });
+  await stage('10.8.0.2/24');
+  await stage('10.8.0.9/24');
+  const pending = await create('Future address owner');
+  expect((await json(pending)).ipv4Address).toBe('10.8.0.2');
+  const pendingKey = (await json(pending)).publicKey;
+  expect(await app.peers()).not.toContain(pendingKey);
+
+  const originalKey = (await json(original)).publicKey;
+  await post(original + '/rotateKeyPair');
+  const rotatedKey = (await json(original)).publicKey;
+  expect(await app.peers()).not.toContain(originalKey);
+  const allowed = () => app.execServer(['wg', 'show', 'wg0', 'allowed-ips']);
+  expect(await allowed()).toContain(rotatedKey + '\t10.8.0.2/32');
+  expect((await json(unchanged)).ipv4Address).toBe('10.8.0.3');
+  expect(await app.pingFromClient('10.8.0.1')).toBe(true);
+
+  await request.delete(original, {
+    headers: { Origin: app.url },
+    failOnStatusCode: true,
+  });
+  expect(await app.peers()).not.toContain(rotatedKey);
+  expect(await allowed()).toContain(pendingKey + '\t10.8.0.2/32');
 });

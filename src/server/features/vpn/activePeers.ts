@@ -17,6 +17,7 @@ function addressFor(
   field: keyof PeerAddresses,
   savedCidr: string,
   activeCidr: string,
+  peers: SavedPeer[],
   previous: ReadonlyMap<number, PeerAddresses>
 ) {
   if (savedCidr === activeCidr) {
@@ -24,8 +25,8 @@ function addressFor(
   }
   const pool = parseCidr(activeCidr);
   const reserved = new Set<string>();
-  for (const addresses of previous.values()) {
-    const address = addresses[field];
+  for (const peer of peers) {
+    const address = previous.get(peer.id)?.[field];
     if (address) {
       reserved.add(normalizeAddress(address));
     }
@@ -62,12 +63,14 @@ export function peersForRunningNetwork<T extends SavedPeer>(
     'ipv4Address',
     saved.ipv4Cidr,
     active.ipv4Cidr,
+    peers,
     previous
   );
   const ipv6 = addressFor(
     'ipv6Address',
     saved.ipv6Cidr,
     active.ipv6Cidr,
+    peers,
     previous
   );
   return peers.flatMap((peer) => {
