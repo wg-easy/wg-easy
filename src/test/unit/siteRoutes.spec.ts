@@ -23,6 +23,8 @@ async function fixture(
   vi.spyOn(commands, 'exec').mockImplementation(async (command) => {
     const args = command.split(' ');
     if (args.includes('show')) {
+      const table = args[args.indexOf('table') + 1];
+      const match = args.includes('match') ? args.at(-1) : undefined;
       return JSON.stringify(
         [
           ...entries,
@@ -31,7 +33,12 @@ async function fixture(
             (dst) => [dst, { dev: 'wg0', table: '254', protocol: '2' }] as const
           ),
         ]
-          .filter(([dst]) => containsCidr(dst, args.at(-1)!))
+          .filter(
+            ([dst, entry]) =>
+              entry.table === table &&
+              dst.includes(':') === args.includes('-6') &&
+              (!match || containsCidr(dst, match))
+          )
           .map(([dst, entry]) => ({
             dev: entry.dev,
             protocol: entry.protocol,
@@ -106,6 +113,27 @@ describe('Server Allowed IP routes', () => {
     await vpn.commit((tx) => tx.clients.deleteMany([1]));
     expect(await store.clients.get(1)).toBeUndefined();
     expect(mutate).not.toHaveBeenCalled();
+  });
+
+  test('falls back to prefix lookups when the selected table exceeds the buffer', async () => {
+    const { setRoutes, entries, mutate } = await fixture();
+    const command = vi.mocked(commands.exec);
+    const run = command.getMockImplementation()!;
+    command.mockImplementation((cmd, options) => {
+      if (cmd.endsWith('route show table 254')) {
+        throw Object.assign(new Error('stdout maxBuffer exceeded'), {
+          code: 'ERR_CHILD_PROCESS_STDIO_MAXBUFFER',
+        });
+      }
+      return run(cmd, options);
+    });
+    entries.set(prefix, { dev: 'eth0', table: '254', protocol: '4' });
+    await expect(setRoutes([prefix])).rejects.toMatchObject({ status: 409 });
+    expect(mutate).not.toHaveBeenCalled();
+    expect(command).toHaveBeenCalledWith(
+      `ip -4 -N -j -details route show table 254 match ${prefix}`,
+      expect.any(Object)
+    );
   });
   test('shares canonical prefixes across enabled clients and withdraws them on expiry', async () => {
     const { store, entries, mutate, setRoutes } = await fixture();
@@ -242,7 +270,16 @@ describe('Server Allowed IP routes', () => {
       ...extras,
     }));
     await setRoutes([prefix]);
-    extras = { prefsrc: '10.8.0.1', metrics: { mtu: 1400 } };
+    const command = vi.mocked(commands.exec);
+    const run = command.getMockImplementation()!;
+    command.mockImplementation(async (cmd, options) => {
+      const result = await run(cmd, options);
+      if (cmd.endsWith('route show table 254')) {
+        // Ownership changes after the snapshot and before deletion.
+        extras = { prefsrc: '10.8.0.1', metrics: { mtu: 1400 } };
+      }
+      return result;
+    });
     await setRoutes([]);
     expect(entries.has(prefix)).toBe(true);
   });
@@ -258,13 +295,16 @@ describe('Server Allowed IP routes', () => {
       await store.hooks.update({ postUp: hook });
       wg.runHook.mockImplementation(async () => {
         expect(entries.get(prefix)?.protocol).toBe('242');
+        entries.delete(prefix);
         entries.set(manual, { dev: 'wg0', table: '254', protocol: '3' });
         return '';
       });
       await vpn[mode]();
       expect(wg.runHook).toHaveBeenCalledExactlyOnceWith('wg0', 'auto', hook);
+      expect(entries.get(prefix)?.protocol).toBe('242');
       await setRoutes([]);
       expect(mutate.mock.calls).toEqual([
+        ['add', prefix, '254'],
         ['add', prefix, '254'],
         ['del', prefix, '254'],
       ]);
@@ -272,7 +312,7 @@ describe('Server Allowed IP routes', () => {
     }
   );
 
-  test('keeps other routes up and retries a conflict cleared by PostUp on the next maintenance pass', async () => {
+  test('installs a route immediately when PostUp clears its conflict', async () => {
     const { store, entries, wg } = await fixture();
     const other = '198.51.100.0/24';
     entries.set(prefix, { dev: 'eth0', table: '254', protocol: '4' });
@@ -284,16 +324,51 @@ describe('Server Allowed IP routes', () => {
     });
     const log = vi.spyOn(console, 'error').mockImplementation(() => {});
     await vpn.start();
-    expect(log).toHaveBeenCalledWith(
-      expect.any(String),
-      expect.objectContaining({ status: 409 })
-    );
+    expect(log).not.toHaveBeenCalled();
     expect(entries.get(other)?.dev).toBe('wg0');
-    expect(entries.has(prefix)).toBe(false);
-    await vpn.maintain();
     expect(entries.get(prefix)?.protocol).toBe('242');
     expect(wg.runHook).toHaveBeenCalledOnce();
     expect(wg.up).toHaveBeenCalledOnce();
     expect(wg.down).toHaveBeenCalledOnce();
+  });
+
+  test('reads each address family once for 200 covered dual-stack peers', async () => {
+    const { store, mutate } = await fixture();
+    const first = (await store.clients.get(1))!;
+    for (let id = 2; id <= 200; id++) {
+      await store.clients.insert({
+        ...first,
+        id,
+        publicKey: `peer-${id}`,
+        ipv4Address: `10.8.0.${id + 1}`,
+        ipv6Address: `fdcc:ad94:bacf:61a4::${id.toString(16)}`,
+      });
+    }
+    await vpn.commit((tx) => tx.interfaces.update({ firewallEnabled: true }));
+    const reads = vi
+      .mocked(commands.exec)
+      .mock.calls.map(([command]) => command)
+      .filter((command) => command.includes('route show'));
+    expect(reads.filter((command) => command.startsWith('ip -4'))).toHaveLength(
+      1
+    );
+    expect(reads.filter((command) => command.startsWith('ip -6'))).toHaveLength(
+      1
+    );
+    expect(mutate).not.toHaveBeenCalled();
+  });
+
+  test('updates covering routes within a single reconciliation', async () => {
+    const { entries, mutate, setRoutes } = await fixture();
+    const child = '192.168.120.0/24';
+    await setRoutes([prefix, child]);
+    expect([...entries.keys()]).toEqual([prefix]);
+    await setRoutes([child]);
+    expect([...entries.keys()]).toEqual([child]);
+    expect(mutate.mock.calls).toEqual([
+      ['add', prefix, '254'],
+      ['del', prefix, '254'],
+      ['add', child, '254'],
+    ]);
   });
 });

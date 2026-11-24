@@ -3,6 +3,7 @@ import { promisify } from 'node:util';
 
 import { WG_ENV } from '#server/utils/config';
 import { parseInterfaceName } from '#server/utils/interfaceName';
+import { minimumIpv6Mtu } from '#shared/contracts/validation';
 
 const run = promisify(execFile);
 
@@ -77,6 +78,11 @@ export async function setTunnelMtu(name: string, mtu: number | null) {
   }
   const device = parseInterfaceName(name);
   // Allow for the outer IPv6, UDP and tunnel headers, as wg-quick does.
-  const value = mtu ?? (await underlayMtu(device)) - 80;
+  let value = mtu;
+  if (value === null) {
+    const detected = (await underlayMtu(device)) - 80;
+    // Linux drops configured IPv6 addresses when the link falls below 1280.
+    value = WG_ENV.DISABLE_IPV6 ? detected : Math.max(minimumIpv6Mtu, detected);
+  }
   await run('ip', ['link', 'set', 'dev', device, 'mtu', String(value)]);
 }

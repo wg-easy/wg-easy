@@ -315,6 +315,124 @@ chmod +x /usr/local/bin/ip`,
   expect(allowed).toContain('2001:db8:abcd::/64');
 });
 
+test('keeps host routing precedence when automatic policy has no free priorities before main', async ({
+  request,
+  app,
+}) => {
+  const api = await routingAdmin(request, app.url);
+  const peer = await api.peer('Default gateway');
+  const ip = (...args: string[]) => app.execServer(['ip', '-4', ...args]);
+  const destination = '203.0.113.17';
+  const selector = ['to', destination, 'table', '600'];
+  await ip('route', 'add', 'default', 'dev', 'eth0', 'table', '600');
+  await ip('rule', 'add', 'pref', '32765', ...selector);
+  const before = await ip('rule', 'show');
+
+  const requestDefault = () =>
+    request.post(peer.url, {
+      headers: { Origin: app.url },
+      data: { ...peer.settings, serverAllowedIps: ['0.0.0.0/0'] },
+    });
+  const failed = await requestDefault();
+  expect(failed.status()).toBe(409);
+  expect((await failed.json()).message).toContain('routing rule priorities');
+  expect(await ip('rule', 'show')).toBe(before);
+  expect(await ip('route', 'get', destination)).toContain('table 600');
+  expect(await app.execServer(['wg', 'show', 'wg0', 'fwmark'])).toBe('off');
+  expect(
+    await app.execServer(['wg', 'show', 'wg0', 'allowed-ips'])
+  ).not.toContain('0.0.0.0/0');
+
+  // Leave precisely two priorities free. A subsequent sync must reuse its pair.
+  await ip('rule', 'add', 'pref', '32763', ...selector);
+  await ip('rule', 'del', 'pref', '32765', ...selector);
+  await peer.routes(['0.0.0.0/0']);
+  await peer.routes(['0.0.0.0/0', '192.0.2.0/24']);
+  expect(await ip('route', 'get', destination)).toContain('table 600');
+  expect(await ip('route', 'get', '203.0.113.18')).toContain('dev wg0');
+
+  // Move the host rule behind an active suppress-main rule. A specific main
+  // route now masks the host's table until the old automatic policy yields.
+  await ip('route', 'add', destination, 'dev', 'eth0');
+  await ip('rule', 'del', 'pref', '32763', ...selector);
+  await ip('rule', 'add', 'pref', '32765', ...selector);
+  expect(await ip('route', 'get', destination)).not.toContain('table 600');
+  expect((await requestDefault()).status()).toBe(409);
+  expect(await ip('rule', 'show')).toBe(before);
+  expect(await ip('route', 'get', destination)).toContain('table 600');
+  expect(await app.execServer(['wg', 'show', 'wg0', 'fwmark'])).toBe('off');
+});
+
+test('allocates a socket mark outside host rule masks in both families', async ({
+  request,
+  app,
+}) => {
+  const api = await routingAdmin(request, app.url);
+  const peer = await api.peer('Marked gateway');
+  const ip = (...args: string[]) => app.execServer(['ip', ...args]);
+  const mark = () => app.execServer(['wg', 'show', 'wg0', 'fwmark']);
+  const destination = '203.0.113.27';
+  await ip('-4', 'route', 'add', destination, 'dev', 'eth0', 'table', '600');
+  await ip(
+    '-4',
+    'rule',
+    'add',
+    'pref',
+    '80',
+    'fwmark',
+    '0x6c/0xff',
+    'table',
+    '600'
+  );
+  await ip(
+    '-6',
+    'rule',
+    'add',
+    'pref',
+    '81',
+    'fwmark',
+    '0/0x80000000',
+    'table',
+    '601'
+  );
+  const route = (mark: string) =>
+    ip('-4', 'route', 'get', destination, 'mark', mark);
+  // The usual 51820 socket mark sends the handshake through the host's table.
+  expect(await route('51820')).toContain('table 600');
+  await peer.routes(['0.0.0.0/0']);
+  const assigned = await mark();
+  expect(Number(assigned) & 0xff).not.toBe(0x6c);
+  expect(Number(assigned)).toBeGreaterThanOrEqual(0x80000000);
+  expect(await route(assigned)).not.toContain('table 600');
+
+  await peer.routes(['0.0.0.0/0', '::/0']);
+  expect(await mark()).toBe(assigned);
+  await peer.routes([]);
+  expect(await mark()).toBe('off');
+  expect(await route('51820')).toContain('table 600');
+
+  // A fresh allocation must use the one mark exempt from an inverted rule.
+  const exemption = '0x80001234';
+  const inverted = ['pref', '79', 'not', 'fwmark', exemption, 'table', '604'];
+  await ip('-6', 'rule', 'add', ...inverted);
+  await peer.routes(['0.0.0.0/0']);
+  expect(await mark()).toBe(exemption);
+  await peer.routes([]);
+  await ip('-6', 'rule', 'del', ...inverted);
+
+  // Every nonzero mark now matches at least one host rule.
+  await ip('-4', 'rule', 'add', 'pref', '82', 'fwmark', '0/1', 'table', '602');
+  await ip('-6', 'rule', 'add', 'pref', '83', 'fwmark', '1/1', 'table', '603');
+  const blocked = await request.post(peer.url, {
+    headers: { Origin: app.url },
+    data: { ...peer.settings, serverAllowedIps: ['0.0.0.0/0'] },
+  });
+  expect(blocked.status()).toBe(409);
+  expect((await blocked.json()).message).toContain('No firewall mark');
+  expect(await mark()).toBe('off');
+  expect(await route('51820')).toContain('table 600');
+});
+
 test('borrows host marks, avoids occupied tables and preserves replaced rules and foreign routes', async ({
   request,
   app,

@@ -42,13 +42,15 @@ When AmneziaWG is active, **Config** also provides default obfuscation parameter
 
 **Interface** controls the server's VPN interface:
 
-- **MTU**: The server interface's maximum transmission unit. Leave empty for automatic detection.
+- **MTU** accepts a whole number up to 9000 bytes. The minimum is 1280 with IPv6 enabled and 1024 for IPv4-only interfaces. Leave it empty for automatic detection. A dual-stack tunnel uses at least 1280 bytes, including when an older configuration has a smaller saved value.
 - **Port**: The UDP port on which WireGuard listens. Changing this does not change the public port under **Config**.
 - **Device**: The network device used by the default forwarding/NAT hooks, such as `eth0`.
-- **Routing Table**: `auto`, `off`, or a routing table number.
+- **Routing Table** accepts `auto`, `off`, or a numeric ID from 0 to 4294967295. Linux interprets IDs with a leading zero as octal.
 - **AmneziaWG Obfuscation Parameters**: Server-side AmneziaWG settings, shown when AmneziaWG is active.
 
 **Change CIDR** saves the IPv4 and IPv6 ranges for the next interface start. Until then, clients and configuration downloads use the current ranges. Adding a client requires space in both the current and saved ranges. **Restart Interface** disconnects clients and applies the saved ranges, listen port, device and hooks. Clients keep any address still usable in the new range. After restart, download and distribute a new configuration for each client whose address changed. MTU and routing table changes apply when you save.
+
+With **Routing Table** set to `auto`, a peer advertising a default route needs the two rule priorities immediately before the main table lookup. If host rules occupy either priority, wg-easy reports a conflict and preserves their precedence. An existing socket mark is preserved. When wg-easy assigns a new mark, it checks the host's IPv4 and IPv6 routing rules, including masked marks. Maintenance retries when the required priorities and mark are available.
 
 The address in the CIDR selects the server's gateway address. A network address keeps the first host as the gateway, preserving existing setups: `10.8.0.0/24` uses `10.8.0.1`. To choose another gateway, enter it directly, for example `10.8.0.15/24`. Clients then use available addresses from `10.8.0.1` through `10.8.0.254`, excluding `10.8.0.15`. The same rule applies to IPv6 and unattended setup CIDRs. The network and last address remain reserved for both address families.
 
@@ -92,8 +94,10 @@ Filtering covers forwarded traffic and traffic addressed to the VPN server itsel
 **Hooks** configures commands run on the server when the VPN interface starts or stops:
 
 - **PreUp**: Before the interface starts.
-- **PostUp** runs after wg-easy attempts to install the routes. If a route conflicts, other routes can still come up. Maintenance retries the failed route.
+- **PostUp** runs after wg-easy attempts to install the routes. When the hook succeeds, wg-easy checks the routes again and restores any required routes the hook removed. Maintenance retries any remaining conflicts.
 - **PreDown**: Before the interface stops.
 - **PostDown**: After the interface stops.
+
+If **PostUp** fails, wg-easy takes the tunnel down and keeps the admin panel available. Replacing the container with the same `/etc/wireguard` volume preserves this state. Check which commands already ran, correct the hook under **Admin Panel → Hooks**, then select **Restart Interface** under **Interface**.
 
 The default hooks set up forwarding and NAT. Templates can use `{{ipv4Cidr}}`, `{{ipv6Cidr}}`, `{{device}}`, `{{interface}}`, `{{port}}`, and `{{uiPort}}`, which are replaced with the current server settings. CIDR placeholders use the network address, so `10.8.0.15/24` becomes `10.8.0.0/24` in hooks. Saved hooks run at the corresponding interface lifecycle event. Hooks on an individual client's page instead run on that client device.

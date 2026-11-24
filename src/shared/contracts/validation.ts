@@ -3,6 +3,7 @@ import { isIP, isIPv4, isIPv6 } from 'is-ip';
 import isCidr from 'is-cidr';
 
 import { wireGuardKeyPattern } from '#shared/utils/wireguard';
+import { parseRoutingTableId } from '#shared/utils/routingTable';
 
 export type ID = number;
 
@@ -34,11 +35,17 @@ export const controlStringRefine = z
 export const EnabledSchema = z.boolean({ message: t('validation.enabled') });
 
 export const MtuSchema = z
-  .number({ message: t('validation.mtu') })
+  .int({ message: t('validation.mtuInteger') })
   // min for IPv6 is 1280, but we allow lower for IPv4
   .min(1024, { message: t('validation.mtu') })
   .max(9000, { message: t('validation.mtu') })
   .nullable();
+
+export const minimumIpv6Mtu = 1280;
+export const Ipv6MtuSchema = MtuSchema.refine(
+  (mtu) => mtu === null || mtu >= minimumIpv6Mtu,
+  { message: t('validation.ipv6Mtu') }
+);
 
 export const JcSchema = z.number().min(1).max(128).nullable();
 
@@ -147,9 +154,10 @@ export const RoutingTableSchema = z
   .string({ message: t('validation.interface.routingTable') })
   .pipe(safeStringRefine)
   .pipe(controlStringRefine)
-  .refine((v) => /^(auto|off|\d+)$/.test(v), {
-    message: t('validation.interface.routingTable'),
-  });
+  .refine(
+    (v) => v === 'auto' || v === 'off' || parseRoutingTableId(v) !== undefined,
+    { message: t('validation.interface.routingTable') }
+  );
 
 export const PersistentKeepaliveSchema = z
   .number({ message: t('validation.persistentKeepalive') })

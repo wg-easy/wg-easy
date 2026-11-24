@@ -17,6 +17,7 @@ type App = {
   publicKey: (privateKey: string) => Promise<string>;
   serverPublicKey: () => Promise<string>;
   restart: () => Promise<string>;
+  recreateContainer: () => Promise<string>;
   startProcess: (disableIpv6?: boolean) => Promise<string>;
   stopProcess: (signal: 'KILL' | 'TERM') => Promise<void>;
   logs: () => Promise<string>;
@@ -135,6 +136,13 @@ export const test = base.extend<{
             ]);
           },
           logs: () => compose(['logs', '--no-color', server]),
+          recreateContainer: async () => {
+            await compose(['up', '-d', '--force-recreate', server]);
+            if (keepNamespace) {
+              await startProcess();
+            }
+            return getUrl();
+          },
           connectClient: async (configuration, index = 1) => {
             await compose([
               'up',

@@ -12,10 +12,20 @@ import {
   type ServerPeer,
 } from './configuration';
 import type { RouteFamily } from './linuxRouting';
+import {
+  clearPostUpFailure,
+  readPostUpFailure,
+  recordPostUpFailure,
+} from './tunnelRecord';
 
 import { getDatabase } from '#db';
 import { assertSubnetCapacity } from '#server/utils/ip';
 import type { InterfaceCidrUpdateType } from '#shared/contracts/interface';
+import {
+  minimumIpv6Mtu,
+  MtuSchema,
+  RoutingTableSchema,
+} from '#shared/contracts/validation';
 import type { InterfaceType } from '#db/repositories/interface/types';
 import type { DatabaseStore, Repositories } from '#db/store';
 import { wg } from '#server/utils/wgHelper';
@@ -35,6 +45,7 @@ type HostState = {
   activeNetwork?: ReturnType<typeof stagedSettings>;
   restoredDefaults: Map<string, string | undefined>;
   mtu?: number | null;
+  awaitingValidSettings?: boolean;
   retry?: ApplyMode;
   failedStart?: {
     error: Error;
@@ -62,9 +73,12 @@ export function stageCidrs(cidrs: InterfaceCidrUpdateType) {
 }
 
 export function restartRequired(saved: InterfaceType) {
-  const active = hostStates.get(getDatabase())?.activeNetwork;
+  const state = hostStates.get(getDatabase());
+  const active = state?.activeNetwork;
   return (
-    active !== undefined && !isDeepStrictEqual(active, stagedSettings(saved))
+    !!state?.failedStart ||
+    !!state?.awaitingValidSettings ||
+    (active !== undefined && !isDeepStrictEqual(active, stagedSettings(saved)))
   );
 }
 
@@ -85,25 +99,34 @@ async function cleanFailedStart(
   }
 }
 
-async function failedPostUp(
-  state: HostState,
-  name: string,
-  cause: unknown
-): Promise<never> {
-  // An arbitrary hook may have applied external effects before failing.
-  const error = createError({
+function postUpError(cause?: unknown) {
+  return createError({
     status: 503,
     statusText: 'VPN interface needs attention',
     message:
       'PostUp failed. Check the hook and its effects, then restart the VPN interface from the admin panel.',
     cause,
   });
+}
+
+async function failedPostUp(
+  state: HostState,
+  name: string,
+  cause: unknown
+): Promise<never> {
+  // Keep the failure after deleting the link and its recovery record. The
+  // hook may have already changed external state, even on a cold start.
+  const error = postUpError(cause);
   state.failedStart = { name, error, cleanupPending: true };
   try {
-    await cleanFailedStart(state.tunnel, state.failedStart);
-    delete state.retry;
-  } catch (error) {
-    console.error('Could not shut down the VPN after PostUp failed:', error);
+    await recordPostUpFailure(name);
+  } finally {
+    try {
+      await cleanFailedStart(state.tunnel, state.failedStart);
+      delete state.retry;
+    } catch (error) {
+      console.error('Could not shut down the VPN after PostUp failed:', error);
+    }
   }
   throw error;
 }
@@ -134,18 +157,25 @@ async function revokePeers(
   return gateways;
 }
 
-async function apply(mode?: ApplyMode) {
+async function apply(mode?: ApplyMode, manualRestart = false) {
   const database = getDatabase();
   let state = hostStates.get(database);
   if (!state) {
+    const failedName = await readPostUpFailure();
     state = {
       tunnel: new LinuxTunnel(),
       restoredDefaults: new Map(),
     };
+    if (failedName) {
+      state.failedStart = {
+        name: failedName,
+        error: postUpError(),
+        cleanupPending: true,
+      };
+    }
     hostStates.set(database, state);
   }
-  const manualRestart = mode === 'restart' || mode === 'start';
-  mode ??= state.retry ?? 'sync';
+  mode ??= state.retry ?? (state.awaitingValidSettings ? 'restart' : 'sync');
   // Clear only after every host effect succeeds. Maintenance retries failures.
   state.retry = mode;
   const { savedNetwork, clients, hooks, defaults } = await database.transaction(
@@ -157,22 +187,22 @@ async function apply(mode?: ApplyMode) {
     })
   );
   const enableIpv6 = !WG_ENV.DISABLE_IPV6;
-  await state.tunnel.checkOwnership(savedNetwork.name);
-  if (mode !== 'sync') {
-    const gateways = await filteredSiteGateways(database);
-    await checkRoutedReplySupport(routedReplyFamilies(gateways, enableIpv6));
-  }
   const options = {
     enableIpv6,
     amnezia: WG_ENV.WG_EXECUTABLE === 'awg',
     uiPort: WG_ENV.PORT,
   };
   const network =
-    mode === 'sync' ? runningSettings(savedNetwork) : savedNetwork;
+    mode === 'sync' ? runningSettings(savedNetwork) : { ...savedNetwork };
+  // Older versions accepted IPv4-sized MTUs on dual-stack tunnels.
+  if (enableIpv6 && network.mtu !== null) {
+    network.mtu = Math.max(minimumIpv6Mtu, network.mtu);
+  }
   async function writeSavedConfig() {
     const contents = generateServerConfig(
       {
         ...savedNetwork,
+        mtu: network.mtu,
         ipv4Cidr: network.ipv4Cidr,
         ipv6Cidr: network.ipv6Cidr,
       },
@@ -191,7 +221,45 @@ async function apply(mode?: ApplyMode) {
       delete state.retry;
       throw state.failedStart.error;
     }
+    await clearPostUpFailure();
     delete state.failedStart;
+  }
+  if (mode !== 'sync') {
+    // Older releases accepted fractional MTUs and invalid routing table IDs.
+    // Leave the saved values available for repair in the admin panel.
+    if (
+      !MtuSchema.safeParse(savedNetwork.mtu).success ||
+      !RoutingTableSchema.safeParse(savedNetwork.routingTable).success
+    ) {
+      if (!state.awaitingValidSettings) {
+        await state.tunnel.stop(savedNetwork.name);
+        state.awaitingValidSettings = true;
+      }
+      delete state.retry;
+      const message =
+        'The VPN interface is down. Correct the saved MTU or routing table in the admin panel.';
+      if (mode === 'start') {
+        console.error(message);
+        return;
+      }
+      throw createError({ status: 422, message });
+    }
+    delete state.awaitingValidSettings;
+  }
+  if (
+    mode === 'start' &&
+    network.firewallEnabled &&
+    !(await firewall.isAvailable(enableIpv6))
+  ) {
+    const tools = enableIpv6 ? 'iptables/ip6tables' : 'iptables';
+    throw new Error(
+      `Per-Client Firewall is enabled but ${tools} is not available. Refusing to start the VPN. Please install ${tools} to use this feature.`
+    );
+  }
+  await state.tunnel.checkOwnership(savedNetwork.name);
+  if (mode !== 'sync') {
+    const gateways = await filteredSiteGateways(database);
+    await checkRoutedReplySupport(routedReplyFamilies(gateways, enableIpv6));
   }
   const restoredDefaults = state.restoredDefaults;
   const verifiedPeers = async () =>
@@ -212,6 +280,7 @@ async function apply(mode?: ApplyMode) {
     state.activeNetwork = stagedSettings(network);
   }
   await writeSavedConfig();
+  let mtuError;
   if (mode === 'sync') {
     try {
       await wg.sync(network, clients, enableIpv6);
@@ -225,7 +294,12 @@ async function apply(mode?: ApplyMode) {
       throw error;
     }
     if (state.mtu !== undefined && state.mtu !== network.mtu) {
-      await setTunnelMtu(network.name, network.mtu);
+      try {
+        await setTunnelMtu(network.name, network.mtu);
+      } catch (error) {
+        // Reconcile routes and reopen filtered traffic before retrying the MTU.
+        mtuError = error;
+      }
     }
   }
   const postUp =
@@ -238,6 +312,17 @@ async function apply(mode?: ApplyMode) {
         : clients,
       defaults,
       enableIpv6
+    );
+  const syncRoutes = () =>
+    state.tunnel.syncRoutes(
+      network,
+      clients,
+      enableIpv6,
+      async (family, prefix) => {
+        const key = previousGateways[family];
+        await wg.restoreDefault(network.name, prefix, key);
+        restoredDefaults.set(prefix, key);
+      }
     );
   let routes;
   try {
@@ -257,18 +342,11 @@ async function apply(mode?: ApplyMode) {
       await wg.sync(network, clients, enableIpv6);
       await state.tunnel.configureLink(network, enableIpv6);
     }
-    state.mtu = network.mtu;
+    if (!mtuError) {
+      state.mtu = network.mtu;
+    }
     restoredDefaults.clear();
-    routes = await state.tunnel.syncRoutes(
-      network,
-      clients,
-      enableIpv6,
-      async (family, prefix) => {
-        const key = previousGateways[family];
-        await wg.restoreDefault(network.name, prefix, key);
-        restoredDefaults.set(prefix, key);
-      }
-    );
+    routes = await syncRoutes();
     if (postUp && network.firewallEnabled) {
       await rebuildFirewall(!!routes.policyError);
     }
@@ -286,26 +364,29 @@ async function apply(mode?: ApplyMode) {
         return failedPostUp(state, network.name, cause);
       }
     }
-    await state.tunnel.completeStartup(network, hooks);
-    // The interface and its hooks are up. Retry subsequent failures live.
+    // PostUp has returned successfully. From here, retry against the live link.
     state.retry = 'sync';
-    if (postUp && network.firewallEnabled) {
-      // The hook may have reloaded or reordered the filter table.
-      await state.tunnel.guardTraffic(network, enableIpv6);
+    state.tunnel.armDownHooks(network, hooks);
+  }
+  const recoveryError = await state.tunnel.persistDownHooks();
+  if (postUp) {
+    // Hooks may reload firewall rules, replace routes or resolve a conflict.
+    await state.tunnel.guardTraffic(network, enableIpv6);
+    if (routes.policyError) {
+      // The first pass withdrew the failed family's default from the peer.
+      await wg.sync(network, clients, enableIpv6);
+      restoredDefaults.clear();
     }
+    routes = await syncRoutes();
   }
   await rebuildFirewall(!!routes.policyError);
   if (!network.firewallEnabled) {
     await state.tunnel.recordFiltering(false);
   }
-  const error = routes.siteError ?? routes.policyError;
+  const error =
+    recoveryError ?? routes.siteError ?? routes.policyError ?? mtuError;
   if (error) {
-    if (mode !== 'start') {
-      throw error;
-    }
-    // The maintenance timer starts after this returns. Keep healthy peers up.
-    console.error('Could not apply all VPN site routes at startup:', error);
-    return;
+    throw error;
   }
   delete state.retry;
 }
@@ -379,7 +460,7 @@ export function maintain() {
   });
 }
 export function restart() {
-  return enqueue(() => apply('restart'));
+  return enqueue(() => apply('restart', true));
 }
 
 export function start() {
@@ -406,16 +487,23 @@ export function start() {
         h4: h4!,
       });
     }
-    if (
-      network.firewallEnabled &&
-      !(await firewall.isAvailable(!WG_ENV.DISABLE_IPV6))
-    ) {
-      const tools = WG_ENV.DISABLE_IPV6 ? 'iptables' : 'iptables/ip6tables';
-      throw new Error(
-        `Per-Client Firewall is enabled but ${tools} is not available. Refusing to start the VPN. Please install ${tools} to use this feature.`
-      );
+    try {
+      await apply('start');
+    } catch (error) {
+      const state = hostStates.get(getDatabase());
+      if (state?.failedStart) {
+        // Keep the database and admin panel available for hook repair.
+        console.error('VPN startup is waiting for an explicit restart:', error);
+      } else if (state?.retry === 'sync') {
+        // PostUp completed. Leave the generation up for the maintenance timer.
+        console.error(
+          'Could not finish applying the VPN configuration at startup:',
+          error
+        );
+      } else {
+        throw error;
+      }
     }
-    await apply('start');
   });
 }
 

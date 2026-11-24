@@ -34,7 +34,7 @@ async function fixture() {
   );
   vi.spyOn(wg, 'runHook').mockResolvedValue('');
   const up = vi.spyOn(LinuxTunnel.prototype, 'create').mockResolvedValue();
-  vi.spyOn(LinuxTunnel.prototype, 'completeStartup').mockResolvedValue();
+  vi.spyOn(LinuxTunnel.prototype, 'armDownHooks').mockImplementation(() => {});
   vi.spyOn(LinuxTunnel.prototype, 'configureLink').mockResolvedValue();
   vi.spyOn(cmd, 'exec').mockResolvedValue('');
   vi.spyOn(firewall, 'rebuildRules').mockResolvedValue();

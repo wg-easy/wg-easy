@@ -1,6 +1,117 @@
 import { expect, test } from './fixtures';
 import { admin } from './helpers';
 
+test.describe('dual-stack MTU', () => {
+  test.use({ ipv6: true });
+
+  test('keeps the IPv6 gateway reachable with explicit and automatic MTUs', async ({
+    app,
+    request,
+  }) => {
+    const { post, json, headers, create, download } = await admin(
+      request,
+      app.url
+    );
+    const iface = '/api/admin/interface';
+    const settings = await json(iface);
+    const peer = await create('Dual-stack peer');
+    await app.connectClient(await download(peer));
+    const ping = () =>
+      app.execClient([
+        'ping',
+        '-6',
+        '-I',
+        'wg0',
+        '-c',
+        '1',
+        '-W',
+        '2',
+        'fdcc:ad94:bacf:61a4::cafe:1',
+      ]);
+    await expect(ping()).resolves.toContain('0% packet loss');
+    const rejected = await request.post(iface, {
+      headers,
+      data: { ...settings, mtu: 1200 },
+    });
+    expect(rejected.status()).toBe(400);
+    expect((await json(iface)).mtu).toBe(settings.mtu);
+
+    const links = JSON.parse(
+      await app.execClient(['ip', '-4', '-j', 'address', 'show', 'dev', 'eth0'])
+    );
+    await app.execServer([
+      'ip',
+      'route',
+      'add',
+      links[0].addr_info[0].local + '/32',
+      'dev',
+      'eth0',
+      'mtu',
+      '1320',
+    ]);
+    await post(iface, { ...settings, mtu: null });
+    expect(await app.execServer(['cat', '/sys/class/net/wg0/mtu'])).toBe(
+      '1280'
+    );
+    await expect(ping()).resolves.toContain('0% packet loss');
+    await post(iface, { ...settings, mtu: 1420 });
+    await expect(ping()).resolves.toContain('0% packet loss');
+  });
+});
+
+test('invalid interface settings and a rejected live MTU preserve filtered traffic', async ({
+  app,
+  request,
+}) => {
+  const { post, json, headers, create, download } = await admin(
+    request,
+    app.url
+  );
+  const iface = '/api/admin/interface';
+  await post(iface, { ...(await json(iface)), firewallEnabled: true });
+  const settings = await json(iface);
+  const peer = await create('Filtered peer');
+  await app.connectClient(await download(peer));
+  const ping = () => app.pingFromClient('10.8.0.1');
+  await expect.poll(ping).toBe(true);
+  for (const invalid of [{ mtu: 1400.5 }, { routingTable: '08' }]) {
+    const rejected = await request.post(iface, {
+      headers,
+      data: { ...settings, ...invalid },
+    });
+    expect(rejected.status()).toBe(400);
+    expect(await json(iface)).toMatchObject({
+      mtu: settings.mtu,
+      routingTable: settings.routingTable,
+    });
+    expect(await ping()).toBe(true);
+  }
+
+  // Reject a valid MTU at the iproute2 boundary while keeping the link up.
+  await app.execServer([
+    'sh',
+    '-ec',
+    `cat > /usr/local/bin/ip <<'SH'
+#!/bin/sh
+if [ "$*" = 'link set dev wg0 mtu 1400' ]; then exit 2; fi
+exec /sbin/ip "$@"
+SH
+chmod +x /usr/local/bin/ip`,
+  ]);
+  const failure = await request.post(iface, {
+    headers,
+    data: { ...settings, mtu: 1400 },
+  });
+  expect(failure.status()).toBe(500);
+  expect(await ping()).toBe(true);
+  expect(await app.execServer(['cat', '/sys/class/net/wg0/mtu'])).toBe(
+    String(settings.mtu)
+  );
+  await app.execServer(['rm', '/usr/local/bin/ip']);
+  await post(iface, { ...settings, mtu: 1400 });
+  expect(await app.execServer(['cat', '/sys/class/net/wg0/mtu'])).toBe('1400');
+});
+
 for (const backend of ['wg', 'awg'] as const) {
   test.describe(backend, () => {
     test.use({ backend });
@@ -121,6 +232,8 @@ for (const backend of ['wg', 'awg'] as const) {
       ]);
       await post(otherUrl, { ...otherPeer, name: 'Renamed peer' });
       expect(await link('mtu')).toBe('1310');
+      await saveMtu(1200);
+      expect(await link('mtu')).toBe('1200');
     });
   });
 }

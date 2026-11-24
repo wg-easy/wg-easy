@@ -62,12 +62,15 @@ chmod +x /usr/local/bin/ip`,
         const phases = '/tmp/tunnel-phases';
         const hooks = {
           preUp: `ip link show dev %i && echo PreUp >> ${phases}`,
-          postUp: `${backend} show %i peers | grep -Fx '${client.publicKey}'; ip address show dev %i | grep '10.8.0.1/24'; ip route show exact ${site} | grep 'dev %i'; echo PostUp >> ${phases}`,
+          postUp: `${backend} show %i peers | grep -Fx '${client.publicKey}'; ip address show dev %i | grep '10.8.0.1/24'; ip route del ${site} dev %i; echo PostUp >> ${phases}`,
           preDown: `ip link show dev %i && echo PreDown >> ${phases}`,
           postDown: `test ! -e /sys/class/net/%i && echo PostDown >> ${phases}`,
         };
         await post('/api/admin/hooks', hooks);
         await post('/api/admin/interface/restart');
+        expect(
+          await app.execServer(['ip', 'route', 'show', 'exact', site])
+        ).toContain('dev wg0');
         if (userspace) {
           expect(
             await app.execServer(['ip', '-details', 'link', 'show', 'wg0'])

@@ -48,6 +48,7 @@ async function linkIdentity(name: string) {
 
 export class LinuxTunnel {
   private running?: TunnelRecord;
+  private pendingDownHooks = false;
   // Only this process can finish removal after it observed link deletion.
   private deleted?: TunnelRecord;
   private defaultPolicy = new DefaultPolicy();
@@ -149,23 +150,42 @@ export class LinuxTunnel {
     }
   }
 
-  async completeStartup(network: InterfaceType, hooks: HooksType) {
+  armDownHooks(network: InterfaceType, hooks: HooksType) {
     if (process.platform !== 'linux') {
       return;
     }
-    const record = await this.checkOwnership(network.name);
-    if (!record) {
-      throw new Error(
-        `Tunnel interface ${network.name} disappeared during startup`
-      );
+    if (this.running?.name !== network.name) {
+      throw new Error(`No tunnel recovery record for ${network.name}`);
     }
-    const applied = {
-      ...record,
+    // A stop during a storage outage still needs this generation's hooks.
+    this.running = {
+      ...this.running,
       preDown: expandHook(hooks.preDown, network, WG_ENV.PORT),
       postDown: expandHook(hooks.postDown, network, WG_ENV.PORT),
     };
-    await saveTunnelRecord(applied);
-    this.running = applied;
+    this.pendingDownHooks = true;
+  }
+
+  async persistDownHooks() {
+    if (!this.pendingDownHooks || !this.running) {
+      return;
+    }
+    const { name } = this.running;
+    if (!(await this.checkOwnership(name))) {
+      throw new Error(`Tunnel interface ${name} disappeared during startup`);
+    }
+    try {
+      await saveTunnelRecord(this.running);
+      this.pendingDownHooks = false;
+    } catch (cause) {
+      // Ownership is verified. A write failure must not skip live repairs.
+      return new Error(
+        `Could not write the tunnel recovery record for ${name}`,
+        {
+          cause,
+        }
+      );
+    }
   }
 
   async syncRoutes(

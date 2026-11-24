@@ -6,7 +6,11 @@ import { z } from 'zod';
 
 import { defaultPolicyState } from './defaultPolicy';
 
+import { parseInterfaceName } from '#server/utils/interfaceName';
+
 const directory = '/etc/wireguard/.wg-easy';
+// The volume holds one VPN configuration, even when WG_INTERFACE is renamed.
+const failureFile = 'failed-post-up';
 const tunnelRecord = z.object({
   version: z.literal(1),
   name: z.string(),
@@ -47,10 +51,10 @@ async function withDirectory<T>(operation: (path: string) => Promise<T>) {
   }
 }
 
-export function readTunnelRecord(name: string) {
+function readRecoveryFile(filename: string) {
   return withDirectory(async (path) => {
     const file = await open(
-      path + '/' + name + '.json',
+      path + '/' + filename,
       constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK
     );
     try {
@@ -58,34 +62,73 @@ export function readTunnelRecord(name: string) {
       if (!stat.isFile() || !privateToService(stat)) {
         throw new Error('Unsafe tunnel recovery file');
       }
-      return tunnelRecord.parse(JSON.parse(await file.readFile('utf8')));
+      return await file.readFile('utf8');
     } finally {
       await file.close();
     }
   });
 }
 
-export async function saveTunnelRecord(record: TunnelRecord) {
+async function saveRecoveryFile(filename: string, contents: string) {
   await mkdir(directory, { recursive: true, mode: 0o700 });
   await withDirectory(async (path) => {
     const temp = path + '/' + randomUUID() + '.tmp';
     const file = await open(temp, 'wx', 0o600);
     try {
       try {
-        await file.writeFile(JSON.stringify(record));
+        await file.writeFile(contents);
         await file.sync();
       } finally {
         await file.close();
       }
-      await rename(temp, path + '/' + record.name + '.json');
+      await rename(temp, path + '/' + filename);
     } finally {
       await rm(temp, { force: true });
     }
   });
 }
 
+export async function readTunnelRecord(name: string) {
+  return tunnelRecord.parse(JSON.parse(await readRecoveryFile(name + '.json')));
+}
+
+export function saveTunnelRecord(record: TunnelRecord) {
+  return saveRecoveryFile(record.name + '.json', JSON.stringify(record));
+}
+
 export function removeTunnelRecord(name: string) {
   return withDirectory((path) =>
     rm(path + '/' + name + '.json', { force: true })
   );
+}
+
+export async function readPostUpFailure() {
+  try {
+    const name = await readRecoveryFile(failureFile);
+    if (!name) {
+      throw new Error('Missing interface name in PostUp failure record');
+    }
+    return parseInterfaceName(name);
+  } catch (error) {
+    // A new volume has neither the private directory nor a failure marker.
+    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+      throw error;
+    }
+  }
+}
+
+export function recordPostUpFailure(name: string) {
+  return saveRecoveryFile(failureFile, parseInterfaceName(name));
+}
+
+export async function clearPostUpFailure() {
+  try {
+    await withDirectory((path) =>
+      rm(path + '/' + failureFile, { force: true })
+    );
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+      throw error;
+    }
+  }
 }

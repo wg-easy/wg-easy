@@ -1,8 +1,11 @@
-import { describe, expect, onTestFinished, test } from 'vitest';
+import { describe, expect, onTestFinished, test, vi } from 'vitest';
 
 import { vpnFixture } from '../helpers/vpn';
 
 import * as settings from '#server/features/vpn/interface';
+import * as vpn from '#server/features/vpn/lifecycle';
+import { routingTable } from '#server/features/vpn/linuxRouting';
+import * as tunnelMtu from '#server/utils/tunnelMtu';
 import * as clients from '#server/features/vpn/clients';
 import { download } from '#server/features/vpn/provisioning';
 import { InterfaceUpdateSchema } from '#shared/contracts/interface';
@@ -25,6 +28,99 @@ async function settingsFixture() {
 }
 
 describe('interface settings', () => {
+  test('validates numeric routing tables with the kernel parser before saving', () => {
+    const schema = InterfaceUpdateSchema.shape.routingTable;
+    for (const [value, id] of [
+      ['0', 254],
+      ['000', 254],
+      ['010', 8],
+      ['100', 100],
+      ['4294967295', 0xffffffff],
+    ] as const) {
+      expect(routingTable(schema.parse(value))).toBe(id);
+    }
+    expect(schema.parse('auto')).toBe('auto');
+    expect(schema.parse('off')).toBe('off');
+    for (const value of ['08', '4294967296', '040000000000', '-1', '1.5']) {
+      expect(schema.safeParse(value).success, value).toBe(false);
+      expect(() => routingTable(value)).toThrow();
+    }
+  });
+
+  test.each([{ mtu: 1400.5 }, { routingTable: '08' }])(
+    'keeps legacy invalid settings %j available until corrected',
+    async (invalid) => {
+      const { store, commands } = await settingsFixture();
+      await store.clients.deleteMany([1]);
+      await store.interfaces.update(invalid);
+      vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      await vpn.start();
+      await vpn.maintain();
+      expect(await settings.get(admin)).toMatchObject({
+        ...invalid,
+        restartRequired: true,
+      });
+      expect(commands.down).toHaveBeenCalledOnce();
+      expect(commands.up).not.toHaveBeenCalled();
+      expect(commands.runHook).not.toHaveBeenCalled();
+
+      const saved = await settings.get(admin);
+      await settings.update(
+        admin,
+        InterfaceUpdateSchema.parse({ ...saved, mtu: 1400, routingTable: '10' })
+      );
+      expect(commands.up).toHaveBeenCalledOnce();
+      expect(await settings.get(admin)).toMatchObject({
+        mtu: 1400,
+        routingTable: '10',
+        restartRequired: false,
+      });
+    }
+  );
+
+  test('starts a legacy dual-stack tunnel at the IPv6 minimum MTU', async () => {
+    const { store, commands, writeConfiguration } = await settingsFixture();
+    await store.interfaces.update({ mtu: 1200 });
+    await vpn.start();
+    expect(commands.up).toHaveBeenCalledWith(
+      expect.objectContaining({ mtu: 1280 })
+    );
+    expect(writeConfiguration.mock.lastCall?.[1]).toContain('\nMTU = 1280\n');
+    expect(await settings.get(admin)).toMatchObject({
+      mtu: 1200,
+      restartRequired: false,
+    });
+  });
+
+  test('restores traffic after a live MTU failure and retries the MTU', async () => {
+    const { store, commands, firewall } = await settingsFixture();
+    await store.interfaces.update({ firewallEnabled: true });
+    await vpn.start();
+    const mtu = vi
+      .spyOn(tunnelMtu, 'setTunnelMtu')
+      .mockRejectedValueOnce(new Error('MTU unavailable'))
+      .mockResolvedValue(undefined);
+    firewall.blockTraffic.mockClear();
+    firewall.rebuildRules.mockClear();
+    const data = InterfaceUpdateSchema.parse({
+      ...(await store.interfaces.get()),
+      mtu: 1400,
+    });
+    await expect(settings.update(admin, data)).rejects.toThrow(
+      'MTU unavailable'
+    );
+    expect(firewall.blockTraffic).toHaveBeenCalledOnce();
+    expect(firewall.rebuildRules.mock.lastCall?.[1]).toMatchObject([{ id: 1 }]);
+    await vpn.maintain();
+    await vpn.maintain();
+    expect(mtu.mock.calls).toEqual([
+      ['wg0', 1400],
+      ['wg0', 1400],
+    ]);
+    expect(commands.up).toHaveBeenCalledOnce();
+  });
+
   test('never returns the server private key or removes it from storage', async () => {
     const { store } = await settingsFixture();
     await store.interfaces.update({ privateKey: 'server-secret' });

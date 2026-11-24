@@ -605,7 +605,7 @@
       "cidr": "CIDR",
       "device": "Device",
       "cidrValid": "CIDR must be valid",
-      "routingTable": "Routing table must be auto, off, or a table number",
+      "routingTable": "Use auto, off, or a routing table ID from 0 to 4294967295. A leading zero makes the ID octal.",
       "headerProtectionJunkSize": "Junk sizes S1-S4 must be at least 12 when a Header Protection Key is set"
     },
     "otl": "One Time link",
@@ -615,6 +615,8 @@
     "hook": "Hook",
     "enabled": "Enabled",
     "mtu": "MTU",
+    "mtuInteger": "MTU must be a whole number",
+    "ipv6Mtu": "MTU must be at least 1280 when IPv6 is enabled",
     "port": "Port",
     "portInteger": "Port must be a whole number",
     "persistentKeepalive": "Persistent Keepalive",

@@ -6,6 +6,7 @@ import {
   EnabledSchema,
   HSchema,
   ISchema,
+  Ipv6MtuSchema,
   JcSchema,
   JmaxSchema,
   JminSchema,
@@ -101,6 +102,10 @@ export const InterfaceUpdateSchema = z
 export const InterfaceCidrUpdateSchema = z.object({
   ipv4Cidr: cidr4,
   ipv6Cidr: cidr6,
+});
+
+export const DualStackInterfaceUpdateSchema = InterfaceUpdateSchema.safeExtend({
+  mtu: Ipv6MtuSchema,
 });
 
 export type InterfaceUpdateType = z.infer<typeof InterfaceUpdateSchema>;

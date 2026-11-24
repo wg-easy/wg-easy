@@ -1,10 +1,15 @@
 import { describe, expect, test, vi } from 'vitest';
+import { createError } from 'nuxt/server';
 
 import { vpnFixture } from '../helpers/vpn';
 
 import { zeroWireGuardKey } from '#shared/utils/wireguard';
 import { roles } from '#shared/utils/permissions';
 import * as vpn from '#server/features/vpn/lifecycle';
+import * as recovery from '#server/features/vpn/tunnelRecord';
+import { LinuxTunnel } from '#server/utils/linuxTunnel';
+import { DefaultPolicy } from '#server/features/vpn/defaultPolicy';
+import { wg } from '#server/utils/wgHelper';
 import * as clients from '#server/features/vpn/clients';
 import * as settings from '#server/features/vpn/interface';
 import * as provisioning from '#server/features/vpn/provisioning';
@@ -113,6 +118,44 @@ describe('VPN operations', () => {
     await expect(vpn.start()).rejects.toThrow('Firewall unavailable');
     expect(commands.sync).not.toHaveBeenCalled();
     expect(commands.runHook).not.toHaveBeenCalled();
+  });
+
+  test('holds a failed boot hook across process starts until an explicit restart', async () => {
+    const { store, commands } = await vpnFixture();
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    await store.hooks.update({ preUp: '', postUp: 'broken hook' });
+    commands.runHook.mockRejectedValueOnce(new Error('failed'));
+    await vpn.start();
+    expect(recovery.recordPostUpFailure).toHaveBeenCalledWith('wg0');
+    expect((await settings.get(admin)).restartRequired).toBe(true);
+
+    await vpn.stop();
+    await vpn.start();
+    await expect(
+      vpn.commit((tx) => tx.hooks.update({ postUp: 'fixed hook' }))
+    ).rejects.toThrow('PostUp failed');
+    await vpn.maintain();
+    expect(commands.runHook).toHaveBeenCalledTimes(1);
+
+    await vpn.restart();
+    expect(commands.runHook).toHaveBeenLastCalledWith(
+      'wg0',
+      'auto',
+      'fixed hook'
+    );
+    expect((await settings.get(admin)).restartRequired).toBe(false);
+    expect(await recovery.readPostUpFailure()).toBeUndefined();
+  });
+
+  test('cleans up the recorded interface when the configured interface was renamed', async () => {
+    const { commands } = await vpnFixture();
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    await recovery.recordPostUpFailure('old0');
+    await vpn.start();
+    expect(commands.down).toHaveBeenCalledWith('old0', true);
+    expect(commands.up).not.toHaveBeenCalled();
+    await vpn.restart();
+    expect(commands.up.mock.lastCall?.[0].name).toBe('wg0');
   });
 
   test.each(['start', 'restart', 'sync'] as const)(
@@ -305,6 +348,70 @@ describe('VPN operations', () => {
     expect(commands.sync).toHaveBeenCalledOnce();
   });
 
+  test.each(['start', 'restart'] as const)(
+    'retains down hooks and retries their recovery write live after %s',
+    async (mode) => {
+      const { commands, store, firewall } = await vpnFixture();
+      vi.spyOn(console, 'error').mockImplementation(() => {});
+      const persist = vi
+        .spyOn(LinuxTunnel.prototype, 'persistDownHooks')
+        .mockResolvedValueOnce(new Error('Recovery volume unavailable'))
+        .mockResolvedValue(undefined);
+      await store.interfaces.update({ firewallEnabled: true });
+      await store.hooks.update({
+        preUp: '',
+        postUp: 'up',
+        postDown: 'applied down',
+      });
+
+      if (mode === 'start') {
+        await vpn.start();
+      } else {
+        await expect(vpn.restart()).rejects.toThrow(
+          'Recovery volume unavailable'
+        );
+      }
+      const arm = vi.mocked(LinuxTunnel.prototype.armDownHooks);
+      expect(arm).toHaveBeenCalledOnce();
+      expect(arm.mock.calls[0]?.[1].postDown).toBe('applied down');
+      expect(arm.mock.invocationCallOrder[0]).toBeLessThan(
+        persist.mock.invocationCallOrder[0]!
+      );
+      expect(firewall.rebuildRules).toHaveBeenCalledTimes(2);
+      await store.hooks.update({ postDown: 'for next generation' });
+      await vpn.maintain();
+      expect(persist).toHaveBeenCalledTimes(2);
+      expect(arm).toHaveBeenCalledOnce();
+      expect(commands.up).toHaveBeenCalledOnce();
+      expect(commands.runHook).toHaveBeenCalledExactlyOnceWith(
+        'wg0',
+        'auto',
+        'up'
+      );
+      expect(commands.down).toHaveBeenCalledOnce();
+    }
+  );
+
+  test('restores the peer default when PostUp clears a route conflict', async () => {
+    const { commands, store } = await vpnFixture();
+    const policy = vi.mocked(DefaultPolicy.prototype.sync);
+    await store.clients.update(1, { serverAllowedIps: ['0.0.0.0/0'] });
+    policy.mockImplementationOnce(async (_network, _defaults, restorePeer) => {
+      await restorePeer('ipv4', '0.0.0.0/0');
+      return createError({ status: 409, message: 'conflicting route' });
+    });
+    vi.spyOn(wg, 'restoreDefault').mockResolvedValue();
+    await vpn.restart();
+    expect(commands.sync).toHaveBeenCalledTimes(2);
+    expect(commands.sync.mock.invocationCallOrder[1]).toBeGreaterThan(
+      commands.runHook.mock.invocationCallOrder[0]!
+    );
+    expect(policy).toHaveBeenCalledTimes(2);
+    expect(policy.mock.invocationCallOrder[1]).toBeGreaterThan(
+      commands.sync.mock.invocationCallOrder[1]!
+    );
+  });
+
   test('retries firewall setup after a restart without running PostUp again', async () => {
     const { commands, firewall } = await vpnFixture();
     firewall.rebuildRules.mockRejectedValueOnce(
@@ -313,6 +420,21 @@ describe('VPN operations', () => {
     await expect(vpn.restart()).rejects.toThrow('Firewall unavailable');
     await vpn.maintain();
     expect(firewall.rebuildRules).toHaveBeenCalledTimes(2);
+    expect(commands.up).toHaveBeenCalledOnce();
+    expect(commands.runHook).toHaveBeenCalledOnce();
+  });
+
+  test('finishes a failed post-hook route check live after a cold start', async () => {
+    const { commands } = await vpnFixture();
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const policy = vi.mocked(DefaultPolicy.prototype.sync);
+    policy
+      .mockResolvedValueOnce(undefined)
+      .mockRejectedValueOnce(new Error('Policy read failed'));
+    await vpn.start();
+    expect(commands.runHook).toHaveBeenCalledOnce();
+    await vpn.maintain();
+    expect(policy).toHaveBeenCalledTimes(3);
     expect(commands.up).toHaveBeenCalledOnce();
     expect(commands.runHook).toHaveBeenCalledOnce();
   });

@@ -1,3 +1,5 @@
+import { parseRoutingTableId } from '#shared/utils/routingTable';
+
 export type KernelRoute = {
   dst: string;
   dev?: string;
@@ -90,9 +92,8 @@ export function routingTable(setting: string) {
   if (setting === 'auto') {
     return 254;
   }
-  // iproute2 reads a leading zero as octal and table zero as the main table.
-  const id = Number(setting.startsWith('0') ? `0o${setting}` : setting);
-  if (!/^\d+$/.test(setting) || !Number.isSafeInteger(id) || id > 0xffffffff) {
+  const id = parseRoutingTableId(setting);
+  if (id === undefined) {
     throw new Error('Invalid Linux routing table');
   }
   return id || 254;

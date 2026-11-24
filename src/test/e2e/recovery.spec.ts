@@ -1,3 +1,5 @@
+import type { APIRequestContext } from '@playwright/test';
+
 import { expect, test } from './fixtures';
 import { admin } from './helpers';
 
@@ -135,6 +137,95 @@ while [ ! -f /tmp/locked ]; do sleep 0.05; done`,
 }
 
 const record = '/etc/wireguard/.wg-easy/wg0.json';
+
+test('retries a failed recovery record write without replaying PostUp', async ({
+  app,
+  request,
+}) => {
+  const { headers, post } = await admin(request, app.url);
+  const directory = '/etc/wireguard/.wg-easy';
+  const phases = '/tmp/recovery-hook-phases';
+  const hooks = {
+    preUp: '',
+    // The recovery writer rejects directories accessible to other users.
+    postUp: `echo up >> ${phases}; chmod 0750 ${directory}`,
+    preDown: `echo pre >> ${phases}`,
+    postDown: `echo post >> ${phases}`,
+  };
+  await post('/api/admin/hooks', hooks);
+  const restart = await request.post('/api/admin/interface/restart', {
+    headers,
+  });
+  expect(restart.status()).toBe(500);
+  const index = () => app.execServer(['cat', '/sys/class/net/wg0/ifindex']);
+  const running = await index();
+  await app.execServer(['chmod', '0700', directory]);
+  // A normal save triggers the same pending retry as maintenance. New hooks
+  // apply to the next generation, even if the current record needs repair.
+  await post('/api/admin/hooks', { ...hooks, preDown: '', postDown: '' });
+  expect(await index()).toBe(running);
+  expect(await app.execServer(['cat', phases])).toBe('up');
+  expect(JSON.parse(await app.execServer(['cat', record]))).toMatchObject({
+    preDown: hooks.preDown,
+    postDown: hooks.postDown,
+  });
+  await app.stopProcess('TERM');
+  expect(await app.execServer(['cat', phases])).toBe('up\npre\npost');
+});
+
+test('keeps a failed boot hook stopped across container replacement until an admin restarts it', async ({
+  app,
+  playwright,
+  request,
+}) => {
+  const { headers, post } = await admin(request, app.url);
+  const iface = '/api/admin/interface';
+  const hooksUrl = '/api/admin/hooks';
+  const attempts = '/etc/wireguard/boot-hook-attempts';
+  const hooks = {
+    preUp: '',
+    postUp: `echo failed >> ${attempts}; false`,
+    preDown: '',
+    postDown: '',
+  };
+  await post(hooksUrl, hooks);
+  const expectStopped = async (api: APIRequestContext, origin: string) => {
+    await expect(async () => {
+      const { json } = await admin(api, origin);
+      expect((await json(iface)).restartRequired).toBe(true);
+    }).toPass({ timeout: 15_000 });
+    await expect
+      .poll(() => app.execServer(['wg', 'show', 'interfaces']))
+      .toBe('');
+    expect(await app.execServer(['cat', attempts])).toBe('failed');
+  };
+  await app.stopProcess('TERM');
+  await app.startProcess();
+  await expectStopped(request, app.url);
+  const fixed = { ...hooks, postUp: `echo recovered >> ${attempts}` };
+  expect(
+    (await request.post(hooksUrl, { headers, data: fixed })).status()
+  ).toBe(503);
+  await app.stopProcess('KILL');
+  const origin = await app.recreateContainer();
+  const replacement = await playwright.request.newContext({ baseURL: origin });
+  try {
+    await expectStopped(replacement, origin);
+    await replacement.post(iface + '/restart', {
+      headers: { Origin: origin },
+      failOnStatusCode: true,
+    });
+    expect(await app.execServer(['cat', attempts])).toBe('failed\nrecovered');
+    await app.stopProcess('TERM');
+    await app.startProcess();
+    await expect
+      .poll(() => app.execServer(['cat', attempts]))
+      .toBe('failed\nrecovered\nrecovered');
+  } finally {
+    await replacement.dispose();
+  }
+  expect(await app.execServer(['wg', 'show', 'interfaces'])).toBe('wg0');
+});
 
 for (const evidence of [
   'stale record',
