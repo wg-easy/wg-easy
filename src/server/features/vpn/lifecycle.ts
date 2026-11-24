@@ -102,15 +102,7 @@ async function apply(mode?: ApplyMode) {
     hostStates.set(database, state);
   }
   const manualRestart = mode === 'restart' || mode === 'start';
-  if (manualRestart) {
-    const gateways = await filteredSiteGateways(database);
-    await checkRoutedReplySupport(
-      routedReplyFamilies(gateways, !WG_ENV.DISABLE_IPV6)
-    );
-  }
   mode ??= state.retry ?? 'sync';
-  // Clear only after every host effect succeeds. Maintenance retries failures.
-  state.retry = mode;
   const { savedNetwork, clients, hooks, defaults } = await database.transaction(
     async (tx) => ({
       savedNetwork: await tx.interfaces.get(),
@@ -120,6 +112,15 @@ async function apply(mode?: ApplyMode) {
     })
   );
   const enableIpv6 = !WG_ENV.DISABLE_IPV6;
+  await state.tunnel.checkOwnership(savedNetwork.name);
+  if (manualRestart) {
+    const gateways = await filteredSiteGateways(database);
+    await checkRoutedReplySupport(
+      routedReplyFamilies(gateways, !WG_ENV.DISABLE_IPV6)
+    );
+  }
+  // Clear only after every host effect succeeds. Maintenance retries failures.
+  state.retry = mode;
   if (state.failedStart) {
     await cleanFailedStart(state.tunnel, state.failedStart);
     if (!manualRestart) {
@@ -137,7 +138,6 @@ async function apply(mode?: ApplyMode) {
     mode === 'sync'
       ? { ...savedNetwork, ...state.activeNetwork }
       : savedNetwork;
-  await state.tunnel.checkOwnership(network.name);
   if (network.firewallEnabled) {
     await firewall.blockTraffic(network.name, enableIpv6);
   }
@@ -193,6 +193,7 @@ async function apply(mode?: ApplyMode) {
         return failedPostUp(state, network.name, cause);
       }
     }
+    await state.tunnel.completeStartup(network, hooks);
     state.activeNetwork = stagedSettings(network);
   }
   state.mtu = network.mtu;
@@ -238,10 +239,12 @@ export function commit<T>(
         enableIpv6
       );
       // Revoking a peer or disabling filtering must still work if the host changes.
-      if (after.size) {
-        await checkRoutedReplySupport(
-          after.difference(routedReplyFamilies(before, enableIpv6))
-        );
+      const added = after.difference(routedReplyFamilies(before, enableIpv6));
+      if (added.size) {
+        const tunnel =
+          hostStates.get(getDatabase())?.tunnel ?? new LinuxTunnel();
+        await tunnel.checkOwnership((await tx.interfaces.get()).name);
+        await checkRoutedReplySupport(added);
       }
       return value;
     });

@@ -94,7 +94,12 @@ export const wg = {
     }
   },
 
-  runHook: (infName: string, table: string, hook: string) => {
+  runHook: (
+    infName: string,
+    table: string,
+    hook: string,
+    disableIpv6?: boolean
+  ) => {
     const name = parseInterfaceName(infName);
     return exec(
       `set -eo pipefail
@@ -105,6 +110,9 @@ ${hook.replaceAll('%i', name)}`,
         log: false,
         env: {
           ...process.env,
+          ...(disableIpv6 === undefined
+            ? {}
+            : { DISABLE_IPV6: String(disableIpv6) }),
           LC_ALL: 'C',
           INTERFACE: name,
           CONFIG_FILE: `/etc/wireguard/${name}.conf`,

@@ -1,0 +1,3 @@
+services:
+  wg-easy:
+    command: ["dumb-init", "sleep", "infinity"]

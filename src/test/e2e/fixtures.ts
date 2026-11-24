@@ -17,6 +17,9 @@ type App = {
   publicKey: (privateKey: string) => Promise<string>;
   serverPublicKey: () => Promise<string>;
   restart: () => Promise<string>;
+  startProcess: (disableIpv6?: boolean) => Promise<string>;
+  stopProcess: (signal: 'KILL' | 'TERM') => Promise<void>;
+  logs: () => Promise<string>;
   connectClient: (configuration: string, index?: number) => Promise<void>;
   execClient: (args: string[], index?: number) => Promise<string>;
   execServer: (args: string[]) => Promise<string>;
@@ -31,17 +34,19 @@ export const credentials = {
 export const test = base.extend<{
   app: App;
   initialized: boolean;
+  keepNamespace: boolean;
   strictReversePath: boolean;
   ipv6: boolean;
   backend: 'wg' | 'awg';
 }>({
-  initialized: [true, { option: true }],
   strictReversePath: [false, { option: true }],
+  keepNamespace: [false, { option: true }],
+  initialized: [true, { option: true }],
   ipv6: [false, { option: true }],
   backend: ['wg', { option: true }],
   app: [
     async (
-      { initialized, ipv6, backend, strictReversePath },
+      { initialized, ipv6, backend, keepNamespace, strictReversePath },
       use,
       testInfo
     ) => {
@@ -62,6 +67,17 @@ export const test = base.extend<{
             '/dev/null',
             '-f',
             composeFile,
+            ...(keepNamespace
+              ? [
+                  '-f',
+                  fileURLToPath(
+                    new URL(
+                      '../../../docker-compose.test-process.yml',
+                      import.meta.url
+                    )
+                  ),
+                ]
+              : []),
             '-p',
             project,
             ...args,
@@ -91,7 +107,25 @@ export const test = base.extend<{
       const getUrl = async () =>
         `http://${await compose(['port', 'wg-easy', '51821'])}`;
 
+      const execServer = (args: string[]) =>
+        compose(['exec', '-T', 'wg-easy', ...args]);
+      const startProcess = (disableIpv6 = !ipv6) =>
+        compose([
+          'exec',
+          '-T',
+          '-d',
+          '-e',
+          'DISABLE_IPV6=' + String(disableIpv6),
+          'wg-easy',
+          'sh',
+          '-ec',
+          'echo $$ > /tmp/e2e-node.pid; exec iptables-backend node server/index.mjs >/proc/1/fd/1 2>/proc/1/fd/2',
+        ]);
       try {
+        if (keepNamespace) {
+          await compose(['up', '-d', 'wg-easy']);
+          await startProcess();
+        }
         await compose([
           'up',
           '-d',
@@ -107,7 +141,16 @@ export const test = base.extend<{
           publicKey: (privateKey) => wg(['pubkey'], `${privateKey}\n`),
           serverPublicKey: () => wg(['show', 'wg0', 'public-key']),
           execClient,
-          execServer: (args) => compose(['exec', '-T', 'wg-easy', ...args]),
+          execServer,
+          startProcess,
+          stopProcess: async (signal) => {
+            await execServer([
+              'sh',
+              '-ec',
+              `pid=$(cat /tmp/e2e-node.pid); kill -${signal} "$pid"; while kill -0 "$pid" 2>/dev/null; do sleep 0.1; done`,
+            ]);
+          },
+          logs: () => compose(['logs', '--no-color', 'wg-easy']),
           connectClient: async (configuration, index = 1) => {
             await compose([
               'up',

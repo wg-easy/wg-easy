@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { isDeepStrictEqual, promisify } from 'node:util';
 
 import { createError } from 'nuxt/server';
+import { z } from 'zod';
 
 import {
   kernelTable,
@@ -21,18 +22,24 @@ class DefaultRouteConflict extends Error {}
 
 type Family = (typeof families)[number];
 type Defaults = Partial<Record<Family, string>>;
-type Item =
-  | { kind: 'route'; table: number }
-  | { kind: 'suppress'; priority: number }
-  | { kind: 'lookup'; priority: number; table: number; mark: number }
-  | { kind: 'listener'; port: number; mark: number }
-  | { kind: 'protect'; address: string };
-
-export type DefaultPolicyState = {
-  tag: string;
-  assignedMark?: number;
-  owned: Record<Family, Item[]>;
-};
+const id = z.int().positive().max(0xffffffff);
+const item = z.discriminatedUnion('kind', [
+  z.object({ kind: z.literal('route'), table: id }),
+  z.object({ kind: z.literal('suppress'), priority: id }),
+  z.object({ kind: z.literal('lookup'), priority: id, table: id, mark: id }),
+  z.object({ kind: z.literal('listener'), port: id.max(65535), mark: id }),
+  z.object({
+    kind: z.literal('protect'),
+    address: z.union([z.ipv4(), z.ipv6()]),
+  }),
+]);
+type Item = z.infer<typeof item>;
+export const defaultPolicyState = z.object({
+  tag: z.string().regex(/^wg-easy-[\da-f-]{36}$/),
+  assignedMark: id.optional(),
+  owned: z.object({ ipv4: z.array(item), ipv6: z.array(item) }),
+});
+export type DefaultPolicyState = z.infer<typeof defaultPolicyState>;
 
 type Rule = Record<string, unknown> & {
   priority: number;
@@ -231,7 +238,7 @@ export class DefaultPolicy {
     return { table, mark };
   }
 
-  private async clearMark(name: string) {
+  private async clearMark(name: string, backend = WG_ENV.WG_EXECUTABLE) {
     const mark = this.state.assignedMark;
     if (
       !mark ||
@@ -243,7 +250,6 @@ export class DefaultPolicy {
     ) {
       return;
     }
-    const backend = WG_ENV.WG_EXECUTABLE;
     const { stdout } = await run(backend, ['show', name, 'fwmark']);
     if (Number(stdout.trim()) === mark) {
       await run(backend, ['set', name, 'fwmark', '0']);
@@ -511,10 +517,10 @@ export class DefaultPolicy {
     return failure;
   }
 
-  async stop(name: string) {
+  async stop(name: string, backend = WG_ENV.WG_EXECUTABLE) {
     for (const family of families) {
       await this.family(name, family, []);
     }
-    await this.clearMark(name);
+    await this.clearMark(name, backend);
   }
 }
