@@ -45,6 +45,12 @@ services:
       retries: 30
       start_period: 5s
 
+  wg-easy-recovery:
+    extends: wg-easy
+    profiles: [recovery]
+    # Keep the network namespace alive when the test kills the server process.
+    command: ["dumb-init", "sleep", "infinity"]
+
   vpn-client:
     image: ${E2E_IMAGE:-wg-easy-e2e:local}
     command: ["dumb-init", "sleep", "infinity"]

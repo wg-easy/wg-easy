@@ -56,6 +56,7 @@ export const test = base.extend<{
       }
 
       const project = `wg-easy-e2e-${randomUUID()}`;
+      const server = keepNamespace ? 'wg-easy-recovery' : 'wg-easy';
       // Fixture teardown can be skipped when startup is interrupted.
       await appendFile(`${runDir}/projects`, `${project}\n`);
       async function compose(args: string[], input?: string) {
@@ -67,17 +68,6 @@ export const test = base.extend<{
             '/dev/null',
             '-f',
             composeFile,
-            ...(keepNamespace
-              ? [
-                  '-f',
-                  fileURLToPath(
-                    new URL(
-                      '../../../docker-compose.test-process.yml',
-                      import.meta.url
-                    )
-                  ),
-                ]
-              : []),
             '-p',
             project,
             ...args,
@@ -85,6 +75,7 @@ export const test = base.extend<{
           {
             env: {
               ...process.env,
+              COMPOSE_PROFILES: keepNamespace ? 'recovery' : '',
               E2E_BACKEND: backend,
               E2E_RP_FILTER: strictReversePath ? '1' : '0',
               E2E_INITIALIZED: String(initialized),
@@ -98,17 +89,17 @@ export const test = base.extend<{
         return (await command).stdout.trim();
       }
       const wg = (args: string[], input?: string) =>
-        compose(['exec', '-T', 'wg-easy', backend, ...args], input);
+        compose(['exec', '-T', server, backend, ...args], input);
       const execClient = (args: string[], index = 1, input?: string) =>
         compose(
           ['exec', '-T', '--index', String(index), 'vpn-client', ...args],
           input
         );
       const getUrl = async () =>
-        `http://${await compose(['port', 'wg-easy', '51821'])}`;
+        `http://${await compose(['port', server, '51821'])}`;
 
       const execServer = (args: string[]) =>
-        compose(['exec', '-T', 'wg-easy', ...args]);
+        compose(['exec', '-T', server, ...args]);
       const startProcess = (disableIpv6 = !ipv6) =>
         compose([
           'exec',
@@ -116,24 +107,17 @@ export const test = base.extend<{
           '-d',
           '-e',
           'DISABLE_IPV6=' + String(disableIpv6),
-          'wg-easy',
+          server,
           'sh',
           '-ec',
           'echo $$ > /tmp/e2e-node.pid; exec iptables-backend node server/index.mjs >/proc/1/fd/1 2>/proc/1/fd/2',
         ]);
       try {
         if (keepNamespace) {
-          await compose(['up', '-d', 'wg-easy']);
+          await compose(['up', '-d', server]);
           await startProcess();
         }
-        await compose([
-          'up',
-          '-d',
-          '--wait',
-          '--wait-timeout',
-          '90',
-          'wg-easy',
-        ]);
+        await compose(['up', '-d', '--wait', '--wait-timeout', '90', server]);
         await use({
           url: await getUrl(),
           peers: async () =>
@@ -150,7 +134,7 @@ export const test = base.extend<{
               `pid=$(cat /tmp/e2e-node.pid); kill -${signal} "$pid"; while kill -0 "$pid" 2>/dev/null; do sleep 0.1; done`,
             ]);
           },
-          logs: () => compose(['logs', '--no-color', 'wg-easy']),
+          logs: () => compose(['logs', '--no-color', server]),
           connectClient: async (configuration, index = 1) => {
             await compose([
               'up',
@@ -190,14 +174,14 @@ ${backend}-quick up wg0`,
             }
           },
           restart: async () => {
-            await compose(['restart', 'wg-easy']);
+            await compose(['restart', server]);
             await compose([
               'up',
               '-d',
               '--wait',
               '--wait-timeout',
               '90',
-              'wg-easy',
+              server,
             ]);
             // Docker can assign a different ephemeral host port on restart.
             return getUrl();
