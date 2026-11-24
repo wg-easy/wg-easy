@@ -1,6 +1,6 @@
 import { execFile, type ExecException } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
-import { appendFile } from 'node:fs/promises';
+import { unlink, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
 
@@ -59,7 +59,8 @@ export const test = base.extend<{
       const project = `wg-easy-e2e-${randomUUID()}`;
       const server = keepNamespace ? 'wg-easy-recovery' : 'wg-easy';
       // Fixture teardown can be skipped when startup is interrupted.
-      await appendFile(`${runDir}/projects`, `${project}\n`);
+      const marker = `${runDir}/${project}`;
+      await writeFile(marker, '');
       async function compose(args: string[], input?: string) {
         const command = exec(
           'docker',
@@ -204,6 +205,7 @@ ${backend}-quick up wg0`,
           });
         } finally {
           await compose(['down', '--volumes', '--remove-orphans']);
+          await unlink(marker);
         }
       }
     },

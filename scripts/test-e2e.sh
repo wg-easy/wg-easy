@@ -4,14 +4,14 @@ set -euo pipefail
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 export E2E_RUN_DIR
 E2E_RUN_DIR="$(mktemp -d "${TMPDIR:-/tmp}/wg-easy-e2e.XXXXXX")"
-touch "$E2E_RUN_DIR/projects"
 
 cleanup() {
-  local project
-  while IFS= read -r project; do
+  local marker
+  for marker in "$E2E_RUN_DIR"/wg-easy-e2e-*; do
+    [[ -f "$marker" ]] || continue
     docker compose --env-file /dev/null -f "$repo_root/docker-compose.test.yml" --profile '*' \
-      -p "$project" down --volumes --remove-orphans >/dev/null 2>&1 || true
-  done < "$E2E_RUN_DIR/projects"
+      -p "${marker##*/}" down --volumes --remove-orphans >/dev/null 2>&1 || true
+  done
   rm -rf "$E2E_RUN_DIR"
 }
 trap cleanup EXIT

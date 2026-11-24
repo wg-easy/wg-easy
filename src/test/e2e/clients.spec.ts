@@ -132,9 +132,13 @@ test('a downloaded client is applied to WireGuard and disabling or deleting it r
   expect(privateKey).toBeTruthy();
   const publicKey = await app.publicKey(privateKey!);
   await expect.poll(app.peers).toContain(publicKey);
+  await app.connectClient(contents);
+  const canReachServer = () => app.pingFromClient('10.8.0.1');
+  await expect.poll(canReachServer).toBe(true);
 
   await card.getByRole('switch', { name: 'Disable Client' }).click();
   await expect.poll(app.peers).not.toContain(publicKey);
+  await expect.poll(canReachServer).toBe(false);
   await reload(page);
   await expect(
     card.getByRole('switch', { name: 'Enable Client' })
@@ -142,6 +146,8 @@ test('a downloaded client is applied to WireGuard and disabling or deleting it r
 
   await card.getByRole('switch', { name: 'Enable Client' }).click();
   await expect.poll(app.peers).toContain(publicKey);
+  // The existing client needs a new handshake after its peer is re-added.
+  await expect.poll(canReachServer, { timeout: 30_000 }).toBe(true);
   await card.getByRole('link', { name: 'Smoke client', exact: true }).click();
   await page
     .getByRole('button', { name: 'Delete', exact: true })

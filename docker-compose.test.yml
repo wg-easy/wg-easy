@@ -42,8 +42,7 @@ services:
           node -e "fetch('http://127.0.0.1:51821/api/information').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"
       interval: 2s
       timeout: 5s
-      retries: 30
-      start_period: 5s
+      retries: 33
 
   wg-easy-recovery:
     extends: wg-easy

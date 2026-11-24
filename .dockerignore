@@ -1,6 +1,9 @@
 /src/node_modules
 /src/.nuxt
 /src/.output
+/src/test
+/src/playwright.config.ts
+/src/vitest.config.ts
 node_modules
 .git
 **/.env
