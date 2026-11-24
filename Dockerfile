@@ -26,8 +26,7 @@ RUN apk add linux-headers build-base go git && \
     cd amneziawg-go && \
     make && \
     cd ../amneziawg-tools/src && \
-    make && \
-    sed -i 's|\[\[ $proto == -4 \]\] && cmd sysctl -q net\.ipv4\.conf\.all\.src_valid_mark=1|[[ $proto == -4 ]] \&\& [[ $(sysctl -n net.ipv4.conf.all.src_valid_mark) != 1 ]] \&\& cmd sysctl -q net.ipv4.conf.all.src_valid_mark=1|' ./wg-quick/linux.bash
+    make
 
 FROM docker.io/library/node:lithium-alpine@sha256:6bd9ab43c0ec0190ca7b2d193906cb8b7edf6e7f4afa43ddeccd6452710bffb5 AS build-libsql
 WORKDIR /app

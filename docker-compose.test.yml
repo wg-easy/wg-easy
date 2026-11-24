@@ -31,6 +31,9 @@ services:
           - vpn.example.test
     volumes:
       - wireguard:/etc/wireguard
+      # No server process can execute a quick script, including on its first start.
+      - /dev/null:/usr/bin/wg-quick:ro
+      - /dev/null:/usr/bin/awg-quick:ro
     healthcheck:
       test:
         - CMD-SHELL
@@ -44,7 +47,15 @@ services:
 
   vpn-client:
     image: ${E2E_IMAGE:-wg-easy-e2e:local}
-    command: ["dumb-init", "sleep", "infinity"]
+    command:
+      - dumb-init
+      - sh
+      - -ec
+      - |
+        # Docker sets this sysctl before startup and mounts it read-only.
+        test "$$(sysctl -n net.ipv4.conf.all.src_valid_mark)" = 1
+        sed -i '/cmd sysctl -q net\.ipv4\.conf\.all\.src_valid_mark=1$/d' /usr/bin/awg-quick
+        exec sleep infinity
     devices:
       - /dev/net/tun:/dev/net/tun
     cap_add:

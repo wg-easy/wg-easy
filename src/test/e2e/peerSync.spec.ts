@@ -36,11 +36,6 @@ for (const backend of ['wg', 'awg'] as const) {
       const ifindex = () =>
         app.execServer(['cat', '/sys/class/net/wg0/ifindex']);
       const original = await ifindex();
-      await app.execServer([
-        'sh',
-        '-ec',
-        `if test -f /usr/bin/${backend}-quick; then mv /usr/bin/${backend}-quick /tmp/unused-quick; fi`,
-      ]);
 
       const traffic = app.execClient([
         'ping',

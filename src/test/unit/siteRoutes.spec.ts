@@ -155,7 +155,7 @@ describe('Server Allowed IP routes', () => {
     expect(wg.sync).toHaveBeenCalledTimes(2);
   });
 
-  test('keeps a failed deferred PostUp down until an explicit restart', async () => {
+  test('keeps a failed PostUp down until an explicit restart', async () => {
     const { store, wg, setRoutes } = await fixture();
     await store.clients.update(1, { serverAllowedIps: [prefix] });
     wg.runHook.mockRejectedValueOnce(

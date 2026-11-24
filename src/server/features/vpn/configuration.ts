@@ -2,7 +2,7 @@ import { normalizeCidr, parseCidr } from 'cidr-tools';
 
 import { zeroWireGuardKey } from '#shared/utils/wireguard';
 import { formatEndpoint } from '#server/utils/endpoint';
-import { getGatewayAddress, normalizePrefix } from '#server/utils/ip';
+import { getGatewayAddress } from '#server/utils/ip';
 import type { ClientType } from '#db/repositories/client/types';
 import type { InterfaceType } from '#db/repositories/interface/types';
 import type { UserConfigType } from '#db/repositories/userConfig/types';
@@ -13,7 +13,6 @@ type Options = {
   amnezia?: boolean;
   uiPort?: string;
 };
-type ServerOptions = Options & { managedSites?: ReadonlySet<string> };
 export type ServerPeer = Omit<ClientType, 'createdAt' | 'updatedAt'>;
 type RouteClient = Pick<ClientType, 'enabled' | 'serverAllowedIps'>;
 
@@ -22,7 +21,7 @@ export function generateServerConfig(
   network: InterfaceType,
   hooks: HooksType,
   clients: ServerPeer[],
-  options: ServerOptions = {}
+  options: Options = {}
 ) {
   return [
     generateServerInterface(network, hooks, options),
@@ -50,34 +49,10 @@ export function generateTunnelConfig(
   );
 }
 
-function generateServerPeers(clients: ServerPeer[], options: ServerOptions) {
+function generateServerPeers(clients: ServerPeer[], options: Options) {
   return clients
     .filter((client) => client.enabled)
     .map((client) => generateServerPeer(client, options));
-}
-
-/** wg-quick owns tunnel addresses and default routes. Ordinary site routes are
- * installed after the complete peer configuration is synced, before PostUp. */
-export function generateStartupConfig(
-  network: InterfaceType,
-  hooks: HooksType,
-  clients: ServerPeer[],
-  options: Options
-) {
-  if (network.routingTable === 'off') {
-    return;
-  }
-  const managedSites = managedSitePrefixes(clients, options.enableIpv6 ?? true);
-  if (!managedSites.size) {
-    return;
-  }
-  return {
-    contents: generateServerConfig(network, { ...hooks, postUp: '' }, clients, {
-      ...options,
-      managedSites,
-    }),
-    postUp: expandHook(hooks.postUp, network, options.uiPort ?? '51821'),
-  };
 }
 
 /** Both startup and live edits derive default policy from enabled peers. */
@@ -95,17 +70,6 @@ export function defaultRoutePolicy(
     }
   }
   return routes;
-}
-
-export function managedSitePrefixes(
-  clients: RouteClient[],
-  enableIpv6: boolean
-) {
-  return new Set(
-    enabledServerAllowedIps(clients, enableIpv6)
-      .map(normalizePrefix)
-      .filter((prefix) => !prefix.endsWith('/0'))
-  );
 }
 
 function enabledServerAllowedIps(clients: RouteClient[], enableIpv6: boolean) {
@@ -134,10 +98,8 @@ export function peerAllowedIps(
   ];
 }
 
-function generateServerPeer(client: ServerPeer, options: ServerOptions = {}) {
-  const allowedIps = peerAllowedIps(client, options.enableIpv6 ?? true).filter(
-    (prefix) => !options.managedSites?.has(normalizePrefix(prefix))
-  );
+function generateServerPeer(client: ServerPeer, options: Options = {}) {
+  const allowedIps = peerAllowedIps(client, options.enableIpv6 ?? true);
 
   const lines = [
     `# Client: ${client.name} (${client.id})`,

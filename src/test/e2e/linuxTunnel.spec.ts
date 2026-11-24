@@ -4,10 +4,15 @@ for (const backend of ['wg', 'awg'] as const) {
   test.describe(backend, () => {
     test.use({ backend });
     for (const userspace of [false, true]) {
-      test(`starts without the server quick script and carries traffic (${userspace ? 'userspace' : 'kernel'})`, async ({
+      test(`starts, syncs, restarts and stops without server quick scripts (${userspace ? 'userspace' : 'kernel'})`, async ({
         request,
         app,
       }) => {
+        for (const quick of ['wg-quick', 'awg-quick']) {
+          expect(
+            await app.execServer(['sh', '-c', `command -v ${quick} || true`])
+          ).toBe('');
+        }
         const kind = backend === 'awg' ? 'amneziawg' : 'wireguard';
         if (!userspace) {
           try {
@@ -47,11 +52,6 @@ for (const backend of ['wg', 'awg'] as const) {
         const client = await (await request.get(url)).json();
         const site = '192.0.2.0/24';
         await post(url, { ...client, jC: 3, serverAllowedIps: [site] });
-        await app.execServer([
-          'mv',
-          `/usr/bin/${backend}-quick`,
-          '/tmp/unused-quick',
-        ]);
         if (userspace) {
           // Simulate a host whose kernel does not provide the link kind.
           await app.execServer([
@@ -68,12 +68,13 @@ chmod +x /usr/local/bin/ip`,
           ]);
         }
         const phases = '/tmp/tunnel-phases';
-        await post('/api/admin/hooks', {
+        const hooks = {
           preUp: `ip link show dev %i && echo PreUp >> ${phases}`,
           postUp: `${backend} show %i peers | grep -Fx '${client.publicKey}'; ip address show dev %i | grep '10.8.0.1/24'; ip route show exact ${site} | grep 'dev %i'; echo PostUp >> ${phases}`,
           preDown: `ip link show dev %i && echo PreDown >> ${phases}`,
           postDown: `test ! -e /sys/class/net/%i && echo PostDown >> ${phases}`,
-        });
+        };
+        await post('/api/admin/hooks', hooks);
         await post('/api/admin/interface/restart');
         if (userspace) {
           expect(
@@ -96,13 +97,35 @@ chmod +x /usr/local/bin/ip`,
         expect(
           parameters(await app.execServer([backend, 'showconf', 'wg0']))
         ).toEqual(serverParams);
-        expect(
-          parameters(await app.execServer(['cat', '/etc/wireguard/wg0.conf']))
-        ).toEqual(serverParams);
+        const server = await app.execServer(['cat', '/etc/wireguard/wg0.conf']);
+        expect(parameters(server)).toEqual(serverParams);
+        const savedLines = server.split('\n');
+        for (const line of [
+          '[Interface]',
+          'Address = 10.8.0.1/24',
+          'ListenPort = 51820',
+          'Table = auto',
+          `PreUp = ${hooks.preUp}`,
+          `PostUp = ${hooks.postUp}`,
+          `PreDown = ${hooks.preDown}`,
+          `PostDown = ${hooks.postDown}`,
+          '[Peer]',
+          `PublicKey = ${client.publicKey}`,
+          `AllowedIPs = ${client.ipv4Address}/32, ${site}`,
+        ]) {
+          expect(savedLines.includes(line), line).toBe(true);
+        }
         expect(parameters(config)).toEqual(peerParams);
         await app.connectClient(config);
         await expect.poll(() => app.pingFromClient('10.8.0.1')).toBe(true);
+        const added = '198.51.100.0/24';
+        await post(url, { ...client, jC: 3, serverAllowedIps: [site, added] });
+        expect(
+          await app.execServer([backend, 'show', 'wg0', 'allowed-ips'])
+        ).toContain(added);
+        await expect.poll(() => app.pingFromClient('10.8.0.1')).toBe(true);
         await app.restart();
+        await expect.poll(() => app.pingFromClient('10.8.0.1')).toBe(true);
         expect(await app.execServer(['cat', phases])).toBe(
           'PreUp\nPostUp\nPreDown\nPostDown\nPreUp\nPostUp'
         );
