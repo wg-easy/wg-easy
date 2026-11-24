@@ -125,6 +125,9 @@ chmod +x /usr/local/bin/ip`,
         ).toContain(added);
         await expect.poll(() => app.pingFromClient('10.8.0.1')).toBe(true);
         await app.restart();
+        // A restarted server has discarded the old session. Reconnect with the export.
+        await app.execClient([`${backend}-quick`, 'down', 'wg0']);
+        await app.execClient([`${backend}-quick`, 'up', 'wg0']);
         await expect.poll(() => app.pingFromClient('10.8.0.1')).toBe(true);
         expect(await app.execServer(['cat', phases])).toBe(
           'PreUp\nPostUp\nPreDown\nPostDown\nPreUp\nPostUp'

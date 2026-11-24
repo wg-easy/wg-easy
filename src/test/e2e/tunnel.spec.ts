@@ -267,7 +267,7 @@ for (const backend of ['wg', 'awg'] as const) {
       const attempts = '/tmp/post-up-attempts';
       const hooks = {
         preUp: '',
-        postUp: `echo run >> ${attempts}; false`,
+        postUp: `echo run >> ${attempts}; false | true`,
         preDown: `if [[ -f ${attempts} ]]; then echo PreDown >> ${attempts}; fi`,
         postDown: `if [[ -f ${attempts} ]]; then echo PostDown >> ${attempts}; fi`,
       };
