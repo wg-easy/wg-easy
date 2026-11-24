@@ -18,7 +18,7 @@ trap cleanup EXIT
 trap 'exit 130' INT
 trap 'exit 143' TERM
 
-docker build -t wg-easy-e2e:local "$repo_root"
+docker build -t "${E2E_IMAGE:-wg-easy-e2e:local}" "$repo_root"
 
 cd "$repo_root/src"
 pnpm exec playwright test "$@"

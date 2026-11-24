@@ -1,8 +1,11 @@
 services:
   wg-easy:
-    image: wg-easy-e2e:local
+    image: ${E2E_IMAGE:-wg-easy-e2e:local}
     environment:
       INSECURE: "true"
+      EXPERIMENTAL_AWG: "true"
+      OVERRIDE_AUTO_AWG: ${E2E_BACKEND:-wg}
+      WG_ENDPOINT_RESOLUTION_RETRIES: "0"
       DISABLE_IPV6: ${E2E_DISABLE_IPV6:-true}
       DISABLE_VERSION_CHECK: "true"
       DEBUG: ""
@@ -11,6 +14,8 @@ services:
       INIT_PASSWORD: e2e-only-password-123!
       INIT_HOST: vpn.example.test
       INIT_PORT: "51820"
+    devices:
+      - /dev/net/tun:/dev/net/tun
     cap_add:
       - NET_ADMIN
     sysctls:
@@ -29,7 +34,7 @@ services:
       test:
         - CMD-SHELL
         - >-
-          wg show wg0 public-key >/dev/null &&
+          ${E2E_BACKEND:-wg} show wg0 public-key >/dev/null &&
           node -e "fetch('http://127.0.0.1:51821/api/information').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"
       interval: 2s
       timeout: 5s
@@ -37,8 +42,10 @@ services:
       start_period: 5s
 
   vpn-client:
-    image: wg-easy-e2e:local
+    image: ${E2E_IMAGE:-wg-easy-e2e:local}
     command: ["dumb-init", "sleep", "infinity"]
+    devices:
+      - /dev/net/tun:/dev/net/tun
     cap_add:
       - NET_ADMIN
     sysctls:

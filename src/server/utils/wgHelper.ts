@@ -1,6 +1,11 @@
 import fs from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 
+import type { InterfaceType } from '#db/repositories/interface/types';
+import {
+  generateTunnelConfig,
+  type ServerPeer,
+} from '#server/features/vpn/configuration';
 import { exec } from '#server/utils/cmd';
 import { WG_ENV } from '#server/utils/config';
 import { parseInterfaceName } from '#server/utils/interfaceName';
@@ -18,7 +23,7 @@ async function up(
     return exec(`${wgExecutable}-quick up ${name}`);
   }
   // wg-quick derives the interface name from the filename. Keep the complete
-  // configuration in /etc/wireguard for syncconf, shutdown and external tools.
+  // configuration in /etc/wireguard for shutdown and external tools.
   const dir = await fs.mkdtemp('/tmp/wg-easy-up-');
   const marker = `${dir}/post-up-started`;
   try {
@@ -89,14 +94,21 @@ export const wg = {
     );
   },
 
-  sync: (infName: string) => {
-    // wg-quick's automatic routing mark exists only on the live interface.
-    // Supply it as an interface setting in the same update as the peers.
+  async sync(
+    network: InterfaceType,
+    clients: ServerPeer[],
+    enableIpv6: boolean
+  ) {
+    const name = parseInterfaceName(network.name);
+    const fwmark = await exec(`${wgExecutable} show ${name} fwmark`);
+    const input = generateTunnelConfig(network, clients, fwmark, {
+      enableIpv6,
+      amnezia: wgExecutable === 'awg',
+    });
+    // Node uses a socket for child stdin. Give syncconf a pipe it can reopen.
     return exec(
-      `fwmark=$(${wgExecutable} show ${infName} fwmark) && ` +
-        `config=$(${wgExecutable}-quick strip ${infName}) && ` +
-        `printf '%s\\n' '[Interface]' "FwMark = $fwmark" "$config" | ` +
-        `${wgExecutable} syncconf ${infName} /dev/stdin`
+      `set -o pipefail; cat | ${wgExecutable} syncconf ${name} /dev/stdin`,
+      { input }
     );
   },
 

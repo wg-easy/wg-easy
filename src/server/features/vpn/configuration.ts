@@ -14,7 +14,7 @@ type Options = {
   uiPort?: string;
 };
 type ServerOptions = Options & { managedSites?: ReadonlySet<string> };
-type ServerPeer = Omit<ClientType, 'createdAt' | 'updatedAt'>;
+export type ServerPeer = Omit<ClientType, 'createdAt' | 'updatedAt'>;
 type RouteClient = Pick<ClientType, 'enabled' | 'serverAllowedIps'>;
 
 /** The complete server file, including enabled peers and its final newline. */
@@ -26,11 +26,34 @@ export function generateServerConfig(
 ) {
   return [
     generateServerInterface(network, hooks, options),
-    ...clients
-      .filter((client) => client.enabled)
-      .map((client) => generateServerPeer(client, options)),
+    ...generateServerPeers(clients, options),
     '',
   ].join('\n\n');
+}
+
+/** Only fields understood by wg/awg syncconf belong in the tunnel configuration. */
+export function generateTunnelConfig(
+  network: InterfaceType,
+  clients: ServerPeer[],
+  fwmark: string,
+  options: Options
+) {
+  const fields = [
+    '[Interface]',
+    `PrivateKey = ${network.privateKey}`,
+    `ListenPort = ${network.port}`,
+    `FwMark = ${fwmark}`,
+    ...(options.amnezia ? buildAwgLines(network) : []),
+  ];
+  return [fields.join('\n'), ...generateServerPeers(clients, options), ''].join(
+    '\n\n'
+  );
+}
+
+function generateServerPeers(clients: ServerPeer[], options: ServerOptions) {
+  return clients
+    .filter((client) => client.enabled)
+    .map((client) => generateServerPeer(client, options));
 }
 
 /** wg-quick owns tunnel addresses and default routes. Ordinary site routes are
