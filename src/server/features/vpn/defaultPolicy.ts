@@ -21,6 +21,7 @@ import {
 
 import { parseRoutingTableId } from '#shared/utils/routingTable';
 import type { InterfaceType } from '#db/repositories/interface/types';
+import { exec } from '#server/utils/cmd';
 import { WG_ENV } from '#server/utils/config';
 import { getGatewayAddress } from '#server/utils/ip';
 
@@ -193,6 +194,7 @@ function runFirewallRule(
     ];
     return run(command, [
       '-w',
+      '2',
       '-t',
       'raw',
       ...ingress,
@@ -209,6 +211,7 @@ function runFirewallRule(
   const setMark = ['-j', 'MARK', '--set-mark', String(rule.mark)];
   return run(command, [
     '-w',
+    '2',
     '-t',
     'mangle',
     ...ingress,
@@ -220,20 +223,29 @@ function runFirewallRule(
   ]);
 }
 
+function missingTable(error: unknown) {
+  return /FIB table does not exist/.test(
+    (error as { stderr?: string }).stderr ?? ''
+  );
+}
+
 async function installRoute(name: string, family: RouteFamily, table: number) {
   const routes = await inspect<KernelRoute>(
     family,
     'route',
     'show',
     'table',
-    'all',
+    String(table),
     'exact',
     'default'
-  );
+  ).catch((error) => {
+    if (missingTable(error)) {
+      return [];
+    }
+    throw error;
+  });
   const preferred = preferredRoute(
-    routes.filter(
-      (route) => kernelTable(route.table) === table && route.dst === 'default'
-    ),
+    routes.filter((route) => route.dst === 'default' && !route.from),
     name
   );
   if (preferred.viaTunnel) {
@@ -325,28 +337,59 @@ async function ruleStillOwned(
   }
 }
 
+async function tableHasRoutes(family: RouteFamily, table: number) {
+  try {
+    const size = await exec(
+      `set -o pipefail; ip ${flag(family)} route show table ${table} | wc -c`
+    );
+    return Number(size) > 0;
+  } catch (error) {
+    if (missingTable(error)) {
+      return false;
+    }
+    throw error;
+  }
+}
+
 async function automaticIds(name: string) {
   const used = new Set([0, 253, 254, 255]);
   const rules: Rule[] = [];
+  const supported: RouteFamily[] = [];
   for (const family of families) {
-    const familyRules = await inspect<Rule>(family, 'rule', 'show');
-    rules.push(...familyRules);
-    const routes = await inspect<KernelRoute>(
-      family,
-      'route',
-      'show',
-      'table',
-      'all'
-    );
-    for (const entry of [...routes, ...familyRules]) {
-      used.add(kernelTable(entry.table));
+    let familyRules;
+    try {
+      familyRules = await inspect<Rule>(family, 'rule', 'show');
+    } catch (error) {
+      const { stderr } = error as { stderr?: string };
+      if (
+        family === 'ipv6' &&
+        WG_ENV.DISABLE_IPV6 &&
+        /address family not supported|operation not supported/i.test(
+          stderr ?? ''
+        )
+      ) {
+        continue;
+      }
+      throw error;
+    }
+    supported.push(family);
+    for (const rule of familyRules) {
+      rules.push(rule);
+      used.add(kernelTable(rule.table));
     }
   }
   const backend = WG_ENV.WG_EXECUTABLE;
   const { stdout } = await run(backend, ['show', name, 'fwmark']);
   const current = stdout.trim() === 'off' ? 0 : Number(stdout.trim());
   let table = current || 51820;
-  while (used.has(table)) {
+  while (
+    used.has(table) ||
+    (
+      await Promise.all(
+        supported.map((family) => tableHasRoutes(family, table))
+      )
+    ).some(Boolean)
+  ) {
     table = table === 0xffffffff ? 1 : table + 1;
   }
   const mark = current || availableMark(table, rules);

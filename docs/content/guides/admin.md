@@ -100,6 +100,10 @@ Filtering covers forwarded traffic and traffic addressed to the VPN server itsel
 - **PreDown**: Before the interface stops.
 - **PostDown**: After the interface stops.
 
-If **PostUp** fails, wg-easy takes the tunnel down and keeps the admin panel available. Replacing the container with the same `/etc/wireguard` volume preserves this state. Check which commands already ran, correct the hook under **Admin Panel → Hooks**, then select **Restart Interface** under **Interface**.
+When upgrading from a version that used wg-quick on the server, check multiline hooks. The server now preserves line breaks. Keep a command and its arguments on one line or end each continued line with a backslash (`\`). A shell comment ends at the next line break.
+
+If your deployment keeps its network namespace during an upgrade or rollback, stop the running version and verify its interface is gone before starting the other version. This lets the original manager run its down hooks and remove its routes and firewall rules. The native tunnel manager uses Linux interface alternate names to identify the link it owns.
+
+If **PostUp** fails or the process stops while it runs, wg-easy takes the tunnel down and keeps the admin panel available. Replacing the container with the same `/etc/wireguard` volume preserves this state. Check which commands already ran, correct the hook under **Admin Panel → Hooks**, then select **Restart Interface** under **Interface**.
 
 The default hooks set up forwarding and NAT. Templates can use `{{ipv4Cidr}}`, `{{ipv6Cidr}}`, `{{device}}`, `{{interface}}`, `{{port}}`, and `{{uiPort}}`, which are replaced with the current server settings. CIDR placeholders use the network address, so `10.8.0.15/24` becomes `10.8.0.0/24` in hooks. Saved hooks run at the corresponding interface lifecycle event. Hooks on an individual client's page instead run on that client device.

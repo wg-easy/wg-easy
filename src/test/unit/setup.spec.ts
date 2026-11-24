@@ -6,6 +6,7 @@ import { databaseFixture } from '../helpers/database';
 import { resetCryptoMocks } from '../helpers/crypto';
 import { legacyBackup } from '../helpers/legacyBackup';
 
+import * as recovery from '#server/features/vpn/tunnelRecord';
 import * as setup from '#server/features/setup';
 import { getIpInformation } from '#server/utils/ip';
 import { roles } from '#shared/utils/permissions';
@@ -25,6 +26,9 @@ vi.mock('#server/utils/ip', async (original) => ({
 async function fixture() {
   const database = await databaseFixture();
   resetCryptoMocks();
+  vi.spyOn(recovery, 'readPostUpFailure').mockResolvedValue(undefined);
+  vi.spyOn(recovery, 'recordPostUpFailure').mockResolvedValue();
+  vi.spyOn(recovery, 'clearPostUpFailure').mockResolvedValue();
   const writeConfiguration = vi.spyOn(fs, 'writeFile').mockResolvedValue();
   vi.spyOn(wg, 'dump').mockResolvedValue([]);
   const sync = vi.spyOn(wg, 'sync').mockResolvedValue('');

@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { readFile } from 'node:fs/promises';
+import { readlink } from 'node:fs/promises';
 
 import { createError } from 'nuxt/server';
 
@@ -28,29 +28,55 @@ import { parseInterfaceName } from '#server/utils/interfaceName';
 import { setTunnelMtu } from '#server/utils/tunnelMtu';
 import { wg } from '#server/utils/wgHelper';
 
-async function linkIdentity(name: string) {
+type Link = {
+  ifname: string;
+  ifindex: number;
+  ifalias?: string;
+  altnames?: string[];
+};
+
+async function linkIdentity(name: string): Promise<Link | undefined> {
   if (process.platform !== 'linux') {
     return;
   }
   try {
-    const directory = `/sys/class/net/${name}`;
-    const [index, alias] = await Promise.all([
-      readFile(directory + '/ifindex', 'utf8'),
-      readFile(directory + '/ifalias', 'utf8'),
-    ]);
-    return { index: Number(index), alias: alias.replace(/\n$/, '') };
+    const links: Link[] = JSON.parse(await exec(`ip -j link show dev ${name}`));
+    return links[0];
   } catch (error) {
-    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+    if (
+      !/Device .* does not exist|Cannot find device/.test(
+        (error as { stderr?: string }).stderr ?? ''
+      )
+    ) {
       throw error;
     }
   }
 }
 
+async function createLink(name: string, kind: 'wireguard' | 'amneziawg') {
+  try {
+    await exec(`ip link add dev ${name} type ${kind}`);
+    return false;
+  } catch (error) {
+    if (
+      !(error instanceof Error) ||
+      !/unknown device type|operation not supported/i.test(error.message)
+    ) {
+      throw error;
+    }
+    await exec(`ip tuntap add dev ${name} mode tun vnet_hdr`);
+    return true;
+  }
+}
+
+function temporaryName(record: TunnelRecord) {
+  // IFNAMSIZ allows 15 characters. The private record reserves this random name.
+  return 'wg' + record.policy.tag.slice(8).replaceAll('-', '').slice(0, 13);
+}
+
 export class LinuxTunnel {
   private running?: TunnelRecord;
   private pendingDownHooks = false;
-  // Only this process can finish removal after it observed link deletion.
-  private deleted?: TunnelRecord;
   readonly sites = new SiteRoutes();
 
   async checkOwnership(name: string) {
@@ -61,9 +87,11 @@ export class LinuxTunnel {
     try {
       const record = this.running ?? (await readTunnelRecord(name));
       if (
-        record.name === name &&
-        record.policy.tag === link.alias &&
-        record.index === link.index
+        record?.name === name &&
+        link.ifname === name &&
+        (link.altnames?.includes(record.policy.tag) ||
+          link.ifalias === record.policy.tag) &&
+        record.index === link.ifindex
       ) {
         this.running = record;
         return record;
@@ -88,30 +116,12 @@ export class LinuxTunnel {
       return;
     }
     const kind = WG_ENV.WG_EXECUTABLE === 'awg' ? 'amneziawg' : 'wireguard';
-    try {
-      await exec(`ip link add dev ${name} type ${kind}`);
-    } catch (error) {
-      // A missing link kind is recoverable. Permission and name collisions
-      // must be reported, since attaching a userspace process is unsafe.
-      if (
-        !(error instanceof Error) ||
-        !/unknown device type|operation not supported/i.test(error.message)
-      ) {
-        throw error;
-      }
-      // Keep the userspace link alive while the container init forwards TERM
-      // to the app. stop() runs PreDown, then deletes the link and its daemon.
-      await exec(`setsid ${kind}-go ${name}`);
-    }
     const alias = 'wg-easy-' + randomUUID();
-    await exec(`ip link set dev ${name} alias ${alias}`);
-    const link = await linkIdentity(name);
-    if (!link || link.alias !== alias) {
-      throw new Error(`Tunnel interface ${name} changed during creation`);
-    }
     const record: TunnelRecord = {
       version: 1,
-      index: link.index,
+      index: null,
+      phase: 'creating',
+      namespace: await readlink('/proc/self/ns/net'),
       name,
       backend: WG_ENV.WG_EXECUTABLE,
       table: network.routingTable,
@@ -121,7 +131,50 @@ export class LinuxTunnel {
       postDown: '',
       policy: { tag: alias, owned: { ipv4: [], ipv6: [] } },
     };
+    // Publish the configured name only after its generation is recoverable.
+    const temporary = temporaryName(record);
+    await saveTunnelRecord(record);
     this.running = record;
+    let userspace;
+    try {
+      userspace = await createLink(temporary, kind);
+    } catch (error) {
+      // Neither exclusive create succeeded. Do not claim an existing device.
+      this.running = undefined;
+      await removeTunnelRecord(name);
+      throw error;
+    }
+    const link = await linkIdentity(temporary);
+    if (!link) {
+      throw new Error(
+        `Tunnel interface ${temporary} disappeared during creation`
+      );
+    }
+    record.index = link.ifindex;
+    await exec(`ip link property add dev ${temporary} altname ${alias}`);
+    await saveTunnelRecord(record);
+    try {
+      await exec(`ip link set dev ${temporary} name ${name}`);
+    } catch (error) {
+      // A collision at the public name must leave neither device modified.
+      const pending = await linkIdentity(temporary);
+      if (
+        pending?.ifindex === link.ifindex &&
+        pending.altnames?.includes(alias)
+      ) {
+        await exec(`ip link delete dev ${alias}`);
+        await removeTunnelRecord(name);
+        this.running = undefined;
+      }
+      throw error;
+    }
+    if (!(await this.checkOwnership(name))) {
+      throw new Error(`Tunnel interface ${name} disappeared during creation`);
+    }
+    if (userspace) {
+      await exec(`setsid ${kind}-go ${name}`);
+    }
+    delete record.phase;
     await saveTunnelRecord(record);
   }
 
@@ -199,10 +252,34 @@ export class LinuxTunnel {
   }
 
   async stop(name: string, skipHooks = false) {
+    if (process.platform !== 'linux') {
+      return;
+    }
+    parseInterfaceName(name);
     let running = await this.checkOwnership(name);
     if (!running) {
+      const record = this.running ?? (await readTunnelRecord(name));
+      if (
+        record?.phase &&
+        record.namespace === (await readlink('/proc/self/ns/net'))
+      ) {
+        if (record.phase === 'creating') {
+          const temporary = temporaryName(record);
+          const link = await linkIdentity(temporary);
+          if (
+            link &&
+            link.ifname === temporary &&
+            (record.index === null || record.index === link.ifindex)
+          ) {
+            await exec(`ip link delete dev ${temporary}`);
+          }
+          await removeTunnelRecord(name);
+        } else {
+          await this.finishDeletion(record, skipHooks);
+        }
+      }
       this.running = undefined;
-      return this.finishDeletion(skipHooks);
+      return;
     }
     // Consume PreDown before invoking Bash. A crash or partial hook failure
     // cannot safely establish which commands from that hook already ran.
@@ -225,17 +302,37 @@ export class LinuxTunnel {
       }
     }
     await removeDefaultRules(running);
-    await exec(`ip link delete dev ${name}`);
-    this.deleted = this.running;
+    running = {
+      ...running,
+      phase: 'deleting',
+      namespace: await readlink('/proc/self/ns/net'),
+    };
+    await saveTunnelRecord(running);
+    this.running = running;
+    const tag = running.policy.tag;
+    let target = await linkIdentity(tag);
+    if (!target) {
+      // Migrate a link created by a version that used only IFLA_IFALIAS.
+      const legacy = await linkIdentity(name);
+      if (legacy?.ifindex !== running.index || legacy.ifalias !== tag) {
+        throw new Error(`Interface ${name} changed during teardown`);
+      }
+      await exec(`ip link property add dev ${name} altname ${tag}`);
+      target = await linkIdentity(tag);
+    }
+    if (
+      target?.ifindex !== running.index ||
+      target.ifname !== name ||
+      !target.altnames?.includes(tag)
+    ) {
+      throw new Error(`Tunnel identity changed during teardown of ${name}`);
+    }
+    await exec(`ip link delete dev ${tag}`);
+    await this.finishDeletion(running, skipHooks);
     this.running = undefined;
-    await this.finishDeletion(skipHooks);
   }
 
-  private async finishDeletion(skipHooks: boolean) {
-    const running = this.deleted;
-    if (!running) {
-      return;
-    }
+  private async finishDeletion(running: TunnelRecord, skipHooks: boolean) {
     const { name } = running;
     // Keep filtering in place through link deletion. Never remove rules or
     // run PostDown for an interface that has since taken the same name.
@@ -245,18 +342,19 @@ export class LinuxTunnel {
     if (running.filtering) {
       await firewall.removeOwnedFiltering(name, !running.disableIpv6);
     }
-    this.deleted = undefined;
-    try {
-      if (!skipHooks && running.postDown) {
-        await wg.runHook(
-          name,
-          running.table,
-          running.postDown,
-          running.disableIpv6
-        );
-      }
-    } finally {
-      await removeTunnelRecord(name);
+    if (!skipHooks && running.postDown) {
+      // Consume before entering Bash. A process restart cannot replay a
+      // partially executed PostDown.
+      const consumed = { ...running, postDown: '' };
+      await saveTunnelRecord(consumed);
+      this.running = consumed;
+      await wg.runHook(
+        name,
+        running.table,
+        running.postDown,
+        running.disableIpv6
+      );
     }
+    await removeTunnelRecord(name);
   }
 }

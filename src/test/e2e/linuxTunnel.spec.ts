@@ -2,9 +2,9 @@ import { expect, test } from './fixtures';
 import { admin } from './helpers';
 
 for (const backend of ['wg', 'awg'] as const) {
-  test.describe(backend, () => {
-    test.use({ backend });
-    for (const userspace of [false, true]) {
+  for (const userspace of [false, true]) {
+    test.describe(`${backend} ${userspace ? 'userspace' : 'kernel'}`, () => {
+      test.use({ backend, userspace });
       test(`starts, syncs, restarts and stops without server quick scripts (${userspace ? 'userspace' : 'kernel'})`, async ({
         request,
         app,
@@ -37,6 +37,12 @@ for (const backend of ['wg', 'awg'] as const) {
           }
           await app.execServer(['ip', 'link', 'del', 'backend-probe']);
         }
+        const checkBackend = async () => {
+          expect(
+            await app.execServer(['ip', '-details', 'link', 'show', 'wg0'])
+          ).toContain(userspace ? 'tun type tun' : kind);
+        };
+        await checkBackend();
         const { post, json, create, download } = await admin(request, app.url);
         const settings = await json('/api/admin/interface');
         await post('/api/admin/interface', { ...settings, s1: 122, jC: 8 });
@@ -44,21 +50,6 @@ for (const backend of ['wg', 'awg'] as const) {
         const client = await json(url);
         const site = '192.0.2.0/24';
         await post(url, { ...client, jC: 3, serverAllowedIps: [site] });
-        if (userspace) {
-          // Simulate a host whose kernel does not provide the link kind.
-          await app.execServer([
-            'sh',
-            '-ec',
-            `cat > /usr/local/bin/ip <<'SH'
-#!/bin/sh
-case " $* " in
-  *" link add "*" type ${kind} "*) echo 'Error: Unknown device type.' >&2; exit 2 ;;
-esac
-exec /sbin/ip "$@"
-SH
-chmod +x /usr/local/bin/ip`,
-          ]);
-        }
         const phases = '/tmp/tunnel-phases';
         const hooks = {
           preUp: `ip link show dev %i && echo PreUp >> ${phases}`,
@@ -71,15 +62,7 @@ chmod +x /usr/local/bin/ip`,
         expect(
           await app.execServer(['ip', 'route', 'show', 'exact', site])
         ).toContain('dev wg0');
-        if (userspace) {
-          expect(
-            await app.execServer(['ip', '-details', 'link', 'show', 'wg0'])
-          ).toContain('tun type tun');
-        } else {
-          expect(
-            await app.execServer(['ip', '-details', 'link', 'show', 'wg0'])
-          ).toContain(kind);
-        }
+        await checkBackend();
         const config = await download(url);
         // S1 is shared. Each end has its own junk packet count.
         const parameters = (contents: string) =>
@@ -114,12 +97,17 @@ chmod +x /usr/local/bin/ip`,
         await app.connectClient(config);
         await expect.poll(() => app.pingFromClient('10.8.0.1')).toBe(true);
         const added = '198.51.100.0/24';
-        await post(url, { ...client, jC: 3, serverAllowedIps: [site, added] });
+        await post(url, {
+          ...client,
+          jC: 3,
+          serverAllowedIps: [site, added],
+        });
         expect(
           await app.execServer([backend, 'show', 'wg0', 'allowed-ips'])
         ).toContain(added);
         await expect.poll(() => app.pingFromClient('10.8.0.1')).toBe(true);
         await app.restart();
+        await checkBackend();
         // A restarted server has discarded the old session. Reconnect with the export.
         await app.execClient([`${backend}-quick`, 'down', 'wg0']);
         await app.execClient([`${backend}-quick`, 'up', 'wg0']);
@@ -128,8 +116,8 @@ chmod +x /usr/local/bin/ip`,
           'PreUp\nPostUp\nPreDown\nPostDown\nPreUp\nPostUp'
         );
       });
-    }
-  });
+    });
+  }
 }
 
 test.describe('numbered routing table', () => {

@@ -168,13 +168,20 @@ export class SiteRoutes {
           action === 'remove'
             ? await readTable(ipv6, route.table, route.prefix)
             : await tableForInstall(ipv6, route);
-        await this.applyRoute(
+        const added = await this.applyRoute(
           device,
           route,
           action,
           network.routingTable === 'auto',
           routes
         );
+        if (added) {
+          // The next prefix needs a live read after a mutation.
+          tables.set(
+            `${ipv6 ? 6 : 4}/${route.table}`,
+            Promise.resolve(undefined)
+          );
+        }
       } catch (cause) {
         const conflict = cause instanceof RouteConflict;
         failure ??= createError({
@@ -228,13 +235,7 @@ export class SiteRoutes {
       throw new RouteConflict();
     }
     await exec(`${ip} route add ${target} proto ${routeProtocol}`);
-    routes.add({
-      dst: prefix,
-      dev: device,
-      protocol: routeProtocol,
-      metric,
-      scope: ipv6 ? 0 : 253,
-    });
     this.owned.set(key, route);
+    return true;
   }
 }

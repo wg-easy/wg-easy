@@ -33,22 +33,33 @@ async function underlayMtu(device: string) {
   const { stdout } = await show('endpoints');
   const endpoints = new Set(
     stdout
-      .matchAll(/\t(?:\[([^\]]+)\]|([\d.]+)):\d+$/gm)
-      .map((match) => match[1] ?? match[2]!)
+      .matchAll(/\t(\[[^\]]+\]|[\d.]+):\d+$/gm)
+      .map((match) => match[0].trim())
   );
   if (endpoints.size) {
     // Match the marked UDP socket even when the tunnel carries a default route.
     const fwmark = (await show('fwmark')).stdout.trim();
+    const listenPort = (await show('listen-port')).stdout.trim();
     const mark = fwmark === 'off' ? [] : ['mark', fwmark];
     let smallest = Infinity;
     for (const endpoint of endpoints) {
-      const [host, scope] = endpoint.split('%');
+      const separator = endpoint.lastIndexOf(':');
+      const [host, scope] = endpoint
+        .slice(0, separator)
+        .replace(/^\[|\]$/g, '')
+        .split('%');
       const lookup = [
         'route',
         'get',
         host!,
         ...(scope ? ['oif', scope] : []),
         ...mark,
+        'ipproto',
+        'udp',
+        'sport',
+        listenPort,
+        'dport',
+        endpoint.slice(separator + 1),
       ];
       // An unreachable peer must not hide another peer's usable route.
       const routes = await ipJson<Route>(lookup).catch(() => []);

@@ -96,6 +96,19 @@ while [ ! -f /tmp/locked ]; do sleep 0.05; done`,
       `,
         record,
       ]);
+      // Earlier records used a descriptive alias instead of a kernel alternate name.
+      const tag = JSON.parse(await read(record)).policy.tag;
+      await app.execServer(['ip', 'link', 'set', 'wg0', 'alias', tag]);
+      await app.execServer([
+        'ip',
+        'link',
+        'property',
+        'del',
+        'dev',
+        'wg0',
+        'altname',
+        tag,
+      ]);
       expect(await read('/sys/class/net/wg0/ifindex')).toBe(index);
       expect(await rules()).toContain('old-hook');
       const namespace = await app.execServer(['readlink', '/proc/self/ns/net']);
@@ -327,7 +340,7 @@ for (const evidence of [
   });
 }
 
-for (const phase of ['PostUp', 'PreDown'] as const) {
+for (const phase of ['PostUp', 'PreDown', 'PostDown'] as const) {
   test(`resumes after a kill during ${phase} without replaying down hooks`, async ({
     app,
     request,
@@ -340,9 +353,10 @@ for (const phase of ['PostUp', 'PreDown'] as const) {
       postUp: phase === 'PostUp' ? pause : '',
       preDown:
         'echo pre >> /tmp/teardown\n' + (phase === 'PreDown' ? pause : ''),
-      postDown: 'echo post >> /tmp/teardown',
+      postDown:
+        'echo post >> /tmp/teardown\n' + (phase === 'PostDown' ? pause : ''),
     });
-    if (phase === 'PreDown') {
+    if (phase !== 'PostUp') {
       await post('/api/admin/interface/restart');
     }
     await app.execServer(['touch', '/tmp/pause']);
@@ -371,10 +385,14 @@ for (const phase of ['PostUp', 'PreDown'] as const) {
         '-c',
         'if test -e /tmp/teardown; then cat /tmp/teardown; fi',
       ]);
-    expect(await teardowns()).toBe(phase === 'PreDown' ? 'pre\npost' : '');
+    expect(await teardowns()).toBe(phase === 'PostUp' ? '' : 'pre\npost');
+    if (phase === 'PostUp') {
+      expect(await app.execServer(['wg', 'show', 'interfaces'])).toBe('');
+      await post('/api/admin/interface/restart');
+    }
     await app.stopProcess('TERM');
     expect(await teardowns()).toBe(
-      phase === 'PreDown' ? 'pre\npost\npre\npost' : 'pre\npost'
+      phase === 'PostUp' ? 'pre\npost' : 'pre\npost\npre\npost'
     );
   });
 }
@@ -404,4 +422,106 @@ test('withdraws filtering after deleting a link whose PostUp failed', async ({
       /WG_CLIENTS_wg0|wg-easy rebuild wg0/
     );
   }
+});
+
+test('finishes filtering and PostDown after a crash just after link deletion', async ({
+  app,
+  request,
+}) => {
+  const { post, json } = await admin(request, app.url);
+  const iface = '/api/admin/interface';
+  await post(iface, { ...(await json(iface)), firewallEnabled: true });
+  await post('/api/admin/hooks', {
+    preUp: '',
+    postUp: '',
+    preDown: '',
+    postDown: 'echo down >> /tmp/post-down',
+  });
+  await post(iface + '/restart');
+  await app.execServer([
+    'sh',
+    '-ec',
+    `cat > /usr/local/bin/ip <<'SH'
+#!/bin/sh
+case "$*" in 'link delete dev wg-easy-'*)
+  /sbin/ip "$@" || exit 1
+  touch /tmp/link-deleted
+  exec sleep 60 ;;
+esac
+exec /sbin/ip "$@"
+SH
+chmod +x /usr/local/bin/ip`,
+  ]);
+  const cutover = post(iface + '/restart').catch(() => {});
+  await expect
+    .poll(() =>
+      app.execServer([
+        'sh',
+        '-c',
+        'test -f /tmp/link-deleted && echo yes || true',
+      ])
+    )
+    .toBe('yes');
+  await app.stopProcess('KILL');
+  await cutover;
+  expect(await app.execServer(['iptables', '-S', 'FORWARD'])).toContain(
+    'WG_CLIENTS_wg0'
+  );
+  await app.execServer(['rm', '/usr/local/bin/ip']);
+  await app.startProcess();
+  await expect
+    .poll(() => app.execServer(['cat', '/tmp/post-down']).catch(() => ''))
+    .toBe('down');
+  await expect
+    .poll(() => app.execServer(['wg', 'show', 'interfaces']))
+    .toBe('wg0');
+});
+
+test('rolls back an unpublished link when alternate name assignment fails', async ({
+  app,
+  request,
+}) => {
+  const { post } = await admin(request, app.url);
+  await app.execServer([
+    'sh',
+    '-ec',
+    `cat > /usr/local/bin/ip <<'SH'
+#!/bin/sh
+case "$*" in *' altname wg-easy-'*) echo "$5" >/tmp/unpublished; exit 2 ;; esac
+exec /sbin/ip "$@"
+SH
+chmod +x /usr/local/bin/ip`,
+  ]);
+  await expect(post('/api/admin/interface/restart')).rejects.toThrow();
+  const temporary = await app.execServer(['cat', '/tmp/unpublished']);
+  await app.execServer(['test', '!', '-e', '/sys/class/net/' + temporary]);
+  await app.execServer(['test', '!', '-e', '/sys/class/net/wg0']);
+  await app.execServer(['rm', '/usr/local/bin/ip']);
+  await post('/api/admin/interface/restart');
+  expect(await app.execServer(['wg', 'show', 'interfaces'])).toBe('wg0');
+});
+
+test('preserves a replacement that takes the public name just before link deletion', async ({
+  app,
+  request,
+}) => {
+  const { post } = await admin(request, app.url);
+  await app.execServer([
+    'sh',
+    '-ec',
+    `cat > /usr/local/bin/ip <<'SH'
+#!/bin/sh
+case "$*" in 'link delete dev wg-easy-'*)
+  index=$(cat /sys/class/net/wg0/ifindex)
+  /sbin/ip link delete dev wg0
+  /sbin/ip link add dev wg0 index "$index" type dummy ;;
+esac
+exec /sbin/ip "$@"
+SH
+chmod +x /usr/local/bin/ip`,
+  ]);
+  await expect(post('/api/admin/interface/restart')).rejects.toThrow();
+  expect(
+    await app.execServer(['ip', '-details', 'link', 'show', 'wg0'])
+  ).toContain('dummy');
 });

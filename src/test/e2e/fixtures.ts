@@ -36,18 +36,27 @@ export const test = base.extend<{
   app: App;
   initialized: boolean;
   keepNamespace: boolean;
+  userspace: boolean;
   strictReversePath: boolean;
   ipv6: boolean;
   backend: 'wg' | 'awg';
 }>({
   strictReversePath: [false, { option: true }],
+  userspace: [false, { option: true }],
   keepNamespace: [false, { option: true }],
   initialized: [true, { option: true }],
   ipv6: [false, { option: true }],
   backend: ['wg', { option: true }],
   app: [
     async (
-      { initialized, ipv6, backend, keepNamespace, strictReversePath },
+      {
+        initialized,
+        ipv6,
+        backend,
+        keepNamespace,
+        strictReversePath,
+        userspace,
+      },
       use,
       testInfo
     ) => {
@@ -57,7 +66,11 @@ export const test = base.extend<{
       }
 
       const project = `wg-easy-e2e-${randomUUID()}`;
-      const server = keepNamespace ? 'wg-easy-recovery' : 'wg-easy';
+      const server = keepNamespace
+        ? 'wg-easy-recovery'
+        : userspace
+          ? 'wg-easy-userspace'
+          : 'wg-easy';
       // Fixture teardown can be skipped when startup is interrupted.
       const marker = `${runDir}/${project}`;
       await writeFile(marker, '');
@@ -77,7 +90,11 @@ export const test = base.extend<{
           {
             env: {
               ...process.env,
-              COMPOSE_PROFILES: keepNamespace ? 'recovery' : '',
+              COMPOSE_PROFILES: keepNamespace
+                ? 'recovery'
+                : userspace
+                  ? 'userspace'
+                  : '',
               E2E_BACKEND: backend,
               E2E_RP_FILTER: strictReversePath ? '1' : '0',
               E2E_INITIALIZED: String(initialized),
@@ -185,6 +202,9 @@ ${backend}-quick up wg0`,
           },
           restart: async () => {
             await compose(['restart', server]);
+            if (keepNamespace) {
+              await startProcess();
+            }
             await compose([
               'up',
               '-d',

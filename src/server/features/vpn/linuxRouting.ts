@@ -2,6 +2,7 @@ import { parseRoutingTableId } from '#shared/utils/routingTable';
 
 export type KernelRoute = {
   dst: string;
+  from?: string;
   dev?: string;
   gateway?: string;
   table?: string | number;

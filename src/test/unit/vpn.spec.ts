@@ -146,6 +146,19 @@ describe('VPN operations', () => {
     expect(await recovery.readPostUpFailure()).toBeUndefined();
   });
 
+  test('skips PostUp when its pending marker cannot be saved', async () => {
+    const { store, commands } = await vpnFixture();
+    await store.hooks.update({ preUp: '', postUp: 'hook' });
+    vi.mocked(recovery.recordPostUpFailure).mockRejectedValueOnce(
+      new Error('Storage full')
+    );
+    await expect(vpn.restart()).rejects.toThrow('Storage full');
+    expect(commands.runHook).not.toHaveBeenCalled();
+    expect(commands.down).toHaveBeenLastCalledWith('wg0', true);
+    await vpn.maintain();
+    expect(commands.runHook).toHaveBeenCalledOnce();
+  });
+
   test('cleans up the recorded interface when the configured interface was renamed', async () => {
     const { commands } = await vpnFixture();
     vi.spyOn(console, 'error').mockImplementation(() => {});
@@ -202,11 +215,14 @@ describe('VPN operations', () => {
         active.delete(publicKey);
         return '';
       });
-      const error = new Error('Configuration unavailable');
+      const fail = async () => {
+        expect(active).toEqual(new Set(['public']));
+        throw new Error('Configuration unavailable');
+      };
       if (stage === 'file write') {
-        writeConfiguration.mockRejectedValueOnce(error);
+        writeConfiguration.mockImplementationOnce(fail);
       } else {
-        commands.sync.mockRejectedValueOnce(error);
+        commands.sync.mockImplementationOnce(fail);
       }
       await expect(clients.apply(admin, 2, 'disable')).rejects.toThrow(
         'Configuration unavailable'
@@ -215,56 +231,63 @@ describe('VPN operations', () => {
     }
   );
 
-  test('a rotated PSK excludes its old traffic and overlapping site ranges after a failed sync', async () => {
-    const { store, commands, firewall } = await vpnFixture();
-    await store.interfaces.update({ firewallEnabled: true });
-    const gateway = (await store.clients.get(1))!;
-    await store.clients.update(1, {
-      serverAllowedIps: ['192.0.2.0/24'],
-      preSharedKey: null,
-    });
-    await store.clients.insert({
-      ...gateway,
-      id: 2,
-      publicKey: 'rotated',
-      ipv4Address: '10.8.0.3',
-      ipv6Address: 'fd00::3',
-      preSharedKey: 'old-key',
-      serverAllowedIps: ['192.0.2.128/25'],
-    });
-    await store.clients.insert({
-      ...gateway,
-      id: 3,
-      publicKey: 'unaffected',
-      ipv4Address: '10.8.0.4',
-      ipv6Address: 'fd00::4',
-      preSharedKey: zeroWireGuardKey,
-    });
-    commands.dump.mockResolvedValue(
-      [
-        ['public', zeroWireGuardKey, '10.8.0.2/32,192.0.2.0/24'],
-        ['rotated', 'old-key', '10.8.0.3/32,192.0.2.128/25'],
-        ['unaffected', '(none)', '10.8.0.4/32'],
-      ].map(([publicKey, preSharedKey, allowedIps]) => ({
-        publicKey: publicKey!,
-        preSharedKey: preSharedKey!,
-        allowedIps: allowedIps!,
-        endpoint: null,
-        latestHandshakeAt: null,
-        transferRx: 0,
-        transferTx: 0,
-        persistentKeepalive: '0',
-      }))
-    );
-    commands.sync.mockRejectedValueOnce(new Error('Endpoint unavailable'));
-    await expect(
-      vpn.commit((tx) => tx.clients.update(2, { preSharedKey: 'new-key' }))
-    ).rejects.toThrow('Endpoint unavailable');
-    expect(firewall.rebuildRules.mock.lastCall?.[1]).toMatchObject([
-      { id: 1, ipv4Address: '10.8.0.2', serverAllowedIps: [] },
-      { id: 3, ipv4Address: '10.8.0.4' },
-    ]);
-  });
+  test.each(['save', 'sync'])(
+    'a rotated PSK excludes old traffic and overlapping site ranges after a failed %s',
+    async (stage) => {
+      const { store, commands, firewall, writeConfiguration } =
+        await vpnFixture();
+      await store.interfaces.update({ firewallEnabled: true });
+      const gateway = (await store.clients.get(1))!;
+      await store.clients.update(1, {
+        serverAllowedIps: ['192.0.2.0/24'],
+        preSharedKey: null,
+      });
+      await store.clients.insert({
+        ...gateway,
+        id: 2,
+        publicKey: 'rotated',
+        ipv4Address: '10.8.0.3',
+        ipv6Address: 'fd00::3',
+        preSharedKey: 'old-key',
+        serverAllowedIps: ['192.0.2.128/25'],
+      });
+      await store.clients.insert({
+        ...gateway,
+        id: 3,
+        publicKey: 'unaffected',
+        ipv4Address: '10.8.0.4',
+        ipv6Address: 'fd00::4',
+        preSharedKey: zeroWireGuardKey,
+      });
+      commands.dump.mockResolvedValue(
+        [
+          ['public', zeroWireGuardKey, '10.8.0.2/32,192.0.2.0/24'],
+          ['rotated', 'old-key', '10.8.0.3/32,192.0.2.128/25'],
+          ['unaffected', '(none)', '10.8.0.4/32'],
+        ].map(([publicKey, preSharedKey, allowedIps]) => ({
+          publicKey: publicKey!,
+          preSharedKey: preSharedKey!,
+          allowedIps: allowedIps!,
+          endpoint: null,
+          latestHandshakeAt: null,
+          transferRx: 0,
+          transferTx: 0,
+          persistentKeepalive: '0',
+        }))
+      );
+      (stage === 'save'
+        ? writeConfiguration
+        : commands.sync
+      ).mockRejectedValueOnce(new Error('Endpoint unavailable'));
+      await expect(
+        vpn.commit((tx) => tx.clients.update(2, { preSharedKey: 'new-key' }))
+      ).rejects.toThrow('Endpoint unavailable');
+      expect(firewall.rebuildRules.mock.lastCall?.[1]).toMatchObject([
+        { id: 1, ipv4Address: '10.8.0.2', serverAllowedIps: [] },
+        { id: 3, ipv4Address: '10.8.0.4' },
+      ]);
+    }
+  );
 
   test('serializes updates and uses one snapshot for configuration and firewall', async () => {
     const { commands, writeConfiguration, firewall, store } =

@@ -235,6 +235,9 @@ for (const backend of ['wg', 'awg'] as const) {
         '-i wg0 -j WG_CLIENTS_wg0'
       );
 
+      expect(
+        await app.execServer(['ip', 'route', 'show', 'exact', siteSubnet])
+      ).toContain('dev wg0');
       await post(clientUrl + '/disable');
       const remaining = await app.execServer([
         'ip',

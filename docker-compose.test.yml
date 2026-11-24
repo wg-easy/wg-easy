@@ -44,6 +44,12 @@ services:
       timeout: 5s
       retries: 33
 
+  wg-easy-userspace:
+    extends: wg-easy
+    profiles: [userspace]
+    volumes:
+      - ./src/test/e2e/userspace-ip.sh:/usr/local/bin/ip:ro
+
   wg-easy-recovery:
     extends: wg-easy
     profiles: [recovery]

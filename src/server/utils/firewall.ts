@@ -25,8 +25,8 @@ function chainName(interfaceName: string) {
 let pendingRebuild: Promise<void> = Promise.resolve();
 
 // Other processes in the namespace can hold the xtables lock during recovery.
-const ipv4Tables = 'iptables -w';
-const ipv6Tables = 'ip6tables -w';
+const ipv4Tables = 'iptables -w 2';
+const ipv6Tables = 'ip6tables -w 2';
 
 function commands(enableIpv6: boolean) {
   return enableIpv6 ? [ipv4Tables, ipv6Tables] : [ipv4Tables];
@@ -42,6 +42,25 @@ async function chainRules(command: string, chain: string) {
   return (await exec(`${command} -S ${chain}`))
     .split('\n')
     .filter((rule) => rule.startsWith(`-A ${chain} `));
+}
+
+// A missing rule/chain is expected after a partial teardown. Lock, permission
+// and table access errors must reach the caller so cleanup is retried.
+async function removeIfPresent(command: string) {
+  try {
+    await exec(command);
+    return true;
+  } catch (error) {
+    const { stderr } = error as { stderr?: string };
+    if (
+      /Bad rule \(does a matching rule exist|No chain\/target\/match by that name|Couldn.t load target .*No such file or directory|chain .* does not exist|RULE_DELETE failed \(No such file or directory\)|CHAIN_USER_DEL failed \(No such file or directory\)/i.test(
+        stderr ?? ''
+      )
+    ) {
+      return false;
+    }
+    throw error;
+  }
 }
 
 async function blockDuringRebuild(interfaceName: string, enableIpv6: boolean) {
@@ -442,21 +461,20 @@ export const firewall = {
   async removeOwnedFiltering(interfaceName: string, enableIpv6: boolean) {
     const chain = chainName(interfaceName);
     for (const command of commands(enableIpv6)) {
-      const rules = (await exec(`${command} -S`)).split('\n');
       for (const parent of trafficChains) {
-        const jump = `${parent} -i ${interfaceName} -j ${chain}`;
-        for (const rule of rules) {
-          if (rule === '-A ' + jump) {
-            await exec(`${command} -D ${jump}`);
+        for (const rule of [
+          `-i ${interfaceName} -j ${chain}`,
+          rebuildGuard(interfaceName),
+        ]) {
+          while (await removeIfPresent(`${command} -D ${parent} ${rule}`)) {
+            // Remove duplicate jumps and guards from interrupted rebuilds.
           }
         }
       }
-      if (rules.includes('-N ' + chain)) {
-        await exec(`${command} -F ${chain}`);
+      if (await removeIfPresent(`${command} -F ${chain}`)) {
         await exec(`${command} -X ${chain}`);
       }
     }
-    await finishRebuild(interfaceName, enableIpv6);
   },
 
   /**

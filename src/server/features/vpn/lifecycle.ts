@@ -47,6 +47,7 @@ type HostState = {
   mtu?: number | null;
   awaitingValidSettings?: boolean;
   retry?: ApplyMode;
+  pendingHookMarker?: boolean;
   failedStart?: ReturnType<typeof postUpFailure>;
 };
 const hostStates = new WeakMap<DatabaseStore, HostState>();
@@ -90,7 +91,15 @@ async function cleanFailedStart(
   failure: NonNullable<HostState['failedStart']>
 ) {
   if (failure.cleanupPending) {
-    await tunnel.stop(failure.name, true);
+    try {
+      // The process may have stopped while PostUp had permitted traffic.
+      const running = await tunnel.checkOwnership(failure.name);
+      if (running?.filtering) {
+        await firewall.blockTraffic(failure.name, !running.disableIpv6);
+      }
+    } finally {
+      await tunnel.stop(failure.name, true);
+    }
     failure.cleanupPending = false;
   }
 }
@@ -119,14 +128,10 @@ async function handlePostUpFailure(
   const failure = postUpFailure(name, cause);
   state.failedStart = failure;
   try {
-    await recordPostUpFailure(name);
-  } finally {
-    try {
-      await cleanFailedStart(state.tunnel, failure);
-      delete state.retry;
-    } catch (error) {
-      console.error('Could not shut down the VPN after PostUp failed:', error);
-    }
+    await cleanFailedStart(state.tunnel, failure);
+    delete state.retry;
+  } catch (error) {
+    console.error('Could not shut down the VPN after PostUp failed:', error);
   }
   throw failure.error;
 }
@@ -273,8 +278,8 @@ async function apply(mode?: ApplyMode, manualRestart = false) {
   let mtuError;
   let postUp = '';
   if (mode === 'sync') {
-    await writeSavedConfig();
     try {
+      await writeSavedConfig();
       await wg.sync(network, clients, enableIpv6);
     } catch (error) {
       if (network.firewallEnabled) {
@@ -302,6 +307,10 @@ async function apply(mode?: ApplyMode, manualRestart = false) {
   } else {
     assertSubnetCapacity(network, clients.length);
     await state.tunnel.stop(network.name);
+    if (state.pendingHookMarker) {
+      await clearPostUpFailure();
+      delete state.pendingHookMarker;
+    }
     await database.transaction((tx) => renumberClients(tx, clients, network));
     state.activeNetwork = stagedSettings(network);
     await writeSavedConfig();
@@ -333,8 +342,17 @@ async function apply(mode?: ApplyMode, manualRestart = false) {
       state.mtu = network.mtu;
       state.defaultTables = defaultTables;
       siteError = await syncSites();
-      if (postUp && network.firewallEnabled) {
-        await rebuildFirewall();
+      if (postUp) {
+        await recordPostUpFailure(network.name);
+        if (network.firewallEnabled) {
+          try {
+            await rebuildFirewall();
+          } catch (error) {
+            // PostUp has not started and the rebuild guards are still active.
+            await clearPostUpFailure();
+            throw error;
+          }
+        }
       }
     } catch (error) {
       await state.tunnel.stop(network.name, true);
@@ -349,9 +367,14 @@ async function apply(mode?: ApplyMode, manualRestart = false) {
     }
     // PostUp has returned successfully. From here, retry against the live link.
     state.retry = 'sync';
+    state.pendingHookMarker = !!postUp;
     state.tunnel.armDownHooks(network, hooks);
   }
   const recoveryError = await state.tunnel.persistDownHooks();
+  if (!recoveryError && state.pendingHookMarker) {
+    await clearPostUpFailure();
+    delete state.pendingHookMarker;
+  }
   if (postUp) {
     // Hooks may reload firewall rules or change individual site routes.
     await state.tunnel.guardTraffic(network, enableIpv6);

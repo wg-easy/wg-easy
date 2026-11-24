@@ -108,6 +108,18 @@ for (const backend of ['wg', 'awg'] as const) {
         .toBe(true);
       await gateway.routes(['0.0.0.0/0', '::/0', '192.0.2.0/24']);
       expect(await index()).toBe(dualStackIndex);
+      expect(
+        await app.execServer([
+          'ip',
+          '-4',
+          'route',
+          'show',
+          'table',
+          'main',
+          'exact',
+          '192.0.2.0/24',
+        ])
+      ).toMatch(/^192\.0\.2\.0\/24 dev wg0\b/);
       expect(await lookup('203.0.113.1')).toContain('dev wg0');
       expect(await lookup('2001:db8::1')).toContain('dev wg0');
       const socketMark = await mark();
@@ -123,6 +135,18 @@ for (const backend of ['wg', 'awg'] as const) {
       expect(await mark()).toBe(socketMark);
       expect(await lookup('203.0.113.1')).toContain('dev wg0');
       await gateway.routes(['0.0.0.0/0', '::/0']);
+      const sourceDefault = [
+        'default',
+        'from',
+        '2001:db8:1::/64',
+        'dev',
+        'underlay6',
+        'metric',
+        '100',
+        'table',
+        '100',
+      ];
+      await app.execServer(['ip', '-6', 'route', 'add', ...sourceDefault]);
       await api.table('100');
       for (const family of ['-4', '-6']) {
         expect(await defaults(family)).toContain('default table 100');
@@ -135,6 +159,9 @@ for (const backend of ['wg', 'awg'] as const) {
       expect(await lookup('203.0.113.1')).toContain('dev wg0');
       await app.execServer(['ip', '-4', 'rule', 'del', ...selector]);
       await api.table('off');
+      expect(
+        await app.execServer(['ip', '-6', 'route', 'show', 'table', '100'])
+      ).toContain('from 2001:db8:1::/64');
       for (const family of ['-4', '-6']) {
         expect(await defaults(family)).toBe('');
       }
@@ -405,5 +432,62 @@ test.describe('strict reverse-path filtering', () => {
     expect(await app.execServer(['wg', 'show', 'wg0', 'endpoints'])).toContain(
       endpoint + ':'
     );
+  });
+});
+
+test.describe('IPv4-only automatic routing', () => {
+  test.use({ ipv6: false });
+  test('skips an unsupported IPv6 rule dump and avoids occupied and reserved tables', async ({
+    app,
+    request,
+  }) => {
+    const api = await routingAdmin(request, app.url);
+    const peer = await api.peer('IPv4 gateway');
+    const ip = (...args: string[]) => app.execServer(['ip', ...args]);
+    await ip(
+      '-4',
+      'route',
+      'add',
+      '192.0.2.1',
+      'dev',
+      'eth0',
+      'table',
+      '51820'
+    );
+    await ip(
+      '-4',
+      'rule',
+      'add',
+      'pref',
+      '700',
+      'to',
+      '198.51.100.1',
+      'table',
+      '51821'
+    );
+    await app.execServer([
+      'sh',
+      '-ec',
+      `cat > /usr/local/bin/ip <<'SH'
+#!/bin/sh
+case "$*" in
+  '-6 -N -j -d rule show') echo "RTNETLINK answers: $(cat /tmp/ipv6-error)" >&2; exit 2 ;;
+  *'route show table all') echo 'unexpected all-table dump' >&2; exit 2 ;;
+esac
+exec /sbin/ip "$@"
+SH
+chmod +x /usr/local/bin/ip
+echo 'Permission denied' > /tmp/ipv6-error`,
+    ]);
+    await expect(peer.routes(['0.0.0.0/0'])).rejects.toThrow();
+    await app.execServer([
+      'sh',
+      '-c',
+      'echo "Address family not supported by protocol" > /tmp/ipv6-error',
+    ]);
+    await peer.routes(['0.0.0.0/0']);
+    expect(
+      await ip('-4', 'route', 'show', 'table', '51822', 'exact', 'default')
+    ).toContain('default dev wg0');
   });
 });

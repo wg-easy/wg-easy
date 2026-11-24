@@ -28,7 +28,9 @@ export type PolicyRule = z.infer<typeof rule>;
 const tunnelRecord = z.object({
   version: z.literal(1),
   name: z.string(),
-  index: z.int().positive(),
+  index: z.int().positive().nullable(),
+  phase: z.enum(['creating', 'deleting']).optional(),
+  namespace: z.string().optional(),
   backend: z.enum(['wg', 'awg']),
   table: z.string(),
   disableIpv6: z.boolean(),
@@ -36,7 +38,7 @@ const tunnelRecord = z.object({
   // Down hooks are armed only after PostUp succeeds.
   preDown: z.string(),
   postDown: z.string(),
-  // The policy tag also identifies this generation in the kernel link alias.
+  // The policy tag identifies this generation by its Linux alternate name.
   policy: z.object({
     tag: z.string().regex(/^wg-easy-[\da-f-]{36}$/),
     owned: z.object({ ipv4: ownedRules, ipv6: ownedRules }),
@@ -106,7 +108,19 @@ async function saveRecoveryFile(filename: string, contents: string) {
 }
 
 export async function readTunnelRecord(name: string) {
-  return tunnelRecord.parse(JSON.parse(await readRecoveryFile(name + '.json')));
+  try {
+    const record = tunnelRecord.parse(
+      JSON.parse(await readRecoveryFile(name + '.json'))
+    );
+    if (record.name !== name) {
+      throw new Error('Tunnel recovery record name mismatch');
+    }
+    return record;
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+      throw error;
+    }
+  }
 }
 
 export function saveTunnelRecord(record: TunnelRecord) {
