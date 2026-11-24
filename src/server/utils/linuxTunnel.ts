@@ -18,6 +18,7 @@ import {
 } from '#server/features/vpn/configuration';
 import { exec } from '#server/utils/cmd';
 import { WG_ENV } from '#server/utils/config';
+import { firewall } from '#server/utils/firewall';
 import { parseInterfaceName } from '#server/utils/interfaceName';
 import { setTunnelMtu } from '#server/utils/tunnelMtu';
 import { wg } from '#server/utils/wgHelper';
@@ -42,6 +43,8 @@ async function linkIdentity(name: string) {
 
 export class LinuxTunnel {
   private running?: TunnelRecord;
+  // Only this process can finish removal after it observed link deletion.
+  private deleted?: TunnelRecord;
   defaultPolicy = new DefaultPolicy();
 
   private attach(record: TunnelRecord) {
@@ -82,7 +85,7 @@ export class LinuxTunnel {
     });
   }
 
-  async create(network: InterfaceType, hooks: HooksType) {
+  async create(network: InterfaceType) {
     const name = parseInterfaceName(network.name);
     if (process.platform !== 'linux') {
       return;
@@ -116,18 +119,27 @@ export class LinuxTunnel {
       backend: WG_ENV.WG_EXECUTABLE,
       table: network.routingTable,
       disableIpv6: WG_ENV.DISABLE_IPV6,
+      filtering: false,
       preDown: '',
       postDown: '',
       policy: { tag: alias, owned: { ipv4: [], ipv6: [] } },
     };
     this.attach(record);
     await saveTunnelRecord(record);
-    if (hooks.preUp) {
-      await wg.runHook(
-        name,
-        network.routingTable,
-        expandHook(hooks.preUp, network, WG_ENV.PORT)
-      );
+  }
+
+  async recordFiltering(enabled: boolean) {
+    if (this.running && this.running.filtering !== enabled) {
+      const updated = { ...this.running, filtering: enabled };
+      await saveTunnelRecord(updated);
+      this.running = updated;
+    }
+  }
+
+  async guardTraffic(network: InterfaceType, enableIpv6: boolean) {
+    if (network.firewallEnabled) {
+      await this.recordFiltering(true);
+      await firewall.blockTraffic(network.name, enableIpv6);
     }
   }
 
@@ -164,7 +176,7 @@ export class LinuxTunnel {
     const running = this.running;
     if (!running || index === undefined) {
       this.running = undefined;
-      return;
+      return this.finishDeletion(skipHooks);
     }
     // Consume PreDown before invoking Bash. A crash or partial hook failure
     // cannot safely establish which commands from that hook already ran.
@@ -192,7 +204,26 @@ export class LinuxTunnel {
     }
     await this.defaultPolicy.stop(name, running.backend);
     await exec(`ip link delete dev ${name}`);
+    this.deleted = this.running;
     this.running = undefined;
+    await this.finishDeletion(skipHooks);
+  }
+
+  private async finishDeletion(skipHooks: boolean) {
+    const running = this.deleted;
+    if (!running) {
+      return;
+    }
+    const { name } = running;
+    // Keep filtering in place through link deletion. Never remove rules or
+    // run PostDown for an interface that has since taken the same name.
+    if (await linkIdentity(name)) {
+      throw new Error(`Interface ${name} was replaced during teardown`);
+    }
+    if (running.filtering) {
+      await firewall.removeOwnedFiltering(name, !running.disableIpv6);
+    }
+    this.deleted = undefined;
     try {
       if (!skipHooks && running.postDown) {
         await wg.runHook(

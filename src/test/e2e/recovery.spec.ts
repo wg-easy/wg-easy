@@ -68,8 +68,18 @@ for (const backend of ['wg', 'awg'] as const) {
         '-S',
       ]);
       expect(oldPolicy).toMatch(/wg-easy-[\da-f-]+/);
+      // The old generation gained filtering during a live edit.
+      await post(iface, { ...settings, firewallEnabled: true });
+      expect(await app.execServer(['ip6tables', '-S'])).toContain(
+        'WG_CLIENTS_wg0'
+      );
       await hooks('new-hook');
-      await post(iface, { ...settings, device: 'lo', port: 51830 });
+      await post(iface, {
+        ...settings,
+        device: 'lo',
+        port: 51830,
+        firewallEnabled: true,
+      });
       await app.stopProcess('KILL');
       expect(await read('/sys/class/net/wg0/ifindex')).toBe(index);
       expect(await rules()).toContain('old-hook');
@@ -92,6 +102,12 @@ for (const backend of ['wg', 'awg'] as const) {
       ).not.toContain(oldPolicy.match(/wg-easy-[\da-f-]+/)![0]);
       expect((await policy('-4')).match(/not .*fwmark/g)).toHaveLength(1);
       expect(await policy('-6')).not.toContain('fwmark');
+      expect(await app.execServer(['ip6tables', '-S'])).not.toMatch(
+        /WG_CLIENTS_wg0|wg-easy rebuild wg0/
+      );
+      expect(await app.execServer(['iptables', '-S'])).toContain(
+        'WG_CLIENTS_wg0'
+      );
       // The advertised endpoint has no port forwarder in this fixture.
       await post('/api/auth/password', { ...credentials, remember: false });
       const config = await (await request.get(url + '/configuration')).text();
@@ -104,6 +120,9 @@ for (const backend of ['wg', 'awg'] as const) {
         'old-hook-wg0-51820-false\nnew-hook-wg0-51830-true'
       );
       expect(await rules()).not.toMatch(/old-hook|new-hook/);
+      expect(await app.execServer(['iptables', '-S'])).not.toMatch(
+        /WG_CLIENTS_wg0|wg-easy rebuild wg0/
+      );
       expect(await rules()).toContain('foreign-rule');
       for (const family of ['-4', '-6']) {
         expect(await policy(family)).not.toContain('fwmark');
@@ -265,3 +284,38 @@ for (const phase of ['PostUp', 'PreDown'] as const) {
     );
   });
 }
+
+test('withdraws filtering after deleting a link whose PostUp failed', async ({
+  app,
+  request,
+}) => {
+  const post = (url: string, data?: object) =>
+    request.post(url, {
+      headers: { Origin: app.url },
+      data,
+      failOnStatusCode: true,
+    });
+  await post('/api/auth/password', { ...credentials, remember: false });
+  const iface = '/api/admin/interface';
+  const settings = await (await request.get(iface)).json();
+  await post(iface, { ...settings, firewallEnabled: true });
+  await post('/api/admin/hooks', {
+    preUp:
+      'iptables -C FORWARD -i %i -m comment --comment "wg-easy rebuild %i" -j DROP && touch /tmp/guarded',
+    postUp: 'false',
+    preDown: 'touch /tmp/ran-down',
+    postDown: 'touch /tmp/ran-down',
+  });
+  const restart = await request.post(iface + '/restart', {
+    headers: { Origin: app.url },
+  });
+  expect(restart.status()).toBe(503);
+  await app.execServer(['test', '-e', '/tmp/guarded']);
+  await app.execServer(['test', '!', '-e', '/sys/class/net/wg0']);
+  await app.execServer(['test', '!', '-e', '/tmp/ran-down']);
+  for (const command of ['iptables', 'ip6tables']) {
+    expect(await app.execServer([command, '-S'])).not.toMatch(
+      /WG_CLIENTS_wg0|wg-easy rebuild wg0/
+    );
+  }
+});

@@ -441,6 +441,27 @@ export const firewall = {
     return result;
   },
 
+  /** Remove only this generation's interface-specific filtering after deletion. */
+  async removeOwnedFiltering(interfaceName: string, enableIpv6: boolean) {
+    const chain = chainName(interfaceName);
+    for (const command of commands(enableIpv6)) {
+      const rules = (await exec(`${command} -S`)).split('\n');
+      for (const parent of trafficChains) {
+        const jump = `${parent} -i ${interfaceName} -j ${chain}`;
+        for (const rule of rules) {
+          if (rule === '-A ' + jump) {
+            await exec(`${command} -D ${jump}`);
+          }
+        }
+      }
+      if (rules.includes('-N ' + chain)) {
+        await exec(`${command} -F ${chain}`);
+        await exec(`${command} -X ${chain}`);
+      }
+    }
+    await finishRebuild(interfaceName, enableIpv6);
+  },
+
   /**
    * Remove all firewall filtering (when feature is disabled)
    */

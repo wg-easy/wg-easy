@@ -14,6 +14,7 @@ const tunnelRecord = z.object({
   backend: z.enum(['wg', 'awg']),
   table: z.string(),
   disableIpv6: z.boolean(),
+  filtering: z.boolean(),
   // Down hooks are armed only after PostUp succeeds.
   preDown: z.string(),
   postDown: z.string(),
