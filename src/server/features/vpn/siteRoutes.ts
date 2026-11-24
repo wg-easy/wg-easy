@@ -3,6 +3,9 @@ import { parseCidr } from 'cidr-tools';
 
 import { peerAllowedIps, type ServerPeer } from './configuration';
 import {
+  directRoute,
+  matchesOwnedRoute,
+  routeMetric,
   kernelTable,
   routeProtocol,
   routingTable,
@@ -114,22 +117,11 @@ export class SiteRoutes {
       Number(parseCidr(entry.dst).prefix)
     );
     const exact = byLength.get(Number(parseCidr(prefix).prefix)) ?? [];
-    const direct = (entry: KernelRoute) =>
-      entry.dev === device &&
-      !entry.gateway &&
-      (entry.type === undefined ||
-        entry.type === 'unicast' ||
-        Number(entry.type) === 1);
-
-    const metric = ipv6 ? 1024 : 0;
+    const family = ipv6 ? 'ipv6' : 'ipv4';
+    const metric = routeMetric(family);
     const installed =
       this.owned.has(key) &&
-      exact.some(
-        (entry) =>
-          direct(entry) &&
-          Number(entry.protocol) === routeProtocol &&
-          (entry.metric ?? 0) === metric
-      );
+      exact.some((entry) => matchesOwnedRoute(entry, device, family));
     if (!installed) {
       this.owned.delete(key);
     }
@@ -152,7 +144,7 @@ export class SiteRoutes {
     if (
       preferred.length &&
       (exact.length || automatic) &&
-      preferred.every(direct)
+      preferred.every((entry) => directRoute(entry, device))
     ) {
       return;
     }

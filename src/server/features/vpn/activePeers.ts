@@ -1,11 +1,17 @@
-import { parseCidr } from 'cidr-tools';
+import { containsCidr, parseCidr } from 'cidr-tools';
+
+import { peerAllowedIps, type ServerPeer } from './configuration';
 
 import type {
   ClientNextIpType,
   ClientType,
 } from '#db/repositories/client/types';
 import type { InterfaceCidrUpdateType } from '#shared/contracts/interface';
-import { isClientAddress, normalizeAddress } from '#server/utils/ip';
+import {
+  isClientAddress,
+  normalizeAddress,
+  normalizePrefix,
+} from '#server/utils/ip';
 
 export type PeerAddresses = {
   ipv4Address: string | null;
@@ -84,4 +90,75 @@ export function peersForRunningNetwork<T extends SavedPeer>(
     );
     return [{ ...peer, ipv4Address, ipv6Address, serverAllowedIps }];
   });
+}
+
+/** Reopen filtering after a failed peer update only for verified sources. */
+export function peersWithVerifiedSources(
+  clients: ServerPeer[],
+  running: { publicKey: string; allowedIps: string }[],
+  enableIpv6: boolean,
+  restoredDefaults: ReadonlyMap<string, string | undefined>
+) {
+  const active = new Map<string, string>();
+  for (const peer of running) {
+    for (const ip of peer.allowedIps.split(',')) {
+      if (ip && ip !== '(none)') {
+        active.set(normalizePrefix(ip), peer.publicKey);
+      }
+    }
+  }
+  const enabled = clients
+    .filter((client) => client.enabled)
+    .map((client) => {
+      if (!restoredDefaults.size) {
+        return client;
+      }
+      const serverAllowedIps = client.serverAllowedIps.filter(
+        (ip) => !restoredDefaults.has(normalizePrefix(ip))
+      );
+      for (const [prefix, previousKey] of restoredDefaults) {
+        if (client.publicKey === previousKey) {
+          serverAllowedIps.push(prefix);
+        }
+      }
+      return { ...client, serverAllowedIps };
+    });
+  const expected = new Map<string, string | null>();
+  for (const peer of enabled) {
+    for (const ip of peerAllowedIps(peer, enableIpv6)) {
+      const prefix = normalizePrefix(ip);
+      const owner = expected.get(prefix);
+      expected.set(
+        prefix,
+        owner === undefined || owner === peer.publicKey ? peer.publicKey : null
+      );
+    }
+  }
+  const changed = [...new Set([...active.keys(), ...expected.keys()])].filter(
+    (prefix) => active.get(prefix) !== expected.get(prefix)
+  );
+  return enabled
+    .map((client) => {
+      const verified = (ip: string) => {
+        const prefix = normalizePrefix(ip);
+        return (
+          active.get(prefix) === client.publicKey &&
+          expected.get(prefix) === client.publicKey &&
+          !changed.some((other) => containsCidr(prefix, other))
+        );
+      };
+      return {
+        ...client,
+        ipv4Address:
+          client.ipv4Address && verified(client.ipv4Address)
+            ? client.ipv4Address
+            : null,
+        ipv6Address:
+          enableIpv6 && client.ipv6Address && verified(client.ipv6Address)
+            ? client.ipv6Address
+            : null,
+        serverAllowedIps: client.serverAllowedIps.filter(verified),
+      };
+    })
+    .filter((client) => client.ipv4Address || client.ipv6Address);
 }

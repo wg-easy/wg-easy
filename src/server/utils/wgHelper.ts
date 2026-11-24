@@ -1,3 +1,6 @@
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
+
 import type { InterfaceType } from '#db/repositories/interface/types';
 import {
   generateTunnelConfig,
@@ -7,6 +10,7 @@ import { exec } from '#server/utils/cmd';
 import { WG_ENV } from '#server/utils/config';
 import { parseInterfaceName } from '#server/utils/interfaceName';
 
+const run = promisify(execFile);
 const wgExecutable = WG_ENV.WG_EXECUTABLE;
 
 export const wg = {
@@ -69,6 +73,38 @@ ${hook.replaceAll('%i', name)}`,
       `set -o pipefail; cat | ${wgExecutable} syncconf ${name} /dev/stdin`,
       { input }
     );
+  },
+
+  async restoreDefault(infName: string, prefix: string, previousKey?: string) {
+    // Update only AllowedIPs from the running peer. Replaying a complete
+    // configuration would undo other edits and could require another DNS lookup.
+    const name = parseInterfaceName(infName);
+    const peers = await this.dump(name);
+    const owner = peers.find((peer) =>
+      peer.allowedIps.split(',').includes(prefix)
+    );
+    if (owner?.publicKey === previousKey) {
+      return;
+    }
+    const previous = peers.find((peer) => peer.publicKey === previousKey);
+    const peer = previous ?? owner;
+    if (!peer) {
+      return;
+    }
+    const allowed = peer.allowedIps
+      .split(',')
+      .filter((ip) => ip && ip !== '(none)' && ip !== prefix);
+    if (previous) {
+      allowed.push(prefix);
+    }
+    await run(wgExecutable, [
+      'set',
+      name,
+      'peer',
+      peer.publicKey,
+      'allowed-ips',
+      allowed.join(','),
+    ]);
   },
 
   removePeer: (infName: string, publicKey: string) => {

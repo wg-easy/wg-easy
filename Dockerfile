@@ -55,7 +55,9 @@ RUN chmod +x /usr/bin/amneziawg-go
 # Copy amneziawg-tools
 COPY --from=build /app/amneziawg-tools/src/wg /usr/bin/awg
 COPY --from=build /app/amneziawg-tools/src/wg-quick/linux.bash /usr/bin/awg-quick
-RUN chmod +x /usr/bin/awg /usr/bin/awg-quick
+# Full-tunnel clients can run with Docker's preconfigured, read-only sysctl.
+RUN sed -i 's|\[\[ $proto == -4 \]\] && cmd sysctl -q net\.ipv4\.conf\.all\.src_valid_mark=1|[[ $proto == -4 ]] \&\& [[ $(sysctl -n net.ipv4.conf.all.src_valid_mark) != 1 ]] \&\& cmd sysctl -q net.ipv4.conf.all.src_valid_mark=1|' /usr/bin/awg-quick && \
+    chmod +x /usr/bin/awg /usr/bin/awg-quick
 
 # Install Linux packages
 RUN apk add --no-cache \

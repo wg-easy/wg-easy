@@ -48,7 +48,7 @@ export function configureEndpoint(host: string, port: number) {
     await tx.userConfigs.update({ host, port });
     await tx.interfaces.update({ port });
     await tx.general.update({ setupStep: 0 });
-  });
+  }, 'restart');
 }
 
 export function importConfiguration(file: string) {

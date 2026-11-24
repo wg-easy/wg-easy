@@ -85,6 +85,22 @@ describe('setup', () => {
     ).rejects.toMatchObject({ status: 400 });
   });
 
+  test('retains a completed setup and retries the selected listener after a host failure', async () => {
+    const { up, sync } = await fixture();
+    await setup.createAdministrator('admin', 'a-long-password');
+    up.mockRejectedValueOnce(new Error('Tunnel unavailable'));
+    await expect(
+      setup.configureEndpoint('vpn.example.com', 51830)
+    ).rejects.toThrow('Tunnel unavailable');
+    expect(await setup.status()).toEqual({ done: true, step: 0 });
+    await maintain();
+    expect(sync).toHaveBeenCalledExactlyOnceWith(
+      expect.objectContaining({ port: 51830 }),
+      [],
+      true
+    );
+  });
+
   test('rolls back account creation when the setup transition cannot be saved', async () => {
     const { connection, store } = await fixture();
     await connection.execute(

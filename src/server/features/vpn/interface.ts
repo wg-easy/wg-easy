@@ -1,7 +1,12 @@
 import { createError } from 'nuxt/server';
 import { parseCidr } from 'cidr-tools';
 
-import { commit, restart as restartVpn, restartRequired } from './lifecycle';
+import {
+  activeAssignments,
+  commit,
+  restart as restartVpn,
+  restartRequired,
+} from './lifecycle';
 import { authorize, type Actor } from './policies';
 
 import { firewall } from '#server/utils/firewall';
@@ -27,35 +32,57 @@ export async function changeCidr(
 ) {
   const previous = await tx.interfaces.get();
   const clients = await tx.clients.getAll();
-  const ipv4Addresses = new Set(
-    clients.map((client) => normalizeAddress(client.ipv4Address))
-  );
-  const ipv6Addresses = new Set(
-    clients.map((client) => normalizeAddress(client.ipv6Address))
-  );
-  const cidr4 = parseCidr(data.ipv4Cidr);
-  const cidr6 = parseCidr(data.ipv6Cidr);
   await tx.interfaces.update(data);
-  for (const client of clients) {
-    let ipv4Address = client.ipv4Address;
-    let ipv6Address = client.ipv6Address;
-    if (
-      data.ipv4Cidr !== previous.ipv4Cidr &&
-      !isClientAddress(ipv4Address, cidr4)
-    ) {
-      ipv4Address = nextIPFromUsedAddresses(cidr4, ipv4Addresses);
-      ipv4Addresses.add(ipv4Address);
-      ipv4Addresses.delete(normalizeAddress(client.ipv4Address));
+  for (const family of ['ipv4', 'ipv6'] as const) {
+    const key = `${family}Address` as const;
+    const cidr = data[`${family}Cidr`];
+    if (cidr === previous[`${family}Cidr`]) {
+      continue;
     }
-    if (
-      data.ipv6Cidr !== previous.ipv6Cidr &&
-      !isClientAddress(ipv6Address, cidr6)
-    ) {
-      ipv6Address = nextIPFromUsedAddresses(cidr6, ipv6Addresses);
-      ipv6Addresses.add(ipv6Address);
-      ipv6Addresses.delete(normalizeAddress(client.ipv6Address));
+    const pool = parseCidr(cidr);
+    const active = activeAssignments(cidr, family);
+    const assigned = new Map<number, string>();
+    const used = new Set<string>();
+    const reserve = (id: number, address?: string | null) => {
+      if (!address || !isClientAddress(address, pool)) {
+        return;
+      }
+      const normalized = normalizeAddress(address);
+      if (!used.has(normalized)) {
+        used.add(normalized);
+        assigned.set(id, address);
+      }
+    };
+    // On a revert, the working assignments take precedence over addresses
+    // which were only distributed for a future cutover.
+    for (const client of clients) {
+      reserve(client.id, active?.get(client.id)?.[key]);
     }
-    await tx.clients.update(client.id, { ipv4Address, ipv6Address });
+    for (const client of clients) {
+      if (!assigned.has(client.id)) {
+        reserve(client.id, client[key]);
+      }
+    }
+    for (const client of clients) {
+      if (!assigned.has(client.id)) {
+        const address = nextIPFromUsedAddresses(pool, used);
+        used.add(address);
+        assigned.set(client.id, address);
+      }
+    }
+    const changed = clients.filter(
+      (client) => assigned.get(client.id) !== client[key]
+    );
+    // SQLite checks the unique indexes after each row update. Vacate only
+    // addresses another peer needs, including cycles, inside this transaction.
+    for (const client of changed) {
+      if (used.has(normalizeAddress(client[key]))) {
+        await tx.clients.update(client.id, { [key]: `reassign-${client.id}` });
+      }
+    }
+    for (const client of changed) {
+      await tx.clients.update(client.id, { [key]: assigned.get(client.id)! });
+    }
   }
 }
 

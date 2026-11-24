@@ -130,42 +130,47 @@ describe('VPN operations', () => {
     }
   );
 
-  test('only enabled, saved peers retain access when configuration sync fails', async () => {
-    const { store, commands } = await vpnFixture();
-    await store.interfaces.update({ firewallEnabled: false });
-    await store.clients.insert({
-      ...(await store.clients.get(1))!,
-      id: 2,
-      publicKey: 'revoked',
-      ipv4Address: '10.8.0.3',
-      ipv6Address: 'fdcc:ad94:bacf:61a4::cafe:3',
-    });
-    const active = new Set(['public', 'revoked', 'deleted']);
-    commands.dump.mockResolvedValue(
-      [...active].map((publicKey) => ({
-        publicKey,
-        preSharedKey: '',
-        endpoint: null,
-        allowedIps: '',
-        latestHandshakeAt: null,
-        transferRx: 0,
-        transferTx: 0,
-        persistentKeepalive: '0',
-      }))
-    );
-    commands.removePeer.mockImplementation(async (_name, publicKey) => {
-      active.delete(publicKey);
-      return '';
-    });
-    commands.sync.mockImplementation(async () => {
+  test.each(['file write', 'peer sync'])(
+    'only enabled, saved peers retain access when %s fails',
+    async (stage) => {
+      const { store, commands, writeConfiguration } = await vpnFixture();
+      await store.interfaces.update({ firewallEnabled: false });
+      await store.clients.insert({
+        ...(await store.clients.get(1))!,
+        id: 2,
+        publicKey: 'revoked',
+        ipv4Address: '10.8.0.3',
+        ipv6Address: 'fdcc:ad94:bacf:61a4::cafe:3',
+      });
+      const active = new Set(['public', 'revoked', 'deleted']);
+      commands.dump.mockResolvedValue(
+        [...active].map((publicKey) => ({
+          publicKey,
+          preSharedKey: '',
+          endpoint: null,
+          allowedIps: '',
+          latestHandshakeAt: null,
+          transferRx: 0,
+          transferTx: 0,
+          persistentKeepalive: '0',
+        }))
+      );
+      commands.removePeer.mockImplementation(async (_name, publicKey) => {
+        active.delete(publicKey);
+        return '';
+      });
+      const error = new Error('Configuration unavailable');
+      if (stage === 'file write') {
+        writeConfiguration.mockRejectedValueOnce(error);
+      } else {
+        commands.sync.mockRejectedValueOnce(error);
+      }
+      await expect(clients.apply(admin, 2, 'disable')).rejects.toThrow(
+        'Configuration unavailable'
+      );
       expect(active).toEqual(new Set(['public']));
-      throw new Error('Configuration unavailable');
-    });
-    await expect(clients.apply(admin, 2, 'disable')).rejects.toThrow(
-      'Configuration unavailable'
-    );
-    expect(active).toEqual(new Set(['public']));
-  });
+    }
+  );
 
   test('serializes updates and uses one snapshot for configuration and firewall', async () => {
     const { commands, writeConfiguration, firewall, store } =

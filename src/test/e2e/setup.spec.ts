@@ -3,7 +3,7 @@ import type { Page } from '@playwright/test';
 import { legacyBackup } from '../helpers/legacyBackup';
 
 import { credentials, expect, test } from './fixtures';
-import { goto, reload } from './helpers';
+import { createClient, downloadConfiguration, goto, reload } from './helpers';
 
 test.use({ initialized: false });
 
@@ -31,6 +31,7 @@ async function signIn(page: Page) {
 
 test('a fresh installation can be configured once through the setup wizard', async ({
   page,
+  app,
 }) => {
   await createAdministrator(page);
   await signIn(page);
@@ -38,10 +39,20 @@ test('a fresh installation can be configured once through the setup wizard', asy
   await expect(page).toHaveURL(/\/setup\/4$/);
   await reload(page);
   await page.getByLabel('Host', { exact: true }).fill('vpn.example.test');
+  await page.getByLabel('Port', { exact: true }).fill('51830');
   await page.getByRole('button', { name: 'Continue', exact: true }).click();
   await expect(
     page.getByRole('heading', { name: 'Clients', exact: true })
   ).toBeVisible();
+
+  expect(await app.execServer(['wg', 'show', 'wg0', 'listen-port'])).toBe(
+    '51830'
+  );
+  const client = await createClient(page, 'First client');
+  const config = await downloadConfiguration(page, client);
+  expect(config.contents).toContain('Endpoint = vpn.example.test:51830');
+  await app.connectClient(config.contents);
+  await expect.poll(() => app.pingFromClient('10.8.0.1')).toBe(true);
 
   const repeated = await page.request.post('/api/setup/2', {
     data: {

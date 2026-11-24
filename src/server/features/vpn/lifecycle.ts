@@ -4,7 +4,11 @@ import { isDeepStrictEqual } from 'node:util';
 import { createError } from 'nuxt/server';
 
 import { isExpired } from './policies';
-import { peersForRunningNetwork, type PeerAddresses } from './activePeers';
+import {
+  peersForRunningNetwork,
+  peersWithVerifiedSources,
+  type PeerAddresses,
+} from './activePeers';
 import {
   defaultRoutePolicy,
   expandHook,
@@ -32,6 +36,7 @@ type HostState = {
   routes: SiteRoutes;
   activeNetwork?: ReturnType<typeof stagedSettings>;
   activeAddresses: Map<number, PeerAddresses>;
+  restoredDefaults: Map<string, string | undefined>;
   mtu?: number | null;
   retry?: ApplyMode;
   failedStart?: {
@@ -44,6 +49,13 @@ const hostStates = new WeakMap<DatabaseStore, HostState>();
 
 function stagedSettings({ port, device, ipv4Cidr, ipv6Cidr }: InterfaceType) {
   return { port, device, ipv4Cidr, ipv6Cidr };
+}
+
+export function activeAssignments(cidr: string, family: 'ipv4' | 'ipv6') {
+  const active = hostStates.get(getDatabase());
+  if (active?.activeNetwork?.[`${family}Cidr`] === cidr) {
+    return active.activeAddresses;
+  }
 }
 
 export function restartRequired(saved: InterfaceType) {
@@ -101,6 +113,7 @@ async function apply(mode?: ApplyMode) {
       tunnel: new LinuxTunnel(),
       routes: new SiteRoutes(),
       activeAddresses: new Map(),
+      restoredDefaults: new Map(),
     };
     hostStates.set(database, state);
   }
@@ -164,18 +177,28 @@ async function apply(mode?: ApplyMode) {
     mode === 'sync'
       ? { ...savedNetwork, ...state.activeNetwork }
       : savedNetwork;
+  const previousGateways: { ipv4?: string; ipv6?: string } = {};
   if (mode === 'sync') {
     await state.tunnel.guardTraffic(network, enableIpv6);
     // Remove revoked peers before parsing or applying the full configuration.
     // An unrelated invalid or unresolvable endpoint must not preserve access.
-    const enabledKeys = new Set(
+    const enabled = new Map(
       clients
         .filter((client) => client.enabled)
-        .map((client) => client.publicKey)
+        .map((client) => [client.publicKey, client])
     );
     for (const peer of await wg.dump(network.name)) {
-      if (!enabledKeys.has(peer.publicKey)) {
+      const client = enabled.get(peer.publicKey);
+      if (!client) {
         await wg.removePeer(network.name, peer.publicKey);
+        continue;
+      }
+      const allowed = peer.allowedIps.split(',');
+      if (client.ipv4Address && allowed.includes('0.0.0.0/0')) {
+        previousGateways.ipv4 = peer.publicKey;
+      }
+      if (enableIpv6 && client.ipv6Address && allowed.includes('::/0')) {
+        previousGateways.ipv6 = peer.publicKey;
       }
     }
   } else {
@@ -183,7 +206,22 @@ async function apply(mode?: ApplyMode) {
   }
   await writeSavedConfig();
   if (mode === 'sync') {
-    await wg.sync(network, clients, enableIpv6);
+    try {
+      await wg.sync(network, clients, enableIpv6);
+    } catch (error) {
+      if (network.firewallEnabled) {
+        const verified = peersWithVerifiedSources(
+          clients,
+          await wg.dump(network.name),
+          enableIpv6,
+          state.restoredDefaults
+        );
+        if (verified.length) {
+          await firewall.rebuildRules(network, verified, defaults, enableIpv6);
+        }
+      }
+      throw error;
+    }
   } else {
     const postUp = expandHook(hooks.postUp, network, options.uiPort);
     state.routes = new SiteRoutes();
@@ -201,6 +239,9 @@ async function apply(mode?: ApplyMode) {
       }
       await wg.sync(network, clients, enableIpv6);
       await state.tunnel.configureLink(network, enableIpv6);
+      if (network.firewallEnabled && postUp) {
+        await firewall.rebuildRules(network, clients, defaults, enableIpv6);
+      }
     } catch (error) {
       await state.tunnel.stop(network.name, true);
       throw error;
@@ -230,15 +271,32 @@ async function apply(mode?: ApplyMode) {
   state.mtu = network.mtu;
   // The interface and its hooks are up. Retry subsequent failures live.
   state.retry = 'sync';
-  await firewall.rebuildRules(network, clients, defaults, enableIpv6);
-  if (!network.firewallEnabled) {
-    await state.tunnel.recordFiltering(false);
-  }
+  const restoredDefaults = state.restoredDefaults;
+  restoredDefaults.clear();
   const siteError = await state.routes.sync(network, clients, enableIpv6);
   const policyError = await state.tunnel.defaultPolicy.sync(
     network,
-    defaultRoutes
+    defaultRoutes,
+    async (family, prefix) => {
+      const key = previousGateways[family];
+      await wg.restoreDefault(network.name, prefix, key);
+      restoredDefaults.set(prefix, key);
+    }
   );
+  if (network.firewallEnabled && policyError) {
+    const verified = peersWithVerifiedSources(
+      clients,
+      await wg.dump(network.name),
+      enableIpv6,
+      restoredDefaults
+    );
+    await firewall.rebuildRules(network, verified, defaults, enableIpv6);
+  } else if (mode === 'sync' || !network.firewallEnabled || !hooks.postUp) {
+    await firewall.rebuildRules(network, clients, defaults, enableIpv6);
+  }
+  if (!network.firewallEnabled) {
+    await state.tunnel.recordFiltering(false);
+  }
   const error = siteError ?? policyError;
   if (error) {
     if (mode !== 'start') {

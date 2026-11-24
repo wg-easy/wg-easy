@@ -1,29 +1,25 @@
 import type { APIRequestContext } from '@playwright/test';
 
-import { credentials, expect, test } from './fixtures';
+import { expect, test } from './fixtures';
+import { admin } from './helpers';
 
 test.use({ ipv6: true });
 
-async function admin(request: APIRequestContext, origin: string) {
-  const headers = { Origin: origin };
-  const post = (path: string, data?: object) =>
-    request.post(path, { headers, data, failOnStatusCode: true });
-  const read = async (path: string) => (await request.get(path)).json();
-  await post('/api/auth/password', { ...credentials, remember: false });
+async function routingAdmin(request: APIRequestContext, origin: string) {
+  const { post, json, create, download } = await admin(request, origin);
   const peer = async (name: string) => {
-    const created = await post('/api/client', { name, expiresAt: null });
-    const url = '/api/client/' + (await created.json()).clientId;
-    const settings = await read(url);
+    const url = await create(name);
+    const settings = await json(url);
     return {
       url,
       settings,
-      config: async () => (await request.get(url + '/configuration')).text(),
+      config: () => download(url),
       routes: (serverAllowedIps: string[]) =>
         post(url, { ...settings, serverAllowedIps }),
     };
   };
   const iface = '/api/admin/interface';
-  const settings = await read(iface);
+  const settings = await json(iface);
   return {
     peer,
     post,
@@ -38,7 +34,7 @@ for (const backend of ['wg', 'awg'] as const) {
       request,
       app,
     }) => {
-      const api = await admin(request, app.url);
+      const api = await routingAdmin(request, app.url);
       const gateway = await api.peer('Default gateway');
       const witness = await api.peer('Connected peer');
       await api.post('/api/admin/hooks', {
@@ -175,9 +171,10 @@ test('rolls back a partially withdrawn IPv6 policy, keeps the revocation, and re
   app,
 }) => {
   test.slow(); // The lifecycle maintenance timer runs once per minute.
-  const api = await admin(request, app.url);
+  const api = await routingAdmin(request, app.url);
   const witness = await api.peer('IPv4 gateway');
   const revoked = await api.peer('IPv6 gateway');
+  const candidate = await api.peer('New IPv6 gateway');
   await api.post('/api/admin/hooks', {
     preUp: 'echo up >> /tmp/phases',
     postUp: '',
@@ -188,8 +185,10 @@ test('rolls back a partially withdrawn IPv6 policy, keeps the revocation, and re
   const read = (family: string) =>
     app.execServer(['/sbin/ip', family, 'rule', 'show']);
   const beforeV6 = await read('-6');
+  const mark = () => app.execServer(['wg', 'show', 'wg0', 'fwmark']);
   await witness.routes(['0.0.0.0/0']);
   await revoked.routes(['::/0']);
+  const appliedMark = await mark();
   await app.connectClient(await witness.config());
   await expect.poll(() => app.pingFromClient('10.8.0.1')).toBe(true);
   const index = () => app.execServer(['cat', '/sys/class/net/wg0/ifindex']);
@@ -207,6 +206,7 @@ test('rolls back a partially withdrawn IPv6 policy, keeps the revocation, and re
 #!/bin/sh
 case " $* " in
   *" -6 rule del "*" suppress_prefixlength "*) exit 2 ;;
+  *" -6 -N -j -d rule show "*) test ! -f /tmp/fail-rule-read || exit 2 ;;
 esac
 exec /sbin/ip "$@"
 SH
@@ -222,6 +222,42 @@ chmod +x /usr/local/bin/ip`,
     'wg0',
     '10.8.0.1',
   ]);
+  // A host reachable only through the gateway's default needs both the Linux
+  // policy and WireGuard AllowedIPs to keep working after rollback.
+  const remote = '2001:db8:1234::1';
+  await app.connectClient(await revoked.config(), 2);
+  await app.execClient(
+    ['ip', '-6', 'address', 'add', remote + '/128', 'dev', 'lo'],
+    2
+  );
+  await app.execClient(
+    ['ping', '-6', '-c', '1', '-W', '3', 'fdcc:ad94:bacf:61a4::cafe:1'],
+    2
+  );
+  const pingRemote = () =>
+    app.execServer(['ping', '-6', '-c', '1', '-W', '3', remote]);
+  expect(await pingRemote()).toContain('0% packet loss');
+  const failedWithdrawal = await request.post(revoked.url, {
+    headers: { Origin: app.url },
+    data: { ...revoked.settings, serverAllowedIps: ['2001:db8:2222::/64'] },
+  });
+  expect(failedWithdrawal.status()).toBe(500);
+  expect(await pingRemote()).toContain('0% packet loss');
+  expect(await app.execServer(['wg', 'show', 'wg0', 'allowed-ips'])).toContain(
+    '2001:db8:2222::/64'
+  );
+  // The old gateway is already removed from saved settings. A failed
+  // transfer to the next gateway must keep the old one carrying traffic.
+  const candidateRoutes = (routes: string[]) =>
+    request.post(candidate.url, {
+      headers: { Origin: app.url },
+      data: { ...candidate.settings, serverAllowedIps: routes },
+    });
+  await app.execServer(['touch', '/tmp/fail-rule-read']);
+  expect((await candidateRoutes(['::/0'])).status()).toBe(500);
+  expect(await pingRemote()).toContain('0% packet loss');
+  expect(await mark()).toBe(appliedMark);
+  expect((await candidateRoutes([])).status()).toBe(500);
   const failed = await request.post(revoked.url + '/disable', {
     headers: { Origin: app.url },
   });
@@ -243,13 +279,35 @@ chmod +x /usr/local/bin/ip`,
   expect(await app.execServer(['cat', '/tmp/phases'])).toBe('up');
   expect(await app.peers()).not.toContain(revoked.settings.publicKey);
   expect(await app.pingFromClient('10.8.0.1')).toBe(true);
+
+  // With no previous gateway, a failed addition leaves only the independent site.
+  await api.table('100');
+  await app.execServer([
+    'ip',
+    '-6',
+    'route',
+    'add',
+    'default',
+    'dev',
+    'eth0',
+    'table',
+    '100',
+    'metric',
+    '1',
+  ]);
+  expect((await candidateRoutes(['::/0', '2001:db8:abcd::/64'])).status()).toBe(
+    409
+  );
+  const allowed = await app.execServer(['wg', 'show', 'wg0', 'allowed-ips']);
+  expect(allowed).not.toContain('::/0');
+  expect(allowed).toContain('2001:db8:abcd::/64');
 });
 
 test('borrows host marks, avoids occupied tables and preserves replaced rules and foreign routes', async ({
   request,
   app,
 }) => {
-  const api = await admin(request, app.url);
+  const api = await routingAdmin(request, app.url);
   const peer = await api.peer('Default gateway');
   const ip = (...args: string[]) => app.execServer(['ip', ...args]);
   const mark = () => app.execServer(['wg', 'show', 'wg0', 'fwmark']);
@@ -330,6 +388,21 @@ test('borrows host marks, avoids occupied tables and preserves replaced rules an
   );
   expect(await ip('-6', 'rule', 'show')).toContain('lookup 600');
   await api.table('101');
+  const site = '192.0.2.128/25';
+  await ip(
+    '-4',
+    'route',
+    'replace',
+    site,
+    'dev',
+    'wg0',
+    'table',
+    '101',
+    'proto',
+    '242',
+    'mtu',
+    '1300'
+  );
   await ip(
     '-4',
     'route',
@@ -348,6 +421,9 @@ test('borrows host marks, avoids occupied tables and preserves replaced rules an
   expect(await ip('-4', '-N', 'route', 'show', 'table', '101')).toContain(
     'src 10.8.0.1'
   );
+  expect(
+    await ip('-4', 'route', 'show', 'table', '101', 'exact', site)
+  ).toContain('mtu 1300');
   expect(await mark()).toBe('0x262');
 });
 
@@ -357,7 +433,7 @@ test.describe('strict reverse-path filtering', () => {
     request,
     app,
   }) => {
-    const api = await admin(request, app.url);
+    const api = await routingAdmin(request, app.url);
     const peer = await api.peer('Remote endpoint');
     const gateway = await api.peer('Default gateway');
     await app.connectClient(await peer.config());

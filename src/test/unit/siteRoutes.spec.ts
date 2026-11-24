@@ -40,6 +40,7 @@ async function fixture(
               : kernelFields(entry.table)),
             // iproute2 omits the prefix length for host routes.
             dst: dst.replace(dst.includes(':') ? /\/128$/ : /\/32$/, ''),
+            scope: args.includes('-6') ? 0 : 253,
             metric: args.includes('-6') ? 1024 : 0,
           }))
       );
@@ -232,6 +233,18 @@ describe('Server Allowed IP routes', () => {
     entries.get(prefix)!.protocol = '4';
     await setRoutes([]);
     expect(entries.get(prefix)?.protocol).toBe('4');
+  });
+
+  test('preserves an operator replacement with the same protocol and metric', async () => {
+    let extras = {};
+    const { setRoutes, entries } = await fixture((table) => ({
+      table,
+      ...extras,
+    }));
+    await setRoutes([prefix]);
+    extras = { prefsrc: '10.8.0.1', metrics: { mtu: 1400 } };
+    await setRoutes([]);
+    expect(entries.has(prefix)).toBe(true);
   });
 
   test.each(['start', 'restart'] as const)(

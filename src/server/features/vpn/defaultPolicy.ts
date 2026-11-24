@@ -6,6 +6,9 @@ import { createError } from 'nuxt/server';
 import { z } from 'zod';
 
 import {
+  directRoute,
+  matchesOwnedRoute,
+  routeMetric,
   kernelTable,
   routeProtocol,
   routingTable,
@@ -45,7 +48,6 @@ type Rule = Record<string, unknown> & {
   priority: number;
   table?: string | number;
 };
-const metric = (family: Family) => (family === 'ipv4' ? 0 : 1024);
 const flag = (family: Family) => (family === 'ipv4' ? '-4' : '-6');
 
 async function inspect<T>(family: Family, ...args: string[]): Promise<T[]> {
@@ -335,36 +337,15 @@ export class DefaultPolicy {
         (entry) =>
           kernelTable(entry.table) === item.table && entry.dst === 'default'
       );
-      const direct = (r: KernelRoute) =>
-        r.dev === name &&
-        !r.gateway &&
-        (r.type === undefined || Number(r.type) === 1 || r.type === 'unicast');
       const rank = Math.min(...entries.map((r) => r.metric ?? 0));
       const preferred = entries.filter((r) => (r.metric ?? 0) === rank);
-      installed = entries.some(
-        (r) =>
-          direct(r) &&
-          Number(r.protocol) === routeProtocol &&
-          (r.metric ?? 0) === metric(family) &&
-          Number(r.scope) === (family === 'ipv4' ? 253 : 0) &&
-          !r.flags?.length &&
-          (r.pref === undefined || r.pref === 'medium') &&
-          Object.keys(r).every((key) =>
-            [
-              'dst',
-              'dev',
-              'table',
-              'protocol',
-              'metric',
-              'scope',
-              'flags',
-              'type',
-              'pref',
-            ].includes(key)
-          )
+      installed = entries.some((route) =>
+        matchesOwnedRoute(route, name, family)
       );
-      satisfied = preferred.length > 0 && preferred.every(direct);
-      if (add && !satisfied && rank <= metric(family)) {
+      satisfied =
+        preferred.length > 0 &&
+        preferred.every((route) => directRoute(route, name));
+      if (add && !satisfied && rank <= routeMetric(family)) {
         throw new DefaultRouteConflict('An existing default route conflicts');
       }
       args = [
@@ -379,7 +360,7 @@ export class DefaultPolicy {
         'proto',
         String(routeProtocol),
         'metric',
-        String(metric(family)),
+        String(routeMetric(family)),
       ];
     } else if (item.kind === 'suppress' || item.kind === 'lookup') {
       const slot = (await inspect<Rule>(family, 'rule', 'show')).filter(
@@ -483,7 +464,11 @@ export class DefaultPolicy {
     }
   }
 
-  async sync(network: InterfaceType, defaults: Defaults) {
+  async sync(
+    network: InterfaceType,
+    defaults: Defaults,
+    restorePeer?: (family: Family, prefix: string) => Promise<void>
+  ) {
     const name = network.name;
     let failure;
     for (const family of families) {
@@ -505,12 +490,21 @@ export class DefaultPolicy {
           await this.desired(network, family, setting, auto)
         );
       } catch (cause) {
+        let error = cause;
         const prefix = family === 'ipv4' ? '0.0.0.0/0' : '::/0';
+        try {
+          await restorePeer?.(family, prefix);
+        } catch (rollbackError) {
+          error = new AggregateError(
+            [cause, rollbackError],
+            'Could not restore default gateway'
+          );
+        }
         failure ??= createError({
           status: cause instanceof DefaultRouteConflict ? 409 : 500,
           statusText: 'Default route update failed',
           message: `Settings saved. Could not update ${prefix} on ${name} in table ${table}. ${cause instanceof DefaultRouteConflict ? 'An existing route conflicts with this default. ' : ''}Maintenance will retry.`,
-          cause,
+          cause: error,
         });
       }
     }

@@ -1,24 +1,5 @@
-import type { APIRequestContext } from '@playwright/test';
-
-import { credentials, expect, test } from './fixtures';
-
-async function admin(request: APIRequestContext, origin: string) {
-  const headers = { Origin: origin };
-  const login = await request.post('/api/auth/password', {
-    headers,
-    data: { ...credentials, remember: false },
-  });
-  expect(login.ok()).toBe(true);
-  const create = async (name: string) => {
-    const response = await request.post('/api/client', {
-      headers,
-      data: { name, expiresAt: null },
-    });
-    expect(response.ok()).toBe(true);
-    return `/api/client/${(await response.json()).clientId}`;
-  };
-  return { headers, create };
-}
+import { expect, test } from './fixtures';
+import { admin } from './helpers';
 
 for (const backend of ['wg', 'awg'] as const) {
   test.describe(backend, () => {
@@ -27,11 +8,9 @@ for (const backend of ['wg', 'awg'] as const) {
       request,
       app,
     }) => {
-      const { headers, create } = await admin(request, app.url);
+      const { create, download, json, post } = await admin(request, app.url);
       const witness = await create('Connected client');
-      await app.connectClient(
-        await (await request.get(witness + '/configuration')).text()
-      );
+      await app.connectClient(await download(witness));
       await expect.poll(() => app.pingFromClient('10.8.0.1')).toBe(true);
       const ifindex = () =>
         app.execServer(['cat', '/sys/class/net/wg0/ifindex']);
@@ -50,13 +29,9 @@ for (const backend of ['wg', 'awg'] as const) {
       const read = (field: string) =>
         app.execServer([backend, 'show', 'wg0', field]);
       const site = await create('Another client');
-      const peer = await (await request.get(site)).json();
+      const peer = await json(site);
       const subnet = '192.0.2.0/24';
-      await request.post(site, {
-        headers,
-        data: { ...peer, serverAllowedIps: [subnet] },
-        failOnStatusCode: true,
-      });
+      await post(site, { ...peer, serverAllowedIps: [subnet] });
       expect(
         await app.execServer(['ip', 'route', 'show', 'exact', subnet])
       ).toContain('dev wg0');
@@ -85,41 +60,71 @@ test('disable, deletion and expiry revoke running peers despite a failing endpoi
   app,
 }) => {
   test.slow(); // Expiry goes through the real one-minute maintenance job.
-  const { headers, create } = await admin(request, app.url);
+  const { headers, create, download, json, post } = await admin(
+    request,
+    app.url
+  );
   const disable = await create('Disable');
   const remove = await create('Delete');
   const expire = await create('Expire');
   const broken = await create('Unresolvable endpoint');
+  const iface = '/api/admin/interface';
+  const filtering = await json(iface);
+  await post(iface, { ...filtering, firewallEnabled: true });
   const peers = [disable, remove, expire, broken];
   for (const [index, url] of peers.entries()) {
-    await app.connectClient(
-      await (await request.get(url + '/configuration')).text(),
-      index + 1
-    );
+    await app.connectClient(await download(url), index + 1);
     await expect
       .poll(() => app.pingFromClient('10.8.0.1', index + 1))
       .toBe(true);
   }
-  const network = await (await request.get('/api/admin/interface')).json();
-  await request.post('/api/admin/interface/cidr', {
-    headers,
-    data: { ipv4Cidr: '10.90.0.0/24', ipv6Cidr: network.ipv6Cidr },
-    failOnStatusCode: true,
+  const network = await json('/api/admin/interface');
+  await post('/api/admin/interface/cidr', {
+    ipv4Cidr: '10.90.0.0/24',
+    ipv6Cidr: network.ipv6Cidr,
   });
   expect(await app.pingFromClient('10.8.0.1', 4)).toBe(true);
-  const expiring = await (await request.get(expire)).json();
+  const expiring = await json(expire);
   const saved = await request.post(expire, {
     headers,
     data: { ...expiring, expiresAt: new Date(Date.now() + 5000).toISOString() },
   });
   expect(saved.ok()).toBe(true);
-  const enabled = await (await request.get(broken)).json();
+  const enabled = await json(broken);
   const failed = await request.post(broken, {
     headers,
     data: { ...enabled, serverEndpoint: 'unresolvable.invalid:51820' },
   });
   expect(failed.status()).toBe(500);
   expect(await app.peers()).toHaveLength(4);
+  expect(await app.pingFromClient('10.8.0.1', 1)).toBe(true);
+  // A changed kernel assignment cannot inherit another saved peer's permission.
+  await app.execServer([
+    'wg',
+    'set',
+    'wg0',
+    'peer',
+    enabled.publicKey,
+    'allowed-ips',
+    '10.8.0.5/32,10.8.0.2/32',
+  ]);
+  const restricted = await json(remove);
+  expect(
+    (
+      await request.post(remove, {
+        headers,
+        data: {
+          ...restricted,
+          firewallIps: ['192.0.2.1/32'],
+        },
+      })
+    ).status()
+  ).toBe(500);
+  expect(
+    await app.execServer(['iptables', '-S', 'WG_CLIENTS_wg0'])
+  ).not.toContain(' -s 10.8.0.2/32 ');
+  expect(await app.pingFromClient('10.8.0.1', 2)).toBe(false);
+  expect(await app.pingFromClient('10.8.0.1', 4)).toBe(true);
   expect((await request.post(disable + '/disable', { headers })).status()).toBe(
     500
   );
@@ -129,7 +134,7 @@ test('disable, deletion and expiry revoke running peers despite a failing endpoi
   await expect
     .poll(() => app.peers(), { timeout: 75_000, intervals: [1000] })
     .toEqual([enabled.publicKey]);
-  expect((await (await request.get(expire)).json()).enabled).toBe(false);
+  expect((await json(expire)).enabled).toBe(false);
   expect(await app.pingFromClient('10.8.0.1', 3)).toBe(false);
   expect(await app.pingFromClient('10.8.0.1', 4)).toBe(true);
 });

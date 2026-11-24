@@ -14,6 +14,51 @@ export type KernelRoute = {
 // Linux route and rule protocol reserved by the application.
 export const routeProtocol = 242;
 
+export type RouteFamily = 'ipv4' | 'ipv6';
+
+export const routeMetric = (family: RouteFamily) =>
+  family === 'ipv4' ? 0 : 1024;
+
+export function directRoute(route: KernelRoute, device: string) {
+  return (
+    route.dev === device &&
+    !route.gateway &&
+    (route.type === undefined ||
+      Number(route.type) === 1 ||
+      route.type === 'unicast')
+  );
+}
+
+// Numeric, detailed iproute2 output identifies attributes that distinguish
+// our direct route from a replacement with the same protocol and metric.
+export function matchesOwnedRoute(
+  route: KernelRoute,
+  device: string,
+  family: RouteFamily
+) {
+  return (
+    directRoute(route, device) &&
+    Number(route.protocol) === routeProtocol &&
+    (route.metric ?? 0) === routeMetric(family) &&
+    Number(route.scope) === (family === 'ipv4' ? 253 : 0) &&
+    !route.flags?.length &&
+    (route.pref === undefined || route.pref === 'medium') &&
+    Object.keys(route).every((key) =>
+      [
+        'dst',
+        'dev',
+        'table',
+        'protocol',
+        'metric',
+        'scope',
+        'flags',
+        'type',
+        'pref',
+      ].includes(key)
+    )
+  );
+}
+
 export function kernelTable(table: KernelRoute['table']) {
   switch (table) {
     case undefined:

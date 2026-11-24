@@ -1,27 +1,7 @@
-import type { APIRequestContext } from '@playwright/test';
-
-import { credentials, expect, test } from './fixtures';
-import { goto } from './helpers';
+import { expect, test } from './fixtures';
+import { admin, goto } from './helpers';
 
 const iface = '/api/admin/interface';
-
-async function admin(request: APIRequestContext, origin: string) {
-  const headers = { Origin: origin };
-  const post = (url: string, data?: object) =>
-    request.post(url, { headers, data, failOnStatusCode: true });
-  const json = async (url: string) =>
-    (await request.get(url, { failOnStatusCode: true })).json();
-  const create = async (name: string) => {
-    const response = await post('/api/client', { name, expiresAt: null });
-    return `/api/client/${(await response.json()).clientId}`;
-  };
-  const download = async (url: string) =>
-    (
-      await request.get(url + '/configuration', { failOnStatusCode: true })
-    ).text();
-  await post('/api/auth/password', { ...credentials, remember: false });
-  return { post, json, create, download };
-}
 
 test('distributes renumbered configurations while established clients use the running subnet and firewall', async ({
   app,
@@ -186,4 +166,27 @@ test('protects an old address across staged gateway edits and key rotation until
   });
   expect(await app.peers()).not.toContain(rotatedKey);
   expect(await allowed()).toContain(pendingKey + '\t10.8.0.2/32');
+});
+
+test('reverting a pending subnet preserves the established manual address and export', async ({
+  request,
+  app,
+}) => {
+  const { post, json, create, download } = await admin(request, app.url);
+  const network = await json(iface);
+  const client = await create('Manually addressed client');
+  await post(client, { ...(await json(client)), ipv4Address: '10.8.0.100' });
+  await app.connectClient(await download(client));
+  const ping = () => app.pingFromClient('10.8.0.1');
+  await expect.poll(ping).toBe(true);
+  const stage = (ipv4Cidr: string) =>
+    post(iface + '/cidr', { ipv4Cidr, ipv6Cidr: network.ipv6Cidr });
+  await stage('10.90.0.0/24');
+  expect((await json(iface)).restartRequired).toBe(true);
+  const pending = await create('New client');
+  await stage(network.ipv4Cidr);
+  expect((await json(iface)).restartRequired).toBe(false);
+  expect(await ping()).toBe(true);
+  expect(await download(client)).toContain('Address = 10.8.0.100/32');
+  expect(await download(pending)).toContain('Address = 10.8.0.2/32');
 });

@@ -323,6 +323,23 @@ for (const backend of ['wg', 'awg'] as const) {
       expect(await readAttempts()).toBe('run\noffice#lan hq #1\nready');
       expect(await app.execServer([backend, 'show', 'interfaces'])).toBe('wg0');
 
+      const iface = '/api/admin/interface';
+      const network = await (await request.get(iface)).json();
+      await request.post(iface, {
+        headers,
+        data: { ...network, firewallEnabled: true },
+        failOnStatusCode: true,
+      });
+      await request.post(hooksUrl, {
+        headers,
+        data: {
+          ...fixed,
+          postUp: `ping -c 1 -W 4 ${peer.ipv4Address}; ip route add ${hookRoute} dev %i`,
+        },
+        failOnStatusCode: true,
+      });
+      await request.post(restartUrl, { headers, failOnStatusCode: true });
+
       const disabled = await request.post(clientUrl + '/disable', { headers });
       expect(disabled.ok()).toBe(true);
       const remaining = await app.execServer([
