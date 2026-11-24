@@ -106,6 +106,8 @@ async function apply(mode?: ApplyMode) {
   }
   const manualRestart = mode === 'restart' || mode === 'start';
   mode ??= state.retry ?? 'sync';
+  // Clear only after every host effect succeeds. Maintenance retries failures.
+  state.retry = mode;
   const { savedNetwork, savedClients, hooks, defaults } =
     await database.transaction(async (tx) => ({
       savedNetwork: await tx.interfaces.get(),
@@ -115,14 +117,12 @@ async function apply(mode?: ApplyMode) {
     }));
   const enableIpv6 = !WG_ENV.DISABLE_IPV6;
   await state.tunnel.checkOwnership(savedNetwork.name);
-  if (manualRestart) {
+  if (mode !== 'sync') {
     const gateways = await filteredSiteGateways(database);
     await checkRoutedReplySupport(
       routedReplyFamilies(gateways, !WG_ENV.DISABLE_IPV6)
     );
   }
-  // Clear only after every host effect succeeds. Maintenance retries failures.
-  state.retry = mode;
   if (state.failedStart) {
     await cleanFailedStart(state.tunnel, state.failedStart);
     if (!manualRestart) {
