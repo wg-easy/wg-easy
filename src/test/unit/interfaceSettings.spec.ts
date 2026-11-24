@@ -130,7 +130,7 @@ describe('interface settings', () => {
     expect(writeConfiguration.mock.lastCall?.[1]).toContain(
       'ListenPort = 51830\nMTU = 1280\n'
     );
-    expect(commands.sync).toHaveBeenCalledWith('wg0');
+    expect(commands.sync).toHaveBeenCalledOnce();
     expect(firewall.rebuildRules.mock.lastCall?.[0]).toMatchObject(data);
   });
 

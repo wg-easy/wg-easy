@@ -186,7 +186,7 @@ async function apply(mode?: ApplyMode) {
       state.retry = 'sync';
     }
   }
-  await wg.sync(network.name);
+  await wg.sync(network, clients, enableIpv6);
   if (startup?.postUp) {
     // PostUp may use a site route, or supply one itself. Apply available
     // routes first, then check the final kernel state after the hook.
