@@ -156,7 +156,9 @@ for (const evidence of [
         'dummy',
       ]);
       await app.execServer(['ip', 'link', 'set', 'wg0', 'up']);
-      if (evidence === 'missing record') await app.execServer(['rm', record]);
+      if (evidence === 'missing record') {
+        await app.execServer(['rm', record]);
+      }
     }
     await app.execServer([
       'ip',
@@ -227,7 +229,9 @@ for (const phase of ['PostUp', 'PreDown'] as const) {
         'echo pre >> /tmp/teardown\n' + (phase === 'PreDown' ? pause : ''),
       postDown: 'echo post >> /tmp/teardown',
     });
-    if (phase === 'PreDown') await post('/api/admin/interface/restart');
+    if (phase === 'PreDown') {
+      await post('/api/admin/interface/restart');
+    }
     await app.execServer(['touch', '/tmp/pause']);
     const cutover = post('/api/admin/interface/restart').catch(() => {});
     await expect

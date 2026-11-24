@@ -23,7 +23,9 @@ import { setTunnelMtu } from '#server/utils/tunnelMtu';
 import { wg } from '#server/utils/wgHelper';
 
 async function linkIdentity(name: string) {
-  if (process.platform !== 'linux') return;
+  if (process.platform !== 'linux') {
+    return;
+  }
   try {
     const directory = `/sys/class/net/${name}`;
     const [index, alias] = await Promise.all([
@@ -32,7 +34,9 @@ async function linkIdentity(name: string) {
     ]);
     return { index: Number(index), alias: alias.replace(/\n$/, '') };
   } catch (error) {
-    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
+    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+      throw error;
+    }
   }
 }
 
@@ -49,7 +53,9 @@ export class LinuxTunnel {
 
   async checkOwnership(name: string) {
     const link = await linkIdentity(parseInterfaceName(name));
-    if (!link) return;
+    if (!link) {
+      return;
+    }
     try {
       const record = this.running ?? (await readTunnelRecord(name));
       if (
@@ -57,7 +63,9 @@ export class LinuxTunnel {
         record.policy.tag === link.alias &&
         record.index === link.index
       ) {
-        if (!this.running) this.attach(record);
+        if (!this.running) {
+          this.attach(record);
+        }
         return link.index;
       }
     } catch (cause) {
@@ -76,7 +84,9 @@ export class LinuxTunnel {
 
   async create(network: InterfaceType, hooks: HooksType) {
     const name = parseInterfaceName(network.name);
-    if (process.platform !== 'linux') return;
+    if (process.platform !== 'linux') {
+      return;
+    }
     const kind = WG_ENV.WG_EXECUTABLE === 'awg' ? 'amneziawg' : 'wireguard';
     try {
       await exec(`ip link add dev ${name} type ${kind}`);
@@ -122,7 +132,9 @@ export class LinuxTunnel {
   }
 
   async completeStartup(network: InterfaceType, hooks: HooksType) {
-    if (process.platform !== 'linux') return;
+    if (process.platform !== 'linux') {
+      return;
+    }
     if (!(await this.checkOwnership(network.name)) || !this.running) {
       throw new Error(
         `Tunnel interface ${network.name} disappeared during startup`
