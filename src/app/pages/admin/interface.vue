@@ -1,5 +1,8 @@
 <template>
   <div v-if="data">
+    <p v-if="data.restartRequired" role="status" class="callout mb-4">
+      {{ $t('admin.interface.restartRequired') }}
+    </p>
     <FormElement @submit.prevent="submit">
       <FormGroup>
         <FormNullNumberField

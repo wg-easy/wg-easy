@@ -1,7 +1,7 @@
 import { createError } from 'nuxt/server';
 import { parseCidr } from 'cidr-tools';
 
-import { commit, restart as restartVpn } from './lifecycle';
+import { commit, restart as restartVpn, restartRequired } from './lifecycle';
 import { authorize, type Actor } from './policies';
 
 import { firewall } from '#server/utils/firewall';
@@ -61,8 +61,10 @@ export async function changeCidr(
 
 export async function get(actor: Actor) {
   authorize(actor, 'admin', 'any');
+  const network = await getDatabase().interfaces.get();
   return {
-    ...(await getDatabase().interfaces.get()),
+    ...network,
+    restartRequired: restartRequired(network),
     privateKey: undefined,
   };
 }

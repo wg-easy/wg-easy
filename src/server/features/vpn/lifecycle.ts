@@ -13,6 +13,7 @@ import {
 import { SiteRoutes } from './siteRoutes';
 
 import { getDatabase } from '#db';
+import type { InterfaceType } from '#db/repositories/interface/types';
 import type { DatabaseStore, Repositories } from '#db/store';
 import { NativePostUpError, wg } from '#server/utils/wgHelper';
 import {
@@ -29,6 +30,7 @@ type ApplyMode = 'sync' | 'start' | 'restart';
 type HostState = {
   tunnel: LinuxTunnel;
   routes: SiteRoutes;
+  activeNetwork?: ReturnType<typeof stagedSettings>;
   defaultRoutes: ReturnType<typeof defaultRoutePolicy>;
   mtu?: number | null;
   retry?: ApplyMode;
@@ -39,6 +41,17 @@ type HostState = {
   };
 };
 const hostStates = new WeakMap<DatabaseStore, HostState>();
+
+function stagedSettings({ port, device }: InterfaceType) {
+  return { port, device };
+}
+
+export function restartRequired(saved: InterfaceType) {
+  const active = hostStates.get(getDatabase())?.activeNetwork;
+  return (
+    active !== undefined && !isDeepStrictEqual(active, stagedSettings(saved))
+  );
+}
 
 /** Each caller waits for its own update; a failure must not block later updates. */
 function enqueue<T>(operation: () => Promise<T>) {
@@ -101,9 +114,9 @@ async function apply(mode?: ApplyMode) {
   mode ??= state.retry ?? 'sync';
   // Clear only after every host effect succeeds. Maintenance retries failures.
   state.retry = mode;
-  const { network, clients, hooks, defaults } = await database.transaction(
+  const { savedNetwork, clients, hooks, defaults } = await database.transaction(
     async (tx) => ({
-      network: await tx.interfaces.get(),
+      savedNetwork: await tx.interfaces.get(),
       clients: await tx.clients.getAll(),
       hooks: await tx.hooks.get(),
       defaults: await tx.userConfigs.get(),
@@ -119,7 +132,7 @@ async function apply(mode?: ApplyMode) {
     delete state.failedStart;
   }
   const defaultRoutes = defaultRoutePolicy(
-    network.routingTable,
+    savedNetwork.routingTable,
     clients,
     enableIpv6
   );
@@ -130,6 +143,10 @@ async function apply(mode?: ApplyMode) {
     mode = 'restart';
     state.retry = mode;
   }
+  const network =
+    mode === 'sync'
+      ? { ...savedNetwork, ...state.activeNetwork }
+      : savedNetwork;
   await state.tunnel.checkOwnership(network.name);
   if (network.firewallEnabled) {
     await firewall.blockTraffic(network.name, enableIpv6);
@@ -158,7 +175,7 @@ async function apply(mode?: ApplyMode) {
     amnezia: WG_ENV.WG_EXECUTABLE === 'awg',
     uiPort: WG_ENV.PORT,
   };
-  const contents = generateServerConfig(network, hooks, clients, options);
+  const contents = generateServerConfig(savedNetwork, hooks, clients, options);
   await fs.writeFile(`/etc/wireguard/${network.name}.conf`, contents, {
     mode: 0o600,
   });
@@ -207,6 +224,7 @@ async function apply(mode?: ApplyMode) {
         return failedPostUp(state, network.name, cause);
       }
     }
+    state.activeNetwork = stagedSettings(network);
   }
   state.mtu = network.mtu;
   // The interface and its hooks are up. Retry subsequent failures live.
