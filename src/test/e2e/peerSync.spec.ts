@@ -27,7 +27,7 @@ for (const backend of ['wg', 'awg'] as const) {
       request,
       app,
     }) => {
-      const { create } = await admin(request, app.url);
+      const { headers, create } = await admin(request, app.url);
       const witness = await create('Connected client');
       await app.connectClient(
         await (await request.get(witness + '/configuration')).text()
@@ -54,7 +54,17 @@ for (const backend of ['wg', 'awg'] as const) {
       ]);
       const read = (field: string) =>
         app.execServer([backend, 'show', 'wg0', field]);
-      await create('Another client');
+      const site = await create('Another client');
+      const peer = await (await request.get(site)).json();
+      const subnet = '192.0.2.0/24';
+      await request.post(site, {
+        headers,
+        data: { ...peer, serverAllowedIps: [subnet] },
+        failOnStatusCode: true,
+      });
+      expect(
+        await app.execServer(['ip', 'route', 'show', 'exact', subnet])
+      ).toContain('dev wg0');
       expect(await read('fwmark')).toBe('off');
       expect(await read('allowed-ips')).toContain('10.8.0.3/32');
       await app.execServer([backend, 'set', 'wg0', 'fwmark', '0xca6d']);

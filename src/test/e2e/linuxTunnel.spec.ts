@@ -1,62 +1,113 @@
 import { credentials, expect, test } from './fixtures';
 
-for (const userspace of [false, true]) {
-  test(`starts WireGuard without wg-quick and carries traffic (${userspace ? 'userspace' : 'kernel'})`, async ({
-    request,
-    app,
-  }) => {
-    const headers = { Origin: app.url };
-    const post = (url: string, data?: object) =>
-      request.post(url, { headers, data, failOnStatusCode: true });
-    await post('/api/auth/password', { ...credentials, remember: false });
-    const peer = await post('/api/client', {
-      name: 'Site router',
-      expiresAt: null,
-    });
-    const url = '/api/client/' + (await peer.json()).clientId;
-    const client = await (await request.get(url)).json();
-    const site = '192.0.2.0/24';
-    await post(url, { ...client, serverAllowedIps: [site] });
-    await app.execServer([
-      'sh',
-      '-ec',
-      'if test -e /usr/bin/wg-quick; then mv /usr/bin/wg-quick /tmp/unused-quick; fi',
-    ]);
-    if (userspace) {
-      // Simulate a host whose kernel does not provide the link kind.
-      await app.execServer([
-        'sh',
-        '-ec',
-        `cat > /usr/local/bin/ip <<'SH'
+for (const backend of ['wg', 'awg'] as const) {
+  test.describe(backend, () => {
+    test.use({ backend });
+    for (const userspace of [false, true]) {
+      test(`starts without the server quick script and carries traffic (${userspace ? 'userspace' : 'kernel'})`, async ({
+        request,
+        app,
+      }) => {
+        const kind = backend === 'awg' ? 'amneziawg' : 'wireguard';
+        if (!userspace) {
+          try {
+            await app.execServer([
+              'ip',
+              'link',
+              'add',
+              'backend-probe',
+              'type',
+              kind,
+            ]);
+          } catch (error) {
+            test.skip(
+              error instanceof Error &&
+                /unknown device type|operation not supported/i.test(
+                  error.message
+                ),
+              `Kernel does not provide ${kind}`
+            );
+            throw error;
+          }
+          await app.execServer(['ip', 'link', 'del', 'backend-probe']);
+        }
+        const headers = { Origin: app.url };
+        const post = (url: string, data?: object) =>
+          request.post(url, { headers, data, failOnStatusCode: true });
+        await post('/api/auth/password', { ...credentials, remember: false });
+        const settings = await (
+          await request.get('/api/admin/interface')
+        ).json();
+        await post('/api/admin/interface', { ...settings, s1: 122, jC: 8 });
+        const peer = await post('/api/client', {
+          name: 'Site router',
+          expiresAt: null,
+        });
+        const url = '/api/client/' + (await peer.json()).clientId;
+        const client = await (await request.get(url)).json();
+        const site = '192.0.2.0/24';
+        await post(url, { ...client, jC: 3, serverAllowedIps: [site] });
+        await app.execServer([
+          'mv',
+          `/usr/bin/${backend}-quick`,
+          '/tmp/unused-quick',
+        ]);
+        if (userspace) {
+          // Simulate a host whose kernel does not provide the link kind.
+          await app.execServer([
+            'sh',
+            '-ec',
+            `cat > /usr/local/bin/ip <<'SH'
 #!/bin/sh
 case " $* " in
-  *" link add "*" type wireguard "*) echo 'Error: Unknown device type.' >&2; exit 2 ;;
+  *" link add "*" type ${kind} "*) echo 'Error: Unknown device type.' >&2; exit 2 ;;
 esac
 exec /sbin/ip "$@"
 SH
 chmod +x /usr/local/bin/ip`,
-      ]);
+          ]);
+        }
+        const phases = '/tmp/tunnel-phases';
+        await post('/api/admin/hooks', {
+          preUp: `ip link show dev %i && echo PreUp >> ${phases}`,
+          postUp: `${backend} show %i peers | grep -Fx '${client.publicKey}'; ip address show dev %i | grep '10.8.0.1/24'; ip route show exact ${site} | grep 'dev %i'; echo PostUp >> ${phases}`,
+          preDown: `ip link show dev %i && echo PreDown >> ${phases}`,
+          postDown: `test ! -e /sys/class/net/%i && echo PostDown >> ${phases}`,
+        });
+        await post('/api/admin/interface/restart');
+        if (userspace) {
+          expect(
+            await app.execServer(['ip', '-details', 'link', 'show', 'wg0'])
+          ).toContain('tun type tun');
+        } else {
+          expect(
+            await app.execServer(['ip', '-details', 'link', 'show', 'wg0'])
+          ).toContain(kind);
+        }
+        const config = await (await request.get(url + '/configuration')).text();
+        // S1 is shared. Each end has its own junk packet count.
+        const parameters = (contents: string) =>
+          contents
+            .split('\n')
+            .filter((line) => /^(Jc|S1) = /.test(line))
+            .sort();
+        const serverParams = backend === 'awg' ? ['Jc = 8', 'S1 = 122'] : [];
+        const peerParams = backend === 'awg' ? ['Jc = 3', 'S1 = 122'] : [];
+        expect(
+          parameters(await app.execServer([backend, 'showconf', 'wg0']))
+        ).toEqual(serverParams);
+        expect(
+          parameters(await app.execServer(['cat', '/etc/wireguard/wg0.conf']))
+        ).toEqual(serverParams);
+        expect(parameters(config)).toEqual(peerParams);
+        await app.connectClient(config);
+        await expect.poll(() => app.pingFromClient('10.8.0.1')).toBe(true);
+        await app.restart();
+        expect(await app.execServer(['cat', phases])).toBe(
+          'PreUp\nPostUp\nPreDown\nPostDown\nPreUp\nPostUp'
+        );
+      });
     }
-    const phases = '/tmp/tunnel-phases';
-    await post('/api/admin/hooks', {
-      preUp: `ip link show dev %i && echo PreUp >> ${phases}`,
-      postUp: `wg show %i peers | grep -Fx '${client.publicKey}'; ip address show dev %i | grep '10.8.0.1/24'; ip route show exact ${site} | grep 'dev %i'; echo PostUp >> ${phases}`,
-      preDown: `ip link show dev %i && echo PreDown >> ${phases}`,
-      postDown: `test ! -e /sys/class/net/%i && echo PostDown >> ${phases}`,
-    });
-    await post('/api/admin/interface/restart');
-    if (userspace) {
-      expect(
-        await app.execServer(['ip', '-details', 'link', 'show', 'wg0'])
-      ).toContain('tun type tun');
-    }
-    const config = await (await request.get(url + '/configuration')).text();
-    await app.connectClient(config);
-    await expect.poll(() => app.pingFromClient('10.8.0.1')).toBe(true);
-    await post('/api/admin/interface/restart');
-    expect(await app.execServer(['cat', phases])).toBe(
-      'PreUp\nPostUp\nPreDown\nPostDown\nPreUp\nPostUp'
-    );
   });
 }
 
