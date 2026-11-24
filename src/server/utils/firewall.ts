@@ -24,8 +24,12 @@ function chainName(interfaceName: string) {
 // Each caller waits for its own snapshot, including disabling filtering.
 let pendingRebuild: Promise<void> = Promise.resolve();
 
+// Other processes in the namespace can hold the xtables lock during recovery.
+const ipv4Tables = 'iptables -w';
+const ipv6Tables = 'ip6tables -w';
+
 function commands(enableIpv6: boolean) {
-  return enableIpv6 ? ['iptables', 'ip6tables'] : ['iptables'];
+  return enableIpv6 ? [ipv4Tables, ipv6Tables] : [ipv4Tables];
 }
 
 const trafficChains = ['FORWARD', 'INPUT'] as const;
@@ -357,31 +361,19 @@ export const firewall = {
 
     for (const ipEntry of effectiveIps) {
       const parsed = parseFirewallEntry(ipEntry);
-      const baseIp = parsed.ip.split('/')[0] ?? parsed.ip; // Handle CIDR by checking base IP
-      const destIsIpv6 = isIPv6(baseIp);
-
-      if (destIsIpv6) {
-        if (enableIpv6 && client.ipv6Address) {
-          const rules = generateRuleArgs(
-            interfaceName,
-            client.ipv6Address,
-            parsed,
-            comment
-          );
-          for (const rule of rules) {
-            await exec(`ip6tables ${rule}`);
-          }
-        }
-      } else if (client.ipv4Address) {
-        const rules = generateRuleArgs(
-          interfaceName,
-          client.ipv4Address,
-          parsed,
-          comment
-        );
-        for (const rule of rules) {
-          await exec(`iptables ${rule}`);
-        }
+      const ipv6 = isIPv6(parsed.ip.split('/')[0]!);
+      const source = ipv6 ? client.ipv6Address : client.ipv4Address;
+      if (!source || (ipv6 && !enableIpv6)) {
+        continue;
+      }
+      const command = ipv6 ? ipv6Tables : ipv4Tables;
+      for (const rule of generateRuleArgs(
+        interfaceName,
+        source,
+        parsed,
+        comment
+      )) {
+        await exec(`${command} ${rule}`);
       }
     }
   },
@@ -428,7 +420,7 @@ export const firewall = {
           enableIpv6
         );
         for (const { source, ipv6 } of routedSites(client, enableIpv6)) {
-          const command = ipv6 ? 'ip6tables' : 'iptables';
+          const command = ipv6 ? ipv6Tables : ipv4Tables;
           const pool = normalizePrefix(
             ipv6 ? wgInterface.ipv6Cidr : wgInterface.ipv4Cidr
           );
@@ -440,9 +432,8 @@ export const firewall = {
 
       // Add final DROP for any traffic not explicitly allowed
       const chain = chainName(wgInterface.name);
-      await exec(`iptables -A ${chain} -j DROP`);
-      if (enableIpv6) {
-        await exec(`ip6tables -A ${chain} -j DROP`);
+      for (const command of commands(enableIpv6)) {
+        await exec(`${command} -A ${chain} -j DROP`);
       }
 
       // Keep the DROP guard first, including if removing it later fails.

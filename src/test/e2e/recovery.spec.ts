@@ -26,7 +26,7 @@ for (const backend of ['wg', 'awg'] as const) {
       await post(iface + '/restart');
       const read = (path: string) => app.execServer(['cat', path]);
       const index = await read('/sys/class/net/wg0/ifindex');
-      const rules = () => app.execServer(['iptables', '-S', 'INPUT']);
+      const rules = () => app.execServer(['iptables', '-w', '-S', 'INPUT']);
       const sentinel = [
         'INPUT',
         '-m',
@@ -64,9 +64,16 @@ for (const backend of ['wg', 'awg'] as const) {
       expect(oldPolicy).toMatch(/wg-easy-[\da-f-]+/);
       // The old generation gained filtering during a live edit.
       await post(iface, { ...settings, firewallEnabled: true });
-      expect(await app.execServer(['ip6tables', '-S'])).toContain(
+      expect(await app.execServer(['ip6tables', '-w', '-S'])).toContain(
         'WG_CLIENTS_wg0'
       );
+      // A firewall reader can hold the lock while the running rules are edited.
+      await app.execServer([
+        'sh',
+        '-ec',
+        `flock /run/xtables.lock sh -c 'touch /tmp/locked; sleep 2' >/dev/null 2>&1 &
+while [ ! -f /tmp/locked ]; do sleep 0.05; done`,
+      ]);
       await hooks('new-hook');
       await post(iface, {
         ...settings,
@@ -79,27 +86,29 @@ for (const backend of ['wg', 'awg'] as const) {
       expect(await rules()).toContain('old-hook');
       const namespace = await app.execServer(['readlink', '/proc/self/ns/net']);
       await app.startProcess(true);
+      // The new generation records its down hooks after PostUp finishes.
       await expect
-        .poll(() => rules(), { timeout: 12000 })
+        .poll(() => read(record).catch(() => ''), { timeout: 12000 })
         .toContain('new-hook');
       expect(await app.execServer(['readlink', '/proc/self/ns/net'])).toBe(
         namespace
       );
-      expect(await rules()).not.toContain('old-hook');
+      const recoveredRules = await rules();
+      expect(recoveredRules).not.toContain('old-hook');
       expect(
-        (await rules()).match(/-i lo .*--dport 51830 .*new-hook/g)
+        recoveredRules.match(/-i lo .*--dport 51830 .*new-hook/g)
       ).toHaveLength(1);
-      expect(await rules()).toContain('foreign-rule');
+      expect(recoveredRules).toContain('foreign-rule');
       expect(await read('/tmp/teardowns')).toBe('old-hook-wg0-51820-false');
       expect(
-        await app.execServer(['iptables', '-t', 'mangle', '-S'])
+        await app.execServer(['iptables', '-w', '-t', 'mangle', '-S'])
       ).not.toContain(oldPolicy.match(/wg-easy-[\da-f-]+/)![0]);
       expect((await policy('-4')).match(/not .*fwmark/g)).toHaveLength(1);
       expect(await policy('-6')).not.toContain('fwmark');
-      expect(await app.execServer(['ip6tables', '-S'])).not.toMatch(
+      expect(await app.execServer(['ip6tables', '-w', '-S'])).not.toMatch(
         /WG_CLIENTS_wg0|wg-easy rebuild wg0/
       );
-      expect(await app.execServer(['iptables', '-S'])).toContain(
+      expect(await app.execServer(['iptables', '-w', '-S'])).toContain(
         'WG_CLIENTS_wg0'
       );
       // The advertised endpoint has no port forwarder in this fixture.
@@ -114,7 +123,7 @@ for (const backend of ['wg', 'awg'] as const) {
         'old-hook-wg0-51820-false\nnew-hook-wg0-51830-true'
       );
       expect(await rules()).not.toMatch(/old-hook|new-hook/);
-      expect(await app.execServer(['iptables', '-S'])).not.toMatch(
+      expect(await app.execServer(['iptables', '-w', '-S'])).not.toMatch(
         /WG_CLIENTS_wg0|wg-easy rebuild wg0/
       );
       expect(await rules()).toContain('foreign-rule');
@@ -205,7 +214,7 @@ for (const evidence of [
         app.execServer(['cat', '/sys/class/net/wg0/ifalias']),
         app.execServer(['ip', 'route', 'show', 'table', '741']),
         app.execServer(['ip', 'rule', 'show']),
-        app.execServer(['iptables', '-S']),
+        app.execServer(['iptables', '-w', '-S']),
       ]);
     const before = await inspect();
     await app.startProcess();
