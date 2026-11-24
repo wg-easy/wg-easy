@@ -1,7 +1,7 @@
 import { createError } from 'nuxt/server';
 import { parseCidr } from 'cidr-tools';
 
-import { managedSitePrefixes } from './configuration';
+import { peerAllowedIps } from './configuration';
 
 import { exec } from '#server/utils/cmd';
 import { normalizePrefix } from '#server/utils/ip';
@@ -110,27 +110,17 @@ export class SiteRoutes {
     if (setting === 'off') {
       return desired;
     }
-    const sites = managedSitePrefixes(clients, enableIpv6);
-    if (!sites.size && !this.owned.size) {
-      return desired;
-    }
     const table = routingTable(setting);
-    // An enabled peer's tunnel address can keep an existing site route alive.
-    const addresses = this.owned.size
-      ? clients
-          .filter((client) => client.enabled)
-          .flatMap((client) =>
-            enableIpv6
-              ? [client.ipv4Address, client.ipv6Address]
-              : [client.ipv4Address]
-          )
-          .map(normalizePrefix)
-      : [];
-    for (const prefix of [...sites, ...addresses]) {
-      const route = { prefix, table };
-      const key = routeKey(route);
-      if (sites.has(prefix) || this.owned.has(key)) {
-        desired.set(key, route);
+    for (const client of clients) {
+      if (!client.enabled) {
+        continue;
+      }
+      for (const value of peerAllowedIps(client, enableIpv6)) {
+        const prefix = normalizePrefix(value);
+        if (!prefix.endsWith('/0')) {
+          const route = { prefix, table };
+          desired.set(routeKey(route), route);
+        }
       }
     }
     return desired;

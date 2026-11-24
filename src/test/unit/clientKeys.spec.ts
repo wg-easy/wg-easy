@@ -65,6 +65,12 @@ beforeEach(async () => {
   writeFile.mockResolvedValue();
   getCurrentUser.mockResolvedValue({ id: 1, role: 1 });
   exec.mockImplementation(async (command: string) => {
+    if (command.includes('route show table all match')) {
+      const dst = command.startsWith('ip -4')
+        ? '10.8.0.0/24'
+        : 'fdcc:ad94:bacf:61a4::/64';
+      return JSON.stringify([{ dst, dev: 'wg0', protocol: 'kernel' }]);
+    }
     if (command === 'wg genpsk') {
       return 'new-preshared-key';
     }

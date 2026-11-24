@@ -123,14 +123,21 @@ function serverAllowedIps(
   );
 }
 
-function generateServerPeer(client: ServerPeer, options: ServerOptions = {}) {
-  const { enableIpv6 = true } = options;
-
-  const allowedIps = [
+export function peerAllowedIps(
+  client: Pick<ServerPeer, 'ipv4Address' | 'ipv6Address' | 'serverAllowedIps'>,
+  enableIpv6: boolean
+) {
+  return [
     `${client.ipv4Address}/32`,
     ...(enableIpv6 ? [`${client.ipv6Address}/128`] : []),
     ...serverAllowedIps(client, enableIpv6),
-  ].filter((prefix) => !options.managedSites?.has(normalizePrefix(prefix)));
+  ];
+}
+
+function generateServerPeer(client: ServerPeer, options: ServerOptions = {}) {
+  const allowedIps = peerAllowedIps(client, options.enableIpv6 ?? true).filter(
+    (prefix) => !options.managedSites?.has(normalizePrefix(prefix))
+  );
 
   const lines = [
     `# Client: ${client.name} (${client.id})`,
@@ -148,6 +155,15 @@ function generateServerPeer(client: ServerPeer, options: ServerOptions = {}) {
   return lines.join('\n');
 }
 
+export function tunnelAddresses(network: InterfaceType, enableIpv6: boolean) {
+  return [network.ipv4Cidr, ...(enableIpv6 ? [network.ipv6Cidr] : [])].map(
+    (value) => {
+      const cidr = parseCidr(value);
+      return `${getGatewayAddress(cidr)}/${cidr.prefix}`;
+    }
+  );
+}
+
 function generateServerInterface(
   wgInterface: InterfaceType,
   hooks: HooksType,
@@ -155,14 +171,7 @@ function generateServerInterface(
 ) {
   const { enableIpv6 = true } = options;
 
-  const cidr4 = parseCidr(wgInterface.ipv4Cidr);
-  const cidr6 = parseCidr(wgInterface.ipv6Cidr);
-  const ipv4Addr = getGatewayAddress(cidr4);
-  const ipv6Addr = getGatewayAddress(cidr6);
-
-  const address =
-    `${ipv4Addr}/${cidr4.prefix}` +
-    (enableIpv6 ? `, ${ipv6Addr}/${cidr6.prefix}` : '');
+  const address = tunnelAddresses(wgInterface, enableIpv6).join(', ');
 
   const extraLines = options.amnezia ? buildAwgLines(wgInterface) : [];
   const configHook = (text: string) =>
@@ -271,7 +280,11 @@ function removeNewlines(text: string) {
   return text.replace(/\r\n|\r|\n/g, ' ');
 }
 
-function expandHook(text: string, network: InterfaceType, uiPort: string) {
+export function expandHook(
+  text: string,
+  network: InterfaceType,
+  uiPort: string
+) {
   const values: Record<string, string> = {
     ipv4Cidr: normalizeCidr(network.ipv4Cidr),
     ipv6Cidr: normalizeCidr(network.ipv6Cidr),

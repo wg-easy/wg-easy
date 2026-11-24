@@ -6,6 +6,7 @@ import { databaseFixture } from './database';
 
 import * as schema from '#db/schema';
 import { roles } from '#shared/utils/permissions';
+import { LinuxTunnel } from '#server/utils/linuxTunnel';
 import { wg } from '#server/utils/wgHelper';
 import { firewall } from '#server/utils/firewall';
 vi.mock('#server/utils/config', () => ({
@@ -41,9 +42,13 @@ export async function vpnFixture() {
   });
   vi.spyOn(wg, 'generatePreSharedKey').mockResolvedValue('new-preshared');
   vi.spyOn(wg, 'dump').mockResolvedValue([]);
-  vi.spyOn(wg, 'up').mockResolvedValue('');
-  vi.spyOn(wg, 'down').mockResolvedValue();
-  vi.spyOn(wg, 'postUp').mockResolvedValue('');
+  const up = vi.spyOn(LinuxTunnel.prototype, 'create').mockResolvedValue();
+  const down = vi.spyOn(LinuxTunnel.prototype, 'stop').mockResolvedValue();
+  vi.spyOn(LinuxTunnel.prototype, 'checkOwnership').mockResolvedValue(
+    undefined
+  );
+  vi.spyOn(LinuxTunnel.prototype, 'configureLink').mockResolvedValue();
+  vi.spyOn(wg, 'runHook').mockResolvedValue('');
   vi.spyOn(wg, 'sync').mockResolvedValue('');
   vi.spyOn(wg, 'removePeer').mockResolvedValue('');
   const writeConfiguration = vi.spyOn(fs, 'writeFile').mockResolvedValue();
@@ -55,7 +60,7 @@ export async function vpnFixture() {
   return {
     db,
     store,
-    commands: vi.mocked(wg),
+    commands: { ...vi.mocked(wg), up, down },
     writeConfiguration,
     firewall: vi.mocked(firewall),
   };

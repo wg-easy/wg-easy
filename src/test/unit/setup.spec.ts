@@ -10,6 +10,7 @@ import * as setup from '#server/features/setup';
 import { getIpInformation } from '#server/utils/ip';
 import { roles } from '#shared/utils/permissions';
 import { zeroWireGuardKey } from '#shared/utils/wireguard';
+import { LinuxTunnel } from '#server/utils/linuxTunnel';
 import { wg } from '#server/utils/wgHelper';
 import { firewall } from '#server/utils/firewall';
 import { maintain } from '#server/features/vpn/lifecycle';
@@ -26,9 +27,13 @@ async function fixture() {
   const writeConfiguration = vi.spyOn(fs, 'writeFile').mockResolvedValue();
   vi.spyOn(wg, 'dump').mockResolvedValue([]);
   const sync = vi.spyOn(wg, 'sync').mockResolvedValue('');
-  vi.spyOn(wg, 'down').mockResolvedValue();
-  vi.spyOn(wg, 'postUp').mockResolvedValue('');
-  const up = vi.spyOn(wg, 'up').mockResolvedValue('');
+  vi.spyOn(LinuxTunnel.prototype, 'stop').mockResolvedValue();
+  vi.spyOn(LinuxTunnel.prototype, 'checkOwnership').mockResolvedValue(
+    undefined
+  );
+  vi.spyOn(wg, 'runHook').mockResolvedValue('');
+  const up = vi.spyOn(LinuxTunnel.prototype, 'create').mockResolvedValue();
+  vi.spyOn(LinuxTunnel.prototype, 'configureLink').mockResolvedValue();
   vi.spyOn(firewall, 'rebuildRules').mockResolvedValue();
   onTestFinished(() => vi.restoreAllMocks());
   const ipInformation = vi

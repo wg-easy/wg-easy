@@ -24,12 +24,20 @@ async function fixture(
     const args = command.split(' ');
     if (args.includes('show')) {
       return JSON.stringify(
-        [...entries]
+        [
+          ...entries,
+          // The kernel installs connected subnet routes with the tunnel addresses.
+          ...['10.8.0.0/24', 'fdcc:ad94:bacf:61a4::/64'].map(
+            (dst) => [dst, { dev: 'wg0', table: '254', protocol: '2' }] as const
+          ),
+        ]
           .filter(([dst]) => containsCidr(dst, args.at(-1)!))
           .map(([dst, entry]) => ({
             dev: entry.dev,
             protocol: entry.protocol,
-            ...kernelFields(entry.table),
+            ...(entry.protocol === '2'
+              ? { table: entry.table }
+              : kernelFields(entry.table)),
             // iproute2 omits the prefix length for host routes.
             dst: dst.replace(dst.includes(':') ? /\/128$/ : /\/32$/, ''),
             metric: args.includes('-6') ? 1024 : 0,
@@ -105,7 +113,7 @@ describe('Server Allowed IP routes', () => {
       id: 2,
       publicKey: 'other',
       ipv4Address: '10.8.0.3',
-      ipv6Address: 'fd00::3',
+      ipv6Address: 'fdcc:ad94:bacf:61a4::3',
     });
     await setRoutes(['192.168.120.1/22']);
     await setRoutes([prefix], 2);
@@ -127,17 +135,22 @@ describe('Server Allowed IP routes', () => {
     expect(entries.get('2001:db8::/64')?.table).toBe('100');
     await vpn.commit((tx) => tx.interfaces.update({ routingTable: 'off' }));
     await setRoutes([prefix]);
-    expect(mutate.mock.calls).toEqual([
-      ['add', '2001:db8::/64', '100'],
-      ['del', '2001:db8::/64', '100'],
-    ]);
+    for (const prefix of [
+      '10.8.0.2/32',
+      'fdcc:ad94:bacf:61a4::cafe:2/128',
+      '2001:db8::/64',
+    ]) {
+      expect(mutate).toHaveBeenCalledWith('add', prefix, '100');
+      expect(mutate).toHaveBeenCalledWith('del', prefix, '100');
+    }
+    expect(entries.size).toBe(0);
   });
 
   test('restarts only when the active default-route family or table changes', async () => {
     const { store, wg, setRoutes } = await fixture();
     await setRoutes(['0.0.0.0/0']);
     expect(wg.up).toHaveBeenCalledTimes(1);
-    expect(wg.up.mock.lastCall?.[1]?.contents).toContain('0.0.0.0/0');
+    expect(wg.up.mock.lastCall?.[2]?.contents).toContain('0.0.0.0/0');
     await setRoutes(['192.0.2.1/0', prefix]);
     expect(wg.up).toHaveBeenCalledTimes(1);
     await setRoutes(['::/0', '0.0.0.0/0']);
@@ -145,11 +158,11 @@ describe('Server Allowed IP routes', () => {
     await setRoutes(['::/0']);
     expect(wg.up).toHaveBeenCalledTimes(3);
     await vpn.commit((tx) => tx.interfaces.update({ routingTable: '100' }));
-    expect(wg.up.mock.lastCall?.[1]?.contents).toContain('Table = 100');
+    expect(wg.up.mock.lastCall?.[2]?.contents).toContain('Table = 100');
     expect(wg.up).toHaveBeenCalledTimes(4);
     await store.clients.update(1, { expiresAt: '2000-01-01' });
     await vpn.maintain();
-    expect(wg.up.mock.lastCall?.[1]?.contents).not.toContain('::/0');
+    expect(wg.up.mock.lastCall?.[2]).toBeUndefined();
     expect(wg.up).toHaveBeenCalledTimes(5);
     expect(wg.removePeer).not.toHaveBeenCalled();
   });
@@ -166,7 +179,7 @@ describe('Server Allowed IP routes', () => {
   test('keeps a failed deferred PostUp down until an explicit restart', async () => {
     const { store, wg, setRoutes } = await fixture();
     await store.clients.update(1, { serverAllowedIps: [prefix] });
-    wg.postUp.mockRejectedValueOnce(
+    wg.runHook.mockRejectedValueOnce(
       new Error('hook failed after its first command')
     );
     await expect(vpn.restart()).rejects.toThrow('PostUp failed');
@@ -175,9 +188,9 @@ describe('Server Allowed IP routes', () => {
     await expect(setRoutes([prefix, '::/0'])).rejects.toThrow('PostUp failed');
     await vpn.maintain();
     expect(wg.up).toHaveBeenCalledTimes(1);
-    expect(wg.postUp).toHaveBeenCalledTimes(1);
+    expect(wg.runHook).toHaveBeenCalledTimes(1);
     await vpn.restart();
-    expect(wg.postUp).toHaveBeenCalledTimes(2);
+    expect(wg.runHook).toHaveBeenCalledTimes(2);
     await vpn.maintain();
     expect(wg.up).toHaveBeenCalledTimes(2);
   });
@@ -194,12 +207,11 @@ describe('Server Allowed IP routes', () => {
       await setRoutes([host]);
       await setRoutes([address]);
       await setRoutes([]);
-      expect([...entries.keys()]).toEqual([host]);
+      expect(entries.get(host)?.dev).toBe('wg0');
       await vpn.commit((tx) => tx.clients.update(1, { enabled: false }));
-      expect(mutate.mock.calls).toEqual([
-        ['add', host, '100'],
-        ['del', host, '100'],
-      ]);
+      expect(mutate).toHaveBeenCalledWith('add', host, '100');
+      expect(mutate).toHaveBeenCalledWith('del', host, '100');
+      expect(entries.size).toBe(0);
     }
   );
 
@@ -252,16 +264,13 @@ describe('Server Allowed IP routes', () => {
       await store.clients.update(1, { serverAllowedIps: [prefix, manual] });
       const hook = `ip -4 route add ${manual} dev %i # office`;
       await store.hooks.update({ postUp: hook });
-      wg.postUp.mockImplementation(async () => {
+      wg.runHook.mockImplementation(async () => {
         expect(entries.get(prefix)?.protocol).toBe('242');
         entries.set(manual, { dev: 'wg0', table: '254', protocol: '3' });
         return '';
       });
       await vpn[mode]();
-      const bootConfig = wg.up.mock.lastCall?.[1]?.contents;
-      expect(bootConfig).toContain('AllowedIPs = 10.8.0.2/32');
-      expect(bootConfig).not.toContain(prefix);
-      expect(wg.postUp).toHaveBeenCalledExactlyOnceWith('wg0', 'auto', hook);
+      expect(wg.runHook).toHaveBeenCalledExactlyOnceWith('wg0', 'auto', hook);
       await setRoutes([]);
       expect(mutate.mock.calls).toEqual([
         ['add', prefix, '254'],

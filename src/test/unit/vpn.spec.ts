@@ -257,7 +257,7 @@ describe('VPN operations', () => {
     await vpn.maintain();
     expect(firewall.rebuildRules).toHaveBeenCalledTimes(2);
     expect(commands.up).toHaveBeenCalledOnce();
-    expect(commands.up.mock.lastCall?.[1]?.nativePostUp).toBe(true);
+    expect(commands.runHook).toHaveBeenCalledOnce();
   });
 
   test('retries only shutdown when cleanup after a failed PostUp also fails', async () => {
@@ -272,7 +272,7 @@ describe('VPN operations', () => {
     await vpn.maintain();
     expect(commands.down).toHaveBeenCalledTimes(3);
     expect(commands.up).toHaveBeenCalledOnce();
-    expect(commands.postUp).not.toHaveBeenCalled();
+    expect(commands.runHook).not.toHaveBeenCalled();
   });
 
   test('retries a failed start without replacing the initialized server identity', async () => {
@@ -487,10 +487,8 @@ describe('VPN operations', () => {
     expect(writeConfiguration.mock.calls[0]?.[1]).toContain(
       'PrivateKey = new-private'
     );
-    expect(commands.up).toHaveBeenCalledWith(
-      'wg0',
-      expect.objectContaining({ nativePostUp: true })
-    );
+    expect(commands.up).toHaveBeenCalledOnce();
+    expect(commands.up.mock.lastCall?.[0].publicKey).toBe('new-public');
     expect(firewall.rebuildRules).toHaveBeenCalledOnce();
     await vpn.stop();
     expect(commands.down).toHaveBeenCalledTimes(2);

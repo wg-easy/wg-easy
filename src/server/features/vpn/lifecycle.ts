@@ -6,6 +6,7 @@ import { createError } from 'nuxt/server';
 import { isExpired } from './policies';
 import {
   defaultRoutePolicy,
+  expandHook,
   generateServerConfig,
   generateStartupConfig,
 } from './configuration';
@@ -20,11 +21,13 @@ import {
   routedReplyFamilies,
 } from '#server/utils/firewall';
 import { WG_ENV } from '#server/utils/config';
+import { LinuxTunnel } from '#server/utils/linuxTunnel';
 import { setTunnelMtu } from '#server/utils/tunnelMtu';
 
 let pending: Promise<unknown> = Promise.resolve();
 type ApplyMode = 'sync' | 'start' | 'restart';
 type HostState = {
+  tunnel: LinuxTunnel;
   routes: SiteRoutes;
   defaultRoutes: ReturnType<typeof defaultRoutePolicy>;
   mtu?: number | null;
@@ -32,7 +35,6 @@ type HostState = {
   failedStart?: {
     error: Error;
     name: string;
-    routingTable: string;
     cleanupPending: boolean;
   };
 };
@@ -46,10 +48,11 @@ function enqueue<T>(operation: () => Promise<T>) {
 }
 
 async function cleanFailedStart(
+  tunnel: LinuxTunnel,
   failure: NonNullable<HostState['failedStart']>
 ) {
   if (failure.cleanupPending) {
-    await wg.down(failure.name, { routingTable: failure.routingTable });
+    await tunnel.stop(failure.name, true);
     failure.cleanupPending = false;
   }
 }
@@ -57,7 +60,6 @@ async function cleanFailedStart(
 async function failedPostUp(
   state: HostState,
   name: string,
-  routingTable: string,
   cause: unknown
 ): Promise<never> {
   // An arbitrary hook may have applied external effects before failing.
@@ -68,9 +70,9 @@ async function failedPostUp(
       'PostUp failed. Check the hook and its effects, then restart the VPN interface from the admin panel.',
     cause,
   });
-  state.failedStart = { name, routingTable, error, cleanupPending: true };
+  state.failedStart = { name, error, cleanupPending: true };
   try {
-    await cleanFailedStart(state.failedStart);
+    await cleanFailedStart(state.tunnel, state.failedStart);
     delete state.retry;
   } catch (error) {
     console.error('Could not shut down the VPN after PostUp failed:', error);
@@ -82,7 +84,11 @@ async function apply(mode?: ApplyMode) {
   const database = getDatabase();
   let state = hostStates.get(database);
   if (!state) {
-    state = { routes: new SiteRoutes(), defaultRoutes: {} };
+    state = {
+      tunnel: new LinuxTunnel(),
+      routes: new SiteRoutes(),
+      defaultRoutes: {},
+    };
     hostStates.set(database, state);
   }
   const manualRestart = mode === 'restart' || mode === 'start';
@@ -105,7 +111,7 @@ async function apply(mode?: ApplyMode) {
   );
   const enableIpv6 = !WG_ENV.DISABLE_IPV6;
   if (state.failedStart) {
-    await cleanFailedStart(state.failedStart);
+    await cleanFailedStart(state.tunnel, state.failedStart);
     if (!manualRestart) {
       delete state.retry;
       throw state.failedStart.error;
@@ -124,6 +130,7 @@ async function apply(mode?: ApplyMode) {
     mode = 'restart';
     state.retry = mode;
   }
+  await state.tunnel.checkOwnership(network.name);
   if (network.firewallEnabled) {
     await firewall.blockTraffic(network.name, enableIpv6);
   }
@@ -144,7 +151,7 @@ async function apply(mode?: ApplyMode) {
   } else {
     // wg-quick down needs the old Table setting and the live peer AllowedIPs
     // to remove its default-route policy before the new configuration is written.
-    await wg.down(network.name);
+    await state.tunnel.stop(network.name);
   }
   const options = {
     enableIpv6,
@@ -152,58 +159,57 @@ async function apply(mode?: ApplyMode) {
     uiPort: WG_ENV.PORT,
   };
   const contents = generateServerConfig(network, hooks, clients, options);
-  const startup =
-    mode === 'sync'
-      ? undefined
-      : generateStartupConfig(network, hooks, clients, options);
-
   await fs.writeFile(`/etc/wireguard/${network.name}.conf`, contents, {
     mode: 0o600,
   });
-  if (mode !== 'sync') {
+  if (mode === 'sync') {
+    await wg.sync(network, clients, enableIpv6);
+    if (state.mtu !== undefined && state.mtu !== network.mtu) {
+      await setTunnelMtu(network.name, network.mtu);
+    }
+  } else {
+    // Until live default policies are available, quick handles those
+    // deployments. AmneziaWG also uses its existing startup path for now.
+    const quick =
+      options.amnezia || Boolean(defaultRoutes.ipv4 || defaultRoutes.ipv6);
+    const startup = quick
+      ? generateStartupConfig(network, hooks, clients, options)
+      : undefined;
+    const postUp = quick
+      ? startup?.postUp
+      : expandHook(hooks.postUp, network, options.uiPort);
+    state.routes = new SiteRoutes();
     try {
-      const config =
-        startup ??
-        (hooks.postUp ? { contents, nativePostUp: true } : undefined);
-      await wg.up(network.name, config);
+      await state.tunnel.create(
+        network,
+        hooks,
+        quick
+          ? (startup ?? { contents, nativePostUp: Boolean(hooks.postUp) })
+          : undefined
+      );
+      await wg.sync(network, clients, enableIpv6);
+      if (!quick) {
+        await state.tunnel.configureLink(network, enableIpv6);
+      }
     } catch (error) {
       if (error instanceof NativePostUpError) {
-        return failedPostUp(state, network.name, network.routingTable, error);
+        return failedPostUp(state, network.name, error);
       }
-      if (
-        error instanceof Error &&
-        error.message.includes(`Cannot find device "${network.name}"`)
-      ) {
-        throw new Error(
-          `WireGuard exited with the error: Cannot find device "${network.name}"\nThis usually means that your host's kernel does not support WireGuard!`,
-          { cause: error }
-        );
-      }
+      await state.tunnel.stop(network.name, true);
       throw error;
     }
-    state.routes = new SiteRoutes();
     state.defaultRoutes = defaultRoutes;
-    state.mtu = network.mtu;
-    // Any native PostUp has completed. A sync failure must not replay it.
-    if (!startup?.postUp) {
-      state.retry = 'sync';
+    if (postUp) {
+      // A hook may use a site route, or supply a missing one itself.
+      await state.routes.sync(network, clients, enableIpv6);
+      try {
+        await wg.runHook(network.name, network.routingTable, postUp);
+      } catch (cause) {
+        return failedPostUp(state, network.name, cause);
+      }
     }
-  }
-  await wg.sync(network, clients, enableIpv6);
-  if (state.mtu !== undefined && state.mtu !== network.mtu) {
-    await setTunnelMtu(network.name, network.mtu);
   }
   state.mtu = network.mtu;
-  if (startup?.postUp) {
-    // PostUp may use a site route, or supply one itself. Apply available
-    // routes first, then check the final kernel state after the hook.
-    await state.routes.sync(network, clients, enableIpv6);
-    try {
-      await wg.postUp(network.name, network.routingTable, startup.postUp);
-    } catch (cause) {
-      return failedPostUp(state, network.name, network.routingTable, cause);
-    }
-  }
   // The interface and its hooks are up. Retry subsequent failures live.
   state.retry = 'sync';
   await firewall.rebuildRules(network, clients, defaults, enableIpv6);
@@ -330,11 +336,11 @@ export function stop() {
   return enqueue(async () => {
     const database = getDatabase();
     const network = await database.interfaces.get();
-    const failure = hostStates.get(database)?.failedStart;
-    if (failure) {
-      await cleanFailedStart(failure);
+    const state = hostStates.get(database);
+    if (state?.failedStart) {
+      await cleanFailedStart(state.tunnel, state.failedStart);
     } else {
-      await wg.down(network.name).catch(() => {});
+      await state?.tunnel.stop(network.name);
     }
     hostStates.delete(database);
   });

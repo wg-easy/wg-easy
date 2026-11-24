@@ -94,7 +94,7 @@ export const wg = {
     }
   },
 
-  postUp: (infName: string, table: string, hook: string) => {
+  runHook: (infName: string, table: string, hook: string) => {
     const name = parseInterfaceName(infName);
     return exec(
       `set -eo pipefail

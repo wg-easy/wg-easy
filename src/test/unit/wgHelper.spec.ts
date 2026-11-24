@@ -26,14 +26,14 @@ test.each(['wg', 'awg'])(
         (await runBash('bash', ['-c', script], { env })).stdout.trim()
       );
       expect(
-        await backendWg.postUp(
+        await backendWg.runHook(
           'wg0',
           '100',
           'cmd echo %i "$INTERFACE" "$TABLE" "$CONFIG_FILE" office#lan "hq #1" # comment'
         )
       ).toBe('wg0 wg0 100 /etc/wireguard/wg0.conf office#lan hq #1');
       await expect(
-        backendWg.postUp('wg0', '100', 'false | true')
+        backendWg.runHook('wg0', '100', 'false | true')
       ).rejects.toThrow();
     } finally {
       config.WG_EXECUTABLE = 'wg';
