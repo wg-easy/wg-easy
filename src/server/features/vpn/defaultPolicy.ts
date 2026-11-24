@@ -491,7 +491,8 @@ export class DefaultPolicy {
       if (!setting && !this.state.owned[family].length) {
         continue;
       }
-      let table = setting;
+      const previous = this.state.owned[family].find((item) => 'table' in item);
+      let table = setting ?? String(previous?.table ?? 254);
       try {
         const auto =
           setting === 'auto' ? await this.automatic(name) : undefined;
@@ -508,7 +509,7 @@ export class DefaultPolicy {
         failure ??= createError({
           status: cause instanceof DefaultRouteConflict ? 409 : 500,
           statusText: 'Default route update failed',
-          message: `Settings saved. Could not update ${prefix} on ${name} in table ${table ?? 'previous'}. Maintenance will retry.`,
+          message: `Settings saved. Could not update ${prefix} on ${name} in table ${table}. ${cause instanceof DefaultRouteConflict ? 'An existing route conflicts with this default. ' : ''}Maintenance will retry.`,
           cause,
         });
       }
