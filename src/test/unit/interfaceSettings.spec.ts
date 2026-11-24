@@ -32,6 +32,7 @@ describe('interface settings', () => {
 
     expect(await settings.get(admin)).toEqual({
       ...before,
+      restartRequired: false,
       privateKey: undefined,
     });
     expect(await store.interfaces.get()).toEqual(before);

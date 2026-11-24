@@ -420,6 +420,7 @@
         "description": "Restart the WireGuard interface"
       },
       "restartWarn": "Are you sure to restart the interface? This will disconnect all clients.",
+      "restartRequired": "Restart required",
       "restartSuccess": "Interface restarted",
       "firewall": "Traffic Filtering",
       "firewallEnabled": {
