@@ -197,9 +197,8 @@ async function apply(mode?: ApplyMode) {
     await wg.sync(network, clients, enableIpv6);
   } else {
     // Until live default policies are available, quick handles those
-    // deployments. AmneziaWG also uses its existing startup path for now.
-    const quick =
-      options.amnezia || Boolean(defaultRoutes.ipv4 || defaultRoutes.ipv6);
+    // deployments for either backend.
+    const quick = Boolean(defaultRoutes.ipv4 || defaultRoutes.ipv6);
     const startup = quick
       ? generateStartupConfig(network, hooks, clients, options)
       : undefined;

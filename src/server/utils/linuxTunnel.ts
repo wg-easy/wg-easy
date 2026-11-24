@@ -56,8 +56,9 @@ export class LinuxTunnel {
     if (quick) {
       await wg.up(name, quick);
     } else {
+      const kind = WG_ENV.WG_EXECUTABLE === 'awg' ? 'amneziawg' : 'wireguard';
       try {
-        await exec(`ip link add dev ${name} type wireguard`);
+        await exec(`ip link add dev ${name} type ${kind}`);
       } catch (error) {
         // A missing link kind is recoverable. Permission and name collisions
         // must be reported, since attaching a userspace process is unsafe.
@@ -67,7 +68,9 @@ export class LinuxTunnel {
         ) {
           throw error;
         }
-        await exec(`wireguard-go ${name}`);
+        // Keep the userspace link alive while the container init forwards TERM
+        // to the app. stop() runs PreDown, then deletes the link and its daemon.
+        await exec(`setsid ${kind}-go ${name}`);
       }
     }
     const index = await interfaceIndex(name);
