@@ -90,7 +90,7 @@ test('disable, deletion and expiry revoke running peers despite a failing endpoi
   const remove = await create('Delete');
   const expire = await create('Expire');
   const broken = await create('Unresolvable endpoint');
-  const peers = [disable, remove, expire];
+  const peers = [disable, remove, expire, broken];
   for (const [index, url] of peers.entries()) {
     await app.connectClient(
       await (await request.get(url + '/configuration')).text(),
@@ -100,6 +100,13 @@ test('disable, deletion and expiry revoke running peers despite a failing endpoi
       .poll(() => app.pingFromClient('10.8.0.1', index + 1))
       .toBe(true);
   }
+  const network = await (await request.get('/api/admin/interface')).json();
+  await request.post('/api/admin/interface/cidr', {
+    headers,
+    data: { ipv4Cidr: '10.90.0.0/24', ipv6Cidr: network.ipv6Cidr },
+    failOnStatusCode: true,
+  });
+  expect(await app.pingFromClient('10.8.0.1', 4)).toBe(true);
   const expiring = await (await request.get(expire)).json();
   const saved = await request.post(expire, {
     headers,
@@ -124,4 +131,5 @@ test('disable, deletion and expiry revoke running peers despite a failing endpoi
     .toEqual([enabled.publicKey]);
   expect((await (await request.get(expire)).json()).enabled).toBe(false);
   expect(await app.pingFromClient('10.8.0.1', 3)).toBe(false);
+  expect(await app.pingFromClient('10.8.0.1', 4)).toBe(true);
 });

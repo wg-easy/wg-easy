@@ -1,5 +1,7 @@
 import { normalizeCidr, parseCidr } from 'cidr-tools';
 
+import type { PeerAddresses } from './activePeers';
+
 import { zeroWireGuardKey } from '#shared/utils/wireguard';
 import { formatEndpoint } from '#server/utils/endpoint';
 import { getGatewayAddress } from '#server/utils/ip';
@@ -13,7 +15,11 @@ type Options = {
   amnezia?: boolean;
   uiPort?: string;
 };
-export type ServerPeer = Omit<ClientType, 'createdAt' | 'updatedAt'>;
+export type ServerPeer = Omit<
+  ClientType,
+  'createdAt' | 'updatedAt' | keyof PeerAddresses
+> &
+  PeerAddresses;
 type RouteClient = Pick<ClientType, 'enabled' | 'serverAllowedIps'>;
 
 /** The complete server file, including enabled peers and its final newline. */
@@ -92,8 +98,8 @@ export function peerAllowedIps(
   enableIpv6: boolean
 ) {
   return [
-    `${client.ipv4Address}/32`,
-    ...(enableIpv6 ? [`${client.ipv6Address}/128`] : []),
+    ...(client.ipv4Address ? [`${client.ipv4Address}/32`] : []),
+    ...(enableIpv6 && client.ipv6Address ? [`${client.ipv6Address}/128`] : []),
     ...serverAllowedIps(client, enableIpv6),
   ];
 }

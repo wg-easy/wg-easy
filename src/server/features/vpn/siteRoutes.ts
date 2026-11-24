@@ -1,7 +1,7 @@
 import { createError } from 'nuxt/server';
 import { parseCidr } from 'cidr-tools';
 
-import { peerAllowedIps } from './configuration';
+import { peerAllowedIps, type ServerPeer } from './configuration';
 import {
   kernelTable,
   routeProtocol,
@@ -12,12 +12,11 @@ import {
 import { exec } from '#server/utils/cmd';
 import { normalizePrefix } from '#server/utils/ip';
 import { parseInterfaceName } from '#server/utils/interfaceName';
-import type { ClientType } from '#db/repositories/client/types';
 import type { InterfaceType } from '#db/repositories/interface/types';
 
 type SiteRoute = { prefix: string; table: number };
 type RouteClient = Pick<
-  ClientType,
+  ServerPeer,
   'enabled' | 'serverAllowedIps' | 'ipv4Address' | 'ipv6Address'
 >;
 function routeKey({ prefix, table }: SiteRoute) {
