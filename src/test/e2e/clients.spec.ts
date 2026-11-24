@@ -62,7 +62,9 @@ test('a device-held key connects using the template and can be replaced', async 
   await expect.poll(app.peers).toEqual([newKey]);
   await staleDialog.getByRole('button', { name: 'Replace Public Key' }).click();
   await expect(
-    otherTab.getByText('The client keys have changed. Refresh and try again.')
+    otherTab.getByText('The client keys have changed. Refresh and try again.', {
+      exact: true,
+    })
   ).toBeVisible();
   expect(await app.peers()).toEqual([newKey]);
   await expect.poll(() => app.pingFromClient('10.8.0.1')).toBe(false);
