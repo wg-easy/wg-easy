@@ -6,6 +6,8 @@ import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { requestEvent } from '../helpers/request';
 import { databaseFixture } from '../helpers/database';
 
+import * as recovery from '#server/features/vpn/tunnelRecord';
+import { LinuxTunnel } from '#server/utils/linuxTunnel';
 import * as clientOperations from '#server/features/vpn/clients';
 import { roles } from '#shared/utils/permissions';
 import * as schema from '#db/schema';
@@ -62,6 +64,10 @@ function event(clientId = '1', body?: Record<string, unknown>) {
 
 beforeEach(async () => {
   vi.resetAllMocks();
+  vi.spyOn(recovery, 'readPostUpFailure').mockResolvedValue(undefined);
+  vi.spyOn(LinuxTunnel.prototype, 'checkOwnership').mockResolvedValue(
+    undefined
+  );
   writeFile.mockResolvedValue();
   getCurrentUser.mockResolvedValue({ id: 1, role: 1 });
   exec.mockImplementation(async (command: string) => {

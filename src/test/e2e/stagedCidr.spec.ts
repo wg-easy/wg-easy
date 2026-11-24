@@ -53,6 +53,10 @@ test('applies the new subnet to peers, downloads and firewall rules at restart',
     'default',
   ]);
   expect(route).toContain('default dev wg0');
+  expect((await json(iface)).restartRequired).toBe(true);
+  expect(await download(witness)).toBe(original);
+  expect(await nat()).toContain('-s 10.8.0.0/24 -o eth0 -j MASQUERADE');
+  await post(iface + '/restart');
   expect((await json(iface)).restartRequired).toBe(false);
   expect(await nat()).not.toContain('10.8.0.0/24');
   expect(await nat()).toContain('-s 10.90.0.0/24 -o eth0 -j MASQUERADE');

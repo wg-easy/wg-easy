@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { constants } from 'node:fs';
-import { mkdir, open, rename, rm } from 'node:fs/promises';
+import { mkdir, open, rename, rm, type FileHandle } from 'node:fs/promises';
 
 import { z } from 'zod';
 
@@ -70,22 +70,32 @@ async function withDirectory<T>(operation: (path: string) => Promise<T>) {
   }
 }
 
-function readRecoveryFile(filename: string) {
+function withRecoveryFile<T>(
+  filename: string,
+  flags: number,
+  operation: (file: FileHandle) => Promise<T>
+) {
   return withDirectory(async (path) => {
     const file = await open(
       path + '/' + filename,
-      constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK
+      flags | constants.O_NOFOLLOW | constants.O_NONBLOCK
     );
     try {
       const stat = await file.stat();
-      if (!stat.isFile() || !privateToService(stat)) {
+      if (!stat.isFile() || !privateToService(stat) || stat.nlink !== 1) {
         throw new Error('Unsafe tunnel recovery file');
       }
-      return await file.readFile('utf8');
+      return await operation(file);
     } finally {
       await file.close();
     }
   });
+}
+
+function readRecoveryFile(filename: string) {
+  return withRecoveryFile(filename, constants.O_RDONLY, (file) =>
+    file.readFile('utf8')
+  );
 }
 
 async function saveRecoveryFile(filename: string, contents: string) {
@@ -136,10 +146,7 @@ export function removeTunnelRecord(name: string) {
 export async function readPostUpFailure() {
   try {
     const name = await readRecoveryFile(failureFile);
-    if (!name) {
-      throw new Error('Missing interface name in PostUp failure record');
-    }
-    return parseInterfaceName(name);
+    return name ? parseInterfaceName(name) : undefined;
   } catch (error) {
     // A new volume has neither the private directory nor a failure marker.
     if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
@@ -158,8 +165,14 @@ export async function clearPostUpFailure() {
       rm(path + '/' + failureFile, { force: true })
     );
   } catch (error) {
-    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
-      throw error;
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+      return;
     }
+    // A directory can prevent unlinking a writable journal. Persist success
+    // in the file itself so a later boot can distinguish it from a failed hook.
+    await withRecoveryFile(failureFile, constants.O_WRONLY, async (file) => {
+      await file.truncate(0);
+      await file.sync();
+    });
   }
 }

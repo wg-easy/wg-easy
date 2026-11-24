@@ -6,6 +6,8 @@ import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { requestEvent } from '../helpers/request';
 import { databaseFixture } from '../helpers/database';
 
+import * as recovery from '#server/features/vpn/tunnelRecord';
+import { LinuxTunnel } from '#server/utils/linuxTunnel';
 import * as schema from '#db/schema';
 import { ClientRepository } from '#db/repositories/client/repository';
 import bulkAction from '#server/api/client/bulk.post';
@@ -56,6 +58,10 @@ function clientEvent(clientId = 1, body?: unknown) {
 
 beforeEach(async () => {
   vi.resetAllMocks();
+  vi.spyOn(recovery, 'readPostUpFailure').mockResolvedValue(undefined);
+  vi.spyOn(LinuxTunnel.prototype, 'checkOwnership').mockResolvedValue(
+    undefined
+  );
   writeFile.mockResolvedValue();
   exec.mockImplementation(async (command: string) => {
     if (command === 'wg genkey') {

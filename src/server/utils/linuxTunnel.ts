@@ -70,7 +70,7 @@ async function createLink(name: string, kind: 'wireguard' | 'amneziawg') {
 }
 
 function temporaryName(record: TunnelRecord) {
-  // IFNAMSIZ allows 15 characters. The private record reserves this random name.
+  // IFNAMSIZ allows 15 characters.
   return 'wg' + record.policy.tag.slice(8).replaceAll('-', '').slice(0, 13);
 }
 
@@ -106,7 +106,7 @@ export class LinuxTunnel {
     throw createError({
       status: 409,
       statusText: 'Interface name collision',
-      message: `Interface ${name} already exists and is not owned by wg-easy.`,
+      message: `Interface ${name} already exists and is not owned by wg-easy. During an upgrade, stop the previous tunnel manager and verify that it removed its interface before starting wg-easy.`,
     });
   }
 
@@ -260,23 +260,42 @@ export class LinuxTunnel {
     if (!running) {
       const record = this.running ?? (await readTunnelRecord(name));
       if (
-        record?.phase &&
+        record &&
         record.namespace === (await readlink('/proc/self/ns/net'))
       ) {
         if (record.phase === 'creating') {
           const temporary = temporaryName(record);
           const link = await linkIdentity(temporary);
-          if (
-            link &&
-            link.ifname === temporary &&
-            (record.index === null || record.index === link.ifindex)
-          ) {
-            await exec(`ip link delete dev ${temporary}`);
+          if (link) {
+            const tagged = link.altnames?.includes(record.policy.tag);
+            // Only the creator can vouch for an index observed before tagging.
+            const justCreated =
+              record === this.running && record.index === link.ifindex;
+            if (
+              link.ifname !== temporary ||
+              (record.index !== null && record.index !== link.ifindex) ||
+              (!tagged && !justCreated)
+            ) {
+              throw new Error(
+                `Cannot verify ownership of unfinished tunnel ${temporary}`
+              );
+            }
+            await exec(
+              `ip link delete dev ${tagged ? record.policy.tag : temporary}`
+            );
           }
-          await removeTunnelRecord(name);
-        } else {
-          await this.finishDeletion(record, skipHooks);
         }
+        if (await linkIdentity(record.policy.tag)) {
+          throw new Error(
+            `Tunnel generation for ${name} still exists under another name`
+          );
+        }
+        await removeDefaultRules(record);
+        // Only a journaled teardown reached the point where PostDown was due.
+        await this.finishDeletion(
+          record,
+          skipHooks || record.phase !== 'deleting'
+        );
       }
       this.running = undefined;
       return;

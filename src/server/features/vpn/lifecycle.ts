@@ -39,7 +39,7 @@ import { LinuxTunnel } from '#server/utils/linuxTunnel';
 import { setTunnelMtu } from '#server/utils/tunnelMtu';
 
 let pending: Promise<unknown> = Promise.resolve();
-type ApplyMode = 'sync' | 'start' | 'restart';
+type ApplyMode = 'sync' | 'start' | 'restart' | 'rebuild';
 type HostState = {
   tunnel: LinuxTunnel;
   activeNetwork?: ReturnType<typeof stagedSettings>;
@@ -188,7 +188,7 @@ async function apply(mode?: ApplyMode, manualRestart = false) {
     mode === 'sync' &&
     !isDeepStrictEqual(defaultTables, state.defaultTables)
   ) {
-    mode = 'restart';
+    mode = 'rebuild';
     state.retry = mode;
   }
   const options = {
@@ -197,7 +197,9 @@ async function apply(mode?: ApplyMode, manualRestart = false) {
     uiPort: WG_ENV.PORT,
   };
   const network =
-    mode === 'sync' ? runningSettings(savedNetwork) : { ...savedNetwork };
+    mode === 'sync' || mode === 'rebuild'
+      ? runningSettings(savedNetwork)
+      : { ...savedNetwork };
   // Older versions accepted IPv4-sized MTUs on dual-stack tunnels.
   if (enableIpv6 && network.mtu !== null) {
     network.mtu = Math.max(minimumIpv6Mtu, network.mtu);
@@ -261,7 +263,7 @@ async function apply(mode?: ApplyMode, manualRestart = false) {
     );
   }
   const running = await state.tunnel.checkOwnership(savedNetwork.name);
-  if (mode === 'sync' || (running && mode === 'restart' && !manualRestart)) {
+  if (mode === 'sync' || (running && mode !== 'start' && !manualRestart)) {
     // Revoke disabled or deleted peers even if the following teardown fails.
     await state.tunnel.guardTraffic(network, enableIpv6);
     await revokePeers(network.name, clients);
@@ -336,7 +338,7 @@ async function apply(mode?: ApplyMode, manualRestart = false) {
         defaultTables
       );
       if (policyError) {
-        state.retry = 'restart';
+        state.retry = 'rebuild';
         throw policyError;
       }
       state.mtu = network.mtu;
@@ -370,10 +372,14 @@ async function apply(mode?: ApplyMode, manualRestart = false) {
     state.pendingHookMarker = !!postUp;
     state.tunnel.armDownHooks(network, hooks);
   }
-  const recoveryError = await state.tunnel.persistDownHooks();
+  let recoveryError: unknown = await state.tunnel.persistDownHooks();
   if (!recoveryError && state.pendingHookMarker) {
-    await clearPostUpFailure();
-    delete state.pendingHookMarker;
+    try {
+      await clearPostUpFailure();
+      delete state.pendingHookMarker;
+    } catch (error) {
+      recoveryError = error;
+    }
   }
   if (postUp) {
     // Hooks may reload firewall rules or change individual site routes.
@@ -493,7 +499,7 @@ export function start() {
       if (state?.failedStart) {
         // Keep the database and admin panel available for hook repair.
         console.error('VPN startup is waiting for an explicit restart:', error);
-      } else if (state?.retry === 'sync' || state?.retry === 'restart') {
+      } else if (state?.retry === 'sync' || state?.retry === 'rebuild') {
         // Maintenance can finish site routes live or retry default policy on a fresh link.
         console.error(
           'Could not finish applying the VPN configuration at startup:',
@@ -515,6 +521,9 @@ export function stop() {
       await cleanFailedStart(state.tunnel, state.failedStart);
     } else {
       await state?.tunnel.stop(network.name);
+      if (state?.pendingHookMarker) {
+        await clearPostUpFailure();
+      }
     }
     hostStates.delete(database);
   });

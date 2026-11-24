@@ -163,6 +163,83 @@ while [ ! -f /tmp/locked ]; do sleep 0.05; done`,
 
 const record = '/etc/wireguard/.wg-easy/wg0.json';
 
+test('recovers owned default rules only after the recorded link is gone', async ({
+  app,
+  request,
+}) => {
+  const { post, json, create } = await admin(request, app.url);
+  const peer = await create('Default gateway');
+  await post(peer, { ...(await json(peer)), serverAllowedIps: ['0.0.0.0/0'] });
+  const readRecord = () => app.execServer(['cat', record]);
+  const running = await readRecord();
+  const tag = JSON.parse(running).policy.tag;
+  const rules = () => app.execServer(['ip', '-4', 'rule', 'show']);
+  const mangle = () => app.execServer(['iptables', '-t', 'mangle', '-S']);
+  await app.execServer(['ip', 'rule', 'add', 'pref', '15000', 'lookup', '741']);
+  expect(await mangle()).toContain(tag);
+  await app.execServer(['ip', 'link', 'set', 'wg0', 'down']);
+  await app.execServer(['ip', 'link', 'set', 'wg0', 'name', 'moved0']);
+  await expect(post('/api/admin/interface/restart')).rejects.toThrow();
+  expect(await readRecord()).toBe(running);
+  expect(await mangle()).toContain(tag);
+  await app.stopProcess('KILL');
+  await app.execServer(['ip', 'link', 'del', 'moved0']);
+  await app.startProcess();
+  await expect.poll(mangle).not.toContain(tag);
+  await expect.poll(rules).toMatch(/not .*fwmark/);
+  expect(await rules()).toContain('lookup 741');
+  expect((await rules()).match(/not .*fwmark/g)).toHaveLength(1);
+  expect(JSON.parse(await readRecord()).policy.tag).not.toBe(tag);
+});
+
+test('preserves a foreign temporary link after a crash before exclusive creation', async ({
+  app,
+  request,
+}) => {
+  const { post } = await admin(request, app.url);
+  await app.execServer([
+    'sh',
+    '-ec',
+    `cat > /usr/local/bin/ip <<'SH'
+#!/bin/sh
+case "$*" in 'link add dev '*)
+  echo "$4" >/tmp/unfinished
+  sleep 15
+  exit 1 ;;
+esac
+exec /sbin/ip "$@"
+SH
+chmod +x /usr/local/bin/ip`,
+  ]);
+  const cutover = post('/api/admin/interface/restart').catch(() => {});
+  const unfinished = () =>
+    app.execServer(['cat', '/tmp/unfinished']).catch(() => '');
+  await expect.poll(unfinished).toMatch(/^wg/);
+  await app.stopProcess('KILL');
+  await cutover;
+  const temporary = await unfinished();
+  const pending = await app.execServer(['cat', record]);
+  expect(JSON.parse(pending)).toMatchObject({ phase: 'creating', index: null });
+  await app.execServer(['rm', '/usr/local/bin/ip']);
+  await app.execServer([
+    'ip',
+    'link',
+    'add',
+    'dev',
+    temporary,
+    'type',
+    'dummy',
+  ]);
+  await app.startProcess();
+  await expect
+    .poll(app.logs)
+    .toContain('Cannot verify ownership of unfinished tunnel');
+  expect(
+    await app.execServer(['ip', '-details', 'link', 'show', temporary])
+  ).toContain('dummy');
+  expect(await app.execServer(['cat', record])).toBe(pending);
+});
+
 test('retries a failed recovery record write without replaying PostUp', async ({
   app,
   request,

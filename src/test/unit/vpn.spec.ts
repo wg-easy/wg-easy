@@ -159,6 +159,25 @@ describe('VPN operations', () => {
     expect(commands.runHook).toHaveBeenCalledOnce();
   });
 
+  test('repairs routes and filtering and acknowledges a successful PostUp at shutdown after a journal error', async () => {
+    const { store, commands, firewall } = await vpnFixture();
+    await store.interfaces.update({ firewallEnabled: true });
+    await store.hooks.update({ preUp: '', postUp: 'hook' });
+    const sites = vi.spyOn(SiteRoutes.prototype, 'sync');
+    vi.mocked(recovery.clearPostUpFailure).mockRejectedValueOnce(
+      new Error('Journal unavailable')
+    );
+    await expect(vpn.restart()).rejects.toThrow('Journal unavailable');
+    expect(sites).toHaveBeenCalledTimes(2);
+    expect(firewall.rebuildRules).toHaveBeenCalledTimes(2);
+    expect(commands.runHook).toHaveBeenCalledOnce();
+    await vpn.stop();
+    expect(await recovery.readPostUpFailure()).toBeUndefined();
+    await vpn.start();
+    expect(commands.up).toHaveBeenCalledTimes(2);
+    expect((await settings.get(admin)).restartRequired).toBe(false);
+  });
+
   test('cleans up the recorded interface when the configured interface was renamed', async () => {
     const { commands } = await vpnFixture();
     vi.spyOn(console, 'error').mockImplementation(() => {});
@@ -415,7 +434,7 @@ describe('VPN operations', () => {
   );
 
   test('restarts for changes to the managed default families or table and syncs ordinary edits live', async () => {
-    const { commands } = await vpnFixture();
+    const { commands, store } = await vpnFixture();
     const configure = vi.mocked(LinuxTunnel.prototype.configureLink);
     const routes = (serverAllowedIps: string[]) =>
       vpn.commit((tx) => tx.clients.update(1, { serverAllowedIps }));
@@ -423,6 +442,8 @@ describe('VPN operations', () => {
       vpn.commit((tx) => tx.interfaces.update({ routingTable }));
 
     await vpn.start();
+    const { port, device } = await store.interfaces.get();
+    await store.interfaces.update({ port: 51830, device: 'lo' });
     await routes(['10.1.2.3/0']);
     await routes(['0.0.0.0/0', '192.0.2.0/24']);
     await routes(['0.0.0.0/0', '::/0']);
@@ -440,6 +461,15 @@ describe('VPN operations', () => {
     ]);
     expect(commands.up).toHaveBeenCalledTimes(5);
     expect(commands.sync).toHaveBeenCalledTimes(9);
+    for (const [network] of commands.up.mock.calls) {
+      expect(network).toMatchObject({ port, device });
+    }
+    expect((await settings.get(admin)).restartRequired).toBe(true);
+    await vpn.restart();
+    expect(commands.up.mock.lastCall?.[0]).toMatchObject({
+      port: 51830,
+      device: 'lo',
+    });
   });
 
   test.each(['start', 'edit'])(
