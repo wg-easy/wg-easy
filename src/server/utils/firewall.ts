@@ -6,7 +6,7 @@ import { createError } from 'nuxt/server';
 
 import { exec } from '#server/utils/cmd';
 import { normalizePrefix } from '#server/utils/ip';
-import type { ClientType } from '#db/repositories/client/types';
+import type { ServerPeer } from '#server/features/vpn/configuration';
 import type { InterfaceType } from '#db/repositories/interface/types';
 import type { UserConfigType } from '#db/repositories/userConfig/types';
 
@@ -76,7 +76,7 @@ type ParsedEntry = {
 };
 
 type FirewallClient = Pick<
-  ClientType,
+  ServerPeer,
   | 'id'
   | 'name'
   | 'ipv4Address'
@@ -97,13 +97,12 @@ type SiteGateway = Pick<
 function* routedSites(client: SiteGateway, enableIpv6: boolean) {
   for (const site of client.serverAllowedIps ?? []) {
     const ipv6 = site.includes(':');
-    if (ipv6 && !enableIpv6) {
+    const address = ipv6 ? client.ipv6Address : client.ipv4Address;
+    if (!address || (ipv6 && !enableIpv6)) {
       continue;
     }
     const source = normalizePrefix(site);
-    if (
-      source === normalizePrefix(ipv6 ? client.ipv6Address : client.ipv4Address)
-    ) {
+    if (source === normalizePrefix(address)) {
       continue;
     }
     yield { source, ipv6 };
@@ -349,7 +348,7 @@ export const firewall = {
       const destIsIpv6 = isIPv6(baseIp);
 
       if (destIsIpv6) {
-        if (enableIpv6) {
+        if (enableIpv6 && client.ipv6Address) {
           const rules = generateRuleArgs(
             interfaceName,
             client.ipv6Address,
@@ -360,7 +359,7 @@ export const firewall = {
             await exec(`ip6tables ${rule}`);
           }
         }
-      } else {
+      } else if (client.ipv4Address) {
         const rules = generateRuleArgs(
           interfaceName,
           client.ipv4Address,

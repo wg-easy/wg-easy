@@ -4,6 +4,7 @@ import { isDeepStrictEqual } from 'node:util';
 import { createError } from 'nuxt/server';
 
 import { isExpired } from './policies';
+import { peersForRunningNetwork, type PeerAddresses } from './activePeers';
 import {
   defaultRoutePolicy,
   expandHook,
@@ -31,6 +32,7 @@ type HostState = {
   tunnel: LinuxTunnel;
   routes: SiteRoutes;
   activeNetwork?: ReturnType<typeof stagedSettings>;
+  activeAddresses: Map<number, PeerAddresses>;
   defaultRoutes: ReturnType<typeof defaultRoutePolicy>;
   mtu?: number | null;
   retry?: ApplyMode;
@@ -42,8 +44,8 @@ type HostState = {
 };
 const hostStates = new WeakMap<DatabaseStore, HostState>();
 
-function stagedSettings({ port, device }: InterfaceType) {
-  return { port, device };
+function stagedSettings({ port, device, ipv4Cidr, ipv6Cidr }: InterfaceType) {
+  return { port, device, ipv4Cidr, ipv6Cidr };
 }
 
 export function restartRequired(saved: InterfaceType) {
@@ -101,6 +103,7 @@ async function apply(mode?: ApplyMode) {
       tunnel: new LinuxTunnel(),
       routes: new SiteRoutes(),
       defaultRoutes: {},
+      activeAddresses: new Map(),
     };
     hostStates.set(database, state);
   }
@@ -114,14 +117,13 @@ async function apply(mode?: ApplyMode) {
   mode ??= state.retry ?? 'sync';
   // Clear only after every host effect succeeds. Maintenance retries failures.
   state.retry = mode;
-  const { savedNetwork, clients, hooks, defaults } = await database.transaction(
-    async (tx) => ({
+  const { savedNetwork, savedClients, hooks, defaults } =
+    await database.transaction(async (tx) => ({
       savedNetwork: await tx.interfaces.get(),
-      clients: await tx.clients.getAll(),
+      savedClients: await tx.clients.getAll(),
       hooks: await tx.hooks.get(),
       defaults: await tx.userConfigs.get(),
-    })
-  );
+    }));
   const enableIpv6 = !WG_ENV.DISABLE_IPV6;
   if (state.failedStart) {
     await cleanFailedStart(state.tunnel, state.failedStart);
@@ -131,6 +133,13 @@ async function apply(mode?: ApplyMode) {
     }
     delete state.failedStart;
   }
+  const clients = peersForRunningNetwork(
+    savedClients,
+    savedNetwork,
+    mode === 'sync' ? state.activeNetwork : undefined,
+    state.activeAddresses,
+    enableIpv6
+  );
   const defaultRoutes = defaultRoutePolicy(
     savedNetwork.routingTable,
     clients,
@@ -175,15 +184,17 @@ async function apply(mode?: ApplyMode) {
     amnezia: WG_ENV.WG_EXECUTABLE === 'awg',
     uiPort: WG_ENV.PORT,
   };
-  const contents = generateServerConfig(savedNetwork, hooks, clients, options);
+  const contents = generateServerConfig(
+    savedNetwork,
+    hooks,
+    savedClients,
+    options
+  );
   await fs.writeFile(`/etc/wireguard/${network.name}.conf`, contents, {
     mode: 0o600,
   });
   if (mode === 'sync') {
     await wg.sync(network, clients, enableIpv6);
-    if (state.mtu !== undefined && state.mtu !== network.mtu) {
-      await setTunnelMtu(network.name, network.mtu);
-    }
   } else {
     // Until live default policies are available, quick handles those
     // deployments. AmneziaWG also uses its existing startup path for now.
@@ -226,6 +237,15 @@ async function apply(mode?: ApplyMode) {
       }
     }
     state.activeNetwork = stagedSettings(network);
+  }
+  state.activeAddresses = new Map(
+    clients.map(({ id, ipv4Address, ipv6Address }) => [
+      id,
+      { ipv4Address, ipv6Address },
+    ])
+  );
+  if (mode === 'sync' && state.mtu !== undefined && state.mtu !== network.mtu) {
+    await setTunnelMtu(network.name, network.mtu);
   }
   state.mtu = network.mtu;
   // The interface and its hooks are up. Retry subsequent failures live.
