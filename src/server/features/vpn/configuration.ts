@@ -86,7 +86,7 @@ export function generateStartupConfig(
   };
 }
 
-/** wg-quick installs one default per active address family in the configured table. */
+/** Both startup and live edits derive default policy from enabled peers. */
 export function defaultRoutePolicy(
   table: string,
   clients: RouteClient[],

@@ -146,27 +146,6 @@ describe('Server Allowed IP routes', () => {
     expect(entries.size).toBe(0);
   });
 
-  test('restarts only when the active default-route family or table changes', async () => {
-    const { store, wg, setRoutes } = await fixture();
-    await setRoutes(['0.0.0.0/0']);
-    expect(wg.up).toHaveBeenCalledTimes(1);
-    expect(wg.up.mock.lastCall?.[2]?.contents).toContain('0.0.0.0/0');
-    await setRoutes(['192.0.2.1/0', prefix]);
-    expect(wg.up).toHaveBeenCalledTimes(1);
-    await setRoutes(['::/0', '0.0.0.0/0']);
-    expect(wg.up).toHaveBeenCalledTimes(2);
-    await setRoutes(['::/0']);
-    expect(wg.up).toHaveBeenCalledTimes(3);
-    await vpn.commit((tx) => tx.interfaces.update({ routingTable: '100' }));
-    expect(wg.up.mock.lastCall?.[2]?.contents).toContain('Table = 100');
-    expect(wg.up).toHaveBeenCalledTimes(4);
-    await store.clients.update(1, { expiresAt: '2000-01-01' });
-    await vpn.maintain();
-    expect(wg.up.mock.lastCall?.[2]).toBeUndefined();
-    expect(wg.up).toHaveBeenCalledTimes(5);
-    expect(wg.removePeer).not.toHaveBeenCalled();
-  });
-
   test('leaves default routing to the host when Table is off', async () => {
     const { store, wg, setRoutes } = await fixture();
     await store.interfaces.update({ routingTable: 'off' });

@@ -57,7 +57,15 @@ test('distributes renumbered configurations while established clients use the ru
 
   const saved = await json(witness);
   await post(witness, { ...saved, serverAllowedIps: ['0.0.0.0/0'] });
-  const route = await app.execServer(['ip', '-4', 'route', 'show', 'table', '123', 'default']);
+  const route = await app.execServer([
+    'ip',
+    '-4',
+    'route',
+    'show',
+    'table',
+    '123',
+    'default',
+  ]);
   expect(route).toContain('default dev wg0');
   expect((await json(iface)).restartRequired).toBe(true);
   expect(await app.pingFromClient('10.8.0.1')).toBe(true);

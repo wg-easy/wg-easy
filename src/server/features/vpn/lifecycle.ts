@@ -9,14 +9,13 @@ import {
   defaultRoutePolicy,
   expandHook,
   generateServerConfig,
-  generateStartupConfig,
 } from './configuration';
 import { SiteRoutes } from './siteRoutes';
 
 import { getDatabase } from '#db';
 import type { InterfaceType } from '#db/repositories/interface/types';
 import type { DatabaseStore, Repositories } from '#db/store';
-import { NativePostUpError, wg } from '#server/utils/wgHelper';
+import { wg } from '#server/utils/wgHelper';
 import {
   checkRoutedReplySupport,
   firewall,
@@ -33,7 +32,6 @@ type HostState = {
   routes: SiteRoutes;
   activeNetwork?: ReturnType<typeof stagedSettings>;
   activeAddresses: Map<number, PeerAddresses>;
-  defaultRoutes: ReturnType<typeof defaultRoutePolicy>;
   mtu?: number | null;
   retry?: ApplyMode;
   failedStart?: {
@@ -102,7 +100,6 @@ async function apply(mode?: ApplyMode) {
     state = {
       tunnel: new LinuxTunnel(),
       routes: new SiteRoutes(),
-      defaultRoutes: {},
       activeAddresses: new Map(),
     };
     hostStates.set(database, state);
@@ -145,13 +142,6 @@ async function apply(mode?: ApplyMode) {
     clients,
     enableIpv6
   );
-  if (
-    mode === 'sync' &&
-    !isDeepStrictEqual(defaultRoutes, state.defaultRoutes)
-  ) {
-    mode = 'restart';
-    state.retry = mode;
-  }
   const network =
     mode === 'sync'
       ? { ...savedNetwork, ...state.activeNetwork }
@@ -175,8 +165,6 @@ async function apply(mode?: ApplyMode) {
       }
     }
   } else {
-    // wg-quick down needs the old Table setting and the live peer AllowedIPs
-    // to remove its default-route policy before the new configuration is written.
     await state.tunnel.stop(network.name);
   }
   const options = {
@@ -196,39 +184,20 @@ async function apply(mode?: ApplyMode) {
   if (mode === 'sync') {
     await wg.sync(network, clients, enableIpv6);
   } else {
-    // Until live default policies are available, quick handles those
-    // deployments for either backend.
-    const quick = Boolean(defaultRoutes.ipv4 || defaultRoutes.ipv6);
-    const startup = quick
-      ? generateStartupConfig(network, hooks, clients, options)
-      : undefined;
-    const postUp = quick
-      ? startup?.postUp
-      : expandHook(hooks.postUp, network, options.uiPort);
+    const postUp = expandHook(hooks.postUp, network, options.uiPort);
     state.routes = new SiteRoutes();
     try {
-      await state.tunnel.create(
-        network,
-        hooks,
-        quick
-          ? (startup ?? { contents, nativePostUp: Boolean(hooks.postUp) })
-          : undefined
-      );
+      await state.tunnel.create(network, hooks);
       await wg.sync(network, clients, enableIpv6);
-      if (!quick) {
-        await state.tunnel.configureLink(network, enableIpv6);
-      }
+      await state.tunnel.configureLink(network, enableIpv6);
     } catch (error) {
-      if (error instanceof NativePostUpError) {
-        return failedPostUp(state, network.name, error);
-      }
       await state.tunnel.stop(network.name, true);
       throw error;
     }
-    state.defaultRoutes = defaultRoutes;
     if (postUp) {
       // A hook may use a site route, or supply a missing one itself.
       await state.routes.sync(network, clients, enableIpv6);
+      await state.tunnel.defaultPolicy.sync(network, defaultRoutes);
       try {
         await wg.runHook(network.name, network.routingTable, postUp);
       } catch (cause) {
@@ -250,7 +219,12 @@ async function apply(mode?: ApplyMode) {
   // The interface and its hooks are up. Retry subsequent failures live.
   state.retry = 'sync';
   await firewall.rebuildRules(network, clients, defaults, enableIpv6);
-  const error = await state.routes.sync(network, clients, enableIpv6);
+  const siteError = await state.routes.sync(network, clients, enableIpv6);
+  const policyError = await state.tunnel.defaultPolicy.sync(
+    network,
+    defaultRoutes
+  );
+  const error = siteError ?? policyError;
   if (error) {
     if (mode !== 'start') {
       throw error;

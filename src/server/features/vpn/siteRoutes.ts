@@ -2,6 +2,12 @@ import { createError } from 'nuxt/server';
 import { parseCidr } from 'cidr-tools';
 
 import { peerAllowedIps, type ServerPeer } from './configuration';
+import {
+  kernelTable,
+  routeProtocol,
+  routingTable,
+  type KernelRoute,
+} from './linuxRouting';
 
 import { exec } from '#server/utils/cmd';
 import { normalizePrefix } from '#server/utils/ip';
@@ -13,47 +19,8 @@ type RouteClient = Pick<
   ServerPeer,
   'enabled' | 'serverAllowedIps' | 'ipv4Address' | 'ipv6Address'
 >;
-type KernelRoute = {
-  dst: string;
-  dev?: string;
-  gateway?: string;
-  table?: string | number;
-  type?: string | number;
-  protocol: string | number;
-  metric?: number;
-};
-
-// Tag every site route installed by wg-easy, including during startup.
-const siteProtocol = 242;
-
-function kernelTable(table: KernelRoute['table']) {
-  switch (table) {
-    case undefined:
-    case 'main':
-      return 254;
-    case 'default':
-      return 253;
-    case 'local':
-      return 255;
-    default:
-      return Number(table);
-  }
-}
-
 function routeKey({ prefix, table }: SiteRoute) {
   return `${table}/${prefix}`;
-}
-
-function routingTable(setting: string) {
-  if (setting === 'auto') {
-    return 254;
-  }
-  // iproute2 reads a leading zero as octal and table zero as the main table.
-  const id = Number(setting.startsWith('0') ? `0o${setting}` : setting);
-  if (!/^\d+$/.test(setting) || !Number.isSafeInteger(id) || id > 0xffffffff) {
-    throw new Error('Invalid Linux routing table');
-  }
-  return id || 254;
 }
 
 class RouteConflict extends Error {}
@@ -160,7 +127,7 @@ export class SiteRoutes {
       exact.some(
         (entry) =>
           direct(entry) &&
-          Number(entry.protocol) === siteProtocol &&
+          Number(entry.protocol) === routeProtocol &&
           (entry.metric ?? 0) === metric
       );
     if (!installed) {
@@ -170,7 +137,7 @@ export class SiteRoutes {
     if (action === 'remove') {
       if (installed) {
         await exec(
-          `${ip} route del ${target} proto ${siteProtocol} metric ${metric}`
+          `${ip} route del ${target} proto ${routeProtocol} metric ${metric}`
         );
         this.owned.delete(key);
       }
@@ -192,7 +159,7 @@ export class SiteRoutes {
     if (exact.length && bestMetric <= metric) {
       throw new RouteConflict();
     }
-    await exec(`${ip} route add ${target} proto ${siteProtocol}`);
+    await exec(`${ip} route add ${target} proto ${routeProtocol}`);
     this.owned.set(key, route);
   }
 }

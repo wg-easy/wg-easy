@@ -9,7 +9,6 @@ import * as settings from '#server/features/vpn/interface';
 import * as provisioning from '#server/features/vpn/provisioning';
 import * as queries from '#server/features/vpn/queries';
 import { ClientQuerySchema } from '#shared/contracts/client';
-import { NativePostUpError } from '#server/utils/wgHelper';
 import * as cmd from '#server/utils/cmd';
 
 const admin = { id: 1, role: roles.ADMIN };
@@ -265,14 +264,14 @@ describe('VPN operations', () => {
     commands.down
       .mockResolvedValueOnce()
       .mockRejectedValueOnce(new Error('Shutdown failed'));
-    commands.up.mockRejectedValueOnce(new NativePostUpError('Hook failed'));
+    commands.runHook.mockRejectedValueOnce(new Error('Hook failed'));
     vi.spyOn(console, 'error').mockImplementation(() => {});
     await expect(vpn.restart()).rejects.toMatchObject({ status: 503 });
     await expect(vpn.maintain()).rejects.toMatchObject({ status: 503 });
     await vpn.maintain();
     expect(commands.down).toHaveBeenCalledTimes(3);
     expect(commands.up).toHaveBeenCalledOnce();
-    expect(commands.runHook).not.toHaveBeenCalled();
+    expect(commands.runHook).toHaveBeenCalledOnce();
   });
 
   test('retries a failed start without replacing the initialized server identity', async () => {
