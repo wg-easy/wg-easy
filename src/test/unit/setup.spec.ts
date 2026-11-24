@@ -69,7 +69,11 @@ describe('setup', () => {
     expect(writeConfiguration.mock.lastCall?.[1]).toContain(
       'ListenPort = 51900'
     );
-    expect(sync).toHaveBeenCalledExactlyOnceWith('wg0');
+    expect(sync).toHaveBeenCalledExactlyOnceWith(
+      expect.objectContaining({ name: 'wg0' }),
+      expect.any(Array),
+      true
+    );
     await expect(
       setup.configureEndpoint('changed', 51901)
     ).rejects.toMatchObject({ status: 400 });
@@ -282,7 +286,11 @@ describe('setup', () => {
         await setup.importConfiguration(file);
       }
       expect(up).toHaveBeenCalledTimes(failRestart ? 2 : 1);
-      expect(sync).toHaveBeenCalledExactlyOnceWith('wg0');
+      expect(sync).toHaveBeenCalledExactlyOnceWith(
+        expect.objectContaining({ name: 'wg0' }),
+        expect.any(Array),
+        true
+      );
       expect(writeConfiguration.mock.lastCall?.[1]).toContain(
         `PrivateKey = ${server.privateKey}`
       );

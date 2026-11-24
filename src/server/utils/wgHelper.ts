@@ -1,6 +1,11 @@
 import fs from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 
+import type { InterfaceType } from '#db/repositories/interface/types';
+import {
+  generateTunnelConfig,
+  type ServerPeer,
+} from '#server/features/vpn/configuration';
 import { exec } from '#server/utils/cmd';
 import { WG_ENV } from '#server/utils/config';
 import { parseInterfaceName } from '#server/utils/interfaceName';
@@ -18,7 +23,7 @@ async function up(
     return exec(`${wgExecutable}-quick up ${name}`);
   }
   // wg-quick derives the interface name from the filename. Keep the complete
-  // configuration in /etc/wireguard for syncconf, shutdown and external tools.
+  // configuration in /etc/wireguard for shutdown and external tools.
   const dir = await fs.mkdtemp('/tmp/wg-easy-up-');
   const marker = `${dir}/post-up-started`;
   try {
@@ -62,20 +67,40 @@ export const wg = {
 
   up,
 
-  down: async (infName: string) => {
+  down: async (infName: string, failedStart?: { routingTable: string }) => {
     const name = parseInterfaceName(infName);
     const interfaces = await exec(`${wgExecutable} show interfaces`);
-    if (interfaces.split(/\s+/).includes(name)) {
+    if (!interfaces.split(/\s+/).includes(name)) {
+      return;
+    }
+    if (!failedStart) {
       await exec(`${wgExecutable}-quick down ${name}`);
+      return;
+    }
+    // Keep quick's default-policy teardown while skipping both down hooks.
+    const dir = await fs.mkdtemp('/tmp/wg-easy-cleanup-');
+    try {
+      const path = `${dir}/${name}.conf`;
+      await fs.writeFile(
+        path,
+        `[Interface]\nTable = ${failedStart.routingTable}\n`,
+        {
+          mode: 0o600,
+        }
+      );
+      await exec(`${wgExecutable}-quick down ${path}`);
+    } finally {
+      await fs.rm(dir, { recursive: true, force: true });
     }
   },
 
   postUp: (infName: string, table: string, hook: string) => {
     const name = parseInterfaceName(infName);
-    // awg-quick strips config comments before handing the hook to Bash.
-    const script = wgExecutable === 'awg' ? hook.split('#', 1)[0]! : hook;
     return exec(
-      `set -eo pipefail\nshopt -s extglob\n${script.replaceAll('%i', name)}`,
+      `set -eo pipefail
+shopt -s extglob
+cmd() { echo "[#] $*" >&2; "$@"; }
+${hook.replaceAll('%i', name)}`,
       {
         log: false,
         env: {
@@ -89,14 +114,21 @@ export const wg = {
     );
   },
 
-  sync: (infName: string) => {
-    // wg-quick's automatic routing mark exists only on the live interface.
-    // Supply it as an interface setting in the same update as the peers.
+  async sync(
+    network: InterfaceType,
+    clients: ServerPeer[],
+    enableIpv6: boolean
+  ) {
+    const name = parseInterfaceName(network.name);
+    const fwmark = await exec(`${wgExecutable} show ${name} fwmark`);
+    const input = generateTunnelConfig(network, clients, fwmark, {
+      enableIpv6,
+      amnezia: wgExecutable === 'awg',
+    });
+    // Node uses a socket for child stdin. Give syncconf a pipe it can reopen.
     return exec(
-      `fwmark=$(${wgExecutable} show ${infName} fwmark) && ` +
-        `config=$(${wgExecutable}-quick strip ${infName}) && ` +
-        `printf '%s\\n' '[Interface]' "FwMark = $fwmark" "$config" | ` +
-        `${wgExecutable} syncconf ${infName} /dev/stdin`
+      `set -o pipefail; cat | ${wgExecutable} syncconf ${name} /dev/stdin`,
+      { input }
     );
   },
 

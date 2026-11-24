@@ -81,7 +81,7 @@ beforeEach(async () => {
     ) {
       return '';
     }
-    if (command === 'wg show wg0 dump') {
+    if (command === 'wg show wg0 fwmark' || command === 'wg show wg0 dump') {
       return '';
     }
     if (
@@ -532,7 +532,8 @@ describe('client key actions', () => {
       'PublicKey = public-key-1'
     );
     expect(exec).toHaveBeenCalledWith(
-      expect.stringContaining('wg syncconf wg0 ')
+      expect.stringContaining('wg syncconf wg0 '),
+      expect.objectContaining({ input: expect.any(String) })
     );
 
     const publicClient = await clients.getPublic(1);

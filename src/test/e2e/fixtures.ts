@@ -20,7 +20,7 @@ type App = {
   connectClient: (configuration: string, index?: number) => Promise<void>;
   execClient: (args: string[], index?: number) => Promise<string>;
   execServer: (args: string[]) => Promise<string>;
-  pingFromClient: (address: string) => Promise<boolean>;
+  pingFromClient: (address: string, index?: number) => Promise<boolean>;
 };
 
 export const credentials = {
@@ -32,11 +32,13 @@ export const test = base.extend<{
   app: App;
   initialized: boolean;
   ipv6: boolean;
+  backend: 'wg' | 'awg';
 }>({
   initialized: [true, { option: true }],
   ipv6: [false, { option: true }],
+  backend: ['wg', { option: true }],
   app: [
-    async ({ initialized, ipv6 }, use, testInfo) => {
+    async ({ initialized, ipv6, backend }, use, testInfo) => {
       const runDir = process.env.E2E_RUN_DIR;
       if (!runDir) {
         throw new Error('Run pnpm test:e2e to manage test containers.');
@@ -61,6 +63,7 @@ export const test = base.extend<{
           {
             env: {
               ...process.env,
+              E2E_BACKEND: backend,
               E2E_INITIALIZED: String(initialized),
               E2E_DISABLE_IPV6: String(!ipv6),
             },
@@ -72,7 +75,7 @@ export const test = base.extend<{
         return (await command).stdout.trim();
       }
       const wg = (args: string[], input?: string) =>
-        compose(['exec', '-T', 'wg-easy', 'wg', ...args], input);
+        compose(['exec', '-T', 'wg-easy', backend, ...args], input);
       const execClient = (args: string[], index = 1, input?: string) =>
         compose(
           ['exec', '-T', '--index', String(index), 'vpn-client', ...args],
@@ -116,25 +119,18 @@ cat > /etc/wireguard/wg0.conf
 cp /etc/resolv.conf /tmp/docker-resolv.conf
 resolvconf -u
 resolvconf -a eth0 < /tmp/docker-resolv.conf
-wg-quick up wg0`,
+${backend}-quick up wg0`,
               ],
               index,
               configuration
             );
           },
-          pingFromClient: async (address) => {
+          pingFromClient: async (address, index) => {
             try {
-              await execClient([
-                'ping',
-                '-4',
-                '-I',
-                'wg0',
-                '-c',
-                '1',
-                '-W',
-                '1',
-                address,
-              ]);
+              await execClient(
+                ['ping', '-4', '-I', 'wg0', '-c', '1', '-W', '1', address],
+                index
+              );
               return true;
             } catch (error) {
               if ((error as ExecException).code !== 1) {
