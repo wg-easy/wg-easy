@@ -47,11 +47,7 @@ type HostState = {
   mtu?: number | null;
   awaitingValidSettings?: boolean;
   retry?: ApplyMode;
-  failedStart?: {
-    error: Error;
-    name: string;
-    cleanupPending: boolean;
-  };
+  failedStart?: ReturnType<typeof postUpFailure>;
 };
 const hostStates = new WeakMap<DatabaseStore, HostState>();
 
@@ -99,36 +95,40 @@ async function cleanFailedStart(
   }
 }
 
-function postUpError(cause?: unknown) {
-  return createError({
-    status: 503,
-    statusText: 'VPN interface needs attention',
-    message:
-      'PostUp failed. Check the hook and its effects, then restart the VPN interface from the admin panel.',
-    cause,
-  });
+function postUpFailure(name: string, cause?: unknown) {
+  return {
+    name,
+    cleanupPending: true,
+    error: createError({
+      status: 503,
+      statusText: 'VPN interface needs attention',
+      message:
+        'PostUp failed. Check the hook and its effects, then restart the VPN interface from the admin panel.',
+      cause,
+    }),
+  };
 }
 
-async function failedPostUp(
+async function handlePostUpFailure(
   state: HostState,
   name: string,
   cause: unknown
 ): Promise<never> {
   // Keep the failure after deleting the link and its recovery record. The
   // hook may have already changed external state, even on a cold start.
-  const error = postUpError(cause);
-  state.failedStart = { name, error, cleanupPending: true };
+  const failure = postUpFailure(name, cause);
+  state.failedStart = failure;
   try {
     await recordPostUpFailure(name);
   } finally {
     try {
-      await cleanFailedStart(state.tunnel, state.failedStart);
+      await cleanFailedStart(state.tunnel, failure);
       delete state.retry;
     } catch (error) {
       console.error('Could not shut down the VPN after PostUp failed:', error);
     }
   }
-  throw error;
+  throw failure.error;
 }
 
 /** Revoke access before saving or syncing, even if an unrelated peer fails DNS. */
@@ -157,8 +157,7 @@ async function revokePeers(
   return gateways;
 }
 
-async function apply(mode?: ApplyMode, manualRestart = false) {
-  const database = getDatabase();
+async function getHostState(database: DatabaseStore) {
   let state = hostStates.get(database);
   if (!state) {
     const failedName = await readPostUpFailure();
@@ -167,14 +166,16 @@ async function apply(mode?: ApplyMode, manualRestart = false) {
       restoredDefaults: new Map(),
     };
     if (failedName) {
-      state.failedStart = {
-        name: failedName,
-        error: postUpError(),
-        cleanupPending: true,
-      };
+      state.failedStart = postUpFailure(failedName);
     }
     hostStates.set(database, state);
   }
+  return state;
+}
+
+async function apply(mode?: ApplyMode, manualRestart = false) {
+  const database = getDatabase();
+  const state = await getHostState(database);
   mode ??= state.retry ?? (state.awaitingValidSettings ? 'restart' : 'sync');
   // Clear only after every host effect succeeds. Maintenance retries failures.
   state.retry = mode;
@@ -257,31 +258,53 @@ async function apply(mode?: ApplyMode, manualRestart = false) {
     );
   }
   await state.tunnel.checkOwnership(savedNetwork.name);
-  if (mode !== 'sync') {
-    const gateways = await filteredSiteGateways(database);
+  if (mode !== 'sync' && network.firewallEnabled) {
+    const gateways = clients.filter((client) => client.enabled);
     await checkRoutedReplySupport(routedReplyFamilies(gateways, enableIpv6));
   }
-  const restoredDefaults = state.restoredDefaults;
   const verifiedPeers = async () =>
     peersWithVerifiedSources(
       clients,
       await wg.dump(network.name),
       enableIpv6,
-      restoredDefaults
+      state.restoredDefaults
     );
-  let previousGateways: Partial<Record<RouteFamily, string>> = {};
+  const rebuildFirewall = async (verifySources: boolean) =>
+    firewall.rebuildRules(
+      network,
+      verifySources && network.firewallEnabled
+        ? await verifiedPeers()
+        : clients,
+      defaults,
+      enableIpv6
+    );
+  function syncRoutes(
+    previousGateways: Partial<Record<RouteFamily, string>> = {}
+  ) {
+    state.restoredDefaults.clear();
+    return state.tunnel.syncRoutes(
+      network,
+      clients,
+      enableIpv6,
+      async (family, prefix) => {
+        const key = previousGateways[family];
+        await wg.restoreDefault(network.name, prefix, key);
+        state.restoredDefaults.set(prefix, key);
+      }
+    );
+  }
+
+  let routes;
+  let mtuError;
+  let postUp = '';
   if (mode === 'sync') {
     await state.tunnel.guardTraffic(network, enableIpv6);
-    previousGateways = await revokePeers(network.name, clients, enableIpv6);
-  } else {
-    assertSubnetCapacity(network, clients.length);
-    await state.tunnel.stop(network.name);
-    await database.transaction((tx) => renumberClients(tx, clients, network));
-    state.activeNetwork = stagedSettings(network);
-  }
-  await writeSavedConfig();
-  let mtuError;
-  if (mode === 'sync') {
+    const previousGateways = await revokePeers(
+      network.name,
+      clients,
+      enableIpv6
+    );
+    await writeSavedConfig();
     try {
       await wg.sync(network, clients, enableIpv6);
     } catch (error) {
@@ -293,41 +316,26 @@ async function apply(mode?: ApplyMode, manualRestart = false) {
       }
       throw error;
     }
-    if (state.mtu !== undefined && state.mtu !== network.mtu) {
-      try {
+    try {
+      if (state.mtu !== undefined && state.mtu !== network.mtu) {
         await setTunnelMtu(network.name, network.mtu);
-      } catch (error) {
-        // Reconcile routes and reopen filtered traffic before retrying the MTU.
-        mtuError = error;
       }
+      state.mtu = network.mtu;
+    } catch (error) {
+      // Reconcile routes and reopen filtered traffic before retrying the MTU.
+      mtuError = error;
     }
-  }
-  const postUp =
-    mode === 'sync' ? '' : expandHook(hooks.postUp, network, options.uiPort);
-  const rebuildFirewall = async (verifySources: boolean) =>
-    firewall.rebuildRules(
-      network,
-      verifySources && network.firewallEnabled
-        ? await verifiedPeers()
-        : clients,
-      defaults,
-      enableIpv6
-    );
-  const syncRoutes = () =>
-    state.tunnel.syncRoutes(
-      network,
-      clients,
-      enableIpv6,
-      async (family, prefix) => {
-        const key = previousGateways[family];
-        await wg.restoreDefault(network.name, prefix, key);
-        restoredDefaults.set(prefix, key);
-      }
-    );
-  let routes;
-  try {
-    if (mode !== 'sync') {
-      state.tunnel = new LinuxTunnel();
+    routes = await syncRoutes(previousGateways);
+  } else {
+    assertSubnetCapacity(network, clients.length);
+    await state.tunnel.stop(network.name);
+    await database.transaction((tx) => renumberClients(tx, clients, network));
+    state.activeNetwork = stagedSettings(network);
+    await writeSavedConfig();
+
+    postUp = expandHook(hooks.postUp, network, options.uiPort);
+    state.tunnel = new LinuxTunnel();
+    try {
       // An unconfigured link cannot carry peer traffic. Bind its identity and
       // filtering claim before installing the guard or handing it to PreUp.
       await state.tunnel.create(network);
@@ -341,27 +349,20 @@ async function apply(mode?: ApplyMode, manualRestart = false) {
       }
       await wg.sync(network, clients, enableIpv6);
       await state.tunnel.configureLink(network, enableIpv6);
-    }
-    if (!mtuError) {
       state.mtu = network.mtu;
-    }
-    restoredDefaults.clear();
-    routes = await syncRoutes();
-    if (postUp && network.firewallEnabled) {
-      await rebuildFirewall(!!routes.policyError);
-    }
-  } catch (error) {
-    if (mode !== 'sync') {
+      routes = await syncRoutes();
+      if (postUp && network.firewallEnabled) {
+        await rebuildFirewall(!!routes.policyError);
+      }
+    } catch (error) {
       await state.tunnel.stop(network.name, true);
+      throw error;
     }
-    throw error;
-  }
-  if (mode !== 'sync') {
     if (postUp) {
       try {
         await wg.runHook(network.name, network.routingTable, postUp);
       } catch (cause) {
-        return failedPostUp(state, network.name, cause);
+        return handlePostUpFailure(state, network.name, cause);
       }
     }
     // PostUp has returned successfully. From here, retry against the live link.
@@ -375,7 +376,6 @@ async function apply(mode?: ApplyMode, manualRestart = false) {
     if (routes.policyError) {
       // The first pass withdrew the failed family's default from the peer.
       await wg.sync(network, clients, enableIpv6);
-      restoredDefaults.clear();
     }
     routes = await syncRoutes();
   }
@@ -391,9 +391,12 @@ async function apply(mode?: ApplyMode, manualRestart = false) {
   delete state.retry;
 }
 
-async function filteredSiteGateways(tx: Repositories) {
+async function requiredReplyFamilies(tx: Repositories) {
   const network = await tx.interfaces.get();
-  return network.firewallEnabled ? tx.clients.getEnabledSiteGateways() : [];
+  const gateways = network.firewallEnabled
+    ? await tx.clients.getEnabledSiteGateways()
+    : [];
+  return routedReplyFamilies(gateways, !WG_ENV.DISABLE_IPV6);
 }
 
 export const unchanged = Symbol('unchanged');
@@ -405,15 +408,11 @@ export function commit<T>(
 ) {
   return enqueue(async () => {
     const result = await getDatabase().transaction(async (tx) => {
-      const before = await filteredSiteGateways(tx);
+      const before = await requiredReplyFamilies(tx);
       const value = await change(tx);
-      const enableIpv6 = !WG_ENV.DISABLE_IPV6;
-      const after = routedReplyFamilies(
-        await filteredSiteGateways(tx),
-        enableIpv6
-      );
+      const after = await requiredReplyFamilies(tx);
       // Revoking a peer or disabling filtering must still work if the host changes.
-      const added = after.difference(routedReplyFamilies(before, enableIpv6));
+      const added = after.difference(before);
       if (added.size) {
         const tunnel =
           hostStates.get(getDatabase())?.tunnel ?? new LinuxTunnel();

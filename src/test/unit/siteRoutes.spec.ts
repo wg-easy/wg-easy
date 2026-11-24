@@ -270,18 +270,15 @@ describe('Server Allowed IP routes', () => {
       ...extras,
     }));
     await setRoutes([prefix]);
-    const command = vi.mocked(commands.exec);
-    const run = command.getMockImplementation()!;
-    command.mockImplementation(async (cmd, options) => {
-      const result = await run(cmd, options);
-      if (cmd.endsWith('route show table 254')) {
-        // Ownership changes after the snapshot and before deletion.
-        extras = { prefsrc: '10.8.0.1', metrics: { mtu: 1400 } };
-      }
-      return result;
-    });
+    // An operator replaces the route after installation. The first routing
+    // read on withdrawal must check this prefix against the live table.
+    extras = { prefsrc: '10.8.0.1', metrics: { mtu: 1400 } };
+    vi.mocked(commands.exec).mockClear();
     await setRoutes([]);
     expect(entries.has(prefix)).toBe(true);
+    expect(vi.mocked(commands.exec).mock.calls[0]?.[0]).toBe(
+      `ip -4 -N -j -details route show table 254 match ${prefix}`
+    );
   });
 
   test.each(['start', 'restart'] as const)(

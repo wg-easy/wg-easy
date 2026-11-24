@@ -168,9 +168,10 @@ ${backend}-quick up wg0`,
             );
           },
           pingFromClient: async (address, index) => {
+            const family = address.includes(':') ? '-6' : '-4';
             try {
               await execClient(
-                ['ping', '-4', '-I', 'wg0', '-c', '1', '-W', '1', address],
+                ['ping', family, '-I', 'wg0', '-c', '1', '-W', '1', address],
                 index
               );
               return true;

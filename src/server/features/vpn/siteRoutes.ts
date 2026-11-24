@@ -52,22 +52,15 @@ class RouteTable {
   matching(value: string) {
     const { start, prefix } = parseCidr(value);
     const wanted = Number(prefix);
-    let best: KernelRoute[] = [];
-    let bestLength = -1;
-    for (const [length, networks] of this.byLength) {
-      if (length > wanted || length <= bestLength) {
-        continue;
-      }
-      const entries = networks.get(start >> BigInt(this.addressBits - length));
-      if (entries?.length) {
-        if (length === wanted) {
-          return { exact: entries, best: entries };
-        }
-        best = entries;
-        bestLength = length;
+    for (let length = wanted; length >= 0; length--) {
+      const entries = this.byLength
+        .get(length)
+        ?.get(start >> BigInt(this.addressBits - length));
+      if (entries) {
+        return { exact: length === wanted, entries };
       }
     }
-    return { exact: [], best };
+    return { exact: false, entries: [] };
   }
 }
 
@@ -137,6 +130,25 @@ export class SiteRoutes {
     const device = parseInterfaceName(network.name);
     const tables = new Map<string, Promise<RouteTable | undefined>>();
 
+    async function tableForInstall(
+      ipv6: boolean,
+      { table, prefix }: SiteRoute
+    ) {
+      const key = `${ipv6 ? 6 : 4}/${table}`;
+      let snapshot = tables.get(key);
+      if (!snapshot) {
+        snapshot = readTable(ipv6, table).catch((error) => {
+          // Large tables fall back to a bounded read per prefix.
+          if (error.code !== 'ERR_CHILD_PROCESS_STDIO_MAXBUFFER') {
+            throw error;
+          }
+          return undefined;
+        });
+        tables.set(key, snapshot);
+      }
+      return (await snapshot) ?? readTable(ipv6, table, prefix);
+    }
+
     let failure;
     // Process each prefix even if another client has a conflicting route.
     // Withdraw obsolete routes first so they cannot mask a still-needed subnet.
@@ -145,20 +157,12 @@ export class SiteRoutes {
       const action = desired.has(key) ? 'install' : 'remove';
       try {
         const ipv6 = route.prefix.includes(':');
-        const tableKey = `${ipv6 ? 6 : 4}/${route.table}`;
-        let table = tables.get(tableKey);
-        if (!table) {
-          table = readTable(ipv6, route.table).catch((error) => {
-            // Keep memory bounded on hosts with unusually large routing tables.
-            if (error.code !== 'ERR_CHILD_PROCESS_STDIO_MAXBUFFER') {
-              throw error;
-            }
-            return undefined;
-          });
-          tables.set(tableKey, table);
-        }
+        // Verify removals against the live prefix. Snapshot the table only
+        // after all withdrawals, so installs see the remaining routes.
         const routes =
-          (await table) ?? (await readTable(ipv6, route.table, route.prefix));
+          action === 'remove'
+            ? await readTable(ipv6, route.table, route.prefix)
+            : await tableForInstall(ipv6, route);
         await this.applyRoute(
           device,
           route,
@@ -190,41 +194,32 @@ export class SiteRoutes {
     const key = routeKey(route);
     const ipv6 = prefix.includes(':');
     const ip = ipv6 ? 'ip -6' : 'ip -4';
-    const { exact, best } = routes.matching(prefix);
+    const { exact, entries } = routes.matching(prefix);
     const family = ipv6 ? 'ipv6' : 'ipv4';
     const metric = routeMetric(family);
     const installed =
       this.owned.has(key) &&
-      exact.some((entry) => matchesOwnedRoute(entry, device, family));
-    if (!installed) {
-      this.owned.delete(key);
-    }
+      exact &&
+      entries.some((entry) => matchesOwnedRoute(entry, device, family));
     const target = `${prefix} dev ${device} table ${table}`;
     if (action === 'remove') {
       if (installed) {
-        // A host operator may have replaced this route since the table dump.
-        // Verify its complete attributes again before issuing a deletion.
-        const current = await readTable(ipv6, table, prefix);
-        exact.splice(0, exact.length, ...current.matching(prefix).exact);
-        const owned = exact.findIndex((entry) =>
-          matchesOwnedRoute(entry, device, family)
+        await exec(
+          `${ip} route del ${target} proto ${routeProtocol} metric ${metric}`
         );
-        if (owned !== -1) {
-          await exec(
-            `${ip} route del ${target} proto ${routeProtocol} metric ${metric}`
-          );
-          exact.splice(owned, 1);
-        }
-        this.owned.delete(key);
       }
+      this.owned.delete(key);
       return;
+    }
+    if (!installed) {
+      this.owned.delete(key);
     }
     // Linux selects the longest prefix first, then the lowest metric.
-    const preferred = preferredRoute(best, device);
-    if ((exact.length || automatic) && preferred.viaTunnel) {
+    const preferred = preferredRoute(entries, device);
+    if ((exact || automatic) && preferred.viaTunnel) {
       return;
     }
-    if (exact.length && preferred.metric <= metric) {
+    if (exact && preferred.metric <= metric) {
       throw new RouteConflict();
     }
     await exec(`${ip} route add ${target} proto ${routeProtocol}`);

@@ -16,19 +16,8 @@ test.describe('dual-stack MTU', () => {
     const settings = await json(iface);
     const peer = await create('Dual-stack peer');
     await app.connectClient(await download(peer));
-    const ping = () =>
-      app.execClient([
-        'ping',
-        '-6',
-        '-I',
-        'wg0',
-        '-c',
-        '1',
-        '-W',
-        '2',
-        'fdcc:ad94:bacf:61a4::cafe:1',
-      ]);
-    await expect(ping()).resolves.toContain('0% packet loss');
+    const ping = () => app.pingFromClient('fdcc:ad94:bacf:61a4::cafe:1');
+    await expect.poll(ping).toBe(true);
     const rejected = await request.post(iface, {
       headers,
       data: { ...settings, mtu: 1200 },
@@ -53,9 +42,9 @@ test.describe('dual-stack MTU', () => {
     expect(await app.execServer(['cat', '/sys/class/net/wg0/mtu'])).toBe(
       '1280'
     );
-    await expect(ping()).resolves.toContain('0% packet loss');
+    expect(await ping()).toBe(true);
     await post(iface, { ...settings, mtu: 1420 });
-    await expect(ping()).resolves.toContain('0% packet loss');
+    expect(await ping()).toBe(true);
   });
 });
 
