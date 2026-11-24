@@ -189,10 +189,20 @@ test('reports a replacement interface and leaves its configuration in place', as
     data: { ...credentials, remember: false },
     failOnStatusCode: true,
   });
-  await app.execServer(['ip', 'link', 'del', 'dev', 'wg0']);
-  await app.execServer(['ip', 'link', 'add', 'dev', 'wg0', 'type', 'dummy']);
-  await app.execServer(['ip', 'address', 'add', '192.0.2.10/32', 'dev', 'wg0']);
   const index = await app.execServer(['cat', '/sys/class/net/wg0/ifindex']);
+  await app.execServer(['ip', 'link', 'del', 'dev', 'wg0']);
+  await app.execServer([
+    'ip',
+    'link',
+    'add',
+    'name',
+    'wg0',
+    'index',
+    index,
+    'type',
+    'dummy',
+  ]);
+  await app.execServer(['ip', 'address', 'add', '192.0.2.10/32', 'dev', 'wg0']);
   const result = await request.post('/api/admin/interface/restart', {
     headers,
   });

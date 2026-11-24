@@ -110,7 +110,8 @@ describe('VPN operations', () => {
     await store.interfaces.update({ firewallEnabled: true });
     firewall.blockTraffic.mockRejectedValue(new Error('Firewall unavailable'));
     await expect(vpn.start()).rejects.toThrow('Firewall unavailable');
-    expect(commands.up).not.toHaveBeenCalled();
+    expect(commands.sync).not.toHaveBeenCalled();
+    expect(commands.runHook).not.toHaveBeenCalled();
   });
 
   test.each(['start', 'restart', 'sync'] as const)(
@@ -118,7 +119,7 @@ describe('VPN operations', () => {
     async (mode) => {
       const { store, commands, firewall } = await vpnFixture();
       await store.interfaces.update({ firewallEnabled: true });
-      commands[mode === 'sync' ? 'sync' : 'up'].mockImplementation(async () => {
+      commands.sync.mockImplementation(async () => {
         expect(firewall.blockTraffic).toHaveBeenCalledWith('wg0', true);
         throw new Error('WireGuard unavailable');
       });

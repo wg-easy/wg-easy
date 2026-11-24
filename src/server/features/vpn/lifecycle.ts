@@ -105,12 +105,6 @@ async function apply(mode?: ApplyMode) {
     hostStates.set(database, state);
   }
   const manualRestart = mode === 'restart' || mode === 'start';
-  if (manualRestart) {
-    const gateways = await filteredSiteGateways(database);
-    await checkRoutedReplySupport(
-      routedReplyFamilies(gateways, !WG_ENV.DISABLE_IPV6)
-    );
-  }
   mode ??= state.retry ?? 'sync';
   // Clear only after every host effect succeeds. Maintenance retries failures.
   state.retry = mode;
@@ -122,6 +116,13 @@ async function apply(mode?: ApplyMode) {
       defaults: await tx.userConfigs.get(),
     }));
   const enableIpv6 = !WG_ENV.DISABLE_IPV6;
+  await state.tunnel.checkOwnership(savedNetwork.name);
+  if (mode !== 'sync') {
+    const gateways = await filteredSiteGateways(database);
+    await checkRoutedReplySupport(
+      routedReplyFamilies(gateways, !WG_ENV.DISABLE_IPV6)
+    );
+  }
   if (state.failedStart) {
     await cleanFailedStart(state.tunnel, state.failedStart);
     if (!manualRestart) {
@@ -146,12 +147,8 @@ async function apply(mode?: ApplyMode) {
     mode === 'sync'
       ? { ...savedNetwork, ...state.activeNetwork }
       : savedNetwork;
-  await state.tunnel.checkOwnership(network.name);
-  if (network.firewallEnabled) {
-    await firewall.blockTraffic(network.name, enableIpv6);
-  }
-
   if (mode === 'sync') {
+    await state.tunnel.guardTraffic(network, enableIpv6);
     // Remove revoked peers before parsing or applying the full configuration.
     // An unrelated invalid or unresolvable endpoint must not preserve access.
     const enabledKeys = new Set(
@@ -187,7 +184,17 @@ async function apply(mode?: ApplyMode) {
     const postUp = expandHook(hooks.postUp, network, options.uiPort);
     state.routes = new SiteRoutes();
     try {
-      await state.tunnel.create(network, hooks);
+      // An unconfigured link cannot carry peer traffic. Bind its identity and
+      // filtering claim before installing the guard or handing it to PreUp.
+      await state.tunnel.create(network);
+      await state.tunnel.guardTraffic(network, enableIpv6);
+      if (hooks.preUp) {
+        await wg.runHook(
+          network.name,
+          network.routingTable,
+          expandHook(hooks.preUp, network, options.uiPort)
+        );
+      }
       await wg.sync(network, clients, enableIpv6);
       await state.tunnel.configureLink(network, enableIpv6);
     } catch (error) {
@@ -204,6 +211,7 @@ async function apply(mode?: ApplyMode) {
         return failedPostUp(state, network.name, cause);
       }
     }
+    await state.tunnel.completeStartup(network, hooks);
     state.activeNetwork = stagedSettings(network);
   }
   state.activeAddresses = new Map(
@@ -219,6 +227,9 @@ async function apply(mode?: ApplyMode) {
   // The interface and its hooks are up. Retry subsequent failures live.
   state.retry = 'sync';
   await firewall.rebuildRules(network, clients, defaults, enableIpv6);
+  if (!network.firewallEnabled) {
+    await state.tunnel.recordFiltering(false);
+  }
   const siteError = await state.routes.sync(network, clients, enableIpv6);
   const policyError = await state.tunnel.defaultPolicy.sync(
     network,
@@ -258,10 +269,12 @@ export function commit<T>(
         enableIpv6
       );
       // Revoking a peer or disabling filtering must still work if the host changes.
-      if (after.size) {
-        await checkRoutedReplySupport(
-          after.difference(routedReplyFamilies(before, enableIpv6))
-        );
+      const added = after.difference(routedReplyFamilies(before, enableIpv6));
+      if (added.size) {
+        const tunnel =
+          hostStates.get(getDatabase())?.tunnel ?? new LinuxTunnel();
+        await tunnel.checkOwnership((await tx.interfaces.get()).name);
+        await checkRoutedReplySupport(added);
       }
       return value;
     });

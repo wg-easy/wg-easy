@@ -48,6 +48,7 @@ export async function vpnFixture() {
   vi.spyOn(LinuxTunnel.prototype, 'checkOwnership').mockResolvedValue(
     undefined
   );
+  vi.spyOn(LinuxTunnel.prototype, 'completeStartup').mockResolvedValue();
   vi.spyOn(LinuxTunnel.prototype, 'configureLink').mockResolvedValue();
   vi.spyOn(DefaultPolicy.prototype, 'sync').mockResolvedValue(undefined);
   vi.spyOn(wg, 'runHook').mockResolvedValue('');
