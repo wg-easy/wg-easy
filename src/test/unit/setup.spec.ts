@@ -10,6 +10,7 @@ import * as setup from '#server/features/setup';
 import { getIpInformation } from '#server/utils/ip';
 import { roles } from '#shared/utils/permissions';
 import { zeroWireGuardKey } from '#shared/utils/wireguard';
+import * as cmd from '#server/utils/cmd';
 import { LinuxTunnel } from '#server/utils/linuxTunnel';
 import { wg } from '#server/utils/wgHelper';
 import { firewall } from '#server/utils/firewall';
@@ -35,6 +36,7 @@ async function fixture() {
   const up = vi.spyOn(LinuxTunnel.prototype, 'create').mockResolvedValue();
   vi.spyOn(LinuxTunnel.prototype, 'completeStartup').mockResolvedValue();
   vi.spyOn(LinuxTunnel.prototype, 'configureLink').mockResolvedValue();
+  vi.spyOn(cmd, 'exec').mockResolvedValue('');
   vi.spyOn(firewall, 'rebuildRules').mockResolvedValue();
   onTestFinished(() => vi.restoreAllMocks());
   const ipInformation = vi

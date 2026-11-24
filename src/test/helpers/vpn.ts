@@ -7,6 +7,7 @@ import { databaseFixture } from './database';
 import * as schema from '#db/schema';
 import { roles } from '#shared/utils/permissions';
 import { DefaultPolicy } from '#server/features/vpn/defaultPolicy';
+import * as cmd from '#server/utils/cmd';
 import { LinuxTunnel } from '#server/utils/linuxTunnel';
 import { wg } from '#server/utils/wgHelper';
 import { firewall } from '#server/utils/firewall';
@@ -51,6 +52,7 @@ export async function vpnFixture() {
   vi.spyOn(LinuxTunnel.prototype, 'completeStartup').mockResolvedValue();
   vi.spyOn(LinuxTunnel.prototype, 'configureLink').mockResolvedValue();
   vi.spyOn(DefaultPolicy.prototype, 'sync').mockResolvedValue(undefined);
+  vi.spyOn(cmd, 'exec').mockResolvedValue('');
   vi.spyOn(wg, 'runHook').mockResolvedValue('');
   vi.spyOn(wg, 'sync').mockResolvedValue('');
   vi.spyOn(wg, 'removePeer').mockResolvedValue('');
