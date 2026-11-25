@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { readlink } from 'node:fs/promises';
+import { createConnection } from 'node:net';
 
 import { createError } from 'nuxt/server';
 
@@ -78,8 +79,30 @@ function temporaryName(record: TunnelRecord) {
 
 export class LinuxTunnel {
   private running?: TunnelRecord;
+  private userspaceSocket?: string;
   private pendingDownHooks = false;
   readonly sites = new SiteRoutes();
+
+  async userspaceExited() {
+    if (!this.running || !this.userspaceSocket) {
+      return false;
+    }
+    // SIGKILL can leave the socket on disk after the daemon has exited.
+    const socket = createConnection(this.userspaceSocket);
+    return new Promise<boolean>((resolve, reject) => {
+      socket.once('connect', () => {
+        socket.destroy();
+        resolve(false);
+      });
+      socket.once('error', (error: NodeJS.ErrnoException) => {
+        if (error.code === 'ECONNREFUSED' || error.code === 'ENOENT') {
+          resolve(true);
+        } else {
+          reject(error);
+        }
+      });
+    });
+  }
 
   async checkOwnership(name: string) {
     const link = await linkIdentity(parseInterfaceName(name));
@@ -175,6 +198,7 @@ export class LinuxTunnel {
     }
     if (userspace) {
       await exec(`setsid ${kind}-go ${name}`);
+      this.userspaceSocket = `/var/run/${kind}/${name}.sock`;
     }
     delete record.phase;
     await saveTunnelRecord(record);

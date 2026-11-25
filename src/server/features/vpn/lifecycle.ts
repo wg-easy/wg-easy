@@ -193,9 +193,10 @@ async function apply(mode?: ApplyMode, manualRestart = false) {
     clients,
     enableIpv6
   );
+  const userspaceExited = await state.tunnel.userspaceExited();
   if (
     mode === 'sync' &&
-    !isDeepStrictEqual(defaultTables, state.defaultTables)
+    (userspaceExited || !isDeepStrictEqual(defaultTables, state.defaultTables))
   ) {
     mode = 'rebuild';
     state.retry = mode;
@@ -273,7 +274,7 @@ async function apply(mode?: ApplyMode, manualRestart = false) {
   }
   const running = await state.tunnel.checkOwnership(savedNetwork.name);
   let priorityError;
-  if (mode !== 'sync' && state.activeNetwork && running) {
+  if (mode !== 'sync' && state.activeNetwork && running && !userspaceExited) {
     try {
       await checkDefaultPriorities(running, defaultTables);
     } catch (error) {
@@ -284,7 +285,10 @@ async function apply(mode?: ApplyMode, manualRestart = false) {
       Object.assign(network, state.activeNetwork);
     }
   }
-  if (mode === 'sync' || (running && mode !== 'start' && !manualRestart)) {
+  if (
+    mode === 'sync' ||
+    (running && mode !== 'start' && !manualRestart && !userspaceExited)
+  ) {
     // Revoke disabled or deleted peers even if the following teardown fails.
     await state.tunnel.guardTraffic(network, enableIpv6);
     await revokePeers(network.name, clients);
@@ -482,7 +486,8 @@ export function maintain() {
       }
       return expired.length > 0;
     });
-    if (changed || hostStates.get(database)?.retry) {
+    const state = hostStates.get(database);
+    if (changed || state?.retry || (await state?.tunnel.userspaceExited())) {
       await apply();
     }
   });

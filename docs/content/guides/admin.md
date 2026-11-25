@@ -58,6 +58,8 @@ With **Routing Table** set to `auto`, a peer advertising a default route needs t
 
 If `PreUp` sets a socket mark, wg-easy uses it. When wg-easy assigns a new mark, it checks the host's IPv4 and IPv6 routing rules, including masked marks. Peer updates keep that mark. If a later host rule conflicts with it, select **Restart Interface** to have wg-easy choose the mark again.
 
+If the userspace WireGuard or AmneziaWG daemon exits, the next maintenance check restarts the tunnel with its active port and address ranges. Connected peers must establish a new handshake.
+
 The address in the CIDR selects the server's gateway address. A network address keeps the first host as the gateway, preserving existing setups: `10.8.0.0/24` uses `10.8.0.1`. To choose another gateway, enter it directly, for example `10.8.0.15/24`. Clients then use available addresses from `10.8.0.1` through `10.8.0.254`, excluding `10.8.0.15`. The same rule applies to IPv6 and unattended setup CIDRs. The network and last address remain reserved for both address families.
 
 ### Per-Client Firewall

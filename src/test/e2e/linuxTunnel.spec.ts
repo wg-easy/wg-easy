@@ -2,6 +2,42 @@ import { expect, test } from './fixtures';
 import { admin } from './helpers';
 
 for (const backend of ['wg', 'awg'] as const) {
+  test.describe(`${backend} daemon recovery`, () => {
+    test.use({ backend, userspace: true });
+    test('reconnects peers after the userspace daemon exits', async ({
+      request,
+      app,
+    }) => {
+      test.slow(); // Wait for the normal one-minute maintenance job.
+      const { create, download, json, post } = await admin(request, app.url);
+      const client = await create('Connected peer');
+      const gateway = await create('Default gateway');
+      await post(gateway, {
+        ...(await json(gateway)),
+        serverAllowedIps: ['0.0.0.0/0'],
+      });
+      await app.connectClient(await download(client));
+      await expect.poll(() => app.pingFromClient('10.8.0.1')).toBe(true);
+      const index = () => app.execServer(['cat', '/sys/class/net/wg0/ifindex']);
+      const original = await index();
+      const mark = () => app.execServer([backend, 'show', 'wg0', 'fwmark']);
+      const originalMark = await mark();
+      const [signal, daemon] =
+        backend === 'wg' ? ['KILL', 'wireguard-go'] : ['TERM', 'amneziawg-go'];
+      await app.execServer([
+        'sh',
+        '-ec',
+        `kill -${signal} "$(pidof ${daemon})"`,
+      ]);
+      await expect
+        .poll(() => index().catch(() => original), { timeout: 80_000 })
+        .not.toBe(original);
+      await expect.poll(() => mark().catch(() => '')).toBe(originalMark);
+      await app.execClient([`${backend}-quick`, 'down', 'wg0']);
+      await app.execClient([`${backend}-quick`, 'up', 'wg0']);
+      await expect.poll(() => app.pingFromClient('10.8.0.1')).toBe(true);
+    });
+  });
   for (const userspace of [false, true]) {
     test.describe(`${backend} ${userspace ? 'userspace' : 'kernel'}`, () => {
       test.use({ backend, userspace });
