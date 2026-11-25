@@ -83,19 +83,6 @@ while [ ! -f /tmp/locked ]; do sleep 0.05; done`,
         firewallEnabled: true,
       });
       await app.stopProcess('KILL');
-      // Older versions also journaled routes that disappear with the link.
-      await app.execServer([
-        'node',
-        '-e',
-        `
-        const fs = require('node:fs');
-        const file = process.argv[1];
-        const record = JSON.parse(fs.readFileSync(file, 'utf8'));
-        record.policy.owned.ipv4.push({ kind: 'route', table: 51820 });
-        fs.writeFileSync(file, JSON.stringify(record));
-      `,
-        record,
-      ]);
       expect(await read('/sys/class/net/wg0/ifindex')).toBe(index);
       expect(await rules()).toContain('old-hook');
       const namespace = await app.execServer(['readlink', '/proc/self/ns/net']);
@@ -384,45 +371,6 @@ test('retains both failed hook names and guards the old filtered link during an 
   expect((await json(iface)).restartRequired).toBe(false);
 });
 
-test('leaves an alias-only link for its operator to identify before adopting it', async ({
-  app,
-  request,
-}) => {
-  const { post } = await admin(request, app.url);
-  const tag = JSON.parse(await app.execServer(['cat', record])).policy.tag;
-  await app.execServer(['ip', 'link', 'set', 'dev', 'wg0', 'alias', tag]);
-  await app.execServer([
-    'ip',
-    'link',
-    'property',
-    'del',
-    'dev',
-    'wg0',
-    'altname',
-    tag,
-  ]);
-  await expect(post('/api/admin/interface/restart')).rejects.toThrow();
-  const [link] = JSON.parse(
-    await app.execServer(['ip', '-j', 'link', 'show', 'wg0'])
-  );
-  expect(link.ifalias).toBe(tag);
-  expect(link.altnames ?? []).not.toContain(tag);
-  await app.execServer([
-    'ip',
-    'link',
-    'property',
-    'add',
-    'dev',
-    'wg0',
-    'altname',
-    tag,
-  ]);
-  await post('/api/admin/interface/restart');
-  expect(JSON.parse(await app.execServer(['cat', record])).policy.tag).not.toBe(
-    tag
-  );
-});
-
 test('recovers owned default rules only after the recorded link is gone', async ({
   app,
   request,
@@ -642,7 +590,17 @@ for (const evidence of [
         'type',
         'dummy',
       ]);
-      await app.execServer(['ip', 'link', 'set', 'wg0', 'up']);
+      // A matching index and descriptive alias cannot prove generation ownership.
+      const { policy } = JSON.parse(await app.execServer(['cat', record]));
+      await app.execServer([
+        'ip',
+        'link',
+        'set',
+        'wg0',
+        'alias',
+        policy.tag,
+        'up',
+      ]);
       if (evidence === 'missing record') {
         await app.execServer(['rm', record]);
       }

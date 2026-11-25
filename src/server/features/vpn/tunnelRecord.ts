@@ -32,24 +32,21 @@ const rule = z.discriminatedUnion('kind', [
     address: z.union([z.ipv4(), z.ipv6()]),
   }),
 ]);
-// Earlier records included routes. Linux removes those with the link.
-const ownedRules = z
-  .array(z.union([rule, z.object({ kind: z.literal('route'), table: id })]))
-  .transform((items) => items.filter((item) => item.kind !== 'route'));
+const ownedRules = z.array(rule);
 export type PolicyRule = z.infer<typeof rule>;
 
 const tunnelRecord = z.object({
   version: z.literal(1),
   name: z.string(),
   index: z.int().positive().nullable(),
-  phase: z.enum(['creating', 'deleting']).optional(),
-  namespace: z.string().optional(),
+  phase: z.enum(['creating', 'created', 'deleting']),
+  namespace: z.string(),
   backend: z.enum(['wg', 'awg']),
   table: z.string(),
   disableIpv6: z.boolean(),
   filtering: z.boolean(),
   // Down hooks are armed only after PostUp succeeds.
-  postUpSucceeded: z.literal(true).optional(),
+  postUpSucceeded: z.boolean(),
   preDown: z.string(),
   postDown: z.string(),
   // The policy tag identifies this generation by its Linux alternate name.
@@ -162,10 +159,6 @@ export async function readPostUpMarker() {
     const contents = await readRecoveryFile(failureFile);
     if (!contents) {
       return;
-    }
-    // Versions before generation-bound markers stored just the interface name.
-    if (!contents.startsWith('{')) {
-      return { name: parseInterfaceName(contents), succeeded: false };
     }
     const marker = postUpMarker.parse(JSON.parse(contents));
     const name = parseInterfaceName(marker.name);

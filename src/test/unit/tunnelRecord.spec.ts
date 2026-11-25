@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -33,7 +34,11 @@ test.runIf(process.platform === 'linux')(
     directory = await mkdtemp(join(tmpdir(), 'wg-post-up-'));
     onTestFinished(() => rm(directory, { recursive: true, force: true }));
     const marker = join(directory, 'failed-post-up');
-    await writeFile(marker, 'wg0', { mode: 0o600 });
+    await writeFile(
+      marker,
+      JSON.stringify({ name: 'wg0', generation: 'wg-easy-' + randomUUID() }),
+      { mode: 0o600 }
+    );
     expect(await readPostUpMarker()).toEqual({ name: 'wg0', succeeded: false });
     await clearPostUpFailure();
     expect(await readFile(marker, 'utf8')).toBe('');

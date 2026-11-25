@@ -46,15 +46,15 @@ export async function vpnFixture() {
   vi.spyOn(wg, 'dump').mockResolvedValue([]);
   const up = vi.spyOn(LinuxTunnel.prototype, 'create').mockResolvedValue();
   const down = vi.spyOn(LinuxTunnel.prototype, 'stop').mockResolvedValue();
-  let failedName: string | undefined;
-  vi.spyOn(recovery, 'readPostUpMarker').mockImplementation(async () =>
-    failedName ? { name: failedName, succeeded: false } : undefined
+  let marker: Awaited<ReturnType<typeof recovery.readPostUpMarker>>;
+  vi.spyOn(recovery, 'readPostUpMarker').mockImplementation(async () => marker);
+  vi.spyOn(recovery, 'writeHookMarker').mockImplementation(
+    async (name, failedDownHook) => {
+      marker = { name, succeeded: false, failedDownHook };
+    }
   );
-  vi.spyOn(recovery, 'writeHookMarker').mockImplementation(async (name) => {
-    failedName = name;
-  });
   vi.spyOn(recovery, 'clearPostUpFailure').mockImplementation(async () => {
-    failedName = undefined;
+    marker = undefined;
   });
   vi.spyOn(LinuxTunnel.prototype, 'checkOwnership').mockResolvedValue(
     undefined

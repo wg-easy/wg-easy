@@ -175,6 +175,7 @@ export class LinuxTunnel {
       table: network.routingTable,
       disableIpv6: WG_ENV.DISABLE_IPV6,
       filtering: false,
+      postUpSucceeded: false,
       preDown: '',
       postDown: '',
       policy: { tag: alias, owned: { ipv4: [], ipv6: [] } },
@@ -223,7 +224,7 @@ export class LinuxTunnel {
       await exec(`setsid ${kind}-go ${name}`);
       this.userspaceSocket = `/var/run/${kind}/${name}.sock`;
     }
-    delete record.phase;
+    record.phase = 'created';
     await saveTunnelRecord(record);
   }
 
