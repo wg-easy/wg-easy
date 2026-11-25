@@ -208,7 +208,7 @@ for (const [hook, problem, command] of [
       preUp: '',
       postUp: `cp -p ${marker} /tmp/confirmed; echo up >> /tmp/phases`,
       preDown: `echo pre >> /tmp/phases; ${hook === 'PreDown' ? command : 'true'}`,
-      postDown: `echo post >> /tmp/phases; ${hook === 'PostDown' ? command : 'true'}`,
+      postDown: `cp ${marker} /tmp/post-down-marker; echo post >> /tmp/phases; ${hook === 'PostDown' ? command : 'true'}`,
     });
     await post('/api/admin/interface/restart');
     await app.stopProcess('KILL');
@@ -229,6 +229,10 @@ for (const [hook, problem, command] of [
       expect(
         JSON.parse(await app.execServer(['cat', marker])).failedDownHook
       ).toBe(hook);
+      expect(
+        JSON.parse(await app.execServer(['cat', '/tmp/post-down-marker']))
+          .failedDownHook
+      ).toBe(hook === 'PreDown' ? 'PreDown and PostDown' : 'PostDown');
     }
     if (problem === 'is interrupted') {
       await app.startProcess();
@@ -306,6 +310,16 @@ chmod +x /usr/local/bin/ip`,
       );
       expect(link.flags).not.toContain('UP');
       await app.stopProcess('TERM');
+      await app.startProcess();
+      await expect
+        .poll(() =>
+          json('/api/admin/interface').then(
+            (r) => r.restartRequired,
+            () => false
+          )
+        )
+        .toBe(true);
+      await expect(post('/api/admin/interface/restart')).rejects.toThrow();
       expect(await app.execServer(['cat', '/tmp/phases'])).toBe('up');
     } else {
       expect(await app.execServer(['wg', 'show', 'interfaces'])).toBe('');
@@ -313,15 +327,13 @@ chmod +x /usr/local/bin/ip`,
     await app.execServer(['rm', '/usr/local/bin/ip']);
     await app.execServer(['rmdir', marker]);
     await app.execServer(['mv', marker + '.saved', marker]);
-    if (hook === 'preDown') {
-      await app.startProcess();
-    } else {
+    if (hook === 'postDown') {
       // This restart discovers a new hook failure after the journal is repaired.
       await expect(post('/api/admin/interface/restart')).rejects.toThrow();
       expect(await app.execServer(['cat', '/tmp/phases'])).toBe('up\ndown');
       expect((await json('/api/admin/interface')).restartRequired).toBe(true);
-      await post('/api/admin/interface/restart');
     }
+    await post('/api/admin/interface/restart');
     await expect
       .poll(() => app.execServer(['cat', '/tmp/phases']))
       .toBe('up\ndown\nup');
@@ -335,6 +347,42 @@ chmod +x /usr/local/bin/ip`,
       .toBe(false);
   });
 }
+
+test('retains both failed hook names and guards the old filtered link during an explicit restart', async ({
+  app,
+  request,
+}) => {
+  const { json, post } = await admin(request, app.url);
+  const iface = '/api/admin/interface';
+  await post(iface, { ...(await json(iface)), firewallEnabled: true });
+  await post('/api/admin/hooks', {
+    preUp: '',
+    postUp: '',
+    preDown:
+      'iptables -w 2 -C FORWARD -i %i -m comment --comment "wg-easy rebuild %i" -j DROP && echo guarded >> /tmp/phases; false',
+    postDown: 'echo post >> /tmp/phases; false',
+  });
+  await post(iface + '/restart');
+  await expect(post(iface + '/restart')).rejects.toThrow();
+  const marker = '/etc/wireguard/.wg-easy/failed-post-up';
+  expect(JSON.parse(await app.execServer(['cat', marker])).failedDownHook).toBe(
+    'PreDown and PostDown'
+  );
+  await app.stopProcess('KILL');
+  await app.startProcess();
+  await expect
+    .poll(() =>
+      json(iface).then(
+        (r) => r.restartRequired,
+        () => false
+      )
+    )
+    .toBe(true);
+  expect(await app.execServer(['cat', '/tmp/phases'])).toBe('guarded\npost');
+  expect(await app.execServer(['wg', 'show', 'interfaces'])).toBe('');
+  await post(iface + '/restart');
+  expect((await json(iface)).restartRequired).toBe(false);
+});
 
 test('leaves an alias-only link for its operator to identify before adopting it', async ({
   app,
@@ -693,10 +741,8 @@ for (const phase of ['PostUp', 'PreDown', 'PostDown'] as const) {
         'if test -e /tmp/teardown; then cat /tmp/teardown; fi',
       ]);
     expect(await teardowns()).toBe(phase === 'PostUp' ? '' : 'pre\npost');
-    if (phase === 'PostUp') {
-      expect(await app.execServer(['wg', 'show', 'interfaces'])).toBe('');
-      await post('/api/admin/interface/restart');
-    }
+    expect(await app.execServer(['wg', 'show', 'interfaces'])).toBe('');
+    await post('/api/admin/interface/restart');
     await app.stopProcess('TERM');
     expect(await teardowns()).toBe(
       phase === 'PostUp' ? 'pre\npost' : 'pre\npost\npre\npost'

@@ -13,9 +13,11 @@ const generation = z.string().regex(/^wg-easy-[\da-f-]{36}$/);
 const postUpMarker = z.object({
   name: z.string().min(1),
   generation,
-  failedDownHook: z.enum(['PreDown', 'PostDown']).optional(),
+  failedDownHook: z
+    .enum(['PreDown', 'PostDown', 'PreDown and PostDown'])
+    .optional(),
 });
-export type DownHook = NonNullable<
+export type DownHookFailure = NonNullable<
   z.infer<typeof postUpMarker>['failedDownHook']
 >;
 const id = z.int().positive().max(0xffffffff);
@@ -186,7 +188,10 @@ export async function readPostUpMarker() {
   }
 }
 
-export async function writeHookMarker(name: string, failedDownHook?: DownHook) {
+export async function writeHookMarker(
+  name: string,
+  failedDownHook?: DownHookFailure
+) {
   const record = await readTunnelRecord(parseInterfaceName(name));
   if (!record) {
     throw new Error(`No tunnel recovery record for ${name}`);

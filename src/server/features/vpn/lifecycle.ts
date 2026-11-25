@@ -20,7 +20,7 @@ import {
   clearPostUpFailure,
   readPostUpMarker,
   writeHookMarker,
-  type DownHook,
+  type DownHookFailure,
 } from './tunnelRecord';
 
 import { getDatabase } from '#db';
@@ -53,6 +53,7 @@ type HostState = {
   awaitingValidSettings?: boolean;
   retry?: ApplyMode;
   pendingHookMarker?: boolean;
+  needsMarkerRead?: boolean;
   recoveringPostUp?: string;
   failedStart?: ReturnType<typeof hookFailure>;
 };
@@ -97,7 +98,10 @@ async function cleanFailedStart(
   tunnel: LinuxTunnel,
   failure: NonNullable<HostState['failedStart']>
 ) {
-  if (failure.cleanupPending) {
+  if (!failure.cleanupPending) {
+    return;
+  }
+  try {
     try {
       // The process may have stopped while PostUp had permitted traffic.
       const running = await tunnel.checkOwnership(failure.name);
@@ -105,13 +109,27 @@ async function cleanFailedStart(
         await firewall.blockTraffic(failure.name, !running.disableIpv6);
       }
     } finally {
-      await tunnel.stop(failure.name, failure.hook === 'PostUp');
+      if (failure.hook === 'PostUp') {
+        await tunnel.stop(failure.name, true);
+      } else {
+        await tunnel.stop(failure.name, false, failure.hook);
+      }
     }
-    failure.cleanupPending = false;
+  } catch (cause) {
+    if (cause instanceof DownHookError) {
+      Object.assign(failure, hookFailure(failure.name, cause.hook, cause));
+      throw failure.error;
+    }
+    throw cause;
   }
+  failure.cleanupPending = false;
 }
 
-function hookFailure(name: string, hook: DownHook | 'PostUp', cause?: unknown) {
+function hookFailure(
+  name: string,
+  hook: DownHookFailure | 'PostUp',
+  cause?: unknown
+) {
   return {
     name,
     hook,
@@ -128,7 +146,7 @@ function hookFailure(name: string, hook: DownHook | 'PostUp', cause?: unknown) {
 async function handleHookFailure(
   state: HostState,
   name: string,
-  hook: DownHook | 'PostUp',
+  hook: DownHookFailure | 'PostUp',
   cause: unknown
 ): Promise<never> {
   // Keep the failure after deleting the link and its recovery record. The
@@ -159,11 +177,24 @@ async function revokePeers(name: string, clients: ServerPeer[]) {
 async function getHostState(database: DatabaseStore) {
   let state = hostStates.get(database);
   if (!state) {
-    const marker = await readPostUpMarker();
     state = {
       tunnel: new LinuxTunnel(),
       defaultTables: {},
+      needsMarkerRead: true,
     };
+    hostStates.set(database, state);
+  }
+  if (state.needsMarkerRead) {
+    // A read error leaves the panel available. No lifecycle operation may
+    // trust the journal until a subsequent read validates its generation.
+    let marker;
+    try {
+      marker = await readPostUpMarker();
+    } catch (cause) {
+      state.retry ??= 'start';
+      throw cause;
+    }
+    delete state.needsMarkerRead;
     if (marker?.succeeded) {
       state.recoveringPostUp = marker.name;
     } else if (marker) {
@@ -172,32 +203,29 @@ async function getHostState(database: DatabaseStore) {
         marker.failedDownHook ?? 'PostUp'
       );
     }
-    hostStates.set(database, state);
   }
   return state;
 }
 
-async function recoverConfirmedPostUp(state?: HostState) {
-  if (!state?.recoveringPostUp) {
-    return;
-  }
-  const name = state.recoveringPostUp;
+async function stopTunnel(state: HostState, name: string) {
+  const recovering = state.recoveringPostUp === name;
   try {
-    // Leave the hook in the record if its marker cannot be written. Every
-    // retry, including shutdown, must journal the hook before entering Bash.
-    await state.tunnel.stop(name, false, (hook) => writeHookMarker(name, hook));
-    await clearPostUpFailure();
-  } catch (cause) {
-    if (!(cause instanceof DownHookError)) {
-      // Recovery may have stopped before PreDown with old peers still live.
-      // Keep the owned link offline while configuration updates are pending.
-      await state.tunnel.suspend(name);
-      throw cause;
+    await state.tunnel.stop(name);
+    if (recovering) {
+      await clearPostUpFailure();
+      delete state.recoveringPostUp;
     }
-    delete state.recoveringPostUp;
-    return handleHookFailure(state, name, cause.hook, cause);
+  } catch (cause) {
+    if (cause instanceof DownHookError) {
+      delete state.recoveringPostUp;
+      return handleHookFailure(state, name, cause.hook, cause);
+    }
+    if (recovering) {
+      // PreDown may still be pending with stale peers on the surviving link.
+      await state.tunnel.suspend(name);
+    }
+    throw cause;
   }
-  delete state.recoveringPostUp;
 }
 
 async function apply(mode?: ApplyMode, manualRestart = false) {
@@ -206,7 +234,9 @@ async function apply(mode?: ApplyMode, manualRestart = false) {
   mode ??= state.retry ?? (state.awaitingValidSettings ? 'restart' : 'sync');
   // Clear only after every host effect succeeds. Maintenance retries failures.
   state.retry = mode;
-  await recoverConfirmedPostUp(state);
+  if (state.recoveringPostUp) {
+    await stopTunnel(state, state.recoveringPostUp);
+  }
   const { savedNetwork, clients, hooks, defaults } = await database.transaction(
     async (tx) => ({
       savedNetwork: await tx.interfaces.get(),
@@ -276,7 +306,7 @@ async function apply(mode?: ApplyMode, manualRestart = false) {
       !RoutingTableSchema.safeParse(savedNetwork.routingTable).success
     ) {
       if (!state.awaitingValidSettings) {
-        await state.tunnel.stop(savedNetwork.name);
+        await stopTunnel(state, savedNetwork.name);
         state.awaitingValidSettings = true;
       }
       delete state.retry;
@@ -320,6 +350,8 @@ async function apply(mode?: ApplyMode, manualRestart = false) {
     // Revoke disabled or deleted peers even if the following teardown fails.
     await state.tunnel.guardTraffic(network, enableIpv6);
     await revokePeers(network.name, clients);
+  } else if (running?.filtering && manualRestart) {
+    await firewall.blockTraffic(network.name, !running.disableIpv6);
   }
   if (mode !== 'sync' && network.firewallEnabled) {
     const gateways = clients.filter((client) => client.enabled);
@@ -363,7 +395,7 @@ async function apply(mode?: ApplyMode, manualRestart = false) {
     }
   } else {
     assertSubnetCapacity(network, clients.length);
-    await state.tunnel.stop(network.name);
+    await stopTunnel(state, network.name);
     if (state.pendingHookMarker) {
       await clearPostUpFailure();
       delete state.pendingHookMarker;
@@ -556,6 +588,7 @@ export function start() {
         // Keep the database and admin panel available for hook repair.
         console.error('VPN startup is waiting for an explicit restart:', error);
       } else if (
+        state?.needsMarkerRead ||
         state?.recoveringPostUp ||
         state?.retry === 'sync' ||
         state?.retry === 'rebuild'
@@ -577,11 +610,18 @@ export function stop() {
     const database = getDatabase();
     const network = await database.interfaces.get();
     const state = hostStates.get(database);
-    await recoverConfirmedPostUp(state);
+    if (state?.needsMarkerRead) {
+      await getHostState(database);
+    }
+    if (state?.recoveringPostUp) {
+      await stopTunnel(state, state.recoveringPostUp);
+    }
     if (state?.failedStart) {
       await cleanFailedStart(state.tunnel, state.failedStart);
     } else {
-      await state?.tunnel.stop(network.name);
+      if (state) {
+        await stopTunnel(state, network.name);
+      }
       if (state?.pendingHookMarker) {
         await clearPostUpFailure();
       }

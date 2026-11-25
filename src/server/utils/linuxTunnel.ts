@@ -16,7 +16,8 @@ import {
   readTunnelRecord,
   removeTunnelRecord,
   saveTunnelRecord,
-  type DownHook,
+  writeHookMarker,
+  type DownHookFailure,
   type TunnelRecord,
 } from '#server/features/vpn/tunnelRecord';
 import type { HooksType } from '#db/repositories/hooks/types';
@@ -93,22 +94,10 @@ async function ownedLinkTarget(running: TunnelRecord) {
 
 export class DownHookError extends Error {
   constructor(
-    readonly hook: DownHook,
+    readonly hook: DownHookFailure,
     cause: unknown
   ) {
     super(`${hook} failed`, { cause });
-  }
-}
-
-async function runDownHook(
-  record: TunnelRecord,
-  hook: DownHook,
-  command: string
-) {
-  try {
-    await wg.runHook(record.name, record.table, command, record.disableIpv6);
-  } catch (cause) {
-    throw new DownHookError(hook, cause);
   }
 }
 
@@ -319,11 +308,36 @@ export class LinuxTunnel {
     return installDefaultRoutes(this.running, network, defaultTables);
   }
 
-  async stop(
-    name: string,
-    skipHooks = false,
-    beforeDownHook?: (hook: DownHook) => Promise<void>
+  private async consumeDownHook(
+    record: TunnelRecord,
+    hook: 'PreDown' | 'PostDown',
+    priorFailure?: DownHookFailure
   ) {
+    const key = hook === 'PreDown' ? 'preDown' : 'postDown';
+    const command = record[key];
+    const hold =
+      (priorFailure === 'PreDown' || priorFailure === 'PreDown and PostDown') &&
+      hook === 'PostDown'
+        ? 'PreDown and PostDown'
+        : hook;
+    await writeHookMarker(record.name, hold);
+    const consumed = { ...record, [key]: '' };
+    await saveTunnelRecord(consumed);
+    this.running = consumed;
+    try {
+      await wg.runHook(record.name, record.table, command, record.disableIpv6);
+    } catch (cause) {
+      throw new DownHookError(hold, cause);
+    }
+    if (priorFailure) {
+      await writeHookMarker(record.name, priorFailure);
+    } else {
+      await clearPostUpFailure();
+    }
+    return consumed;
+  }
+
+  async stop(name: string, skipHooks = false, priorFailure?: DownHookFailure) {
     if (process.platform !== 'linux') {
       return;
     }
@@ -367,33 +381,20 @@ export class LinuxTunnel {
         await this.finishDeletion(
           record,
           skipHooks || record.phase !== 'deleting',
-          beforeDownHook
+          priorFailure
         );
       }
       this.running = undefined;
       return;
     }
-    // Consume PreDown before invoking Bash. A crash or partial hook failure
-    // cannot safely establish which commands from that hook already ran.
-    if (running.preDown || (skipHooks && running.postDown)) {
-      const { preDown, postDown } = running;
-      if (!skipHooks && preDown) {
-        await beforeDownHook?.('PreDown');
-      }
-      running = {
-        ...running,
-        preDown: '',
-        postDown: skipHooks ? '' : postDown,
-      };
+    if (skipHooks && (running.preDown || running.postDown)) {
+      running = { ...running, preDown: '', postDown: '' };
       await saveTunnelRecord(running);
       this.running = running;
-      if (!skipHooks && preDown) {
-        await runDownHook(running, 'PreDown', preDown);
-        if (!(await this.checkOwnership(name))) {
-          throw new Error(
-            `Tunnel interface ${name} disappeared during PreDown`
-          );
-        }
+    } else if (running.preDown) {
+      running = await this.consumeDownHook(running, 'PreDown', priorFailure);
+      if (!(await this.checkOwnership(name))) {
+        throw new Error(`Tunnel interface ${name} disappeared during PreDown`);
       }
     }
     await removeDefaultRules(running);
@@ -406,14 +407,14 @@ export class LinuxTunnel {
     this.running = running;
     const tag = await ownedLinkTarget(running);
     await exec(`ip link delete dev ${tag}`);
-    await this.finishDeletion(running, skipHooks, beforeDownHook);
+    await this.finishDeletion(running, skipHooks, priorFailure);
     this.running = undefined;
   }
 
   private async finishDeletion(
     running: TunnelRecord,
     skipHooks: boolean,
-    beforeDownHook?: (hook: DownHook) => Promise<void>
+    priorFailure?: DownHookFailure
   ) {
     const { name } = running;
     // Keep filtering in place through link deletion. Never remove rules or
@@ -425,18 +426,12 @@ export class LinuxTunnel {
       await firewall.removeOwnedFiltering(name, !running.disableIpv6);
     }
     if (!skipHooks && running.postDown) {
-      // Consume before entering Bash. A process restart cannot replay a
-      // partially executed PostDown.
-      await beforeDownHook?.('PostDown');
-      const consumed = { ...running, postDown: '' };
-      await saveTunnelRecord(consumed);
-      this.running = consumed;
-      await runDownHook(running, 'PostDown', running.postDown);
+      await this.consumeDownHook(running, 'PostDown', priorFailure);
     }
-    if (running.postUpSucceeded) {
-      // Retain confirmation across interruptions until the marker is gone.
+    if (running.postUpSucceeded && !skipHooks && !priorFailure) {
+      // Retry a marker clear that failed after a hook returned successfully.
       const marker = await readPostUpMarker();
-      if (marker?.name === name && marker.succeeded) {
+      if (marker?.name === name) {
         await clearPostUpFailure();
       }
     }
