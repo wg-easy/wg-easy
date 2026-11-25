@@ -247,7 +247,7 @@ test('keeps host routing precedence when automatic policy has no free priorities
   const v4Firewall = () =>
     Promise.all(
       ['mangle', 'raw'].map((table) =>
-        app.execServer(['iptables', '-t', table, '-S'])
+        app.execServer(['iptables', '-w', '2', '-t', table, '-S'])
       )
     );
   const originalFirewall = await v4Firewall();

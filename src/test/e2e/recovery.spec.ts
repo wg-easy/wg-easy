@@ -209,7 +209,8 @@ test('recovers owned default rules only after the recorded link is gone', async 
   const running = await readRecord();
   const tag = JSON.parse(running).policy.tag;
   const rules = () => app.execServer(['ip', '-4', 'rule', 'show']);
-  const mangle = () => app.execServer(['iptables', '-t', 'mangle', '-S']);
+  const mangle = () =>
+    app.execServer(['iptables', '-w', '2', '-t', 'mangle', '-S']);
   await app.execServer(['ip', 'rule', 'add', 'pref', '15000', 'lookup', '741']);
   expect(await mangle()).toContain(tag);
   await app.execServer(['ip', 'link', 'set', 'wg0', 'down']);
