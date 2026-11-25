@@ -1,7 +1,7 @@
 import { text } from 'node:stream/consumers';
 
 import { waitForHydration } from '@nuxt/test-utils/e2e';
-import type { APIRequestContext, Locator, Page } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 
 import { credentials, expect } from './fixtures';
 
@@ -66,22 +66,4 @@ export async function downloadConfiguration(page: Page, card: Locator) {
     filename: download.suggestedFilename(),
     contents: await text(await download.createReadStream()),
   };
-}
-
-export async function admin(request: APIRequestContext, origin: string) {
-  const headers = { Origin: origin };
-  const post = (url: string, data?: object) =>
-    request.post(url, { headers, data, failOnStatusCode: true });
-  const json = async (url: string) =>
-    (await request.get(url, { failOnStatusCode: true })).json();
-  const create = async (name: string) => {
-    const response = await post('/api/client', { name, expiresAt: null });
-    return `/api/client/${(await response.json()).clientId}`;
-  };
-  const download = async (url: string) =>
-    (
-      await request.get(url + '/configuration', { failOnStatusCode: true })
-    ).text();
-  await post('/api/auth/password', { ...credentials, remember: false });
-  return { headers, post, json, create, download };
 }

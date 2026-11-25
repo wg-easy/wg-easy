@@ -135,26 +135,25 @@ export class SiteRoutes {
       enableIpv6
     );
     const device = parseInterfaceName(network.name);
-    const tables = new Map<string, Promise<RouteTable | undefined>>();
+    // All installs use the selected table. Cache one snapshot per IP family.
+    const tables = new Map<boolean, RouteTable | undefined>();
     let readLivePrefixes = false;
 
     async function tableForInstall(
       ipv6: boolean,
       { table, prefix }: SiteRoute
     ) {
-      const key = `${ipv6 ? 6 : 4}/${table}`;
-      let snapshot = tables.get(key);
-      if (!snapshot) {
-        snapshot = readTable(ipv6, table).catch((error) => {
+      if (!tables.has(ipv6)) {
+        const snapshot = await readTable(ipv6, table).catch((error) => {
           // Large tables fall back to a bounded read per prefix.
           if (error.code !== 'ERR_CHILD_PROCESS_STDIO_MAXBUFFER') {
             throw error;
           }
           return undefined;
         });
-        tables.set(key, snapshot);
+        tables.set(ipv6, snapshot);
       }
-      return (await snapshot) ?? readTable(ipv6, table, prefix);
+      return tables.get(ipv6) ?? readTable(ipv6, table, prefix);
     }
 
     let failure;

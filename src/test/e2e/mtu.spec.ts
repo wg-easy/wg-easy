@@ -1,5 +1,4 @@
 import { expect, test } from './fixtures';
-import { admin } from './helpers';
 
 test.describe('dual-stack MTU', () => {
   test.use({ ipv6: true });
@@ -7,11 +6,8 @@ test.describe('dual-stack MTU', () => {
   test('keeps the IPv6 gateway reachable with explicit and automatic MTUs', async ({
     app,
     request,
+    api: { post, json, headers, create, download },
   }) => {
-    const { post, json, headers, create, download } = await admin(
-      request,
-      app.url
-    );
     const iface = '/api/admin/interface';
     const settings = await json(iface);
     const peer = await create('Dual-stack peer');
@@ -39,9 +35,7 @@ test.describe('dual-stack MTU', () => {
       '1320',
     ]);
     await post(iface, { ...settings, mtu: null });
-    expect(await app.execServer(['cat', '/sys/class/net/wg0/mtu'])).toBe(
-      '1280'
-    );
+    expect(await app.read('/sys/class/net/wg0/mtu')).toBe('1280');
     expect(await ping()).toBe(true);
     await post(iface, { ...settings, mtu: 1420 });
     expect(await ping()).toBe(true);
@@ -51,11 +45,8 @@ test.describe('dual-stack MTU', () => {
 test('invalid interface settings and a rejected live MTU preserve filtered traffic', async ({
   app,
   request,
+  api: { post, json, headers, create, download },
 }) => {
-  const { post, json, headers, create, download } = await admin(
-    request,
-    app.url
-  );
   const iface = '/api/admin/interface';
   await post(iface, { ...(await json(iface)), firewallEnabled: true });
   const settings = await json(iface);
@@ -77,28 +68,18 @@ test('invalid interface settings and a rejected live MTU preserve filtered traff
   }
 
   // Reject a valid MTU at the iproute2 boundary while keeping the link up.
-  await app.execServer([
-    'sh',
-    '-ec',
-    `cat > /usr/local/bin/ip <<'SH'
-#!/bin/sh
-if [ "$*" = 'link set dev wg0 mtu 1400' ]; then exit 2; fi
-exec /sbin/ip "$@"
-SH
-chmod +x /usr/local/bin/ip`,
-  ]);
+  await app.overrideIp(`if [ "$*" = 'link set dev wg0 mtu 1400' ]; then exit 2; fi
+exec /sbin/ip "$@"`);
   const failure = await request.post(iface, {
     headers,
     data: { ...settings, mtu: 1400 },
   });
   expect(failure.status()).toBe(500);
   expect(await ping()).toBe(true);
-  expect(await app.execServer(['cat', '/sys/class/net/wg0/mtu'])).toBe(
-    String(settings.mtu)
-  );
+  expect(await app.read('/sys/class/net/wg0/mtu')).toBe(String(settings.mtu));
   await app.execServer(['rm', '/usr/local/bin/ip']);
   await post(iface, { ...settings, mtu: 1400 });
-  expect(await app.execServer(['cat', '/sys/class/net/wg0/mtu'])).toBe('1400');
+  expect(await app.read('/sys/class/net/wg0/mtu')).toBe('1400');
 });
 
 for (const backend of ['wg', 'awg'] as const) {
@@ -106,9 +87,8 @@ for (const backend of ['wg', 'awg'] as const) {
     test.use({ backend });
     test('saving the server MTU tunes the connected tunnel in place', async ({
       app,
-      request,
+      api: { post, json, create, download },
     }) => {
-      const { post, json, create, download } = await admin(request, app.url);
       await post('/api/admin/hooks', {
         preUp: 'echo preUp >> /tmp/mtu-hooks',
         postUp: 'echo postUp >> /tmp/mtu-hooks',
@@ -116,7 +96,7 @@ for (const backend of ['wg', 'awg'] as const) {
         postDown: 'echo postDown >> /tmp/mtu-hooks',
       });
       await post('/api/admin/interface/restart');
-      const hooks = () => app.execServer(['cat', '/tmp/mtu-hooks']);
+      const hooks = () => app.read('/tmp/mtu-hooks');
       const before = await hooks();
       expect(before).toContain('preUp\npostUp');
       // Docker networks can use jumbo frames. Pin the underlay for automatic MTU.
@@ -124,8 +104,7 @@ for (const backend of ['wg', 'awg'] as const) {
       const url = '/api/admin/interface';
       const settings = await json(url);
       const saveMtu = (mtu: number | null) => post(url, { ...settings, mtu });
-      const link = (field: string) =>
-        app.execServer(['cat', '/sys/class/net/wg0/' + field]);
+      const link = (field: string) => app.read('/sys/class/net/wg0/' + field);
       await saveMtu(null);
       expect(await link('mtu')).toBe('1400');
 

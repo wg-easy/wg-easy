@@ -9,6 +9,16 @@ import {
   normalizeAddress,
 } from '#server/utils/ip';
 
+export async function changeCidr(
+  tx: Repositories,
+  cidrs: InterfaceCidrUpdateType
+) {
+  await tx.interfaces.update(cidrs);
+  const clients = await tx.clients.getAll();
+  await renumberClients(tx, clients, cidrs);
+  return clients;
+}
+
 /** Reserve usable addresses before assigning any replacements. */
 export async function renumberClients(
   tx: Repositories,

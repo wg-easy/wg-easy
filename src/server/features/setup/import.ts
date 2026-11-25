@@ -5,7 +5,7 @@ import { createError } from 'nuxt/server';
 import { z } from 'zod';
 
 import type { Repositories } from '#db/store';
-import { renumberClients } from '#server/features/vpn/subnets';
+import { changeCidr } from '#server/features/vpn/subnets';
 import { clientDefaults } from '#server/features/vpn/clients';
 import {
   isClientAddress,
@@ -111,13 +111,10 @@ export async function importLegacyConfiguration(
   const ipv4Cidr = parseCidr(server.address + '/24');
   const ipv6Cidr = parseCidr('fdcc:ad94:bacf:61a4::cafe:0/112');
 
-  const cidrs = {
+  const existing = await changeCidr(tx, {
     ipv4Cidr: ipv4Cidr.cidr,
     ipv6Cidr: ipv6Cidr.cidr,
-  };
-  await tx.interfaces.update(cidrs);
-  const existing = await tx.clients.getAll();
-  await renumberClients(tx, existing, cidrs);
+  });
   const ipv6Addresses = new Set(
     existing.map((client) => normalizeAddress(client.ipv6Address))
   );

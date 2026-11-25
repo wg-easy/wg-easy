@@ -67,18 +67,14 @@ function privateToService(stat: { uid: number; mode: number }) {
 // Pin the private directory while opening and renaming entries. A replaced
 // directory or symlink in the configuration volume cannot redirect writes.
 async function withDirectory<T>(operation: (path: string) => Promise<T>) {
-  const dir = await open(
+  await using dir = await open(
     directory,
     constants.O_RDONLY | constants.O_DIRECTORY | constants.O_NOFOLLOW
   );
-  try {
-    if (!privateToService(await dir.stat())) {
-      throw new Error('Unsafe tunnel recovery directory');
-    }
-    return await operation('/proc/self/fd/' + dir.fd);
-  } finally {
-    await dir.close();
+  if (!privateToService(await dir.stat())) {
+    throw new Error('Unsafe tunnel recovery directory');
   }
+  return await operation('/proc/self/fd/' + dir.fd);
 }
 
 function withRecoveryFile<T>(
@@ -87,26 +83,28 @@ function withRecoveryFile<T>(
   operation: (file: FileHandle) => Promise<T>
 ) {
   return withDirectory(async (path) => {
-    const file = await open(
+    await using file = await open(
       path + '/' + filename,
       flags | constants.O_NOFOLLOW | constants.O_NONBLOCK
     );
-    try {
-      const stat = await file.stat();
-      if (!stat.isFile() || !privateToService(stat) || stat.nlink !== 1) {
-        throw new Error('Unsafe tunnel recovery file');
-      }
-      return await operation(file);
-    } finally {
-      await file.close();
+    const stat = await file.stat();
+    if (!stat.isFile() || !privateToService(stat) || stat.nlink !== 1) {
+      throw new Error('Unsafe tunnel recovery file');
     }
+    return await operation(file);
   });
 }
 
-function readRecoveryFile(filename: string) {
-  return withRecoveryFile(filename, constants.O_RDONLY, (file) =>
-    file.readFile('utf8')
-  );
+async function readRecoveryFile(filename: string) {
+  try {
+    return await withRecoveryFile(filename, constants.O_RDONLY, (file) =>
+      file.readFile('utf8')
+    );
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+      throw error;
+    }
+  }
 }
 
 async function saveRecoveryFile(filename: string, contents: string) {
@@ -129,19 +127,15 @@ async function saveRecoveryFile(filename: string, contents: string) {
 }
 
 export async function readTunnelRecord(name: string) {
-  try {
-    const record = tunnelRecord.parse(
-      JSON.parse(await readRecoveryFile(name + '.json'))
-    );
-    if (record.name !== name) {
-      throw new Error('Tunnel recovery record name mismatch');
-    }
-    return record;
-  } catch (error) {
-    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
-      throw error;
-    }
+  const contents = await readRecoveryFile(name + '.json');
+  if (contents === undefined) {
+    return;
   }
+  const record = tunnelRecord.parse(JSON.parse(contents));
+  if (record.name !== name) {
+    throw new Error('Tunnel recovery record name mismatch');
+  }
+  return record;
 }
 
 export function saveTunnelRecord(record: TunnelRecord) {
@@ -155,30 +149,23 @@ export function removeTunnelRecord(name: string) {
 }
 
 export async function readPostUpMarker() {
-  try {
-    const contents = await readRecoveryFile(failureFile);
-    if (!contents) {
-      return;
-    }
-    const marker = postUpMarker.parse(JSON.parse(contents));
-    const name = parseInterfaceName(marker.name);
-    const record = await readTunnelRecord(name);
-    if (record && record.policy.tag !== marker.generation) {
-      throw new Error(
-        `PostUp marker for ${name} belongs to a different tunnel generation`
-      );
-    }
-    return {
-      name,
-      succeeded: !marker.failedDownHook && record?.postUpSucceeded === true,
-      failedDownHook: marker.failedDownHook,
-    };
-  } catch (error) {
-    // A new volume has neither the private directory nor a failure marker.
-    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
-      throw error;
-    }
+  const contents = await readRecoveryFile(failureFile);
+  if (!contents) {
+    return;
   }
+  const marker = postUpMarker.parse(JSON.parse(contents));
+  const name = parseInterfaceName(marker.name);
+  const record = await readTunnelRecord(name);
+  if (record && record.policy.tag !== marker.generation) {
+    throw new Error(
+      `PostUp marker for ${name} belongs to a different tunnel generation`
+    );
+  }
+  return {
+    name,
+    succeeded: !marker.failedDownHook && record?.postUpSucceeded === true,
+    failedDownHook: marker.failedDownHook,
+  };
 }
 
 export async function writeHookMarker(

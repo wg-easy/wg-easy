@@ -1,7 +1,7 @@
 import type { Page } from '@playwright/test';
 
 import { expect, test } from './fixtures';
-import { admin, createClient, downloadConfiguration, login } from './helpers';
+import { createClient, downloadConfiguration, login } from './helpers';
 
 const siteSubnet = '192.168.120.0/22';
 
@@ -109,12 +109,9 @@ for (const backend of ['wg', 'awg'] as const) {
     test.use({ backend });
     test('a partially failed PostUp stays down until an administrator restarts it', async ({
       request,
+      api: { post, headers, create, download, json },
       app,
     }) => {
-      const { post, headers, create, download, json } = await admin(
-        request,
-        app.url
-      );
       const clientUrl = await create('Office router');
       const peer = await json(clientUrl);
       const hookRoute = '10.8.0.77/32';
@@ -157,7 +154,7 @@ for (const backend of ['wg', 'awg'] as const) {
       expect(
         await app.execServer(['ip', 'route', 'show', 'exact', siteSubnet])
       ).toBe('');
-      const readAttempts = () => app.execServer(['cat', attempts]);
+      const readAttempts = () => app.read(attempts);
       expect(await readAttempts()).toBe('run');
       // The preferred tunnel route may coexist with an operator's backup route.
       await app.execServer([
@@ -298,14 +295,12 @@ test('starts with a site conflict, preserves hook and backup routes, and retries
   expect(await read(backup)).toContain('dev wg0');
   expect(await read(backup)).toMatch(/\bdev eth0\b[^\n]*\bmetric 500\b/);
   expect(await read(manual)).toContain('dev wg0');
-  expect(
-    await app.execServer(['wg', 'show', 'wg0', 'allowed-ips'])
-  ).not.toContain(ipv6);
+  expect(await app.show('allowed-ips')).not.toContain(ipv6);
   expect(
     await app.execServer(['ip', '-6', 'route', 'show', 'exact', ipv6])
   ).toBe('');
 
-  const ifindex = () => app.execServer(['cat', '/sys/class/net/wg0/ifindex']);
+  const ifindex = () => app.read('/sys/class/net/wg0/ifindex');
   const before = await ifindex();
   await app.execServer(['ip', 'route', 'del', siteSubnet, 'dev', 'eth0']);
   await expect

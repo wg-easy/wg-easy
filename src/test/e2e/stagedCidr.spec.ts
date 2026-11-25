@@ -1,5 +1,5 @@
-import { expect, test } from './fixtures';
-import { admin, goto } from './helpers';
+import { admin, expect, test } from './fixtures';
+import { goto } from './helpers';
 
 const iface = '/api/admin/interface';
 
@@ -43,15 +43,7 @@ test('applies the new subnet to peers, downloads and firewall rules at restart',
   expect(await nat()).not.toContain('10.90.0.0/24');
   const saved = await json(witness);
   await post(witness, { ...saved, serverAllowedIps: ['0.0.0.0/0'] });
-  const route = await app.execServer([
-    'ip',
-    '-4',
-    'route',
-    'show',
-    'table',
-    '123',
-    'default',
-  ]);
+  const route = await app.shell('ip -4 route show table 123 default');
   expect(route).toContain('default dev wg0');
   expect((await json(iface)).restartRequired).toBe(true);
   expect(await download(witness)).toBe(original);
@@ -82,10 +74,9 @@ test('applies the new subnet to peers, downloads and firewall rules at restart',
 });
 
 test('reverting a pending subnet preserves the established manual address and export', async ({
-  request,
+  api: { post, json, create, download },
   app,
 }) => {
-  const { post, json, create, download } = await admin(request, app.url);
   const network = await json(iface);
   const client = await create('Manually addressed client');
   await post(client, { ...(await json(client)), ipv4Address: '10.8.0.100' });

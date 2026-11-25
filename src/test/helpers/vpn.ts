@@ -38,6 +38,10 @@ export async function vpnFixture() {
     persistentKeepalive: 0,
     enabled: true,
   });
+  return { db, store, ...mockVpnHost() };
+}
+
+export function mockVpnHost() {
   vi.spyOn(wg, 'generateKeyPair').mockResolvedValue({
     privateKey: 'new-private',
     publicKey: 'new-public',
@@ -72,8 +76,6 @@ export async function vpnFixture() {
   vi.spyOn(firewall, 'clearAvailabilityCache').mockImplementation(() => {});
   onTestFinished(() => vi.restoreAllMocks());
   return {
-    db,
-    store,
     commands: { ...vi.mocked(wg), up, down },
     writeConfiguration,
     firewall: vi.mocked(firewall),

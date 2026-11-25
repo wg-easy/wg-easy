@@ -18,6 +18,7 @@ export type KernelRoute = {
 export const routeProtocol = 242;
 
 export type RouteFamily = 'ipv4' | 'ipv6';
+export type DefaultRouteTables = Partial<Record<RouteFamily, number | 'auto'>>;
 
 export const routeMetric = (family: RouteFamily) =>
   family === 'ipv4' ? 0 : 1024;

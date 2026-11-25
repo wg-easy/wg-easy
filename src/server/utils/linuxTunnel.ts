@@ -7,8 +7,8 @@ import { createError } from 'nuxt/server';
 import {
   installDefaultRoutes,
   removeDefaultRules,
-  type DefaultRouteTables,
 } from '#server/features/vpn/defaultPolicy';
+import type { DefaultRouteTables } from '#server/features/vpn/linuxRouting';
 import { SiteRoutes } from '#server/features/vpn/siteRoutes';
 import {
   clearPostUpFailure,
@@ -78,15 +78,23 @@ function temporaryName(record: TunnelRecord) {
   return 'wg' + record.policy.tag.slice(8).replaceAll('-', '').slice(0, 13);
 }
 
+function matchesLink(
+  link: Link | undefined,
+  record: TunnelRecord,
+  name: string
+) {
+  return (
+    link?.ifname === name &&
+    link.ifindex === record.index &&
+    link.altnames?.includes(record.policy.tag)
+  );
+}
+
 async function ownedLinkTarget(running: TunnelRecord) {
   const { name } = running;
   const tag = running.policy.tag;
   const target = await linkIdentity(tag);
-  if (
-    target?.ifindex !== running.index ||
-    target.ifname !== name ||
-    !target.altnames?.includes(tag)
-  ) {
+  if (!matchesLink(target, running, name)) {
     throw new Error(`Tunnel identity changed during teardown of ${name}`);
   }
   return tag;
@@ -106,6 +114,12 @@ export class LinuxTunnel {
   private userspaceSocket?: string;
   private pendingDownHooks = false;
   readonly sites = new SiteRoutes();
+
+  private async save(record: TunnelRecord) {
+    await saveTunnelRecord(record);
+    this.running = record;
+    return record;
+  }
 
   async userspaceExited() {
     if (!this.running || !this.userspaceSocket) {
@@ -135,12 +149,7 @@ export class LinuxTunnel {
     }
     try {
       const record = this.running ?? (await readTunnelRecord(name));
-      if (
-        record?.name === name &&
-        link.ifname === name &&
-        link.altnames?.includes(record.policy.tag) &&
-        record.index === link.ifindex
-      ) {
+      if (record?.name === name && matchesLink(link, record, name)) {
         this.running = record;
         return record;
       }
@@ -182,8 +191,7 @@ export class LinuxTunnel {
     };
     // Publish the configured name only after its generation is recoverable.
     const temporary = temporaryName(record);
-    await saveTunnelRecord(record);
-    this.running = record;
+    await this.save(record);
     let userspace;
     try {
       userspace = await createLink(temporary, kind);
@@ -207,10 +215,7 @@ export class LinuxTunnel {
     } catch (error) {
       // A collision at the public name must leave neither device modified.
       const pending = await linkIdentity(temporary);
-      if (
-        pending?.ifindex === link.ifindex &&
-        pending.altnames?.includes(alias)
-      ) {
+      if (matchesLink(pending, record, temporary)) {
         await exec(`ip link delete dev ${alias}`);
         await removeTunnelRecord(name);
         this.running = undefined;
@@ -237,9 +242,7 @@ export class LinuxTunnel {
 
   async recordFiltering(enabled: boolean) {
     if (this.running && this.running.filtering !== enabled) {
-      const updated = { ...this.running, filtering: enabled };
-      await saveTunnelRecord(updated);
-      this.running = updated;
+      await this.save({ ...this.running, filtering: enabled });
     }
   }
 
@@ -322,9 +325,7 @@ export class LinuxTunnel {
         ? 'PreDown and PostDown'
         : hook;
     await writeHookMarker(record.name, hold);
-    const consumed = { ...record, [key]: '' };
-    await saveTunnelRecord(consumed);
-    this.running = consumed;
+    const consumed = await this.save({ ...record, [key]: '' });
     try {
       await wg.runHook(record.name, record.table, command, record.disableIpv6);
     } catch (cause) {
@@ -338,93 +339,89 @@ export class LinuxTunnel {
     return consumed;
   }
 
-  async stop(name: string, skipHooks = false, priorFailure?: DownHookFailure) {
-    if (process.platform !== 'linux') {
-      return;
-    }
-    parseInterfaceName(name);
-    let running = await this.checkOwnership(name);
-    if (!running) {
-      const record = this.running ?? (await readTunnelRecord(name));
-      if (
-        record &&
-        record.namespace === (await readlink('/proc/self/ns/net'))
-      ) {
-        if (record.phase === 'creating') {
-          const temporary = temporaryName(record);
-          const link = await linkIdentity(temporary);
-          if (link) {
-            const tagged = link.altnames?.includes(record.policy.tag);
-            // Only the creator can vouch for an index observed before tagging.
-            const justCreated =
-              record === this.running && record.index === link.ifindex;
-            if (
-              link.ifname !== temporary ||
-              (record.index !== null && record.index !== link.ifindex) ||
-              (!tagged && !justCreated)
-            ) {
-              throw new Error(
-                `Cannot verify ownership of unfinished tunnel ${temporary}`
-              );
-            }
-            await exec(
-              `ip link delete dev ${tagged ? record.policy.tag : temporary}`
-            );
-          }
-        }
-        if (await linkIdentity(record.policy.tag)) {
-          throw new Error(
-            `Tunnel generation for ${name} still exists under another name`
-          );
-        }
-        await removeDefaultRules(record);
-        // Only a journaled teardown reached the point where PostDown was due.
-        await this.finishDeletion(
-          record,
-          skipHooks || record.phase !== 'deleting',
-          priorFailure
-        );
-      }
-      this.running = undefined;
-      return;
-    }
-    if (skipHooks && (running.preDown || running.postDown)) {
-      running = { ...running, preDown: '', postDown: '' };
-      await saveTunnelRecord(running);
-      this.running = running;
-    } else if (running.preDown) {
-      running = await this.consumeDownHook(running, 'PreDown', priorFailure);
-      if (!(await this.checkOwnership(name))) {
-        throw new Error(`Tunnel interface ${name} disappeared during PreDown`);
-      }
-    }
-    await removeDefaultRules(running);
-    running = {
-      ...running,
-      phase: 'deleting',
-      namespace: await readlink('/proc/self/ns/net'),
-    };
-    await saveTunnelRecord(running);
-    this.running = running;
-    const tag = await ownedLinkTarget(running);
-    await exec(`ip link delete dev ${tag}`);
-    await this.finishDeletion(running, skipHooks, priorFailure);
-    this.running = undefined;
-  }
-
-  private async finishDeletion(
+  private async deleteLiveLink(
     running: TunnelRecord,
     skipHooks: boolean,
     priorFailure?: DownHookFailure
   ) {
-    const { name } = running;
+    if (skipHooks && (running.preDown || running.postDown)) {
+      running = await this.save({ ...running, preDown: '', postDown: '' });
+    } else if (running.preDown) {
+      running = await this.consumeDownHook(running, 'PreDown', priorFailure);
+      if (!(await this.checkOwnership(running.name))) {
+        throw new Error(
+          `Tunnel interface ${running.name} disappeared during PreDown`
+        );
+      }
+    }
+    await removeDefaultRules(running);
+    running = await this.save({
+      ...running,
+      phase: 'deleting',
+      namespace: await readlink('/proc/self/ns/net'),
+    });
+    const tag = await ownedLinkTarget(running);
+    await exec(`ip link delete dev ${tag}`);
+    return running;
+  }
+
+  private async deleteUnpublishedLink(record: TunnelRecord) {
+    const temporary = temporaryName(record);
+    const link = await linkIdentity(temporary);
+    if (!link) {
+      return;
+    }
+    const tagged = link.altnames?.includes(record.policy.tag);
+    // Only the creator can vouch for an index observed before tagging.
+    const justCreated =
+      record === this.running && record.index === link.ifindex;
+    if (
+      link.ifname !== temporary ||
+      (record.index !== null && record.index !== link.ifindex) ||
+      (!tagged && !justCreated)
+    ) {
+      throw new Error(
+        `Cannot verify ownership of unfinished tunnel ${temporary}`
+      );
+    }
+    await exec(`ip link delete dev ${tagged ? record.policy.tag : temporary}`);
+  }
+
+  async stop(name: string, skipHooks = false, priorFailure?: DownHookFailure) {
+    if (process.platform !== 'linux') {
+      return;
+    }
+    let running = await this.checkOwnership(name);
+    if (running) {
+      running = await this.deleteLiveLink(running, skipHooks, priorFailure);
+    } else {
+      running = this.running ?? (await readTunnelRecord(name));
+      if (
+        !running ||
+        running.namespace !== (await readlink('/proc/self/ns/net'))
+      ) {
+        this.running = undefined;
+        return;
+      }
+      if (running.phase === 'creating') {
+        await this.deleteUnpublishedLink(running);
+      }
+      if (await linkIdentity(running.policy.tag)) {
+        throw new Error(
+          `Tunnel generation for ${name} still exists under another name`
+        );
+      }
+      await removeDefaultRules(running);
+      // Only a journaled teardown reached the point where PostDown was due.
+      skipHooks ||= running.phase !== 'deleting';
+    }
     // Keep filtering in place through link deletion. Never remove rules or
     // run PostDown for an interface that has since taken the same name.
-    if (await linkIdentity(name)) {
-      throw new Error(`Interface ${name} was replaced during teardown`);
+    if (await linkIdentity(running.name)) {
+      throw new Error(`Interface ${running.name} was replaced during teardown`);
     }
     if (running.filtering) {
-      await firewall.removeOwnedFiltering(name, !running.disableIpv6);
+      await firewall.removeOwnedFiltering(running.name, !running.disableIpv6);
     }
     if (!skipHooks && running.postDown) {
       await this.consumeDownHook(running, 'PostDown', priorFailure);
@@ -432,10 +429,11 @@ export class LinuxTunnel {
     if (running.postUpSucceeded && !skipHooks && !priorFailure) {
       // Retry a marker clear that failed after a hook returned successfully.
       const marker = await readPostUpMarker();
-      if (marker?.name === name) {
+      if (marker?.name === running.name) {
         await clearPostUpFailure();
       }
     }
-    await removeTunnelRecord(name);
+    await removeTunnelRecord(running.name);
+    this.running = undefined;
   }
 }

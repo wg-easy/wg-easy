@@ -1,23 +1,16 @@
-import fs from 'node:fs/promises';
-
-import { describe, expect, test, vi, onTestFinished } from 'vitest';
+import { describe, expect, test, vi } from 'vitest';
 
 import { databaseFixture } from '../helpers/database';
 import { resetCryptoMocks } from '../helpers/crypto';
 import { legacyBackup } from '../helpers/legacyBackup';
+import { mockVpnHost } from '../helpers/vpn';
 
-import * as recovery from '#server/features/vpn/tunnelRecord';
 import * as setup from '#server/features/setup';
 import { getIpInformation } from '#server/utils/ip';
 import { roles } from '#shared/utils/permissions';
 import { zeroWireGuardKey } from '#shared/utils/wireguard';
-import * as cmd from '#server/utils/cmd';
-import { LinuxTunnel } from '#server/utils/linuxTunnel';
-import { wg } from '#server/utils/wgHelper';
-import { firewall } from '#server/utils/firewall';
 import { maintain } from '#server/features/vpn/lifecycle';
 import { generateClientConfig } from '#server/features/vpn/configuration';
-vi.mock('#server/utils/config', () => ({ WG_ENV: {} }));
 vi.mock('#server/utils/ip', async (original) => ({
   ...(await original<typeof import('#server/utils/ip')>()),
   getIpInformation: vi.fn(),
@@ -26,23 +19,7 @@ vi.mock('#server/utils/ip', async (original) => ({
 async function fixture() {
   const database = await databaseFixture();
   resetCryptoMocks();
-  vi.spyOn(recovery, 'readPostUpMarker').mockResolvedValue(undefined);
-  vi.spyOn(recovery, 'writeHookMarker').mockResolvedValue();
-  vi.spyOn(recovery, 'clearPostUpFailure').mockResolvedValue();
-  const writeConfiguration = vi.spyOn(fs, 'writeFile').mockResolvedValue();
-  vi.spyOn(wg, 'dump').mockResolvedValue([]);
-  const sync = vi.spyOn(wg, 'sync').mockResolvedValue('');
-  vi.spyOn(LinuxTunnel.prototype, 'stop').mockResolvedValue();
-  vi.spyOn(LinuxTunnel.prototype, 'checkOwnership').mockResolvedValue(
-    undefined
-  );
-  vi.spyOn(wg, 'runHook').mockResolvedValue('');
-  const up = vi.spyOn(LinuxTunnel.prototype, 'create').mockResolvedValue();
-  vi.spyOn(LinuxTunnel.prototype, 'armDownHooks').mockImplementation(() => {});
-  vi.spyOn(LinuxTunnel.prototype, 'configureLink').mockResolvedValue(undefined);
-  vi.spyOn(cmd, 'exec').mockResolvedValue('');
-  vi.spyOn(firewall, 'rebuildRules').mockResolvedValue();
-  onTestFinished(() => vi.restoreAllMocks());
+  const { writeConfiguration, commands } = mockVpnHost();
   const ipInformation = vi
     .mocked(getIpInformation)
     .mockReset()
@@ -51,8 +28,8 @@ async function fixture() {
     ...database,
     ipInformation,
     writeConfiguration,
-    sync,
-    up,
+    sync: commands.sync,
+    up: commands.up,
   };
 }
 

@@ -7,15 +7,13 @@ import { isExpired } from './policies';
 import { peersWithVerifiedSources } from './activePeers';
 import { renumberClients } from './subnets';
 import {
+  defaultRoutePolicy,
   expandHook,
   generateServerConfig,
   type ServerPeer,
 } from './configuration';
-import {
-  checkDefaultPriorities,
-  defaultRouteTables,
-  type DefaultRouteTables,
-} from './defaultPolicy';
+import { checkDefaultPriorities } from './defaultPolicy';
+import type { DefaultRouteTables } from './linuxRouting';
 import {
   clearPostUpFailure,
   readPostUpMarker,
@@ -228,6 +226,13 @@ async function stopTunnel(state: HostState, name: string) {
   }
 }
 
+async function clearPendingHookMarker(state: HostState) {
+  if (state.pendingHookMarker) {
+    await clearPostUpFailure();
+    delete state.pendingHookMarker;
+  }
+}
+
 async function apply(mode?: ApplyMode, manualRestart = false) {
   const database = getDatabase();
   const state = await getHostState(database);
@@ -246,7 +251,7 @@ async function apply(mode?: ApplyMode, manualRestart = false) {
     })
   );
   const enableIpv6 = !WG_ENV.DISABLE_IPV6;
-  const defaultTables = defaultRouteTables(
+  const defaultTables = defaultRoutePolicy(
     savedNetwork.routingTable,
     clients,
     enableIpv6
@@ -396,10 +401,7 @@ async function apply(mode?: ApplyMode, manualRestart = false) {
   } else {
     assertSubnetCapacity(network, clients.length);
     await stopTunnel(state, network.name);
-    if (state.pendingHookMarker) {
-      await clearPostUpFailure();
-      delete state.pendingHookMarker;
-    }
+    await clearPendingHookMarker(state);
     await database.transaction((tx) => renumberClients(tx, clients, network));
     state.activeNetwork = stagedSettings(network);
     await writeSavedConfig();
@@ -460,10 +462,9 @@ async function apply(mode?: ApplyMode, manualRestart = false) {
     state.tunnel.armDownHooks(network, hooks);
   }
   let recoveryError: unknown = await state.tunnel.persistDownHooks();
-  if (!recoveryError && state.pendingHookMarker) {
+  if (!recoveryError) {
     try {
-      await clearPostUpFailure();
-      delete state.pendingHookMarker;
+      await clearPendingHookMarker(state);
     } catch (error) {
       recoveryError = error;
     }
@@ -610,21 +611,20 @@ export function stop() {
     const database = getDatabase();
     const network = await database.interfaces.get();
     const state = hostStates.get(database);
-    if (state?.needsMarkerRead) {
+    if (!state) {
+      return;
+    }
+    if (state.needsMarkerRead) {
       await getHostState(database);
     }
-    if (state?.recoveringPostUp) {
+    if (state.recoveringPostUp) {
       await stopTunnel(state, state.recoveringPostUp);
     }
-    if (state?.failedStart) {
+    if (state.failedStart) {
       await cleanFailedStart(state.tunnel, state.failedStart);
     } else {
-      if (state) {
-        await stopTunnel(state, network.name);
-      }
-      if (state?.pendingHookMarker) {
-        await clearPostUpFailure();
-      }
+      await stopTunnel(state, network.name);
+      await clearPendingHookMarker(state);
     }
     hostStates.delete(database);
   });

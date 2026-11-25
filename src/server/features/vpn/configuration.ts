@@ -1,5 +1,8 @@
 import { normalizeCidr, parseCidr } from 'cidr-tools';
 
+import type { DefaultRouteTables } from './linuxRouting';
+
+import { parseRoutingTableId } from '#shared/utils/routingTable';
 import { zeroWireGuardKey } from '#shared/utils/wireguard';
 import { formatEndpoint } from '#server/utils/endpoint';
 import { getGatewayAddress } from '#server/utils/ip';
@@ -14,6 +17,7 @@ type Options = {
   uiPort?: string;
 };
 export type ServerPeer = Omit<ClientType, 'createdAt' | 'updatedAt'>;
+type RouteClient = Pick<ClientType, 'enabled' | 'serverAllowedIps'>;
 
 /** The complete server file, including enabled peers and its final newline. */
 export function generateServerConfig(
@@ -48,6 +52,35 @@ export function generateTunnelConfig(
   );
 }
 
+/** Select one default routing table for each enabled address family. */
+export function defaultRoutePolicy(
+  setting: string,
+  clients: RouteClient[],
+  enableIpv6: boolean
+) {
+  const routes: DefaultRouteTables = {};
+  const table = setting === 'auto' ? 'auto' : parseRoutingTableId(setting);
+  if (table !== undefined) {
+    for (const client of clients.filter((client) => client.enabled)) {
+      for (const prefix of serverAllowedIps(client, enableIpv6)) {
+        if (/\/0+$/.test(prefix)) {
+          routes[prefix.includes(':') ? 'ipv6' : 'ipv4'] = table || 254;
+        }
+      }
+    }
+  }
+  return routes;
+}
+
+function serverAllowedIps(
+  client: Pick<ClientType, 'serverAllowedIps'>,
+  enableIpv6: boolean
+) {
+  return (client.serverAllowedIps ?? []).filter(
+    (prefix) => enableIpv6 || !prefix.includes(':')
+  );
+}
+
 function generateServerPeers(clients: ServerPeer[], options: Options) {
   return clients
     .filter((client) => client.enabled)
@@ -61,9 +94,7 @@ export function peerAllowedIps(
   return [
     `${client.ipv4Address}/32`,
     ...(enableIpv6 ? [`${client.ipv6Address}/128`] : []),
-    ...(client.serverAllowedIps ?? []).filter(
-      (prefix) => enableIpv6 || !prefix.includes(':')
-    ),
+    ...serverAllowedIps(client, enableIpv6),
   ];
 }
 

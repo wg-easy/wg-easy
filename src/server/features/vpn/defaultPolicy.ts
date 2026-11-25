@@ -8,17 +8,16 @@ import {
   routeMetric,
   kernelTable,
   routeProtocol,
+  type DefaultRouteTables,
   type KernelRoute,
   type RouteFamily,
 } from './linuxRouting';
-import type { ServerPeer } from './configuration';
 import {
   saveTunnelRecord,
   type PolicyRule,
   type TunnelRecord,
 } from './tunnelRecord';
 
-import { parseRoutingTableId } from '#shared/utils/routingTable';
 import type { InterfaceType } from '#db/repositories/interface/types';
 import { exec } from '#server/utils/cmd';
 import { WG_ENV } from '#server/utils/config';
@@ -26,34 +25,6 @@ import { WG_ENV } from '#server/utils/config';
 const run = promisify(execFile);
 const families = ['ipv4', 'ipv6'] as const;
 class DefaultRouteConflict extends Error {}
-
-export type DefaultRouteTables = Partial<Record<RouteFamily, number | 'auto'>>;
-
-export function defaultRouteTables(
-  setting: string,
-  clients: ServerPeer[],
-  enableIpv6: boolean
-): DefaultRouteTables {
-  const tables: DefaultRouteTables = {};
-  const table = setting === 'auto' ? 'auto' : parseRoutingTableId(setting);
-  if (table === undefined) {
-    return tables;
-  }
-  for (const peer of clients) {
-    if (!peer.enabled) {
-      continue;
-    }
-    for (const prefix of peer.serverAllowedIps ?? []) {
-      if (/\/0+$/.test(prefix)) {
-        const family = prefix.includes(':') ? 'ipv6' : 'ipv4';
-        if (enableIpv6 || family === 'ipv4') {
-          tables[family] = table || 254;
-        }
-      }
-    }
-  }
-  return tables;
-}
 
 type Rule = Record<string, unknown> & {
   priority: number;
@@ -207,66 +178,61 @@ function runFirewallRule(
   action: '-I' | '-C' | '-D'
 ) {
   const command = family === 'ipv4' ? 'iptables' : 'ip6tables';
-  const ingress = [action, 'PREROUTING', '!', '-i', name];
-  const comment = ['-m', 'comment', '--comment', policy.tag];
-  if (rule.kind === 'save-mark' || rule.kind === 'restore-mark') {
-    const save = rule.kind === 'save-mark';
-    const chain = save ? 'POSTROUTING' : 'PREROUTING';
-    const match = save ? ['-m', 'mark', '--mark', String(rule.mark)] : [];
-    const target = ['-j', 'CONNMARK', save ? '--save-mark' : '--restore-mark'];
-    return run(command, [
-      '-w',
-      '2',
-      '-t',
-      'mangle',
-      action,
-      chain,
-      '-p',
-      'udp',
-      ...match,
-      ...comment,
-      ...target,
-    ]);
+  function apply(
+    table: string,
+    chain: string,
+    match: string[],
+    target: string[]
+  ) {
+    const chainArgs = ['-w', '2', '-t', table, action, chain];
+    const comment = ['-m', 'comment', '--comment', policy.tag];
+    return run(command, [...chainArgs, ...match, ...comment, '-j', ...target]);
   }
-  if (rule.kind === 'protect') {
-    const external = [
-      '-d',
-      rule.address,
-      '-m',
-      'addrtype',
-      '!',
-      '--src-type',
-      'LOCAL',
-    ];
-    return run(command, [
-      '-w',
-      '2',
-      '-t',
-      'raw',
-      ...ingress,
-      ...external,
-      ...comment,
-      '-j',
-      'DROP',
-    ]);
+  const ingress = ['!', '-i', name];
+  switch (rule.kind) {
+    case 'save-mark':
+      return apply(
+        'mangle',
+        'POSTROUTING',
+        ['-p', 'udp', '-m', 'mark', '--mark', String(rule.mark)],
+        ['CONNMARK', '--save-mark']
+      );
+    case 'restore-mark':
+      return apply(
+        'mangle',
+        'PREROUTING',
+        ['-p', 'udp'],
+        ['CONNMARK', '--restore-mark']
+      );
+    case 'protect':
+      return apply(
+        'raw',
+        'PREROUTING',
+        [
+          ...ingress,
+          '-d',
+          rule.address,
+          '-m',
+          'addrtype',
+          '!',
+          '--src-type',
+          'LOCAL',
+        ],
+        ['DROP']
+      );
+    case 'listener': {
+      // Mark fresh handshakes for strict rp_filter without overwriting a host mark.
+      const listener = ['-p', 'udp', '--dport', String(rule.port)];
+      const local = ['-m', 'addrtype', '--dst-type', 'LOCAL'];
+      const unmarked = ['-m', 'mark', '--mark', '0'];
+      return apply(
+        'mangle',
+        'PREROUTING',
+        [...ingress, ...listener, ...local, ...unmarked],
+        ['MARK', '--set-mark', String(rule.mark)]
+      );
+    }
   }
-  // Mark fresh handshakes for strict rp_filter without overwriting a host mark.
-  const listener = ['-p', 'udp', '--dport', String(rule.port)];
-  const local = ['-m', 'addrtype', '--dst-type', 'LOCAL'];
-  const unmarked = ['-m', 'mark', '--mark', '0'];
-  const setMark = ['-j', 'MARK', '--set-mark', String(rule.mark)];
-  return run(command, [
-    '-w',
-    '2',
-    '-t',
-    'mangle',
-    ...ingress,
-    ...listener,
-    ...local,
-    ...unmarked,
-    ...comment,
-    ...setMark,
-  ]);
 }
 
 function missingTable(error: unknown) {

@@ -1,9 +1,21 @@
 import type { APIRequestContext } from '@playwright/test';
 
-import { expect, test } from './fixtures';
-import { admin } from './helpers';
+import { admin, expect, test } from './fixtures';
+
+const iface = '/api/admin/interface';
+const record = '/etc/wireguard/.wg-easy/wg0.json';
+const marker = '/etc/wireguard/.wg-easy/failed-post-up';
 
 test.use({ keepNamespace: true, ipv6: true });
+
+function expectRestartRequired(
+  json: Awaited<ReturnType<typeof admin>>['json'],
+  required: boolean
+) {
+  return expect(async () => {
+    expect((await json(iface)).restartRequired).toBe(required);
+  }).toPass({ timeout: 10_000 });
+}
 
 for (const backend of ['wg', 'awg'] as const) {
   test.describe(backend, () => {
@@ -11,9 +23,8 @@ for (const backend of ['wg', 'awg'] as const) {
     test('recovers the surviving tunnel, its applied hooks and recorded default rules', async ({
       app,
       request,
+      api: { post, json, create, download },
     }) => {
-      const { post, json, create, download } = await admin(request, app.url);
-      const iface = '/api/admin/interface';
       const settings = await json(iface);
       const hooks = (tag: string) => {
         const rule = `INPUT -i {{device}} -p udp --dport {{port}} -m comment --comment ${tag} -j ACCEPT`;
@@ -25,22 +36,14 @@ for (const backend of ['wg', 'awg'] as const) {
         });
       };
       await hooks('old-hook');
-      const read = (path: string) => app.execServer(['cat', path]);
       const rules = () => app.execServer(['iptables', '-w', '-S', 'INPUT']);
-      const sentinel = [
-        'INPUT',
-        '-m',
-        'comment',
-        '--comment',
-        'foreign-rule',
-        '-j',
-        'ACCEPT',
-      ];
-      await app.execServer(['iptables', '-A', ...sentinel]);
+      await app.shell(
+        'iptables -A INPUT -m comment --comment foreign-rule -j ACCEPT'
+      );
       const url = await create('Recovery peer');
       const client = await json(url);
       await post(url, { ...client, serverAllowedIps: ['0.0.0.0/0', '::/0'] });
-      const index = await read('/sys/class/net/wg0/ifindex');
+      const index = await app.read('/sys/class/net/wg0/ifindex');
       expect(await app.execServer(['stat', '-c', '%u %a', record])).toBe(
         '0 600'
       );
@@ -69,12 +72,8 @@ for (const backend of ['wg', 'awg'] as const) {
         'WG_CLIENTS_wg0'
       );
       // A firewall reader can hold the lock while the running rules are edited.
-      await app.execServer([
-        'sh',
-        '-ec',
-        `flock /run/xtables.lock sh -c 'touch /tmp/locked; sleep 2' >/dev/null 2>&1 &
-while [ ! -f /tmp/locked ]; do sleep 0.05; done`,
-      ]);
+      await app.shell(`flock /run/xtables.lock sh -c 'touch /tmp/locked; sleep 2' >/dev/null 2>&1 &
+while [ ! -f /tmp/locked ]; do sleep 0.05; done`);
       await hooks('new-hook');
       await post(iface, {
         ...settings,
@@ -83,13 +82,13 @@ while [ ! -f /tmp/locked ]; do sleep 0.05; done`,
         firewallEnabled: true,
       });
       await app.stopProcess('KILL');
-      expect(await read('/sys/class/net/wg0/ifindex')).toBe(index);
+      expect(await app.read('/sys/class/net/wg0/ifindex')).toBe(index);
       expect(await rules()).toContain('old-hook');
       const namespace = await app.execServer(['readlink', '/proc/self/ns/net']);
       await app.startProcess(true);
       // The new generation records its down hooks after PostUp finishes.
       await expect
-        .poll(() => read(record).catch(() => ''), { timeout: 12000 })
+        .poll(() => app.read(record).catch(() => ''), { timeout: 12000 })
         .toContain('new-hook');
       expect(await app.execServer(['readlink', '/proc/self/ns/net'])).toBe(
         namespace
@@ -100,7 +99,7 @@ while [ ! -f /tmp/locked ]; do sleep 0.05; done`,
         recoveredRules.match(/-i lo .*--dport 51830 .*new-hook/g)
       ).toHaveLength(1);
       expect(recoveredRules).toContain('foreign-rule');
-      expect(await read('/tmp/teardowns')).toBe('old-hook-wg0-51820-false');
+      expect(await app.read('/tmp/teardowns')).toBe('old-hook-wg0-51820-false');
       expect(
         await app.execServer(['iptables', '-w', '-t', 'mangle', '-S'])
       ).not.toContain(oldPolicy.match(/wg-easy-[\da-f-]+/)![0]);
@@ -120,7 +119,7 @@ while [ ! -f /tmp/locked ]; do sleep 0.05; done`,
       );
       await expect.poll(() => app.pingFromClient('10.8.0.1')).toBe(true);
       await app.stopProcess('TERM');
-      expect(await read('/tmp/teardowns')).toBe(
+      expect(await app.read('/tmp/teardowns')).toBe(
         'old-hook-wg0-51820-false\nnew-hook-wg0-51830-true'
       );
       expect(await rules()).not.toMatch(/old-hook|new-hook/);
@@ -135,30 +134,24 @@ while [ ! -f /tmp/locked ]; do sleep 0.05; done`,
   });
 }
 
-const record = '/etc/wireguard/.wg-easy/wg0.json';
-
 test('runs confirmed down hooks after a crash with the PostUp marker still present', async ({
   app,
-  request,
+  api: { post },
 }) => {
-  const { post } = await admin(request, app.url);
-  const marker = '/etc/wireguard/.wg-easy/failed-post-up';
   await post('/api/admin/hooks', {
     preUp: '',
     postUp: `if ! test -e /tmp/pending-hook; then cp -p ${marker} /tmp/pending-hook; fi; echo up >> /tmp/phases`,
     preDown: 'echo pre >> /tmp/phases',
     postDown: 'echo post >> /tmp/phases',
   });
-  await post('/api/admin/interface/restart');
+  await post(iface + '/restart');
   await app.stopProcess('KILL');
   // Recreate the on-disk state between saving the down hooks and clearing the marker.
   await app.execServer(['cp', '-p', '/tmp/pending-hook', marker]);
   await app.startProcess();
-  await expect
-    .poll(() => app.execServer(['cat', '/tmp/phases']))
-    .toBe('up\npre\npost\nup');
+  await expect.poll(() => app.read('/tmp/phases')).toBe('up\npre\npost\nup');
   // The same marker cannot authorize teardown of the replacement generation.
-  const index = () => app.execServer(['cat', '/sys/class/net/wg0/ifindex']);
+  const index = () => app.read('/sys/class/net/wg0/ifindex');
   const replacement = await index();
   await app.stopProcess('KILL');
   await app.execServer(['cp', '-p', '/tmp/pending-hook', marker]);
@@ -167,9 +160,7 @@ test('runs confirmed down hooks after a crash with the PostUp marker still prese
     .poll(app.logs)
     .toContain('belongs to a different tunnel generation');
   expect(await index()).toBe(replacement);
-  expect(await app.execServer(['cat', '/tmp/phases'])).toBe(
-    'up\npre\npost\nup'
-  );
+  expect(await app.read('/tmp/phases')).toBe('up\npre\npost\nup');
 });
 
 for (const [hook, problem, command] of [
@@ -187,38 +178,25 @@ for (const [hook, problem, command] of [
 ] as const) {
   test(`keeps the admin panel available after ${hook} ${problem} during confirmed hook recovery`, async ({
     app,
-    request,
+    api: { post, json },
   }) => {
-    const { post, json } = await admin(request, app.url);
-    const marker = '/etc/wireguard/.wg-easy/failed-post-up';
     await post('/api/admin/hooks', {
       preUp: '',
       postUp: `cp -p ${marker} /tmp/confirmed; echo up >> /tmp/phases`,
       preDown: `echo pre >> /tmp/phases; ${hook === 'PreDown' ? command : 'true'}`,
       postDown: `cp ${marker} /tmp/post-down-marker; echo post >> /tmp/phases; ${hook === 'PostDown' ? command : 'true'}`,
     });
-    await post('/api/admin/interface/restart');
+    await post(iface + '/restart');
     await app.stopProcess('KILL');
     await app.execServer(['cp', '-p', '/tmp/confirmed', marker]);
     async function startAwaitingRepair() {
       await app.startProcess();
-      await expect
-        .poll(
-          async () =>
-            (await json('/api/admin/interface').catch(() => ({})))
-              .restartRequired
-        )
-        .toBe(true);
+      await expectRestartRequired(json, true);
       expect(await app.execServer(['wg', 'show', 'interfaces'])).toBe('');
-      expect(await app.execServer(['cat', '/tmp/phases'])).toBe(
-        'up\npre\npost'
-      );
+      expect(await app.read('/tmp/phases')).toBe('up\npre\npost');
+      expect(JSON.parse(await app.read(marker)).failedDownHook).toBe(hook);
       expect(
-        JSON.parse(await app.execServer(['cat', marker])).failedDownHook
-      ).toBe(hook);
-      expect(
-        JSON.parse(await app.execServer(['cat', '/tmp/post-down-marker']))
-          .failedDownHook
+        JSON.parse(await app.read('/tmp/post-down-marker')).failedDownHook
       ).toBe(hook === 'PreDown' ? 'PreDown and PostDown' : 'PostDown');
     }
     if (problem === 'is interrupted') {
@@ -231,21 +209,17 @@ for (const [hook, problem, command] of [
     await app.execServer(['chmod', '0700', '/etc/wireguard/.wg-easy']);
     await app.stopProcess('TERM');
     await startAwaitingRepair();
-    await post('/api/admin/interface/restart');
-    expect(await app.execServer(['cat', '/tmp/phases'])).toBe(
-      'up\npre\npost\nup'
-    );
-    expect((await json('/api/admin/interface')).restartRequired).toBe(false);
+    await post(iface + '/restart');
+    expect(await app.read('/tmp/phases')).toBe('up\npre\npost\nup');
+    expect((await json(iface)).restartRequired).toBe(false);
   });
 }
 
 for (const hook of ['preDown', 'postDown'] as const) {
   test(`keeps the panel available when the marker write fails before ${hook}`, async ({
     app,
-    request,
+    api: { json, post },
   }) => {
-    const { json, post } = await admin(request, app.url);
-    const marker = '/etc/wireguard/.wg-easy/failed-post-up';
     const command =
       hook === 'postDown'
         ? 'echo down >> /tmp/phases; false'
@@ -257,7 +231,7 @@ for (const hook of ['preDown', 'postDown'] as const) {
       postDown: '',
       [hook]: command,
     });
-    await post('/api/admin/interface/restart');
+    await post(iface + '/restart');
     await app.stopProcess('KILL');
     await app.execServer(['cp', '-p', '/tmp/confirmed', marker]);
     // Let startup read the confirmed marker, then prevent its atomic replacement.
@@ -265,32 +239,15 @@ for (const hook of ['preDown', 'postDown'] as const) {
       hook === 'preDown'
         ? "'-j link show dev wg0'"
         : "'link delete dev wg-easy-'*";
-    await app.execServer([
-      'sh',
-      '-ec',
-      `cat > /usr/local/bin/ip <<'SH'
-#!/bin/sh
-/sbin/ip "$@" || exit $?
+    await app.overrideIp(`/sbin/ip "$@" || exit $?
 case "$*" in ${trigger})
   if test -f ${marker}; then mv ${marker} ${marker}.saved && mkdir ${marker}; fi ;;
-esac
-SH
-chmod +x /usr/local/bin/ip`,
-    ]);
+esac`);
     await app.startProcess();
-    await expect
-      .poll(async () =>
-        json('/api/admin/interface').then(
-          (r) => r.restartRequired,
-          () => false
-        )
-      )
-      .toBe(true);
-    await expect(post('/api/admin/interface/restart')).rejects.toThrow();
-    expect(JSON.parse(await app.execServer(['cat', record]))[hook]).toBe(
-      command
-    );
-    expect(await app.execServer(['cat', '/tmp/phases'])).toBe('up');
+    await expectRestartRequired(json, true);
+    await expect(post(iface + '/restart')).rejects.toThrow();
+    expect(JSON.parse(await app.read(record))[hook]).toBe(command);
+    expect(await app.read('/tmp/phases')).toBe('up');
     if (hook === 'preDown') {
       const [link] = JSON.parse(
         await app.execServer(['ip', '-j', 'link', 'show', 'wg0'])
@@ -298,16 +255,9 @@ chmod +x /usr/local/bin/ip`,
       expect(link.flags).not.toContain('UP');
       await app.stopProcess('TERM');
       await app.startProcess();
-      await expect
-        .poll(() =>
-          json('/api/admin/interface').then(
-            (r) => r.restartRequired,
-            () => false
-          )
-        )
-        .toBe(true);
-      await expect(post('/api/admin/interface/restart')).rejects.toThrow();
-      expect(await app.execServer(['cat', '/tmp/phases'])).toBe('up');
+      await expectRestartRequired(json, true);
+      await expect(post(iface + '/restart')).rejects.toThrow();
+      expect(await app.read('/tmp/phases')).toBe('up');
     } else {
       expect(await app.execServer(['wg', 'show', 'interfaces'])).toBe('');
     }
@@ -316,31 +266,20 @@ chmod +x /usr/local/bin/ip`,
     await app.execServer(['mv', marker + '.saved', marker]);
     if (hook === 'postDown') {
       // This restart discovers a new hook failure after the journal is repaired.
-      await expect(post('/api/admin/interface/restart')).rejects.toThrow();
-      expect(await app.execServer(['cat', '/tmp/phases'])).toBe('up\ndown');
-      expect((await json('/api/admin/interface')).restartRequired).toBe(true);
+      await expect(post(iface + '/restart')).rejects.toThrow();
+      expect(await app.read('/tmp/phases')).toBe('up\ndown');
+      expect((await json(iface)).restartRequired).toBe(true);
     }
-    await post('/api/admin/interface/restart');
-    await expect
-      .poll(() => app.execServer(['cat', '/tmp/phases']))
-      .toBe('up\ndown\nup');
-    await expect
-      .poll(() =>
-        json('/api/admin/interface').then(
-          (r) => r.restartRequired,
-          () => true
-        )
-      )
-      .toBe(false);
+    await post(iface + '/restart');
+    await expect.poll(() => app.read('/tmp/phases')).toBe('up\ndown\nup');
+    await expectRestartRequired(json, false);
   });
 }
 
 test('retains both failed hook names and guards the old filtered link during an explicit restart', async ({
   app,
-  request,
+  api: { json, post },
 }) => {
-  const { json, post } = await admin(request, app.url);
-  const iface = '/api/admin/interface';
   await post(iface, { ...(await json(iface)), firewallEnabled: true });
   await post('/api/admin/hooks', {
     preUp: '',
@@ -351,21 +290,13 @@ test('retains both failed hook names and guards the old filtered link during an 
   });
   await post(iface + '/restart');
   await expect(post(iface + '/restart')).rejects.toThrow();
-  const marker = '/etc/wireguard/.wg-easy/failed-post-up';
-  expect(JSON.parse(await app.execServer(['cat', marker])).failedDownHook).toBe(
+  expect(JSON.parse(await app.read(marker)).failedDownHook).toBe(
     'PreDown and PostDown'
   );
   await app.stopProcess('KILL');
   await app.startProcess();
-  await expect
-    .poll(() =>
-      json(iface).then(
-        (r) => r.restartRequired,
-        () => false
-      )
-    )
-    .toBe(true);
-  expect(await app.execServer(['cat', '/tmp/phases'])).toBe('guarded\npost');
+  await expectRestartRequired(json, true);
+  expect(await app.read('/tmp/phases')).toBe('guarded\npost');
   expect(await app.execServer(['wg', 'show', 'interfaces'])).toBe('');
   await post(iface + '/restart');
   expect((await json(iface)).restartRequired).toBe(false);
@@ -373,12 +304,11 @@ test('retains both failed hook names and guards the old filtered link during an 
 
 test('recovers owned default rules only after the recorded link is gone', async ({
   app,
-  request,
+  api: { post, json, create },
 }) => {
-  const { post, json, create } = await admin(request, app.url);
   const peer = await create('Default gateway');
   await post(peer, { ...(await json(peer)), serverAllowedIps: ['0.0.0.0/0'] });
-  const readRecord = () => app.execServer(['cat', record]);
+  const readRecord = () => app.read(record);
   const running = await readRecord();
   const tag = JSON.parse(running).policy.tag;
   const rules = () => app.execServer(['ip', '-4', 'rule', 'show']);
@@ -388,7 +318,7 @@ test('recovers owned default rules only after the recorded link is gone', async 
   expect(await mangle()).toContain(tag);
   await app.execServer(['ip', 'link', 'set', 'wg0', 'down']);
   await app.execServer(['ip', 'link', 'set', 'wg0', 'name', 'moved0']);
-  await expect(post('/api/admin/interface/restart')).rejects.toThrow();
+  await expect(post(iface + '/restart')).rejects.toThrow();
   expect(await readRecord()).toBe(running);
   expect(await mangle()).toContain(tag);
   await app.stopProcess('KILL');
@@ -404,33 +334,23 @@ test('recovers owned default rules only after the recorded link is gone', async 
 for (const created of [false, true]) {
   test(`recovers after the operator frees an untagged temporary link (${created ? 'interrupted creation' : 'foreign link'})`, async ({
     app,
-    request,
+    api: { post },
   }) => {
-    const { post } = await admin(request, app.url);
-    await app.execServer([
-      'sh',
-      '-ec',
-      `cat > /usr/local/bin/ip <<'SH'
-#!/bin/sh
-case "$*" in 'link add dev '*|'tuntap add dev '*)
+    await app.overrideIp(`case "$*" in 'link add dev '*|'tuntap add dev '*)
   ${created ? '/sbin/ip "$@" || exit $?' : ''}
   echo "$4" >/tmp/unfinished
   while ! test -e /tmp/release-create; do sleep 0.1; done
   exit 1 ;;
 esac
-exec /sbin/ip "$@"
-SH
-chmod +x /usr/local/bin/ip`,
-    ]);
-    const cutover = post('/api/admin/interface/restart').catch(() => {});
-    const unfinished = () =>
-      app.execServer(['cat', '/tmp/unfinished']).catch(() => '');
+exec /sbin/ip "$@"`);
+    const cutover = post(iface + '/restart').catch(() => {});
+    const unfinished = () => app.read('/tmp/unfinished').catch(() => '');
     await expect.poll(unfinished).toMatch(/^wg/);
     await app.stopProcess('KILL');
     await app.execServer(['touch', '/tmp/release-create']);
     await cutover;
     const temporary = await unfinished();
-    const pending = await app.execServer(['cat', record]);
+    const pending = await app.read(record);
     expect(JSON.parse(pending)).toMatchObject({
       phase: 'creating',
       index: null,
@@ -454,14 +374,14 @@ chmod +x /usr/local/bin/ip`,
     expect(
       await app.execServer(['ip', '-details', 'link', 'show', temporary])
     ).toMatch(created ? /wireguard|tun type tun/ : /dummy/);
-    expect(await app.execServer(['cat', record])).toBe(pending);
+    expect(await app.read(record)).toBe(pending);
     // The operator knows who created this link and can safely free its name.
     await app.execServer(['ip', 'link', 'del', temporary]);
     await app.startProcess();
     await expect
       .poll(() => app.execServer(['wg', 'show', 'interfaces']))
       .toBe('wg0');
-    const ready = JSON.parse(await app.execServer(['cat', record]));
+    const ready = JSON.parse(await app.read(record));
     expect(ready.policy.tag).not.toBe(JSON.parse(pending).policy.tag);
   });
 }
@@ -469,8 +389,8 @@ chmod +x /usr/local/bin/ip`,
 test('retries a failed recovery record write without replaying PostUp', async ({
   app,
   request,
+  api: { headers, post },
 }) => {
-  const { headers, post } = await admin(request, app.url);
   const directory = '/etc/wireguard/.wg-easy';
   const phases = '/tmp/recovery-hook-phases';
   const hooks = {
@@ -485,29 +405,28 @@ test('retries a failed recovery record write without replaying PostUp', async ({
     headers,
   });
   expect(restart.status()).toBe(500);
-  const index = () => app.execServer(['cat', '/sys/class/net/wg0/ifindex']);
+  const index = () => app.read('/sys/class/net/wg0/ifindex');
   const running = await index();
   await app.execServer(['chmod', '0700', directory]);
   // A normal save triggers the same pending retry as maintenance. New hooks
   // apply to the next generation, even if the current record needs repair.
   await post('/api/admin/hooks', { ...hooks, preDown: '', postDown: '' });
   expect(await index()).toBe(running);
-  expect(await app.execServer(['cat', phases])).toBe('up');
-  expect(JSON.parse(await app.execServer(['cat', record]))).toMatchObject({
+  expect(await app.read(phases)).toBe('up');
+  expect(JSON.parse(await app.read(record))).toMatchObject({
     preDown: hooks.preDown,
     postDown: hooks.postDown,
   });
   await app.stopProcess('TERM');
-  expect(await app.execServer(['cat', phases])).toBe('up\npre\npost');
+  expect(await app.read(phases)).toBe('up\npre\npost');
 });
 
 test('keeps a failed boot hook stopped across container replacement until an admin restarts it', async ({
   app,
   playwright,
   request,
+  api: { headers, post },
 }) => {
-  const { headers, post } = await admin(request, app.url);
-  const iface = '/api/admin/interface';
   const hooksUrl = '/api/admin/hooks';
   const attempts = '/etc/wireguard/boot-hook-attempts';
   const hooks = {
@@ -525,7 +444,7 @@ test('keeps a failed boot hook stopped across container replacement until an adm
     await expect
       .poll(() => app.execServer(['wg', 'show', 'interfaces']))
       .toBe('');
-    expect(await app.execServer(['cat', attempts])).toBe('failed');
+    expect(await app.read(attempts)).toBe('failed');
   };
   await app.stopProcess('TERM');
   await app.startProcess();
@@ -543,11 +462,11 @@ test('keeps a failed boot hook stopped across container replacement until an adm
       headers: { Origin: origin },
       failOnStatusCode: true,
     });
-    expect(await app.execServer(['cat', attempts])).toBe('failed\nrecovered');
+    expect(await app.read(attempts)).toBe('failed\nrecovered');
     await app.stopProcess('TERM');
     await app.startProcess();
     await expect
-      .poll(() => app.execServer(['cat', attempts]))
+      .poll(() => app.read(attempts))
       .toBe('failed\nrecovered\nrecovered');
   } finally {
     await replacement.dispose();
@@ -562,17 +481,16 @@ for (const evidence of [
 ]) {
   test(`refuses a collision with ${evidence} before changing the namespace`, async ({
     app,
-    request,
+    api: { post },
   }) => {
-    const { post } = await admin(request, app.url);
     await post('/api/admin/hooks', {
       preUp: '',
       postUp: '',
       preDown: 'touch /tmp/ran-down',
       postDown: 'touch /tmp/ran-down',
     });
-    await post('/api/admin/interface/restart');
-    const index = await app.execServer(['cat', '/sys/class/net/wg0/ifindex']);
+    await post(iface + '/restart');
+    const index = await app.read('/sys/class/net/wg0/ifindex');
     await app.stopProcess('KILL');
     if (evidence === 'unsafe permissions') {
       // Even a matching live generation must not authorize untrusted hooks.
@@ -591,7 +509,7 @@ for (const evidence of [
         'dummy',
       ]);
       // A matching index and descriptive alias cannot prove generation ownership.
-      const { policy } = JSON.parse(await app.execServer(['cat', record]));
+      const { policy } = JSON.parse(await app.read(record));
       await app.execServer([
         'ip',
         'link',
@@ -605,42 +523,15 @@ for (const evidence of [
         await app.execServer(['rm', record]);
       }
     }
-    await app.execServer([
-      'ip',
-      'route',
-      'add',
-      '192.0.2.0/24',
-      'dev',
-      'wg0',
-      'table',
-      '741',
-    ]);
-    await app.execServer([
-      'ip',
-      'rule',
-      'add',
-      'pref',
-      '14444',
-      'lookup',
-      '741',
-    ]);
-    await app.execServer([
-      'iptables',
-      '-A',
-      'FORWARD',
-      '-i',
-      'wg0',
-      '-m',
-      'comment',
-      '--comment',
-      'foreign',
-      '-j',
-      'ACCEPT',
-    ]);
+    await app.shell('ip route add 192.0.2.0/24 dev wg0 table 741');
+    await app.shell('ip rule add pref 14444 lookup 741');
+    await app.shell(
+      'iptables -A FORWARD -i wg0 -m comment --comment foreign -j ACCEPT'
+    );
     const inspect = () =>
       Promise.all([
-        app.execServer(['cat', '/sys/class/net/wg0/ifindex']),
-        app.execServer(['cat', '/sys/class/net/wg0/ifalias']),
+        app.read('/sys/class/net/wg0/ifindex'),
+        app.read('/sys/class/net/wg0/ifalias'),
         app.execServer(['ip', 'route', 'show', 'table', '741']),
         app.execServer(['ip', 'rule', 'show']),
         app.execServer(['iptables', '-w', '-S']),
@@ -657,8 +548,8 @@ for (const phase of ['PostUp', 'PreDown', 'PostDown'] as const) {
   test(`resumes after a kill during ${phase} without replaying down hooks`, async ({
     app,
     request,
+    api: { post },
   }) => {
-    const { post } = await admin(request, app.url);
     const pause =
       'if test -e /tmp/pause; then rm /tmp/pause; echo $$ >/tmp/paused-hook; exec sleep 60; fi';
     await post('/api/admin/hooks', {
@@ -670,10 +561,10 @@ for (const phase of ['PostUp', 'PreDown', 'PostDown'] as const) {
         'echo post >> /tmp/teardown\n' + (phase === 'PostDown' ? pause : ''),
     });
     if (phase !== 'PostUp') {
-      await post('/api/admin/interface/restart');
+      await post(iface + '/restart');
     }
     await app.execServer(['touch', '/tmp/pause']);
-    const cutover = post('/api/admin/interface/restart').catch(() => {});
+    const cutover = post(iface + '/restart').catch(() => {});
     await expect
       .poll(() =>
         app.execServer([
@@ -685,7 +576,7 @@ for (const phase of ['PostUp', 'PreDown', 'PostDown'] as const) {
       .toBe('paused');
     await app.stopProcess('KILL');
     await cutover;
-    await app.execServer(['sh', '-ec', 'kill "$(cat /tmp/paused-hook)"']);
+    await app.shell('kill "$(cat /tmp/paused-hook)"');
     await app.startProcess();
     await expect
       .poll(async () =>
@@ -700,7 +591,7 @@ for (const phase of ['PostUp', 'PreDown', 'PostDown'] as const) {
       ]);
     expect(await teardowns()).toBe(phase === 'PostUp' ? '' : 'pre\npost');
     expect(await app.execServer(['wg', 'show', 'interfaces'])).toBe('');
-    await post('/api/admin/interface/restart');
+    await post(iface + '/restart');
     await app.stopProcess('TERM');
     expect(await teardowns()).toBe(
       phase === 'PostUp' ? 'pre\npost' : 'pre\npost\npre\npost'
@@ -711,9 +602,8 @@ for (const phase of ['PostUp', 'PreDown', 'PostDown'] as const) {
 test('withdraws filtering after deleting a link whose PostUp failed', async ({
   app,
   request,
+  api: { headers, json, post },
 }) => {
-  const { headers, json, post } = await admin(request, app.url);
-  const iface = '/api/admin/interface';
   const settings = await json(iface);
   await post(iface, { ...settings, firewallEnabled: true });
   await post('/api/admin/hooks', {
@@ -737,10 +627,8 @@ test('withdraws filtering after deleting a link whose PostUp failed', async ({
 
 test('finishes filtering and PostDown after a crash just after link deletion', async ({
   app,
-  request,
+  api: { post, json },
 }) => {
-  const { post, json } = await admin(request, app.url);
-  const iface = '/api/admin/interface';
   await post(iface, { ...(await json(iface)), firewallEnabled: true });
   await post('/api/admin/hooks', {
     preUp: '',
@@ -749,20 +637,12 @@ test('finishes filtering and PostDown after a crash just after link deletion', a
     postDown: 'echo down >> /tmp/post-down',
   });
   await post(iface + '/restart');
-  await app.execServer([
-    'sh',
-    '-ec',
-    `cat > /usr/local/bin/ip <<'SH'
-#!/bin/sh
-case "$*" in 'link delete dev wg-easy-'*)
+  await app.overrideIp(`case "$*" in 'link delete dev wg-easy-'*)
   /sbin/ip "$@" || exit 1
   touch /tmp/link-deleted
   exec sleep 60 ;;
 esac
-exec /sbin/ip "$@"
-SH
-chmod +x /usr/local/bin/ip`,
-  ]);
+exec /sbin/ip "$@"`);
   const cutover = post(iface + '/restart').catch(() => {});
   await expect
     .poll(() =>
@@ -781,7 +661,7 @@ chmod +x /usr/local/bin/ip`,
   await app.execServer(['rm', '/usr/local/bin/ip']);
   await app.startProcess();
   await expect
-    .poll(() => app.execServer(['cat', '/tmp/post-down']).catch(() => ''))
+    .poll(() => app.read('/tmp/post-down').catch(() => ''))
     .toBe('down');
   await expect
     .poll(() => app.execServer(['wg', 'show', 'interfaces']))
@@ -790,48 +670,30 @@ chmod +x /usr/local/bin/ip`,
 
 test('rolls back an unpublished link when alternate name assignment fails', async ({
   app,
-  request,
+  api: { post },
 }) => {
-  const { post } = await admin(request, app.url);
-  await app.execServer([
-    'sh',
-    '-ec',
-    `cat > /usr/local/bin/ip <<'SH'
-#!/bin/sh
-case "$*" in *' altname wg-easy-'*) echo "$5" >/tmp/unpublished; exit 2 ;; esac
-exec /sbin/ip "$@"
-SH
-chmod +x /usr/local/bin/ip`,
-  ]);
-  await expect(post('/api/admin/interface/restart')).rejects.toThrow();
-  const temporary = await app.execServer(['cat', '/tmp/unpublished']);
+  await app.overrideIp(`case "$*" in *' altname wg-easy-'*) echo "$5" >/tmp/unpublished; exit 2 ;; esac
+exec /sbin/ip "$@"`);
+  await expect(post(iface + '/restart')).rejects.toThrow();
+  const temporary = await app.read('/tmp/unpublished');
   await app.execServer(['test', '!', '-e', '/sys/class/net/' + temporary]);
   await app.execServer(['test', '!', '-e', '/sys/class/net/wg0']);
   await app.execServer(['rm', '/usr/local/bin/ip']);
-  await post('/api/admin/interface/restart');
+  await post(iface + '/restart');
   expect(await app.execServer(['wg', 'show', 'interfaces'])).toBe('wg0');
 });
 
 test('preserves a replacement that takes the public name just before link deletion', async ({
   app,
-  request,
+  api: { post },
 }) => {
-  const { post } = await admin(request, app.url);
-  await app.execServer([
-    'sh',
-    '-ec',
-    `cat > /usr/local/bin/ip <<'SH'
-#!/bin/sh
-case "$*" in 'link delete dev wg-easy-'*)
+  await app.overrideIp(`case "$*" in 'link delete dev wg-easy-'*)
   index=$(cat /sys/class/net/wg0/ifindex)
   /sbin/ip link delete dev wg0
   /sbin/ip link add dev wg0 index "$index" type dummy ;;
 esac
-exec /sbin/ip "$@"
-SH
-chmod +x /usr/local/bin/ip`,
-  ]);
-  await expect(post('/api/admin/interface/restart')).rejects.toThrow();
+exec /sbin/ip "$@"`);
+  await expect(post(iface + '/restart')).rejects.toThrow();
   expect(
     await app.execServer(['ip', '-details', 'link', 'show', 'wg0'])
   ).toContain('dummy');

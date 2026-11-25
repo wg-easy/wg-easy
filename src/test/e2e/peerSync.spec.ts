@@ -1,19 +1,16 @@
 import { expect, test } from './fixtures';
-import { admin } from './helpers';
 
 for (const backend of ['wg', 'awg'] as const) {
   test.describe(backend, () => {
     test.use({ backend });
     test('syncs peers without the server quick script while an existing client sends traffic', async ({
-      request,
+      api: { create, download, json, post },
       app,
     }) => {
-      const { create, download, json, post } = await admin(request, app.url);
       const witness = await create('Connected client');
       await app.connectClient(await download(witness));
       await expect.poll(() => app.pingFromClient('10.8.0.1')).toBe(true);
-      const ifindex = () =>
-        app.execServer(['cat', '/sys/class/net/wg0/ifindex']);
+      const ifindex = () => app.read('/sys/class/net/wg0/ifindex');
       const original = await ifindex();
 
       const traffic = app.execClient([
@@ -26,8 +23,6 @@ for (const backend of ['wg', 'awg'] as const) {
         'wg0',
         '10.8.0.1',
       ]);
-      const read = (field: string) =>
-        app.execServer([backend, 'show', 'wg0', field]);
       const site = await create('Another client');
       const peer = await json(site);
       const subnet = '192.0.2.0/24';
@@ -35,15 +30,15 @@ for (const backend of ['wg', 'awg'] as const) {
       expect(
         await app.execServer(['ip', 'route', 'show', 'exact', subnet])
       ).toContain('dev wg0');
-      expect(await read('fwmark')).toBe('off');
-      expect(await read('allowed-ips')).toContain('10.8.0.3/32');
+      expect(await app.show('fwmark')).toBe('off');
+      expect(await app.show('allowed-ips')).toContain('10.8.0.3/32');
       await app.execServer([backend, 'set', 'wg0', 'fwmark', '0xca6d']);
       await create('Third client');
-      expect(await read('fwmark')).toBe('0xca6d');
-      expect(await read('allowed-ips')).toContain('10.8.0.4/32');
+      expect(await app.show('fwmark')).toBe('0xca6d');
+      expect(await app.show('allowed-ips')).toContain('10.8.0.4/32');
       expect(await ifindex()).toBe(original);
       expect(await traffic).toContain(', 0% packet loss');
-      const saved = await app.execServer(['cat', '/etc/wireguard/wg0.conf']);
+      const saved = await app.read('/etc/wireguard/wg0.conf');
       for (const field of [
         'Address = 10.8.0.1/24',
         'PostUp =',
@@ -57,13 +52,10 @@ for (const backend of ['wg', 'awg'] as const) {
 
 test('disable, deletion and expiry revoke running peers despite a failing endpoint lookup', async ({
   request,
+  api: { headers, create, download, json, post },
   app,
 }) => {
-  test.slow(); // Expiry goes through the real one-minute maintenance job.
-  const { headers, create, download, json, post } = await admin(
-    request,
-    app.url
-  );
+  test.slow();
   const disable = await create('Disable');
   const remove = await create('Delete');
   const expire = await create('Expire');

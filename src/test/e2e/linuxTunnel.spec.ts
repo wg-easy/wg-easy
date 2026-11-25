@@ -1,15 +1,13 @@
 import { expect, test } from './fixtures';
-import { admin } from './helpers';
 
 for (const backend of ['wg', 'awg'] as const) {
   test.describe(`${backend} daemon recovery`, () => {
     test.use({ backend, userspace: true });
     test('reconnects peers after the userspace daemon exits', async ({
-      request,
+      api: { create, download, json, post },
       app,
     }) => {
-      test.slow(); // Wait for the normal one-minute maintenance job.
-      const { create, download, json, post } = await admin(request, app.url);
+      test.slow();
       const client = await create('Connected peer');
       const gateway = await create('Default gateway');
       await post(gateway, {
@@ -18,17 +16,13 @@ for (const backend of ['wg', 'awg'] as const) {
       });
       await app.connectClient(await download(client));
       await expect.poll(() => app.pingFromClient('10.8.0.1')).toBe(true);
-      const index = () => app.execServer(['cat', '/sys/class/net/wg0/ifindex']);
+      const index = () => app.read('/sys/class/net/wg0/ifindex');
       const original = await index();
-      const mark = () => app.execServer([backend, 'show', 'wg0', 'fwmark']);
+      const mark = () => app.show('fwmark');
       const originalMark = await mark();
       const [signal, daemon] =
         backend === 'wg' ? ['KILL', 'wireguard-go'] : ['TERM', 'amneziawg-go'];
-      await app.execServer([
-        'sh',
-        '-ec',
-        `kill -${signal} "$(pidof ${daemon})"`,
-      ]);
+      await app.shell(`kill -${signal} "$(pidof ${daemon})"`);
       await expect
         .poll(() => index().catch(() => original), { timeout: 80_000 })
         .not.toBe(original);
@@ -42,7 +36,7 @@ for (const backend of ['wg', 'awg'] as const) {
     test.describe(`${backend} ${userspace ? 'userspace' : 'kernel'}`, () => {
       test.use({ backend, userspace });
       test(`starts, syncs, restarts and stops without server quick scripts (${userspace ? 'userspace' : 'kernel'})`, async ({
-        request,
+        api: { post, json, create, download },
         app,
       }) => {
         for (const quick of ['wg-quick', 'awg-quick']) {
@@ -79,7 +73,6 @@ for (const backend of ['wg', 'awg'] as const) {
           ).toContain(userspace ? 'tun type tun' : kind);
         };
         await checkBackend();
-        const { post, json, create, download } = await admin(request, app.url);
         const settings = await json('/api/admin/interface');
         await post('/api/admin/interface', { ...settings, s1: 122, jC: 8 });
         const url = await create('Site router');
@@ -111,7 +104,7 @@ for (const backend of ['wg', 'awg'] as const) {
         expect(
           parameters(await app.execServer([backend, 'showconf', 'wg0']))
         ).toEqual(serverParams);
-        const server = await app.execServer(['cat', '/etc/wireguard/wg0.conf']);
+        const server = await app.read('/etc/wireguard/wg0.conf');
         expect(parameters(server)).toEqual(serverParams);
         const savedLines = server.split('\n');
         for (const line of [
@@ -138,9 +131,7 @@ for (const backend of ['wg', 'awg'] as const) {
           jC: 3,
           serverAllowedIps: [site, added],
         });
-        expect(
-          await app.execServer([backend, 'show', 'wg0', 'allowed-ips'])
-        ).toContain(added);
+        expect(await app.show('allowed-ips')).toContain(added);
         await expect.poll(() => app.pingFromClient('10.8.0.1')).toBe(true);
         await app.restart();
         await checkBackend();
@@ -148,7 +139,7 @@ for (const backend of ['wg', 'awg'] as const) {
         await app.execClient([`${backend}-quick`, 'down', 'wg0']);
         await app.execClient([`${backend}-quick`, 'up', 'wg0']);
         await expect.poll(() => app.pingFromClient('10.8.0.1')).toBe(true);
-        expect(await app.execServer(['cat', phases])).toBe(
+        expect(await app.read(phases)).toBe(
           'PreUp\nPostUp\nPreDown\nPostDown\nPreUp\nPostUp'
         );
       });
@@ -160,9 +151,8 @@ test.describe('numbered routing table', () => {
   test.use({ ipv6: true });
   test('installs all peer addresses in the selected table and withdraws them when routing is off', async ({
     app,
-    request,
+    api: { post, json, create },
   }) => {
-    const { post, json, create } = await admin(request, app.url);
     const iface = '/api/admin/interface';
     const settings = await json(iface);
     await post(iface, { ...settings, routingTable: '100' });
@@ -208,7 +198,7 @@ test.describe('numbered routing table', () => {
     expect(
       JSON.parse(await ipv6Route('show', 'table', '100', 'exact', peerPrefix))
     ).toMatchObject([{ from: source, dev: 'lo' }]);
-    const allowed = await app.execServer(['wg', 'show', 'wg0', 'allowed-ips']);
+    const allowed = await app.show('allowed-ips');
     expect(allowed).toContain(client.ipv4Address + '/32');
     expect(allowed).toContain(client.ipv6Address + '/128');
   });
@@ -217,9 +207,9 @@ test.describe('numbered routing table', () => {
 test('reports a replacement interface and leaves its configuration in place', async ({
   app,
   request,
+  api: { headers },
 }) => {
-  const { headers } = await admin(request, app.url);
-  const index = await app.execServer(['cat', '/sys/class/net/wg0/ifindex']);
+  const index = await app.read('/sys/class/net/wg0/ifindex');
   await app.execServer(['ip', 'link', 'del', 'dev', 'wg0']);
   await app.execServer([
     'ip',
@@ -238,9 +228,7 @@ test('reports a replacement interface and leaves its configuration in place', as
   });
   expect(result.status()).toBe(409);
   expect((await result.json()).message).toContain('wg0 already exists');
-  expect(await app.execServer(['cat', '/sys/class/net/wg0/ifindex'])).toBe(
-    index
-  );
+  expect(await app.read('/sys/class/net/wg0/ifindex')).toBe(index);
   expect(
     await app.execServer(['ip', 'address', 'show', 'dev', 'wg0'])
   ).toContain('192.0.2.10/32');

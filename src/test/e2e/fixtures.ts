@@ -4,7 +4,7 @@ import { unlink, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
 
-import { test as base } from '@playwright/test';
+import { test as base, type APIRequestContext } from '@playwright/test';
 
 const exec = promisify(execFile);
 const composeFile = fileURLToPath(
@@ -24,6 +24,10 @@ type App = {
   connectClient: (configuration: string, index?: number) => Promise<void>;
   execClient: (args: string[], index?: number) => Promise<string>;
   execServer: (args: string[]) => Promise<string>;
+  shell: (script: string) => Promise<string>;
+  read: (path: string) => Promise<string>;
+  show: (field: string) => Promise<string>;
+  overrideIp: (script: string) => Promise<string>;
   pingFromClient: (address: string, index?: number) => Promise<boolean>;
 };
 
@@ -32,7 +36,26 @@ export const credentials = {
   password: 'e2e-only-password-123!',
 };
 
+export async function admin(request: APIRequestContext, origin: string) {
+  const headers = { Origin: origin };
+  const post = (url: string, data?: object) =>
+    request.post(url, { headers, data, failOnStatusCode: true });
+  const json = async (url: string) =>
+    (await request.get(url, { failOnStatusCode: true })).json();
+  const create = async (name: string) => {
+    const response = await post('/api/client', { name, expiresAt: null });
+    return `/api/client/${(await response.json()).clientId}`;
+  };
+  const download = async (url: string) =>
+    (
+      await request.get(url + '/configuration', { failOnStatusCode: true })
+    ).text();
+  await post('/api/auth/password', { ...credentials, remember: false });
+  return { headers, post, json, create, download };
+}
+
 export const test = base.extend<{
+  api: Awaited<ReturnType<typeof admin>>;
   app: App;
   initialized: boolean;
   keepNamespace: boolean;
@@ -66,11 +89,8 @@ export const test = base.extend<{
       }
 
       const project = `wg-easy-e2e-${randomUUID()}`;
-      const server = keepNamespace
-        ? 'wg-easy-recovery'
-        : userspace
-          ? 'wg-easy-userspace'
-          : 'wg-easy';
+      const profile = keepNamespace ? 'recovery' : userspace ? 'userspace' : '';
+      const server = profile ? 'wg-easy-' + profile : 'wg-easy';
       // Fixture teardown can be skipped when startup is interrupted.
       const marker = `${runDir}/${project}`;
       await writeFile(marker, '');
@@ -90,11 +110,7 @@ export const test = base.extend<{
           {
             env: {
               ...process.env,
-              COMPOSE_PROFILES: keepNamespace
-                ? 'recovery'
-                : userspace
-                  ? 'userspace'
-                  : '',
+              COMPOSE_PROFILES: profile,
               E2E_BACKEND: backend,
               E2E_RP_FILTER: strictReversePath ? '1' : '0',
               E2E_INITIALIZED: String(initialized),
@@ -117,8 +133,13 @@ export const test = base.extend<{
       const getUrl = async () =>
         `http://${await compose(['port', server, '51821'])}`;
 
-      const execServer = (args: string[]) =>
-        compose(['exec', '-T', server, ...args]);
+      const execServer = (args: string[], input?: string) =>
+        compose(['exec', '-T', server, ...args], input);
+      const shell = (script: string, input?: string) =>
+        execServer(['sh', '-ec', script], input);
+      const show = (field: string) => wg(['show', 'wg0', field]);
+      const waitForServer = () =>
+        compose(['up', '-d', '--wait', '--wait-timeout', '90', server]);
       const startProcess = (disableIpv6 = !ipv6) =>
         compose([
           'exec',
@@ -136,15 +157,22 @@ export const test = base.extend<{
           await compose(['up', '-d', server]);
           await startProcess();
         }
-        await compose(['up', '-d', '--wait', '--wait-timeout', '90', server]);
+        await waitForServer();
         await use({
           url: await getUrl(),
-          peers: async () =>
-            (await wg(['show', 'wg0', 'peers'])).split(/\s+/).filter(Boolean),
+          peers: async () => (await show('peers')).split(/\s+/).filter(Boolean),
           publicKey: (privateKey) => wg(['pubkey'], `${privateKey}\n`),
-          serverPublicKey: () => wg(['show', 'wg0', 'public-key']),
+          serverPublicKey: () => show('public-key'),
           execClient,
           execServer,
+          shell,
+          read: (path) => execServer(['cat', path]),
+          show,
+          overrideIp: (script) =>
+            shell(
+              'cat > /usr/local/bin/ip && chmod +x /usr/local/bin/ip',
+              `#!/bin/sh\n${script}\n`
+            ),
           startProcess,
           stopProcess: async (signal) => {
             await execServer([
@@ -205,14 +233,7 @@ ${backend}-quick up wg0`,
             if (keepNamespace) {
               await startProcess();
             }
-            await compose([
-              'up',
-              '-d',
-              '--wait',
-              '--wait-timeout',
-              '90',
-              server,
-            ]);
+            await waitForServer();
             // Docker can assign a different ephemeral host port on restart.
             return getUrl();
           },
@@ -231,6 +252,7 @@ ${backend}-quick up wg0`,
     },
     { timeout: 180_000 },
   ],
+  api: async ({ app, request }, use) => use(await admin(request, app.url)),
   baseURL: async ({ app }, use) => use(app.url),
 });
 

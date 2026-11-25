@@ -26,7 +26,8 @@ RUN apk add linux-headers build-base go git && \
     cd amneziawg-go && \
     make && \
     cd ../amneziawg-tools/src && \
-    make
+    make && \
+    sed -i 's|\[\[ $proto == -4 \]\] && cmd sysctl -q net\.ipv4\.conf\.all\.src_valid_mark=1|[[ $proto == -4 ]] \&\& [[ $(sysctl -n net.ipv4.conf.all.src_valid_mark) != 1 ]] \&\& cmd sysctl -q net.ipv4.conf.all.src_valid_mark=1|' ./wg-quick/linux.bash
 
 FROM docker.io/library/node:lithium-alpine@sha256:6bd9ab43c0ec0190ca7b2d193906cb8b7edf6e7f4afa43ddeccd6452710bffb5 AS build-libsql
 WORKDIR /app
@@ -55,9 +56,7 @@ RUN chmod +x /usr/bin/amneziawg-go
 # Copy amneziawg-tools
 COPY --from=build /app/amneziawg-tools/src/wg /usr/bin/awg
 COPY --from=build /app/amneziawg-tools/src/wg-quick/linux.bash /usr/bin/awg-quick
-# Full-tunnel clients can run with Docker's preconfigured, read-only sysctl.
-RUN sed -i 's|\[\[ $proto == -4 \]\] && cmd sysctl -q net\.ipv4\.conf\.all\.src_valid_mark=1|[[ $proto == -4 ]] \&\& [[ $(sysctl -n net.ipv4.conf.all.src_valid_mark) != 1 ]] \&\& cmd sysctl -q net.ipv4.conf.all.src_valid_mark=1|' /usr/bin/awg-quick && \
-    chmod +x /usr/bin/awg /usr/bin/awg-quick
+RUN chmod +x /usr/bin/awg /usr/bin/awg-quick
 
 # Install Linux packages
 RUN apk add --no-cache \

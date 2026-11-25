@@ -1,11 +1,10 @@
-import { expect, test } from './fixtures';
-import { admin, goto, reload } from './helpers';
+import { admin, expect, test } from './fixtures';
+import { goto, reload } from './helpers';
 
 test('stages the listener and uplink until restart and replaces their hook-installed rules together', async ({
   app,
-  request,
+  api: { post, json, create, download },
 }) => {
-  const { post, json, create, download } = await admin(request, app.url);
   const iface = '/api/admin/interface';
   const settings = await json(iface);
   const installHooks = (tag: string) => {
@@ -20,7 +19,7 @@ test('stages the listener and uplink until restart and replaces their hook-insta
   await installHooks('cutover-old');
   await post(iface + '/restart');
   const rules = () => app.execServer(['iptables', '-S', 'INPUT']);
-  const port = () => app.execServer(['wg', 'show', 'wg0', 'listen-port']);
+  const port = () => app.show('listen-port');
   const oldRule = /-i eth0 .*--dport 51820 .*cutover-old/;
   const newRule = /-i lo .*--dport 51830 .*cutover-new/;
   expect(await rules()).toMatch(oldRule);
@@ -49,7 +48,7 @@ test('stages the listener and uplink until restart and replaces their hook-insta
   expect(await download(witness)).toContain(
     'Endpoint = vpn.example.test:51820'
   );
-  expect(await app.execServer(['cat', '/etc/wireguard/wg0.conf'])).toContain(
+  expect(await app.read('/etc/wireguard/wg0.conf')).toContain(
     'ListenPort = 51830'
   );
 
