@@ -27,7 +27,7 @@ async function fixture() {
   const database = await databaseFixture();
   resetCryptoMocks();
   vi.spyOn(recovery, 'readPostUpMarker').mockResolvedValue(undefined);
-  vi.spyOn(recovery, 'recordPostUpFailure').mockResolvedValue();
+  vi.spyOn(recovery, 'writeHookMarker').mockResolvedValue();
   vi.spyOn(recovery, 'clearPostUpFailure').mockResolvedValue();
   const writeConfiguration = vi.spyOn(fs, 'writeFile').mockResolvedValue();
   vi.spyOn(wg, 'dump').mockResolvedValue([]);

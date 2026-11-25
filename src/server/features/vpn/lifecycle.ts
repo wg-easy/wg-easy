@@ -19,7 +19,8 @@ import {
 import {
   clearPostUpFailure,
   readPostUpMarker,
-  recordPostUpFailure,
+  writeHookMarker,
+  type DownHook,
 } from './tunnelRecord';
 
 import { getDatabase } from '#db';
@@ -39,7 +40,7 @@ import {
   routedReplyFamilies,
 } from '#server/utils/firewall';
 import { WG_ENV } from '#server/utils/config';
-import { LinuxTunnel } from '#server/utils/linuxTunnel';
+import { DownHookError, LinuxTunnel } from '#server/utils/linuxTunnel';
 import { setTunnelMtu } from '#server/utils/tunnelMtu';
 
 let pending: Promise<unknown> = Promise.resolve();
@@ -52,7 +53,7 @@ type HostState = {
   awaitingValidSettings?: boolean;
   retry?: ApplyMode;
   pendingHookMarker?: boolean;
-  failedStart?: ReturnType<typeof postUpFailure>;
+  failedStart?: ReturnType<typeof hookFailure>;
 };
 const hostStates = new WeakMap<DatabaseStore, HostState>();
 
@@ -103,21 +104,21 @@ async function cleanFailedStart(
         await firewall.blockTraffic(failure.name, !running.disableIpv6);
       }
     } finally {
-      await tunnel.stop(failure.name, true);
+      await tunnel.stop(failure.name, failure.hook === 'PostUp');
     }
     failure.cleanupPending = false;
   }
 }
 
-function postUpFailure(name: string, cause?: unknown) {
+function hookFailure(name: string, hook: DownHook | 'PostUp', cause?: unknown) {
   return {
     name,
+    hook,
     cleanupPending: true,
     error: createError({
       status: 503,
       statusText: 'VPN interface needs attention',
-      message:
-        'PostUp failed. Check the hook and its effects, then restart the VPN interface from the admin panel.',
+      message: `${hook} failed. Check the hook and its effects, then restart the VPN interface from the admin panel.`,
       cause,
     }),
   };
@@ -130,7 +131,7 @@ async function handlePostUpFailure(
 ): Promise<never> {
   // Keep the failure after deleting the link and its recovery record. The
   // hook may have already changed external state, even on a cold start.
-  const failure = postUpFailure(name, cause);
+  const failure = hookFailure(name, 'PostUp', cause);
   state.failedStart = failure;
   try {
     await cleanFailedStart(state.tunnel, failure);
@@ -163,10 +164,21 @@ async function getHostState(database: DatabaseStore) {
     };
     if (marker?.succeeded) {
       // The same generation durably armed its down hooks before the crash.
-      await state.tunnel.stop(marker.name);
-      await clearPostUpFailure();
+      try {
+        await state.tunnel.stop(marker.name);
+        await clearPostUpFailure();
+      } catch (cause) {
+        if (!(cause instanceof DownHookError)) {
+          throw cause;
+        }
+        await writeHookMarker(marker.name, cause.hook);
+        state.failedStart = hookFailure(marker.name, cause.hook, cause);
+      }
     } else if (marker) {
-      state.failedStart = postUpFailure(marker.name);
+      state.failedStart = hookFailure(
+        marker.name,
+        marker.failedDownHook ?? 'PostUp'
+      );
     }
     hostStates.set(database, state);
   }
@@ -372,7 +384,7 @@ async function apply(mode?: ApplyMode, manualRestart = false) {
       state.defaultTables = defaultTables;
       siteError = await syncSites();
       if (postUp) {
-        await recordPostUpFailure(network.name);
+        await writeHookMarker(network.name);
         if (network.firewallEnabled) {
           try {
             await rebuildFirewall();

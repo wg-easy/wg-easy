@@ -16,6 +16,7 @@ import {
   readTunnelRecord,
   removeTunnelRecord,
   saveTunnelRecord,
+  type DownHook,
   type TunnelRecord,
 } from '#server/features/vpn/tunnelRecord';
 import type { HooksType } from '#db/repositories/hooks/types';
@@ -75,6 +76,27 @@ async function createLink(name: string, kind: 'wireguard' | 'amneziawg') {
 function temporaryName(record: TunnelRecord) {
   // IFNAMSIZ allows 15 characters.
   return 'wg' + record.policy.tag.slice(8).replaceAll('-', '').slice(0, 13);
+}
+
+export class DownHookError extends Error {
+  constructor(
+    readonly hook: DownHook,
+    cause: unknown
+  ) {
+    super(`${hook} failed`, { cause });
+  }
+}
+
+async function runDownHook(
+  record: TunnelRecord,
+  hook: DownHook,
+  command: string
+) {
+  try {
+    await wg.runHook(record.name, record.table, command, record.disableIpv6);
+  } catch (cause) {
+    throw new DownHookError(hook, cause);
+  }
 }
 
 export class LinuxTunnel {
@@ -339,7 +361,7 @@ export class LinuxTunnel {
       await saveTunnelRecord(running);
       this.running = running;
       if (!skipHooks && preDown) {
-        await wg.runHook(name, running.table, preDown, running.disableIpv6);
+        await runDownHook(running, 'PreDown', preDown);
         if (!(await this.checkOwnership(name))) {
           throw new Error(
             `Tunnel interface ${name} disappeared during PreDown`
@@ -394,12 +416,7 @@ export class LinuxTunnel {
       const consumed = { ...running, postDown: '' };
       await saveTunnelRecord(consumed);
       this.running = consumed;
-      await wg.runHook(
-        name,
-        running.table,
-        running.postDown,
-        running.disableIpv6
-      );
+      await runDownHook(running, 'PostDown', running.postDown);
     }
     if (running.postUpSucceeded) {
       // Retain confirmation across interruptions until the marker is gone.

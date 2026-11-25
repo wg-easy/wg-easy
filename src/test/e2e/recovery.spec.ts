@@ -198,6 +198,50 @@ test('runs confirmed down hooks after a crash with the PostUp marker still prese
   );
 });
 
+for (const hook of ['PreDown', 'PostDown'] as const) {
+  test(`keeps the admin panel available after ${hook} fails during confirmed hook recovery`, async ({
+    app,
+    request,
+  }) => {
+    const { post, json } = await admin(request, app.url);
+    const marker = '/etc/wireguard/.wg-easy/failed-post-up';
+    await post('/api/admin/hooks', {
+      preUp: '',
+      postUp: `cp -p ${marker} /tmp/confirmed; echo up >> /tmp/phases`,
+      preDown: `echo pre >> /tmp/phases; ${hook === 'PreDown' ? 'false' : 'true'}`,
+      postDown: `echo post >> /tmp/phases; ${hook === 'PostDown' ? 'false' : 'true'}`,
+    });
+    await post('/api/admin/interface/restart');
+    await app.stopProcess('KILL');
+    await app.execServer(['cp', '-p', '/tmp/confirmed', marker]);
+    async function startAwaitingRepair() {
+      await app.startProcess();
+      await expect
+        .poll(
+          async () =>
+            (await json('/api/admin/interface').catch(() => ({})))
+              .restartRequired
+        )
+        .toBe(true);
+      expect(await app.execServer(['wg', 'show', 'interfaces'])).toBe('');
+      expect(await app.execServer(['cat', '/tmp/phases'])).toBe(
+        'up\npre\npost'
+      );
+      expect(
+        JSON.parse(await app.execServer(['cat', marker])).failedDownHook
+      ).toBe(hook);
+    }
+    await startAwaitingRepair();
+    await app.stopProcess('TERM');
+    await startAwaitingRepair();
+    await post('/api/admin/interface/restart');
+    expect(await app.execServer(['cat', '/tmp/phases'])).toBe(
+      'up\npre\npost\nup'
+    );
+    expect((await json('/api/admin/interface')).restartRequired).toBe(false);
+  });
+}
+
 test('recovers owned default rules only after the recorded link is gone', async ({
   app,
   request,

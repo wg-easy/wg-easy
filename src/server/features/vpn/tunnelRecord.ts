@@ -10,7 +10,14 @@ const directory = '/etc/wireguard/.wg-easy';
 // The volume holds one VPN configuration, even when WG_INTERFACE is renamed.
 const failureFile = 'failed-post-up';
 const generation = z.string().regex(/^wg-easy-[\da-f-]{36}$/);
-const postUpMarker = z.object({ name: z.string().min(1), generation });
+const postUpMarker = z.object({
+  name: z.string().min(1),
+  generation,
+  failedDownHook: z.enum(['PreDown', 'PostDown']).optional(),
+});
+export type DownHook = NonNullable<
+  z.infer<typeof postUpMarker>['failedDownHook']
+>;
 const id = z.int().positive().max(0xffffffff);
 const rule = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('suppress'), priority: id }),
@@ -166,7 +173,11 @@ export async function readPostUpMarker() {
         `PostUp marker for ${name} belongs to a different tunnel generation`
       );
     }
-    return { name, succeeded: record?.postUpSucceeded === true };
+    return {
+      name,
+      succeeded: !marker.failedDownHook && record?.postUpSucceeded === true,
+      failedDownHook: marker.failedDownHook,
+    };
   } catch (error) {
     // A new volume has neither the private directory nor a failure marker.
     if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
@@ -175,14 +186,14 @@ export async function readPostUpMarker() {
   }
 }
 
-export async function recordPostUpFailure(name: string) {
+export async function writeHookMarker(name: string, failedDownHook?: DownHook) {
   const record = await readTunnelRecord(parseInterfaceName(name));
   if (!record) {
     throw new Error(`No tunnel recovery record for ${name}`);
   }
   return saveRecoveryFile(
     failureFile,
-    JSON.stringify({ name, generation: record.policy.tag })
+    JSON.stringify({ name, generation: record.policy.tag, failedDownHook })
   );
 }
 

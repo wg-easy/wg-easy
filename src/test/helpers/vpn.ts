@@ -50,7 +50,7 @@ export async function vpnFixture() {
   vi.spyOn(recovery, 'readPostUpMarker').mockImplementation(async () =>
     failedName ? { name: failedName, succeeded: false } : undefined
   );
-  vi.spyOn(recovery, 'recordPostUpFailure').mockImplementation(async (name) => {
+  vi.spyOn(recovery, 'writeHookMarker').mockImplementation(async (name) => {
     failedName = name;
   });
   vi.spyOn(recovery, 'clearPostUpFailure').mockImplementation(async () => {

@@ -125,7 +125,7 @@ describe('VPN operations', () => {
     await store.hooks.update({ preUp: '', postUp: 'broken hook' });
     commands.runHook.mockRejectedValueOnce(new Error('failed'));
     await vpn.start();
-    expect(recovery.recordPostUpFailure).toHaveBeenCalledWith('wg0');
+    expect(recovery.writeHookMarker).toHaveBeenCalledWith('wg0');
     expect((await settings.get(admin)).restartRequired).toBe(true);
 
     await vpn.stop();
@@ -149,7 +149,7 @@ describe('VPN operations', () => {
   test('skips PostUp when its pending marker cannot be saved', async () => {
     const { store, commands } = await vpnFixture();
     await store.hooks.update({ preUp: '', postUp: 'hook' });
-    vi.mocked(recovery.recordPostUpFailure).mockRejectedValueOnce(
+    vi.mocked(recovery.writeHookMarker).mockRejectedValueOnce(
       new Error('Storage full')
     );
     await expect(vpn.restart()).rejects.toThrow('Storage full');
@@ -181,7 +181,7 @@ describe('VPN operations', () => {
   test('cleans up the recorded interface when the configured interface was renamed', async () => {
     const { commands } = await vpnFixture();
     vi.spyOn(console, 'error').mockImplementation(() => {});
-    await recovery.recordPostUpFailure('old0');
+    await recovery.writeHookMarker('old0');
     await vpn.start();
     expect(commands.down).toHaveBeenCalledWith('old0', true);
     expect(commands.up).not.toHaveBeenCalled();
