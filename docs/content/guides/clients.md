@@ -149,7 +149,7 @@ Enter each comma-separated value below as a separate row in the form.
 
 ### Server Allowed IPs
 
-Additional IPs and networks the server routes to this client, such as a LAN behind the client. The client's own VPN addresses are included automatically. See the [routed setup guide](../examples/tutorials/routed.md) for an example.
+Additional IPs and networks the server routes to this client, such as a LAN behind the client. The client's own VPN addresses are included automatically. Adding the first or withdrawing the last enabled gateway for `0.0.0.0/0` or `::/0` automatically restarts the server interface when wg-easy manages routes. This also applies when a gateway is enabled, disabled, deleted, or expires. See the [routed setup guide](../examples/tutorials/routed.md) for an example.
 
 ### DNS
 

@@ -1,20 +1,16 @@
-import fs from 'node:fs/promises';
-
-import { describe, expect, test, vi, onTestFinished } from 'vitest';
+import { describe, expect, test, vi } from 'vitest';
 
 import { databaseFixture } from '../helpers/database';
 import { resetCryptoMocks } from '../helpers/crypto';
 import { legacyBackup } from '../helpers/legacyBackup';
+import { mockVpnHost } from '../helpers/vpn';
 
 import * as setup from '#server/features/setup';
 import { getIpInformation } from '#server/utils/ip';
 import { roles } from '#shared/utils/permissions';
 import { zeroWireGuardKey } from '#shared/utils/wireguard';
-import { wg } from '#server/utils/wgHelper';
-import { firewall } from '#server/utils/firewall';
 import { maintain } from '#server/features/vpn/lifecycle';
 import { generateClientConfig } from '#server/features/vpn/configuration';
-vi.mock('#server/utils/config', () => ({ WG_ENV: {} }));
 vi.mock('#server/utils/ip', async (original) => ({
   ...(await original<typeof import('#server/utils/ip')>()),
   getIpInformation: vi.fn(),
@@ -23,14 +19,7 @@ vi.mock('#server/utils/ip', async (original) => ({
 async function fixture() {
   const database = await databaseFixture();
   resetCryptoMocks();
-  const writeConfiguration = vi.spyOn(fs, 'writeFile').mockResolvedValue();
-  vi.spyOn(wg, 'dump').mockResolvedValue([]);
-  const sync = vi.spyOn(wg, 'sync').mockResolvedValue('');
-  vi.spyOn(wg, 'down').mockResolvedValue();
-  vi.spyOn(wg, 'postUp').mockResolvedValue('');
-  const up = vi.spyOn(wg, 'up').mockResolvedValue('');
-  vi.spyOn(firewall, 'rebuildRules').mockResolvedValue();
-  onTestFinished(() => vi.restoreAllMocks());
+  const { writeConfiguration, commands } = mockVpnHost();
   const ipInformation = vi
     .mocked(getIpInformation)
     .mockReset()
@@ -39,8 +28,8 @@ async function fixture() {
     ...database,
     ipInformation,
     writeConfiguration,
-    sync,
-    up,
+    sync: commands.sync,
+    up: commands.up,
   };
 }
 
@@ -69,10 +58,30 @@ describe('setup', () => {
     expect(writeConfiguration.mock.lastCall?.[1]).toContain(
       'ListenPort = 51900'
     );
-    expect(sync).toHaveBeenCalledExactlyOnceWith('wg0');
+    expect(sync).toHaveBeenCalledExactlyOnceWith(
+      expect.objectContaining({ name: 'wg0' }),
+      expect.any(Array),
+      true
+    );
     await expect(
       setup.configureEndpoint('changed', 51901)
     ).rejects.toMatchObject({ status: 400 });
+  });
+
+  test('retains a completed setup and retries the selected listener after a host failure', async () => {
+    const { up, sync } = await fixture();
+    await setup.createAdministrator('admin', 'a-long-password');
+    up.mockRejectedValueOnce(new Error('Tunnel unavailable'));
+    await expect(
+      setup.configureEndpoint('vpn.example.com', 51830)
+    ).rejects.toThrow('Tunnel unavailable');
+    expect(await setup.status()).toEqual({ done: true, step: 0 });
+    await maintain();
+    expect(sync).toHaveBeenCalledExactlyOnceWith(
+      expect.objectContaining({ port: 51830 }),
+      [],
+      true
+    );
   });
 
   test('rolls back account creation when the setup transition cannot be saved', async () => {
@@ -282,7 +291,11 @@ describe('setup', () => {
         await setup.importConfiguration(file);
       }
       expect(up).toHaveBeenCalledTimes(failRestart ? 2 : 1);
-      expect(sync).toHaveBeenCalledExactlyOnceWith('wg0');
+      expect(sync).toHaveBeenCalledExactlyOnceWith(
+        expect.objectContaining({ name: 'wg0' }),
+        expect.any(Array),
+        true
+      );
       expect(writeConfiguration.mock.lastCall?.[1]).toContain(
         `PrivateKey = ${server.privateKey}`
       );

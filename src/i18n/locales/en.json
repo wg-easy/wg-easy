@@ -166,7 +166,7 @@
       },
       "serverAllowedIps": {
         "label": "Server Allowed IPs",
-        "description": "Which IPs the server will route to the client"
+        "description": "Which IPs the server routes to this client. Adding or removing a managed default route restarts the interface for all clients."
       },
       "allowedIps": {
         "description": "Which IPs will be routed through the VPN (overrides global config)"
@@ -406,7 +406,7 @@
       },
       "routingTable": {
         "label": "Routing Table",
-        "description": "Routing table for WireGuard routes. Set to auto, off, or a table number."
+        "description": "Routing table for WireGuard routes. Set to auto, off, or a table number. Changing the table for a managed default route restarts the interface for all clients."
       },
       "mtu": {
         "description": "MTU WireGuard will use. Leave empty for automatic detection"
@@ -420,6 +420,7 @@
         "description": "Restart the WireGuard interface"
       },
       "restartWarn": "Are you sure to restart the interface? This will disconnect all clients.",
+      "restartRequired": "Restart required",
       "restartSuccess": "Interface restarted",
       "firewall": "Traffic Filtering",
       "firewallEnabled": {
@@ -604,7 +605,7 @@
       "cidr": "CIDR",
       "device": "Device",
       "cidrValid": "CIDR must be valid",
-      "routingTable": "Routing table must be auto, off, or a table number",
+      "routingTable": "Use auto, off, or a routing table ID from 0 to 4294967295. A leading zero makes the ID octal.",
       "headerProtectionJunkSize": "Junk sizes S1-S4 must be at least 12 when a Header Protection Key is set"
     },
     "otl": "One Time link",
@@ -614,6 +615,8 @@
     "hook": "Hook",
     "enabled": "Enabled",
     "mtu": "MTU",
+    "mtuInteger": "MTU must be a whole number",
+    "ipv6Mtu": "MTU must be at least 1280 when IPv6 is enabled",
     "port": "Port",
     "portInteger": "Port must be a whole number",
     "persistentKeepalive": "Persistent Keepalive",

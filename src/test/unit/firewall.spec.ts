@@ -63,10 +63,10 @@ describe('firewall chains', () => {
           continue;
         }
         expect(replies).toEqual([
-          `${tool} -A WG_CLIENTS_wg1 -o wg1 -s ${site} -d ${pool} -m conntrack --ctstate ESTABLISHED --ctdir REPLY -j ACCEPT`,
+          `${tool} -w 2 -A WG_CLIENTS_wg1 -o wg1 -s ${site} -d ${pool} -m conntrack --ctstate ESTABLISHED --ctdir REPLY -j ACCEPT`,
         ]);
         expect(rules.indexOf(replies[0]!)).toBeLessThan(
-          rules.indexOf(`${tool} -A WG_CLIENTS_wg1 -j DROP`)
+          rules.indexOf(`${tool} -w 2 -A WG_CLIENTS_wg1 -j DROP`)
         );
       }
     }
@@ -101,7 +101,9 @@ describe('firewall chains', () => {
       };
       let fail = true;
       execMock.mockImplementation(async (command) => {
-        const [family, action, chain] = command.split(' ');
+        const [family, wait, seconds, action, chain] = command.split(' ');
+        expect(wait).toBe('-w');
+        expect(seconds).toBe('2');
         const entries = rules.get(`${family}:${chain}`);
         if (action === '-S' && entries) {
           return [
@@ -121,7 +123,7 @@ describe('firewall chains', () => {
         }
         if (action === '-D' && entries) {
           expect(complete.size).toBe(2);
-          const rule = command.split(' ').slice(3).join(' ');
+          const rule = command.split(' ').slice(5).join(' ');
           const index = entries.indexOf(rule);
           expect(index).toBeGreaterThanOrEqual(0);
           entries.splice(index, 1);
@@ -164,13 +166,15 @@ describe('firewall chains', () => {
     await firewall.removeFiltering('wg1', false);
 
     expect(execMock).toHaveBeenCalledWith(
-      expect.stringContaining('iptables -N WG_CLIENTS_wg1')
+      expect.stringContaining('iptables -w 2 -N WG_CLIENTS_wg1')
     );
     expect(execMock).toHaveBeenCalledWith(
-      expect.stringContaining('iptables -D FORWARD -i wg1 -j WG_CLIENTS_wg1')
+      expect.stringContaining(
+        'iptables -w 2 -D FORWARD -i wg1 -j WG_CLIENTS_wg1'
+      )
     );
     expect(execMock).toHaveBeenCalledWith(
-      expect.stringContaining('iptables -X WG_CLIENTS_wg1')
+      expect.stringContaining('iptables -w 2 -X WG_CLIENTS_wg1')
     );
     expect(execMock).not.toHaveBeenCalledWith(
       expect.stringMatching(/(?:-F|-X) WG_CLIENTS\s/)
@@ -179,10 +183,12 @@ describe('firewall chains', () => {
       expect.stringContaining('ip6tables')
     );
     expect(execMock).toHaveBeenCalledWith(
-      expect.stringContaining('iptables -C INPUT -i wg1 -j WG_CLIENTS_wg1')
+      expect.stringContaining(
+        'iptables -w 2 -I INPUT 1 -i wg1 -j WG_CLIENTS_wg1'
+      )
     );
     expect(execMock).toHaveBeenCalledWith(
-      expect.stringContaining('iptables -D INPUT -i wg1 -j WG_CLIENTS_wg1')
+      expect.stringContaining('iptables -w 2 -D INPUT -i wg1 -j WG_CLIENTS_wg1')
     );
   });
 
@@ -198,12 +204,12 @@ describe('firewall chains', () => {
       for (const parent of ['INPUT', 'FORWARD']) {
         expect(execMock).toHaveBeenCalledWith(
           expect.stringContaining(
-            `${family} -D ${parent} -i wg0 -j WG_CLIENTS_wg0`
+            `${family} -w 2 -D ${parent} -i wg0 -j WG_CLIENTS_wg0`
           )
         );
         expect(execMock).toHaveBeenCalledWith(
           expect.stringContaining(
-            `${family} -D ${parent} -i wg0 -m comment --comment "wg-easy rebuild wg0" -j DROP`
+            `${family} -w 2 -D ${parent} -i wg0 -m comment --comment "wg-easy rebuild wg0" -j DROP`
           )
         );
       }
@@ -321,7 +327,7 @@ describe('firewall entries', () => {
       expect(execMock.mock.calls.map(([command]) => command)).toEqual(
         protocols.map(
           (protocol) =>
-            `${command} -A WG_CLIENTS_wg0 -s ${source} -d ${destination}${protocol} -m comment --comment "client 1: Laptop" -j ACCEPT`
+            `${command} -w 2 -A WG_CLIENTS_wg0 -s ${source} -d ${destination}${protocol} -m comment --comment "client 1: Laptop" -j ACCEPT`
         )
       );
     }

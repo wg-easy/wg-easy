@@ -62,6 +62,7 @@
 
 <script lang="ts" setup>
 import { ChevronDownIcon, SlidersHorizontalIcon } from '@lucide/vue';
+
 import { $fetch } from '#imports';
 
 const name = ref<string>('');

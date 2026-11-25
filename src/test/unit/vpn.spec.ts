@@ -1,15 +1,19 @@
 import { describe, expect, test, vi } from 'vitest';
+import { createError } from 'nuxt/server';
 
 import { vpnFixture } from '../helpers/vpn';
 
+import { zeroWireGuardKey } from '#shared/utils/wireguard';
 import { roles } from '#shared/utils/permissions';
 import * as vpn from '#server/features/vpn/lifecycle';
+import * as recovery from '#server/features/vpn/tunnelRecord';
+import { LinuxTunnel } from '#server/utils/linuxTunnel';
+import { SiteRoutes } from '#server/features/vpn/siteRoutes';
 import * as clients from '#server/features/vpn/clients';
 import * as settings from '#server/features/vpn/interface';
 import * as provisioning from '#server/features/vpn/provisioning';
 import * as queries from '#server/features/vpn/queries';
 import { ClientQuerySchema } from '#shared/contracts/client';
-import { NativePostUpError } from '#server/utils/wgHelper';
 import * as cmd from '#server/utils/cmd';
 
 const admin = { id: 1, role: roles.ADMIN };
@@ -27,6 +31,15 @@ describe('VPN operations', () => {
         enabled: operation !== 'peer',
         serverAllowedIps: operation === 'site' ? [] : [site],
       });
+      if (operation === 'restart') {
+        vi.mocked(LinuxTunnel.prototype.checkOwnership, {
+          partial: true,
+        }).mockResolvedValue({
+          name: 'wg0',
+          filtering: true,
+          disableIpv6: false,
+        });
+      }
       const exec = vi.spyOn(cmd, 'exec').mockImplementation(async (command) => {
         if (command.includes('-m conntrack')) {
           throw new Error('match unavailable');
@@ -49,6 +62,9 @@ describe('VPN operations', () => {
         status: 422,
         message: expect.stringMatching(/IPv6.*conntrack.*ip6tables/),
       });
+      if (operation === 'restart') {
+        await vpn.maintain();
+      }
       expect((await store.interfaces.get()).firewallEnabled).toBe(
         operation !== 'firewall'
       );
@@ -111,7 +127,103 @@ describe('VPN operations', () => {
     await store.interfaces.update({ firewallEnabled: true });
     firewall.blockTraffic.mockRejectedValue(new Error('Firewall unavailable'));
     await expect(vpn.start()).rejects.toThrow('Firewall unavailable');
+    expect(commands.sync).not.toHaveBeenCalled();
+    expect(commands.runHook).not.toHaveBeenCalled();
+  });
+
+  test('holds a failed boot hook across process starts until an explicit restart', async () => {
+    const { store, commands } = await vpnFixture();
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    await store.hooks.update({ preUp: '', postUp: 'broken hook' });
+    commands.runHook.mockRejectedValueOnce(new Error('failed'));
+    await vpn.start();
+    expect(recovery.writeHookMarker).toHaveBeenCalledWith('wg0');
+    expect((await settings.get(admin)).restartRequired).toBe(true);
+
+    await vpn.stop();
+    await vpn.start();
+    await expect(
+      vpn.commit((tx) => tx.hooks.update({ postUp: 'fixed hook' }))
+    ).rejects.toThrow('PostUp failed');
+    await vpn.maintain();
+    expect(commands.runHook).toHaveBeenCalledTimes(1);
+
+    await vpn.restart();
+    expect(commands.runHook).toHaveBeenLastCalledWith(
+      'wg0',
+      'auto',
+      'fixed hook'
+    );
+    expect((await settings.get(admin)).restartRequired).toBe(false);
+    expect(await recovery.readPostUpMarker()).toBeUndefined();
+  });
+
+  test('skips PostUp when its pending marker cannot be saved', async () => {
+    const { store, commands } = await vpnFixture();
+    await store.hooks.update({ preUp: '', postUp: 'hook' });
+    vi.mocked(recovery.writeHookMarker).mockRejectedValueOnce(
+      new Error('Storage full')
+    );
+    await expect(vpn.restart()).rejects.toThrow('Storage full');
+    expect(commands.runHook).not.toHaveBeenCalled();
+    expect(commands.down).toHaveBeenLastCalledWith('wg0', true);
+    await vpn.maintain();
+    expect(commands.runHook).toHaveBeenCalledOnce();
+  });
+
+  test('preserves the recovery error and retries teardown if suspension also fails', async () => {
+    const { commands } = await vpnFixture();
+    vi.mocked(recovery.readPostUpMarker).mockResolvedValueOnce({
+      name: 'wg0',
+      succeeded: true,
+    });
+    const journalError = new Error('Journal unavailable');
+    const suspendError = new Error('Link unavailable');
+    commands.down.mockRejectedValueOnce(journalError);
+    vi.spyOn(LinuxTunnel.prototype, 'suspend').mockRejectedValueOnce(
+      suspendError
+    );
+    const log = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    await expect(vpn.restart()).rejects.toBe(journalError);
+    expect(log).toHaveBeenCalledWith(
+      expect.stringContaining('wg0'),
+      suspendError
+    );
+    expect(recovery.clearPostUpFailure).not.toHaveBeenCalled();
+    await vpn.maintain();
+    expect(recovery.clearPostUpFailure).toHaveBeenCalled();
+    expect(commands.up).toHaveBeenCalledOnce();
+  });
+
+  test('repairs routes and filtering and acknowledges a successful PostUp at shutdown after a journal error', async () => {
+    const { store, commands, firewall } = await vpnFixture();
+    await store.interfaces.update({ firewallEnabled: true });
+    await store.hooks.update({ preUp: '', postUp: 'hook' });
+    const sites = vi.spyOn(SiteRoutes.prototype, 'sync');
+    vi.mocked(recovery.clearPostUpFailure).mockRejectedValueOnce(
+      new Error('Journal unavailable')
+    );
+    await expect(vpn.restart()).rejects.toThrow('Journal unavailable');
+    expect(sites).toHaveBeenCalledTimes(2);
+    expect(firewall.rebuildRules).toHaveBeenCalledTimes(2);
+    expect(commands.runHook).toHaveBeenCalledOnce();
+    await vpn.stop();
+    expect(await recovery.readPostUpMarker()).toBeUndefined();
+    await vpn.start();
+    expect(commands.up).toHaveBeenCalledTimes(2);
+    expect((await settings.get(admin)).restartRequired).toBe(false);
+  });
+
+  test('cleans up the recorded interface when the configured interface was renamed', async () => {
+    const { commands } = await vpnFixture();
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    await recovery.writeHookMarker('old0');
+    await vpn.start();
+    expect(commands.down).toHaveBeenCalledWith('old0', true);
     expect(commands.up).not.toHaveBeenCalled();
+    await vpn.restart();
+    expect(commands.up.mock.lastCall?.[0].name).toBe('wg0');
   });
 
   test.each(['start', 'restart', 'sync'] as const)(
@@ -119,7 +231,7 @@ describe('VPN operations', () => {
     async (mode) => {
       const { store, commands, firewall } = await vpnFixture();
       await store.interfaces.update({ firewallEnabled: true });
-      commands[mode === 'sync' ? 'sync' : 'up'].mockImplementation(async () => {
+      commands.sync.mockImplementation(async () => {
         expect(firewall.blockTraffic).toHaveBeenCalledWith('wg0', true);
         throw new Error('WireGuard unavailable');
       });
@@ -130,42 +242,108 @@ describe('VPN operations', () => {
     }
   );
 
-  test('only enabled, saved peers retain access when configuration sync fails', async () => {
-    const { store, commands } = await vpnFixture();
-    await store.interfaces.update({ firewallEnabled: false });
-    await store.clients.insert({
-      ...(await store.clients.get(1))!,
-      id: 2,
-      publicKey: 'revoked',
-      ipv4Address: '10.8.0.3',
-      ipv6Address: 'fdcc:ad94:bacf:61a4::cafe:3',
-    });
-    const active = new Set(['public', 'revoked', 'deleted']);
-    commands.dump.mockResolvedValue(
-      [...active].map((publicKey) => ({
-        publicKey,
-        preSharedKey: '',
-        endpoint: null,
-        allowedIps: '',
-        latestHandshakeAt: null,
-        transferRx: 0,
-        transferTx: 0,
-        persistentKeepalive: '0',
-      }))
-    );
-    commands.removePeer.mockImplementation(async (_name, publicKey) => {
-      active.delete(publicKey);
-      return '';
-    });
-    commands.sync.mockImplementation(async () => {
+  test.each(['file write', 'peer sync'])(
+    'only enabled, saved peers retain access when %s fails',
+    async (stage) => {
+      const { store, commands, writeConfiguration } = await vpnFixture();
+      await store.interfaces.update({ firewallEnabled: false });
+      await store.clients.insert({
+        ...(await store.clients.get(1))!,
+        id: 2,
+        publicKey: 'revoked',
+        ipv4Address: '10.8.0.3',
+        ipv6Address: 'fdcc:ad94:bacf:61a4::cafe:3',
+      });
+      const active = new Set(['public', 'revoked', 'deleted']);
+      commands.dump.mockResolvedValue(
+        [...active].map((publicKey) => ({
+          publicKey,
+          preSharedKey: '',
+          endpoint: null,
+          allowedIps: '',
+          latestHandshakeAt: null,
+          transferRx: 0,
+          transferTx: 0,
+          persistentKeepalive: '0',
+        }))
+      );
+      commands.removePeer.mockImplementation(async (_name, publicKey) => {
+        active.delete(publicKey);
+        return '';
+      });
+      const fail = async () => {
+        expect(active).toEqual(new Set(['public']));
+        throw new Error('Configuration unavailable');
+      };
+      if (stage === 'file write') {
+        writeConfiguration.mockImplementationOnce(fail);
+      } else {
+        commands.sync.mockImplementationOnce(fail);
+      }
+      await expect(clients.apply(admin, 2, 'disable')).rejects.toThrow(
+        'Configuration unavailable'
+      );
       expect(active).toEqual(new Set(['public']));
-      throw new Error('Configuration unavailable');
-    });
-    await expect(clients.apply(admin, 2, 'disable')).rejects.toThrow(
-      'Configuration unavailable'
-    );
-    expect(active).toEqual(new Set(['public']));
-  });
+    }
+  );
+
+  test.each(['save', 'sync'])(
+    'a rotated PSK excludes old traffic and overlapping site ranges after a failed %s',
+    async (stage) => {
+      const { store, commands, firewall, writeConfiguration } =
+        await vpnFixture();
+      await store.interfaces.update({ firewallEnabled: true });
+      const gateway = (await store.clients.get(1))!;
+      await store.clients.update(1, {
+        serverAllowedIps: ['192.0.2.0/24'],
+        preSharedKey: null,
+      });
+      await store.clients.insert({
+        ...gateway,
+        id: 2,
+        publicKey: 'rotated',
+        ipv4Address: '10.8.0.3',
+        ipv6Address: 'fd00::3',
+        preSharedKey: 'old-key',
+        serverAllowedIps: ['192.0.2.128/25'],
+      });
+      await store.clients.insert({
+        ...gateway,
+        id: 3,
+        publicKey: 'unaffected',
+        ipv4Address: '10.8.0.4',
+        ipv6Address: 'fd00::4',
+        preSharedKey: zeroWireGuardKey,
+      });
+      commands.dump.mockResolvedValue(
+        [
+          ['public', zeroWireGuardKey, '10.8.0.2/32,192.0.2.0/24'],
+          ['rotated', 'old-key', '10.8.0.3/32,192.0.2.128/25'],
+          ['unaffected', '(none)', '10.8.0.4/32'],
+        ].map(([publicKey, preSharedKey, allowedIps]) => ({
+          publicKey: publicKey!,
+          preSharedKey: preSharedKey!,
+          allowedIps: allowedIps!,
+          endpoint: null,
+          latestHandshakeAt: null,
+          transferRx: 0,
+          transferTx: 0,
+          persistentKeepalive: '0',
+        }))
+      );
+      (stage === 'save'
+        ? writeConfiguration
+        : commands.sync
+      ).mockRejectedValueOnce(new Error('Endpoint unavailable'));
+      await expect(
+        vpn.commit((tx) => tx.clients.update(2, { preSharedKey: 'new-key' }))
+      ).rejects.toThrow('Endpoint unavailable');
+      expect(firewall.rebuildRules.mock.lastCall?.[1]).toMatchObject([
+        { id: 1, ipv4Address: '10.8.0.2', serverAllowedIps: [] },
+        { id: 3, ipv4Address: '10.8.0.4' },
+      ]);
+    }
+  );
 
   test('serializes updates and uses one snapshot for configuration and firewall', async () => {
     const { commands, writeConfiguration, firewall, store } =
@@ -248,6 +426,126 @@ describe('VPN operations', () => {
     expect(commands.sync).toHaveBeenCalledOnce();
   });
 
+  test.each(['start', 'restart'] as const)(
+    'retains down hooks and retries their recovery write live after %s',
+    async (mode) => {
+      const { commands, store, firewall } = await vpnFixture();
+      vi.spyOn(console, 'error').mockImplementation(() => {});
+      const persist = vi
+        .spyOn(LinuxTunnel.prototype, 'persistDownHooks')
+        .mockResolvedValueOnce(new Error('Recovery volume unavailable'))
+        .mockResolvedValue(undefined);
+      await store.interfaces.update({ firewallEnabled: true });
+      await store.hooks.update({
+        preUp: '',
+        postUp: 'up',
+        postDown: 'applied down',
+      });
+
+      if (mode === 'start') {
+        await vpn.start();
+      } else {
+        await expect(vpn.restart()).rejects.toThrow(
+          'Recovery volume unavailable'
+        );
+      }
+      const arm = vi.mocked(LinuxTunnel.prototype.armDownHooks);
+      expect(arm).toHaveBeenCalledOnce();
+      expect(arm.mock.calls[0]?.[1].postDown).toBe('applied down');
+      expect(arm.mock.invocationCallOrder[0]).toBeLessThan(
+        persist.mock.invocationCallOrder[0]!
+      );
+      expect(firewall.rebuildRules).toHaveBeenCalledTimes(2);
+      await store.hooks.update({ postDown: 'for next generation' });
+      await vpn.maintain();
+      expect(persist).toHaveBeenCalledTimes(2);
+      expect(arm).toHaveBeenCalledOnce();
+      expect(commands.up).toHaveBeenCalledOnce();
+      expect(commands.runHook).toHaveBeenCalledExactlyOnceWith(
+        'wg0',
+        'auto',
+        'up'
+      );
+      expect(commands.down).toHaveBeenCalledOnce();
+    }
+  );
+
+  test('restarts for changes to the managed default families or table and syncs ordinary edits live', async () => {
+    const { commands, store } = await vpnFixture();
+    const configure = vi.mocked(LinuxTunnel.prototype.configureLink);
+    const routes = (serverAllowedIps: string[]) =>
+      vpn.commit((tx) => tx.clients.update(1, { serverAllowedIps }));
+    const table = (routingTable: string) =>
+      vpn.commit((tx) => tx.interfaces.update({ routingTable }));
+
+    await vpn.start();
+    const { port, device } = await store.interfaces.get();
+    await store.interfaces.update({ port: 51830, device: 'lo' });
+    await routes(['10.1.2.3/0']);
+    await routes(['0.0.0.0/0', '192.0.2.0/24']);
+    await routes(['0.0.0.0/0', '::/0']);
+    await table('010');
+    await table('8');
+    await clients.apply(admin, 1, 'disable');
+    await table('off');
+    await clients.apply(admin, 1, 'enable');
+    expect(configure.mock.calls.map(([, , tables]) => tables)).toEqual([
+      {},
+      { ipv4: 'auto' },
+      { ipv4: 'auto', ipv6: 'auto' },
+      { ipv4: 8, ipv6: 8 },
+      {},
+    ]);
+    expect(commands.up).toHaveBeenCalledTimes(5);
+    expect(commands.sync).toHaveBeenCalledTimes(9);
+    for (const [network] of commands.up.mock.calls) {
+      expect(network).toMatchObject({ port, device });
+    }
+    expect((await settings.get(admin)).restartRequired).toBe(true);
+    commands.up.mockRejectedValueOnce(new Error('Device unavailable'));
+    await expect(vpn.restart()).rejects.toThrow('Device unavailable');
+    expect((await settings.get(admin)).restartRequired).toBe(true);
+    await vpn.maintain();
+    expect((await settings.get(admin)).restartRequired).toBe(false);
+    expect(commands.up.mock.lastCall?.[0]).toMatchObject({
+      port: 51830,
+      device: 'lo',
+    });
+  });
+
+  test.each(['start', 'edit'])(
+    'cleans up failed default policy at %s and retries on a fresh link before PostUp',
+    async (operation) => {
+      const { store, commands } = await vpnFixture();
+      await store.hooks.update({ preUp: '', postUp: 'up' });
+      const configure = vi.mocked(LinuxTunnel.prototype.configureLink);
+      configure.mockResolvedValueOnce(
+        createError({ status: 409, message: 'Default route conflict' })
+      );
+      const changes = { serverAllowedIps: ['::/0'] };
+      if (operation === 'start') {
+        vi.spyOn(console, 'error').mockImplementation(() => {});
+        await store.clients.update(1, changes);
+        await vpn.start();
+      } else {
+        await expect(
+          vpn.commit((tx) => tx.clients.update(1, changes))
+        ).rejects.toMatchObject({ status: 409 });
+      }
+      expect(commands.down).toHaveBeenLastCalledWith('wg0', true);
+      expect(commands.runHook).not.toHaveBeenCalled();
+      await vpn.maintain();
+      await vpn.maintain();
+      expect(commands.up).toHaveBeenCalledTimes(2);
+      expect(configure).toHaveBeenCalledTimes(2);
+      expect(commands.runHook).toHaveBeenCalledExactlyOnceWith(
+        'wg0',
+        'auto',
+        'up'
+      );
+    }
+  );
+
   test('retries firewall setup after a restart without running PostUp again', async () => {
     const { commands, firewall } = await vpnFixture();
     firewall.rebuildRules.mockRejectedValueOnce(
@@ -257,7 +555,22 @@ describe('VPN operations', () => {
     await vpn.maintain();
     expect(firewall.rebuildRules).toHaveBeenCalledTimes(2);
     expect(commands.up).toHaveBeenCalledOnce();
-    expect(commands.up.mock.lastCall?.[1]?.nativePostUp).toBe(true);
+    expect(commands.runHook).toHaveBeenCalledOnce();
+  });
+
+  test('finishes a failed post-hook route check live after a cold start', async () => {
+    const { commands } = await vpnFixture();
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const sites = vi.spyOn(SiteRoutes.prototype, 'sync');
+    sites
+      .mockResolvedValueOnce(undefined)
+      .mockRejectedValueOnce(new Error('Route read failed'));
+    await vpn.start();
+    expect(commands.runHook).toHaveBeenCalledOnce();
+    await vpn.maintain();
+    expect(sites).toHaveBeenCalledTimes(3);
+    expect(commands.up).toHaveBeenCalledOnce();
+    expect(commands.runHook).toHaveBeenCalledOnce();
   });
 
   test('retries only shutdown when cleanup after a failed PostUp also fails', async () => {
@@ -265,20 +578,21 @@ describe('VPN operations', () => {
     commands.down
       .mockResolvedValueOnce()
       .mockRejectedValueOnce(new Error('Shutdown failed'));
-    commands.up.mockRejectedValueOnce(new NativePostUpError('Hook failed'));
+    commands.runHook.mockRejectedValueOnce(new Error('Hook failed'));
     vi.spyOn(console, 'error').mockImplementation(() => {});
     await expect(vpn.restart()).rejects.toMatchObject({ status: 503 });
     await expect(vpn.maintain()).rejects.toMatchObject({ status: 503 });
     await vpn.maintain();
     expect(commands.down).toHaveBeenCalledTimes(3);
     expect(commands.up).toHaveBeenCalledOnce();
-    expect(commands.postUp).not.toHaveBeenCalled();
+    expect(commands.runHook).toHaveBeenCalledOnce();
   });
 
   test('retries a failed start without replacing the initialized server identity', async () => {
     const { store, commands } = await vpnFixture();
     commands.up.mockRejectedValueOnce(new Error('Device unavailable'));
     await expect(vpn.start()).rejects.toThrow('Device unavailable');
+    expect((await settings.get(admin)).restartRequired).toBe(true);
     const initialized = await store.interfaces.get();
     expect(initialized).toMatchObject({
       privateKey: 'new-private',
@@ -287,6 +601,7 @@ describe('VPN operations', () => {
 
     await vpn.maintain();
 
+    expect((await settings.get(admin)).restartRequired).toBe(false);
     expect(commands.up).toHaveBeenCalledTimes(2);
     expect(commands.sync).toHaveBeenCalledOnce();
     expect(commands.generateKeyPair).toHaveBeenCalledOnce();
@@ -487,10 +802,8 @@ describe('VPN operations', () => {
     expect(writeConfiguration.mock.calls[0]?.[1]).toContain(
       'PrivateKey = new-private'
     );
-    expect(commands.up).toHaveBeenCalledWith(
-      'wg0',
-      expect.objectContaining({ nativePostUp: true })
-    );
+    expect(commands.up).toHaveBeenCalledOnce();
+    expect(commands.up.mock.lastCall?.[0].publicKey).toBe('new-public');
     expect(firewall.rebuildRules).toHaveBeenCalledOnce();
     await vpn.stop();
     expect(commands.down).toHaveBeenCalledTimes(2);

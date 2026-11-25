@@ -2,7 +2,7 @@ import { createError } from 'nuxt/server';
 
 import { importLegacyConfiguration } from './import';
 
-import { changeCidr } from '#server/features/vpn/interface';
+import { changeCidr } from '#server/features/vpn/subnets';
 import { commit } from '#server/features/vpn/lifecycle';
 import { getDatabase } from '#db';
 import type { SetupStepType } from '#shared/contracts/general';
@@ -48,7 +48,7 @@ export function configureEndpoint(host: string, port: number) {
     await tx.userConfigs.update({ host, port });
     await tx.interfaces.update({ port });
     await tx.general.update({ setupStep: 0 });
-  });
+  }, 'restart');
 }
 
 export function importConfiguration(file: string) {

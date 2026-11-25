@@ -1,8 +1,11 @@
 import { normalizeCidr, parseCidr } from 'cidr-tools';
 
+import type { DefaultRouteTables } from './linuxRouting';
+
+import { parseRoutingTableId } from '#shared/utils/routingTable';
 import { zeroWireGuardKey } from '#shared/utils/wireguard';
 import { formatEndpoint } from '#server/utils/endpoint';
-import { getGatewayAddress, normalizePrefix } from '#server/utils/ip';
+import { getGatewayAddress } from '#server/utils/ip';
 import type { ClientType } from '#db/repositories/client/types';
 import type { InterfaceType } from '#db/repositories/interface/types';
 import type { UserConfigType } from '#db/repositories/userConfig/types';
@@ -13,8 +16,7 @@ type Options = {
   amnezia?: boolean;
   uiPort?: string;
 };
-type ServerOptions = Options & { managedSites?: ReadonlySet<string> };
-type ServerPeer = Omit<ClientType, 'createdAt' | 'updatedAt'>;
+export type ServerPeer = Omit<ClientType, 'createdAt' | 'updatedAt'>;
 type RouteClient = Pick<ClientType, 'enabled' | 'serverAllowedIps'>;
 
 /** The complete server file, including enabled peers and its final newline. */
@@ -22,73 +24,52 @@ export function generateServerConfig(
   network: InterfaceType,
   hooks: HooksType,
   clients: ServerPeer[],
-  options: ServerOptions = {}
+  options: Options = {}
 ) {
   return [
     generateServerInterface(network, hooks, options),
-    ...clients
-      .filter((client) => client.enabled)
-      .map((client) => generateServerPeer(client, options)),
+    ...generateServerPeers(clients, options),
     '',
   ].join('\n\n');
 }
 
-/** wg-quick owns tunnel addresses and default routes. Ordinary site routes are
- * installed after the complete peer configuration is synced, before PostUp. */
-export function generateStartupConfig(
+/** Only fields understood by wg/awg syncconf belong in the tunnel configuration. */
+export function generateTunnelConfig(
   network: InterfaceType,
-  hooks: HooksType,
   clients: ServerPeer[],
+  fwmark: string,
   options: Options
 ) {
-  if (network.routingTable === 'off') {
-    return;
-  }
-  const managedSites = managedSitePrefixes(clients, options.enableIpv6 ?? true);
-  if (!managedSites.size) {
-    return;
-  }
-  return {
-    contents: generateServerConfig(network, { ...hooks, postUp: '' }, clients, {
-      ...options,
-      managedSites,
-    }),
-    postUp: iptablesTemplate(hooks.postUp, network, options.uiPort ?? '51821'),
-  };
+  const fields = [
+    '[Interface]',
+    `PrivateKey = ${network.privateKey}`,
+    `ListenPort = ${network.port}`,
+    `FwMark = ${fwmark}`,
+    ...(options.amnezia ? buildAwgLines(network) : []),
+  ];
+  return [fields.join('\n'), ...generateServerPeers(clients, options), ''].join(
+    '\n\n'
+  );
 }
 
-/** wg-quick installs one default per active address family in the configured table. */
+/** Select one default routing table for each enabled address family. */
 export function defaultRoutePolicy(
-  table: string,
+  setting: string,
   clients: RouteClient[],
   enableIpv6: boolean
 ) {
-  const routes: { ipv4?: string; ipv6?: string } = {};
-  if (table !== 'off') {
-    for (const prefix of enabledServerAllowedIps(clients, enableIpv6)) {
-      if (prefix.endsWith('/0')) {
-        routes[prefix.includes(':') ? 'ipv6' : 'ipv4'] = table;
+  const routes: DefaultRouteTables = {};
+  const table = setting === 'auto' ? 'auto' : parseRoutingTableId(setting);
+  if (table !== undefined) {
+    for (const client of clients.filter((client) => client.enabled)) {
+      for (const prefix of serverAllowedIps(client, enableIpv6)) {
+        if (/\/0+$/.test(prefix)) {
+          routes[prefix.includes(':') ? 'ipv6' : 'ipv4'] = table || 254;
+        }
       }
     }
   }
   return routes;
-}
-
-export function managedSitePrefixes(
-  clients: RouteClient[],
-  enableIpv6: boolean
-) {
-  return new Set(
-    enabledServerAllowedIps(clients, enableIpv6)
-      .map(normalizePrefix)
-      .filter((prefix) => !prefix.endsWith('/0'))
-  );
-}
-
-function enabledServerAllowedIps(clients: RouteClient[], enableIpv6: boolean) {
-  return clients
-    .filter((client) => client.enabled)
-    .flatMap((client) => serverAllowedIps(client, enableIpv6));
 }
 
 function serverAllowedIps(
@@ -100,14 +81,25 @@ function serverAllowedIps(
   );
 }
 
-function generateServerPeer(client: ServerPeer, options: ServerOptions = {}) {
-  const { enableIpv6 = true } = options;
+function generateServerPeers(clients: ServerPeer[], options: Options) {
+  return clients
+    .filter((client) => client.enabled)
+    .map((client) => generateServerPeer(client, options));
+}
 
-  const allowedIps = [
+export function peerAllowedIps(
+  client: Pick<ServerPeer, 'ipv4Address' | 'ipv6Address' | 'serverAllowedIps'>,
+  enableIpv6: boolean
+) {
+  return [
     `${client.ipv4Address}/32`,
     ...(enableIpv6 ? [`${client.ipv6Address}/128`] : []),
     ...serverAllowedIps(client, enableIpv6),
-  ].filter((prefix) => !options.managedSites?.has(normalizePrefix(prefix)));
+  ];
+}
+
+function generateServerPeer(client: ServerPeer, options: Options = {}) {
+  const allowedIps = peerAllowedIps(client, options.enableIpv6 ?? true);
 
   const lines = [
     `# Client: ${client.name} (${client.id})`,
@@ -115,14 +107,21 @@ function generateServerPeer(client: ServerPeer, options: ServerOptions = {}) {
     `PublicKey = ${client.publicKey}`,
     // An all-zero key clears any preshared key on the active peer.
     `PresharedKey = ${client.preSharedKey ?? zeroWireGuardKey}`,
+    `AllowedIPs = ${allowedIps.join(', ')}`,
   ];
-  if (allowedIps.length) {
-    lines.push(`AllowedIPs = ${allowedIps.join(', ')}`);
-  }
   if (client.serverEndpoint) {
     lines.push(`Endpoint = ${client.serverEndpoint}`);
   }
   return lines.join('\n');
+}
+
+export function tunnelAddresses(network: InterfaceType, enableIpv6: boolean) {
+  return [network.ipv4Cidr, ...(enableIpv6 ? [network.ipv6Cidr] : [])].map(
+    (value) => {
+      const cidr = parseCidr(value);
+      return `${getGatewayAddress(cidr)}/${cidr.prefix}`;
+    }
+  );
 }
 
 function generateServerInterface(
@@ -132,16 +131,11 @@ function generateServerInterface(
 ) {
   const { enableIpv6 = true } = options;
 
-  const cidr4 = parseCidr(wgInterface.ipv4Cidr);
-  const cidr6 = parseCidr(wgInterface.ipv6Cidr);
-  const ipv4Addr = getGatewayAddress(cidr4);
-  const ipv6Addr = getGatewayAddress(cidr6);
-
-  const address =
-    `${ipv4Addr}/${cidr4.prefix}` +
-    (enableIpv6 ? `, ${ipv6Addr}/${cidr6.prefix}` : '');
+  const address = tunnelAddresses(wgInterface, enableIpv6).join(', ');
 
   const extraLines = options.amnezia ? buildAwgLines(wgInterface) : [];
+  const configHook = (text: string) =>
+    removeNewlines(expandHook(text, wgInterface, options.uiPort ?? '51821'));
 
   return `# Note: Do not edit this file directly.
 # Your changes will be overwritten!
@@ -153,10 +147,10 @@ Address = ${address}
 ListenPort = ${wgInterface.port}
 ${wgInterface.mtu !== null ? `MTU = ${wgInterface.mtu}\n` : ''}Table = ${wgInterface.routingTable}
 ${extraLines.length ? `${extraLines.join('\n')}\n` : ''}
-PreUp = ${iptablesTemplate(hooks.preUp, wgInterface, options.uiPort ?? '51821')}
-PostUp = ${iptablesTemplate(hooks.postUp, wgInterface, options.uiPort ?? '51821')}
-PreDown = ${iptablesTemplate(hooks.preDown, wgInterface, options.uiPort ?? '51821')}
-PostDown = ${iptablesTemplate(hooks.postDown, wgInterface, options.uiPort ?? '51821')}`;
+PreUp = ${configHook(hooks.preUp)}
+PostUp = ${configHook(hooks.postUp)}
+PreDown = ${configHook(hooks.preDown)}
+PostDown = ${configHook(hooks.postDown)}`;
 }
 
 export function generateClientConfig(
@@ -246,7 +240,7 @@ function removeNewlines(text: string) {
   return text.replace(/\r\n|\r|\n/g, ' ');
 }
 
-function iptablesTemplate(
+export function expandHook(
   text: string,
   network: InterfaceType,
   uiPort: string
@@ -259,8 +253,7 @@ function iptablesTemplate(
     port: network.port.toString(),
     uiPort,
   };
-  return removeNewlines(text).replace(
-    /\{\{(\w+)\}\}/g,
-    (match, key: string) => values[key] ?? match
-  );
+  return text
+    .replace(/\r\n?/g, '\n')
+    .replace(/\{\{(\w+)\}\}/g, (match, key: string) => values[key] ?? match);
 }

@@ -18,7 +18,7 @@ describe('MTU validation', () => {
     for (const mtu of [1024, 9000]) {
       expect(MtuSchema.parse(mtu)).toBe(mtu);
     }
-    for (const mtu of [0, 1023, 9001, 'invalid']) {
+    for (const mtu of [0, 1023, 1400.5, 9001, 'invalid']) {
       expect(MtuSchema.safeParse(mtu).success).toBe(false);
     }
   });

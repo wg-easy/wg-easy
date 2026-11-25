@@ -1,10 +1,10 @@
 import { execFile, type ExecException } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
-import { appendFile } from 'node:fs/promises';
+import { unlink, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
 
-import { test as base } from '@playwright/test';
+import { test as base, type APIRequestContext } from '@playwright/test';
 
 const exec = promisify(execFile);
 const composeFile = fileURLToPath(
@@ -17,10 +17,18 @@ type App = {
   publicKey: (privateKey: string) => Promise<string>;
   serverPublicKey: () => Promise<string>;
   restart: () => Promise<string>;
+  recreateContainer: () => Promise<string>;
+  startProcess: (disableIpv6?: boolean) => Promise<string>;
+  stopProcess: (signal: 'KILL' | 'TERM') => Promise<void>;
+  logs: () => Promise<string>;
   connectClient: (configuration: string, index?: number) => Promise<void>;
   execClient: (args: string[], index?: number) => Promise<string>;
   execServer: (args: string[]) => Promise<string>;
-  pingFromClient: (address: string) => Promise<boolean>;
+  shell: (script: string) => Promise<string>;
+  read: (path: string) => Promise<string>;
+  show: (field: string) => Promise<string>;
+  overrideIp: (script: string) => Promise<string>;
+  pingFromClient: (address: string, index?: number) => Promise<boolean>;
 };
 
 export const credentials = {
@@ -28,23 +36,64 @@ export const credentials = {
   password: 'e2e-only-password-123!',
 };
 
+export async function admin(request: APIRequestContext, origin: string) {
+  const headers = { Origin: origin };
+  const post = (url: string, data?: object) =>
+    request.post(url, { headers, data, failOnStatusCode: true });
+  const json = async (url: string) =>
+    (await request.get(url, { failOnStatusCode: true })).json();
+  const create = async (name: string) => {
+    const response = await post('/api/client', { name, expiresAt: null });
+    return `/api/client/${(await response.json()).clientId}`;
+  };
+  const download = async (url: string) =>
+    (
+      await request.get(url + '/configuration', { failOnStatusCode: true })
+    ).text();
+  await post('/api/auth/password', { ...credentials, remember: false });
+  return { headers, post, json, create, download };
+}
+
 export const test = base.extend<{
+  api: Awaited<ReturnType<typeof admin>>;
   app: App;
   initialized: boolean;
+  keepNamespace: boolean;
+  userspace: boolean;
+  strictReversePath: boolean;
   ipv6: boolean;
+  backend: 'wg' | 'awg';
 }>({
+  strictReversePath: [false, { option: true }],
+  userspace: [false, { option: true }],
+  keepNamespace: [false, { option: true }],
   initialized: [true, { option: true }],
   ipv6: [false, { option: true }],
+  backend: ['wg', { option: true }],
   app: [
-    async ({ initialized, ipv6 }, use, testInfo) => {
+    async (
+      {
+        initialized,
+        ipv6,
+        backend,
+        keepNamespace,
+        strictReversePath,
+        userspace,
+      },
+      use,
+      testInfo
+    ) => {
       const runDir = process.env.E2E_RUN_DIR;
       if (!runDir) {
         throw new Error('Run pnpm test:e2e to manage test containers.');
       }
 
       const project = `wg-easy-e2e-${randomUUID()}`;
+      const profile = keepNamespace ? 'recovery' : userspace ? 'userspace' : '';
+      const server = profile ? 'wg-easy-' + profile : 'wg-easy';
       // Fixture teardown can be skipped when startup is interrupted.
-      await appendFile(`${runDir}/projects`, `${project}\n`);
+      const marker = `${runDir}/${project}`;
+      await writeFile(marker, '');
       async function compose(args: string[], input?: string) {
         const command = exec(
           'docker',
@@ -61,6 +110,9 @@ export const test = base.extend<{
           {
             env: {
               ...process.env,
+              COMPOSE_PROFILES: profile,
+              E2E_BACKEND: backend,
+              E2E_RP_FILTER: strictReversePath ? '1' : '0',
               E2E_INITIALIZED: String(initialized),
               E2E_DISABLE_IPV6: String(!ipv6),
             },
@@ -72,32 +124,71 @@ export const test = base.extend<{
         return (await command).stdout.trim();
       }
       const wg = (args: string[], input?: string) =>
-        compose(['exec', '-T', 'wg-easy', 'wg', ...args], input);
+        compose(['exec', '-T', server, backend, ...args], input);
       const execClient = (args: string[], index = 1, input?: string) =>
         compose(
           ['exec', '-T', '--index', String(index), 'vpn-client', ...args],
           input
         );
       const getUrl = async () =>
-        `http://${await compose(['port', 'wg-easy', '51821'])}`;
+        `http://${await compose(['port', server, '51821'])}`;
 
-      try {
-        await compose([
-          'up',
+      const execServer = (args: string[], input?: string) =>
+        compose(['exec', '-T', server, ...args], input);
+      const shell = (script: string, input?: string) =>
+        execServer(['sh', '-ec', script], input);
+      const show = (field: string) => wg(['show', 'wg0', field]);
+      const waitForServer = () =>
+        compose(['up', '-d', '--wait', '--wait-timeout', '90', server]);
+      const startProcess = (disableIpv6 = !ipv6) =>
+        compose([
+          'exec',
+          '-T',
           '-d',
-          '--wait',
-          '--wait-timeout',
-          '90',
-          'wg-easy',
+          '-e',
+          'DISABLE_IPV6=' + String(disableIpv6),
+          server,
+          'sh',
+          '-ec',
+          'echo $$ > /tmp/e2e-node.pid; exec iptables-backend node server/index.mjs >/proc/1/fd/1 2>/proc/1/fd/2',
         ]);
+      try {
+        if (keepNamespace) {
+          await compose(['up', '-d', server]);
+          await startProcess();
+        }
+        await waitForServer();
         await use({
           url: await getUrl(),
-          peers: async () =>
-            (await wg(['show', 'wg0', 'peers'])).split(/\s+/).filter(Boolean),
+          peers: async () => (await show('peers')).split(/\s+/).filter(Boolean),
           publicKey: (privateKey) => wg(['pubkey'], `${privateKey}\n`),
-          serverPublicKey: () => wg(['show', 'wg0', 'public-key']),
+          serverPublicKey: () => show('public-key'),
           execClient,
-          execServer: (args) => compose(['exec', '-T', 'wg-easy', ...args]),
+          execServer,
+          shell,
+          read: (path) => execServer(['cat', path]),
+          show,
+          overrideIp: (script) =>
+            shell(
+              'cat > /usr/local/bin/ip && chmod +x /usr/local/bin/ip',
+              `#!/bin/sh\n${script}\n`
+            ),
+          startProcess,
+          stopProcess: async (signal) => {
+            await execServer([
+              'sh',
+              '-ec',
+              `pid=$(cat /tmp/e2e-node.pid); kill -${signal} "$pid"; while kill -0 "$pid" 2>/dev/null; do sleep 0.1; done`,
+            ]);
+          },
+          logs: () => compose(['logs', '--no-color', server]),
+          recreateContainer: async () => {
+            await compose(['up', '-d', '--force-recreate', server]);
+            if (keepNamespace) {
+              await startProcess();
+            }
+            return getUrl();
+          },
           connectClient: async (configuration, index = 1) => {
             await compose([
               'up',
@@ -116,25 +207,19 @@ cat > /etc/wireguard/wg0.conf
 cp /etc/resolv.conf /tmp/docker-resolv.conf
 resolvconf -u
 resolvconf -a eth0 < /tmp/docker-resolv.conf
-wg-quick up wg0`,
+${backend}-quick up wg0`,
               ],
               index,
               configuration
             );
           },
-          pingFromClient: async (address) => {
+          pingFromClient: async (address, index) => {
+            const family = address.includes(':') ? '-6' : '-4';
             try {
-              await execClient([
-                'ping',
-                '-4',
-                '-I',
-                'wg0',
-                '-c',
-                '1',
-                '-W',
-                '1',
-                address,
-              ]);
+              await execClient(
+                ['ping', family, '-I', 'wg0', '-c', '1', '-W', '1', address],
+                index
+              );
               return true;
             } catch (error) {
               if ((error as ExecException).code !== 1) {
@@ -144,15 +229,11 @@ wg-quick up wg0`,
             }
           },
           restart: async () => {
-            await compose(['restart', 'wg-easy']);
-            await compose([
-              'up',
-              '-d',
-              '--wait',
-              '--wait-timeout',
-              '90',
-              'wg-easy',
-            ]);
+            await compose(['restart', server]);
+            if (keepNamespace) {
+              await startProcess();
+            }
+            await waitForServer();
             // Docker can assign a different ephemeral host port on restart.
             return getUrl();
           },
@@ -165,11 +246,13 @@ wg-quick up wg0`,
           });
         } finally {
           await compose(['down', '--volumes', '--remove-orphans']);
+          await unlink(marker);
         }
       }
     },
     { timeout: 180_000 },
   ],
+  api: async ({ app, request }, use) => use(await admin(request, app.url)),
   baseURL: async ({ app }, use) => use(app.url),
 });
 

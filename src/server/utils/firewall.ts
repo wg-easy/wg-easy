@@ -24,8 +24,12 @@ function chainName(interfaceName: string) {
 // Each caller waits for its own snapshot, including disabling filtering.
 let pendingRebuild: Promise<void> = Promise.resolve();
 
+// Other processes in the namespace can hold the xtables lock during recovery.
+const ipv4Tables = 'iptables -w 2';
+const ipv6Tables = 'ip6tables -w 2';
+
 function commands(enableIpv6: boolean) {
-  return enableIpv6 ? ['iptables', 'ip6tables'] : ['iptables'];
+  return enableIpv6 ? [ipv4Tables, ipv6Tables] : [ipv4Tables];
 }
 
 const trafficChains = ['FORWARD', 'INPUT'] as const;
@@ -34,13 +38,36 @@ function rebuildGuard(interfaceName: string) {
   return `-i ${interfaceName} -m comment --comment "wg-easy rebuild ${interfaceName}" -j DROP`;
 }
 
+async function chainRules(command: string, chain: string) {
+  return (await exec(`${command} -S ${chain}`))
+    .split('\n')
+    .filter((rule) => rule.startsWith(`-A ${chain} `));
+}
+
+// A missing rule/chain is expected after a partial teardown. Lock, permission
+// and table access errors must reach the caller so cleanup is retried.
+async function removeIfPresent(command: string) {
+  try {
+    await exec(command);
+    return true;
+  } catch (error) {
+    const { stderr } = error as { stderr?: string };
+    if (
+      /Bad rule \(does a matching rule exist|No chain\/target\/match by that name|Couldn.t load target .*No such file or directory|chain .* does not exist|RULE_DELETE failed \(No such file or directory\)|CHAIN_USER_DEL failed \(No such file or directory\)/i.test(
+        stderr ?? ''
+      )
+    ) {
+      return false;
+    }
+    throw error;
+  }
+}
+
 async function blockDuringRebuild(interfaceName: string, enableIpv6: boolean) {
   const guard = rebuildGuard(interfaceName);
   for (const command of commands(enableIpv6)) {
     for (const chain of trafficChains) {
-      const rules = (await exec(`${command} -S ${chain}`))
-        .split('\n')
-        .filter((rule) => rule.startsWith(`-A ${chain} `));
+      const rules = await chainRules(command, chain);
       // A guard below an ACCEPT or a jump to an old chain does not block
       // traffic. This also repairs guards left by older failed rebuilds.
       if (rules[0] !== `-A ${chain} ${guard}`) {
@@ -77,15 +104,8 @@ type ParsedEntry = {
 
 type FirewallClient = Pick<
   ClientType,
-  | 'id'
-  | 'name'
-  | 'ipv4Address'
-  | 'ipv6Address'
-  | 'allowedIps'
-  | 'serverAllowedIps'
-  | 'firewallIps'
-  | 'enabled'
->;
+  'id' | 'name' | 'allowedIps' | 'serverAllowedIps' | 'firewallIps' | 'enabled'
+> & { ipv4Address: string | null; ipv6Address: string | null };
 
 const replyMatch = '-m conntrack --ctstate ESTABLISHED --ctdir REPLY';
 type AddressFamily = 'IPv4' | 'IPv6';
@@ -97,13 +117,12 @@ type SiteGateway = Pick<
 function* routedSites(client: SiteGateway, enableIpv6: boolean) {
   for (const site of client.serverAllowedIps ?? []) {
     const ipv6 = site.includes(':');
-    if (ipv6 && !enableIpv6) {
+    const address = ipv6 ? client.ipv6Address : client.ipv4Address;
+    if (!address || (ipv6 && !enableIpv6)) {
       continue;
     }
     const source = normalizePrefix(site);
-    if (
-      source === normalizePrefix(ipv6 ? client.ipv6Address : client.ipv4Address)
-    ) {
+    if (source === normalizePrefix(address)) {
       continue;
     }
     yield { source, ipv6 };
@@ -303,9 +322,18 @@ export const firewall = {
         continue;
       }
       for (const parent of trafficChains) {
-        await exec(
-          `${command} -C ${parent} -i ${interfaceName} -j ${chain} 2>/dev/null || ${command} -I ${parent} ${position} -i ${interfaceName} -j ${chain}`
-        );
+        const jump = `-i ${interfaceName} -j ${chain}`;
+        const rules = await chainRules(command, parent);
+        const matches = rules.filter((rule) => rule === `-A ${parent} ${jump}`);
+        if (matches.length === 1 && rules[position - 1] === matches[0]) {
+          continue;
+        }
+        // The rebuild guard stays first until both families are ready. A hook
+        // may have removed our jump or placed a foreign ACCEPT ahead of it.
+        for (let i = 0; i < matches.length; i++) {
+          await exec(`${command} -D ${parent} ${jump}`);
+        }
+        await exec(`${command} -I ${parent} ${position} ${jump}`);
       }
     }
   },
@@ -345,31 +373,19 @@ export const firewall = {
 
     for (const ipEntry of effectiveIps) {
       const parsed = parseFirewallEntry(ipEntry);
-      const baseIp = parsed.ip.split('/')[0] ?? parsed.ip; // Handle CIDR by checking base IP
-      const destIsIpv6 = isIPv6(baseIp);
-
-      if (destIsIpv6) {
-        if (enableIpv6) {
-          const rules = generateRuleArgs(
-            interfaceName,
-            client.ipv6Address,
-            parsed,
-            comment
-          );
-          for (const rule of rules) {
-            await exec(`ip6tables ${rule}`);
-          }
-        }
-      } else {
-        const rules = generateRuleArgs(
-          interfaceName,
-          client.ipv4Address,
-          parsed,
-          comment
-        );
-        for (const rule of rules) {
-          await exec(`iptables ${rule}`);
-        }
+      const ipv6 = isIPv6(parsed.ip.split('/')[0]!);
+      const source = ipv6 ? client.ipv6Address : client.ipv4Address;
+      if (!source || (ipv6 && !enableIpv6)) {
+        continue;
+      }
+      const command = ipv6 ? ipv6Tables : ipv4Tables;
+      for (const rule of generateRuleArgs(
+        interfaceName,
+        source,
+        parsed,
+        comment
+      )) {
+        await exec(`${command} ${rule}`);
       }
     }
   },
@@ -416,7 +432,7 @@ export const firewall = {
           enableIpv6
         );
         for (const { source, ipv6 } of routedSites(client, enableIpv6)) {
-          const command = ipv6 ? 'ip6tables' : 'iptables';
+          const command = ipv6 ? ipv6Tables : ipv4Tables;
           const pool = normalizePrefix(
             ipv6 ? wgInterface.ipv6Cidr : wgInterface.ipv4Cidr
           );
@@ -428,9 +444,8 @@ export const firewall = {
 
       // Add final DROP for any traffic not explicitly allowed
       const chain = chainName(wgInterface.name);
-      await exec(`iptables -A ${chain} -j DROP`);
-      if (enableIpv6) {
-        await exec(`ip6tables -A ${chain} -j DROP`);
+      for (const command of commands(enableIpv6)) {
+        await exec(`${command} -A ${chain} -j DROP`);
       }
 
       // Keep the DROP guard first, including if removing it later fails.
@@ -440,6 +455,26 @@ export const firewall = {
     });
     pendingRebuild = result.catch(() => {});
     return result;
+  },
+
+  /** Remove the interface-specific filtering after link deletion. */
+  async removeOwnedFiltering(interfaceName: string, enableIpv6: boolean) {
+    const chain = chainName(interfaceName);
+    for (const command of commands(enableIpv6)) {
+      for (const parent of trafficChains) {
+        for (const rule of [
+          `-i ${interfaceName} -j ${chain}`,
+          rebuildGuard(interfaceName),
+        ]) {
+          while (await removeIfPresent(`${command} -D ${parent} ${rule}`)) {
+            // Remove duplicate jumps and guards from interrupted rebuilds.
+          }
+        }
+      }
+      if (await removeIfPresent(`${command} -F ${chain}`)) {
+        await exec(`${command} -X ${chain}`);
+      }
+    }
   },
 
   /**

@@ -60,12 +60,11 @@ test.each(readdirSync(localesDir).filter((file) => file.endsWith('.json')))(
       warnHtmlMessage: false,
     });
     const original = JSON.parse(source);
-    for (const key of messageKeys(original)) {
-      expect(englishKeys.has(key), `${file}: unknown key ${key}`).toBe(true);
-      expect(i18n.global.te(key), `${file}: missing compiled key ${key}`).toBe(
-        true
-      );
-    }
+    const keys = messageKeys(original);
+    const unknownKeys = keys.filter((key) => !englishKeys.has(key));
+    const missingKeys = keys.filter((key) => !i18n.global.te(key));
+    expect(unknownKeys).toEqual([]);
+    expect(missingKeys).toEqual([]);
     for (let index = 1; index <= 5; index++) {
       const key = `i${index}`;
       const description = original.wireguard?.obfuscation?.[key]?.description;

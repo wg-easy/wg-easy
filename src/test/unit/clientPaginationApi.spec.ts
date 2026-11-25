@@ -36,11 +36,13 @@ function request(query = '') {
   return listClients(requestEvent(`http://localhost/api/client${query}`));
 }
 
-beforeEach(async () => {
+beforeEach(() => {
   vi.resetAllMocks();
   getCurrentUser.mockResolvedValue({ id: 1, role: 1 });
   dump.mockResolvedValue([]);
+});
 
+async function seedClients() {
   ({ db } = await databaseFixture());
   await db.insert(schema.user).values(
     [1, 2, 3].map((id) => ({
@@ -72,9 +74,11 @@ beforeEach(async () => {
     })
   );
   clients = new ClientRepository(db);
-});
+}
 
 describe('paginated client API', () => {
+  beforeEach(seedClients);
+
   test('defaults to 25 clients and includes the total without exposing secrets', async () => {
     const result = await request();
     expect(result).toMatchObject({ page: 1, pageSize: 25, total: 60 });

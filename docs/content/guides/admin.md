@@ -42,13 +42,23 @@ When AmneziaWG is active, **Config** also provides default obfuscation parameter
 
 **Interface** controls the server's VPN interface:
 
-- **MTU**: The server interface's maximum transmission unit. Leave empty for automatic detection.
+- **MTU** accepts a whole number up to 9000 bytes. The minimum is 1280 with IPv6 enabled and 1024 for IPv4-only interfaces. Leave it empty for automatic detection. A dual-stack tunnel uses at least 1280 bytes, including when an older configuration has a smaller saved value.
 - **Port**: The UDP port on which WireGuard listens. Changing this does not change the public port under **Config**.
 - **Device**: The network device used by the default forwarding/NAT hooks, such as `eth0`.
-- **Routing Table**: `auto`, `off`, or a routing table number.
+- **Routing Table** accepts `auto`, `off`, or a numeric ID from 0 to 4294967295. Linux interprets IDs with a leading zero as octal.
 - **AmneziaWG Obfuscation Parameters**: Server-side AmneziaWG settings, shown when AmneziaWG is active.
 
-**Change CIDR** updates the VPN address ranges, preserves client addresses that remain usable, and reassigns addresses that fall outside the new pool or become reserved. Distribute updated configurations to clients whose addresses changed. **Restart Interface** brings the interface down and back up, disconnecting all clients. Restart after changes to settings applied by `wg-quick`, such as interface addresses, MTU, routing table, or hooks.
+**Change CIDR** saves the IPv4 and IPv6 ranges for the next interface start. Until then, clients and configuration downloads use the current ranges. Adding a client requires space in both the current and saved ranges. **Restart Interface** disconnects clients and applies the saved ranges, listen port, device and hooks. Clients keep any address still usable in the new range. After restart, download and distribute a new configuration for each client whose address changed. MTU changes apply when you save.
+
+If the replacement interface fails to start after wg-easy assigns the new addresses, those assignments stay saved. **Restart required** remains visible. Maintenance retries routing and interface setup failures. A failed **PostUp** requires an explicit restart after you check the hook and its effects.
+
+wg-easy automatically restarts the interface when it adds or removes a managed default route for IPv4 or IPv6, or moves a default route to another routing table. All peers briefly disconnect. The new interface runs the saved hooks with the active listen port, device and address ranges. Staged changes stay pending until you select **Restart Interface** or restart the service. Ordinary site routes update live. With **Routing Table** set to `off`, wg-easy leaves route installation to the host.
+
+With **Routing Table** set to `auto`, a peer advertising a default route needs the two rule priorities immediately before the main table lookup. Higher-priority host rules can still route matching traffic outside the tunnel. If host rules occupy either priority when a running interface needs to restart, wg-easy reports a conflict and keeps the current interface and its routing policy active. Peer and firewall updates continue. Maintenance retries the restart after the priorities become available. If a conflict arises during startup itself, wg-easy removes the incomplete interface and retries.
+
+If `PreUp` sets a socket mark, wg-easy uses it. When wg-easy assigns a new mark, it checks the host's IPv4 and IPv6 routing rules, including masked marks. Peer updates keep that mark. If a later host rule conflicts with it, select **Restart Interface** to have wg-easy choose the mark again.
+
+If the userspace WireGuard or AmneziaWG daemon exits, the next maintenance check restarts the tunnel with its active port and address ranges. Connected peers must establish a new handshake.
 
 The address in the CIDR selects the server's gateway address. A network address keeps the first host as the gateway, preserving existing setups: `10.8.0.0/24` uses `10.8.0.1`. To choose another gateway, enter it directly, for example `10.8.0.15/24`. Clients then use available addresses from `10.8.0.1` through `10.8.0.254`, excluding `10.8.0.15`. The same rule applies to IPv6 and unattended setup CIDRs. The network and last address remain reserved for both address families.
 
@@ -92,8 +102,22 @@ Filtering covers forwarded traffic and traffic addressed to the VPN server itsel
 **Hooks** configures commands run on the server when the VPN interface starts or stops:
 
 - **PreUp**: Before the interface starts.
-- **PostUp**: After the interface starts.
+- **PostUp** runs after wg-easy installs the default routes and attempts the site routes. After the hook, wg-easy checks site routes again. Maintenance retries any remaining site-route conflicts.
 - **PreDown**: Before the interface stops.
 - **PostDown**: After the interface stops.
+
+When upgrading from a version that used wg-quick on the server, check multiline hooks. The server now preserves line breaks. Keep a command and its arguments on one line or end each continued line with a backslash (`\`). A shell comment ends at the next line break.
+
+If your deployment keeps its network namespace during an upgrade or rollback, stop the running version and verify its interface is gone before starting the other version. This lets the original manager run its down hooks and remove its routes and firewall rules. The native tunnel manager uses Linux interface alternate names to identify the link it owns.
+
+If startup reports `Cannot verify ownership of unfinished tunnel`, inspect the temporary link named in the error in the same network namespace. A crash can leave a new link without its generation tag. If you can verify that it belongs to the interrupted startup, remove it and restart wg-easy. If another service owns the link, coordinate with its operator to free the temporary name.
+
+If **PostUp** fails or the process stops before wg-easy can record its success, wg-easy takes the tunnel down and keeps the admin panel available. Replacing the container with the same `/etc/wireguard` volume preserves this state. Inspect the hook's external effects and undo any partial changes, correct the hook under **Admin Panel → Hooks**, then select **Restart Interface** under **Interface**. Once success and the down hooks are saved together, crash recovery runs the recorded teardown.
+
+If **PreDown** or **PostDown** fails or is interrupted during teardown, wg-easy keeps the panel available for repair. Inspect the hook's effects before selecting **Restart Interface**. Recovery runs each saved down hook at most once. If both hooks failed or may have been interrupted, the recovery marker names both.
+
+If recovery cannot write the marker before a down hook starts, wg-easy takes the owned link offline and leaves the hook pending. The admin panel stays available. Restore write access to the recovery volume. Maintenance or **Restart Interface** then resumes teardown and runs the pending hook.
+
+If the journal is unreadable at boot, the admin panel remains available while VPN operations wait. Repair the volume and its private recovery files. wg-easy validates the saved generation before resuming.
 
 The default hooks set up forwarding and NAT. Templates can use `{{ipv4Cidr}}`, `{{ipv6Cidr}}`, `{{device}}`, `{{interface}}`, `{{port}}`, and `{{uiPort}}`, which are replaced with the current server settings. CIDR placeholders use the network address, so `10.8.0.15/24` becomes `10.8.0.0/24` in hooks. Saved hooks run at the corresponding interface lifecycle event. Hooks on an individual client's page instead run on that client device.

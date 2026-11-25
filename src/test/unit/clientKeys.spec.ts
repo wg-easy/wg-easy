@@ -6,6 +6,8 @@ import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { requestEvent } from '../helpers/request';
 import { databaseFixture } from '../helpers/database';
 
+import * as recovery from '#server/features/vpn/tunnelRecord';
+import { LinuxTunnel } from '#server/utils/linuxTunnel';
 import * as clientOperations from '#server/features/vpn/clients';
 import { roles } from '#shared/utils/permissions';
 import * as schema from '#db/schema';
@@ -62,9 +64,19 @@ function event(clientId = '1', body?: Record<string, unknown>) {
 
 beforeEach(async () => {
   vi.resetAllMocks();
+  vi.spyOn(recovery, 'readPostUpMarker').mockResolvedValue(undefined);
+  vi.spyOn(LinuxTunnel.prototype, 'checkOwnership').mockResolvedValue(
+    undefined
+  );
   writeFile.mockResolvedValue();
   getCurrentUser.mockResolvedValue({ id: 1, role: 1 });
   exec.mockImplementation(async (command: string) => {
+    if (command.includes('route show table 254')) {
+      const dst = command.startsWith('ip -4')
+        ? '10.8.0.0/24'
+        : 'fdcc:ad94:bacf:61a4::/64';
+      return JSON.stringify([{ dst, dev: 'wg0', protocol: 'kernel' }]);
+    }
     if (command === 'wg genpsk') {
       return 'new-preshared-key';
     }
@@ -74,14 +86,7 @@ beforeEach(async () => {
     if (command === 'echo new-private-key | wg pubkey') {
       return 'new-public-key';
     }
-    if (
-      command === 'wg show interfaces' ||
-      command.startsWith('wg-quick up ') ||
-      command.startsWith('set -eo pipefail\n')
-    ) {
-      return '';
-    }
-    if (command === 'wg show wg0 dump') {
+    if (command === 'wg show wg0 fwmark' || command === 'wg show wg0 dump') {
       return '';
     }
     if (
@@ -532,7 +537,8 @@ describe('client key actions', () => {
       'PublicKey = public-key-1'
     );
     expect(exec).toHaveBeenCalledWith(
-      expect.stringContaining('wg syncconf wg0 ')
+      expect.stringContaining('wg syncconf wg0 '),
+      expect.objectContaining({ input: expect.any(String) })
     );
 
     const publicClient = await clients.getPublic(1);

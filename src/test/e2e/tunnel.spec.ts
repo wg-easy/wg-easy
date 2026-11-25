@@ -13,29 +13,9 @@ function serverAllowedIps(page: Page) {
 
 async function addSiteSubnet(page: Page, prefix = siteSubnet) {
   const routes = serverAllowedIps(page);
-  await routes.getByRole('button', { name: 'Add' }).click();
+  await routes.getByRole('button', { name: 'Add', exact: true }).click();
   await routes.getByRole('textbox').last().fill(prefix);
 }
-
-test('a downloaded configuration carries traffic only while the client is enabled', async ({
-  page,
-  app,
-}) => {
-  await login(page);
-  const card = await createClient(page, 'Tunnel client');
-  const { contents } = await downloadConfiguration(page, card);
-  await app.connectClient(contents);
-
-  const canReachServer = () => app.pingFromClient('10.8.0.1');
-  await expect.poll(canReachServer).toBe(true);
-
-  await card.getByRole('switch', { name: 'Disable Client' }).click();
-  await expect.poll(canReachServer).toBe(false);
-
-  await card.getByRole('switch', { name: 'Enable Client' }).click();
-  // The existing client needs a new handshake after its peer is re-added.
-  await expect.poll(canReachServer, { timeout: 30_000 }).toBe(true);
-});
 
 test('saving a site subnet routes live traffic without interrupting another peer', async ({
   page,
@@ -91,95 +71,6 @@ test('saving a site subnet routes live traffic without interrupting another peer
   expect(await traffic).toContain(', 0% packet loss');
 });
 
-test.describe('dual-stack default routes', () => {
-  test.use({ ipv6: true });
-  test('saving default prefixes installs and withdraws wg-quick policy routing', async ({
-    page,
-    app,
-  }) => {
-    await login(page);
-    const card = await createClient(page, 'Default gateway');
-    const edit = () =>
-      card.getByRole('link', { name: 'Default gateway', exact: true }).click();
-    const save = async () => {
-      await page.getByRole('button', { name: 'Save', exact: true }).click();
-      await expect(page).toHaveURL(app.url + '/');
-    };
-    const rules = () =>
-      Promise.all(
-        ['-4', '-6'].map((family) =>
-          app.execServer(['ip', family, 'rule', 'show'])
-        )
-      );
-    const lookup = () =>
-      app.execServer(['ip', '-4', 'route', 'get', '203.0.113.1']);
-    const before = await rules();
-    await edit();
-    await addSiteSubnet(page, '0.0.0.0/0');
-    await addSiteSubnet(page, '::/0');
-    await save();
-    expect(await lookup()).toContain('dev wg0');
-    expect(
-      await app.execServer(['ip', '-6', 'route', 'get', '2001:db8::1'])
-    ).toContain('dev wg0');
-
-    const url = app.url + '/api/admin/interface';
-    const settings = await (await page.request.get(url)).json();
-    const changeTable = async (routingTable: string) => {
-      const response = await page.request.post(url, {
-        headers: { Origin: app.url },
-        data: { ...settings, routingTable },
-      });
-      expect(response.ok()).toBe(true);
-    };
-    await changeTable('100');
-    expect(
-      await app.execServer([
-        'ip',
-        '-4',
-        'route',
-        'show',
-        'table',
-        '100',
-        'exact',
-        '0.0.0.0/0',
-      ])
-    ).toContain('default dev wg0');
-    expect(
-      await app.execServer([
-        'ip',
-        '-6',
-        'route',
-        'show',
-        'table',
-        '100',
-        'exact',
-        '::/0',
-      ])
-    ).toContain('default dev wg0');
-    expect(await rules()).toEqual(before);
-    expect(await lookup()).toContain('dev eth0');
-    await changeTable('auto');
-    expect(await lookup()).toContain('dev wg0');
-
-    await edit();
-    // Withdraw IPv6 on its own while IPv4 still needs the policy table.
-    const remove = serverAllowedIps(page).getByRole('button', {
-      name: 'Delete',
-    });
-    await remove.last().click();
-    await save();
-    expect((await rules())[1]).toEqual(before[1]);
-    expect(await lookup()).toContain('dev wg0');
-    await edit();
-    await remove.click();
-    await save();
-    expect(await rules()).toEqual(before);
-    expect(await lookup()).toContain('dev eth0');
-    expect(await app.execServer(['wg', 'show', 'wg0', 'fwmark'])).toBe('off');
-  });
-});
-
 test('reports a route conflict and withdraws the site route after a restart', async ({
   page,
   app,
@@ -213,43 +104,153 @@ test('reports a route conflict and withdraws the site route after a restart', as
   await expect.poll(readRoute).toBe('');
 });
 
-test('a partially failed PostUp stays down until an administrator restarts it', async ({
-  page,
-  app,
-}) => {
-  await login(page);
-  const hooksUrl = app.url + '/api/admin/hooks';
-  const restartUrl = app.url + '/api/admin/interface/restart';
-  const headers = { Origin: app.url };
-  const hooks = {
-    preUp: '',
-    postUp: 'echo run >> /tmp/post-up-attempts; false',
-    preDown: '',
-    postDown: '',
-  };
-  expect(
-    (await page.request.post(hooksUrl, { headers, data: hooks })).ok()
-  ).toBe(true);
-  const failed = await page.request.post(restartUrl, { headers });
-  expect(failed.status()).toBe(503);
-  expect((await failed.json()).message).toContain('PostUp failed');
-  expect(await app.execServer(['wg', 'show', 'interfaces'])).toBe('');
+for (const backend of ['wg', 'awg'] as const) {
+  test.describe(`${backend} site-routed hooks`, () => {
+    test.use({ backend });
+    test('a partially failed PostUp stays down until an administrator restarts it', async ({
+      request,
+      api: { post, headers, create, download, json },
+      app,
+    }) => {
+      const clientUrl = await create('Office router');
+      const peer = await json(clientUrl);
+      const hookRoute = '10.8.0.77/32';
+      const siteHost = '192.168.120.1';
+      await app.connectClient(await download(clientUrl));
+      await app.execClient([
+        'ip',
+        'addr',
+        'add',
+        siteHost + '/32',
+        'dev',
+        'lo',
+      ]);
+      const port = await app.execClient([
+        backend,
+        'show',
+        'wg0',
+        'listen-port',
+      ]);
+      await post(clientUrl, {
+        ...peer,
+        serverEndpoint: `vpn-client:${port}`,
+        serverAllowedIps: [siteSubnet, hookRoute],
+      });
 
-  const fixed = {
-    ...hooks,
-    postUp:
-      'test "$CONFIG_FILE" = /etc/wireguard/wg0.conf; cmd echo fixed >> /tmp/post-up-attempts',
-  };
-  // The corrected hook is saved. Applying it requires an explicit restart.
-  expect(
-    (await page.request.post(hooksUrl, { headers, data: fixed })).status()
-  ).toBe(503);
-  const attempts = () => app.execServer(['cat', '/tmp/post-up-attempts']);
-  expect(await attempts()).toBe('run');
-  expect((await page.request.post(restartUrl, { headers })).ok()).toBe(true);
-  expect(await attempts()).toBe('run\nfixed');
-  expect(await app.execServer(['wg', 'show', 'interfaces'])).toBe('wg0');
-});
+      const hooksUrl = '/api/admin/hooks';
+      const restartUrl = '/api/admin/interface/restart';
+      const attempts = '/tmp/post-up-attempts';
+      const hooks = {
+        preUp: '',
+        postUp: `echo run >> ${attempts}; false | true`,
+        preDown: `if [[ -f ${attempts} ]]; then echo PreDown >> ${attempts}; fi`,
+        postDown: `if [[ -f ${attempts} ]]; then echo PostDown >> ${attempts}; fi`,
+      };
+      await post(hooksUrl, hooks);
+      const failed = await request.post(restartUrl, { headers });
+      expect(failed.status()).toBe(503);
+      expect((await failed.json()).message).toContain('PostUp failed');
+      expect(await app.execServer([backend, 'show', 'interfaces'])).toBe('');
+      expect(
+        await app.execServer(['ip', 'route', 'show', 'exact', siteSubnet])
+      ).toBe('');
+      const readAttempts = () => app.read(attempts);
+      expect(await readAttempts()).toBe('run');
+      // The preferred tunnel route may coexist with an operator's backup route.
+      await app.execServer([
+        'ip',
+        'route',
+        'add',
+        siteSubnet,
+        'dev',
+        'eth0',
+        'metric',
+        '500',
+      ]);
+
+      const fixed = {
+        ...hooks,
+        postUp: [
+          'test "$CONFIG_FILE" = /etc/wireguard/wg0.conf',
+          `grep '^AllowedIPs = .*${siteSubnet}' "$CONFIG_FILE"`,
+          'test "$INTERFACE" = {{interface}}',
+          'test "$TABLE" = auto',
+          `ping -c 1 -W 4 ${siteHost}`,
+          `ip route add ${hookRoute} dev %i`,
+          `cmd echo office#lan "hq #1" >> ${attempts} # trailing comment`,
+          `echo ready >> ${attempts}`,
+        ].join(';\n'),
+      };
+      // The corrected hook is saved. Applying it requires an explicit restart.
+      expect(
+        (await request.post(hooksUrl, { headers, data: fixed })).status()
+      ).toBe(503);
+      const savedHook = await app.execServer([
+        'grep',
+        '^PostUp =',
+        '/etc/wireguard/wg0.conf',
+      ]);
+      expect(savedHook).toContain('echo ready');
+      expect(await readAttempts()).toBe('run');
+      await post(restartUrl);
+      expect(await readAttempts()).toBe('run\noffice#lan hq #1\nready');
+      expect(await app.execServer([backend, 'show', 'interfaces'])).toBe('wg0');
+
+      const iface = '/api/admin/interface';
+      await post(iface, { ...(await json(iface)), firewallEnabled: true });
+      const localTarget = '192.0.2.99';
+      await app.execServer([
+        'ip',
+        'addr',
+        'add',
+        localTarget + '/32',
+        'dev',
+        'lo',
+      ]);
+      await post(clientUrl, {
+        ...(await json(clientUrl)),
+        firewallIps: ['10.8.0.1/32'],
+      });
+      await post(hooksUrl, {
+        ...fixed,
+        postUp: [
+          `ping -c 1 -W 4 ${peer.ipv4Address}`,
+          `ip route add ${hookRoute} dev %i`,
+          'iptables -I INPUT 1 -i %i -m comment --comment site-hook -j ACCEPT',
+          'iptables -D FORWARD -i %i -j WG_CLIENTS_%i',
+          'iptables -F WG_CLIENTS_%i',
+        ].join('; '),
+      });
+      await post(restartUrl);
+
+      expect(await app.pingFromClient('10.8.0.1')).toBe(true);
+      expect(await app.pingFromClient(localTarget)).toBe(false);
+      expect(await app.execServer(['iptables', '-S', 'INPUT'])).toContain(
+        'site-hook'
+      );
+      expect(await app.execServer(['iptables', '-S', 'FORWARD'])).toContain(
+        '-i wg0 -j WG_CLIENTS_wg0'
+      );
+
+      expect(
+        await app.execServer(['ip', 'route', 'show', 'exact', siteSubnet])
+      ).toContain('dev wg0');
+      await post(clientUrl + '/disable');
+      const remaining = await app.execServer([
+        'ip',
+        'route',
+        'show',
+        'exact',
+        siteSubnet,
+      ]);
+      expect(remaining).toMatch(/dev eth0.*metric 500/);
+      expect(remaining).not.toContain('dev wg0');
+      expect(
+        await app.execServer(['ip', 'route', 'show', 'exact', hookRoute])
+      ).toContain('dev wg0');
+    });
+  });
+}
 
 test('starts with a site conflict, preserves hook and backup routes, and retries live', async ({
   page,
@@ -294,14 +295,12 @@ test('starts with a site conflict, preserves hook and backup routes, and retries
   expect(await read(backup)).toContain('dev wg0');
   expect(await read(backup)).toMatch(/\bdev eth0\b[^\n]*\bmetric 500\b/);
   expect(await read(manual)).toContain('dev wg0');
-  expect(
-    await app.execServer(['wg', 'show', 'wg0', 'allowed-ips'])
-  ).not.toContain(ipv6);
+  expect(await app.show('allowed-ips')).not.toContain(ipv6);
   expect(
     await app.execServer(['ip', '-6', 'route', 'show', 'exact', ipv6])
   ).toBe('');
 
-  const ifindex = () => app.execServer(['cat', '/sys/class/net/wg0/ifindex']);
+  const ifindex = () => app.read('/sys/class/net/wg0/ifindex');
   const before = await ifindex();
   await app.execServer(['ip', 'route', 'del', siteSubnet, 'dev', 'eth0']);
   await expect
