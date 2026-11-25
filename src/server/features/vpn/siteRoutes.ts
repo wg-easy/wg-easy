@@ -83,8 +83,10 @@ async function readTable(ipv6: boolean, table: number, match?: string) {
     throw error;
   }
   for (const route of JSON.parse(output || '[]') as KernelRoute[]) {
+    // Peer routes must serve traffic from every source.
     if (
       route.dst !== 'default' &&
+      !route.from &&
       (route.table === undefined || kernelTable(route.table) === table)
     ) {
       routes.add(route);

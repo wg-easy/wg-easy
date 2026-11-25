@@ -186,8 +186,28 @@ test.describe('numbered routing table', () => {
     const [v4, v6] = await routes();
     expect(v4).toContain(client.ipv4Address + ' table 100');
     expect(v6).toContain(client.ipv6Address + ' table 100');
+
+    const peerPrefix = client.ipv6Address + '/128';
+    const source = '2001:db8:1::/64';
+    const ipv6Route = (...args: string[]) =>
+      app.execServer(['ip', '-6', '-j', 'route', ...args]);
+    await ipv6Route(
+      'add',
+      peerPrefix,
+      'from',
+      source,
+      'dev',
+      'lo',
+      'table',
+      '100'
+    );
+    await post(iface + '/restart');
+    expect((await routes())[1]).toContain(client.ipv6Address + ' table 100');
     await post(iface, { ...settings, routingTable: 'off' });
     expect((await routes()).join('\n')).not.toContain('table 100');
+    expect(
+      JSON.parse(await ipv6Route('show', 'table', '100', 'exact', peerPrefix))
+    ).toMatchObject([{ from: source, dev: 'lo' }]);
     const allowed = await app.execServer(['wg', 'show', 'wg0', 'allowed-ips']);
     expect(allowed).toContain(client.ipv4Address + '/32');
     expect(allowed).toContain(client.ipv6Address + '/128');
