@@ -233,8 +233,24 @@ test('keeps host routing precedence when automatic policy has no free priorities
 }) => {
   const api = await routingAdmin(request, app.url);
   const peer = await api.peer('Default gateway');
+  await peer.routes(['0.0.0.0/0']);
+  const witness = await api.peer('Connected peer');
+  await app.connectClient(await witness.config());
+  const iface = '/api/admin/interface';
+  const settings = await (await request.get(iface)).json();
+  await api.post(iface, { ...settings, firewallEnabled: true });
+  await expect.poll(() => app.pingFromClient('10.8.0.1')).toBe(true);
+  const index = () => app.execServer(['cat', '/sys/class/net/wg0/ifindex']);
+  const original = await index();
   const ip = (...args: string[]) => app.execServer(['ip', '-6', ...args]);
   const v4Rules = () => app.execServer(['ip', '-4', 'rule', 'show']);
+  const v4Firewall = () =>
+    Promise.all(
+      ['mangle', 'raw'].map((table) =>
+        app.execServer(['iptables', '-t', table, '-S'])
+      )
+    );
+  const originalFirewall = await v4Firewall();
   const beforeV4 = await v4Rules();
   const destination = '2001:db8::17';
   const selector = ['to', destination, 'table', '600'];
@@ -252,12 +268,10 @@ test('keeps host routing precedence when automatic policy has no free priorities
   expect((await failed.json()).message).toContain('routing rule priorities');
   expect(await ip('rule', 'show')).toBe(before);
   expect(await v4Rules()).toBe(beforeV4);
-  for (const table of ['mangle', 'raw']) {
-    expect(await app.execServer(['iptables', '-t', table, '-S'])).not.toMatch(
-      /wg-easy-[\da-f-]+/
-    );
-  }
-  expect(await app.execServer(['wg', 'show', 'interfaces'])).toBe('');
+  expect(await v4Firewall()).toEqual(originalFirewall);
+  expect(await index()).toBe(original);
+  expect(await ip('route', 'get', destination)).toContain('table 600');
+  await expect.poll(() => app.pingFromClient('10.8.0.1')).toBe(true);
 
   // Leave precisely two priorities free, then retry the failed start.
   await ip('rule', 'add', 'pref', '32763', ...selector);

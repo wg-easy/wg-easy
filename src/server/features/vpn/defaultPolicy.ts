@@ -149,6 +149,9 @@ function availableMark(preferred: number, rules: Rule[]) {
   return mark;
 }
 
+const priorityConflict =
+  'No available routing rule priorities between host policy and the main table.';
+
 function suppressPriority(rules: Rule[]) {
   const main = rules.find(
     (rule) =>
@@ -161,14 +164,40 @@ function suppressPriority(rules: Rule[]) {
   // An earlier pair would put the tunnel ahead of the intervening host policy.
   const first = (main?.priority ?? 0) - 2;
   if (
-    first <= 0 ||
-    rules.some((rule) => rule.priority === first || rule.priority === first + 1)
+    first > 0 &&
+    !rules.some(
+      (rule) => rule.priority === first || rule.priority === first + 1
+    )
   ) {
-    throw new DefaultRouteConflict(
-      'No available routing rule priorities between host policy and the main table.'
-    );
+    return first;
   }
-  return first;
+}
+
+/** Check the host rules that will survive the current generation's teardown. */
+export async function checkDefaultPriorities(
+  record: TunnelRecord,
+  tables: DefaultRouteTables
+) {
+  for (const family of families) {
+    if (tables[family] !== 'auto') {
+      continue;
+    }
+    const rules = await inspect<Rule>(family, 'rule', 'show');
+    for (const owned of record.policy.owned[family]) {
+      if ('priority' in owned) {
+        const index = rules.findIndex((rule) => matchesRule(rule, owned));
+        if (index !== -1) {
+          rules.splice(index, 1);
+        }
+      }
+    }
+    if (suppressPriority(rules) === undefined) {
+      throw createError({
+        status: 409,
+        message: `${priorityConflict} ${record.name} is still running. Maintenance will retry.`,
+      });
+    }
+  }
 }
 
 function runFirewallRule(
@@ -459,6 +488,9 @@ export async function installDefaultRoutes(
       const priority = suppressPriority(
         await inspect<Rule>(family, 'rule', 'show')
       );
+      if (priority === undefined) {
+        throw new DefaultRouteConflict(priorityConflict);
+      }
       auto ??= await automaticIds(name);
       table = auto.table;
       await installRoute(name, family, auto.table);

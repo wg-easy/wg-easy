@@ -11,7 +11,11 @@ import {
   generateServerConfig,
   type ServerPeer,
 } from './configuration';
-import { defaultRouteTables, type DefaultRouteTables } from './defaultPolicy';
+import {
+  checkDefaultPriorities,
+  defaultRouteTables,
+  type DefaultRouteTables,
+} from './defaultPolicy';
 import {
   clearPostUpFailure,
   readPostUpMarker,
@@ -268,6 +272,18 @@ async function apply(mode?: ApplyMode, manualRestart = false) {
     );
   }
   const running = await state.tunnel.checkOwnership(savedNetwork.name);
+  let priorityError;
+  if (mode !== 'sync' && state.activeNetwork && running) {
+    try {
+      await checkDefaultPriorities(running, defaultTables);
+    } catch (error) {
+      // Keep peers, revocations and filtering current on the old interface
+      // while maintenance waits for the occupied priorities to be released.
+      priorityError = error;
+      mode = 'sync';
+      Object.assign(network, state.activeNetwork);
+    }
+  }
   if (mode === 'sync' || (running && mode !== 'start' && !manualRestart)) {
     // Revoke disabled or deleted peers even if the following teardown fails.
     await state.tunnel.guardTraffic(network, enableIpv6);
@@ -310,7 +326,9 @@ async function apply(mode?: ApplyMode, manualRestart = false) {
       // Reconcile routes and reopen filtered traffic before retrying the MTU.
       mtuError = error;
     }
-    siteError = await syncSites();
+    if (!priorityError) {
+      siteError = await syncSites();
+    }
   } else {
     assertSubnetCapacity(network, clients.length);
     await state.tunnel.stop(network.name);
@@ -395,7 +413,7 @@ async function apply(mode?: ApplyMode, manualRestart = false) {
   if (!network.firewallEnabled) {
     await state.tunnel.recordFiltering(false);
   }
-  const error = recoveryError ?? siteError ?? mtuError;
+  const error = recoveryError ?? priorityError ?? siteError ?? mtuError;
   if (error) {
     throw error;
   }
