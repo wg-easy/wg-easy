@@ -38,7 +38,8 @@ for (const backend of ['wg', 'awg'] as const) {
       const gateway = await api.peer('Default gateway');
       const witness = await api.peer('Connected peer');
       await api.post('/api/admin/hooks', {
-        preUp: 'echo pre >> /tmp/hooks',
+        preUp:
+          'ip addr add 192.0.2.111/32 dev %i; ip addr add 2001:db8::111/128 dev %i; echo pre >> /tmp/hooks',
         postUp: 'echo up >> /tmp/hooks',
         preDown: 'echo down >> /tmp/hooks',
         postDown: 'echo post >> /tmp/hooks',
@@ -124,6 +125,43 @@ for (const backend of ['wg', 'awg'] as const) {
       expect(await lookup('2001:db8::1')).toContain('dev wg0');
       const socketMark = await mark();
       expect(socketMark).not.toBe('off');
+      const { policy } = JSON.parse(
+        await app.execServer(['cat', '/etc/wireguard/.wg-easy/wg0.json'])
+      );
+      for (const [flag, command] of [
+        ['-4', 'iptables'],
+        ['-6', 'ip6tables'],
+      ] as const) {
+        const comment = `-m comment --comment ${policy.tag}`;
+        const check = (table: string, rule: string) =>
+          app.execServer([command, '-t', table, '-C', ...rule.split(' ')]);
+        await check(
+          'mangle',
+          `POSTROUTING -p udp -m mark --mark ${socketMark} ${comment} -j CONNMARK --save-mark`
+        );
+        await check(
+          'mangle',
+          `PREROUTING -p udp ${comment} -j CONNMARK --restore-mark`
+        );
+        const [link] = JSON.parse(
+          await app.execServer([
+            'ip',
+            flag,
+            '-j',
+            'address',
+            'show',
+            'dev',
+            'wg0',
+          ])
+        );
+        expect(link.addr_info.length).toBeGreaterThanOrEqual(2);
+        for (const { local } of link.addr_info) {
+          await check(
+            'raw',
+            `PREROUTING ! -i wg0 -d ${local} -m addrtype ! --src-type LOCAL ${comment} -j DROP`
+          );
+        }
+      }
       expect(await lookup('203.0.113.1', 'mark', socketMark)).toContain(
         'dev eth0'
       );
@@ -132,6 +170,11 @@ for (const backend of ['wg', 'awg'] as const) {
       );
       await gateway.routes(['0.0.0.0/0']);
       expect((await rules())[1]).toBe(originalRules[1]);
+      for (const table of ['mangle', 'raw']) {
+        expect(
+          await app.execServer(['ip6tables', '-t', table, '-S'])
+        ).not.toContain(policy.tag);
+      }
       expect(await mark()).toBe(socketMark);
       expect(await lookup('203.0.113.1')).toContain('dev wg0');
       await gateway.routes(['0.0.0.0/0', '::/0']);

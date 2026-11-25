@@ -16,6 +16,8 @@ const rule = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('suppress'), priority: id }),
   z.object({ kind: z.literal('lookup'), priority: id, table: id, mark: id }),
   z.object({ kind: z.literal('listener'), port: id.max(65535), mark: id }),
+  z.object({ kind: z.literal('save-mark'), mark: id }),
+  z.object({ kind: z.literal('restore-mark') }),
   z.object({
     kind: z.literal('protect'),
     address: z.union([z.ipv4(), z.ipv6()]),

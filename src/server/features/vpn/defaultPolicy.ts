@@ -1,7 +1,6 @@
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 
-import { parseCidr } from 'cidr-tools';
 import { createError } from 'nuxt/server';
 
 import {
@@ -23,7 +22,6 @@ import { parseRoutingTableId } from '#shared/utils/routingTable';
 import type { InterfaceType } from '#db/repositories/interface/types';
 import { exec } from '#server/utils/cmd';
 import { WG_ENV } from '#server/utils/config';
-import { getGatewayAddress } from '#server/utils/ip';
 
 const run = promisify(execFile);
 const families = ['ipv4', 'ipv6'] as const;
@@ -176,12 +174,31 @@ function suppressPriority(rules: Rule[]) {
 function runFirewallRule(
   { name, policy }: TunnelRecord,
   family: RouteFamily,
-  rule: Extract<PolicyRule, { kind: 'listener' | 'protect' }>,
+  rule: Exclude<PolicyRule, { priority: number }>,
   action: '-I' | '-C' | '-D'
 ) {
   const command = family === 'ipv4' ? 'iptables' : 'ip6tables';
   const ingress = [action, 'PREROUTING', '!', '-i', name];
   const comment = ['-m', 'comment', '--comment', policy.tag];
+  if (rule.kind === 'save-mark' || rule.kind === 'restore-mark') {
+    const save = rule.kind === 'save-mark';
+    const chain = save ? 'POSTROUTING' : 'PREROUTING';
+    const match = save ? ['-m', 'mark', '--mark', String(rule.mark)] : [];
+    const target = ['-j', 'CONNMARK', save ? '--save-mark' : '--restore-mark'];
+    return run(command, [
+      '-w',
+      '2',
+      '-t',
+      'mangle',
+      action,
+      chain,
+      '-p',
+      'udp',
+      ...match,
+      ...comment,
+      ...target,
+    ]);
+  }
   if (rule.kind === 'protect') {
     const external = [
       '-d',
@@ -445,8 +462,16 @@ export async function installDefaultRoutes(
       auto ??= await automaticIds(name);
       table = auto.table;
       await installRoute(name, family, auto.table);
-      const address = getGatewayAddress(parseCidr(network[`${family}Cidr`]));
-      await installRule(record, family, { kind: 'protect', address });
+      const links = await inspect<{ addr_info: { local: string }[] }>(
+        family,
+        'address',
+        'show',
+        'dev',
+        name
+      );
+      for (const { local } of links.flatMap((link) => link.addr_info)) {
+        await installRule(record, family, { kind: 'protect', address: local });
+      }
       if (family === 'ipv4') {
         const { stdout } = await run('sysctl', [
           '-n',
@@ -461,6 +486,10 @@ export async function installDefaultRoutes(
           mark: auto.mark,
         });
       }
+      // Insertion at the head restores established flows before the IPv4
+      // listener fallback handles a fresh, unmarked handshake.
+      await installRule(record, family, { kind: 'save-mark', mark: auto.mark });
+      await installRule(record, family, { kind: 'restore-mark' });
       await installRule(record, family, { kind: 'suppress', priority });
       await installRule(record, family, {
         kind: 'lookup',
