@@ -379,17 +379,19 @@ test('recovers owned default rules only after the recorded link is gone', async 
   expect(JSON.parse(await readRecord()).policy.tag).not.toBe(tag);
 });
 
-test('preserves a foreign temporary link after a crash before exclusive creation', async ({
-  app,
-  request,
-}) => {
-  const { post } = await admin(request, app.url);
-  await app.execServer([
-    'sh',
-    '-ec',
-    `cat > /usr/local/bin/ip <<'SH'
+for (const created of [false, true]) {
+  test(`recovers after the operator frees an untagged temporary link (${created ? 'interrupted creation' : 'foreign link'})`, async ({
+    app,
+    request,
+  }) => {
+    const { post } = await admin(request, app.url);
+    await app.execServer([
+      'sh',
+      '-ec',
+      `cat > /usr/local/bin/ip <<'SH'
 #!/bin/sh
-case "$*" in 'link add dev '*)
+case "$*" in 'link add dev '*|'tuntap add dev '*)
+  ${created ? '/sbin/ip "$@" || exit $?' : ''}
   echo "$4" >/tmp/unfinished
   sleep 15
   exit 1 ;;
@@ -397,35 +399,49 @@ esac
 exec /sbin/ip "$@"
 SH
 chmod +x /usr/local/bin/ip`,
-  ]);
-  const cutover = post('/api/admin/interface/restart').catch(() => {});
-  const unfinished = () =>
-    app.execServer(['cat', '/tmp/unfinished']).catch(() => '');
-  await expect.poll(unfinished).toMatch(/^wg/);
-  await app.stopProcess('KILL');
-  await cutover;
-  const temporary = await unfinished();
-  const pending = await app.execServer(['cat', record]);
-  expect(JSON.parse(pending)).toMatchObject({ phase: 'creating', index: null });
-  await app.execServer(['rm', '/usr/local/bin/ip']);
-  await app.execServer([
-    'ip',
-    'link',
-    'add',
-    'dev',
-    temporary,
-    'type',
-    'dummy',
-  ]);
-  await app.startProcess();
-  await expect
-    .poll(app.logs)
-    .toContain('Cannot verify ownership of unfinished tunnel');
-  expect(
-    await app.execServer(['ip', '-details', 'link', 'show', temporary])
-  ).toContain('dummy');
-  expect(await app.execServer(['cat', record])).toBe(pending);
-});
+    ]);
+    const cutover = post('/api/admin/interface/restart').catch(() => {});
+    const unfinished = () =>
+      app.execServer(['cat', '/tmp/unfinished']).catch(() => '');
+    await expect.poll(unfinished).toMatch(/^wg/);
+    await app.stopProcess('KILL');
+    await cutover;
+    const temporary = await unfinished();
+    const pending = await app.execServer(['cat', record]);
+    expect(JSON.parse(pending)).toMatchObject({
+      phase: 'creating',
+      index: null,
+    });
+    await app.execServer(['rm', '/usr/local/bin/ip']);
+    if (!created) {
+      await app.execServer([
+        'ip',
+        'link',
+        'add',
+        'dev',
+        temporary,
+        'type',
+        'dummy',
+      ]);
+    }
+    await app.startProcess();
+    await expect
+      .poll(app.logs)
+      .toContain('Cannot verify ownership of unfinished tunnel');
+    expect(
+      await app.execServer(['ip', '-details', 'link', 'show', temporary])
+    ).toMatch(created ? /wireguard|tun type tun/ : /dummy/);
+    expect(await app.execServer(['cat', record])).toBe(pending);
+    // The operator knows who created this link and can safely free its name.
+    await app.execServer(['ip', 'link', 'del', temporary]);
+    await app.startProcess();
+    await expect
+      .poll(() => app.execServer(['wg', 'show', 'interfaces']))
+      .toBe('wg0');
+    const ready = JSON.parse(await app.execServer(['cat', record]));
+    expect(ready.policy.tag).not.toBe(JSON.parse(pending).policy.tag);
+  });
+}
 
 test('retries a failed recovery record write without replaying PostUp', async ({
   app,
