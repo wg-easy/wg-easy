@@ -327,6 +327,17 @@ export class LinuxTunnel {
     await writeHookMarker(record.name, hold);
     const consumed = await this.save({ ...record, [key]: '' });
     try {
+      // PostDown runs after deletion. The name can still be reused between
+      // this last lookup and the administrator's shell command.
+      if (
+        hook === 'PostDown' &&
+        ((await linkIdentity(record.policy.tag)) ||
+          (await linkIdentity(record.name)))
+      ) {
+        throw new Error(
+          `Tunnel interface reappeared before PostDown for ${record.name}`
+        );
+      }
       await wg.runHook(record.name, record.table, command, record.disableIpv6);
     } catch (cause) {
       throw new DownHookError(hold, cause);

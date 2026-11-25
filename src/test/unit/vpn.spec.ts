@@ -31,6 +31,15 @@ describe('VPN operations', () => {
         enabled: operation !== 'peer',
         serverAllowedIps: operation === 'site' ? [] : [site],
       });
+      if (operation === 'restart') {
+        vi.mocked(LinuxTunnel.prototype.checkOwnership, {
+          partial: true,
+        }).mockResolvedValue({
+          name: 'wg0',
+          filtering: true,
+          disableIpv6: false,
+        });
+      }
       const exec = vi.spyOn(cmd, 'exec').mockImplementation(async (command) => {
         if (command.includes('-m conntrack')) {
           throw new Error('match unavailable');
@@ -53,6 +62,9 @@ describe('VPN operations', () => {
         status: 422,
         message: expect.stringMatching(/IPv6.*conntrack.*ip6tables/),
       });
+      if (operation === 'restart') {
+        await vpn.maintain();
+      }
       expect((await store.interfaces.get()).firewallEnabled).toBe(
         operation !== 'firewall'
       );
@@ -157,6 +169,31 @@ describe('VPN operations', () => {
     expect(commands.down).toHaveBeenLastCalledWith('wg0', true);
     await vpn.maintain();
     expect(commands.runHook).toHaveBeenCalledOnce();
+  });
+
+  test('preserves the recovery error and retries teardown if suspension also fails', async () => {
+    const { commands } = await vpnFixture();
+    vi.mocked(recovery.readPostUpMarker).mockResolvedValueOnce({
+      name: 'wg0',
+      succeeded: true,
+    });
+    const journalError = new Error('Journal unavailable');
+    const suspendError = new Error('Link unavailable');
+    commands.down.mockRejectedValueOnce(journalError);
+    vi.spyOn(LinuxTunnel.prototype, 'suspend').mockRejectedValueOnce(
+      suspendError
+    );
+    const log = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    await expect(vpn.restart()).rejects.toBe(journalError);
+    expect(log).toHaveBeenCalledWith(
+      expect.stringContaining('wg0'),
+      suspendError
+    );
+    expect(recovery.clearPostUpFailure).not.toHaveBeenCalled();
+    await vpn.maintain();
+    expect(recovery.clearPostUpFailure).toHaveBeenCalled();
+    expect(commands.up).toHaveBeenCalledOnce();
   });
 
   test('repairs routes and filtering and acknowledges a successful PostUp at shutdown after a journal error', async () => {

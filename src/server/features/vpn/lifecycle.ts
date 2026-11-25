@@ -220,7 +220,14 @@ async function stopTunnel(state: HostState, name: string) {
     }
     if (recovering) {
       // PreDown may still be pending with stale peers on the surviving link.
-      await state.tunnel.suspend(name);
+      try {
+        await state.tunnel.suspend(name);
+      } catch (error) {
+        console.error(
+          `Could not suspend ${name} during tunnel recovery:`,
+          error
+        );
+      }
     }
     throw cause;
   }
@@ -236,6 +243,7 @@ async function clearPendingHookMarker(state: HostState) {
 async function apply(mode?: ApplyMode, manualRestart = false) {
   const database = getDatabase();
   const state = await getHostState(database);
+  const previousRetry = state.retry;
   mode ??= state.retry ?? (state.awaitingValidSettings ? 'restart' : 'sync');
   // Clear only after every host effect succeeds. Maintenance retries failures.
   state.retry = mode;
@@ -355,12 +363,15 @@ async function apply(mode?: ApplyMode, manualRestart = false) {
     // Revoke disabled or deleted peers even if the following teardown fails.
     await state.tunnel.guardTraffic(network, enableIpv6);
     await revokePeers(network.name, clients);
-  } else if (running?.filtering && manualRestart) {
-    await firewall.blockTraffic(network.name, !running.disableIpv6);
   }
   if (mode !== 'sync' && network.firewallEnabled) {
     const gateways = clients.filter((client) => client.enabled);
+    if (manualRestart && running) {
+      // A rejected preflight leaves the live tunnel and any prior retry alone.
+      state.retry = previousRetry;
+    }
     await checkRoutedReplySupport(routedReplyFamilies(gateways, enableIpv6));
+    state.retry = mode;
   }
   const syncSites = () => state.tunnel.sites.sync(network, clients, enableIpv6);
   const rebuildFirewall = () =>
@@ -400,6 +411,9 @@ async function apply(mode?: ApplyMode, manualRestart = false) {
     }
   } else {
     assertSubnetCapacity(network, clients.length);
+    if (running?.filtering && manualRestart) {
+      await firewall.blockTraffic(network.name, !running.disableIpv6);
+    }
     await stopTunnel(state, network.name);
     await clearPendingHookMarker(state);
     await database.transaction((tx) => renumberClients(tx, clients, network));

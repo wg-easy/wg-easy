@@ -457,7 +457,7 @@ export const firewall = {
     return result;
   },
 
-  /** Remove only this generation's interface-specific filtering after deletion. */
+  /** Remove the interface-specific filtering after link deletion. */
   async removeOwnedFiltering(interfaceName: string, enableIpv6: boolean) {
     const chain = chainName(interfaceName);
     for (const command of commands(enableIpv6)) {

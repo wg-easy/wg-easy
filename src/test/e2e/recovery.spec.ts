@@ -683,6 +683,28 @@ exec /sbin/ip "$@"`);
   expect(await app.execServer(['wg', 'show', 'interfaces'])).toBe('wg0');
 });
 
+test('holds PostDown if its interface name is taken after the hook is journaled', async ({
+  app,
+  api: { post },
+}) => {
+  await post('/api/admin/hooks', {
+    preUp: '',
+    postUp: '',
+    preDown: '',
+    postDown: 'touch /tmp/ran-post-down',
+  });
+  await post(iface + '/restart');
+  await app.overrideIp(`if [ "$*" = '-j link show dev wg0' ] && [ -f ${marker} ] && [ ! -e /sys/class/net/wg0 ]; then
+  echo '[{"ifname":"wg0","ifindex":42}]'
+  exit 0
+fi
+exec /sbin/ip "$@"`);
+  await expect(post(iface + '/restart')).rejects.toThrow(/PostDown failed/);
+  expect(JSON.parse(await app.read(record)).postDown).toBe('');
+  expect(JSON.parse(await app.read(marker)).failedDownHook).toBe('PostDown');
+  await app.execServer(['test', '!', '-e', '/tmp/ran-post-down']);
+});
+
 test('preserves a replacement that takes the public name just before link deletion', async ({
   app,
   api: { post },
