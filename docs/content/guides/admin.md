@@ -114,6 +114,6 @@ If startup reports `Cannot verify ownership of unfinished tunnel`, inspect the t
 
 If **PostUp** fails or the process stops before wg-easy can record its success, wg-easy takes the tunnel down and keeps the admin panel available. Replacing the container with the same `/etc/wireguard` volume preserves this state. Inspect the hook's external effects and undo any partial changes, correct the hook under **Admin Panel → Hooks**, then select **Restart Interface** under **Interface**. Once success and the down hooks are saved together, crash recovery runs the recorded teardown.
 
-If a saved **PreDown** or **PostDown** fails while recovering a confirmed **PostUp** marker, wg-easy finishes teardown and keeps the panel available. Inspect the failed hook's effects before selecting **Restart Interface**. Recovery runs each saved down hook at most once.
+If a saved **PreDown** or **PostDown** fails or is interrupted while recovering a confirmed **PostUp** marker, wg-easy keeps the panel available for repair. Inspect the hook's effects before selecting **Restart Interface**. Recovery runs each saved down hook at most once.
 
 The default hooks set up forwarding and NAT. Templates can use `{{ipv4Cidr}}`, `{{ipv6Cidr}}`, `{{device}}`, `{{interface}}`, `{{port}}`, and `{{uiPort}}`, which are replaced with the current server settings. CIDR placeholders use the network address, so `10.8.0.15/24` becomes `10.8.0.0/24` in hooks. Saved hooks run at the corresponding interface lifecycle event. Hooks on an individual client's page instead run on that client device.

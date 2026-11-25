@@ -163,15 +163,17 @@ async function getHostState(database: DatabaseStore) {
       defaultTables: {},
     };
     if (marker?.succeeded) {
-      // The same generation durably armed its down hooks before the crash.
+      // Record each down hook before consuming it. A crash or loss of storage
+      // after Bash starts must leave the marker available for manual repair.
       try {
-        await state.tunnel.stop(marker.name);
+        await state.tunnel.stop(marker.name, false, (hook) =>
+          writeHookMarker(marker.name, hook)
+        );
         await clearPostUpFailure();
       } catch (cause) {
         if (!(cause instanceof DownHookError)) {
           throw cause;
         }
-        await writeHookMarker(marker.name, cause.hook);
         state.failedStart = hookFailure(marker.name, cause.hook, cause);
       }
     } else if (marker) {

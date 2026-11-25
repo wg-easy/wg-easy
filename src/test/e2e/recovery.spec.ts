@@ -198,8 +198,20 @@ test('runs confirmed down hooks after a crash with the PostUp marker still prese
   );
 });
 
-for (const hook of ['PreDown', 'PostDown'] as const) {
-  test(`keeps the admin panel available after ${hook} fails during confirmed hook recovery`, async ({
+for (const [hook, problem, command] of [
+  ['PreDown', 'fails', 'false'],
+  [
+    'PostDown',
+    'fails with the recovery directory unavailable',
+    'chmod 0750 /etc/wireguard/.wg-easy; false',
+  ],
+  [
+    'PostDown',
+    'is interrupted',
+    'kill -KILL "$(cat /tmp/e2e-node.pid)"; touch /tmp/interrupted',
+  ],
+] as const) {
+  test(`keeps the admin panel available after ${hook} ${problem} during confirmed hook recovery`, async ({
     app,
     request,
   }) => {
@@ -208,8 +220,8 @@ for (const hook of ['PreDown', 'PostDown'] as const) {
     await post('/api/admin/hooks', {
       preUp: '',
       postUp: `cp -p ${marker} /tmp/confirmed; echo up >> /tmp/phases`,
-      preDown: `echo pre >> /tmp/phases; ${hook === 'PreDown' ? 'false' : 'true'}`,
-      postDown: `echo post >> /tmp/phases; ${hook === 'PostDown' ? 'false' : 'true'}`,
+      preDown: `echo pre >> /tmp/phases; ${hook === 'PreDown' ? command : 'true'}`,
+      postDown: `echo post >> /tmp/phases; ${hook === 'PostDown' ? command : 'true'}`,
     });
     await post('/api/admin/interface/restart');
     await app.stopProcess('KILL');
@@ -231,7 +243,14 @@ for (const hook of ['PreDown', 'PostDown'] as const) {
         JSON.parse(await app.execServer(['cat', marker])).failedDownHook
       ).toBe(hook);
     }
+    if (problem === 'is interrupted') {
+      await app.startProcess();
+      await expect
+        .poll(() => app.execServer(['ls', '/tmp/interrupted']).catch(() => ''))
+        .toBe('/tmp/interrupted');
+    }
     await startAwaitingRepair();
+    await app.execServer(['chmod', '0700', '/etc/wireguard/.wg-easy']);
     await app.stopProcess('TERM');
     await startAwaitingRepair();
     await post('/api/admin/interface/restart');

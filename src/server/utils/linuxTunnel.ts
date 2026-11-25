@@ -300,7 +300,11 @@ export class LinuxTunnel {
     return installDefaultRoutes(this.running, network, defaultTables);
   }
 
-  async stop(name: string, skipHooks = false) {
+  async stop(
+    name: string,
+    skipHooks = false,
+    beforeDownHook?: (hook: DownHook) => Promise<void>
+  ) {
     if (process.platform !== 'linux') {
       return;
     }
@@ -343,7 +347,8 @@ export class LinuxTunnel {
         // Only a journaled teardown reached the point where PostDown was due.
         await this.finishDeletion(
           record,
-          skipHooks || record.phase !== 'deleting'
+          skipHooks || record.phase !== 'deleting',
+          beforeDownHook
         );
       }
       this.running = undefined;
@@ -353,6 +358,9 @@ export class LinuxTunnel {
     // cannot safely establish which commands from that hook already ran.
     if (running.preDown || (skipHooks && running.postDown)) {
       const { preDown, postDown } = running;
+      if (!skipHooks && preDown) {
+        await beforeDownHook?.('PreDown');
+      }
       running = {
         ...running,
         preDown: '',
@@ -396,11 +404,15 @@ export class LinuxTunnel {
       throw new Error(`Tunnel identity changed during teardown of ${name}`);
     }
     await exec(`ip link delete dev ${tag}`);
-    await this.finishDeletion(running, skipHooks);
+    await this.finishDeletion(running, skipHooks, beforeDownHook);
     this.running = undefined;
   }
 
-  private async finishDeletion(running: TunnelRecord, skipHooks: boolean) {
+  private async finishDeletion(
+    running: TunnelRecord,
+    skipHooks: boolean,
+    beforeDownHook?: (hook: DownHook) => Promise<void>
+  ) {
     const { name } = running;
     // Keep filtering in place through link deletion. Never remove rules or
     // run PostDown for an interface that has since taken the same name.
@@ -413,6 +425,7 @@ export class LinuxTunnel {
     if (!skipHooks && running.postDown) {
       // Consume before entering Bash. A process restart cannot replay a
       // partially executed PostDown.
+      await beforeDownHook?.('PostDown');
       const consumed = { ...running, postDown: '' };
       await saveTunnelRecord(consumed);
       this.running = consumed;
