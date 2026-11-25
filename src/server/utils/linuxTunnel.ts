@@ -78,6 +78,29 @@ function temporaryName(record: TunnelRecord) {
   return 'wg' + record.policy.tag.slice(8).replaceAll('-', '').slice(0, 13);
 }
 
+async function ownedLinkTarget(running: TunnelRecord) {
+  const { name } = running;
+  const tag = running.policy.tag;
+  let target = await linkIdentity(tag);
+  if (!target) {
+    // Migrate a link created by a version that used only IFLA_IFALIAS.
+    const legacy = await linkIdentity(name);
+    if (legacy?.ifindex !== running.index || legacy.ifalias !== tag) {
+      throw new Error(`Interface ${name} changed during teardown`);
+    }
+    await exec(`ip link property add dev ${name} altname ${tag}`);
+    target = await linkIdentity(tag);
+  }
+  if (
+    target?.ifindex !== running.index ||
+    target.ifname !== name ||
+    !target.altnames?.includes(tag)
+  ) {
+    throw new Error(`Tunnel identity changed during teardown of ${name}`);
+  }
+  return tag;
+}
+
 export class DownHookError extends Error {
   constructor(
     readonly hook: DownHook,
@@ -224,6 +247,13 @@ export class LinuxTunnel {
     }
     delete record.phase;
     await saveTunnelRecord(record);
+  }
+
+  async suspend(name: string) {
+    if (this.running?.name === name && (await this.checkOwnership(name))) {
+      const target = await ownedLinkTarget(this.running);
+      await exec(`ip link set dev ${target} down`);
+    }
   }
 
   async recordFiltering(enabled: boolean) {
@@ -385,24 +415,7 @@ export class LinuxTunnel {
     };
     await saveTunnelRecord(running);
     this.running = running;
-    const tag = running.policy.tag;
-    let target = await linkIdentity(tag);
-    if (!target) {
-      // Migrate a link created by a version that used only IFLA_IFALIAS.
-      const legacy = await linkIdentity(name);
-      if (legacy?.ifindex !== running.index || legacy.ifalias !== tag) {
-        throw new Error(`Interface ${name} changed during teardown`);
-      }
-      await exec(`ip link property add dev ${name} altname ${tag}`);
-      target = await linkIdentity(tag);
-    }
-    if (
-      target?.ifindex !== running.index ||
-      target.ifname !== name ||
-      !target.altnames?.includes(tag)
-    ) {
-      throw new Error(`Tunnel identity changed during teardown of ${name}`);
-    }
+    const tag = await ownedLinkTarget(running);
     await exec(`ip link delete dev ${tag}`);
     await this.finishDeletion(running, skipHooks, beforeDownHook);
     this.running = undefined;

@@ -261,6 +261,94 @@ for (const [hook, problem, command] of [
   });
 }
 
+for (const hook of ['preDown', 'postDown'] as const) {
+  test(`keeps the panel available when the marker write fails before ${hook}`, async ({
+    app,
+    request,
+  }) => {
+    const { json, post } = await admin(request, app.url);
+    const marker = '/etc/wireguard/.wg-easy/failed-post-up';
+    const command =
+      hook === 'postDown'
+        ? 'echo down >> /tmp/phases; false'
+        : 'echo down >> /tmp/phases';
+    await post('/api/admin/hooks', {
+      preUp: '',
+      postUp: `cp -p ${marker} /tmp/confirmed; echo up >> /tmp/phases`,
+      preDown: '',
+      postDown: '',
+      [hook]: command,
+    });
+    await post('/api/admin/interface/restart');
+    await app.stopProcess('KILL');
+    await app.execServer(['cp', '-p', '/tmp/confirmed', marker]);
+    // Let startup read the confirmed marker, then prevent its atomic replacement.
+    const trigger =
+      hook === 'preDown'
+        ? "'-j link show dev wg0'"
+        : "'link delete dev wg-easy-'*";
+    await app.execServer([
+      'sh',
+      '-ec',
+      `cat > /usr/local/bin/ip <<'SH'
+#!/bin/sh
+/sbin/ip "$@" || exit $?
+case "$*" in ${trigger})
+  if test -f ${marker}; then mv ${marker} ${marker}.saved && mkdir ${marker}; fi ;;
+esac
+SH
+chmod +x /usr/local/bin/ip`,
+    ]);
+    await app.startProcess();
+    await expect
+      .poll(async () =>
+        json('/api/admin/interface').then(
+          (r) => r.restartRequired,
+          () => false
+        )
+      )
+      .toBe(true);
+    await expect(post('/api/admin/interface/restart')).rejects.toThrow();
+    expect(JSON.parse(await app.execServer(['cat', record]))[hook]).toBe(
+      command
+    );
+    expect(await app.execServer(['cat', '/tmp/phases'])).toBe('up');
+    if (hook === 'preDown') {
+      const [link] = JSON.parse(
+        await app.execServer(['ip', '-j', 'link', 'show', 'wg0'])
+      );
+      expect(link.flags).not.toContain('UP');
+      await app.stopProcess('TERM');
+      expect(await app.execServer(['cat', '/tmp/phases'])).toBe('up');
+    } else {
+      expect(await app.execServer(['wg', 'show', 'interfaces'])).toBe('');
+    }
+    await app.execServer(['rm', '/usr/local/bin/ip']);
+    await app.execServer(['rmdir', marker]);
+    await app.execServer(['mv', marker + '.saved', marker]);
+    if (hook === 'preDown') {
+      await app.startProcess();
+    } else {
+      // This restart discovers a new hook failure after the journal is repaired.
+      await expect(post('/api/admin/interface/restart')).rejects.toThrow();
+      expect(await app.execServer(['cat', '/tmp/phases'])).toBe('up\ndown');
+      expect((await json('/api/admin/interface')).restartRequired).toBe(true);
+      await post('/api/admin/interface/restart');
+    }
+    await expect
+      .poll(() => app.execServer(['cat', '/tmp/phases']))
+      .toBe('up\ndown\nup');
+    await expect
+      .poll(() =>
+        json('/api/admin/interface').then(
+          (r) => r.restartRequired,
+          () => true
+        )
+      )
+      .toBe(false);
+  });
+}
+
 test('recovers owned default rules only after the recorded link is gone', async ({
   app,
   request,

@@ -53,6 +53,7 @@ type HostState = {
   awaitingValidSettings?: boolean;
   retry?: ApplyMode;
   pendingHookMarker?: boolean;
+  recoveringPostUp?: string;
   failedStart?: ReturnType<typeof hookFailure>;
 };
 const hostStates = new WeakMap<DatabaseStore, HostState>();
@@ -124,20 +125,21 @@ function hookFailure(name: string, hook: DownHook | 'PostUp', cause?: unknown) {
   };
 }
 
-async function handlePostUpFailure(
+async function handleHookFailure(
   state: HostState,
   name: string,
+  hook: DownHook | 'PostUp',
   cause: unknown
 ): Promise<never> {
   // Keep the failure after deleting the link and its recovery record. The
   // hook may have already changed external state, even on a cold start.
-  const failure = hookFailure(name, 'PostUp', cause);
+  const failure = hookFailure(name, hook, cause);
   state.failedStart = failure;
   try {
     await cleanFailedStart(state.tunnel, failure);
     delete state.retry;
   } catch (error) {
-    console.error('Could not shut down the VPN after PostUp failed:', error);
+    console.error(`Could not shut down the VPN after ${hook} failed:`, error);
   }
   throw failure.error;
 }
@@ -163,19 +165,7 @@ async function getHostState(database: DatabaseStore) {
       defaultTables: {},
     };
     if (marker?.succeeded) {
-      // Record each down hook before consuming it. A crash or loss of storage
-      // after Bash starts must leave the marker available for manual repair.
-      try {
-        await state.tunnel.stop(marker.name, false, (hook) =>
-          writeHookMarker(marker.name, hook)
-        );
-        await clearPostUpFailure();
-      } catch (cause) {
-        if (!(cause instanceof DownHookError)) {
-          throw cause;
-        }
-        state.failedStart = hookFailure(marker.name, cause.hook, cause);
-      }
+      state.recoveringPostUp = marker.name;
     } else if (marker) {
       state.failedStart = hookFailure(
         marker.name,
@@ -187,12 +177,36 @@ async function getHostState(database: DatabaseStore) {
   return state;
 }
 
+async function recoverConfirmedPostUp(state?: HostState) {
+  if (!state?.recoveringPostUp) {
+    return;
+  }
+  const name = state.recoveringPostUp;
+  try {
+    // Leave the hook in the record if its marker cannot be written. Every
+    // retry, including shutdown, must journal the hook before entering Bash.
+    await state.tunnel.stop(name, false, (hook) => writeHookMarker(name, hook));
+    await clearPostUpFailure();
+  } catch (cause) {
+    if (!(cause instanceof DownHookError)) {
+      // Recovery may have stopped before PreDown with old peers still live.
+      // Keep the owned link offline while configuration updates are pending.
+      await state.tunnel.suspend(name);
+      throw cause;
+    }
+    delete state.recoveringPostUp;
+    return handleHookFailure(state, name, cause.hook, cause);
+  }
+  delete state.recoveringPostUp;
+}
+
 async function apply(mode?: ApplyMode, manualRestart = false) {
   const database = getDatabase();
   const state = await getHostState(database);
   mode ??= state.retry ?? (state.awaitingValidSettings ? 'restart' : 'sync');
   // Clear only after every host effect succeeds. Maintenance retries failures.
   state.retry = mode;
+  await recoverConfirmedPostUp(state);
   const { savedNetwork, clients, hooks, defaults } = await database.transaction(
     async (tx) => ({
       savedNetwork: await tx.interfaces.get(),
@@ -405,7 +419,7 @@ async function apply(mode?: ApplyMode, manualRestart = false) {
       try {
         await wg.runHook(network.name, network.routingTable, postUp);
       } catch (cause) {
-        return handlePostUpFailure(state, network.name, cause);
+        return handleHookFailure(state, network.name, 'PostUp', cause);
       }
     }
     // PostUp has returned successfully. From here, retry against the live link.
@@ -541,8 +555,12 @@ export function start() {
       if (state?.failedStart) {
         // Keep the database and admin panel available for hook repair.
         console.error('VPN startup is waiting for an explicit restart:', error);
-      } else if (state?.retry === 'sync' || state?.retry === 'rebuild') {
-        // Maintenance can finish site routes live or retry default policy on a fresh link.
+      } else if (
+        state?.recoveringPostUp ||
+        state?.retry === 'sync' ||
+        state?.retry === 'rebuild'
+      ) {
+        // Maintenance resumes pending teardown or configuration.
         console.error(
           'Could not finish applying the VPN configuration at startup:',
           error
@@ -559,6 +577,7 @@ export function stop() {
     const database = getDatabase();
     const network = await database.interfaces.get();
     const state = hostStates.get(database);
+    await recoverConfirmedPostUp(state);
     if (state?.failedStart) {
       await cleanFailedStart(state.tunnel, state.failedStart);
     } else {

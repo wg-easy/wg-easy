@@ -116,4 +116,8 @@ If **PostUp** fails or the process stops before wg-easy can record its success, 
 
 If a saved **PreDown** or **PostDown** fails or is interrupted while recovering a confirmed **PostUp** marker, wg-easy keeps the panel available for repair. Inspect the hook's effects before selecting **Restart Interface**. Recovery runs each saved down hook at most once.
 
+If recovery cannot write the marker before a down hook starts, wg-easy takes the owned link offline and leaves the hook pending. The admin panel stays available. Restore write access to the recovery volume. Maintenance or **Restart Interface** then resumes teardown and runs the pending hook.
+
+During an ordinary shutdown or interface restart, wg-easy records each down hook as consumed before running it. If the process exits mid-hook, the next start continues with the remaining teardown. Check any external changes made by the interrupted hook.
+
 The default hooks set up forwarding and NAT. Templates can use `{{ipv4Cidr}}`, `{{ipv6Cidr}}`, `{{device}}`, `{{interface}}`, `{{port}}`, and `{{uiPort}}`, which are replaced with the current server settings. CIDR placeholders use the network address, so `10.8.0.15/24` becomes `10.8.0.0/24` in hooks. Saved hooks run at the corresponding interface lifecycle event. Hooks on an individual client's page instead run on that client device.
