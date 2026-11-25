@@ -134,6 +134,7 @@ export class SiteRoutes {
     );
     const device = parseInterfaceName(network.name);
     const tables = new Map<string, Promise<RouteTable | undefined>>();
+    let readLivePrefixes = false;
 
     async function tableForInstall(
       ipv6: boolean,
@@ -165,7 +166,7 @@ export class SiteRoutes {
         // Verify removals against the live prefix. Snapshot the table only
         // after all withdrawals, so installs see the remaining routes.
         const routes =
-          action === 'remove'
+          action === 'remove' || readLivePrefixes
             ? await readTable(ipv6, route.table, route.prefix)
             : await tableForInstall(ipv6, route);
         const added = await this.applyRoute(
@@ -176,13 +177,11 @@ export class SiteRoutes {
           routes
         );
         if (added) {
-          // The next prefix needs a live read after a mutation.
-          tables.set(
-            `${ipv6 ? 6 : 4}/${route.table}`,
-            Promise.resolve(undefined)
-          );
+          // Host routes in either family can change during an awaited add.
+          readLivePrefixes = true;
         }
       } catch (cause) {
+        readLivePrefixes = true;
         const conflict = cause instanceof RouteConflict;
         failure ??= createError({
           status: conflict ? 409 : 500,

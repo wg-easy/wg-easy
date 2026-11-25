@@ -355,17 +355,19 @@ describe('Server Allowed IP routes', () => {
     expect(mutate).not.toHaveBeenCalled();
   });
 
-  test('observes a route removed while installing a preceding prefix', async () => {
-    const { setRoutes, entries, mutate } = await fixture();
-    const other = '198.51.100.0/24';
-    entries.set(other, { dev: 'wg0', table: '254', protocol: '4' });
-    mutate.mockImplementationOnce(() => entries.delete(other));
-    await setRoutes([prefix, other]);
-    expect(mutate.mock.calls).toEqual([
-      ['add', prefix, '254'],
-      ['add', other, '254'],
-    ]);
-  });
+  test.each(['198.51.100.0/24', '2001:db8::/64'])(
+    'observes %s being removed while installing a preceding prefix',
+    async (other) => {
+      const { setRoutes, entries, mutate } = await fixture();
+      entries.set(other, { dev: 'wg0', table: '254', protocol: '4' });
+      mutate.mockImplementationOnce(() => entries.delete(other));
+      await setRoutes([prefix, other]);
+      expect(mutate.mock.calls).toEqual([
+        ['add', prefix, '254'],
+        ['add', other, '254'],
+      ]);
+    }
+  );
 
   test('updates covering routes within a single reconciliation', async () => {
     const { entries, mutate, setRoutes } = await fixture();
