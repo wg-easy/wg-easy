@@ -2494,7 +2494,7 @@
 <li>Block internet, allow LAN: Leave "Allowed IPs" as <code>0.0.0.0/0, ::/0</code> but set Firewall IPs to <code>10.0.0.0/8, 192.168.0.0/16</code></li>
 </ul>
 <h3 id="server-allowed-ips">Server Allowed IPs<a class="headerlink" href="#server-allowed-ips" title="Permanent link">&para;</a></h3>
-<p>Additional IPs and networks the server routes to this client, such as a LAN behind the client. The client's own VPN addresses are included automatically. See the <a href="../../examples/tutorials/routed/">routed setup guide</a> for an example.</p>
+<p>Additional IPs and networks the server routes to this client, such as a LAN behind the client. The client's own VPN addresses are included automatically. Adding the first or withdrawing the last enabled gateway for <code>0.0.0.0/0</code> or <code>::/0</code> automatically restarts the server interface when wg-easy manages routes. This also applies when a gateway is enabled, disabled, deleted, or expires. See the <a href="../../examples/tutorials/routed/">routed setup guide</a> for an example.</p>
 <h3 id="dns">DNS<a class="headerlink" href="#dns" title="Permanent link">&para;</a></h3>
 <p>The DNS servers included in the client's configuration. Leave the list empty to use <strong>Admin Panel → Config → DNS</strong>, or add entries to override the global list. The up/down arrows change their order in the generated configuration.</p>
 <h3 id="advanced">Advanced<a class="headerlink" href="#advanced" title="Permanent link">&para;</a></h3>
