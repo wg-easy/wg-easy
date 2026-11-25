@@ -393,7 +393,7 @@ for (const created of [false, true]) {
 case "$*" in 'link add dev '*|'tuntap add dev '*)
   ${created ? '/sbin/ip "$@" || exit $?' : ''}
   echo "$4" >/tmp/unfinished
-  sleep 15
+  while ! test -e /tmp/release-create; do sleep 0.1; done
   exit 1 ;;
 esac
 exec /sbin/ip "$@"
@@ -405,6 +405,7 @@ chmod +x /usr/local/bin/ip`,
       app.execServer(['cat', '/tmp/unfinished']).catch(() => '');
     await expect.poll(unfinished).toMatch(/^wg/);
     await app.stopProcess('KILL');
+    await app.execServer(['touch', '/tmp/release-create']);
     await cutover;
     const temporary = await unfinished();
     const pending = await app.execServer(['cat', record]);
