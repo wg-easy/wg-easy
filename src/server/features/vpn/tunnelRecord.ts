@@ -9,6 +9,8 @@ import { parseInterfaceName } from '#server/utils/interfaceName';
 const directory = '/etc/wireguard/.wg-easy';
 // The volume holds one VPN configuration, even when WG_INTERFACE is renamed.
 const failureFile = 'failed-post-up';
+const generation = z.string().regex(/^wg-easy-[\da-f-]{36}$/);
+const postUpMarker = z.object({ name: z.string().min(1), generation });
 const id = z.int().positive().max(0xffffffff);
 const rule = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('suppress'), priority: id }),
@@ -36,11 +38,12 @@ const tunnelRecord = z.object({
   disableIpv6: z.boolean(),
   filtering: z.boolean(),
   // Down hooks are armed only after PostUp succeeds.
+  postUpSucceeded: z.literal(true).optional(),
   preDown: z.string(),
   postDown: z.string(),
   // The policy tag identifies this generation by its Linux alternate name.
   policy: z.object({
-    tag: z.string().regex(/^wg-easy-[\da-f-]{36}$/),
+    tag: generation,
     owned: z.object({ ipv4: ownedRules, ipv6: ownedRules }),
   }),
 });
@@ -143,10 +146,25 @@ export function removeTunnelRecord(name: string) {
   );
 }
 
-export async function readPostUpFailure() {
+export async function readPostUpMarker() {
   try {
-    const name = await readRecoveryFile(failureFile);
-    return name ? parseInterfaceName(name) : undefined;
+    const contents = await readRecoveryFile(failureFile);
+    if (!contents) {
+      return;
+    }
+    // Versions before generation-bound markers stored just the interface name.
+    if (!contents.startsWith('{')) {
+      return { name: parseInterfaceName(contents), succeeded: false };
+    }
+    const marker = postUpMarker.parse(JSON.parse(contents));
+    const name = parseInterfaceName(marker.name);
+    const record = await readTunnelRecord(name);
+    if (record && record.policy.tag !== marker.generation) {
+      throw new Error(
+        `PostUp marker for ${name} belongs to a different tunnel generation`
+      );
+    }
+    return { name, succeeded: record?.postUpSucceeded === true };
   } catch (error) {
     // A new volume has neither the private directory nor a failure marker.
     if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
@@ -155,8 +173,15 @@ export async function readPostUpFailure() {
   }
 }
 
-export function recordPostUpFailure(name: string) {
-  return saveRecoveryFile(failureFile, parseInterfaceName(name));
+export async function recordPostUpFailure(name: string) {
+  const record = await readTunnelRecord(parseInterfaceName(name));
+  if (!record) {
+    throw new Error(`No tunnel recovery record for ${name}`);
+  }
+  return saveRecoveryFile(
+    failureFile,
+    JSON.stringify({ name, generation: record.policy.tag })
+  );
 }
 
 export async function clearPostUpFailure() {

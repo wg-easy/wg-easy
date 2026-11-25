@@ -143,7 +143,7 @@ describe('VPN operations', () => {
       'fixed hook'
     );
     expect((await settings.get(admin)).restartRequired).toBe(false);
-    expect(await recovery.readPostUpFailure()).toBeUndefined();
+    expect(await recovery.readPostUpMarker()).toBeUndefined();
   });
 
   test('skips PostUp when its pending marker cannot be saved', async () => {
@@ -172,7 +172,7 @@ describe('VPN operations', () => {
     expect(firewall.rebuildRules).toHaveBeenCalledTimes(2);
     expect(commands.runHook).toHaveBeenCalledOnce();
     await vpn.stop();
-    expect(await recovery.readPostUpFailure()).toBeUndefined();
+    expect(await recovery.readPostUpMarker()).toBeUndefined();
     await vpn.start();
     expect(commands.up).toHaveBeenCalledTimes(2);
     expect((await settings.get(admin)).restartRequired).toBe(false);
@@ -465,7 +465,11 @@ describe('VPN operations', () => {
       expect(network).toMatchObject({ port, device });
     }
     expect((await settings.get(admin)).restartRequired).toBe(true);
-    await vpn.restart();
+    commands.up.mockRejectedValueOnce(new Error('Device unavailable'));
+    await expect(vpn.restart()).rejects.toThrow('Device unavailable');
+    expect((await settings.get(admin)).restartRequired).toBe(true);
+    await vpn.maintain();
+    expect((await settings.get(admin)).restartRequired).toBe(false);
     expect(commands.up.mock.lastCall?.[0]).toMatchObject({
       port: 51830,
       device: 'lo',
@@ -551,6 +555,7 @@ describe('VPN operations', () => {
     const { store, commands } = await vpnFixture();
     commands.up.mockRejectedValueOnce(new Error('Device unavailable'));
     await expect(vpn.start()).rejects.toThrow('Device unavailable');
+    expect((await settings.get(admin)).restartRequired).toBe(true);
     const initialized = await store.interfaces.get();
     expect(initialized).toMatchObject({
       privateKey: 'new-private',
@@ -559,6 +564,7 @@ describe('VPN operations', () => {
 
     await vpn.maintain();
 
+    expect((await settings.get(admin)).restartRequired).toBe(false);
     expect(commands.up).toHaveBeenCalledTimes(2);
     expect(commands.sync).toHaveBeenCalledOnce();
     expect(commands.generateKeyPair).toHaveBeenCalledOnce();

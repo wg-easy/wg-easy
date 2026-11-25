@@ -47,8 +47,8 @@ export async function vpnFixture() {
   const up = vi.spyOn(LinuxTunnel.prototype, 'create').mockResolvedValue();
   const down = vi.spyOn(LinuxTunnel.prototype, 'stop').mockResolvedValue();
   let failedName: string | undefined;
-  vi.spyOn(recovery, 'readPostUpFailure').mockImplementation(
-    async () => failedName
+  vi.spyOn(recovery, 'readPostUpMarker').mockImplementation(async () =>
+    failedName ? { name: failedName, succeeded: false } : undefined
   );
   vi.spyOn(recovery, 'recordPostUpFailure').mockImplementation(async (name) => {
     failedName = name;

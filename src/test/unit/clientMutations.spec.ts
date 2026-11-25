@@ -58,7 +58,7 @@ function clientEvent(clientId = 1, body?: unknown) {
 
 beforeEach(async () => {
   vi.resetAllMocks();
-  vi.spyOn(recovery, 'readPostUpFailure').mockResolvedValue(undefined);
+  vi.spyOn(recovery, 'readPostUpMarker').mockResolvedValue(undefined);
   vi.spyOn(LinuxTunnel.prototype, 'checkOwnership').mockResolvedValue(
     undefined
   );

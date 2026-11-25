@@ -163,6 +163,41 @@ while [ ! -f /tmp/locked ]; do sleep 0.05; done`,
 
 const record = '/etc/wireguard/.wg-easy/wg0.json';
 
+test('runs confirmed down hooks after a crash with the PostUp marker still present', async ({
+  app,
+  request,
+}) => {
+  const { post } = await admin(request, app.url);
+  const marker = '/etc/wireguard/.wg-easy/failed-post-up';
+  await post('/api/admin/hooks', {
+    preUp: '',
+    postUp: `if ! test -e /tmp/pending-hook; then cp -p ${marker} /tmp/pending-hook; fi; echo up >> /tmp/phases`,
+    preDown: 'echo pre >> /tmp/phases',
+    postDown: 'echo post >> /tmp/phases',
+  });
+  await post('/api/admin/interface/restart');
+  await app.stopProcess('KILL');
+  // Recreate the on-disk state between saving the down hooks and clearing the marker.
+  await app.execServer(['cp', '-p', '/tmp/pending-hook', marker]);
+  await app.startProcess();
+  await expect
+    .poll(() => app.execServer(['cat', '/tmp/phases']))
+    .toBe('up\npre\npost\nup');
+  // The same marker cannot authorize teardown of the replacement generation.
+  const index = () => app.execServer(['cat', '/sys/class/net/wg0/ifindex']);
+  const replacement = await index();
+  await app.stopProcess('KILL');
+  await app.execServer(['cp', '-p', '/tmp/pending-hook', marker]);
+  await app.startProcess();
+  await expect
+    .poll(app.logs)
+    .toContain('belongs to a different tunnel generation');
+  expect(await index()).toBe(replacement);
+  expect(await app.execServer(['cat', '/tmp/phases'])).toBe(
+    'up\npre\npost\nup'
+  );
+});
+
 test('recovers owned default rules only after the recorded link is gone', async ({
   app,
   request,

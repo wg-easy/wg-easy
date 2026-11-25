@@ -14,7 +14,7 @@ import {
 import { defaultRouteTables, type DefaultRouteTables } from './defaultPolicy';
 import {
   clearPostUpFailure,
-  readPostUpFailure,
+  readPostUpMarker,
   recordPostUpFailure,
 } from './tunnelRecord';
 
@@ -75,6 +75,7 @@ export function restartRequired(saved: InterfaceType) {
   return (
     !!state?.failedStart ||
     !!state?.awaitingValidSettings ||
+    (state?.retry !== undefined && state.retry !== 'sync') ||
     (active !== undefined && !isDeepStrictEqual(active, stagedSettings(saved)))
   );
 }
@@ -151,13 +152,17 @@ async function revokePeers(name: string, clients: ServerPeer[]) {
 async function getHostState(database: DatabaseStore) {
   let state = hostStates.get(database);
   if (!state) {
-    const failedName = await readPostUpFailure();
+    const marker = await readPostUpMarker();
     state = {
       tunnel: new LinuxTunnel(),
       defaultTables: {},
     };
-    if (failedName) {
-      state.failedStart = postUpFailure(failedName);
+    if (marker?.succeeded) {
+      // The same generation durably armed its down hooks before the crash.
+      await state.tunnel.stop(marker.name);
+      await clearPostUpFailure();
+    } else if (marker) {
+      state.failedStart = postUpFailure(marker.name);
     }
     hostStates.set(database, state);
   }

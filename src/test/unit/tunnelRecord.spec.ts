@@ -6,7 +6,7 @@ import { expect, onTestFinished, test, vi } from 'vitest';
 
 import {
   clearPostUpFailure,
-  readPostUpFailure,
+  readPostUpMarker,
 } from '#server/features/vpn/tunnelRecord';
 
 let directory: string;
@@ -34,9 +34,9 @@ test.runIf(process.platform === 'linux')(
     onTestFinished(() => rm(directory, { recursive: true, force: true }));
     const marker = join(directory, 'failed-post-up');
     await writeFile(marker, 'wg0', { mode: 0o600 });
-    expect(await readPostUpFailure()).toBe('wg0');
+    expect(await readPostUpMarker()).toEqual({ name: 'wg0', succeeded: false });
     await clearPostUpFailure();
     expect(await readFile(marker, 'utf8')).toBe('');
-    expect(await readPostUpFailure()).toBeUndefined();
+    expect(await readPostUpMarker()).toBeUndefined();
   }
 );

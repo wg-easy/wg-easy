@@ -10,6 +10,8 @@ import {
 } from '#server/features/vpn/defaultPolicy';
 import { SiteRoutes } from '#server/features/vpn/siteRoutes';
 import {
+  clearPostUpFailure,
+  readPostUpMarker,
   readTunnelRecord,
   removeTunnelRecord,
   saveTunnelRecord,
@@ -203,6 +205,7 @@ export class LinuxTunnel {
     // A stop during a storage outage still needs this generation's hooks.
     this.running = {
       ...this.running,
+      postUpSucceeded: true,
       preDown: expandHook(hooks.preDown, network, WG_ENV.PORT),
       postDown: expandHook(hooks.postDown, network, WG_ENV.PORT),
     };
@@ -373,6 +376,13 @@ export class LinuxTunnel {
         running.postDown,
         running.disableIpv6
       );
+    }
+    if (running.postUpSucceeded) {
+      // Retain confirmation across interruptions until the marker is gone.
+      const marker = await readPostUpMarker();
+      if (marker?.name === name && marker.succeeded) {
+        await clearPostUpFailure();
+      }
     }
     await removeTunnelRecord(name);
   }
