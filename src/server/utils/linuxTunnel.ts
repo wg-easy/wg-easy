@@ -35,7 +35,6 @@ import { wg } from '#server/utils/wgHelper';
 type Link = {
   ifname: string;
   ifindex: number;
-  ifalias?: string;
   altnames?: string[];
 };
 
@@ -81,16 +80,7 @@ function temporaryName(record: TunnelRecord) {
 async function ownedLinkTarget(running: TunnelRecord) {
   const { name } = running;
   const tag = running.policy.tag;
-  let target = await linkIdentity(tag);
-  if (!target) {
-    // Migrate a link created by a version that used only IFLA_IFALIAS.
-    const legacy = await linkIdentity(name);
-    if (legacy?.ifindex !== running.index || legacy.ifalias !== tag) {
-      throw new Error(`Interface ${name} changed during teardown`);
-    }
-    await exec(`ip link property add dev ${name} altname ${tag}`);
-    target = await linkIdentity(tag);
-  }
+  const target = await linkIdentity(tag);
   if (
     target?.ifindex !== running.index ||
     target.ifname !== name ||
@@ -159,8 +149,7 @@ export class LinuxTunnel {
       if (
         record?.name === name &&
         link.ifname === name &&
-        (link.altnames?.includes(record.policy.tag) ||
-          link.ifalias === record.policy.tag) &&
+        link.altnames?.includes(record.policy.tag) &&
         record.index === link.ifindex
       ) {
         this.running = record;

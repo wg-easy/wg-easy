@@ -96,19 +96,6 @@ while [ ! -f /tmp/locked ]; do sleep 0.05; done`,
       `,
         record,
       ]);
-      // Earlier records used a descriptive alias instead of a kernel alternate name.
-      const tag = JSON.parse(await read(record)).policy.tag;
-      await app.execServer(['ip', 'link', 'set', 'wg0', 'alias', tag]);
-      await app.execServer([
-        'ip',
-        'link',
-        'property',
-        'del',
-        'dev',
-        'wg0',
-        'altname',
-        tag,
-      ]);
       expect(await read('/sys/class/net/wg0/ifindex')).toBe(index);
       expect(await rules()).toContain('old-hook');
       const namespace = await app.execServer(['readlink', '/proc/self/ns/net']);
@@ -348,6 +335,45 @@ chmod +x /usr/local/bin/ip`,
       .toBe(false);
   });
 }
+
+test('leaves an alias-only link for its operator to identify before adopting it', async ({
+  app,
+  request,
+}) => {
+  const { post } = await admin(request, app.url);
+  const tag = JSON.parse(await app.execServer(['cat', record])).policy.tag;
+  await app.execServer(['ip', 'link', 'set', 'dev', 'wg0', 'alias', tag]);
+  await app.execServer([
+    'ip',
+    'link',
+    'property',
+    'del',
+    'dev',
+    'wg0',
+    'altname',
+    tag,
+  ]);
+  await expect(post('/api/admin/interface/restart')).rejects.toThrow();
+  const [link] = JSON.parse(
+    await app.execServer(['ip', '-j', 'link', 'show', 'wg0'])
+  );
+  expect(link.ifalias).toBe(tag);
+  expect(link.altnames ?? []).not.toContain(tag);
+  await app.execServer([
+    'ip',
+    'link',
+    'property',
+    'add',
+    'dev',
+    'wg0',
+    'altname',
+    tag,
+  ]);
+  await post('/api/admin/interface/restart');
+  expect(JSON.parse(await app.execServer(['cat', record])).policy.tag).not.toBe(
+    tag
+  );
+});
 
 test('recovers owned default rules only after the recorded link is gone', async ({
   app,
