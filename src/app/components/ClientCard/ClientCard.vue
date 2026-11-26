@@ -59,6 +59,7 @@
           <ClientCardEdit :client="client" />
           <ClientCardQRCode v-if="client.hasPrivateKey" :client="client" />
           <ClientCardConfig :client="client" />
+          <ClientCardCopyConfig :client="client" />
           <ClientCardOneTimeLinkBtn :client="client" />
         </div>
       </div>
