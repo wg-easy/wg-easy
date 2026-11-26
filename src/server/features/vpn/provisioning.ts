@@ -13,13 +13,27 @@ import type { Repositories } from '#db/store';
 const tokenAlphabet =
   'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
-function filename(name: string, id: number, template: boolean) {
+function cleanName(name: string, disallowed: RegExp) {
   const clean = name
-    .replace(/[^a-zA-Z0-9_=+.-]/g, '-')
+    .replace(disallowed, '-')
     .replace(/(-{2,}|-$)/g, '-')
-    .replace(/-$/, '')
-    .substring(0, 32);
-  return `${clean || id}${template ? '.template' : ''}.conf`;
+    .replace(/-$/, '');
+  // Slice by code point so multi-unit characters are never split.
+  return Array.from(clean).slice(0, 32).join('');
+}
+
+export function filenames(name: string, id: number, template: boolean) {
+  const suffix = `${template ? '.template' : ''}.conf`;
+  // Kept ASCII-only and unchanged: it is the `filename` fallback and stays
+  // usable as a wg-quick interface name.
+  const ascii = cleanName(name, /[^a-zA-Z0-9_=+.-]/g);
+  const unicode = cleanName(name.normalize('NFC'), /[^\p{L}\p{M}\p{N}_=+.-]/gu);
+  return {
+    filename: `${ascii || id}${suffix}`,
+    // Only set when it differs, so ASCII names keep the exact same header.
+    unicodeFilename:
+      unicode && unicode !== ascii ? `${unicode}${suffix}` : undefined,
+  };
 }
 
 async function configuration(tx: Repositories, client: ClientType) {
@@ -27,7 +41,7 @@ async function configuration(tx: Repositories, client: ClientType) {
   const defaults = await tx.userConfigs.get();
   const isTemplate = !client.privateKey;
   return {
-    filename: filename(client.name, client.id, isTemplate),
+    ...filenames(client.name, client.id, isTemplate),
     isTemplate,
     contents: generateClientConfig(network, defaults, client, {
       enableIpv6: !WG_ENV.DISABLE_IPV6,
