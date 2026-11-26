@@ -122,13 +122,19 @@ To resolve this issue, you can try the following steps:
     sudo modprobe xt_comment
     ```
 
-2. **Load the `xt_comment` kernel module on boot**: If you want to ensure that the module is loaded automatically on boot, you can add it to the `/etc/modules` file:
+2. **Load the `xt_comment` kernel module on boot**: If you want to ensure that the module is loaded automatically on boot, use your host's boot-time module configuration. On systemd hosts, create a `modules-load.d` entry:
+
+    ```shell
+    echo "xt_comment" | sudo tee /etc/modules-load.d/xt_comment.conf
+    ```
+
+    On distributions that read `/etc/modules` (for example Debian-based systems without systemd-modules-load), you can add it there instead:
 
     ```shell
     echo "xt_comment" | sudo tee -a /etc/modules
     ```
 
-If `modprobe` reports that the module does not exist, your kernel was built without it (for example on some NAS systems like Synology DSM) and the Per-Client Firewall can't be used on that host.
+If `modprobe` reports that the module does not exist, it may simply not be installed for your running kernel. Check that the kernel module package matching your kernel is installed (for example `linux-modules-extra-$(uname -r)` or similar, depending on your distribution) and that your kernel configuration enables `CONFIG_NETFILTER_XT_MATCH_COMMENT`. If the kernel was built without it (for example on some NAS systems like Synology DSM) and it can't be added, the Per-Client Firewall can't be used on that host.
 
 ## Clients lose connectivity after restarting the container when using multiple networks?
 
