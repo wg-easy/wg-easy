@@ -16,7 +16,9 @@
       "create": "생성",
       "save": "저장",
       "revert": "되돌리기",
-      "add": "추가"
+      "add": "추가",
+      "reorder": "드래그하거나 위/아래 화살표 키를 사용해 순서를 바꾸세요",
+      "retry": "다시 시도"
     },
     "yes": "예",
     "no": "아니요",
@@ -44,14 +46,21 @@
         "advanced": "고급"
       },
       "noItems": "항목 없음",
-      "nullNoItems": "항목이 없습니다. 전역 구성을 사용합니다"
+      "nullNoItems": "항목 없음(전역 구성 사용)",
+      "nullNotSet": "설정되지 않음",
+      "set": "설정",
+      "unset": "설정 해제",
+      "chooseOption": "옵션 선택"
     },
     "clipboard": {
       "notSupported": "복사가 지원되지 않습니다",
       "copied": "복사됨!",
       "failed": "복사 실패",
       "copy": "복사"
-    }
+    },
+    "documentation": "문서",
+    "selectLanguage": "언어 선택",
+    "skipToContent": "본문으로 건너뛰기"
   },
   "auth": {
     "logout": "로그아웃",
@@ -73,7 +82,9 @@
         "required": "2단계 인증이 필요합니다",
         "invalid": "2단계 인증 코드가 올바르지 않습니다"
       },
-      "expired": "로그인이 만료되었습니다. 다시 시도하세요"
+      "expired": "로그인이 만료되었습니다. 다시 시도하세요",
+      "title": "다시 오신 것을 환영합니다",
+      "description": "로그인하여 프라이빗 네트워크를 관리하세요."
     }
   },
   "account": {
@@ -107,6 +118,7 @@
     "welcomeDescription": "어떤 Linux 호스트에서든 WireGuard를 설치하고 관리하는 가장 쉬운 방법입니다",
     "existingSetup": "기존 설정이 있습니까?",
     "createAdminDescription": "먼저 관리자 사용자 이름과 강력하고 안전한 비밀번호를 입력하세요. 이 정보는 관리 패널에 로그인하는 데 사용됩니다.",
+    "enablePasswordSignIn": "최초 관리자를 생성하고 로그인하려면 DISABLE_PASSWORD_AUTH=false로 지정한 뒤 변경 사항을 반영해 컨테이너를 다시 생성하세요. 초기 설정을 마친 후에는 관리자 계정의 OAuth 로그인을 연결하고 테스트한 다음 비밀번호 로그인을 다시 비활성화할 수 있습니다.",
     "setupConfigDescription": "호스트 및 포트 정보를 입력하세요. 이는 클라이언트 기기에서 WireGuard를 설정할 때 클라이언트 구성에 사용됩니다.",
     "setupMigrationDescription": "이전 wg-easy 버전에서 새 설정으로 데이터를 마이그레이션하려면 백업 파일을 제공하세요.",
     "upload": "업로드",
@@ -114,7 +126,8 @@
     "createAccount": "계정 생성",
     "successful": "설정 성공",
     "hostDescription": "클라이언트가 연결할 공개 호스트 이름",
-    "portDescription": "클라이언트가 연결하고 WireGuard가 수신 대기할 공개 UDP 포트"
+    "portDescription": "클라이언트가 연결하고 WireGuard가 수신 대기할 공개 UDP 포트",
+    "title": "시작하기"
   },
   "clients": {
     "title": "클라이언트",
@@ -124,9 +137,18 @@
       "new": "새로 만들기",
       "sort": "정렬",
       "newClient": "새 클라이언트",
-      "search": "클라이언트 검색..."
+      "search": "클라이언트 검색...",
+      "total": "클라이언트",
+      "title": "내 클라이언트",
+      "autoRefresh": "자동으로 업데이트됨",
+      "connectionIssue": "연결 끊김",
+      "loadError": "클라이언트 목록을 새로 고칠 수 없습니다. 연결을 확인한 후 다시 시도하세요.",
+      "hint": "구성을 다운로드하거나 QR 코드를 스캔하여 기기를 연결하세요. 일회성 링크를 사용하면 구성을 안전하게 공유할 수 있습니다.",
+      "noResults": "검색어 또는 필터와 일치하는 클라이언트가 없습니다.",
+      "clearSearch": "검색어 지우기"
     },
     "create": {
+      "publicKeyHint": "기기의 공개 키를 입력하세요. 비워 두면 키 쌍이 자동으로 생성됩니다.",
       "action": "클라이언트 생성",
       "success": "클라이언트 생성됨",
       "title": "새 클라이언트"
@@ -136,21 +158,21 @@
         "label": "이름"
       },
       "expiresAt": {
-        "label": "만료 날짜",
-        "description": "클라이언트가 비활성화되는 날짜. 영구적으로 사용하려면 비워 두세요"
+        "label": "만료 일시",
+        "description": "클라이언트가 비활성화되는 날짜와 시간(현지 시간대 기준). 영구적으로 사용하려면 비워 두세요"
       },
       "address": {
         "label": "주소"
       },
       "serverAllowedIps": {
         "label": "서버 허용 IP",
-        "description": "서버가 클라이언트로 라우팅할 IP"
+        "description": "서버가 이 클라이언트로 라우팅할 IP. 관리되는 기본 경로를 추가하거나 제거하면 인터페이스가 재시작되며 모든 클라이언트에 영향을 줍니다."
       },
       "allowedIps": {
         "description": "VPN을 통해 라우팅될 IP(전역 구성 재정의)"
       },
       "mtu": {
-        "description": "VPN 터널의 최대 전송 단위(패킷 크기)를 설정합니다"
+        "description": "VPN 터널의 최대 전송 단위(패킷 크기)를 설정합니다. 자동 감지를 사용하려면 비워 두세요"
       },
       "persistentKeepalive": {
         "description": "연결 유지 패킷의 간격(초 단위)을 설정합니다. 0으로 설정하면 비활성화됩니다"
@@ -169,18 +191,62 @@
     },
     "delete": {
       "title": "클라이언트 삭제",
-      "description": "{name} 클라이언트를 정말로 삭제하시겠습니까? 이 작업은 실행 취소할 수 없습니다."
+      "description": "{name} 클라이언트를 정말로 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다."
     },
     "status": {
       "enabled": "활성화",
-      "permanent": "영구적",
+      "permanent": "만료 없음",
       "createdOn": "생성일: {date}",
       "lastSeen": "마지막 접속: {date}",
       "disable": "클라이언트 비활성화",
       "enable": "클라이언트 활성화",
-      "notConnected": "클라이언트가 연결되지 않음"
+      "notConnected": "연결되지 않음",
+      "disabled": "비활성화",
+      "online": "온라인",
+      "offline": "오프라인"
+    },
+    "keys": {
+      "title": "키",
+      "publicKey": "공개 키",
+      "preSharedKey": "사전 공유 키",
+      "preSharedKeySet": "구성됨",
+      "preSharedKeyNone": "구성되지 않음",
+      "actions": {
+        "addPreSharedKey": {
+          "label": "사전 공유 키 추가",
+          "description": "{name}의 사전 공유 키를 생성하시겠습니까?"
+        },
+        "rotatePreSharedKey": {
+          "label": "사전 공유 키 교체",
+          "description": "{name}의 새 사전 공유 키를 생성하시겠습니까?"
+        },
+        "removePreSharedKey": {
+          "label": "사전 공유 키 제거",
+          "description": "{name}의 사전 공유 키를 제거하시겠습니까?"
+        },
+        "rotateKeyPair": {
+          "label": "키 쌍 교체",
+          "description": "{name}의 새 키 쌍을 생성하시겠습니까?"
+        },
+        "replacePublicKey": {
+          "label": "공개 키 교체",
+          "description": "{name}의 공개 키를 교체하시겠습니까? 이전 키로는 더 이상 접속할 수 없습니다."
+        },
+        "useDeviceKey": {
+          "label": "기기 키 사용",
+          "description": "{name}의 개인 키를 wg-easy에서 제거하시겠습니까? 연결을 유지하려면 현재 공개 키를 그대로 두세요. 이후 다운로드는 템플릿으로 제공되며 기존 일회성 링크는 만료됩니다."
+        },
+        "useManagedKey": {
+          "label": "wg-easy에서 키 관리",
+          "description": "{name}의 새 키 쌍을 생성하시겠습니까? 다시 연결하려면 새 구성을 설치하세요. 기존 일회성 링크는 만료됩니다."
+        }
+      },
+      "updated": "키가 업데이트되었습니다"
     },
     "configuration": {
+      "template": "구성 템플릿",
+      "viewTemplate": "구성 템플릿 보기",
+      "downloadTemplate": "구성 템플릿 다운로드",
       "oneTimeLink": "짧은 일회성 링크 생성",
       "noPrivateKey": "이 클라이언트에는 등록된 개인 키가 없습니다. 구성을 생성할 수 없습니다.",
       "showQrCode": "QR 코드 표시",
@@ -192,12 +258,91 @@
     },
     "traffic": {
       "totalDownload": "총 다운로드: {total}",
-      "totalUpload": "총 업로드: {total}"
+      "totalUpload": "총 업로드: {total}",
+      "download": "다운로드",
+      "upload": "업로드"
     },
     "hooks": {
       "title": "후크",
       "description": "후크는 wg-quick에서만 작동합니다",
       "fieldDescription": "wg-quick 전용입니다. 그 외의 경우에는 비워 두세요"
+    },
+    "bulk": {
+      "title": "일괄 작업",
+      "done": "선택 완료",
+      "selectPage": "이 페이지 선택",
+      "selectClient": "{name} 선택",
+      "selected": "{count}개 선택됨",
+      "clearSelection": "선택 해제",
+      "actions": {
+        "enable": {
+          "label": "선택 항목 활성화",
+          "title": "선택한 클라이언트 {count}개를 활성화하시겠습니까?",
+          "description": "선택한 클라이언트가 VPN에 접속할 수 있게 됩니다. 만료된 클라이언트는 먼저 만료 일시를 변경해야 합니다.",
+          "success": "클라이언트 {count}개를 활성화했습니다."
+        },
+        "disable": {
+          "label": "선택 항목 비활성화",
+          "title": "선택한 클라이언트 {count}개를 비활성화하시겠습니까?",
+          "description": "선택한 클라이언트는 VPN에 접속할 수 없게 됩니다. 나중에 다시 활성화할 수 있습니다.",
+          "success": "클라이언트 {count}개를 비활성화했습니다."
+        },
+        "delete": {
+          "label": "선택 항목 삭제",
+          "title": "선택한 클라이언트 {count}개를 삭제하시겠습니까?",
+          "description": "선택한 클라이언트는 VPN에 접속할 수 없게 되며, 구성과 일회성 링크가 영구적으로 삭제됩니다. 이 작업은 되돌릴 수 없습니다.",
+          "success": "클라이언트 {count}개를 삭제했습니다."
+        }
+      },
+      "applying": "선택한 클라이언트에 변경 사항을 적용하는 중…",
+      "failed": "일괄 작업을 적용할 수 없습니다. 목록을 새로 고친 후 다시 시도하세요."
+    },
+    "description": "내 기기, 내 네트워크, 안전한 연결.",
+    "pagination": {
+      "label": "클라이언트 목록 페이지 이동",
+      "range": "전체 클라이언트 {total}개 중 {start}–{end}",
+      "previous": "이전",
+      "next": "다음",
+      "pageOf": "{page} / {total} 페이지",
+      "perPage": "페이지당 항목 수"
+    },
+    "sort": {
+      "ascending": "정렬: 이름 오름차순",
+      "descending": "정렬: 이름 내림차순",
+      "label": "정렬 기준",
+      "options": {
+        "nameAsc": "이름: 오름차순",
+        "nameDesc": "이름: 내림차순",
+        "newest": "최신순",
+        "oldest": "오래된 순",
+        "addressAsc": "IPv4 주소: 낮은 순",
+        "addressDesc": "IPv4 주소: 높은 순",
+        "expiryAsc": "만료일: 빠른 순",
+        "expiryDesc": "만료일: 늦은 순"
+      }
+    },
+    "edit": "{name} 편집",
+    "filters": {
+      "status": {
+        "label": "상태",
+        "options": {
+          "all": "모든 상태",
+          "enabled": "활성화",
+          "disabled": "비활성화",
+          "online": "온라인",
+          "offline": "오프라인"
+        }
+      },
+      "expiry": {
+        "label": "만료",
+        "options": {
+          "all": "모든 만료 상태",
+          "permanent": "만료 없음",
+          "expiring": "7일 이내 만료",
+          "expired": "만료됨"
+        }
+      },
+      "clear": "필터 지우기"
     }
   },
   "admin": {
@@ -226,10 +371,10 @@
       "title": "구성",
       "connection": "연결",
       "host": {
-        "description": "클라이언트가 연결할 공개 호스트 이름(구성 무효화)"
+        "description": "클라이언트가 연결할 공개 호스트 이름(변경하면 기존 클라이언트 구성이 무효화됩니다)"
       },
       "port": {
-        "description": "클라이언트가 연결할 공개 UDP 포트(구성을 무효화하며, 인터페이스 포트도 변경하는 것이 좋습니다)"
+        "description": "클라이언트가 연결할 공개 UDP 포트(변경하면 기존 클라이언트 구성이 무효화되며, 인터페이스 포트도 함께 변경하는 것이 좋습니다)"
       },
       "allowedIps": {
         "description": "클라이언트가 사용할 허용 IP(전역 구성)"
@@ -238,10 +383,14 @@
         "description": "클라이언트가 사용할 DNS 서버(전역 구성)"
       },
       "mtu": {
-        "description": "클라이언트가 사용할 MTU(새 클라이언트 전용)"
+        "description": "클라이언트가 사용할 MTU(새 클라이언트 전용). 자동 감지를 사용하려면 비워 두세요"
       },
       "persistentKeepalive": {
         "description": "서버에 연결 유지 패킷을 보내기 위한 간격(초). 0 = 비활성화(새 클라이언트 전용)"
+      },
+      "generatePreSharedKey": {
+        "label": "사전 공유 키 생성",
+        "description": "새 클라이언트의 사전 공유 키를 자동으로 생성합니다"
       },
       "suggest": {
         "label": "제안",
@@ -257,13 +406,13 @@
       },
       "routingTable": {
         "label": "라우팅 테이블",
-        "description": "WireGuard 경로에 사용할 라우팅 테이블. auto, off 또는 테이블 번호를 입력하세요."
+        "description": "WireGuard 경로에 사용할 라우팅 테이블. auto, off 또는 테이블 번호를 입력하세요. 관리되는 기본 경로의 테이블을 변경하면 인터페이스가 재시작되며 모든 클라이언트에 영향을 줍니다."
       },
       "mtu": {
-        "description": "WireGuard가 사용할 MTU"
+        "description": "WireGuard가 사용할 MTU. 자동 감지를 사용하려면 비워 두세요"
       },
       "port": {
-        "description": "WireGuard가 수신할 UDP 포트(구성 포트도 변경하는 것이 좋습니다)"
+        "description": "WireGuard가 수신할 UDP 포트(구성 페이지의 포트도 함께 변경하는 것이 좋습니다)"
       },
       "changeCidr": "CIDR 변경",
       "restart": {
@@ -271,6 +420,7 @@
         "description": "WireGuard 인터페이스를 재시작합니다"
       },
       "restartWarn": "인터페이스를 재시작하시겠습니까? 모든 클라이언트의 연결이 끊어집니다.",
+      "restartRequired": "재시작 필요",
       "restartSuccess": "인터페이스가 재시작되었습니다",
       "firewall": "트래픽 필터링",
       "firewallEnabled": {
@@ -281,14 +431,16 @@
     "hooks": {
       "title": "후크"
     },
-    "introduction": "관리 패널에 오신 것을 환영합니다.\n\n여기에서 일반 설정, 구성, 인터페이스 설정 및 후크를 관리할 수 있습니다.\n\n사이드바에서 섹션 중 하나를 선택하여 시작하세요."
+    "introduction": "관리 패널에 오신 것을 환영합니다.\n\n여기에서 일반 설정, 구성, 인터페이스 설정 및 후크를 관리할 수 있습니다.\n\n사이드바에서 섹션 중 하나를 선택하여 시작하세요.",
+    "description": "네트워크를 구성하고 서버를 관리하세요.",
+    "overview": "개요"
   },
   "wireguard": {
     "fields": {
       "mtu": "MTU",
       "allowedIps": "허용 IP",
       "dns": "DNS",
-      "persistentKeepalive": "지속적인 연결 유지",
+      "persistentKeepalive": "연결 유지 간격",
       "host": "호스트",
       "port": "포트"
     },
@@ -363,6 +515,43 @@
         "label": "특수 정크 패킷 5 (I5)",
         "description": "16진수 형식의 프로토콜 모방 패킷: <b 0x...>"
       },
+      "rangeNote": "다음 매개변수에는 단일 숫자 또는 양 끝을 포함하는 범위(0-65535)를 입력할 수 있습니다. 예: 30 또는 30-90",
+      "headerProtectionKey": {
+        "label": "헤더 보호 키",
+        "description": "패킷 헤더를 암호화하는 데 사용하는 32바이트 base64 키. 양쪽 값이 일치해야 하므로 모든 클라이언트에 복사됩니다. S1-S4가 12 이상이어야 합니다"
+      },
+      "contentPaddingAddition": {
+        "label": "콘텐츠 패딩 추가",
+        "description": "암호화 전에 전송 패킷에 덧붙이는 임의 크기의 바이트"
+      },
+      "rekeyAfterTime": {
+        "label": "키 재협상 주기",
+        "description": "세션을 재협상하기까지의 시간(초, WireGuard 기본값: 120)"
+      },
+      "rekeyTimeout": {
+        "label": "키 재협상 제한 시간",
+        "description": "핸드셰이크 재시도 간격(초, WireGuard 기본값: 5)"
+      },
+      "rejectAfterTime": {
+        "label": "세션 만료 시간",
+        "description": "세션 유지 시간(초, WireGuard 기본값: 180)"
+      },
+      "keepaliveTimeout": {
+        "label": "연결 유지 대기 시간",
+        "description": "연결 유지 패킷을 보내기 전의 유휴 시간(초, WireGuard 기본값: 10)"
+      },
+      "maxHandshakeAttempts": {
+        "label": "최대 핸드셰이크 시도 횟수",
+        "description": "중단하기 전까지 핸드셰이크를 시도하는 횟수(WireGuard 기본값: 18)"
+      },
+      "randomTrailers": {
+        "label": "임의 트레일러",
+        "description": "핸드셰이크 패킷에 임의 크기의 바이트를 덧붙입니다. 양쪽 값이 일치해야 하므로 모든 클라이언트에 복사됩니다"
+      },
+      "disableCookies": {
+        "label": "쿠키 비활성화",
+        "description": "부하가 걸렸을 때 핸드셰이크에 쿠키 메시지로 응답하지 않습니다. 이 설정은 터널의 이쪽 끝에만 적용됩니다"
+      },
       "mtuNote": "값은 MTU에 따라 달라집니다",
       "title": "AmneziaWG 난독화 매개변수"
     }
@@ -382,8 +571,10 @@
     },
     "client": {
       "id": "클라이언트 ID",
+      "publicKey": "유효한 32바이트 WireGuard 공개 키를 base64 형식으로 입력하세요(모든 바이트가 0인 키는 사용할 수 없습니다).",
       "name": "이름",
       "expiresAt": "만료 시간",
+      "expiresAtInvalid": "만료일은 유효한 날짜(YYYY-MM-DD) 또는 시간대가 포함된 ISO 타임스탬프여야 합니다",
       "address4": "IPv4 주소",
       "address6": "IPv6 주소",
       "serverAllowedIps": "서버 허용 IP",
@@ -414,19 +605,26 @@
       "cidr": "CIDR",
       "device": "장치",
       "cidrValid": "CIDR는 유효해야 합니다",
-      "routingTable": "라우팅 테이블은 auto, off 또는 테이블 번호여야 합니다"
+      "routingTable": "auto, off 또는 0부터 4294967295 사이의 라우팅 테이블 ID를 사용하세요. 앞에 0을 붙이면 ID가 8진수로 해석됩니다.",
+      "headerProtectionJunkSize": "헤더 보호 키를 설정한 경우 정크 크기 S1-S4는 12 이상이어야 합니다"
     },
     "otl": "일회성 링크",
     "stringMalformed": "문자열이 잘못되었습니다",
+    "keyMalformed": "키는 base64로 인코딩된 32바이트 키여야 합니다",
     "body": "본문은 유효한 객체여야 합니다",
     "hook": "후크",
     "enabled": "활성화",
     "mtu": "MTU",
+    "mtuInteger": "MTU는 정수여야 합니다",
+    "ipv6Mtu": "IPv6를 사용하는 경우 MTU는 1280 이상이어야 합니다",
     "port": "포트",
-    "persistentKeepalive": "지속적인 연결 유지",
+    "portInteger": "포트는 정수여야 합니다",
+    "persistentKeepalive": "연결 유지 간격",
     "address": "IP 주소",
     "dns": "DNS",
     "allowedIps": "허용 IP",
+    "allowedIpsInvalid": "각 허용 IP 항목은 단일 IP 주소 또는 CIDR여야 합니다",
+    "endpointInvalid": "호스트 이름 또는 IPv4 주소 뒤에 :포트를 붙이거나 [IPv6]:포트 형식을 사용하세요(포트 1–65535)",
     "file": "파일"
   }
 }
