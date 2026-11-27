@@ -118,6 +118,7 @@
     "welcomeDescription": "Du har hittat det enklaste sättet att installera och hantera WireGuard på valfri Linux-värd",
     "existingSetup": "Har du en befintlig konfiguration?",
     "createAdminDescription": "Ange först ett administratörsanvändarnamn och ett starkt, säkert lösenord. Dessa uppgifter används för att logga in på adminpanelen.",
+    "enablePasswordSignIn": "För att skapa den första administratören och logga in, ange DISABLE_PASSWORD_AUTH=false och återskapa containern med den uppdaterade inställningen. Efter installationen kan du inaktivera inloggning med lösenord igen när du har länkat och testat administratörens OAuth-inloggning.",
     "setupConfigDescription": "Ange värdnamn och port. Uppgifterna används när WireGuard konfigureras på klienternas enheter.",
     "setupMigrationDescription": "Ladda upp en säkerhetskopia om du vill flytta data från en tidigare version av wg-easy till den nya installationen.",
     "upload": "Ladda upp",
@@ -147,6 +148,7 @@
       "clearSearch": "Rensa sökning"
     },
     "create": {
+      "publicKeyHint": "Ange enhetens publika nyckel eller lämna tomt för att generera ett nyckelpar.",
       "action": "Skapa klient",
       "success": "Klienten skapades",
       "title": "Ny klient"
@@ -225,11 +227,26 @@
         "rotateKeyPair": {
           "label": "Byt nyckelpar",
           "description": "Vill du generera ett nytt nyckelpar för {name}?"
+        },
+        "replacePublicKey": {
+          "label": "Ersätt publik nyckel",
+          "description": "Ersätta den publika nyckeln för {name}? Den gamla nyckeln förlorar åtkomsten."
+        },
+        "useDeviceKey": {
+          "label": "Använd enhetsnyckel",
+          "description": "Ta bort den privata nyckeln för {name} från wg-easy? Behåll den aktuella publika nyckeln för att fortsätta vara ansluten. Nedladdningar blir mallar och befintliga engångslänkar upphör att gälla."
+        },
+        "useManagedKey": {
+          "label": "Hantera nyckel i wg-easy",
+          "description": "Generera ett nytt nyckelpar för {name}? Installera den nya konfigurationen för att ansluta igen. Befintliga engångslänkar upphör att gälla."
         }
       },
       "updated": "Nycklarna uppdaterades"
     },
     "configuration": {
+      "template": "Konfigurationsmall",
+      "viewTemplate": "Visa konfigurationsmall",
+      "downloadTemplate": "Ladda ner konfigurationsmall",
       "oneTimeLink": "Skapa en kort engångslänk",
       "noPrivateKey": "Klientens privata nyckel är okänd. Det går inte att skapa konfigurationen.",
       "showQrCode": "Visa QR-kod",
@@ -403,6 +420,7 @@
         "description": "Starta om WireGuard-gränssnittet"
       },
       "restartWarn": "Är du säker på att du vill starta om gränssnittet? Alla klienter kopplas från.",
+      "restartRequired": "Omstart krävs",
       "restartSuccess": "Gränssnittet startades om",
       "firewall": "Trafikfiltrering",
       "firewallEnabled": {
@@ -553,6 +571,7 @@
     },
     "client": {
       "id": "Klient-ID",
+      "publicKey": "Ange en giltig publik WireGuard-nyckel (32 byte, base64) som inte består av enbart nollor.",
       "name": "Namn",
       "expiresAt": "Utgångsdatum",
       "expiresAtInvalid": "Utgångsdatumet måste vara ett giltigt datum (YYYY-MM-DD) eller en ISO-tidsstämpel med tidszon",
@@ -596,6 +615,8 @@
     "hook": "Hook",
     "enabled": "Aktiverad",
     "mtu": "MTU",
+    "mtuInteger": "MTU måste vara ett heltal",
+    "ipv6Mtu": "MTU måste vara minst 1280 när IPv6 är aktiverat",
     "port": "Port",
     "portInteger": "Porten måste anges som ett heltal",
     "persistentKeepalive": "Persistent Keepalive",
